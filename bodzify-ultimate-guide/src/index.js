@@ -5,8 +5,27 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+function Header() {
+  const title = "Bodzify";
+  return (<h1>{title}</h1>);
+}
+
+function Description() {
+  const description = "The Ultimate Guide to Music";
+  return (<p>{description}</p>);
+}
+
+function Banner() {
+  return (<div>
+      <Header />
+      <Description />
+  </div>);
+}
+
 root.render(
   <React.StrictMode>
+    <Banner />
     <App />
   </React.StrictMode>
 );
