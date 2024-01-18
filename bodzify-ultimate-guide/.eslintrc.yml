@@ -11,4 +11,3 @@ plugins:
   - react
 rules:
   no-extra-semi: error
-  semi: error
