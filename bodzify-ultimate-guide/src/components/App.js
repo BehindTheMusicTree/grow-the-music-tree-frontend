@@ -1,8 +1,14 @@
 import React from 'react'
 import Banner from './Banner'
+import GenreList from './GenreList'
 
 function App() {
-  return (<Banner />)
+  return (
+    <div>
+      <Banner />
+      <GenreList />
+    </div>
+  )
 }
 
 export default App
