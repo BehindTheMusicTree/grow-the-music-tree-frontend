@@ -7,6 +7,8 @@ function SearchForm() {
         search: 'search',
     })
 
+    const [searchNumber, setSearchNumber] = useState(0)
+
     const handleChange = (e) => {
         const { name, value } = e.target
 
@@ -22,21 +24,25 @@ function SearchForm() {
             alert('Please enter a search term')
             return
         }
+        else {
+            setSearchNumber(searchNumber + 1)
+        }
         alert(formData.search)
     }
 
     const handleFocus = (e) => {
-      const { name } = e.target;
+      const { name } = e.target
       setFormData({
         ...formData,
         [name]: '',
-      });
-    };
+      })
+    }
 
     return (
         <form onSubmit={handleSubmit}>
-          <label>
-            Search:
+            <label>
+                Search no {searchNumber}:
+            </label>
             <input
               type="text"
               name="search"
@@ -44,8 +50,7 @@ function SearchForm() {
               onChange={handleChange}
               onFocus={handleFocus}
             />
-            </label>
-        </form>        
+        </form>   
     )
 }
 
