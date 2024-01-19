@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 function GenreListItem({genreLabel, genreRating}) {
 
     const handleGenreClick = (genreLabel) => {
-        console.log(genreLabel)
+        alert(genreLabel)
     }
 
     return (
