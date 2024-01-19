@@ -1,6 +1,6 @@
 import React from 'react'
-import Banner from './Banner'
-import GenreList from './GenreList'
+import Banner from './banner/Banner'
+import GenreList from './genre/GenreList'
 
 function App() {
   return (

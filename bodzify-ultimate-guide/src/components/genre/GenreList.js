@@ -1,12 +1,14 @@
 import React from 'react';
+import GenreListItem from './GenreListItem';
+
 const genreList = [
     ['Rock', 9],
     ['Pop', 8],
-    ['Jazz', 7],
     ['Metal', 6],
-    ['Country', 10],
-    ['Rap', 4],
+    ['Country', 10000],
     ['Hip-Hop', 3],
+    ['Rap', 4],
+    ['Jazz', 7],
     ['R&B', 2],
     ['Electronic', 1],
     ['Folk', 0],
@@ -21,7 +23,7 @@ const genreList = [
     ['Techno', 18],
     ['Dance', 19],
     ['House', 20],
-    ['Indie', 21],
+    ['Indie', 2],
     ['Alternative', 22],
     ['Gospel', 23],
     ['Experimental', 24],
@@ -84,7 +86,7 @@ function GenreList() {
             <h2>Genre</h2>
             <ul>
                 {genreList.map((genre, index) => (
-                        <li key={'genre' + index}>{genre[0]}{genre[1] > 5 ? <span>🔥</span> : null}</li>
+                        <GenreListItem key={index} genreLabel={genre[0]} genreRating={genre[1]} />
                 ))}
             </ul>
         </div>
