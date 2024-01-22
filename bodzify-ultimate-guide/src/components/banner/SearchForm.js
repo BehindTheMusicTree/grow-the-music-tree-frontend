@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types';
 
 function SearchForm({setSearchSubmitted}) {
@@ -7,6 +7,10 @@ function SearchForm({setSearchSubmitted}) {
     const [searchNumber, setSearchNumber] = useState(0)
     const [isFirstFocus, setIsFirstFocus] = useState(true)
     const [searchUnsubmitted, setSearchUnsubmitted] = useState('search')
+
+    useEffect(() => {
+        document.title = `${searchNumber} searches`
+    });
 
     const handleSubmit = (e) => {
         e.preventDefault()
