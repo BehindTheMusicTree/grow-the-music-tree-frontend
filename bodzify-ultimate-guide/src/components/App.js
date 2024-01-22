@@ -1,16 +1,18 @@
 import React from 'react'
-import Banner from './banner/Banner'
-import GenreList from './genre/GenreList'
-import { useState } from 'react';
-
-function App() {
-
-  const [searchSubmitted, setSearchSubmitted] = useState('search')
-
+import Dashboard from './Dashboard'
+import Homepage from './Homepage'
+import {BrowserRouter, Routes,Route } from "react-router-dom"
+const App = () => {
+  
   return (
     <div>
-      <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted}/>
-      <GenreList searchSubmitted={searchSubmitted}/>
+      <h1 className="text-3xl text-white font-bold">Auth-Application</h1>
+      <BrowserRouter> 
+      <Routes>
+        <Route path="/" element={<Homepage/>} />
+        <Route path="/Dashboard" element={<Dashboard/>} />
+      </Routes>
+      </BrowserRouter>
     </div>
   )
 }
