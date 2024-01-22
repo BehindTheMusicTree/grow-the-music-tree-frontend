@@ -1,5 +1,6 @@
 import React from 'react';
 import GenreListItem from './GenreListItem';
+import PropTypes from 'prop-types';
 
 const genreList = [
     ['Rock', 9],
@@ -80,17 +81,24 @@ const genreList = [
     ['Rocksteady', 75]
 ]
 
-function GenreList() {
+function GenreList({searchSubmitted}) {
     return (
         <div>
             <h2>Genre</h2>
             <ul>
                 {genreList.map((genre, index) => (
-                        <GenreListItem key={index} genreLabel={genre[0]} genreRating={genre[1]} />
+                        genre[0].toLowerCase().includes(searchSubmitted.toLowerCase()) ? 
+                            <GenreListItem key={index} genreLabel={genre[0]} genreRating={genre[1]}/>
+                            : null
                 ))}
             </ul>
         </div>
     )
+}
+
+GenreList.propTypes = {
+    searchSubmitted: PropTypes.string.isRequired,
+    setSearchSubmitted: PropTypes.func.isRequired
 }
 
 export default GenreList
