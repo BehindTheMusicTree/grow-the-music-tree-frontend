@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import ApiService from '../api/ApiService';
+import ApiService from '../../service/apiService';
+import PropTypes from 'prop-types';
 
-const Login = () => {
-  const [credentials, setCredentials] = useState({ username: 'ultimate_music_guide', password: '$yy&6p7C7xFY^E' });
+const Login = ({ onLogin }) => {
+
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
 
   const handleInputChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -11,7 +13,7 @@ const Login = () => {
   const handleLogin = async () => {
     try {
       const token = await ApiService.login(credentials);
-      console.log('Logged in with token:', token);
+      onLogin(token);
     } catch (error) {
       console.error('Login error:', error.message);
     }
@@ -31,6 +33,10 @@ const Login = () => {
       <button onClick={handleLogin}>Login</button>
     </div>
   );
+};
+
+Login.propTypes = {
+  onLogin: PropTypes.func.isRequired,
 };
 
 export default Login;
