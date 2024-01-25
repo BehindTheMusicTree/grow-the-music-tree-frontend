@@ -5,7 +5,7 @@ const App = () => {
   const bearerToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzA2MjAyNjYyLCJqdGkiOiJiMWFlNzY0ZTUzZjU0NzgzOTc5YmZiYzdhNzQ4Y2NmYSIsInVzZXJfaWQiOjV9.qbCLXy3gY68F8SDv2lXwz-8MYOZmsbKGkaMKhNmBfeU'
 
   // Replace 'https://example.com/api/data' with your actual API endpoint
-  const apiUrl = 'https://bodzify.com/api/v1/';
+  const apiUrl = 'https://bodzify.com/api/v1/genres/';
 
   useEffect(() => {
     // Fetch options with headers, including the Bearer token
