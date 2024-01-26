@@ -1,23 +1,20 @@
-const apiUrl = 'https://bodzify.com/api/v1/'
+import config from '../config/config'; 
 
 const ApiService = {
   getToken: () => {
-    // Implement your logic to retrieve the JWT token (from localStorage, cookies, etc.)
-    // For example, assuming you store the token in localStorage:
-    return localStorage.getItem('jwtToken');
+    return JSON.parse(localStorage.getItem('jwtToken'));
   },
 
-  setToken: (token) => {
-    // Implement your logic to store the JWT token (in localStorage, cookies, etc.)
-    // For example, assuming you store the token in localStorage:
-    localStorage.setItem('jwtToken', token);
+  setToken: (jwtToken) => {
+    console.log('setToken', jwtToken);
+    localStorage.setItem('jwtToken', JSON.stringify(jwtToken));
   },
 
   getHeaders: () => {
-    const token = ApiService.getToken();
-    if (token) {
+    const accessToken = ApiService.getToken().access;
+    if (accessToken) {
       return {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       };
     }
@@ -27,11 +24,10 @@ const ApiService = {
   },
 
   fetchData: async (endpoint, method = 'GET', data = null) => {
-    return fetch(`${apiUrl}${endpoint}`, {
+    return fetch(`${config.apiBaseUrl}${endpoint}`, {
       method,
       headers: ApiService.getHeaders(),
-      body: JSON.stringify(data),
-    })
+      body: data ? JSON.stringify(data) : null,})
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Request failed with status: ${response.status}`);
@@ -44,22 +40,23 @@ const ApiService = {
   },
 
   login: async (credentials) => {
-    const response = await fetch(`${apiUrl}auth/token/`, {
+    fetch(`${config.apiBaseUrl}auth/token/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(credentials),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Login failed with status: ${response.status}`);
-    }
-
-    const { token } = await response.json();
-    ApiService.setToken(token);
-
-    return token;
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Login failed with status: ${response.status}`);
+      }
+      
+      response.json()
+      .then((responseJson) => {
+        ApiService.setToken(responseJson);
+      })
+    })
   }
 };
 
