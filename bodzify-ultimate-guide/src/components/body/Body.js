@@ -2,20 +2,21 @@ import React, { useState } from 'react';
 import ApiService from '../../service/apiService';
 import Login from '../login/Login';
 
-const Api = () => {
-  const [apiData, setApiData] = useState(null);
+const Body = () => {
+  const [genres, setGenres] = useState(null);
   const [token, setToken] = useState(ApiService.getToken());
 
   const handleLogin = (newToken) => {
     setToken(newToken);
   };
 
-  const fetchData = async () => {
+  const fetchGenres = async () => {
     try {
-      const data = await ApiService.fetchData('/auth/token');
-      setApiData(data);
+      const data = await ApiService.fetchData('genres/');
+      setGenres(data);
     } catch (error) {
-      console.error('API request failed:', error.message);
+      console.error('API request failed:', error.message)
+      alert('API request failed. Please check the console for more info.');
     }
   };
 
@@ -23,10 +24,10 @@ const Api = () => {
     <div>
       {token ? (
         <div>
-          <button onClick={fetchData}>Fetch Data</button>
+          <button onClick={fetchGenres}>Fetch Data</button>
           <h2>API Data:</h2>
-          {apiData ? (
-            <pre>{JSON.stringify(apiData, null, 2)}</pre>
+          {genres ? (
+            <pre>{JSON.stringify(genres, null, 2)}</pre>
           ) : (
             <p>Click &quot;Fetch Data&quot; to load API data.</p>
           )}
@@ -38,4 +39,4 @@ const Api = () => {
   );
 };
 
-export default Api;
+export default Body;
