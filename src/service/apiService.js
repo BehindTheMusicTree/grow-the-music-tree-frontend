@@ -6,7 +6,6 @@ const ApiService = {
   },
 
   setToken: (jwtToken) => {
-    console.log('setToken', jwtToken);
     localStorage.setItem('jwtToken', JSON.stringify(jwtToken));
   },
 
