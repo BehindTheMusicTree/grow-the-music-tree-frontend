@@ -20,7 +20,7 @@ jobs:
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_UMG_REACT_REPO_NAME }}:${{ secrets.DOCKERHUB_UMG_REACT_REPO_TAG }} .
   
       - name: Log in to Docker Hub
-        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_UMG_SECRET_KEY }}
+        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_UMG_REACT_SECRET_KEY }}
   
       - name: Push Docker Image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_UMG_REACT_REPO_NAME }}:${{ secrets.DOCKERHUB_UMG_REACT_REPO_TAG }}
