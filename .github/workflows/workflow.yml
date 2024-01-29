@@ -9,23 +9,24 @@ on:
     branches: [ "dev" ]
 
 jobs:
-  build:
-
+  Build-And-Push-To-Dockerhub:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    # - run: npm ci
-    - run: npm install
-    - run: npm run build --if-present
-    # - run: npm test
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-docker@v2
+        with:
+          dockerfile: Dockerfile
+          context: .
+  
+      - name: Build Docker Image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_UMG_REPO_NAME }}:${{ secrets.DOCKERHUB_UMG_REPO_TAG }} .
+  
+      - name: Log in to Docker Hub
+        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_UMG_SECRET_KEY }}
+  
+      - name: Push Docker Image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_UMG_REPO_NAME }}:${{ secrets.DOCKERHUB_UMG_REPO_TAG }}
