@@ -4,6 +4,7 @@ on:
   push:
     branches: 
       - dev
+      - put-api-credentials-as-env-variables
   pull_request:
     branches: [ "dev" ]
 
