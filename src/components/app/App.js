@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
-import Body from '../body/Body';
-import Banner from '../banner/Banner';
-import config from '../../config/config';
-import ApiService from '../../service/apiService';
+import React, { useEffect } from 'react'
+import Body from '../body/Body'
+import Banner from '../banner/Banner'
+import config from '../../config/config'
+import ApiService from '../../service/apiService'
 
 function App() {
 
@@ -19,9 +19,8 @@ function App() {
       }
     };
 
-    // Perform initial authentication when the component mounts
     authenticate();
-  }, []); // Empty dependency array ensures it runs only once during the initial render
+  }, [])
 
 
   return (
