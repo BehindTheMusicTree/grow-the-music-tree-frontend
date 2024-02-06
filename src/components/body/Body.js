@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
 import ApiService from '../../service/apiService';
-import Login from '../login/Login';
+import TreeGraph from './TreeGraph';
 
 const Body = () => {
   const [genres, setGenres] = useState(null);
-  const [token, setToken] = useState(ApiService.getToken());
-
-  const handleLogin = (newToken) => {
-    setToken(newToken);
-  };
 
   const fetchGenres = async () => {
     try {
@@ -20,21 +15,28 @@ const Body = () => {
     }
   };
 
+  const renderTree = () => {
+    if (genres) {
+      return <TreeGraph data={genres} />;
+    } else {
+      return <p>No genres data available.</p>;
+    }
+  };
+
   return (
     <div>
-      {token ? (
-        <div>
-          <button onClick={fetchGenres}>Fetch Data</button>
-          <h2>API Data:</h2>
-          {genres ? (
-            <pre>{JSON.stringify(genres, null, 2)}</pre>
-          ) : (
-            <p>Click &quot;Fetch Data&quot; to load API data.</p>
-          )}
-        </div>
-      ) : (
-        <Login onLogin={handleLogin} />
-      )}
+      <div>
+        <button onClick={fetchGenres}>Fetch Data</button>
+        <h2>API Data:</h2>
+        {genres ? (
+          <pre>{JSON.stringify(genres, null, 2)}</pre>
+        ) : (
+          <p>Click &quot;Fetch Data&quot; to load API data.</p>
+        )}
+
+        <h1>Tree Graph</h1>
+        {renderTree()}
+      </div>
     </div>
   );
 };
