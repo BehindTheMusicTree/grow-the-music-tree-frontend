@@ -40,7 +40,6 @@ const ApiService = {
 
   login: async (credentials) => {
     console.log('credentials', credentials);
-    alert('credentials', credentials);
     fetch(`${config.apiBaseUrl}auth/token/`, {
       method: 'POST',
       headers: {
