@@ -3,10 +3,11 @@ FROM node:14-alpine
 ARG bodzifyApiUmgUsername
 ARG bodzifyApiUmgUserPassword
 
-ENV BODZIFY_API_UMG_USERNAME=${bodzifyApiUmgUsername}
-ENV BODZIFY_API_UMG_USER_PASSWORD=${bodzifyApiUmgUserPassword}
+# react env variables have to be prefixed with REACT_APP_
+ENV REACT_APP_BODZIFY_API_UMG_USERNAME=${bodzifyApiUmgUsername}
+ENV REACT_APP_BODZIFY_API_UMG_USER_PASSWORD=${bodzifyApiUmgUserPassword}
 
-RUN echo "BODZIFY_API_UMG_USERNAME=${BODZIFY_API_UMG_USERNAME}"
+RUN echo "REACT_APP_BODZIFY_API_UMG_USERNAME=${REACT_APP_BODZIFY_API_UMG_USERNAME}"
 
 WORKDIR /usr/src/app
 
