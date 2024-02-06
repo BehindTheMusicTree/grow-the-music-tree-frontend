@@ -39,6 +39,7 @@ const ApiService = {
   },
 
   login: async (credentials) => {
+    console.log('credentials', credentials);
     fetch(`${config.apiBaseUrl}auth/token/`, {
       method: 'POST',
       headers: {
