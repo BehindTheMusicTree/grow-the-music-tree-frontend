@@ -3,6 +3,8 @@ import * as d3 from 'd3';
 import PropTypes from 'prop-types';
 
 function TreeGraph({ genres }) {
+  console.log("genres")
+  console.log(genres)
   const svgRef = useRef(null);
 
   useEffect(() => {
@@ -10,7 +12,7 @@ function TreeGraph({ genres }) {
     const buildTreeHierarchy = () => {
       return d3.stratify()
         .id(d => d.uuid)
-        .parentId(d => d.parent || null)(genres);
+        .parentId(d => d.parent?.uuid || null)(genres);
     };
 
     // Parse data and build the tree hierarchy
