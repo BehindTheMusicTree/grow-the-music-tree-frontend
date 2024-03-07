@@ -1,6 +1,7 @@
+import './Body.scss';
 import React, { useState, useEffect } from 'react';
 import ApiService from '../../service/apiService';
-import TreeGraph from './TreeGraph';
+import TreeGraph from './TreeGraph/TreeGraph';
 
 const Body = () => {
   const [genres, setGenres] = useState(null);
@@ -41,7 +42,7 @@ const Body = () => {
 
   return (
     <div>
-      <div>
+      <div id="genre-tree">
         <h1>Genre Tree</h1>
         {groupedGenres ? Object.values(groupedGenres).map((genreTree, index) => {
           return (

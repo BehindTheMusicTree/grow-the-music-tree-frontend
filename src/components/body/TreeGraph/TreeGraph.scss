@@ -1,0 +1,27 @@
+#genre-tree {
+    background-color: #c5c5c5;
+    color: #333;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 50px;
+}
+
+.tree-graph-svg {
+    background-color: #bef008;
+    border: 1px solid #000;
+    overflow: visible;
+}
+
+.node {
+    background-color: #bababa;
+    stroke: #1edc5d;
+    stroke-width: 1px;
+    overflow: visible;
+}
+
+.link {
+    fill: none;
+    stroke: #555;
+    stroke-opacity: 0.4;
+    stroke-width: 2;
+  }
