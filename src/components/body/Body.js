@@ -42,14 +42,7 @@ const Body = () => {
   return (
     <div>
       <div>
-        <h2>API Data:</h2>
-        {genres ? (
-          <pre>{JSON.stringify(groupedGenres, null, 2)}</pre>
-        ) : (
-          <p>Click &quot;Fetch Data&quot; to load API data.</p>
-        )}
-
-        <h1>Tree Graph</h1>
+        <h1>Genre Tree</h1>
         {groupedGenres ? Object.values(groupedGenres).map((genreTree, index) => {
           return (
             <TreeGraph key={index} genres={genreTree}/>
