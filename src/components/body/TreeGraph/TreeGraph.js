@@ -56,7 +56,6 @@ function TreeGraph({ genres }) {
 
     const xExtremum = Math.max(Math.abs(lowestNodeX), Math.abs(highestNodeX));
     const xShift = xExtremum - (xGap / 2);
-    console.log(xShift);
 
     const svg = d3.select(svgRef.current)
     .attr('width', svgWidth)
@@ -100,6 +99,24 @@ function TreeGraph({ genres }) {
       .attr('text-anchor', 'middle')
       .text(function(d) {
         return d.data.name;
+      });
+    
+      svg.selectAll('g.node')
+      .append('text')
+      .attr('class', 'plus-button')
+      .attr('dominant-baseline', 'middle')
+      .attr('text-anchor', 'middle')
+      .attr('x', RECT_WIDTH / 2 - 10)
+      .attr('y', 0)
+      .text('+')
+
+    svg.selectAll('g.node')
+      .on('mouseover', function() {
+        d3.select(this).select('.plus-button').style('display', 'block'); // Affiche le bouton lors du survol de la souris
+        console.log(d3.select(this).select('.plus-button').style('display'));
+      })
+      .on('mouseout', function() {
+        d3.select(this).select('.plus-button').style('display', 'none'); // Cache le bouton lorsque la souris n'est plus sur le nœud
       });
   }, [genres]);
 

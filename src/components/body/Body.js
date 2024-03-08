@@ -6,6 +6,18 @@ import TreeGraph from './TreeGraph/TreeGraph';
 const Body = () => {
   const [genres, setGenres] = useState(null);
   const [groupedGenres, setGroupedGenres] = useState(null);
+  const [isGenreFetchingStarted, setIsGenreFetchingStarted] = useState(false);
+
+  useEffect(() => {
+    console.log('isGenreFetchingStarted ' + isGenreFetchingStarted);
+    if (!isGenreFetchingStarted) {
+      setIsGenreFetchingStarted(true);
+    }
+    else {
+      console.log('fetching genres');
+      fetchGenres();
+    }
+  }, [isGenreFetchingStarted]);
 
   useEffect(() => {
     if (genres) {
@@ -13,10 +25,7 @@ const Body = () => {
     }
   }, [genres]);
 
-  useEffect(() => {
-    fetchGenres();
-  }, []);
-
+    
   const fetchGenres = async () => {
     try {
       const data = await ApiService.fetchData('genres/');
