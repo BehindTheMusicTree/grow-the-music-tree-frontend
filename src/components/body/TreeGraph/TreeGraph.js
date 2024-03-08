@@ -23,29 +23,16 @@ function TreeGraph({ genres }) {
     };
 
     const root = buildTreeHierarchy();
-    const treeData = d3.tree().nodeSize([RECT_HEIGHT + VERTICAL_SEPARATOON_BETWEEN_NODES, RECT_WIDTH + HORIZONTAL_SEPARATOON_BETWEEN_NODES])(root);
+    const treeData = d3.tree().nodeSize([VERTICAL_SEPARATOON_BETWEEN_NODES, HORIZONTAL_SEPARATOON_BETWEEN_NODES])(root);
   
     const numberOfLevels = root.height;
 
     const svgWidth = numberOfLevels * HORIZONTAL_SEPARATOON_BETWEEN_NODES + RECT_WIDTH;
-    console.log('svgWidth', svgWidth);
-    console.log('RECT_WIDTH', RECT_WIDTH);
-    console.log('HORIZONTAL_SEPARATOON_BETWEEN_NODES', HORIZONTAL_SEPARATOON_BETWEEN_NODES);
-    console.log('numberOfLevels', numberOfLevels);
     const svgHeight = (numberOfLevels + 1) * (RECT_HEIGHT + VERTICAL_SEPARATOON_BETWEEN_NODES);
 
     const svg = d3.select(svgRef.current)
     .attr('width', svgWidth)
     .attr('height', svgHeight);
-
-    svg.selectAll('path.link')
-      .data(treeData.links())
-      .enter().append('path')
-      .attr('class', 'link')
-      .attr('d', d3.linkHorizontal()
-        .x(d => d.y)
-        .y(d => d.x)
-      );
 
     let firstNodeX;
     let nodeY
@@ -57,7 +44,10 @@ function TreeGraph({ genres }) {
       .attr('class', 'node')
       .attr('transform', function(d, i) {
         nodeY = RECT_WIDTH / 2 + HORIZONTAL_SEPARATOON_BETWEEN_NODES * d.depth;
-        console.log('nodeY', nodeY);
+        console.log('X');
+        console.log(d.x);
+        console.log('Y');
+        console.log(d.y);
         if (i === 0) {
           firstNodeX = d.x;
           return 'translate(' + nodeY + ',' + svgHeight / 2 + ')';
@@ -78,12 +68,21 @@ function TreeGraph({ genres }) {
       .text(function(d) {
         return d.data.name;
       });
+
+    const linkGenerator = d3.linkHorizontal()
+    .x(d => d.y)
+    .y(d => d.x - firstNodeX + svgHeight / 2);
+
+    svg.selectAll('path.link')
+      .data(treeData.links())
+      .enter()
+      .append('path')
+      .attr('class', 'link')
+      .attr('d', linkGenerator);
   }, [genres]);
 
-  // Return JSX
   return (
     <svg ref={svgRef} width="600" height="400" className="tree-graph-svg">
-      {/* SVG elements will be rendered here */}
     </svg>
   );
 }
