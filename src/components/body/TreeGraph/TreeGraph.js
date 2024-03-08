@@ -43,6 +43,7 @@ function TreeGraph({ genres }) {
       );
 
     let firstNodeX;
+    let nodeY
 
     svg.selectAll('g.node')
       .data(treeData.descendants())
@@ -50,11 +51,12 @@ function TreeGraph({ genres }) {
       .append('g')
       .attr('class', 'node')
       .attr('transform', function(d, i) {
-        if (i === 0) { // Si c'est le premier nœud
+        nodeY = d.y + HORIZONTAL_SEPARATOON_BETWEEN_NODES * d.depth;
+        if (i === 0) {
           firstNodeX = d.x;
-          return 'translate(' + d.y + ',' + svgHeight / 2 + ')';
+          return 'translate(' + nodeY + ',' + svgHeight / 2 + ')';
         } else {
-          return 'translate(' + d.y + ',' + (d.x - firstNodeX + svgHeight / 2) + ')';
+          return 'translate(' + nodeY + ',' + (d.x - firstNodeX + svgHeight / 2) + ')';
         }
       })
       .append('rect')
@@ -73,7 +75,7 @@ function TreeGraph({ genres }) {
       })
       .append('circle')
       .attr('r', 2.5) // Rayon du cercle
-      .style('fill', 'black'); // Couleur du cercle
+      .style('fill', 'red'); // Couleur du cercle
 
     svg.selectAll('g.node')
       .append('text')
