@@ -14,13 +14,34 @@ function TreeGraph({ genres }) {
 
   const svgRef = useRef(null);
 
-  useEffect(() => {
+  const buildTreeHierarchy = () => {
+    return d3.stratify()
+      .id(d => d.uuid)
+      .parentId(d => d.parent?.uuid || null)(genres);
+  };
+  
+  const calculateSvgHeight = (treeData) => {
+    let nodesAtEachLevel = [];
+  
+    // Parcourez tous les nœuds de l'arbre
+    treeData.each(node => {
+      // Utilisez la profondeur du nœud comme index pour le tableau
+      let depth = node.depth;
+  
+      // Si l'entrée pour ce niveau n'existe pas encore, créez-la
+      if (!nodesAtEachLevel[depth]) {
+        nodesAtEachLevel[depth] = 0;
+      }
+  
+      // Incrémentez le nombre de nœuds à ce niveau
+      nodesAtEachLevel[depth]++;
+    });
+  
+    let maxNodesAtAnyLevel = Math.max(...nodesAtEachLevel);
+    return (RECT_HEIGHT + VERTICAL_SEPARATOON_BETWEEN_NODES) * maxNodesAtAnyLevel;
+  }
 
-    const buildTreeHierarchy = () => {
-      return d3.stratify()
-        .id(d => d.uuid)
-        .parentId(d => d.parent?.uuid || null)(genres);
-    };
+  useEffect(() => {
 
     const root = buildTreeHierarchy();
     const treeData = d3.tree().nodeSize([VERTICAL_SEPARATOON_BETWEEN_NODES, HORIZONTAL_SEPARATOON_BETWEEN_NODES])(root);
@@ -29,7 +50,7 @@ function TreeGraph({ genres }) {
     const numberOfLevels = root.height;
 
     const svgWidth = numberOfLevels * HORIZONTAL_SEPARATOON_BETWEEN_NODES + RECT_WIDTH;
-    const svgHeight = (numberOfLevels + 1) * (RECT_HEIGHT + VERTICAL_SEPARATOON_BETWEEN_NODES);
+    const svgHeight = calculateSvgHeight(treeData);
 
     const svg = d3.select(svgRef.current)
     .attr('width', svgWidth)
