@@ -70,28 +70,11 @@ function TreeGraph({ genres }) {
       .attr('height', RECT_HEIGHT)
       .attr('x', -RECT_WIDTH / 2)
       .attr('y', -RECT_HEIGHT / 2);
-    
-    svg.selectAll('g.node')
-      .data(treeData.descendants())
-      .enter()
-      .append('g')
-      .attr('class', 'node')
-      .attr('transform', function(d) {
-        return 'translate(' + d.y + ',' + d.x + ')';
-      })
-      .append('circle')
-      .attr('r', 2.5) // Rayon du cercle
-      .style('fill', 'red'); // Couleur du cercle
 
     svg.selectAll('g.node')
       .append('text')
-      .attr('dy', '.35em')
-      .attr('x', function(d) {
-        return d.children || d._children ? -13 : 13;
-      })
-      .attr('text-anchor', function(d) {
-        return d.children || d._children ? 'end' : 'start';
-      })
+      .attr('dominant-baseline', 'middle')
+      .attr('text-anchor', 'middle')
       .text(function(d) {
         return d.data.name;
       });
