@@ -24,6 +24,7 @@ function TreeGraph({ genres }) {
 
     const root = buildTreeHierarchy();
     const treeData = d3.tree().nodeSize([VERTICAL_SEPARATOON_BETWEEN_NODES, HORIZONTAL_SEPARATOON_BETWEEN_NODES])(root);
+    let firstNodeX = treeData.descendants()[0].x;
   
     const numberOfLevels = root.height;
 
@@ -34,8 +35,18 @@ function TreeGraph({ genres }) {
     .attr('width', svgWidth)
     .attr('height', svgHeight);
 
-    let firstNodeX;
     let nodeY
+
+    const linkGenerator = d3.linkHorizontal()
+      .x(d => d.y + RECT_WIDTH / 2)
+      .y(d => d.x - firstNodeX + svgHeight / 2);
+
+    svg.selectAll('path.link')
+      .data(treeData.links())
+      .enter()
+      .append('path')
+      .attr('class', 'link')
+      .attr('d', linkGenerator);
 
     svg.selectAll('g.node')
       .data(treeData.descendants())
@@ -44,10 +55,6 @@ function TreeGraph({ genres }) {
       .attr('class', 'node')
       .attr('transform', function(d, i) {
         nodeY = RECT_WIDTH / 2 + HORIZONTAL_SEPARATOON_BETWEEN_NODES * d.depth;
-        console.log('X');
-        console.log(d.x);
-        console.log('Y');
-        console.log(d.y);
         if (i === 0) {
           firstNodeX = d.x;
           return 'translate(' + nodeY + ',' + svgHeight / 2 + ')';
@@ -55,6 +62,8 @@ function TreeGraph({ genres }) {
           return 'translate(' + nodeY + ',' + (d.x - firstNodeX + svgHeight / 2) + ')';
         }
       })
+
+    svg.selectAll('g.node')
       .append('rect')
       .attr('width', RECT_WIDTH)
       .attr('height', RECT_HEIGHT)
@@ -68,17 +77,6 @@ function TreeGraph({ genres }) {
       .text(function(d) {
         return d.data.name;
       });
-
-    const linkGenerator = d3.linkHorizontal()
-    .x(d => d.y)
-    .y(d => d.x - firstNodeX + svgHeight / 2);
-
-    svg.selectAll('path.link')
-      .data(treeData.links())
-      .enter()
-      .append('path')
-      .attr('class', 'link')
-      .attr('d', linkGenerator);
   }, [genres]);
 
   return (
