@@ -19,38 +19,44 @@ function TreeGraph({ genres }) {
       .id(d => d.uuid)
       .parentId(d => d.parent?.uuid || null)(genres);
   };
-  
-  const calculateSvgHeight = (treeData) => {
-    let nodesAtEachLevel = [];
-  
-    // Parcourez tous les nœuds de l'arbre
+    
+  const calculateHighestNodeX = (treeData) => {
+    let xMin = treeData.descendants()[0].x;
     treeData.each(node => {
-      // Utilisez la profondeur du nœud comme index pour le tableau
-      let depth = node.depth;
-  
-      // Si l'entrée pour ce niveau n'existe pas encore, créez-la
-      if (!nodesAtEachLevel[depth]) {
-        nodesAtEachLevel[depth] = 0;
+      if (node.x < xMin) {
+        xMin = node.x;
       }
-  
-      // Incrémentez le nombre de nœuds à ce niveau
-      nodesAtEachLevel[depth]++;
     });
-  
-    let maxNodesAtAnyLevel = Math.max(...nodesAtEachLevel);
-    return (RECT_HEIGHT + VERTICAL_SEPARATOON_BETWEEN_NODES) * maxNodesAtAnyLevel;
+    return xMin;
+  }
+    
+  const calculateLowestNodeX = (treeData) => {
+    let xMax = treeData.descendants()[0].x;
+    treeData.each(node => {
+      if (node.x > xMax) {
+        xMax = node.x;
+      }
+    });
+    return xMax;
   }
 
   useEffect(() => {
 
     const root = buildTreeHierarchy();
     const treeData = d3.tree().nodeSize([VERTICAL_SEPARATOON_BETWEEN_NODES, HORIZONTAL_SEPARATOON_BETWEEN_NODES])(root);
-    let firstNodeX = treeData.descendants()[0].x;
   
     const numberOfLevels = root.height;
 
     const svgWidth = numberOfLevels * HORIZONTAL_SEPARATOON_BETWEEN_NODES + RECT_WIDTH;
-    const svgHeight = calculateSvgHeight(treeData);
+    const lowestNodeX = calculateLowestNodeX(treeData);
+    const highestNodeX = calculateHighestNodeX(treeData);
+
+    const xGap = lowestNodeX - highestNodeX;
+    const svgHeight = xGap + RECT_HEIGHT;
+
+    const xExtremum = Math.max(Math.abs(lowestNodeX), Math.abs(highestNodeX));
+    const xShift = xExtremum - (xGap / 2);
+    console.log(xShift);
 
     const svg = d3.select(svgRef.current)
     .attr('width', svgWidth)
@@ -58,9 +64,11 @@ function TreeGraph({ genres }) {
 
     let nodeY
 
+    let firstNodeXCorrected = treeData.descendants()[0].x - xShift;
+
     const linkGenerator = d3.linkHorizontal()
       .x(d => d.y + RECT_WIDTH / 2)
-      .y(d => d.x - firstNodeX + svgHeight / 2);
+      .y(d => d.x - firstNodeXCorrected + svgHeight / 2);
 
     svg.selectAll('path.link')
       .data(treeData.links())
@@ -74,14 +82,9 @@ function TreeGraph({ genres }) {
       .enter()
       .append('g')
       .attr('class', 'node')
-      .attr('transform', function(d, i) {
+      .attr('transform', function(d) {
         nodeY = RECT_WIDTH / 2 + HORIZONTAL_SEPARATOON_BETWEEN_NODES * d.depth;
-        if (i === 0) {
-          firstNodeX = d.x;
-          return 'translate(' + nodeY + ',' + svgHeight / 2 + ')';
-        } else {
-          return 'translate(' + nodeY + ',' + (d.x - firstNodeX + svgHeight / 2) + ')';
-        }
+        return 'translate(' + nodeY + ',' + (d.x - firstNodeXCorrected + svgHeight / 2) + ')';
       })
 
     svg.selectAll('g.node')
