@@ -44,9 +44,9 @@ const Body = () => {
     <div>
       <div id="genre-tree">
         <h1>Genre Tree</h1>
-        {groupedGenres ? Object.values(groupedGenres).map((genreTree, index) => {
+        {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
           return (
-            <TreeGraph key={index} genres={genreTree}/>
+            <TreeGraph key={uuid} genres={genreTree}/>
           );
         }) : (
           <p>Click &quot;Fetch Data&quot; to load API data.</p>
