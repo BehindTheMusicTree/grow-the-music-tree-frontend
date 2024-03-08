@@ -4,7 +4,7 @@ on:
   push:
     branches: 
       - dev
-      - fix-api-login
+      - improve-tree-design
   pull_request:
     branches: [ "dev" ]
 
