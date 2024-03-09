@@ -24,7 +24,6 @@ const Body = () => {
   }, [genres]);
     
   const fetchGenres = async () => {
-    console.log('Fetching genres');
     try {
       const data = await ApiService.fetchData('genres/');
       setGenres(data.results);
