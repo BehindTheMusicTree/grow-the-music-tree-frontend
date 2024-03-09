@@ -60,7 +60,7 @@ const Body = () => {
         <h1>Genre Tree</h1>
         {groupedGenres && areGenreGroupsCreated ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
           return (
-            <TreeGraph key={uuid} genres={genreTree}/>
+            <TreeGraph key={uuid} genres={genreTree} fetchGenres={fetchGenres}/>
           );
         }) : (
           <p>Loading data.</p>
