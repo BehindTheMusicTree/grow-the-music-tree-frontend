@@ -7,23 +7,35 @@ const Body = () => {
   const [genres, setGenres] = useState(null);
   const [groupedGenres, setGroupedGenres] = useState(null);
   const [isGenreFetchingStarted, setIsGenreFetchingStarted] = useState(false);
+  const [areGenreGroupsCreated, setAreGenreGroupsCreated] = useState(false);
 
   useEffect(() => {
-    console.log('isGenreFetchingStarted ' + isGenreFetchingStarted);
+    console.log('Body useEffect ', isGenreFetchingStarted);
     if (!isGenreFetchingStarted) {
       setIsGenreFetchingStarted(true);
     }
     else {
-      console.log('fetching genres');
       fetchGenres();
     }
   }, [isGenreFetchingStarted]);
 
   useEffect(() => {
     if (genres) {
+      console.log('Body genres ', genres);
       setGroupedGenres(getGenresGroupedByRoot(genres));
     }
   }, [genres]);
+
+  useEffect(() => {
+    console.log('Body groupedGenres ');
+    if (groupedGenres) {
+      console.log('groupedGenres ', groupedGenres)
+      setAreGenreGroupsCreated(true);
+      // console.log('Body useEffect ', Object.entries(groupedGenres).map(([uuid, genreTree]) => {
+      //   return { uuid, genreTree }
+      // }));
+    }
+  }, [groupedGenres]);
 
     
   const fetchGenres = async () => {
@@ -53,12 +65,12 @@ const Body = () => {
     <div>
       <div id="genre-tree">
         <h1>Genre Tree</h1>
-        {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
+        {groupedGenres && areGenreGroupsCreated ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
           return (
             <TreeGraph key={uuid} genres={genreTree}/>
           );
         }) : (
-          <p>Click &quot;Fetch Data&quot; to load API data.</p>
+          <p>Loading data.</p>
         )}
       </div>
     </div>

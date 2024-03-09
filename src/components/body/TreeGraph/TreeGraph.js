@@ -41,6 +41,7 @@ function TreeGraph({ genres }) {
   }
 
   useEffect(() => {
+    console.log('TreeGraph useEffect ', genres);
 
     const root = buildTreeHierarchy();
     const treeData = d3.tree().nodeSize([VERTICAL_SEPARATOON_BETWEEN_NODES, HORIZONTAL_SEPARATOON_BETWEEN_NODES])(root);
@@ -76,7 +77,7 @@ function TreeGraph({ genres }) {
       .attr('class', 'link')
       .attr('d', linkGenerator);
 
-    svg.selectAll('g.node')
+    const nodes = svg.selectAll('g.node')
       .data(treeData.descendants())
       .enter()
       .append('g')
@@ -86,23 +87,20 @@ function TreeGraph({ genres }) {
         return 'translate(' + nodeY + ',' + (d.x - firstNodeXCorrected + svgHeight / 2) + ')';
       })
 
-    svg.selectAll('g.node')
-      .append('rect')
+    nodes.append('rect')
       .attr('width', RECT_WIDTH)
       .attr('height', RECT_HEIGHT)
       .attr('x', -RECT_WIDTH / 2)
       .attr('y', -RECT_HEIGHT / 2);
 
-    svg.selectAll('g.node')
-      .append('text')
+    nodes.append('text')
       .attr('dominant-baseline', 'middle')
       .attr('text-anchor', 'middle')
       .text(function(d) {
         return d.data.name;
       });
     
-      svg.selectAll('g.node')
-      .append('text')
+    nodes.append('text')
       .attr('class', 'plus-button')
       .attr('dominant-baseline', 'middle')
       .attr('text-anchor', 'middle')
@@ -110,8 +108,7 @@ function TreeGraph({ genres }) {
       .attr('y', 0)
       .text('+')
 
-    svg.selectAll('g.node')
-      .on('mouseover', function() {
+    nodes.on('mouseover', function() {
         d3.select(this).select('.plus-button').style('display', 'block'); // Affiche le bouton lors du survol de la souris
         console.log(d3.select(this).select('.plus-button').style('display'));
       })
