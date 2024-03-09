@@ -1,5 +1,6 @@
 import './TreeGraph.scss'
 import React, { useEffect, useRef } from 'react';
+import ApiService from '../../../service/apiService';
 import * as d3 from 'd3';
 import PropTypes from 'prop-types';
 
@@ -105,13 +106,20 @@ function TreeGraph({ genres }) {
       .attr('x', RECT_WIDTH / 2 - 10)
       .attr('y', 0)
       .text('+')
+      .on('click', function(event, d) {
+        event.stopPropagation();
+        const name = prompt('New genre name:');
+        if (!name) {
+          return;
+        }
+        postGenre(name, d.data.uuid);
+      })
 
     nodes.on('mouseover', function() {
-        d3.select(this).select('.plus-button').style('display', 'block'); // Affiche le bouton lors du survol de la souris
-        console.log(d3.select(this).select('.plus-button').style('display'));
+        d3.select(this).select('.plus-button').style('display', 'block');
       })
       .on('mouseout', function() {
-        d3.select(this).select('.plus-button').style('display', 'none'); // Cache le bouton lorsque la souris n'est plus sur le nœud
+        d3.select(this).select('.plus-button').style('display', 'none');
       });
   }, [genres]);
 
@@ -120,6 +128,15 @@ function TreeGraph({ genres }) {
     </svg>
   );
 }
+
+const postGenre = async (name, parent) => {
+  try {
+    await ApiService.fetchData('genres/', 'POST', { name: name, parent: parent});
+  } catch (error) {
+    console.error('API request failed:', error.message)
+    alert('API request failed. Please check the console for more info.');
+  }
+};
 
 TreeGraph.propTypes = {
     genres: PropTypes.array
