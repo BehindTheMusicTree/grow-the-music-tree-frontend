@@ -6,10 +6,10 @@ import PropTypes from 'prop-types';
 
 function TreeGraph({ genres }) {
   
-  const RECT_WIDTH = 220;
-  const RECT_HEIGHT = 50;
-  const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 100;
-  const VERTICAL_SEPARATOON_BETWEEN_RECTANGLES = 100;
+  const RECT_WIDTH = 180;
+  const RECT_HEIGHT = 30;
+  const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
+  const VERTICAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const HORIZONTAL_SEPARATOON_BETWEEN_NODES = RECT_WIDTH + HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES;
   const VERTICAL_SEPARATOON_BETWEEN_NODES = RECT_HEIGHT + VERTICAL_SEPARATOON_BETWEEN_RECTANGLES;
 
@@ -93,6 +93,7 @@ function TreeGraph({ genres }) {
       .attr('y', -RECT_HEIGHT / 2);
 
     nodes.append('text')
+      .attr('class', 'node-label')
       .attr('dominant-baseline', 'middle')
       .attr('text-anchor', 'middle')
       .text(function(d) {
