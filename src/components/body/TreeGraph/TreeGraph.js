@@ -41,8 +41,6 @@ function TreeGraph({ genres }) {
   }
 
   useEffect(() => {
-    console.log('TreeGraph useEffect ', genres);
-
     const root = buildTreeHierarchy();
     const treeData = d3.tree().nodeSize([VERTICAL_SEPARATOON_BETWEEN_NODES, HORIZONTAL_SEPARATOON_BETWEEN_NODES])(root);
   

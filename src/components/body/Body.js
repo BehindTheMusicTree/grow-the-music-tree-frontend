@@ -10,7 +10,6 @@ const Body = () => {
   const [areGenreGroupsCreated, setAreGenreGroupsCreated] = useState(false);
 
   useEffect(() => {
-    console.log('Body useEffect ', isGenreFetchingStarted);
     if (!isGenreFetchingStarted) {
       setIsGenreFetchingStarted(true);
     }
@@ -21,19 +20,13 @@ const Body = () => {
 
   useEffect(() => {
     if (genres) {
-      console.log('Body genres ', genres);
       setGroupedGenres(getGenresGroupedByRoot(genres));
     }
   }, [genres]);
 
   useEffect(() => {
-    console.log('Body groupedGenres ');
     if (groupedGenres) {
-      console.log('groupedGenres ', groupedGenres)
       setAreGenreGroupsCreated(true);
-      // console.log('Body useEffect ', Object.entries(groupedGenres).map(([uuid, genreTree]) => {
-      //   return { uuid, genreTree }
-      // }));
     }
   }, [groupedGenres]);
 
