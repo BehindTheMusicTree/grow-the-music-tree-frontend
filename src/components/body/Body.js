@@ -7,7 +7,6 @@ const Body = () => {
   const [genres, setGenres] = useState(null);
   const [groupedGenres, setGroupedGenres] = useState(null);
   const [isGenreFetchingStarted, setIsGenreFetchingStarted] = useState(false);
-  const [areGenreGroupsCreated, setAreGenreGroupsCreated] = useState(false);
 
   useEffect(() => {
     if (!isGenreFetchingStarted) {
@@ -23,15 +22,9 @@ const Body = () => {
       setGroupedGenres(getGenresGroupedByRoot(genres));
     }
   }, [genres]);
-
-  useEffect(() => {
-    if (groupedGenres) {
-      setAreGenreGroupsCreated(true);
-    }
-  }, [groupedGenres]);
-
     
   const fetchGenres = async () => {
+    console.log('Fetching genres');
     try {
       const data = await ApiService.fetchData('genres/');
       setGenres(data.results);
@@ -58,9 +51,10 @@ const Body = () => {
     <div>
       <div id="genre-tree">
         <h1>Genre Tree</h1>
-        {groupedGenres && areGenreGroupsCreated ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
+        {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
+          const key = `${uuid}-${Date.now()}`;
           return (
-            <TreeGraph key={uuid} genres={genreTree} fetchGenres={fetchGenres}/>
+            <TreeGraph key={key} genres={genreTree} fetchGenres={fetchGenres}/>
           );
         }) : (
           <p>Loading data.</p>
