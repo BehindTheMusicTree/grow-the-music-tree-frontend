@@ -6,18 +6,25 @@ import TreeGraph from './TreeGraph/TreeGraph';
 const Body = () => {
   const [genres, setGenres] = useState(null);
   const [groupedGenres, setGroupedGenres] = useState(null);
+  const [isGenreFetchingStarted, setIsGenreFetchingStarted] = useState(false);
+
+  useEffect(() => {
+    if (!isGenreFetchingStarted) {
+      setIsGenreFetchingStarted(true);
+    }
+    else {
+      fetchGenres();
+    }
+  }, [isGenreFetchingStarted]);
 
   useEffect(() => {
     if (genres) {
       setGroupedGenres(getGenresGroupedByRoot(genres));
     }
   }, [genres]);
-
-  useEffect(() => {
-    fetchGenres();
-  }, []);
-
+    
   const fetchGenres = async () => {
+    console.log('Fetching genres');
     try {
       const data = await ApiService.fetchData('genres/');
       setGenres(data.results);
@@ -44,12 +51,13 @@ const Body = () => {
     <div>
       <div id="genre-tree">
         <h1>Genre Tree</h1>
-        {groupedGenres ? Object.values(groupedGenres).map((genreTree, index) => {
+        {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
+          const key = `${uuid}-${Date.now()}`;
           return (
-            <TreeGraph key={index} genres={genreTree}/>
+            <TreeGraph key={key} genres={genreTree} fetchGenres={fetchGenres}/>
           );
         }) : (
-          <p>Click &quot;Fetch Data&quot; to load API data.</p>
+          <p>Loading data.</p>
         )}
       </div>
     </div>

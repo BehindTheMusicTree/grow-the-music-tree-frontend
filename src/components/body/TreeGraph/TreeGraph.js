@@ -1,14 +1,15 @@
 import './TreeGraph.scss'
 import React, { useEffect, useRef } from 'react';
+import ApiService from '../../../service/apiService';
 import * as d3 from 'd3';
 import PropTypes from 'prop-types';
 
-function TreeGraph({ genres }) {
+function TreeGraph({ genres, fetchGenres }) {
   
-  const RECT_WIDTH = 220;
-  const RECT_HEIGHT = 50;
-  const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 100;
-  const VERTICAL_SEPARATOON_BETWEEN_RECTANGLES = 100;
+  const RECT_WIDTH = 180;
+  const RECT_HEIGHT = 30;
+  const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
+  const VERTICAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const HORIZONTAL_SEPARATOON_BETWEEN_NODES = RECT_WIDTH + HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES;
   const VERTICAL_SEPARATOON_BETWEEN_NODES = RECT_HEIGHT + VERTICAL_SEPARATOON_BETWEEN_RECTANGLES;
 
@@ -41,7 +42,6 @@ function TreeGraph({ genres }) {
   }
 
   useEffect(() => {
-
     const root = buildTreeHierarchy();
     const treeData = d3.tree().nodeSize([VERTICAL_SEPARATOON_BETWEEN_NODES, HORIZONTAL_SEPARATOON_BETWEEN_NODES])(root);
   
@@ -56,7 +56,6 @@ function TreeGraph({ genres }) {
 
     const xExtremum = Math.max(Math.abs(lowestNodeX), Math.abs(highestNodeX));
     const xShift = xExtremum - (xGap / 2);
-    console.log(xShift);
 
     const svg = d3.select(svgRef.current)
     .attr('width', svgWidth)
@@ -77,7 +76,7 @@ function TreeGraph({ genres }) {
       .attr('class', 'link')
       .attr('d', linkGenerator);
 
-    svg.selectAll('g.node')
+    const nodes = svg.selectAll('g.node')
       .data(treeData.descendants())
       .enter()
       .append('g')
@@ -87,21 +86,53 @@ function TreeGraph({ genres }) {
         return 'translate(' + nodeY + ',' + (d.x - firstNodeXCorrected + svgHeight / 2) + ')';
       })
 
-    svg.selectAll('g.node')
-      .append('rect')
+    nodes.append('rect')
       .attr('width', RECT_WIDTH)
       .attr('height', RECT_HEIGHT)
       .attr('x', -RECT_WIDTH / 2)
       .attr('y', -RECT_HEIGHT / 2);
 
-    svg.selectAll('g.node')
-      .append('text')
+    nodes.append('text')
+      .attr('class', 'node-label')
       .attr('dominant-baseline', 'middle')
       .attr('text-anchor', 'middle')
       .text(function(d) {
         return d.data.name;
       });
+    
+    nodes.append('text')
+      .attr('class', 'plus-button')
+      .attr('dominant-baseline', 'middle')
+      .attr('text-anchor', 'middle')
+      .attr('x', RECT_WIDTH / 2 - 10)
+      .attr('y', 0)
+      .text('+')
+      .on('click', function(event, d) {
+        event.stopPropagation();
+        const name = prompt('New genre name:');
+        if (!name) {
+          return;
+        }
+        postGenre(name, d.data.uuid);
+      })
+
+    nodes.on('mouseover', function() {
+        d3.select(this).select('.plus-button').style('display', 'block');
+      })
+      .on('mouseout', function() {
+        d3.select(this).select('.plus-button').style('display', 'none');
+      });
   }, [genres]);
+
+  const postGenre = async (name, parent) => {
+    try {
+      await ApiService.fetchData('genres/', 'POST', { name: name, parent: parent});
+      await fetchGenres();
+    } catch (error) {
+      console.error('API request failed:', error.message)
+      alert('API request failed. Please check the console for more info.');
+    }
+  };
 
   return (
     <svg ref={svgRef} width="600" height="400" className="tree-graph-svg">
@@ -112,5 +143,10 @@ function TreeGraph({ genres }) {
 TreeGraph.propTypes = {
     genres: PropTypes.array
 }
+
+TreeGraph.propTypes = {
+  genres: PropTypes.array,
+  fetchGenres: PropTypes.func.isRequired,
+};
 
 export default TreeGraph;
