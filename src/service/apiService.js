@@ -1,4 +1,5 @@
 import config from '../config/config'; 
+import axios from 'axios';
 
 const ApiService = {
   getToken: () => {
@@ -56,6 +57,19 @@ const ApiService = {
         ApiService.setToken(responseJson);
       })
     })
+  },
+
+  getAudio: (callback) => {
+    axios.get(`${config.apiBaseUrl}tracks/Ly7Ru2ugWX3Xr4vazS5kqX/download/`, {
+      headers: {
+        'Authorization': `Bearer ${ApiService.getToken().access}`
+      },
+      responseType: 'arraybuffer'
+    }).then(response => {
+      const blob = new Blob([response.data], {type: 'audio/wav'});
+      const url = URL.createObjectURL(blob);
+      callback(url);
+    });
   }
 };
 
