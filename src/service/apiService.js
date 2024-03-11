@@ -66,7 +66,7 @@ const ApiService = {
       },
       responseType: 'arraybuffer'
     }).then(response => {
-      const blob = new Blob([response.data], {type: 'audio/wav'});
+      const blob = new Blob([response.data], {type: 'audio/*'});
       const url = URL.createObjectURL(blob);
       callback(url);
     });
