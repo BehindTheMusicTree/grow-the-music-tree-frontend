@@ -4,7 +4,7 @@ import Banner from '../banner/Banner'
 import config from '../../config/config'
 import ApiService from '../../service/apiService'
 import { Howler } from 'howler';
-import OnlyPlayPauseButton from '../player/OnlyPlayPauseButton';
+import Player from '../player/Player';
 
 Howler.html5PoolSize = 100;
 Howler.autoUnlock = true;
@@ -26,7 +26,7 @@ function App() {
   };
 
   useEffect(() => {
-    if (isLoggedIn === false) {
+    if (!isLoggedIn && !shouldLogin) {
       setShouldLogin(true);
     }
   }, [])
@@ -52,7 +52,7 @@ function App() {
           <section>
             <h1>Simple Player</h1>
             <p className='subheading'>Only play/pause button</p>
-            <OnlyPlayPauseButton isLoggedIn={isLoggedIn}/>
+            <Player isLoggedIn={isLoggedIn}/>
           </section>
       </div>
     </div>
