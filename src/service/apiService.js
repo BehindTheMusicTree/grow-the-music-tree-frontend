@@ -23,22 +23,6 @@ const ApiService = {
     };
   },
 
-  fetchData: async (endpoint, method = 'GET', data = null) => {
-    return fetch(`${config.apiBaseUrl}${endpoint}`, {
-      method,
-      headers: ApiService.getHeaders(),
-      body: data ? JSON.stringify(data) : null,})
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Request failed with status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .catch((error) => {
-        throw error;
-      });
-  },
-
   login: async (credentials) => {
     fetch(`${config.apiBaseUrl}auth/token/`, {
       method: 'POST',
@@ -59,16 +43,42 @@ const ApiService = {
     })
   },
 
-  getAudio: (callback) => {
-    axios.get(`${config.apiBaseUrl}tracks/Ly7Ru2ugWX3Xr4vazS5kqX/download/`, {
-      headers: {
-        'Authorization': `Bearer ${ApiService.getToken().access}`
-      },
+  fetchData: async (endpoint, method = 'GET', data = null) => {
+    return fetch(`${config.apiBaseUrl}${endpoint}`, {
+      method,
+      headers: ApiService.getHeaders(),
+      body: data ? JSON.stringify(data) : null,})
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Request failed with status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .catch((error) => {
+        throw error;
+      });
+  },
+    
+  retrieveLibraryTrack: async (libraryTrackUuid, onLoad) => {
+    const data = await ApiService.fetchData(`tracks/${libraryTrackUuid}/`);
+    onLoad(data);
+  },
+
+  getLibraryTrackAudio: (libraryTrackRelativeUrl, onLoad) => {
+    const headers = {'Authorization': `Bearer ${ApiService.getToken().access}`}
+    ApiService.getAudio(`${config.apiBaseUrl}${libraryTrackRelativeUrl}download/`, headers, onLoad);
+  },
+
+  getAudio: (trackUrl, headers, onLoad) => {
+    axios.get(trackUrl, {
+      headers: headers,
       responseType: 'arraybuffer'
     }).then(response => {
       const blob = new Blob([response.data], {type: 'audio/*'});
       const url = URL.createObjectURL(blob);
-      callback(url);
+      onLoad(url);
+    }).catch(error => {
+      console.error('Error fetching audio:', error);
     });
   }
 };

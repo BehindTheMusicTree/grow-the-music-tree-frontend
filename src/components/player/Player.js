@@ -5,26 +5,18 @@ import ApiService from '../../service/apiService'
 import PropTypes from 'prop-types';
 
 const Player = ({isLoggedIn}) => {
+  const LIBRARY_TRACK_SAMPLE_UUID = `Ly7Ru2ugWX3Xr4vazS5kqX`
+
   const [isLoadingStream, setIsLoadingStream] = useState(false);
-  const [stream, setStream] = useState({ url: '', format: ''});
+  const [blobUrl, setBlobUrl] = useState();
   const [playing, setPlaying] = useState(false);
-
-  useEffect(() => {
-    if (isLoggedIn && !isLoadingStream) {
-      setIsLoadingStream(true);
-    }
-  }, [isLoggedIn]);
-
-  useEffect(() => {
-    if (isLoadingStream) {
-      setIsLoadingStream(false);
-      ApiService.getAudio((url, format) => { 
-        console.log('setStream', url, format);
-        setStream({ url, format });
+  const [libraryTrack, setLibraryTrack] = useState();
+    
+  const retrieveLibraryTrack = async (libraryTrackUuid) => {
+      await ApiService.retrieveLibraryTrack(libraryTrackUuid, (data) => {
+        setLibraryTrack(data);
       });
-    }
-  }, [isLoadingStream]);
-
+  };
 
   const handlePlay = () => {
     setPlaying(true);
@@ -35,19 +27,45 @@ const Player = ({isLoggedIn}) => {
   }
 
   const handleLoadError = (id, err) => {
-    console.log(`Error loading track of url ${stream.url}: ${err}`);
+    console.log(`Error loading track of blob url ${blobUrl}: ${err}`);
   }
+
+  const loadStream = () => {
+    const libraryTrackUuid = LIBRARY_TRACK_SAMPLE_UUID
+    retrieveLibraryTrack(libraryTrackUuid);
+  }
+
+  useEffect(() => {
+    if (isLoggedIn && !isLoadingStream) {
+      setIsLoadingStream(true);
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (isLoadingStream) {
+      setIsLoadingStream(false);
+      loadStream();
+    }
+  }, [isLoadingStream]);
+
+  useEffect(() => {
+    if (libraryTrack) {
+      ApiService.getLibraryTrackAudio(libraryTrack.relative_url, (blobUrl) => { 
+        setBlobUrl(blobUrl);
+      });
+    }
+  }, [libraryTrack])
 
   return (
     <div>
-      {stream.url ?  (
+      {blobUrl ?  (
         <>
           <ReactHowler
-            src={[stream.url]}
+            src={[blobUrl]}
             html5={true}
             playing={playing}
             onLoad={() => console.log('loaded')}
-            format={[stream.format]}
+            format={[libraryTrack.file_extension.replace('.', '')]}
             onLoadError={handleLoadError}
           />
           <Button onClick={handlePlay}>Play</Button>
