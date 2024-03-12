@@ -32,7 +32,9 @@ const Player = ({isLoggedIn}) => {
 
   const loadStream = () => {
     const libraryTrackUuid = LIBRARY_TRACK_SAMPLE_UUID
-    retrieveLibraryTrack(libraryTrackUuid);
+    retrieveLibraryTrack(libraryTrackUuid, (data) => {
+      setLibraryTrack(data)
+    })
   }
 
   useEffect(() => {

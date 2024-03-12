@@ -43,44 +43,75 @@ const ApiService = {
     })
   },
 
-  fetchData: async (endpoint, method = 'GET', data = null) => {
-    return fetch(`${config.apiBaseUrl}${endpoint}`, {
+  fetchData: async (endpoint, method, data = null, page = null) => {
+    let url = `${config.apiBaseUrl}${endpoint}`
+    if (page) {
+      url += `?page=${page}`
+    }
+
+    const response = await fetch(url, {
       method,
       headers: ApiService.getHeaders(),
-      body: data ? JSON.stringify(data) : null,})
-      .then((response) => {
+      body: data ? JSON.stringify(data) : null,
+    })
+      .then(async (response) => {
         if (!response.ok) {
           throw new Error(`Request failed with status: ${response.status}`);
         }
-        return response.json();
+        return response; 
       })
       .catch((error) => {
         throw error;
       });
+
+      const responseJson = await response.json();
+      return responseJson;
   },
     
-  retrieveLibraryTrack: async (libraryTrackUuid, onLoad) => {
-    const data = await ApiService.fetchData(`tracks/${libraryTrackUuid}/`);
-    onLoad(data);
+  retrieveLibraryTrack: async (libraryTrackUuid) => {
+    return await ApiService.fetchData(`tracks/${libraryTrackUuid}/`, 'GET', null, null);
   },
 
-  getLibraryTrackAudio: (libraryTrackRelativeUrl, onLoad) => {
+  getLibraryTrackAudio: async (libraryTrackRelativeUrl) => {
     const headers = {'Authorization': `Bearer ${ApiService.getToken().access}`}
-    ApiService.getAudio(`${config.apiBaseUrl}${libraryTrackRelativeUrl}download/`, headers, onLoad);
+    return await ApiService.getTrackAudio(`${config.apiBaseUrl}${libraryTrackRelativeUrl}download/`, headers);
   },
 
-  getAudio: (trackUrl, headers, onLoad) => {
-    axios.get(trackUrl, {
+  getTrackAudio: async (trackUrl, headers) => {
+    return await axios.get(trackUrl, {
       headers: headers,
       responseType: 'arraybuffer'
     }).then(response => {
       const blob = new Blob([response.data], {type: 'audio/*'});
       const url = URL.createObjectURL(blob);
-      onLoad(url);
+      return url
     }).catch(error => {
       console.error('Error fetching audio:', error);
     });
-  }
+  },
+
+  getGenres: async () => {
+    let results = [];
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore) {
+      const data = await ApiService.fetchData('genres/', 'GET', null, page);
+      results = results.concat(data.results);
+
+      if (data.next) {
+        page++;
+      } else {
+        hasMore = false;
+      }
+    }
+
+    return results
+  },
+
+  postGenre: async (genreData) => {
+    return await ApiService.fetchData('genres/', 'POST', genreData, null);
+  },
 };
 
 export default ApiService;
