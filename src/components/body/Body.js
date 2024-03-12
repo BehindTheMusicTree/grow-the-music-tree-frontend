@@ -9,29 +9,11 @@ const Body = () => {
   const [isGenreFetchingStarted, setIsGenreFetchingStarted] = useState(false);
   const [genreDataToPost, setGenreDataToPost] = useState(null);
 
-  useEffect(() => {
-    if (!isGenreFetchingStarted) {
-      setIsGenreFetchingStarted(true);
-    }
-    else {
-      fetchGenres();
-    }
-  }, [isGenreFetchingStarted]);
-
-  useEffect(() => {
-    if (genres) {
-      setGroupedGenres(getGenresGroupedByRoot(genres));
-    }
-  }, [genres]);
-
-  useEffect(() => {
-    if (genreDataToPost) {
-      ApiService.postGenre(genreDataToPost, (data) => {
-        console.log('Genre posted:', data);
-        fetchGenres((data) => setGenres(data.results))
-      })
-    }
-  }, [genreDataToPost]);
+  const postGenre = async (genreDataToPost) => {
+    await ApiService.postGenre(genreDataToPost);
+    const genres = await ApiService.getGenres();
+    setGenres(genres);
+  };
     
   const fetchGenres = async () => {
     const genres = await ApiService.getGenres()
@@ -50,6 +32,27 @@ const Body = () => {
     
     return groupedGenres
   };
+
+  useEffect(() => {
+    if (!isGenreFetchingStarted) {
+      setIsGenreFetchingStarted(true);
+    }
+    else {
+      fetchGenres();
+    }
+  }, [isGenreFetchingStarted]);
+
+  useEffect(() => {
+    if (genres) {
+      setGroupedGenres(getGenresGroupedByRoot(genres));
+    }
+  }, [genres]);
+
+  useEffect(() => {
+    if (genreDataToPost) {
+      postGenre(genreDataToPost);
+    }
+  }, [genreDataToPost]);
 
   return (
     <div>
