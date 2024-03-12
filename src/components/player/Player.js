@@ -34,6 +34,10 @@ const Player = ({isLoggedIn}) => {
     setPlaying(false);
   }
 
+  const handleLoadError = (id, err) => {
+    console.log(`Error loading track of url ${stream.url}: ${err}`);
+  }
+
   return (
     <div>
       {stream.url ?  (
@@ -44,7 +48,7 @@ const Player = ({isLoggedIn}) => {
             playing={playing}
             onLoad={() => console.log('loaded')}
             format={[stream.format]}
-            onLoadError={(id, err) => console.log('load error ', err)}
+            onLoadError={handleLoadError}
           />
           <Button onClick={handlePlay}>Play</Button>
           <Button onClick={handlePause}>Pause</Button>
