@@ -65,7 +65,7 @@ const Player = ({isLoggedIn}) => {
             html5={true}
             playing={playing}
             onLoad={() => console.log('loaded')}
-            format={[libraryTrack.extension]}
+            format={[libraryTrack.file_extension.replace('.', '')]}
             onLoadError={handleLoadError}
           />
           <Button onClick={handlePlay}>Play</Button>

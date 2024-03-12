@@ -4,7 +4,7 @@ on:
   push:
     branches: 
       - dev
-      - improve-tree-design
+      - load-track-info-before-playing
   pull_request:
     branches: [ "dev" ]
 
