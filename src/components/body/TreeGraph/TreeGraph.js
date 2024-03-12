@@ -1,10 +1,9 @@
 import './TreeGraph.scss'
 import React, { useEffect, useRef } from 'react';
-import ApiService from '../../../service/apiService';
 import * as d3 from 'd3';
 import PropTypes from 'prop-types';
 
-function TreeGraph({ genres, fetchGenres }) {
+function TreeGraph({ genres, setGenreDataToPost }) {
   
   const RECT_WIDTH = 180;
   const RECT_HEIGHT = 30;
@@ -113,7 +112,10 @@ function TreeGraph({ genres, fetchGenres }) {
         if (!name) {
           return;
         }
-        postGenre(name, d.data.uuid);
+        setGenreDataToPost({
+          name: name,
+          parent: d.data.uuid
+        });
       })
 
     nodes.on('mouseover', function() {
@@ -123,16 +125,6 @@ function TreeGraph({ genres, fetchGenres }) {
         d3.select(this).select('.plus-button').style('display', 'none');
       });
   }, [genres]);
-
-  const postGenre = async (name, parent) => {
-    try {
-      await ApiService.fetchData('genres/', 'POST', { name: name, parent: parent});
-      await fetchGenres();
-    } catch (error) {
-      console.error('API request failed:', error.message)
-      alert('API request failed. Please check the console for more info.');
-    }
-  };
 
   return (
     <svg ref={svgRef} width="600" height="400" className="tree-graph-svg">
@@ -146,7 +138,7 @@ TreeGraph.propTypes = {
 
 TreeGraph.propTypes = {
   genres: PropTypes.array,
-  fetchGenres: PropTypes.func.isRequired,
+  setGenreDataToPost: PropTypes.func.isRequired,
 };
 
 export default TreeGraph;

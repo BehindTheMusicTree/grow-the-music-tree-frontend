@@ -7,6 +7,7 @@ const Body = () => {
   const [genres, setGenres] = useState(null);
   const [groupedGenres, setGroupedGenres] = useState(null);
   const [isGenreFetchingStarted, setIsGenreFetchingStarted] = useState(false);
+  const [genreDataToPost, setGenreDataToPost] = useState(null);
 
   useEffect(() => {
     if (!isGenreFetchingStarted) {
@@ -22,15 +23,20 @@ const Body = () => {
       setGroupedGenres(getGenresGroupedByRoot(genres));
     }
   }, [genres]);
+
+  useEffect(() => {
+    if (genreDataToPost) {
+      ApiService.postGenre(genreDataToPost, (data) => {
+        console.log('Genre posted:', data);
+        fetchGenres((data) => setGenres(data.results))
+      })
+    }
+  }, [genreDataToPost]);
     
   const fetchGenres = async () => {
-    try {
-      const data = await ApiService.fetchData('genres/');
+    ApiService.getGenres((data) => {
       setGenres(data.results);
-    } catch (error) {
-      console.error('API request failed:', error.message)
-      alert('API request failed. Please check the console for more info.');
-    }
+    })
   };
 
   const getGenresGroupedByRoot = (genres) => {
@@ -53,7 +59,7 @@ const Body = () => {
         {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
           const key = `${uuid}-${Date.now()}`;
           return (
-            <TreeGraph key={key} genres={genreTree} fetchGenres={fetchGenres}/>
+            <TreeGraph key={key} genres={genreTree} setGenreDataToPost={setGenreDataToPost}/>
           );
         }) : (
           <p>Loading data.</p>

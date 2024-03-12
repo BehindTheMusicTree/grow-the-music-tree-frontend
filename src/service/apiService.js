@@ -43,33 +43,34 @@ const ApiService = {
     })
   },
 
-  fetchData: async (endpoint, method = 'GET', data = null) => {
+  fetchData: async (endpoint, method, data = null, onSuccess) => {
     return fetch(`${config.apiBaseUrl}${endpoint}`, {
       method,
       headers: ApiService.getHeaders(),
-      body: data ? JSON.stringify(data) : null,})
-      .then((response) => {
+      body: data ? JSON.stringify(data) : null,
+    })
+      .then(async (response) => {
         if (!response.ok) {
           throw new Error(`Request failed with status: ${response.status}`);
         }
-        return response.json();
+        const responseJson = await response.json();
+        onSuccess(responseJson);
       })
       .catch((error) => {
         throw error;
       });
   },
     
-  retrieveLibraryTrack: async (libraryTrackUuid, onLoad) => {
-    const data = await ApiService.fetchData(`tracks/${libraryTrackUuid}/`);
-    onLoad(data);
+  retrieveLibraryTrack: async (libraryTrackUuid, onSuccess) => {
+    ApiService.fetchData(`tracks/${libraryTrackUuid}/`, 'GET', null, onSuccess);
   },
 
   getLibraryTrackAudio: (libraryTrackRelativeUrl, onLoad) => {
     const headers = {'Authorization': `Bearer ${ApiService.getToken().access}`}
-    ApiService.getAudio(`${config.apiBaseUrl}${libraryTrackRelativeUrl}download/`, headers, onLoad);
+    ApiService.getTrackAudio(`${config.apiBaseUrl}${libraryTrackRelativeUrl}download/`, headers, onLoad);
   },
 
-  getAudio: (trackUrl, headers, onLoad) => {
+  getTrackAudio: (trackUrl, headers, onLoad) => {
     axios.get(trackUrl, {
       headers: headers,
       responseType: 'arraybuffer'
@@ -80,7 +81,15 @@ const ApiService = {
     }).catch(error => {
       console.error('Error fetching audio:', error);
     });
-  }
+  },
+
+  getGenres: (onSuccess) => {
+    ApiService.fetchData('genres/', 'GET', null, onSuccess);
+  },
+
+  postGenre: async (genreData, onSuccess) => {
+    ApiService.fetchData('genres/', 'POST', genreData, onSuccess);
+  },
 };
 
 export default ApiService;

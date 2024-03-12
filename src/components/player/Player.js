@@ -32,7 +32,9 @@ const Player = ({isLoggedIn}) => {
 
   const loadStream = () => {
     const libraryTrackUuid = LIBRARY_TRACK_SAMPLE_UUID
-    retrieveLibraryTrack(libraryTrackUuid);
+    retrieveLibraryTrack(libraryTrackUuid, (data) => {
+      setLibraryTrack(data)
+    })
   }
 
   useEffect(() => {
@@ -64,7 +66,6 @@ const Player = ({isLoggedIn}) => {
             src={[blobUrl]}
             html5={true}
             playing={playing}
-            onLoad={() => console.log('loaded')}
             format={[libraryTrack.file_extension.replace('.', '')]}
             onLoadError={handleLoadError}
           />
