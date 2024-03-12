@@ -34,9 +34,8 @@ const Body = () => {
   }, [genreDataToPost]);
     
   const fetchGenres = async () => {
-    ApiService.getGenres((data) => {
-      setGenres(data.results);
-    })
+    const genres = await ApiService.getGenres()
+    setGenres(genres);
   };
 
   const getGenresGroupedByRoot = (genres) => {
