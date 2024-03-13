@@ -98,25 +98,35 @@ function TreeGraph({ genres, setGenreDataToPost }) {
       .text(function(d) {
         return d.data.name;
       });
-    
+  
     nodes.append('text')
-      .attr('class', 'plus-button')
+      .attr('class', 'playlist-tracks-count-text')
       .attr('dominant-baseline', 'middle')
       .attr('text-anchor', 'middle')
-      .attr('x', RECT_WIDTH / 2 - 10)
+      .attr('x', RECT_WIDTH / 2 - 20)
       .attr('y', 0)
-      .text('+')
-      .on('click', function(event, d) {
-        event.stopPropagation();
-        const name = prompt('New genre name:');
-        if (!name) {
-          return;
-        }
-        setGenreDataToPost({
-          name: name,
-          parent: d.data.uuid
-        });
+      .text(function(d) {
+        return d.data.criteriaPlaylist.libraryTracksCount;
       })
+  
+      nodes.append('text')
+        .attr('class', 'plus-button')
+        .attr('dominant-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .attr('x', RECT_WIDTH / 2 - 10)
+        .attr('y', 0)
+        .text('+')
+        .on('click', function(event, d) {
+          event.stopPropagation();
+          const name = prompt('New genre name:');
+          if (!name) {
+            return;
+          }
+          setGenreDataToPost({
+            name: name,
+            parent: d.data.uuid
+          });
+        })
 
     nodes.on('mouseover', function() {
         d3.select(this).select('.plus-button').style('display', 'block');
