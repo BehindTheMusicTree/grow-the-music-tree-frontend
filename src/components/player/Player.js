@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react'
 import ReactHowler from 'react-howler';
 import Button from '../button/Button';
 import ApiService from '../../service/apiService'
-import PropTypes from 'prop-types';
 
-const Player = ({isLoggedIn}) => {
+const Player = () => {
   const LIBRARY_TRACK_SAMPLE_UUID = `joy8KSUE3L57QzUdH7LZNL`
 
   const [isLoadingStream, setIsLoadingStream] = useState(false);
@@ -36,10 +35,10 @@ const Player = ({isLoggedIn}) => {
   }
 
   useEffect(() => {
-    if (isLoggedIn && !isLoadingStream) {
+    if (!isLoadingStream) {
       setIsLoadingStream(true);
     }
-  }, [isLoggedIn]);
+  }, []);
 
   useEffect(() => {
     if (isLoadingStream) {
@@ -73,10 +72,6 @@ const Player = ({isLoggedIn}) => {
       )}
     </div>
   )
-}
-
-Player.propTypes = {
-  isLoggedIn: PropTypes.bool.isRequired,
 }
 
 export default Player

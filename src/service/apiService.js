@@ -2,6 +2,8 @@ import config from '../config/config';
 import axios from 'axios';
 
 const ApiService = {
+  credentials: { username: config.username, password: config.password },
+
   getToken: () => {
     return JSON.parse(localStorage.getItem('jwtToken'));
   },
@@ -9,33 +11,65 @@ const ApiService = {
   setToken: (jwtToken) => {
     localStorage.setItem('jwtToken', JSON.stringify(jwtToken));
   },
+  
+  refreshToken: async () => {
+    const refreshToken = ApiService.getToken().refresh;
+    if (refreshToken) {
+      try {
+        const response = await axios.post(`${config.apiBaseUrl}auth/token/refresh/`, {
+          refresh: refreshToken,
+        });
+        if (response.status === 200) {
+          let newToken = ApiService.getToken();
+          newToken.access = response.data.access;
+          ApiService.setToken(newToken);
+        }
+      } catch (error) {
+        // Gérer l'erreur
+      }
+    }
+    else {
+      await ApiService.login();
+    }
+  },
 
-  getHeaders: () => {
-    const accessToken = ApiService.getToken().access;
+  getHeaders: async () => {
+    let accessToken = ApiService.getToken().access;
     if (accessToken) {
+      try {
+        const payload = JSON.parse(atob(accessToken.split('.')[1]));
+        const expDate = new Date(payload.exp * 1000);
+        if (expDate < new Date()) {
+          await ApiService.refreshToken();
+          accessToken = ApiService.getToken().access;
+        }
+      } catch (error) {
+        // handle error
+      }
       return {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       };
     }
-    return {
-      'Content-Type': 'application/json',
-    };
+    else {
+      await ApiService.login();
+      return ApiService.getHeaders();
+    }
   },
 
-  login: async (credentials) => {
+  login: async () => {
     fetch(`${config.apiBaseUrl}auth/token/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(credentials),
+      body: JSON.stringify(ApiService.credentials),
     })
     .then((response) => {
       if (!response.ok) {
         throw new Error(`Login failed with status: ${response.status}`);
       }
-      
+
       response.json()
       .then((responseJson) => {
         ApiService.setToken(responseJson);
@@ -49,9 +83,10 @@ const ApiService = {
       url += `?page=${page}`
     }
 
+    const headers = await ApiService.getHeaders();
     const response = await fetch(url, {
       method,
-      headers: ApiService.getHeaders(),
+      headers: headers,
       body: data ? JSON.stringify(data) : null,
     })
       .then(async (response) => {
