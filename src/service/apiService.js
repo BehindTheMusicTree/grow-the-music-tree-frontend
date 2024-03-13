@@ -10,20 +10,16 @@ const ApiService = {
 
   setToken: (jwtToken) => {
     localStorage.setItem('jwtToken', JSON.stringify(jwtToken));
-    console.log('Token set:', jwtToken);
   },
   
   refreshToken: async () => {
     const refreshToken = ApiService.getToken().refresh;
-    console.log('Refresh token:', refreshToken);
     if (refreshToken) {
       try {
-        console.log('Refreshing token');
         const response = await axios.post(`${config.apiBaseUrl}auth/token/refresh/`, {
           refresh: refreshToken,
         });
         if (response.status === 200) {
-          console.log('Token refreshed:', response.data);
           let newToken = ApiService.getToken();
           newToken.access = response.data.access;
           ApiService.setToken(newToken);
@@ -33,27 +29,19 @@ const ApiService = {
       }
     }
     else {
-      console.log('No refresh token, logging in');
       await ApiService.login();
     }
   },
 
   getHeaders: async () => {
-    console.log('Getting headers');
     let accessToken = ApiService.getToken().access;
-    console.log('Access token:', accessToken);
     if (accessToken) {
       try {
         const payload = JSON.parse(atob(accessToken.split('.')[1]));
         const expDate = new Date(payload.exp * 1000);
-        console.log('Token expiration:', expDate);
         if (expDate < new Date()) {
-          console.log('Token expired, refreshing');
           await ApiService.refreshToken();
           accessToken = ApiService.getToken().access;
-        }
-        else {
-          console.log('Token still valid');
         }
       } catch (error) {
         // handle error
@@ -84,14 +72,12 @@ const ApiService = {
 
       response.json()
       .then((responseJson) => {
-        console.log('Login successful:', responseJson);
         ApiService.setToken(responseJson);
       })
     })
   },
 
   fetchData: async (endpoint, method, data = null, page = null) => {
-    console.log('Fetching data:', endpoint);
     let url = `${config.apiBaseUrl}${endpoint}`
     if (page) {
       url += `?page=${page}`
