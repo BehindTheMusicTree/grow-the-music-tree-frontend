@@ -4,7 +4,7 @@ on:
   push:
     branches: 
       - dev
-      - load-track-info-before-playing
+      - display-playlist-count-on-genre
   pull_request:
     branches: [ "dev" ]
 
