@@ -4,7 +4,7 @@ on:
   push:
     branches: 
       - dev
-      - display-playlist-count-on-genre
+      - enable-token-refreshing
   pull_request:
     branches: [ "dev" ]
 
