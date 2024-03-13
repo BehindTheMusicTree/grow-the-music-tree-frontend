@@ -20,7 +20,13 @@
     stroke: #555;
     stroke-opacity: 0.4;
     stroke-width: 2px;
-  }
+}
+
+.playlist-tracks-count-text {
+    font-size: 12px;
+    fill: #ffffff;
+    text-anchor: middle;
+}
 
 .plus-button {
     fill: red;

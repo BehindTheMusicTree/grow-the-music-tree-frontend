@@ -5,18 +5,12 @@ import ApiService from '../../service/apiService'
 import PropTypes from 'prop-types';
 
 const Player = ({isLoggedIn}) => {
-  const LIBRARY_TRACK_SAMPLE_UUID = `Ly7Ru2ugWX3Xr4vazS5kqX`
+  const LIBRARY_TRACK_SAMPLE_UUID = `joy8KSUE3L57QzUdH7LZNL`
 
   const [isLoadingStream, setIsLoadingStream] = useState(false);
   const [blobUrl, setBlobUrl] = useState();
   const [playing, setPlaying] = useState(false);
   const [libraryTrack, setLibraryTrack] = useState();
-    
-  const retrieveLibraryTrack = async (libraryTrackUuid) => {
-      await ApiService.retrieveLibraryTrack(libraryTrackUuid, (data) => {
-        setLibraryTrack(data);
-      });
-  };
 
   const handlePlay = () => {
     setPlaying(true);
@@ -30,11 +24,15 @@ const Player = ({isLoggedIn}) => {
     console.log(`Error loading track of blob url ${blobUrl}: ${err}`);
   }
 
-  const loadStream = () => {
+  const getLibraryTrack = async () => {
     const libraryTrackUuid = LIBRARY_TRACK_SAMPLE_UUID
-    retrieveLibraryTrack(libraryTrackUuid, (data) => {
-      setLibraryTrack(data)
-    })
+    const libraryTrack = await ApiService.retrieveLibraryTrack(libraryTrackUuid)
+    setLibraryTrack(libraryTrack)
+  }
+
+  const getLibraryTrackBlobUrl = async () => {
+    const blobUrl = await ApiService.getLibraryTrackAudio(libraryTrack.relativeUrl)
+    setBlobUrl(blobUrl);
   }
 
   useEffect(() => {
@@ -46,15 +44,13 @@ const Player = ({isLoggedIn}) => {
   useEffect(() => {
     if (isLoadingStream) {
       setIsLoadingStream(false);
-      loadStream();
+      getLibraryTrack();
     }
   }, [isLoadingStream]);
 
   useEffect(() => {
     if (libraryTrack) {
-      ApiService.getLibraryTrackAudio(libraryTrack.relative_url, (blobUrl) => { 
-        setBlobUrl(blobUrl);
-      });
+      getLibraryTrackBlobUrl();
     }
   }, [libraryTrack])
 
@@ -66,7 +62,7 @@ const Player = ({isLoggedIn}) => {
             src={[blobUrl]}
             html5={true}
             playing={playing}
-            format={[libraryTrack.file_extension.replace('.', '')]}
+            format={[libraryTrack.fileExtension.replace('.', '')]}
             onLoadError={handleLoadError}
           />
           <Button onClick={handlePlay}>Play</Button>
