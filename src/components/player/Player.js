@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types';
 import ReactHowler from 'react-howler';
 import Button from '../button/Button';
 import ApiService from '../../service/apiService'
 
-const Player = () => {
+const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   const LIBRARY_TRACK_SAMPLE_UUID = `joy8KSUE3L57QzUdH7LZNL`
 
-  const [isLoadingStream, setIsLoadingStream] = useState(false);
+  const [mustLoadStream, setIsLoadingStream] = useState(false);
   const [blobUrl, setBlobUrl] = useState();
   const [playing, setPlaying] = useState(false);
-  const [libraryTrack, setLibraryTrack] = useState();
 
   const handlePlay = () => {
     setPlaying(true);
@@ -26,32 +26,32 @@ const Player = () => {
   const getLibraryTrack = async () => {
     const libraryTrackUuid = LIBRARY_TRACK_SAMPLE_UUID
     const libraryTrack = await ApiService.retrieveLibraryTrack(libraryTrackUuid)
-    setLibraryTrack(libraryTrack)
+    setPlayingLibraryTrack(libraryTrack)
   }
 
   const getLibraryTrackBlobUrl = async () => {
-    const blobUrl = await ApiService.getLibraryTrackAudio(libraryTrack.relativeUrl)
+    const blobUrl = await ApiService.getLibraryTrackAudio(playingLibraryTrack.relativeUrl)
     setBlobUrl(blobUrl);
   }
 
   useEffect(() => {
-    if (!isLoadingStream) {
+    if (!mustLoadStream) {
       setIsLoadingStream(true);
     }
   }, []);
 
   useEffect(() => {
-    if (isLoadingStream) {
+    if (mustLoadStream) {
       setIsLoadingStream(false);
       getLibraryTrack();
     }
-  }, [isLoadingStream]);
+  }, [mustLoadStream]);
 
   useEffect(() => {
-    if (libraryTrack) {
+    if (playingLibraryTrack) {
       getLibraryTrackBlobUrl();
     }
-  }, [libraryTrack])
+  }, [playingLibraryTrack])
 
   return (
     <div>
@@ -61,7 +61,7 @@ const Player = () => {
             src={[blobUrl]}
             html5={true}
             playing={playing}
-            format={[libraryTrack.fileExtension.replace('.', '')]}
+            format={[playingLibraryTrack.fileExtension.replace('.', '')]}
             onLoadError={handleLoadError}
           />
           <Button onClick={handlePlay}>Play</Button>
@@ -73,5 +73,10 @@ const Player = () => {
     </div>
   )
 }
+
+Player.propTypes = {
+  playingLibraryTrack: PropTypes.object,
+  setPlayingLibraryTrack: PropTypes.func.isRequired
+};
 
 export default Player

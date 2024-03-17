@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react';
 import Body from '../body/Body'
 import Banner from '../banner/Banner'
 import { Howler } from 'howler';
@@ -9,17 +9,18 @@ Howler.autoUnlock = true;
 
 function App() {
 
-  const [searchSubmitted, setSearchSubmitted] = React.useState('')
+  const [searchSubmitted, setSearchSubmitted] = useState('')
+  const [playingLibraryTrack, setPlayingLibraryTrack] = useState(null);
 
   return (
     <div>
       <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-      <Body />
+      <Body setPlayingLibraryTrack={setPlayingLibraryTrack}/>
       <div>
           <section>
             <h1>Simple Player</h1>
             <p className='subheading'>Only play/pause button</p>
-            <Player/>
+            <Player playingLibraryTrack={playingLibraryTrack} setPlayingLibraryTrack={setPlayingLibraryTrack}/>
           </section>
       </div>
     </div>

@@ -1,9 +1,10 @@
 import './Body.scss';
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import ApiService from '../../service/apiService';
 import TreeGraph from './TreeGraph/TreeGraph';
 
-const Body = () => {
+const Body = ({setPlayingLibraryTrack}) => {
   const [genres, setGenres] = useState(null);
   const [groupedGenres, setGroupedGenres] = useState(null);
   const [isGenreFetchingStarted, setIsGenreFetchingStarted] = useState(false);
@@ -37,6 +38,10 @@ const Body = () => {
   const retrievePlaylist = async (playlistToRetrieve) => {
     const playlist = await ApiService.retrievePlaylist(playlistToRetrieve);
     console.log('Playlist retrieved:', playlist);
+    const libraryTracks = playlist.libraryTracks;
+    if (libraryTracks.length > 0) {
+      setPlayingLibraryTrack(libraryTracks[0]);
+    }
   }
 
   useEffect(() => {
@@ -82,5 +87,9 @@ const Body = () => {
     </div>
   );
 }
+
+Body.propTypes = {
+  setPlayingLibraryTrack: PropTypes.func.isRequired
+};
 
 export default Body;

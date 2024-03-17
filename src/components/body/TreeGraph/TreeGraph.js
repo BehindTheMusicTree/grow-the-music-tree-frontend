@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import PropTypes from 'prop-types';
 
-function TreeGraph({ genres, setGenreDataToPost, setPlaylistToRetrieve }) {
+const TreeGraph = ({ genres, setGenreDataToPost, setPlaylistToRetrieve }) => {
   
   const RECT_WIDTH = 180;
   const RECT_HEIGHT = 30;
@@ -155,12 +155,9 @@ function TreeGraph({ genres, setGenreDataToPost, setPlaylistToRetrieve }) {
 }
 
 TreeGraph.propTypes = {
-    genres: PropTypes.array
-}
-
-TreeGraph.propTypes = {
   genres: PropTypes.array,
   setGenreDataToPost: PropTypes.func.isRequired,
+  setPlaylistToRetrieve: PropTypes.func.isRequired
 };
 
 export default TreeGraph;
