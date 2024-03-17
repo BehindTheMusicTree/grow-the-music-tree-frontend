@@ -24,10 +24,9 @@ const ApiService = {
       })
 
       if (response.status === 200) {
-        console.log('refresh ok')
+        const responseJson = await response.json()
         let newToken = ApiService.getToken();
-        newToken.access = response.data.access;
-        console.log('new token' + newToken.access)
+        newToken.access = responseJson.access;
         ApiService.setToken(newToken);
       }
       else if (response.status === 401) {
@@ -79,7 +78,6 @@ const ApiService = {
       throw new Error(`Login failed with status: ${response.status}`);
     }
     const responseJson = await response.json()
-    console.log('login ok with token: ' + responseJson.access)
     ApiService.setToken(responseJson);
   },
 
