@@ -15,17 +15,26 @@ const ApiService = {
   refreshToken: async () => {
     const refreshToken = ApiService.getToken().refresh;
     if (refreshToken) {
-      try {
-        const response = await axios.post(`${config.apiBaseUrl}auth/token/refresh/`, {
-          refresh: refreshToken,
-        });
-        if (response.status === 200) {
-          let newToken = ApiService.getToken();
-          newToken.access = response.data.access;
-          ApiService.setToken(newToken);
-        }
-      } catch (error) {
-        // Gérer l'erreur
+      const response = await fetch(`${config.apiBaseUrl}auth/token/refresh/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({refresh: refreshToken}),
+      })
+
+      if (response.status === 200) {
+        console.log('refresh ok')
+        let newToken = ApiService.getToken();
+        newToken.access = response.data.access;
+        console.log('new token' + newToken.access)
+        ApiService.setToken(newToken);
+      }
+      else if (response.status === 401) {
+        await ApiService.login();
+      }
+      else {
+        console.error('Error refreshing token:', response);
       }
     }
     else {
@@ -44,7 +53,7 @@ const ApiService = {
           accessToken = ApiService.getToken().access;
         }
       } catch (error) {
-        // handle error
+        console.error('Error parsing token:', error);
       }
       return {
         'Authorization': `Bearer ${accessToken}`,
@@ -58,23 +67,20 @@ const ApiService = {
   },
 
   login: async () => {
-    fetch(`${config.apiBaseUrl}auth/token/`, {
+    const response = await fetch(`${config.apiBaseUrl}auth/token/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(ApiService.credentials),
     })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Login failed with status: ${response.status}`);
-      }
 
-      response.json()
-      .then((responseJson) => {
-        ApiService.setToken(responseJson);
-      })
-    })
+    if (!response.ok) {
+      throw new Error(`Login failed with status: ${response.status}`);
+    }
+    const responseJson = await response.json()
+    console.log('login ok with token: ' + responseJson.access)
+    ApiService.setToken(responseJson);
   },
 
   fetchData: async (endpoint, method, data = null, page = null) => {
@@ -89,18 +95,13 @@ const ApiService = {
       headers: headers,
       body: data ? JSON.stringify(data) : null,
     })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`Request failed with status: ${response.status}`);
-        }
-        return response; 
-      })
-      .catch((error) => {
-        throw error;
-      });
 
-      const responseJson = await response.json();
-      return responseJson;
+    if (!response.ok) {
+      throw new Error(`Request failed with status: ${response.status}`);
+    }
+
+    const responseJson = await response.json();
+    return responseJson;
   },
     
   retrieveLibraryTrack: async (libraryTrackUuid) => {
@@ -146,6 +147,10 @@ const ApiService = {
 
   postGenre: async (genreData) => {
     return await ApiService.fetchData('genres/', 'POST', genreData, null);
+  },
+
+  retrievePlaylist: async (playlistUuid) => {
+    return await ApiService.fetchData(`playlists/${playlistUuid}/`, 'GET', null, null);
   },
 };
 

@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import PropTypes from 'prop-types';
 
-function TreeGraph({ genres, setGenreDataToPost }) {
+const TreeGraph = ({ genres, setGenreDataToPost, setPlaylistToRetrieve }) => {
   
   const RECT_WIDTH = 180;
   const RECT_HEIGHT = 30;
@@ -100,6 +100,18 @@ function TreeGraph({ genres, setGenreDataToPost }) {
       });
   
     nodes.append('text')
+      .attr('class', 'play-button')
+      .attr('dominant-baseline', 'middle')
+      .attr('text-anchor', 'middle')
+      .attr('x', RECT_WIDTH / 2 - 30)
+      .attr('y', 0)
+      .text('►')
+      .on('click', function(event, d) {
+        event.stopPropagation();
+        setPlaylistToRetrieve(d.data.criteriaPlaylist.uuid);
+      })
+
+    nodes.append('text')
       .attr('class', 'playlist-tracks-count-text')
       .attr('dominant-baseline', 'middle')
       .attr('text-anchor', 'middle')
@@ -109,24 +121,24 @@ function TreeGraph({ genres, setGenreDataToPost }) {
         return d.data.criteriaPlaylist.libraryTracksCount;
       })
   
-      nodes.append('text')
-        .attr('class', 'plus-button')
-        .attr('dominant-baseline', 'middle')
-        .attr('text-anchor', 'middle')
-        .attr('x', RECT_WIDTH / 2 - 10)
-        .attr('y', 0)
-        .text('+')
-        .on('click', function(event, d) {
-          event.stopPropagation();
-          const name = prompt('New genre name:');
-          if (!name) {
-            return;
-          }
-          setGenreDataToPost({
-            name: name,
-            parent: d.data.uuid
-          });
-        })
+    nodes.append('text')
+      .attr('class', 'plus-button')
+      .attr('dominant-baseline', 'middle')
+      .attr('text-anchor', 'middle')
+      .attr('x', RECT_WIDTH / 2 - 10)
+      .attr('y', 0)
+      .text('+')
+      .on('click', function(event, d) {
+        event.stopPropagation();
+        const name = prompt('New genre name:');
+        if (!name) {
+          return;
+        }
+        setGenreDataToPost({
+          name: name,
+          parent: d.data.uuid
+        });
+      })
 
     nodes.on('mouseover', function() {
         d3.select(this).select('.plus-button').style('display', 'block');
@@ -143,12 +155,9 @@ function TreeGraph({ genres, setGenreDataToPost }) {
 }
 
 TreeGraph.propTypes = {
-    genres: PropTypes.array
-}
-
-TreeGraph.propTypes = {
   genres: PropTypes.array,
   setGenreDataToPost: PropTypes.func.isRequired,
+  setPlaylistToRetrieve: PropTypes.func.isRequired
 };
 
 export default TreeGraph;

@@ -1,13 +1,15 @@
 import './Body.scss';
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import ApiService from '../../service/apiService';
 import TreeGraph from './TreeGraph/TreeGraph';
 
-const Body = () => {
+const Body = ({setPlayingLibraryTrack}) => {
   const [genres, setGenres] = useState(null);
   const [groupedGenres, setGroupedGenres] = useState(null);
   const [isGenreFetchingStarted, setIsGenreFetchingStarted] = useState(false);
   const [genreDataToPost, setGenreDataToPost] = useState(null);
+  const [playlistToRetrieve, setPlaylistToRetrieve] = useState(null);
 
   const postGenre = async (genreDataToPost) => {
     await ApiService.postGenre(genreDataToPost);
@@ -33,6 +35,15 @@ const Body = () => {
     return groupedGenres
   };
 
+  const retrievePlaylist = async (playlistToRetrieve) => {
+    const playlist = await ApiService.retrievePlaylist(playlistToRetrieve);
+    console.log('Playlist retrieved:', playlist);
+    const libraryTracks = playlist.libraryTracks;
+    if (libraryTracks.length > 0) {
+      setPlayingLibraryTrack(libraryTracks[0]);
+    }
+  }
+
   useEffect(() => {
     if (!isGenreFetchingStarted) {
       setIsGenreFetchingStarted(true);
@@ -54,6 +65,12 @@ const Body = () => {
     }
   }, [genreDataToPost]);
 
+  useEffect(() => {
+    if (playlistToRetrieve) {
+      retrievePlaylist(playlistToRetrieve);
+    }
+  }, [playlistToRetrieve]);
+
   return (
     <div>
       <div id="genre-tree">
@@ -61,7 +78,7 @@ const Body = () => {
         {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
           const key = `${uuid}-${Date.now()}`;
           return (
-            <TreeGraph key={key} genres={genreTree} setGenreDataToPost={setGenreDataToPost}/>
+            <TreeGraph key={key} genres={genreTree} setGenreDataToPost={setGenreDataToPost} setPlaylistToRetrieve={setPlaylistToRetrieve}/>
           );
         }) : (
           <p>Loading data.</p>
@@ -70,5 +87,9 @@ const Body = () => {
     </div>
   );
 }
+
+Body.propTypes = {
+  setPlayingLibraryTrack: PropTypes.func.isRequired
+};
 
 export default Body;
