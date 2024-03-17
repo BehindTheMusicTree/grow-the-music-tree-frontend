@@ -1,3 +1,4 @@
+import styles from './Player.module.scss'
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types';
 import ReactHowler from 'react-howler';
@@ -54,7 +55,7 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   }, [playingLibraryTrack])
 
   return (
-    <div>
+    <div className={styles.Player}>
       {blobUrl ?  (
         <>
           <ReactHowler

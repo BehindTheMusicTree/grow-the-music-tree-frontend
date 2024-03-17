@@ -4,7 +4,6 @@ import * as d3 from 'd3';
 import PropTypes from 'prop-types';
 
 const TreeGraph = ({ genres, setGenreDataToPost, setPlaylistToRetrieve }) => {
-  
   const RECT_WIDTH = 180;
   const RECT_HEIGHT = 30;
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
