@@ -16,13 +16,7 @@ function App() {
     <div>
       <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
       <Body setPlayingLibraryTrack={setPlayingLibraryTrack}/>
-      <div>
-          <section>
-            <h1>Simple Player</h1>
-            <p className='subheading'>Only play/pause button</p>
-            <Player playingLibraryTrack={playingLibraryTrack} setPlayingLibraryTrack={setPlayingLibraryTrack}/>
-          </section>
-      </div>
+      <Player playingLibraryTrack={playingLibraryTrack} setPlayingLibraryTrack={setPlayingLibraryTrack}/>
     </div>
   );
 }
