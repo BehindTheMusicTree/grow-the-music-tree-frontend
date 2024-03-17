@@ -35,15 +35,6 @@ const Body = ({setPlayingLibraryTrack}) => {
     return groupedGenres
   };
 
-  const retrievePlaylist = async (playlistToRetrieve) => {
-    const playlist = await ApiService.retrievePlaylist(playlistToRetrieve);
-    console.log('Playlist retrieved:', playlist);
-    const libraryTracks = playlist.libraryTracks;
-    if (libraryTracks.length > 0) {
-      setPlayingLibraryTrack(libraryTracks[0]);
-    }
-  }
-
   useEffect(() => {
     if (!isGenreFetchingStarted) {
       setIsGenreFetchingStarted(true);
@@ -66,6 +57,14 @@ const Body = ({setPlayingLibraryTrack}) => {
   }, [genreDataToPost]);
 
   useEffect(() => {
+    const retrievePlaylist = async (playlistToRetrieve) => {
+      const playlist = await ApiService.retrievePlaylist(playlistToRetrieve);
+      const libraryTracks = playlist.libraryTracks;
+      if (libraryTracks.length > 0) {
+        setPlayingLibraryTrack(libraryTracks[0]);
+      }
+    }
+
     if (playlistToRetrieve) {
       retrievePlaylist(playlistToRetrieve);
     }
