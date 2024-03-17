@@ -95,18 +95,13 @@ const ApiService = {
       headers: headers,
       body: data ? JSON.stringify(data) : null,
     })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`Request failed with status: ${response.status}`);
-        }
-        return response; 
-      })
-      .catch((error) => {
-        throw error;
-      });
 
-      const responseJson = await response.json();
-      return responseJson;
+    if (!response.ok) {
+      throw new Error(`Request failed with status: ${response.status}`);
+    }
+
+    const responseJson = await response.json();
+    return responseJson;
   },
     
   retrieveLibraryTrack: async (libraryTrackUuid) => {
