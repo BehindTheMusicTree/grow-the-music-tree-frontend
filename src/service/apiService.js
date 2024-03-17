@@ -13,38 +13,58 @@ const ApiService = {
   },
   
   refreshToken: async () => {
+    console.log('refresh token')
     const refreshToken = ApiService.getToken().refresh;
     if (refreshToken) {
-      try {
-        const response = await axios.post(`${config.apiBaseUrl}auth/token/refresh/`, {
-          refresh: refreshToken,
-        });
-        if (response.status === 200) {
-          let newToken = ApiService.getToken();
-          newToken.access = response.data.access;
-          ApiService.setToken(newToken);
-        }
-      } catch (error) {
-        // Gérer l'erreur
+      console.log('refresh oui')
+      const response = await fetch(`${config.apiBaseUrl}auth/token/refresh/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({refresh: refreshToken}),
+      })
+
+      if (response.status === 200) {
+        console.log('refresh ok')
+        let newToken = ApiService.getToken();
+        newToken.access = response.data.access;
+        console.log('new token' + newToken.access)
+        ApiService.setToken(newToken);
+      }
+      else if (response.status === 401) {
+        console.error('Refresh token expired, login');
+        await ApiService.login();
+      }
+      else {
+        console.error('Error refreshing token:', response);
       }
     }
     else {
+      console.log('refresh non')
       await ApiService.login();
     }
   },
 
   getHeaders: async () => {
     let accessToken = ApiService.getToken().access;
+    console.log('access1 ' + ApiService.getToken().access)
+    console.log('refresh ' + ApiService.getToken().refresh)
     if (accessToken) {
       try {
         const payload = JSON.parse(atob(accessToken.split('.')[1]));
         const expDate = new Date(payload.exp * 1000);
+        console.log('exp date' + expDate)
         if (expDate < new Date()) {
           await ApiService.refreshToken();
           accessToken = ApiService.getToken().access;
+          console.log('access2 ' + ApiService.getToken().access)
+          const payload = JSON.parse(atob(accessToken.split('.')[1]));
+          const newexpDate = new Date(payload.exp * 1000);
+          console.log('exp date' + newexpDate)
         }
       } catch (error) {
-        // handle error
+        console.error('Error parsing token:', error);
       }
       return {
         'Authorization': `Bearer ${accessToken}`,
@@ -58,23 +78,21 @@ const ApiService = {
   },
 
   login: async () => {
-    fetch(`${config.apiBaseUrl}auth/token/`, {
+    console.log('login')
+    const response = await fetch(`${config.apiBaseUrl}auth/token/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(ApiService.credentials),
     })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Login failed with status: ${response.status}`);
-      }
 
-      response.json()
-      .then((responseJson) => {
-        ApiService.setToken(responseJson);
-      })
-    })
+    if (!response.ok) {
+      throw new Error(`Login failed with status: ${response.status}`);
+    }
+    const responseJson = await response.json()
+    console.log('login ok with token: ' + responseJson.access)
+    ApiService.setToken(responseJson);
   },
 
   fetchData: async (endpoint, method, data = null, page = null) => {
@@ -146,6 +164,10 @@ const ApiService = {
 
   postGenre: async (genreData) => {
     return await ApiService.fetchData('genres/', 'POST', genreData, null);
+  },
+
+  retrievePlaylist: async (playlistUuid) => {
+    return await ApiService.fetchData(`playlists/${playlistUuid}/`, 'GET', null, null);
   },
 };
 
