@@ -10,13 +10,13 @@ Howler.autoUnlock = true;
 function App() {
 
   const [searchSubmitted, setSearchSubmitted] = useState('')
-  const [playingLibraryTrack, setPlayingLibraryTrack] = useState(null);
+  const [playingLibTrackObject, setPlayingLibTrackObject] = useState(null);
 
   return (
     <div>
       <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-      <Body setPlayingLibraryTrack={setPlayingLibraryTrack}/>
-      <Player playingLibraryTrack={playingLibraryTrack} setPlayingLibraryTrack={setPlayingLibraryTrack}/>
+      <Body setPlayingLibTrackObject={setPlayingLibTrackObject}/>
+      {playingLibTrackObject ? <Player playingLibTrackObject={playingLibTrackObject}/> : null}
     </div>
   );
 }

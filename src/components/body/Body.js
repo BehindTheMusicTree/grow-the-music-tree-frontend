@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import ApiService from '../../service/apiService';
 import TreeGraph from './TreeGraph/TreeGraph';
 
-const Body = ({setPlayingLibraryTrack}) => {
+const Body = ({setPlayingLibTrackObject}) => {
   const [genres, setGenres] = useState(null);
   const [groupedGenres, setGroupedGenres] = useState(null);
   const [isGenreFetchingStarted, setIsGenreFetchingStarted] = useState(false);
@@ -61,7 +61,7 @@ const Body = ({setPlayingLibraryTrack}) => {
       const playlist = await ApiService.retrievePlaylist(playlistToRetrieve);
       const libraryTracks = playlist.libraryTracks;
       if (libraryTracks.length > 0) {
-        setPlayingLibraryTrack(libraryTracks[0]);
+        setPlayingLibTrackObject(libraryTracks[0]);
       }
     }
 
@@ -88,7 +88,7 @@ const Body = ({setPlayingLibraryTrack}) => {
 }
 
 Body.propTypes = {
-  setPlayingLibraryTrack: PropTypes.func.isRequired
+  setPlayingLibTrackObject: PropTypes.func.isRequired
 };
 
 export default Body;
