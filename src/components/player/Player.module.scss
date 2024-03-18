@@ -6,25 +6,39 @@
     display: flex;
     justify-content: space-between;
     padding: 20px;
+
+    .TrackInfo, .Controls1, .Controls2 {
+        flex: 1;
+        align-items: center;
+    }
 }
 
 .TrackInfo {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    align-self: flex-start;
+    background-color: blue;
 }
 
 .Controls1{
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    align-self: center;
+    background-color: red;
 }
 
 .Seek {
     display: flex;
-  }
-  
+    flex-direction: line;
+    justify-content: center;
+    width: 100%;
+    background-color: green;
+}
+
+.Progressbar {
+    flex: 0 0 50%;
+    background-color: pink;
+}
+
 .TimeCurrent {
     margin-right: 10px;
 }
@@ -32,5 +46,6 @@
 .Controls2 {
     display: flex;
     align-items: center;
-    align-self: flex-end;
+    justify-content: center;
+    background-color: yellow;
 }
