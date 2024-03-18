@@ -1,15 +1,30 @@
-.Player {
+.PlayerContainer {
+    width: 100%;
     position: fixed;
-    left: 50%;
+    left: 0;
     bottom: 0;
-    transform: translateX(-50%);
+    display: flex;
+    justify-content: space-between;
+    background-color: green;
 }
 
-.PlayerSeek {
+.TrackInfo {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: flex-start;
+}
+
+.Controls{
+    display: flex;
+    justify-content: center;
+    align-self: center;
+}
+
+.Seek {
+    display: flex;
   }
   
-.PlayerTimeCurrent {
-    margin-right: 10px; /* Ajoutez une marge à droite pour espacer le temps de la barre de progression */
+.TimeCurrent {
+    margin-right: 10px;
 }
