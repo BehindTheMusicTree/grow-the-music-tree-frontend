@@ -77,6 +77,14 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
     raf.cancel(_raf)
   }
   
+  const formatTime = (seconds) => {
+    let minutes = Math.floor(seconds / 60);
+    let secs = Math.floor(seconds % 60);
+    if (minutes < 10) { minutes = "0" + minutes; }
+    if (secs < 10) { secs = "0" + secs; }
+    return `${minutes}:${secs}`;
+  }
+  
   useEffect(() => {
 
     if (!mustLoadStream) {
@@ -124,8 +132,10 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
         )}
       </div>
       <div className={styles.PlayerSeek}>
-          <label>
-            Seek:
+        <div className={styles.PlayerTimeCurrent}>
+          {formatTime(seek)}
+        </div>
+        <div className={styles.PlayerProgressbar}>
             <span className='slider-container'>
               <input
                 type='range'
@@ -138,8 +148,11 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
                 onMouseUp={handleMouseUpSeek}
               />
             </span>
-          </label>
+          </div>
+        <div className={styles.PlayerTimeEnd}>
+          {playingLibraryTrack ? formatTime(playingLibraryTrack.duration) : '00:00'}
         </div>
+      </div>
     </div>
   )
 }

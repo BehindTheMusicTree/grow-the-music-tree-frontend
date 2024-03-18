@@ -4,3 +4,12 @@
     bottom: 0;
     transform: translateX(-50%);
 }
+
+.PlayerSeek {
+    display: flex;
+    align-items: center;
+  }
+  
+.PlayerTimeCurrent {
+    margin-right: 10px; /* Ajoutez une marge à droite pour espacer le temps de la barre de progression */
+}
