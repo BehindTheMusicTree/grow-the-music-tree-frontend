@@ -36,7 +36,6 @@ const Player = ({playingLibTrackObject}) => {
   }
   
   const handlePlay = () => {
-    console.log('handlePlay');
     if (playState !== PlayStates.STOPPED) {
       setPlayState(PlayStates.PLAYING);
     }
@@ -96,13 +95,11 @@ const Player = ({playingLibTrackObject}) => {
         isTrackLoading.current = false;
       }
     };
-    
+
     fetchAndSetBlobUrl();
   }, [playingLibTrackObject])
 
   useEffect(() => {
-    console.log('playState', playState);
-    console.log('playerRef.current', playerRef.current);
     if (playState === PlayStates.PLAYING) {
       if (playerRef.current) {
         renderSeekPos();
@@ -114,7 +111,7 @@ const Player = ({playingLibTrackObject}) => {
   }, [playState])
 
   useEffect(() => {
-    if (playState.current === PlayStates.PLAYING) {
+    if (playState === PlayStates.PLAYING) {
       if (isSeeking) {
         raf.cancel(rafId.current);
       }
@@ -122,8 +119,8 @@ const Player = ({playingLibTrackObject}) => {
         renderSeekPos();
       }
     }
-    else if (playState.current === PlayStates.STOPPED) {
-      playState.current = PlayStates.NOT_PLAYING;
+    else if (playState === PlayStates.STOPPED) {
+      setPlayState(PlayStates.NOT_PLAYING);
     }
   }, [isSeeking])
 
