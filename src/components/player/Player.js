@@ -111,46 +111,56 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   }, [playingLibraryTrack])
 
   return (
-    <div className={styles.Player}>
-      <div className={styles.PlayerButtons}>
-        {blobUrl ?  (
-          <>
-            <ReactHowler
-              ref={playerRef}
-              src={[blobUrl]}
-              html5={true}
-              playing={playing}
-              format={[playingLibraryTrack.fileExtension.replace('.', '')]}
-              onLoadError={handleLoadError}
-              onEnd={handleOnEnd}
-            />
-            <Button onClick={handlePlay}>Play</Button>
-            <Button onClick={handlePause}>Pause</Button>
-          </>
-        ) : (
-          <p>Loading audio stream...</p>
-        )}
-      </div>
-      <div className={styles.PlayerSeek}>
-        <div className={styles.PlayerTimeCurrent}>
-          {formatTime(seek)}
+    <div className={styles.PlayerContainer}>
+      <div className={styles.TrackInfo}>
+        <div className={styles.TrackTitle}>
+          {playingLibraryTrack ? playingLibraryTrack.title : ''}
         </div>
-        <div className={styles.PlayerProgressbar}>
-            <span className='slider-container'>
-              <input
-                type='range'
-                min='0'
-                max={playingLibraryTrack ? playingLibraryTrack.duration.toFixed(2) : 0}
-                step='.01'
-                value={seek}
-                onChange={handleSeekingChange}
-                onMouseDown={handleMouseDownSeek}
-                onMouseUp={handleMouseUpSeek}
+        <div className={styles.ArtistName}>
+          {playingLibraryTrack ? (playingLibraryTrack.artist ? playingLibraryTrack.artist.name : '')  : ''}
+        </div>
+      </div>
+      <div className={styles.Controls}>
+        <div className={styles.PlayPause}>
+          {blobUrl ?  (
+            <>
+              <ReactHowler
+                ref={playerRef}
+                src={[blobUrl]}
+                html5={true}
+                playing={playing}
+                format={[playingLibraryTrack.fileExtension.replace('.', '')]}
+                onLoadError={handleLoadError}
+                onEnd={handleOnEnd}
               />
-            </span>
+              <Button onClick={handlePlay}>Play</Button>
+              <Button onClick={handlePause}>Pause</Button>
+            </>
+          ) : (
+            <p>Loading audio stream...</p>
+          )}
+        </div>
+        <div className={styles.Seek}>
+          <div className={styles.TimeCurrent}>
+            {formatTime(seek)}
           </div>
-        <div className={styles.PlayerTimeEnd}>
-          {playingLibraryTrack ? formatTime(playingLibraryTrack.duration) : '00:00'}
+          <div className={styles.Progressbar}>
+              <span className='slider-container'>
+                <input
+                  type='range'
+                  min='0'
+                  max={playingLibraryTrack ? playingLibraryTrack.duration.toFixed(2) : 0}
+                  step='.01'
+                  value={seek}
+                  onChange={handleSeekingChange}
+                  onMouseDown={handleMouseDownSeek}
+                  onMouseUp={handleMouseUpSeek}
+                />
+              </span>
+            </div>
+          <div className={styles.TimeEnd}>
+            {playingLibraryTrack ? formatTime(playingLibraryTrack.duration) : '00:00'}
+          </div>
         </div>
       </div>
     </div>
