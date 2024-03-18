@@ -34,13 +34,6 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
     setBlobUrl(blobUrl);
   }
   
-  const updateSeek = () => {
-    if (playerRef.current) {
-      const newSeek = playerRef.current.seek();
-      setSeek(newSeek);
-    }
-  }
-  
   const handlePause = () => {
     setPlaying(false);
     clearInterval(seekInterval);
@@ -48,9 +41,6 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   
   const handlePlay = () => {
     setPlaying(true);
-    seekInterval.current = setInterval(() => {
-      updateSeek();
-    }, 1000);
     renderSeekPos()
   }
 
@@ -59,9 +49,9 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
     clearRAF()
   }
   
-  const handleSeekingChange = (newSeek) => {
+  const handleSeekingChange = (event) => {
     if (playerRef.current) {
-      playerRef.current.seek(newSeek);
+      setSeek(parseFloat(event.target.value))
     }
   }
 
@@ -88,24 +78,15 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   }
   
   useEffect(() => {
-    // Créez l'intervalle lorsque le composant est monté
-    seekInterval.current = setInterval(() => {
-      if (playing) {
-        updateSeek();
-      }
-    }, 1000);
+
+    if (!mustLoadStream) {
+      setIsLoadingStream(true);
+    }
   
-    // Nettoyez l'intervalle lorsque le composant est démonté
     return () => {
       clearInterval(seekInterval)
       clearRAF()
     };
-  }, []);
-
-  useEffect(() => {
-    if (!mustLoadStream) {
-      setIsLoadingStream(true);
-    }
   }, []);
 
   useEffect(() => {
