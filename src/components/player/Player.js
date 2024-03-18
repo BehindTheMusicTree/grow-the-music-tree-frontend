@@ -113,6 +113,17 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
     }
   }, [playing])
 
+  useEffect(() => {
+    if (isSeeking) {
+      raf.cancel(rafId.current);
+    }
+    else {
+      if (rafId.current) {
+        renderSeekPos();
+      }
+    }
+  }, [isSeeking])
+
   return (
     <div className={styles.PlayerContainer}>
       <div className={styles.TrackInfo}>
