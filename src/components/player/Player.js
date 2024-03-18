@@ -6,18 +6,20 @@ import raf from 'raf';
 import Button from '../button/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons'
+import { FaPlay, FaPause } from 'react-icons/fa';
+
 
 const Player = ({libTrackObjectWithBlobUrl}) => {
   const PlayStates = {
     PLAYING: 'PLAYING',
-    NOT_PLAYING: 'NOT_PLAYING',
+    PAUSED: 'NOT_PLAYING',
     STOPPED: 'STOPPED'
   };
 
   const [seek, setSeek] = useState(0);
   const [isSeeking, setIsSeeking] = useState(false);
   const [volume, setVolume] = useState(0.5);
-  const [playState, setPlayState] = useState(PlayStates.NOT_PLAYING);
+  const [playState, setPlayState] = useState(PlayStates.PAUSED);
 
   const playerRef = useRef(null);
   let rafIdRef = useRef(null);
@@ -26,14 +28,15 @@ const Player = ({libTrackObjectWithBlobUrl}) => {
     console.log(`Error loading track of blob url ${libTrackObjectWithBlobUrl.blobUrl}: ${err}`);
   }
   
-  const handlePause = () => {
-    if (playState !== PlayStates.STOPPED) {
-        setPlayState(PlayStates.NOT_PLAYING);
+  const handlePlayPause = () => {
+    if (playState === PlayStates.STOPPED) {
+      setSeek(0);
+      setPlayState(PlayStates.PLAYING);
     }
-  }
-  
-  const handlePlay = () => {
-    if (playState !== PlayStates.STOPPED) {
+    else if (playState === PlayStates.PLAYING) {
+      setPlayState(PlayStates.PAUSED);
+    }
+    else {
       setPlayState(PlayStates.PLAYING);
     }
   }
@@ -102,7 +105,7 @@ const Player = ({libTrackObjectWithBlobUrl}) => {
       }
     }
     else if (playState === PlayStates.STOPPED) {
-      setPlayState(PlayStates.NOT_PLAYING);
+      setPlayState(PlayStates.PAUSED);
     }
   }, [isSeeking])
 
@@ -129,9 +132,7 @@ const Player = ({libTrackObjectWithBlobUrl}) => {
               onEnd={handlePlayerOnEnd}
               volume={volume}
             />
-            <Button onClick={handlePlay}>Play</Button>
-            <Button onClick={handlePause}>Pause</Button>
-            <div>
+              <Button onClick={handlePlayPause}>{playState === PlayStates.PLAYING ? <FaPause /> : <FaPlay />}</Button>            <div>
               seek {seek}
             </div>
           </>
