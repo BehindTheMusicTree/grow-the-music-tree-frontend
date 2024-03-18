@@ -59,10 +59,14 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   }
 
   const handleMouseDownSeek = () => {
-    setIsSeeking(true)
+    console.log('handleMouseDownSeek')
+    if (playing) {
+      setIsSeeking(true)
+    }
   }
 
   const handleMouseUpSeek = () => {
+    console.log('handleMouseUpSeek')
     if (isSeeking) {
       setIsSeeking(false)
       playerRef.current.seek(seek)
@@ -70,7 +74,9 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   }
   
   const renderSeekPos = () => {
+    console.log('renderSeekPos')
     if (!isSeeking) {
+      console.log('renderSeekPos - !isSeeking')
       setSeek(playerRef.current.seek())
     }
     if (playing) {
