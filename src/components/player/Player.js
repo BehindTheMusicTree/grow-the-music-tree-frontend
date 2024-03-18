@@ -21,7 +21,6 @@ const Player = ({playingLibTrackObject}) => {
   const [volume, setVolume] = useState(0.5);
   const [playState, setPlayState] = useState(PlayStates.NOT_PLAYING);
 
-  const mustGetLibTrackBlobUrl = useRef(false);
   const isTrackLoading = useRef(false);
   const playerRef = useRef(null);
   let rafId = useRef(null);
@@ -37,13 +36,13 @@ const Player = ({playingLibTrackObject}) => {
   }
   
   const handlePlay = () => {
+    console.log('handlePlay');
     if (playState !== PlayStates.STOPPED) {
       setPlayState(PlayStates.PLAYING);
     }
   }
 
   const handlePlayerOnEnd = () => {
-    console.log('handlePlayerOnEnd')
     setPlayState(PlayStates.STOPPED);
   }
   
@@ -82,34 +81,29 @@ const Player = ({playingLibTrackObject}) => {
   };
 
   useEffect(() => {
-    if (playingLibTrackObject && !isTrackLoading.current) {
-      isTrackLoading.current = true;
-      mustGetLibTrackBlobUrl.current = true;
-    }
-  }, [playingLibTrackObject, isTrackLoading.current])
-
-  useEffect(() => {
     const getLibraryTrackBlobUrl = async () => {
       const blobUrl = await ApiService.getLibraryTrackAudio(playingLibTrackObject.relativeUrl)
-      setLibTrackBlobUrl(blobUrl);
+      return blobUrl;
     }
 
-    if (mustGetLibTrackBlobUrl.current) {
-      mustGetLibTrackBlobUrl.current = false;
-      getLibraryTrackBlobUrl();
-    }
-  }, [mustGetLibTrackBlobUrl.current])
+    const fetchAndSetBlobUrl = async () => {
+      if (playingLibTrackObject && !isTrackLoading.current) {
+        isTrackLoading.current = true;
+        const blobUrl = await getLibraryTrackBlobUrl();
+        setLibTrackBlobUrl(blobUrl);
+        setSeek(0);
+        setPlayState(PlayStates.PLAYING);
+        isTrackLoading.current = false;
+      }
+    };
+    
+    fetchAndSetBlobUrl();
+  }, [playingLibTrackObject])
 
   useEffect(() => {
-    if (libTrackBlobUrl) {
-      setSeek(0);
-      setPlayState(PlayStates.PLAYING);
-      isTrackLoading.current = false;
-    }
-  }, [libTrackBlobUrl])
-
-  useEffect(() => {
-    if (playState.PLAYING) {
+    console.log('playState', playState);
+    console.log('playerRef.current', playerRef.current);
+    if (playState === PlayStates.PLAYING) {
       if (playerRef.current) {
         renderSeekPos();
       }
@@ -117,14 +111,19 @@ const Player = ({playingLibTrackObject}) => {
     else if (rafId.current) {
       raf.cancel(rafId.current);
     }
-  }, [playState, playerRef.current])
+  }, [playState])
 
   useEffect(() => {
-    if (isSeeking) {
-      raf.cancel(rafId.current);
-    }
-    else if (rafId.current) {
+    if (playState.current === PlayStates.PLAYING) {
+      if (isSeeking) {
+        raf.cancel(rafId.current);
+      }
+      else if (rafId.current) {
         renderSeekPos();
+      }
+    }
+    else if (playState.current === PlayStates.STOPPED) {
+      playState.current = PlayStates.NOT_PLAYING;
     }
   }, [isSeeking])
 
