@@ -2,6 +2,7 @@ import styles from './Player.module.scss'
 import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types';
 import ReactHowler from 'react-howler';
+import raf from 'raf'
 import Button from '../button/Button';
 import ApiService from '../../service/apiService'
 
@@ -12,9 +13,11 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   const [blobUrl, setBlobUrl] = useState();
   const [playing, setPlaying] = useState(false);
   const [seek, setSeek] = useState(0);
+  const [isSeeking, setIsSeeking] = useState(false);
 
   const seekInterval = useRef(null);
   const playerRef = useRef(null);
+  let _raf = useRef(null);
 
   const handleLoadError = (id, err) => {
     console.log(`Error loading track of blob url ${blobUrl}: ${err}`);
@@ -48,12 +51,40 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
     seekInterval.current = setInterval(() => {
       updateSeek();
     }, 1000);
+    renderSeekPos()
+  }
+
+  const handleOnEnd = () => {
+    setPlaying(false)
+    clearRAF()
   }
   
   const handleSeekingChange = (newSeek) => {
     if (playerRef.current) {
       playerRef.current.seek(newSeek);
     }
+  }
+
+  const handleMouseDownSeek = () => {
+    setIsSeeking(true)
+  }
+
+  const handleMouseUpSeek = (e) => {
+    setIsSeeking(false)
+    playerRef.current.seek(e.target.value)
+  }
+  
+  const renderSeekPos = () => {
+    if (!isSeeking) {
+      setSeek(playerRef.current.seek())
+    }
+    if (playing) {
+      _raf = raf(renderSeekPos)
+    }
+  }
+
+  const clearRAF = () => {
+    raf.cancel(_raf)
   }
   
   useEffect(() => {
@@ -66,7 +97,8 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   
     // Nettoyez l'intervalle lorsque le composant est démonté
     return () => {
-      clearInterval(seekInterval);
+      clearInterval(seekInterval)
+      clearRAF()
     };
   }, []);
 
@@ -101,6 +133,7 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
               playing={playing}
               format={[playingLibraryTrack.fileExtension.replace('.', '')]}
               onLoadError={handleLoadError}
+              onEnd={handleOnEnd}
             />
             <Button onClick={handlePlay}>Play</Button>
             <Button onClick={handlePause}>Pause</Button>
@@ -120,8 +153,8 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
                 step='.01'
                 value={seek}
                 onChange={handleSeekingChange}
-                // onMouseDown={handleMouseDownSeek}
-                // onMouseUp={handleMouseUpSeek}
+                onMouseDown={handleMouseDownSeek}
+                onMouseUp={handleMouseUpSeek}
               />
             </span>
           </label>
