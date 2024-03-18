@@ -133,7 +133,6 @@ const TreeGraph = ({ genres, postGenreAndRefresh, setPlaylistToRetrieve }) => {
         if (!name) {
           return;
         }
-        console.log('d.data', d.data);
         postGenreAndRefresh({
           name: name,
           parent: d.data.uuid
