@@ -106,7 +106,7 @@ const ApiService = {
     return await ApiService.fetchData(`tracks/${libraryTrackUuid}/`, 'GET', null, null);
   },
 
-  getLibraryTrackAudio: async (libraryTrackRelativeUrl) => {
+  getLoadAudioAndGetLibTrackBlobUrl: async (libraryTrackRelativeUrl) => {
     const headers = {'Authorization': `Bearer ${ApiService.getToken().access}`}
     return await ApiService.getTrackAudio(`${config.apiBaseUrl}${libraryTrackRelativeUrl}download/`, headers);
   },
