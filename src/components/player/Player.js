@@ -132,29 +132,22 @@ const Player = ({libTrackObjectWithBlobUrl}) => {
               onEnd={handlePlayerOnEnd}
               volume={volume}
             />
-              <Button onClick={handlePlayPause}>{playState === PlayStates.PLAYING ? <FaPause /> : <FaPlay />}</Button>            <div>
-              seek {seek}
-            </div>
+              <Button onClick={handlePlayPause}>{playState === PlayStates.PLAYING ? <FaPause /> : <FaPlay />}</Button>
           </>
         </div>
         <div className={styles.Seek}>
           <div className={styles.TimeCurrent}>
             {formatTime(seek)}
           </div>
-          <div className={styles.Progressbar}>
-              <span className='slider-container'>
-                <input
-                  type='range'
-                  min='0'
-                  max={libTrackObjectWithBlobUrl ? libTrackObjectWithBlobUrl.duration.toFixed(2) : 0}
-                  step='.01'
-                  value={seek}
-                  onChange={handleSeekingChange}
-                  onMouseDown={handleSeekMouseDown}
-                  onMouseUp={handleSeekMouseUp}
-                />
-              </span>
-            </div>
+          <input className={styles.Progressbar}
+            type='range'
+            min='0'
+            max={libTrackObjectWithBlobUrl ? libTrackObjectWithBlobUrl.duration.toFixed(2) : 0}
+            step='.01'
+            value={seek}
+            onChange={handleSeekingChange}
+            onMouseDown={handleSeekMouseDown}
+            onMouseUp={handleSeekMouseUp} />
           <div className={styles.TimeEnd}>
             {libTrackObjectWithBlobUrl ? formatTime(libTrackObjectWithBlobUrl.duration) : '00:00'}
           </div>
