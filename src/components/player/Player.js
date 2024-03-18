@@ -37,7 +37,6 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   }
   
   const handlePause = () => {
-    console.log('handlePause')
     setPlaying(false);
   }
   
@@ -66,7 +65,6 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
     if (!isSeeking) {
       setSeek(playerRef.current.seek())
     }
-    console.log('renderSeekPos playing ', playing)
     if (playing) {
       rafId.current = raf(renderSeekPos);
     }
