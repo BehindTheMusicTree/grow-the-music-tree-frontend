@@ -5,6 +5,8 @@ import ReactHowler from 'react-howler';
 import raf from 'raf'
 import Button from '../button/Button';
 import ApiService from '../../service/apiService'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faVolumeUp } from '@fortawesome/free-solid-svg-icons'
 
 const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   const LIBRARY_TRACK_SAMPLE_UUID = `joy8KSUE3L57QzUdH7LZNL`
@@ -14,6 +16,7 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   const [playing, setPlaying] = useState(false);
   const [seek, setSeek] = useState(0);
   const [isSeeking, setIsSeeking] = useState(false);
+  const [volume, setVolume] = useState(0.5); // Initialise le volume à 0.5
 
   const seekInterval = useRef(null);
   const playerRef = useRef(null);
@@ -84,6 +87,11 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
     if (secs < 10) { secs = "0" + secs; }
     return `${minutes}:${secs}`;
   }
+
+  const handleVolumeChange = (event) => {
+    console.log('volume changed ' + event.target.value)
+    setVolume(event.target.value);
+  };
   
   useEffect(() => {
 
@@ -120,7 +128,7 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
           {playingLibraryTrack ? (playingLibraryTrack.artist ? playingLibraryTrack.artist.name : '')  : ''}
         </div>
       </div>
-      <div className={styles.Controls}>
+      <div className={styles.Controls1}>
         <div className={styles.PlayPause}>
           {blobUrl ?  (
             <>
@@ -132,6 +140,7 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
                 format={[playingLibraryTrack.fileExtension.replace('.', '')]}
                 onLoadError={handleLoadError}
                 onEnd={handleOnEnd}
+                volume={volume}
               />
               <Button onClick={handlePlay}>Play</Button>
               <Button onClick={handlePause}>Pause</Button>
@@ -161,6 +170,19 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
           <div className={styles.TimeEnd}>
             {playingLibraryTrack ? formatTime(playingLibraryTrack.duration) : '00:00'}
           </div>
+        </div>
+      </div>
+      <div className={styles.Controls2}>
+        <div className={styles.Volume}>
+          <FontAwesomeIcon icon={faVolumeUp} />
+          <input 
+            type='range' 
+            min='0' 
+            max='1' 
+            step='.01' 
+            value={volume} 
+            onChange={handleVolumeChange} 
+          />
         </div>
       </div>
     </div>
