@@ -53,22 +53,26 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   }
   
   const handleSeekingChange = (event) => {
+    console.log('handleSeekingChange', event.target.value)
     if (playerRef.current) {
       setSeek(parseFloat(event.target.value))
     }
   }
 
   const handleMouseDownSeek = () => {
+    console.log('handleMouseDownSeek')
     setIsSeeking(true)
   }
 
-  const handleMouseUpSeek = (e) => {
+  const handleMouseUpSeek = () => {
+    console.log('handleMouseUpSeek')
     setIsSeeking(false)
-    playerRef.current.seek(e.target.value)
+    playerRef.current.seek(seek)
   }
   
   const renderSeekPos = () => {
     if (!isSeeking) {
+      console.log('renderSeekPos')
       setSeek(playerRef.current.seek())
     }
     if (playing) {
@@ -89,7 +93,6 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   }
 
   const handleVolumeChange = (event) => {
-    console.log('volume changed ' + event.target.value)
     setVolume(event.target.value);
   };
   
@@ -117,6 +120,22 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
       getLibraryTrackBlobUrl();
     }
   }, [playingLibraryTrack])
+
+  useEffect(() => {
+    if (playing) {
+      seekInterval.current = setInterval(() => {
+        if (playerRef.current) {
+          setSeek(playerRef.current.seek());
+        }
+      }, 1000);
+    } else {
+      clearInterval(seekInterval.current);
+    }
+  
+    return () => {
+      clearInterval(seekInterval.current);
+    };
+  }, [playing]);
 
   return (
     <div className={styles.PlayerContainer}>
