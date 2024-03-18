@@ -8,44 +8,43 @@ import ApiService from '../../service/apiService'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons'
 
-const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
-  const LIBRARY_TRACK_SAMPLE_UUID = `joy8KSUE3L57QzUdH7LZNL`
+const Player = ({playingLibTrackObject}) => {
+  const PlayStates = {
+    PLAYING: 'PLAYING',
+    NOT_PLAYING: 'NOT_PLAYING',
+    STOPPED: 'STOPPED'
+  };
 
-  const [mustLoadStream, setIsLoadingStream] = useState(false);
-  const [blobUrl, setBlobUrl] = useState();
+  const [libTrackBlobUrl, setLibTrackBlobUrl] = useState();
   const [seek, setSeek] = useState(0);
   const [isSeeking, setIsSeeking] = useState(false);
   const [volume, setVolume] = useState(0.5);
-  const [playing, setPlaying] = useState(false);
+  const [playState, setPlayState] = useState(PlayStates.NOT_PLAYING);
 
+  const mustGetLibTrackBlobUrl = useRef(false);
+  const isTrackLoading = useRef(false);
   const playerRef = useRef(null);
   let rafId = useRef(null);
 
   const handleLoadError = (id, err) => {
-    console.log(`Error loading track of blob url ${blobUrl}: ${err}`);
-  }
-
-  const getLibraryTrack = async () => {
-    const libraryTrackUuid = LIBRARY_TRACK_SAMPLE_UUID
-    const libraryTrack = await ApiService.retrieveLibraryTrack(libraryTrackUuid)
-    setPlayingLibraryTrack(libraryTrack)
-  }
-
-  const getLibraryTrackBlobUrl = async () => {
-    const blobUrl = await ApiService.getLibraryTrackAudio(playingLibraryTrack.relativeUrl)
-    setBlobUrl(blobUrl);
+    console.log(`Error loading track of blob url ${libTrackBlobUrl}: ${err}`);
   }
   
   const handlePause = () => {
-    setPlaying(false);
+    if (playState !== PlayStates.STOPPED) {
+        setPlayState(PlayStates.NOT_PLAYING);
+    }
   }
   
   const handlePlay = () => {
-    setPlaying(true);
+    if (playState !== PlayStates.STOPPED) {
+      setPlayState(PlayStates.PLAYING);
+    }
   }
 
   const handlePlayerOnEnd = () => {
-    setPlaying(false)
+    console.log('handlePlayerOnEnd')
+    setPlayState(PlayStates.STOPPED);
   }
   
   const handleSeekingChange = (event) => {
@@ -65,7 +64,7 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
     if (!isSeeking) {
       setSeek(playerRef.current.seek())
     }
-    if (playing) {
+    if (playState) {
       rafId.current = raf(renderSeekPos);
     }
   }
@@ -81,44 +80,51 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   const handleVolumeChange = (event) => {
     setVolume(event.target.value);
   };
-  
-  useEffect(() => {
-    if (!mustLoadStream) {
-      setIsLoadingStream(true);
-    }
-  }, []);
 
   useEffect(() => {
-    if (mustLoadStream) {
-      setIsLoadingStream(false);
-      getLibraryTrack();
+    if (playingLibTrackObject && !isTrackLoading.current) {
+      isTrackLoading.current = true;
+      mustGetLibTrackBlobUrl.current = true;
     }
-  }, [mustLoadStream]);
+  }, [playingLibTrackObject, isTrackLoading.current])
 
   useEffect(() => {
-    if (playingLibraryTrack) {
-      setSeek(0);
+    const getLibraryTrackBlobUrl = async () => {
+      const blobUrl = await ApiService.getLibraryTrackAudio(playingLibTrackObject.relativeUrl)
+      setLibTrackBlobUrl(blobUrl);
+    }
+
+    if (mustGetLibTrackBlobUrl.current) {
+      mustGetLibTrackBlobUrl.current = false;
       getLibraryTrackBlobUrl();
     }
-  }, [playingLibraryTrack])
+  }, [mustGetLibTrackBlobUrl.current])
 
   useEffect(() => {
-    if (playing) {
-      renderSeekPos();
+    if (libTrackBlobUrl) {
+      setSeek(0);
+      setPlayState(PlayStates.PLAYING);
+      isTrackLoading.current = false;
     }
-    else {
+  }, [libTrackBlobUrl])
+
+  useEffect(() => {
+    if (playState.PLAYING) {
+      if (playerRef.current) {
+        renderSeekPos();
+      }
+    }
+    else if (rafId.current) {
       raf.cancel(rafId.current);
     }
-  }, [playing])
+  }, [playState, playerRef.current])
 
   useEffect(() => {
     if (isSeeking) {
       raf.cancel(rafId.current);
     }
-    else {
-      if (rafId.current) {
+    else if (rafId.current) {
         renderSeekPos();
-      }
     }
   }, [isSeeking])
 
@@ -126,35 +132,31 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
     <div className={styles.PlayerContainer}>
       <div className={styles.TrackInfo}>
         <div className={styles.TrackTitle}>
-          {playingLibraryTrack ? playingLibraryTrack.title : ''}
+          {playingLibTrackObject ? playingLibTrackObject.title : ''}
         </div>
         <div className={styles.ArtistName}>
-          {playingLibraryTrack ? (playingLibraryTrack.artist ? playingLibraryTrack.artist.name : '')  : ''}
+          {playingLibTrackObject ? (playingLibTrackObject.artist ? playingLibTrackObject.artist.name : '')  : ''}
         </div>
       </div>
       <div className={styles.Controls1}>
         <div className={styles.PlayPause}>
-          {blobUrl ?  (
-            <>
-              <ReactHowler
-                ref={playerRef}
-                src={[blobUrl]}
-                html5={true}
-                playing={playing}
-                format={[playingLibraryTrack.fileExtension.replace('.', '')]}
-                onLoadError={handleLoadError}
-                onEnd={handlePlayerOnEnd}
-                volume={volume}
-              />
-              <Button onClick={handlePlay}>Play</Button>
-              <Button onClick={handlePause}>Pause</Button>
-              <div>
-                seek {seek}
-              </div>
-            </>
-          ) : (
-            <p>Loading audio stream...</p>
-          )}
+          <>
+            <ReactHowler
+              ref={playerRef}
+              src={[libTrackBlobUrl ? libTrackBlobUrl : '']}
+              html5={true}
+              playing={playState === PlayStates.PLAYING}
+              format={[playingLibTrackObject.fileExtension.replace('.', '')]}
+              onLoadError={handleLoadError}
+              onEnd={handlePlayerOnEnd}
+              volume={volume}
+            />
+            <Button onClick={handlePlay}>Play</Button>
+            <Button onClick={handlePause}>Pause</Button>
+            <div>
+              seek {seek}
+            </div>
+          </>
         </div>
         <div className={styles.Seek}>
           <div className={styles.TimeCurrent}>
@@ -165,7 +167,7 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
                 <input
                   type='range'
                   min='0'
-                  max={playingLibraryTrack ? playingLibraryTrack.duration.toFixed(2) : 0}
+                  max={playingLibTrackObject ? playingLibTrackObject.duration.toFixed(2) : 0}
                   step='.01'
                   value={seek}
                   onChange={handleSeekingChange}
@@ -175,7 +177,7 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
               </span>
             </div>
           <div className={styles.TimeEnd}>
-            {playingLibraryTrack ? formatTime(playingLibraryTrack.duration) : '00:00'}
+            {playingLibTrackObject ? formatTime(playingLibTrackObject.duration) : '00:00'}
           </div>
         </div>
       </div>
@@ -197,8 +199,7 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
 }
 
 Player.propTypes = {
-  playingLibraryTrack: PropTypes.object,
-  setPlayingLibraryTrack: PropTypes.func.isRequired
+  playingLibTrackObject: PropTypes.object,
 };
 
 export default Player
