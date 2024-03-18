@@ -53,26 +53,24 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   }
   
   const handleSeekingChange = (event) => {
-    console.log('handleSeekingChange', event.target.value)
-    if (playerRef.current) {
+    if (playerRef.current && isSeeking) {
       setSeek(parseFloat(event.target.value))
     }
   }
 
   const handleMouseDownSeek = () => {
-    console.log('handleMouseDownSeek')
     setIsSeeking(true)
   }
 
   const handleMouseUpSeek = () => {
-    console.log('handleMouseUpSeek')
-    setIsSeeking(false)
-    playerRef.current.seek(seek)
+    if (isSeeking) {
+      setIsSeeking(false)
+      playerRef.current.seek(seek)
+    }
   }
   
   const renderSeekPos = () => {
     if (!isSeeking) {
-      console.log('renderSeekPos')
       setSeek(playerRef.current.seek())
     }
     if (playing) {
@@ -105,6 +103,14 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
     return () => {
       clearInterval(seekInterval)
       clearRAF()
+    };
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('mouseup', handleMouseUpSeek);
+  
+    return () => {
+      window.removeEventListener('mouseup', handleMouseUpSeek);
     };
   }, []);
 
@@ -180,7 +186,7 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
                   max={playingLibraryTrack ? playingLibraryTrack.duration.toFixed(2) : 0}
                   step='.01'
                   value={seek}
-                  onChange={handleSeekingChange}
+                  onInput={handleSeekingChange}
                   onMouseDown={handleMouseDownSeek}
                   onMouseUp={handleMouseUpSeek}
                 />
