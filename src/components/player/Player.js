@@ -53,7 +53,7 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   }
   
   const handleSeekingChange = (event) => {
-    if (playerRef.current) {
+    if (playerRef.current && isSeeking) {
       setSeek(parseFloat(event.target.value))
     }
   }
@@ -62,9 +62,11 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
     setIsSeeking(true)
   }
 
-  const handleMouseUpSeek = (e) => {
-    setIsSeeking(false)
-    playerRef.current.seek(e.target.value)
+  const handleMouseUpSeek = () => {
+    if (isSeeking) {
+      setIsSeeking(false)
+      playerRef.current.seek(seek)
+    }
   }
   
   const renderSeekPos = () => {
@@ -89,7 +91,6 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   }
 
   const handleVolumeChange = (event) => {
-    console.log('volume changed ' + event.target.value)
     setVolume(event.target.value);
   };
   
@@ -106,6 +107,14 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   }, []);
 
   useEffect(() => {
+    window.addEventListener('mouseup', handleMouseUpSeek);
+  
+    return () => {
+      window.removeEventListener('mouseup', handleMouseUpSeek);
+    };
+  }, []);
+
+  useEffect(() => {
     if (mustLoadStream) {
       setIsLoadingStream(false);
       getLibraryTrack();
@@ -117,6 +126,22 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
       getLibraryTrackBlobUrl();
     }
   }, [playingLibraryTrack])
+
+  useEffect(() => {
+    if (playing) {
+      seekInterval.current = setInterval(() => {
+        if (playerRef.current) {
+          setSeek(playerRef.current.seek());
+        }
+      }, 1000);
+    } else {
+      clearInterval(seekInterval.current);
+    }
+  
+    return () => {
+      clearInterval(seekInterval.current);
+    };
+  }, [playing]);
 
   return (
     <div className={styles.PlayerContainer}>
@@ -161,7 +186,7 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
                   max={playingLibraryTrack ? playingLibraryTrack.duration.toFixed(2) : 0}
                   step='.01'
                   value={seek}
-                  onChange={handleSeekingChange}
+                  onInput={handleSeekingChange}
                   onMouseDown={handleMouseDownSeek}
                   onMouseUp={handleMouseUpSeek}
                 />
