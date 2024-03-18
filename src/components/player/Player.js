@@ -1,7 +1,8 @@
 import styles from './Player.module.scss'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types';
 import ReactHowler from 'react-howler';
+import raf from 'raf'
 import Button from '../button/Button';
 import ApiService from '../../service/apiService'
 
@@ -11,14 +12,12 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
   const [mustLoadStream, setIsLoadingStream] = useState(false);
   const [blobUrl, setBlobUrl] = useState();
   const [playing, setPlaying] = useState(false);
+  const [seek, setSeek] = useState(0);
+  const [isSeeking, setIsSeeking] = useState(false);
 
-  const handlePlay = () => {
-    setPlaying(true);
-  }
-
-  const handlePause = () => {
-    setPlaying(false);
-  }
+  const seekInterval = useRef(null);
+  const playerRef = useRef(null);
+  let _raf = useRef(null);
 
   const handleLoadError = (id, err) => {
     console.log(`Error loading track of blob url ${blobUrl}: ${err}`);
@@ -34,11 +33,60 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
     const blobUrl = await ApiService.getLibraryTrackAudio(playingLibraryTrack.relativeUrl)
     setBlobUrl(blobUrl);
   }
+  
+  const handlePause = () => {
+    setPlaying(false);
+    clearInterval(seekInterval);
+  }
+  
+  const handlePlay = () => {
+    setPlaying(true);
+    renderSeekPos()
+  }
 
+  const handleOnEnd = () => {
+    setPlaying(false)
+    clearRAF()
+  }
+  
+  const handleSeekingChange = (event) => {
+    if (playerRef.current) {
+      setSeek(parseFloat(event.target.value))
+    }
+  }
+
+  const handleMouseDownSeek = () => {
+    setIsSeeking(true)
+  }
+
+  const handleMouseUpSeek = (e) => {
+    setIsSeeking(false)
+    playerRef.current.seek(e.target.value)
+  }
+  
+  const renderSeekPos = () => {
+    if (!isSeeking) {
+      setSeek(playerRef.current.seek())
+    }
+    if (playing) {
+      _raf = raf(renderSeekPos)
+    }
+  }
+
+  const clearRAF = () => {
+    raf.cancel(_raf)
+  }
+  
   useEffect(() => {
+
     if (!mustLoadStream) {
       setIsLoadingStream(true);
     }
+  
+    return () => {
+      clearInterval(seekInterval)
+      clearRAF()
+    };
   }, []);
 
   useEffect(() => {
@@ -56,21 +104,42 @@ const Player = ({playingLibraryTrack, setPlayingLibraryTrack}) => {
 
   return (
     <div className={styles.Player}>
-      {blobUrl ?  (
-        <>
-          <ReactHowler
-            src={[blobUrl]}
-            html5={true}
-            playing={playing}
-            format={[playingLibraryTrack.fileExtension.replace('.', '')]}
-            onLoadError={handleLoadError}
-          />
-          <Button onClick={handlePlay}>Play</Button>
-          <Button onClick={handlePause}>Pause</Button>
-        </>
-      ) : (
-        <p>Loading audio stream...</p>
-      )}
+      <div className={styles.PlayerButtons}>
+        {blobUrl ?  (
+          <>
+            <ReactHowler
+              ref={playerRef}
+              src={[blobUrl]}
+              html5={true}
+              playing={playing}
+              format={[playingLibraryTrack.fileExtension.replace('.', '')]}
+              onLoadError={handleLoadError}
+              onEnd={handleOnEnd}
+            />
+            <Button onClick={handlePlay}>Play</Button>
+            <Button onClick={handlePause}>Pause</Button>
+          </>
+        ) : (
+          <p>Loading audio stream...</p>
+        )}
+      </div>
+      <div className={styles.PlayerSeek}>
+          <label>
+            Seek:
+            <span className='slider-container'>
+              <input
+                type='range'
+                min='0'
+                max={playingLibraryTrack ? playingLibraryTrack.duration.toFixed(2) : 0}
+                step='.01'
+                value={seek}
+                onChange={handleSeekingChange}
+                onMouseDown={handleMouseDownSeek}
+                onMouseUp={handleMouseUpSeek}
+              />
+            </span>
+          </label>
+        </div>
     </div>
   )
 }

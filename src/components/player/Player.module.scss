@@ -1,6 +1,6 @@
 .Player {
     position: fixed;
+    left: 50%;
     bottom: 0;
-    width: 100%;
-    color: yellow;
+    transform: translateX(-50%);
 }
