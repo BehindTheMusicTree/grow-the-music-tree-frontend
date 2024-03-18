@@ -1,25 +1,19 @@
 import './Body.scss';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ApiService from '../../service/apiService';
 import TreeGraph from './TreeGraph/TreeGraph';
 
 const Body = ({setPlayingLibTrackObject}) => {
-  const [genres, setGenres] = useState(null);
   const [groupedGenres, setGroupedGenres] = useState(null);
-  const [isGenreFetchingStarted, setIsGenreFetchingStarted] = useState(false);
-  const [genreDataToPost, setGenreDataToPost] = useState(null);
   const [playlistToRetrieve, setPlaylistToRetrieve] = useState(null);
+  const [mustFetchGenres, setMustFetchGenres] = useState(true);
 
-  const postGenre = async (genreDataToPost) => {
+  const isGenreFetchingRef = useRef(false);
+
+  const postGenreAndRefresh = async (genreDataToPost) => {
     await ApiService.postGenre(genreDataToPost);
-    const genres = await ApiService.getGenres();
-    setGenres(genres);
-  };
-    
-  const fetchGenres = async () => {
-    const genres = await ApiService.getGenres()
-    setGenres(genres);
+    setMustFetchGenres(true);
   };
 
   const getGenresGroupedByRoot = (genres) => {
@@ -36,25 +30,22 @@ const Body = ({setPlayingLibTrackObject}) => {
   };
 
   useEffect(() => {
-    if (!isGenreFetchingStarted) {
-      setIsGenreFetchingStarted(true);
+    const fetchGenres = async () => {
+      return await ApiService.getGenres();
     }
-    else {
-      fetchGenres();
-    }
-  }, [isGenreFetchingStarted]);
 
-  useEffect(() => {
-    if (genres) {
+    const fetchAndSetGenres = async () => {
+      const genres = await fetchGenres();
       setGroupedGenres(getGenresGroupedByRoot(genres));
     }
-  }, [genres]);
-
-  useEffect(() => {
-    if (genreDataToPost) {
-      postGenre(genreDataToPost);
+    
+    if (mustFetchGenres && !isGenreFetchingRef.current) {
+      setMustFetchGenres(false);
+      isGenreFetchingRef.current = true;
+      fetchAndSetGenres();
+      isGenreFetchingRef.current = false;
     }
-  }, [genreDataToPost]);
+  }, [mustFetchGenres]);
 
   useEffect(() => {
     const retrievePlaylist = async (playlistToRetrieve) => {
@@ -77,7 +68,7 @@ const Body = ({setPlayingLibTrackObject}) => {
         {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
           const key = `${uuid}-${Date.now()}`;
           return (
-            <TreeGraph key={key} genres={genreTree} setGenreDataToPost={setGenreDataToPost} setPlaylistToRetrieve={setPlaylistToRetrieve}/>
+            <TreeGraph key={key} genres={genreTree} postGenreAndRefresh={postGenreAndRefresh} setPlaylistToRetrieve={setPlaylistToRetrieve}/>
           );
         }) : (
           <p>Loading data.</p>

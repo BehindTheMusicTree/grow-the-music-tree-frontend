@@ -21,9 +21,9 @@ const Player = ({playingLibTrackObject}) => {
   const [volume, setVolume] = useState(0.5);
   const [playState, setPlayState] = useState(PlayStates.NOT_PLAYING);
 
-  const isTrackLoading = useRef(false);
+  const isTrackLoadingRef = useRef(false);
   const playerRef = useRef(null);
-  let rafId = useRef(null);
+  let rafIdRef = useRef(null);
 
   const handleLoadError = (id, err) => {
     console.log(`Error loading track of blob url ${libTrackBlobUrl}: ${err}`);
@@ -63,7 +63,7 @@ const Player = ({playingLibTrackObject}) => {
       setSeek(playerRef.current.seek())
     }
     if (playState) {
-      rafId.current = raf(renderSeekPos);
+      rafIdRef.current = raf(renderSeekPos);
     }
   }
   
@@ -86,13 +86,13 @@ const Player = ({playingLibTrackObject}) => {
     }
 
     const fetchAndSetBlobUrl = async () => {
-      if (playingLibTrackObject && !isTrackLoading.current) {
-        isTrackLoading.current = true;
+      if (playingLibTrackObject && !isTrackLoadingRef.current) {
+        isTrackLoadingRef.current = true;
         const blobUrl = await getLibraryTrackBlobUrl();
         setLibTrackBlobUrl(blobUrl);
         setSeek(0);
         setPlayState(PlayStates.PLAYING);
-        isTrackLoading.current = false;
+        isTrackLoadingRef.current = false;
       }
     };
 
@@ -105,17 +105,17 @@ const Player = ({playingLibTrackObject}) => {
         renderSeekPos();
       }
     }
-    else if (rafId.current) {
-      raf.cancel(rafId.current);
+    else if (rafIdRef.current) {
+      raf.cancel(rafIdRef.current);
     }
   }, [playState])
 
   useEffect(() => {
     if (playState === PlayStates.PLAYING) {
       if (isSeeking) {
-        raf.cancel(rafId.current);
+        raf.cancel(rafIdRef.current);
       }
-      else if (rafId.current) {
+      else if (rafIdRef.current) {
         renderSeekPos();
       }
     }
