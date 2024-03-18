@@ -4,29 +4,26 @@ import PropTypes from 'prop-types';
 import ReactHowler from 'react-howler';
 import raf from 'raf';
 import Button from '../button/Button';
-import ApiService from '../../service/apiService'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons'
 
-const Player = ({playingLibTrackObject}) => {
+const Player = ({libTrackObjectWithBlobUrl}) => {
   const PlayStates = {
     PLAYING: 'PLAYING',
     NOT_PLAYING: 'NOT_PLAYING',
     STOPPED: 'STOPPED'
   };
 
-  const [libTrackBlobUrl, setLibTrackBlobUrl] = useState();
   const [seek, setSeek] = useState(0);
   const [isSeeking, setIsSeeking] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [playState, setPlayState] = useState(PlayStates.NOT_PLAYING);
 
-  const isTrackLoadingRef = useRef(false);
   const playerRef = useRef(null);
   let rafIdRef = useRef(null);
 
   const handleLoadError = (id, err) => {
-    console.log(`Error loading track of blob url ${libTrackBlobUrl}: ${err}`);
+    console.log(`Error loading track of blob url ${libTrackObjectWithBlobUrl.blobUrl}: ${err}`);
   }
   
   const handlePause = () => {
@@ -80,24 +77,9 @@ const Player = ({playingLibTrackObject}) => {
   };
 
   useEffect(() => {
-    const getLibraryTrackBlobUrl = async () => {
-      const blobUrl = await ApiService.getLibraryTrackAudio(playingLibTrackObject.relativeUrl)
-      return blobUrl;
-    }
-
-    const fetchAndSetBlobUrl = async () => {
-      if (playingLibTrackObject && !isTrackLoadingRef.current) {
-        isTrackLoadingRef.current = true;
-        const blobUrl = await getLibraryTrackBlobUrl();
-        setLibTrackBlobUrl(blobUrl);
-        setSeek(0);
-        setPlayState(PlayStates.PLAYING);
-        isTrackLoadingRef.current = false;
-      }
-    };
-
-    fetchAndSetBlobUrl();
-  }, [playingLibTrackObject])
+    setSeek(0);
+    setPlayState(PlayStates.PLAYING);
+  }, [libTrackObjectWithBlobUrl])
 
   useEffect(() => {
     if (playState === PlayStates.PLAYING) {
@@ -128,10 +110,10 @@ const Player = ({playingLibTrackObject}) => {
     <div className={styles.PlayerContainer}>
       <div className={styles.TrackInfo}>
         <div className={styles.TrackTitle}>
-          {playingLibTrackObject ? playingLibTrackObject.title : ''}
+          {libTrackObjectWithBlobUrl ? libTrackObjectWithBlobUrl.title : ''}
         </div>
         <div className={styles.ArtistName}>
-          {playingLibTrackObject ? (playingLibTrackObject.artist ? playingLibTrackObject.artist.name : '')  : ''}
+          {libTrackObjectWithBlobUrl ? (libTrackObjectWithBlobUrl.artist ? libTrackObjectWithBlobUrl.artist.name : '')  : ''}
         </div>
       </div>
       <div className={styles.Controls1}>
@@ -139,10 +121,10 @@ const Player = ({playingLibTrackObject}) => {
           <>
             <ReactHowler
               ref={playerRef}
-              src={[libTrackBlobUrl ? libTrackBlobUrl : '']}
+              src={[libTrackObjectWithBlobUrl.blobUrl ? libTrackObjectWithBlobUrl.blobUrl : '']}
               html5={true}
               playing={playState === PlayStates.PLAYING}
-              format={[playingLibTrackObject.fileExtension.replace('.', '')]}
+              format={[libTrackObjectWithBlobUrl.fileExtension.replace('.', '')]}
               onLoadError={handleLoadError}
               onEnd={handlePlayerOnEnd}
               volume={volume}
@@ -163,7 +145,7 @@ const Player = ({playingLibTrackObject}) => {
                 <input
                   type='range'
                   min='0'
-                  max={playingLibTrackObject ? playingLibTrackObject.duration.toFixed(2) : 0}
+                  max={libTrackObjectWithBlobUrl ? libTrackObjectWithBlobUrl.duration.toFixed(2) : 0}
                   step='.01'
                   value={seek}
                   onChange={handleSeekingChange}
@@ -173,7 +155,7 @@ const Player = ({playingLibTrackObject}) => {
               </span>
             </div>
           <div className={styles.TimeEnd}>
-            {playingLibTrackObject ? formatTime(playingLibTrackObject.duration) : '00:00'}
+            {libTrackObjectWithBlobUrl ? formatTime(libTrackObjectWithBlobUrl.duration) : '00:00'}
           </div>
         </div>
       </div>
@@ -195,7 +177,7 @@ const Player = ({playingLibTrackObject}) => {
 }
 
 Player.propTypes = {
-  playingLibTrackObject: PropTypes.object,
+  libTrackObjectWithBlobUrl: PropTypes.object
 };
 
 export default Player
