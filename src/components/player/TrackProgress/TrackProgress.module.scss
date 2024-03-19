@@ -1,0 +1,16 @@
+.Seek {
+    display: flex;
+    flex-direction: line;
+    justify-content: center;
+    width: 100%;
+    background-color: green;
+}
+
+.Progressbar {
+    flex: 0 0 80%;
+    background-color: pink;
+}
+
+.TimeCurrent {
+    margin-right: 10px;
+}
