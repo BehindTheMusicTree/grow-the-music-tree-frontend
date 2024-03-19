@@ -8,18 +8,18 @@
     padding: 20px;
 
     .TrackInfo, .Controls1, .Controls2 {
-        flex: 1;
         align-items: center;
     }
 }
 
 .TrackInfo {
-    display: flex;
+    width: 100%;
     flex-direction: column;
     background-color: blue;
 }
 
 .Controls1 {
+    flex: 0 0 60%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -51,6 +51,7 @@
 }
 
 .Controls2 {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
