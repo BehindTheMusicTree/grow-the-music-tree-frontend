@@ -48,9 +48,9 @@ const Player = ({libTrackObjectWithBlobUrl}) => {
         </div>
       </div>
       <div className={styles.Controls1}>
-        <div className={styles.PlayPause}>
-          <Button onClick={handlePlayPause}>{playState === PlayStates.PLAYING ? <FaPause /> : <FaPlay />}</Button>
-        </div>
+        <Button 
+        className={playState === PlayStates.PLAYING ? styles.PauseButton : styles.PlayButton} 
+          onClick={handlePlayPause}>{playState === PlayStates.PLAYING ? <FaPause /> : <FaPlay />}</Button>
         <TrackProgress 
           playState={playState} 
           setPlayState={setPlayState} 
