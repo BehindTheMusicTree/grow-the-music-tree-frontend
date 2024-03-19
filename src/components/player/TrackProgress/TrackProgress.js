@@ -106,6 +106,7 @@ const TrackProgress = ({
         {formatTime(seek)}
       </div>
       <input
+        className={styles.ProgressBar}
         type="range"
         min="0"
         max={playerRef.current ? playerRef.current.duration() : 0}

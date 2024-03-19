@@ -1,12 +1,13 @@
-.Seek {
+.TrackProgress {
     display: flex;
     flex-direction: line;
     justify-content: center;
+    align-items: center;
     width: 100%;
     background-color: green;
 }
 
-.Progressbar {
+.ProgressBar {
     flex: 0 0 80%;
     background-color: pink;
 }

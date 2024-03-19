@@ -5,8 +5,6 @@ import './Button.module.scss'
 
 const Button = ({ children, className, ...otherProps }) => {
 
-  console.log('Rerender')
-
   return (
     <button className={classnames('button', className)} {...otherProps} >
       {children}
