@@ -45,8 +45,10 @@ const TrackProgress = ({
   }
 
   const handleSeekMouseUp = (event) => {
-    setIsSeeking(false);
-    playerRef.current.seek(event.target.value);
+    if (isSeeking) {
+      setIsSeeking(false);
+      playerRef.current.seek(event.target.value);
+    }
   }
 
   const renderSeekPos = () => {
@@ -73,6 +75,9 @@ const TrackProgress = ({
     if (playState === PlayStates.PLAYING) {
       if (isSeeking) {
         raf.cancel(rafIdRef.current);
+      }
+      else if (seek === Math.floor(libTrackObjectWithBlobUrl.duration)) {
+        setPlayState(PlayStates.STOPPED);
       }
       else if (rafIdRef.current) {
         renderSeekPos();
@@ -105,16 +110,17 @@ const TrackProgress = ({
       <div className={styles.CurrentTime}>
         {formatTime(seek)}
       </div>
-      <input
+      {playerRef.current ? <input
         className={styles.ProgressBar}
         type="range"
         min="0"
-        max={playerRef.current ? playerRef.current.duration() : 0}
+        max={Math.floor(playerRef.current.duration())}
         value={seek}
         onChange={handleSeekingChange}
         onMouseDown={handleSeekMouseDown}
         onMouseUp={handleSeekMouseUp}
-      />
+        onMouseLeave={handleSeekMouseUp} // because mouseup doesn't fire if mouse leaves the element
+      /> : null}
       <div className={styles.TotalTime}>
         {formatTime(playerRef.current ? playerRef.current.duration() : 0)}
       </div>
