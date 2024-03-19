@@ -1,13 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import './Button.scss'
+import './Button.module.scss'
 
-const Button = (props) => {
-  const { children, className, ...otherProps } = props
+const Button = ({ children, className, ...otherProps }) => {
 
   return (
-    <button className={classnames('button', className)} {...otherProps}>
+    <button className={classnames('button', className)} {...otherProps} >
       {children}
     </button>
   )
@@ -15,7 +14,7 @@ const Button = (props) => {
 
 Button.propTypes = {
   children: PropTypes.node.isRequired,
-  className: PropTypes.string
+  className: PropTypes.string,
 }
 
 export default Button
