@@ -5,10 +5,10 @@
     bottom: 0;
     display: flex;
     justify-content: space-between;
-    padding: 20px;
+    padding: 10px;
     background-color: rgba(0, 0, 0, 0.947);
     color: #fffffff6;
-    
+    font-size: 13px;
 }
 
 .PlayerLeft {
@@ -45,14 +45,15 @@
     align-items: center;
 
     .PlayButton, .PauseButton {
-        width: 50px;
-        height: 50px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #ffffff9a;
-        background-color: #7f7f7f;
+        color: #000000d1;
+        background-color: #f3f1f1;
+        margin-bottom: 10px;
     }
     
     .button:hover {
