@@ -53,11 +53,13 @@
         justify-content: center;
         color: #000000d1;
         background-color: #f3f1f1;
-        margin-bottom: 10px;
+        margin-bottom: 10px;    
+        transition: width 0.2s ease, height 0.2s ease;
     }
-    
-    .button:hover {
-        color: #ffffff9a;
+
+    .PlayButton:hover, .PauseButton:hover {
+        width: 35px;
+        height: 35px;
     }
 
     .PlayButton svg {
