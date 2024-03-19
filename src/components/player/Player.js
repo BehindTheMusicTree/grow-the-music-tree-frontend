@@ -7,6 +7,7 @@ import { faVolumeUp } from '@fortawesome/free-solid-svg-icons'
 import { FaPlay, FaPause } from 'react-icons/fa';
 import TrackProgress from './TrackProgress/TrackProgress';
 import { PlayStates } from '../../constants';
+import albumCover from '../../assets/images/album-cover-default.png';
 
 const Player = ({libTrackObjectWithBlobUrl}) => {
 
@@ -39,12 +40,15 @@ const Player = ({libTrackObjectWithBlobUrl}) => {
 
   return (
     <div className={styles.PlayerContainer}>
-      <div className={styles.TrackInfo}>
-        <div className={styles.TrackTitle}>
-          {libTrackObjectWithBlobUrl ? libTrackObjectWithBlobUrl.title : ''}
-        </div>
-        <div className={styles.ArtistName}>
-          {libTrackObjectWithBlobUrl ? (libTrackObjectWithBlobUrl.artist ? libTrackObjectWithBlobUrl.artist.name : '')  : ''}
+      <div className={styles.PlayerLeft}>
+        <img className={styles.AlbumCover} src={albumCover} alt="Album Cover" />
+        <div className={styles.TrackInfo}>
+          <div className={styles.TrackTitle}>
+            {libTrackObjectWithBlobUrl ? libTrackObjectWithBlobUrl.title : ''}
+          </div>
+          <div className={styles.ArtistName}>
+            {libTrackObjectWithBlobUrl ? (libTrackObjectWithBlobUrl.artist ? libTrackObjectWithBlobUrl.artist.name : '')  : ''}
+          </div>
         </div>
       </div>
       <div className={styles.Controls1}>
