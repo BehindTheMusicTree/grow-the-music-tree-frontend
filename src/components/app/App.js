@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Body from '../body/Body'
 import Banner from '../banner/Banner'
 import { Howler } from 'howler';
@@ -12,20 +12,37 @@ function App() {
 
   const [searchSubmitted, setSearchSubmitted] = useState('')
   const [playingLibTrackObjectWithBlobUrl, setPlayingLibTrackObjectWithBlobUrl] = useState(null);
+  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const [selectedPlaylistPlayingLibTrackNumber, setSelectedPlaylistPlayingLibTrackNumber] = useState(0);
 
-  const isPlayingLibTrackLoadingRef = useRef(false);
+  const setSelectedPlaylistUuid = async (uuid) => {
+    setSelectedPlaylist(await ApiService.retrievePlaylist(uuid))
+  }
 
-  const setPlayingLibTrack = async (playingLibTrackObject) => {
-    isPlayingLibTrackLoadingRef.current = true;
-    const playingLibTrackBlobUrl = await ApiService.getLoadAudioAndGetLibTrackBlobUrl(playingLibTrackObject.relativeUrl)
-    setPlayingLibTrackObjectWithBlobUrl({...playingLibTrackObject, blobUrl: playingLibTrackBlobUrl});
-    isPlayingLibTrackLoadingRef.current = false;
-  };
+  useEffect(() => {
+    const setPlayingLibTrack = async (playingLibTrackObject) => {
+      const playingLibTrackBlobUrl = await ApiService.getLoadAudioAndGetLibTrackBlobUrl(playingLibTrackObject.relativeUrl)
+      setPlayingLibTrackObjectWithBlobUrl({...playingLibTrackObject, blobUrl: playingLibTrackBlobUrl});
+    };
+
+    if (selectedPlaylist && selectedPlaylist.libraryTracks.length > 0) {
+      setPlayingLibTrack(selectedPlaylist.libraryTracks[selectedPlaylistPlayingLibTrackNumber]);
+    }
+    setSelectedPlaylistPlayingLibTrackNumber(0);
+  }, [selectedPlaylist, selectedPlaylistPlayingLibTrackNumber]);
 
   return (
     <div>
       <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-      <Body setPlayingLibTrack={setPlayingLibTrack}/>
+      <Body setSelectedPlaylistUuid={setSelectedPlaylistUuid}/>
+      {selectedPlaylist ? 
+        (selectedPlaylist.libraryTracks.length > selectedPlaylistPlayingLibTrackNumber + 1 ?
+          (selectedPlaylist.libraryTracks[selectedPlaylistPlayingLibTrackNumber + 1].artist ? 
+            selectedPlaylist.libraryTracks[selectedPlaylistPlayingLibTrackNumber + 1].artist.name + ' - ' 
+            : null)
+          + selectedPlaylist.libraryTracks[selectedPlaylistPlayingLibTrackNumber + 1].title
+          : null)
+      : null}
       {playingLibTrackObjectWithBlobUrl ? <Player libTrackObjectWithBlobUrl={playingLibTrackObjectWithBlobUrl}/> : null}
     </div>
   );
