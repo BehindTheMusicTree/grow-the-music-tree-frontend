@@ -17,23 +17,19 @@ const TrackProgress = ({
     playState, 
     setPlayState, 
     shouldResetSeek, 
-    setShouldResetSeek, 
-    isSeeking, 
-    setIsSeeking, 
-    libTrackObjectWithBlobUrl,
-    volume }) => {
+    setShouldResetSeek,
+    playerTrackObject,
+    volume,
+    handleTrackEnd}) => {
 
   const [seek, setSeek] = useState(0);
+  const [isSeeking, setIsSeeking] = useState(false);
 
   const playerRef = useRef(null);
   let rafIdRef = useRef(null);
 
-  const handlePlayerOnEnd = () => {
-    setPlayState(PlayStates.STOPPED);
-  }
-
   const handleLoadError = (id, err) => {
-    console.log(`Error loading track of blob url ${libTrackObjectWithBlobUrl.blobUrl}: ${err}`);
+    console.log(`Error loading track of blob url ${playerTrackObject.blobUrl}: ${err}`);
   }
 
   const handleSeekingChange = (event) => {
@@ -41,45 +37,83 @@ const TrackProgress = ({
   }
 
   const handleSeekMouseDown = () => {
+    console.log('Seek mouse down');
     setIsSeeking(true)
   }
 
-  const handleSeekMouseUp = (event) => {
+  const handleLeaveSeeking = (event) => {
+    console.log('Seek mouse up');
     if (isSeeking) {
+      console.log('set not seeking');
       setIsSeeking(false);
       playerRef.current.seek(event.target.value);
     }
   }
 
   const renderSeekPos = () => {
+    // console.log('Render seek pos');
+    // console.log('isSeeking', isSeeking);
     if (!isSeeking) {
       setSeek(playerRef.current.seek())
     }
-    if (playState) {
-      rafIdRef.current = raf(renderSeekPos);
+
+    if (playState === PlayStates.PLAYING && !rafIdRef.current) {
+      console.log('raf');
+      rafIdRef.current = raf(() => {
+        rafIdRef.current = null;
+        renderSeekPos();
+      });
     }
   }
 
+  const cancelRaf = () => {
+    raf.cancel(rafIdRef.current);
+    rafIdRef.current = null;
+  }
+
   useEffect(() => {
-    if (playState === PlayStates.PLAYING) {
-      if (playerRef.current) {
-        renderSeekPos();
-      }
+    console.log('Render progressbar');
+    // console.log('Render progressbar lib track', playerTrackObject.blobUrl);
+    // console.log('Render progressbar lib track', playerTrackObject.title);
+    // console.log('Render progressbar lib track', playerTrackObject.hasNext);
+    // console.log('Render progressbar lib track', playState);
+    // console.log('Render progressbar lib track', shouldResetSeek);
+
+    return () => {
+      console.log('Unmount progressbar');
+      cancelRaf();
     }
-    else if (rafIdRef.current) {
-      raf.cancel(rafIdRef.current);
+  }, [])
+
+  useEffect(() => {
+    // console.log('playerTrackObject', playerTrackObject);
+    // console.log('shouldResetSeek', shouldResetSeek);
+    // console.log('playState', playState);
+  }, [shouldResetSeek, playerTrackObject, playState])
+
+  useEffect(() => {
+    console.log('playState', playState);
+    if (playState === PlayStates.PLAYING) {
+      console.log('renderSeekPos1');
+      renderSeekPos();
+    }
+    else {
+      cancelRaf();
     }
   }, [playState])
 
   useEffect(() => {
+    console.log('isSeeking', isSeeking);
     if (playState === PlayStates.PLAYING) {
       if (isSeeking) {
-        raf.cancel(rafIdRef.current);
+        console.log('Cancel raf');
+        cancelRaf();
       }
-      else if (seek === Math.floor(libTrackObjectWithBlobUrl.duration)) {
-        setPlayState(PlayStates.STOPPED);
+      else if (seek === Math.floor(playerTrackObject.duration)) {
+        handleTrackEnd()
       }
-      else if (rafIdRef.current) {
+      else {
+        console.log('renderSeekPos2');
         renderSeekPos();
       }
     }
@@ -95,16 +129,21 @@ const TrackProgress = ({
     }
   }, [shouldResetSeek])
 
+  const handleTrackEnd2 = () => {
+    console.log('Track end2');
+    handleTrackEnd();
+  }
+
   return (
     <div className={styles.TrackProgress}>
         <ReactHowler
         ref={playerRef}
-        src={[libTrackObjectWithBlobUrl.blobUrl]}
+        src={[playerTrackObject.blobUrl]}
         html5={true}
         playing={playState === PlayStates.PLAYING}
-        format={[libTrackObjectWithBlobUrl.fileExtension.replace('.', '')]}
+        format={[playerTrackObject.fileExtension.replace('.', '')]}
         onLoadError={handleLoadError}
-        onEnd={handlePlayerOnEnd}
+        onEnd={handleTrackEnd2}
         volume={volume}
         />
       <div className={styles.CurrentTime}>
@@ -118,8 +157,8 @@ const TrackProgress = ({
         value={seek}
         onChange={handleSeekingChange}
         onMouseDown={handleSeekMouseDown}
-        onMouseUp={handleSeekMouseUp}
-        onMouseLeave={handleSeekMouseUp} // because mouseup doesn't fire if mouse leaves the element
+        onMouseUp={handleLeaveSeeking}
+        onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
       /> : null}
       <div className={styles.TotalTime}>
         {formatTime(playerRef.current ? playerRef.current.duration() : 0)}
@@ -131,11 +170,10 @@ const TrackProgress = ({
 TrackProgress.propTypes = {
     playState: PropTypes.string,
     setPlayState: PropTypes.func,
-    isSeeking: PropTypes.bool,
-    setIsSeeking: PropTypes.func,
     shouldResetSeek: PropTypes.bool,
     setShouldResetSeek: PropTypes.func,
-    libTrackObjectWithBlobUrl: PropTypes.object,
-    volume: PropTypes.number};
+    playerTrackObject: PropTypes.object,
+    volume: PropTypes.number,
+    handleTrackEnd: PropTypes.func};
 
 export default TrackProgress;

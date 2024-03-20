@@ -4,6 +4,7 @@ import Banner from '../banner/Banner'
 import { Howler } from 'howler';
 import Player from '../player/Player';
 import ApiService from '../../service/apiService';
+import { PlayStates } from '../../constants';
 
 Howler.html5PoolSize = 100;
 Howler.autoUnlock = true;
@@ -11,24 +12,49 @@ Howler.autoUnlock = true;
 function App() {
 
   const [searchSubmitted, setSearchSubmitted] = useState('')
-  const [playingLibTrackObjectWithBlobUrl, setPlayingLibTrackObjectWithBlobUrl] = useState(null);
+  const [playerTrackObject, setPlayerTrackObject] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [selectedPlaylistPlayingLibTrackNumber, setSelectedPlaylistPlayingLibTrackNumber] = useState(0);
+
+  const [playState, setPlayState] = useState(PlayStates.PLAYING);
+  const [shouldResetSeek, setShouldResetSeek] = useState(false);
 
   const setSelectedPlaylistUuid = async (uuid) => {
     setSelectedPlaylist(await ApiService.retrievePlaylist(uuid))
   }
 
+  const setNextTrack = () => {
+    setShouldResetSeek(true);
+    // console.log('next track');
+    setSelectedPlaylistPlayingLibTrackNumber(prev => prev + 1);
+  }
+
+  useEffect(() => {
+    // console.log('App mounted');
+    return () => {
+      // console.log('App unmounted');
+    }
+  }, [])
+
   useEffect(() => {
     const setPlayingLibTrack = async (playingLibTrackObject) => {
       const playingLibTrackBlobUrl = await ApiService.getLoadAudioAndGetLibTrackBlobUrl(playingLibTrackObject.relativeUrl)
-      setPlayingLibTrackObjectWithBlobUrl({...playingLibTrackObject, blobUrl: playingLibTrackBlobUrl});
+      setPlayerTrackObject({
+        ...playingLibTrackObject, 
+        blobUrl: playingLibTrackBlobUrl,
+        hasNext: selectedPlaylist.libraryTracks.length > selectedPlaylistPlayingLibTrackNumber + 1
+      });
     };
 
-    if (selectedPlaylist && selectedPlaylist.libraryTracks.length > 0) {
+    if (selectedPlaylist) {
+      // console.log('selectedPlaylistPlayingLibTrackNumber', selectedPlaylistPlayingLibTrackNumber);
+      // console.log('selectedPlaylist', selectedPlaylist.uuid);
+      // console.log('selectedPlaylist.libraryTracks.length', selectedPlaylist.libraryTracks.length);
+    }
+    if (selectedPlaylist && selectedPlaylist.libraryTracks.length > selectedPlaylistPlayingLibTrackNumber) {
+      // console.log('setPlayingLibTrack');
       setPlayingLibTrack(selectedPlaylist.libraryTracks[selectedPlaylistPlayingLibTrackNumber]);
     }
-    setSelectedPlaylistPlayingLibTrackNumber(0);
   }, [selectedPlaylist, selectedPlaylistPlayingLibTrackNumber]);
 
   return (
@@ -43,7 +69,16 @@ function App() {
           + selectedPlaylist.libraryTracks[selectedPlaylistPlayingLibTrackNumber + 1].title
           : null)
       : null}
-      {playingLibTrackObjectWithBlobUrl ? <Player libTrackObjectWithBlobUrl={playingLibTrackObjectWithBlobUrl}/> : null}
+      {playerTrackObject ? 
+        <Player 
+          playerTrackObject={playerTrackObject}
+          playState={playState}
+          setPlayState={setPlayState}
+          shouldResetSeek={shouldResetSeek} 
+          setShouldResetSeek={setShouldResetSeek}
+          setNextTrack={setNextTrack}
+        /> 
+      : null}
     </div>
   );
 }
