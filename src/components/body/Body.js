@@ -4,9 +4,8 @@ import PropTypes from 'prop-types';
 import ApiService from '../../service/apiService';
 import TreeGraph from './TreeGraph/TreeGraph';
 
-const Body = ({setPlayingLibTrack}) => {
+const Body = ({setSelectedPlaylistUuid}) => {
   const [groupedGenres, setGroupedGenres] = useState(null);
-  const [playlistToRetrieve, setPlaylistToRetrieve] = useState(null);
   const [mustFetchGenres, setMustFetchGenres] = useState(true);
 
   const isGenreFetchingRef = useRef(false);
@@ -47,20 +46,6 @@ const Body = ({setPlayingLibTrack}) => {
     }
   }, [mustFetchGenres]);
 
-  useEffect(() => {
-    const retrievePlaylist = async (playlistToRetrieve) => {
-      const playlist = await ApiService.retrievePlaylist(playlistToRetrieve);
-      const libraryTracks = playlist.libraryTracks;
-      if (libraryTracks.length > 0) {
-        setPlayingLibTrack(libraryTracks[0]);
-      }
-    }
-
-    if (playlistToRetrieve) {
-      retrievePlaylist(playlistToRetrieve);
-    }
-  }, [playlistToRetrieve]);
-
   return (
     <div>
       <div id="genre-tree">
@@ -68,7 +53,11 @@ const Body = ({setPlayingLibTrack}) => {
         {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
           const key = `${uuid}-${Date.now()}`;
           return (
-            <TreeGraph key={key} genres={genreTree} postGenreAndRefresh={postGenreAndRefresh} setPlaylistToRetrieve={setPlaylistToRetrieve}/>
+            <TreeGraph 
+              key={key} 
+              genres={genreTree} 
+              postGenreAndRefresh={postGenreAndRefresh} 
+              setSelectedPlaylistUuid={setSelectedPlaylistUuid}/>
           );
         }) : (
           <p>Loading data.</p>
@@ -79,7 +68,7 @@ const Body = ({setPlayingLibTrack}) => {
 }
 
 Body.propTypes = {
-  setPlayingLibTrack: PropTypes.func.isRequired
+  setSelectedPlaylistUuid: PropTypes.func.isRequired
 };
 
 export default Body;
