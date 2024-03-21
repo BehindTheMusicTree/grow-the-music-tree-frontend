@@ -6,7 +6,7 @@ import Description from './Description'
 import SearchForm from './SearchForm'
 import PropTypes from 'prop-types';
 
-function Banner({searchSubmitted, setSearchSubmitted}) {
+export default function Banner({searchSubmitted, setSearchSubmitted}) {
     return (
     <div className='banner'>
         <img src={logo} className='banner-logo' alt='logo' />
@@ -21,5 +21,3 @@ Banner.propTypes = {
     searchSubmitted: PropTypes.string.isRequired,
     setSearchSubmitted: PropTypes.func.isRequired
 }
-
-export default Banner

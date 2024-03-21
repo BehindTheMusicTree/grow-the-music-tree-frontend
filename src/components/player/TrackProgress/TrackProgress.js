@@ -13,27 +13,23 @@ const formatTime = (seconds) => {
     return `${minutes}:${secs}`;
 }
 
-const TrackProgress = ({ 
+export default function TrackProgress ({ 
     playState, 
     setPlayState, 
     shouldResetSeek, 
-    setShouldResetSeek, 
-    isSeeking, 
-    setIsSeeking, 
-    libTrackObjectWithBlobUrl,
-    volume }) => {
+    setShouldResetSeek,
+    playerTrackObject,
+    volume,
+    handleTrackEnd}) {
 
   const [seek, setSeek] = useState(0);
+  const [isSeeking, setIsSeeking] = useState(false);
 
   const playerRef = useRef(null);
   let rafIdRef = useRef(null);
 
-  const handlePlayerOnEnd = () => {
-    setPlayState(PlayStates.STOPPED);
-  }
-
   const handleLoadError = (id, err) => {
-    console.log(`Error loading track of blob url ${libTrackObjectWithBlobUrl.blobUrl}: ${err}`);
+    console.log(`Error loading track of blob url ${playerTrackObject.blobUrl}: ${err}`);
   }
 
   const handleSeekingChange = (event) => {
@@ -44,7 +40,7 @@ const TrackProgress = ({
     setIsSeeking(true)
   }
 
-  const handleSeekMouseUp = (event) => {
+  const handleLeaveSeeking = (event) => {
     if (isSeeking) {
       setIsSeeking(false);
       playerRef.current.seek(event.target.value);
@@ -55,31 +51,50 @@ const TrackProgress = ({
     if (!isSeeking) {
       setSeek(playerRef.current.seek())
     }
-    if (playState) {
-      rafIdRef.current = raf(renderSeekPos);
+
+    if (playState === PlayStates.PLAYING && !rafIdRef.current) {
+      rafIdRef.current = raf(() => {
+        rafIdRef.current = null;
+        renderSeekPos();
+      });
     }
   }
 
+  const cancelRaf = () => {
+    raf.cancel(rafIdRef.current);
+    rafIdRef.current = null;
+  }
+
+  useEffect(() => {
+    console.log('Render progressbar');
+
+    return () => {
+      console.log('Unmount progressbar');
+      cancelRaf();
+    }
+  }, [])
+
+  useEffect(() => {
+  }, [shouldResetSeek, playerTrackObject, playState])
+
   useEffect(() => {
     if (playState === PlayStates.PLAYING) {
-      if (playerRef.current) {
-        renderSeekPos();
-      }
+      renderSeekPos();
     }
-    else if (rafIdRef.current) {
-      raf.cancel(rafIdRef.current);
+    else {
+      cancelRaf();
     }
   }, [playState])
 
   useEffect(() => {
     if (playState === PlayStates.PLAYING) {
       if (isSeeking) {
-        raf.cancel(rafIdRef.current);
+        cancelRaf();
       }
-      else if (seek === Math.floor(libTrackObjectWithBlobUrl.duration)) {
-        setPlayState(PlayStates.STOPPED);
+      else if (seek >= Math.floor(playerTrackObject.duration)) {
+        handleTrackEnd()
       }
-      else if (rafIdRef.current) {
+      else {
         renderSeekPos();
       }
     }
@@ -99,12 +114,12 @@ const TrackProgress = ({
     <div className={styles.TrackProgress}>
         <ReactHowler
         ref={playerRef}
-        src={[libTrackObjectWithBlobUrl.blobUrl]}
+        src={[playerTrackObject.blobUrl]}
         html5={true}
         playing={playState === PlayStates.PLAYING}
-        format={[libTrackObjectWithBlobUrl.fileExtension.replace('.', '')]}
+        format={[playerTrackObject.fileExtension.replace('.', '')]}
         onLoadError={handleLoadError}
-        onEnd={handlePlayerOnEnd}
+        onEnd={handleTrackEnd}
         volume={volume}
         />
       <div className={styles.CurrentTime}>
@@ -118,8 +133,8 @@ const TrackProgress = ({
         value={seek}
         onChange={handleSeekingChange}
         onMouseDown={handleSeekMouseDown}
-        onMouseUp={handleSeekMouseUp}
-        onMouseLeave={handleSeekMouseUp} // because mouseup doesn't fire if mouse leaves the element
+        onMouseUp={handleLeaveSeeking}
+        onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
       /> : null}
       <div className={styles.TotalTime}>
         {formatTime(playerRef.current ? playerRef.current.duration() : 0)}
@@ -131,11 +146,8 @@ const TrackProgress = ({
 TrackProgress.propTypes = {
     playState: PropTypes.string,
     setPlayState: PropTypes.func,
-    isSeeking: PropTypes.bool,
-    setIsSeeking: PropTypes.func,
     shouldResetSeek: PropTypes.bool,
     setShouldResetSeek: PropTypes.func,
-    libTrackObjectWithBlobUrl: PropTypes.object,
-    volume: PropTypes.number};
-
-export default TrackProgress;
+    playerTrackObject: PropTypes.object,
+    volume: PropTypes.number,
+    handleTrackEnd: PropTypes.func};

@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import PropTypes from 'prop-types';
 
-const TreeGraph = ({ genres, postGenreAndRefresh, setSelectedPlaylistUuid }) => {
+export default function TreeGraph ({ genres, postGenreAndRefresh, setSelectedPlaylistUuid }) {
   const RECT_WIDTH = 180;
   const RECT_HEIGHT = 30;
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
@@ -158,5 +158,3 @@ TreeGraph.propTypes = {
   postGenreAndRefresh: PropTypes.func.isRequired,
   setSelectedPlaylistUuid: PropTypes.func.isRequired
 };
-
-export default TreeGraph;
