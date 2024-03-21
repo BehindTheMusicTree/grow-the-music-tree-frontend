@@ -9,21 +9,19 @@ import TrackProgress from './TrackProgress/TrackProgress';
 import { PlayStates } from '../../constants';
 import albumCover from '../../assets/images/album-cover-default.png';
 
-const Player = ({playerTrackObject, playState, setPlayState, shouldResetSeek, setShouldResetSeek, setNextTrack}) => {
+export default function Player ({playerTrackObject, playState, setPlayState, shouldResetSeek, setShouldResetSeek, setNextTrack}) {
 
   const [volume, setVolume] = useState(0.5);
   
   const handlePlayPause = () => {
     if (playState === PlayStates.STOPPED) {
       setShouldResetSeek(true);
-      console.log('set playing1');
       setPlayState(PlayStates.PLAYING);
     }
     else if (playState === PlayStates.PLAYING) {
       setPlayState(PlayStates.PAUSED);
     }
     else {
-      console.log('set playing2');
       setPlayState(PlayStates.PLAYING);
     }
   }
@@ -33,19 +31,15 @@ const Player = ({playerTrackObject, playState, setPlayState, shouldResetSeek, se
   };
 
   const handleTrackEnd = () => {
-    console.log('Track end1');
     if (playerTrackObject.hasNext) {
-      console.log('has next');
       setNextTrack();
     }
     else {
-      console.log('hasnt next');
       setPlayState(PlayStates.STOPPED);
     }
   }
 
   const handleNextClick = () => {
-    console.log('Next click');
     setNextTrack();
   }
 
@@ -119,5 +113,3 @@ Player.propTypes = {
   setShouldResetSeek: PropTypes.func.isRequired,
   setNextTrack: PropTypes.func.isRequired
 };
-
-export default Player

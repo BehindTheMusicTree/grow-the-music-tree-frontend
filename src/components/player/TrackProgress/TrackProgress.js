@@ -13,14 +13,14 @@ const formatTime = (seconds) => {
     return `${minutes}:${secs}`;
 }
 
-const TrackProgress = ({ 
+export default function TrackProgress ({ 
     playState, 
     setPlayState, 
     shouldResetSeek, 
     setShouldResetSeek,
     playerTrackObject,
     volume,
-    handleTrackEnd}) => {
+    handleTrackEnd}) {
 
   const [seek, setSeek] = useState(0);
   const [isSeeking, setIsSeeking] = useState(false);
@@ -37,28 +37,22 @@ const TrackProgress = ({
   }
 
   const handleSeekMouseDown = () => {
-    console.log('Seek mouse down');
     setIsSeeking(true)
   }
 
   const handleLeaveSeeking = (event) => {
-    console.log('Seek mouse up');
     if (isSeeking) {
-      console.log('set not seeking');
       setIsSeeking(false);
       playerRef.current.seek(event.target.value);
     }
   }
 
   const renderSeekPos = () => {
-    // console.log('Render seek pos');
-    // console.log('isSeeking', isSeeking);
     if (!isSeeking) {
       setSeek(playerRef.current.seek())
     }
 
     if (playState === PlayStates.PLAYING && !rafIdRef.current) {
-      console.log('raf');
       rafIdRef.current = raf(() => {
         rafIdRef.current = null;
         renderSeekPos();
@@ -73,11 +67,6 @@ const TrackProgress = ({
 
   useEffect(() => {
     console.log('Render progressbar');
-    // console.log('Render progressbar lib track', playerTrackObject.blobUrl);
-    // console.log('Render progressbar lib track', playerTrackObject.title);
-    // console.log('Render progressbar lib track', playerTrackObject.hasNext);
-    // console.log('Render progressbar lib track', playState);
-    // console.log('Render progressbar lib track', shouldResetSeek);
 
     return () => {
       console.log('Unmount progressbar');
@@ -86,15 +75,10 @@ const TrackProgress = ({
   }, [])
 
   useEffect(() => {
-    // console.log('playerTrackObject', playerTrackObject);
-    // console.log('shouldResetSeek', shouldResetSeek);
-    // console.log('playState', playState);
   }, [shouldResetSeek, playerTrackObject, playState])
 
   useEffect(() => {
-    console.log('playState', playState);
     if (playState === PlayStates.PLAYING) {
-      console.log('renderSeekPos1');
       renderSeekPos();
     }
     else {
@@ -103,17 +87,14 @@ const TrackProgress = ({
   }, [playState])
 
   useEffect(() => {
-    console.log('isSeeking', isSeeking);
     if (playState === PlayStates.PLAYING) {
       if (isSeeking) {
-        console.log('Cancel raf');
         cancelRaf();
       }
-      else if (seek === Math.floor(playerTrackObject.duration)) {
+      else if (seek >= Math.floor(playerTrackObject.duration)) {
         handleTrackEnd()
       }
       else {
-        console.log('renderSeekPos2');
         renderSeekPos();
       }
     }
@@ -129,11 +110,6 @@ const TrackProgress = ({
     }
   }, [shouldResetSeek])
 
-  const handleTrackEnd2 = () => {
-    console.log('Track end2');
-    handleTrackEnd();
-  }
-
   return (
     <div className={styles.TrackProgress}>
         <ReactHowler
@@ -143,7 +119,7 @@ const TrackProgress = ({
         playing={playState === PlayStates.PLAYING}
         format={[playerTrackObject.fileExtension.replace('.', '')]}
         onLoadError={handleLoadError}
-        onEnd={handleTrackEnd2}
+        onEnd={handleTrackEnd}
         volume={volume}
         />
       <div className={styles.CurrentTime}>
@@ -175,5 +151,3 @@ TrackProgress.propTypes = {
     playerTrackObject: PropTypes.object,
     volume: PropTypes.number,
     handleTrackEnd: PropTypes.func};
-
-export default TrackProgress;
