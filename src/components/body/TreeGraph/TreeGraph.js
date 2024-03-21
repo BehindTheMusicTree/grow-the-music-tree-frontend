@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { PlayStates } from '../../../constants';
 
 export default function TreeGraph (
-  { genres, postGenreAndRefresh, setPlayingPlaylistUuid, playState, playingPlaylist, isLibTrackLoading }) {
+  { genres, postGenreAndRefresh, selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState }) {
   const RECT_WIDTH = 180;
   const RECT_HEIGHT = 30;
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
@@ -107,8 +107,12 @@ export default function TreeGraph (
       .attr('x', RECT_WIDTH / 2 - 30)
       .attr('y', 0)
       .text(function(d) {
-        if (playingPlaylist && playingPlaylist.uuid === d.data.criteriaPlaylist.uuid) {
-          if (isLibTrackLoading) {
+        if (d.data.criteriaPlaylist.libraryTracksCount === 0) {
+          return '';
+        }
+        
+        if (playingPlaylistUuidWithLoadingState && playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid) {
+          if (playingPlaylistUuidWithLoadingState.isLoading) {
             return '⏳';
           }
           return playState === PlayStates.PLAYING ? "⏸" : '►';
@@ -116,10 +120,10 @@ export default function TreeGraph (
         return '►';
       })
       .on('click', function(event, d) {
-        if (!playingPlaylist || playingPlaylist.uuid !== d.data.criteriaPlaylist.uuid) {
+        if (!playingPlaylistUuidWithLoadingState || playingPlaylistUuidWithLoadingState.uuid !== d.data.criteriaPlaylist.uuid) {
           if (d.data.criteriaPlaylist.libraryTracksCount > 0) {
             event.stopPropagation();
-            setPlayingPlaylistUuid(d.data.criteriaPlaylist.uuid);
+            selectPlaylistUuidToPlay(d.data.criteriaPlaylist.uuid);
           }
         }
       })
@@ -166,7 +170,7 @@ export default function TreeGraph (
       .on('mouseout', function() {
         d3.select(this).select('.plus-button').style('display', 'none');
       });
-  }, [genres, playingPlaylist, playState, isLibTrackLoading]);
+  }, [genres, playState, playingPlaylistUuidWithLoadingState]);
 
   return (
     <svg ref={svgRef} width="600" height="400" className="tree-graph-svg"></svg>
@@ -176,8 +180,7 @@ export default function TreeGraph (
 TreeGraph.propTypes = {
   genres: PropTypes.array.isRequired,
   postGenreAndRefresh: PropTypes.func.isRequired,
-  setPlayingPlaylistUuid: PropTypes.func.isRequired,
+  selectPlaylistUuidToPlay: PropTypes.func.isRequired,
   playState: PropTypes.string.isRequired,
-  playingPlaylist: PropTypes.object,
-  isLibTrackLoading: PropTypes.bool.isRequired
+  playingPlaylistUuidWithLoadingState: PropTypes.object,
 };

@@ -13,16 +13,16 @@ export default function App() {
 
   const [searchSubmitted, setSearchSubmitted] = useState('')
   const [playerTrackObject, setPlayerTrackObject] = useState(null);
-  const [playingPlaylist, setPlayingPlaylist] = useState(null);
+  const [playingPlaylistUuidWithLoadingState, setPlayingPlaylistUuidWithLoadingState] = useState(null);
+  const [playingPlaylistObject, setPlayingPlaylistObject] = useState(null);
   const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
-  const [isLibTrackLoading, setIsLibTrackLoading] = useState(false);
 
   const [playState, setPlayState] = useState(PlayStates.PLAYING);
   const [shouldResetSeek, setShouldResetSeek] = useState(false);
 
-  const setPlayingPlaylistUuid = async (uuid) => {
-    setIsLibTrackLoading(true);
-    setPlayingPlaylist(await ApiService.retrievePlaylist(uuid))
+  const selectPlaylistUuidToPlay = async (uuid) => {
+    setPlayingPlaylistUuidWithLoadingState({uuid: uuid, isLoading: true});
+    setPlayingPlaylistObject(await ApiService.retrievePlaylist(uuid))
   }
 
   const setNextTrack = () => {
@@ -36,18 +36,24 @@ export default function App() {
       setPlayerTrackObject({
         ...playingLibTrackObject, 
         blobUrl: playingLibTrackBlobUrl,
-        hasNext: playingPlaylist.libraryTracks.length > playingPlaylistLibTrackNumber + 1
+        hasNext: playingPlaylistObject.libraryTracks.length > playingPlaylistLibTrackNumber + 1
       });
     };
 
-    if (playingPlaylist && playingPlaylist.libraryTracks.length > playingPlaylistLibTrackNumber) {
-      setPlayingLibTrack(playingPlaylist.libraryTracks[playingPlaylistLibTrackNumber]);
+    if (playingPlaylistUuidWithLoadingState && playingPlaylistUuidWithLoadingState.isLoading) {
+      setPlayingPlaylistLibTrackNumber(0);
     }
-  }, [playingPlaylist, playingPlaylistLibTrackNumber]);
+
+    if (playingPlaylistObject && playingPlaylistObject.libraryTracks.length > playingPlaylistLibTrackNumber) {
+      setPlayingLibTrack(playingPlaylistObject.libraryTracks[playingPlaylistLibTrackNumber]);
+    }
+  }, [playingPlaylistObject, playingPlaylistLibTrackNumber]);
 
   useEffect(() => {
     if (playerTrackObject) {
-      setIsLibTrackLoading(false);
+      if (playingPlaylistUuidWithLoadingState.isLoading) {
+        setPlayingPlaylistUuidWithLoadingState({...playingPlaylistUuidWithLoadingState,  isLoading: false});
+      }
     }
   }, [playerTrackObject]);
 
@@ -55,16 +61,15 @@ export default function App() {
     <div>
       <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
       <Body 
-        setPlayingPlaylistUuid={setPlayingPlaylistUuid} 
+        selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
         playState={playState} 
-        playingPlaylist={playingPlaylist}
-        isLibTrackLoading={isLibTrackLoading}/>
-      {playingPlaylist ? 
-        (playingPlaylist.libraryTracks.length > playingPlaylistLibTrackNumber + 1 ?
-          (playingPlaylist.libraryTracks[playingPlaylistLibTrackNumber + 1].artist ? 
-            playingPlaylist.libraryTracks[playingPlaylistLibTrackNumber + 1].artist.name + ' - ' 
+        playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}/>
+      {playingPlaylistObject ? 
+        (playingPlaylistObject.libraryTracks.length > playingPlaylistLibTrackNumber + 1 ?
+          (playingPlaylistObject.libraryTracks[playingPlaylistLibTrackNumber + 1].artist ? 
+            playingPlaylistObject.libraryTracks[playingPlaylistLibTrackNumber + 1].artist.name + ' - ' 
             : null)
-          + playingPlaylist.libraryTracks[playingPlaylistLibTrackNumber + 1].title
+          + playingPlaylistObject.libraryTracks[playingPlaylistLibTrackNumber + 1].title
           : null)
       : null}
       {playerTrackObject ? 

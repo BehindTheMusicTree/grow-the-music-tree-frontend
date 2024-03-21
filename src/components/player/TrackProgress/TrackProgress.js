@@ -66,10 +66,7 @@ export default function TrackProgress ({
   }
 
   useEffect(() => {
-    console.log('Render progressbar');
-
     return () => {
-      console.log('Unmount progressbar');
       cancelRaf();
     }
   }, [])
