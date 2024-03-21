@@ -114,8 +114,10 @@ export default function TreeGraph ({ genres, postGenreAndRefresh, setPlayingPlay
           : '►'
       })
       .on('click', function(event, d) {
-        event.stopPropagation();
-        setPlayingPlaylistUuid(d.data.criteriaPlaylist.uuid);
+        if (!playingPlaylist || playingPlaylist.uuid !== d.data.criteriaPlaylist.uuid) {
+          event.stopPropagation();
+          setPlayingPlaylistUuid(d.data.criteriaPlaylist.uuid);
+        }
       })
 
     nodes.append('text')
