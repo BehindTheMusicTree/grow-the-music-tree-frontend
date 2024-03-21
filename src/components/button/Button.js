@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import './Button.module.scss'
 
-const Button = ({ children, className, ...otherProps }) => {
+export default function Button ({ children, className, ...otherProps }) {
 
   return (
     <button className={classnames('button', className)} {...otherProps} >
@@ -16,5 +16,3 @@ Button.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
 }
-
-export default Button

@@ -9,7 +9,7 @@ import { PlayStates } from '../../constants';
 Howler.html5PoolSize = 100;
 Howler.autoUnlock = true;
 
-function App() {
+export default function App() {
 
   const [searchSubmitted, setSearchSubmitted] = useState('')
   const [playerTrackObject, setPlayerTrackObject] = useState(null);
@@ -82,5 +82,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

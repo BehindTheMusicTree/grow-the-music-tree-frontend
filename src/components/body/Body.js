@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import ApiService from '../../service/apiService';
 import TreeGraph from './TreeGraph/TreeGraph';
 
-const Body = ({setSelectedPlaylistUuid}) => {
+export default function Body ({setSelectedPlaylistUuid}) {
   const [groupedGenres, setGroupedGenres] = useState(null);
   const [mustFetchGenres, setMustFetchGenres] = useState(true);
 
@@ -70,5 +70,3 @@ const Body = ({setSelectedPlaylistUuid}) => {
 Body.propTypes = {
   setSelectedPlaylistUuid: PropTypes.func.isRequired
 };
-
-export default Body;

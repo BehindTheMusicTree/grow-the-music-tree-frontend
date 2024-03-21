@@ -2,7 +2,7 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types';
 
-function SearchForm({setSearchSubmitted}) {
+export default function SearchForm({setSearchSubmitted}) {
 
     const [searchNumber, setSearchNumber] = useState(0)
     const [isFirstFocus, setIsFirstFocus] = useState(true)
@@ -55,5 +55,3 @@ function SearchForm({setSearchSubmitted}) {
 SearchForm.propTypes = {
     setSearchSubmitted: PropTypes.func.isRequired
 }
-
-export default SearchForm
