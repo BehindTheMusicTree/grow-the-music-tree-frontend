@@ -3,6 +3,8 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import PropTypes from 'prop-types';
 import { PlayStates } from '../../../constants';
+import ReactDOMServer from 'react-dom/server';
+import { FaSpinner } from 'react-icons/fa';
 
 export default function TreeGraph (
   { genres, postGenreAndRefresh, selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState }) {
@@ -12,6 +14,8 @@ export default function TreeGraph (
   const VERTICAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const HORIZONTAL_SEPARATOON_BETWEEN_NODES = RECT_WIDTH + HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES;
   const VERTICAL_SEPARATOON_BETWEEN_NODES = RECT_HEIGHT + VERTICAL_SEPARATOON_BETWEEN_RECTANGLES;
+
+  const FA_ICON_SIZE = 14;
 
   const svgRef = useRef(null);
 
@@ -99,12 +103,28 @@ export default function TreeGraph (
       .text(function(d) {
         return d.data.name;
       });
+
+    nodes.append('foreignObject')
+      .attr('class', 'spinner')
+      .attr('width', FA_ICON_SIZE)
+      .attr('height', FA_ICON_SIZE)
+      .attr('dominant-baseline', 'middle')
+      .attr('text-anchor', 'middle')
+      .attr('x', RECT_WIDTH / 2 - 33 - FA_ICON_SIZE / 2)
+      .attr('y', - RECT_HEIGHT / 2 + FA_ICON_SIZE / 2)
+      .html(function(d) {
+        if (playingPlaylistUuidWithLoadingState 
+          && playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid
+          && playingPlaylistUuidWithLoadingState.isLoading) {
+            return ReactDOMServer.renderToString(<FaSpinner size={FA_ICON_SIZE}/>)
+          }
+      })
   
     nodes.append('text')
       .attr('class', 'play-button')
       .attr('dominant-baseline', 'middle')
       .attr('text-anchor', 'middle')
-      .attr('x', RECT_WIDTH / 2 - 30)
+      .attr('x', RECT_WIDTH / 2 - 33)
       .attr('y', 0)
       .text(function(d) {
         if (d.data.criteriaPlaylist.libraryTracksCount === 0) {
@@ -113,7 +133,7 @@ export default function TreeGraph (
         
         if (playingPlaylistUuidWithLoadingState && playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid) {
           if (playingPlaylistUuidWithLoadingState.isLoading) {
-            return '⏳';
+            return ''
           }
           return playState === PlayStates.PLAYING ? "⏸" : '►';
         }
@@ -133,7 +153,6 @@ export default function TreeGraph (
         }
         return 'default';
       })
-      
 
     nodes.append('text')
       .attr('class', 'playlist-tracks-count-text')
