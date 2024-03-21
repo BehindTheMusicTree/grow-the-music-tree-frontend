@@ -1,12 +1,4 @@
-#genre-tree {
-    background-color: #c5c5c5;
-    color: #333;
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 50px;
-}
-
-.tree-graph-svg {
+.TreeGraphSvg {
     margin-bottom: 10px;
 }
 
@@ -15,37 +7,51 @@
     stroke-width: 1px;
 }
 
-.link {
+.Link {
     fill: none;
     stroke: #555;
     stroke-opacity: 0.4;
     stroke-width: 2px;
 }
 
-.play-button {
+.PlayPauseButton {
     font-size: 12px;
     fill: #ffffff;
     text-anchor: middle;
 }
 
-.playlist-tracks-count-text {
+.PlaylistTracksCountText {
     font-size: 12px;
     fill: #ffffff;
     text-anchor: middle;
 }
 
-.plus-button {
+.PlusButton {
     fill: red;
     display: none;
     cursor: pointer;
 }
 
-.node-label {
+.NodeLabel {
     font-size: 12px;
     fill: #ffffff;
     text-anchor: middle;
 }
 
-.spinner svg {
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.SpinnerContainer {
+    width: 14px;
+    height: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Spinner {
+    animation: spin 2s linear infinite;
     fill: white;
 }

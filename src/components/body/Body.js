@@ -1,4 +1,4 @@
-import './Body.scss';
+import styles from './Body.module.scss';
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ApiService from '../../service/apiService';
@@ -47,8 +47,8 @@ export default function Body ({selectPlaylistUuidToPlay, playState, playingPlayl
   }, [mustFetchGenres]);
 
   return (
-    <div>
-      <div id="genre-tree">
+    <div id={styles.Body}>
+      <div id={styles.GenreTreeContainer}>
         <h1>Genre Tree</h1>
         {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
           const key = `${uuid}-${Date.now()}`;

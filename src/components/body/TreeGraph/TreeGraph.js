@@ -1,4 +1,4 @@
-import './TreeGraph.scss'
+import styles from './TreeGraph.module.scss'
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import PropTypes from 'prop-types';
@@ -77,14 +77,14 @@ export default function TreeGraph (
       .data(treeData.links())
       .enter()
       .append('path')
-      .attr('class', 'link')
+      .attr('class', styles.Link)
       .attr('d', linkGenerator);
 
     const nodes = svg.selectAll('g.node')
       .data(treeData.descendants())
       .enter()
       .append('g')
-      .attr('class', 'node')
+      .attr('class', styles.Node)
       .attr('transform', function(d) {
         nodeY = RECT_WIDTH / 2 + HORIZONTAL_SEPARATOON_BETWEEN_NODES * d.depth;
         return 'translate(' + nodeY + ',' + (d.x - firstNodeXCorrected + svgHeight / 2) + ')';
@@ -97,7 +97,7 @@ export default function TreeGraph (
       .attr('y', -RECT_HEIGHT / 2);
 
     nodes.append('text')
-      .attr('class', 'node-label')
+      .attr('class', styles.NodeLabel)
       .attr('dominant-baseline', 'middle')
       .attr('text-anchor', 'middle')
       .text(function(d) {
@@ -105,27 +105,31 @@ export default function TreeGraph (
       });
 
     nodes.append('foreignObject')
-      .attr('class', 'spinner')
+      .attr('class', styles.SpinnerContainer)
       .attr('width', FA_ICON_SIZE)
       .attr('height', FA_ICON_SIZE)
       .attr('dominant-baseline', 'middle')
-      .attr('text-anchor', 'middle')
       .attr('x', RECT_WIDTH / 2 - 33 - FA_ICON_SIZE / 2)
       .attr('y', - RECT_HEIGHT / 2 + FA_ICON_SIZE / 2)
       .html(function(d) {
         if (playingPlaylistUuidWithLoadingState 
           && playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid
           && playingPlaylistUuidWithLoadingState.isLoading) {
-            return ReactDOMServer.renderToString(<FaSpinner size={FA_ICON_SIZE}/>)
+            return ReactDOMServer.renderToString(<FaSpinner size={FA_ICON_SIZE} className={styles.Spinner}/>)
           }
       })
   
     nodes.append('text')
-      .attr('class', 'play-button')
+      .attr('class', styles.PlayPauseButton)
       .attr('dominant-baseline', 'middle')
       .attr('text-anchor', 'middle')
       .attr('x', RECT_WIDTH / 2 - 33)
       .attr('y', 0)
+      .style('visibility', function(d) {
+        playingPlaylistUuidWithLoadingState 
+          && playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid
+          && playingPlaylistUuidWithLoadingState.isLoading ? 'hidden' : 'visible';
+      })
       .text(function(d) {
         if (d.data.criteriaPlaylist.libraryTracksCount === 0) {
           return '';
@@ -155,7 +159,7 @@ export default function TreeGraph (
       })
 
     nodes.append('text')
-      .attr('class', 'playlist-tracks-count-text')
+      .attr('class', styles.PlaylistTracksCountText)
       .attr('dominant-baseline', 'middle')
       .attr('text-anchor', 'middle')
       .attr('x', RECT_WIDTH / 2 - 20)
@@ -165,7 +169,7 @@ export default function TreeGraph (
       })
   
     nodes.append('text')
-      .attr('class', 'plus-button')
+      .attr('class', styles.PlusButton)
       .attr('dominant-baseline', 'middle')
       .attr('text-anchor', 'middle')
       .attr('x', RECT_WIDTH / 2 - 10)
@@ -192,7 +196,7 @@ export default function TreeGraph (
   }, [genres, playState, playingPlaylistUuidWithLoadingState]);
 
   return (
-    <svg ref={svgRef} width="600" height="400" className="tree-graph-svg"></svg>
+    <svg ref={svgRef} width="600" height="400" className={styles.TreeGraphSvg}></svg>
   );
 }
 
