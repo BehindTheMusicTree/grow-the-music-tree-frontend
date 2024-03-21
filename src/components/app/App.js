@@ -15,11 +15,13 @@ export default function App() {
   const [playerTrackObject, setPlayerTrackObject] = useState(null);
   const [playingPlaylist, setPlayingPlaylist] = useState(null);
   const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
+  const [isLibTrackLoading, setIsLibTrackLoading] = useState(false);
 
   const [playState, setPlayState] = useState(PlayStates.PLAYING);
   const [shouldResetSeek, setShouldResetSeek] = useState(false);
 
   const setPlayingPlaylistUuid = async (uuid) => {
+    setIsLibTrackLoading(true);
     setPlayingPlaylist(await ApiService.retrievePlaylist(uuid))
   }
 
@@ -43,10 +45,20 @@ export default function App() {
     }
   }, [playingPlaylist, playingPlaylistLibTrackNumber]);
 
+  useEffect(() => {
+    if (playerTrackObject) {
+      setIsLibTrackLoading(false);
+    }
+  }, [playerTrackObject]);
+
   return (
     <div>
       <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-      <Body setPlayingPlaylistUuid={setPlayingPlaylistUuid} playState={playState} playingPlaylist={playingPlaylist}/>
+      <Body 
+        setPlayingPlaylistUuid={setPlayingPlaylistUuid} 
+        playState={playState} 
+        playingPlaylist={playingPlaylist}
+        isLibTrackLoading={isLibTrackLoading}/>
       {playingPlaylist ? 
         (playingPlaylist.libraryTracks.length > playingPlaylistLibTrackNumber + 1 ?
           (playingPlaylist.libraryTracks[playingPlaylistLibTrackNumber + 1].artist ? 

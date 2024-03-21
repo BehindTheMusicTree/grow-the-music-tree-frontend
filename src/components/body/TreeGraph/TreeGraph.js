@@ -4,7 +4,8 @@ import * as d3 from 'd3';
 import PropTypes from 'prop-types';
 import { PlayStates } from '../../../constants';
 
-export default function TreeGraph ({ genres, postGenreAndRefresh, setPlayingPlaylistUuid, playState, playingPlaylist }) {
+export default function TreeGraph (
+  { genres, postGenreAndRefresh, setPlayingPlaylistUuid, playState, playingPlaylist, isLibTrackLoading }) {
   const RECT_WIDTH = 180;
   const RECT_HEIGHT = 30;
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
@@ -106,19 +107,29 @@ export default function TreeGraph ({ genres, postGenreAndRefresh, setPlayingPlay
       .attr('x', RECT_WIDTH / 2 - 30)
       .attr('y', 0)
       .text(function(d) {
-        if (!playingPlaylist) {
-          return '►';
+        if (playingPlaylist && playingPlaylist.uuid === d.data.criteriaPlaylist.uuid) {
+          if (isLibTrackLoading) {
+            return '⏳';
+          }
+          return playState === PlayStates.PLAYING ? "⏸" : '►';
         }
-        return playingPlaylist.uuid === d.data.criteriaPlaylist.uuid ? 
-          (playState === PlayStates.PLAYING ? "⏸" : '►')
-          : '►'
+        return '►';
       })
       .on('click', function(event, d) {
         if (!playingPlaylist || playingPlaylist.uuid !== d.data.criteriaPlaylist.uuid) {
-          event.stopPropagation();
-          setPlayingPlaylistUuid(d.data.criteriaPlaylist.uuid);
+          if (d.data.criteriaPlaylist.libraryTracksCount > 0) {
+            event.stopPropagation();
+            setPlayingPlaylistUuid(d.data.criteriaPlaylist.uuid);
+          }
         }
       })
+      .style('cursor', function(d) {
+        if (d.data.criteriaPlaylist.libraryTracksCount > 0) {
+          return 'pointer';
+        }
+        return 'default';
+      })
+      
 
     nodes.append('text')
       .attr('class', 'playlist-tracks-count-text')
@@ -155,7 +166,7 @@ export default function TreeGraph ({ genres, postGenreAndRefresh, setPlayingPlay
       .on('mouseout', function() {
         d3.select(this).select('.plus-button').style('display', 'none');
       });
-  }, [genres, playingPlaylist, playState]);
+  }, [genres, playingPlaylist, playState, isLibTrackLoading]);
 
   return (
     <svg ref={svgRef} width="600" height="400" className="tree-graph-svg"></svg>
@@ -167,5 +178,6 @@ TreeGraph.propTypes = {
   postGenreAndRefresh: PropTypes.func.isRequired,
   setPlayingPlaylistUuid: PropTypes.func.isRequired,
   playState: PropTypes.string.isRequired,
-  playingPlaylist: PropTypes.object
+  playingPlaylist: PropTypes.object,
+  isLibTrackLoading: PropTypes.bool.isRequired
 };
