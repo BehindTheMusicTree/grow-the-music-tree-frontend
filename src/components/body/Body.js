@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import ApiService from '../../service/apiService';
 import TreeGraph from './TreeGraph/TreeGraph';
 
-export default function Body ({setSelectedPlaylistUuid}) {
+export default function Body ({selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState}) {
   const [groupedGenres, setGroupedGenres] = useState(null);
   const [mustFetchGenres, setMustFetchGenres] = useState(true);
 
@@ -57,7 +57,9 @@ export default function Body ({setSelectedPlaylistUuid}) {
               key={key} 
               genres={genreTree} 
               postGenreAndRefresh={postGenreAndRefresh} 
-              setSelectedPlaylistUuid={setSelectedPlaylistUuid}/>
+              selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
+              playState={playState}
+              playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}/>
           );
         }) : (
           <p>Loading data.</p>
@@ -68,5 +70,7 @@ export default function Body ({setSelectedPlaylistUuid}) {
 }
 
 Body.propTypes = {
-  setSelectedPlaylistUuid: PropTypes.func.isRequired
+  selectPlaylistUuidToPlay: PropTypes.func.isRequired,
+  playState: PropTypes.string.isRequired,
+  playingPlaylistUuidWithLoadingState: PropTypes.object
 };

@@ -2,8 +2,10 @@ import './TreeGraph.scss'
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import PropTypes from 'prop-types';
+import { PlayStates } from '../../../constants';
 
-export default function TreeGraph ({ genres, postGenreAndRefresh, setSelectedPlaylistUuid }) {
+export default function TreeGraph (
+  { genres, postGenreAndRefresh, selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState }) {
   const RECT_WIDTH = 180;
   const RECT_HEIGHT = 30;
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
@@ -104,11 +106,34 @@ export default function TreeGraph ({ genres, postGenreAndRefresh, setSelectedPla
       .attr('text-anchor', 'middle')
       .attr('x', RECT_WIDTH / 2 - 30)
       .attr('y', 0)
-      .text('►')
-      .on('click', function(event, d) {
-        event.stopPropagation();
-        setSelectedPlaylistUuid(d.data.criteriaPlaylist.uuid);
+      .text(function(d) {
+        if (d.data.criteriaPlaylist.libraryTracksCount === 0) {
+          return '';
+        }
+        
+        if (playingPlaylistUuidWithLoadingState && playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid) {
+          if (playingPlaylistUuidWithLoadingState.isLoading) {
+            return '⏳';
+          }
+          return playState === PlayStates.PLAYING ? "⏸" : '►';
+        }
+        return '►';
       })
+      .on('click', function(event, d) {
+        if (!playingPlaylistUuidWithLoadingState || playingPlaylistUuidWithLoadingState.uuid !== d.data.criteriaPlaylist.uuid) {
+          if (d.data.criteriaPlaylist.libraryTracksCount > 0) {
+            event.stopPropagation();
+            selectPlaylistUuidToPlay(d.data.criteriaPlaylist.uuid);
+          }
+        }
+      })
+      .style('cursor', function(d) {
+        if (d.data.criteriaPlaylist.libraryTracksCount > 0) {
+          return 'pointer';
+        }
+        return 'default';
+      })
+      
 
     nodes.append('text')
       .attr('class', 'playlist-tracks-count-text')
@@ -145,16 +170,17 @@ export default function TreeGraph ({ genres, postGenreAndRefresh, setSelectedPla
       .on('mouseout', function() {
         d3.select(this).select('.plus-button').style('display', 'none');
       });
-  }, [genres]);
+  }, [genres, playState, playingPlaylistUuidWithLoadingState]);
 
   return (
-    <svg ref={svgRef} width="600" height="400" className="tree-graph-svg">
-    </svg>
+    <svg ref={svgRef} width="600" height="400" className="tree-graph-svg"></svg>
   );
 }
 
 TreeGraph.propTypes = {
-  genres: PropTypes.array,
+  genres: PropTypes.array.isRequired,
   postGenreAndRefresh: PropTypes.func.isRequired,
-  setSelectedPlaylistUuid: PropTypes.func.isRequired
+  selectPlaylistUuidToPlay: PropTypes.func.isRequired,
+  playState: PropTypes.string.isRequired,
+  playingPlaylistUuidWithLoadingState: PropTypes.object,
 };
