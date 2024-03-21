@@ -2,8 +2,9 @@ import './TreeGraph.scss'
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import PropTypes from 'prop-types';
+import { PlayStates } from '../../../constants';
 
-export default function TreeGraph ({ genres, postGenreAndRefresh, setSelectedPlaylistUuid }) {
+export default function TreeGraph ({ genres, postGenreAndRefresh, setPlayingPlaylistUuid, playState, playingPlaylist }) {
   const RECT_WIDTH = 180;
   const RECT_HEIGHT = 30;
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
@@ -104,10 +105,17 @@ export default function TreeGraph ({ genres, postGenreAndRefresh, setSelectedPla
       .attr('text-anchor', 'middle')
       .attr('x', RECT_WIDTH / 2 - 30)
       .attr('y', 0)
-      .text('►')
+      .text(function(d) {
+        if (!playingPlaylist) {
+          return '►';
+        }
+        return playingPlaylist.uuid === d.data.criteriaPlaylist.uuid ? 
+          (playState === PlayStates.PLAYING ? "⏸" : '►')
+          : '►'
+      })
       .on('click', function(event, d) {
         event.stopPropagation();
-        setSelectedPlaylistUuid(d.data.criteriaPlaylist.uuid);
+        setPlayingPlaylistUuid(d.data.criteriaPlaylist.uuid);
       })
 
     nodes.append('text')
@@ -145,16 +153,17 @@ export default function TreeGraph ({ genres, postGenreAndRefresh, setSelectedPla
       .on('mouseout', function() {
         d3.select(this).select('.plus-button').style('display', 'none');
       });
-  }, [genres]);
+  }, [genres, playingPlaylist, playState]);
 
   return (
-    <svg ref={svgRef} width="600" height="400" className="tree-graph-svg">
-    </svg>
+    <svg ref={svgRef} width="600" height="400" className="tree-graph-svg"></svg>
   );
 }
 
 TreeGraph.propTypes = {
-  genres: PropTypes.array,
+  genres: PropTypes.array.isRequired,
   postGenreAndRefresh: PropTypes.func.isRequired,
-  setSelectedPlaylistUuid: PropTypes.func.isRequired
+  setPlayingPlaylistUuid: PropTypes.func.isRequired,
+  playState: PropTypes.string.isRequired,
+  playingPlaylist: PropTypes.object
 };

@@ -13,19 +13,19 @@ export default function App() {
 
   const [searchSubmitted, setSearchSubmitted] = useState('')
   const [playerTrackObject, setPlayerTrackObject] = useState(null);
-  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
-  const [selectedPlaylistPlayingLibTrackNumber, setSelectedPlaylistPlayingLibTrackNumber] = useState(0);
+  const [playingPlaylist, setPlayingPlaylist] = useState(null);
+  const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
 
   const [playState, setPlayState] = useState(PlayStates.PLAYING);
   const [shouldResetSeek, setShouldResetSeek] = useState(false);
 
-  const setSelectedPlaylistUuid = async (uuid) => {
-    setSelectedPlaylist(await ApiService.retrievePlaylist(uuid))
+  const setPlayingPlaylistUuid = async (uuid) => {
+    setPlayingPlaylist(await ApiService.retrievePlaylist(uuid))
   }
 
   const setNextTrack = () => {
     setShouldResetSeek(true);
-    setSelectedPlaylistPlayingLibTrackNumber(prev => prev + 1);
+    setPlayingPlaylistLibTrackNumber(prev => prev + 1);
   }
 
   useEffect(() => {
@@ -34,25 +34,25 @@ export default function App() {
       setPlayerTrackObject({
         ...playingLibTrackObject, 
         blobUrl: playingLibTrackBlobUrl,
-        hasNext: selectedPlaylist.libraryTracks.length > selectedPlaylistPlayingLibTrackNumber + 1
+        hasNext: playingPlaylist.libraryTracks.length > playingPlaylistLibTrackNumber + 1
       });
     };
 
-    if (selectedPlaylist && selectedPlaylist.libraryTracks.length > selectedPlaylistPlayingLibTrackNumber) {
-      setPlayingLibTrack(selectedPlaylist.libraryTracks[selectedPlaylistPlayingLibTrackNumber]);
+    if (playingPlaylist && playingPlaylist.libraryTracks.length > playingPlaylistLibTrackNumber) {
+      setPlayingLibTrack(playingPlaylist.libraryTracks[playingPlaylistLibTrackNumber]);
     }
-  }, [selectedPlaylist, selectedPlaylistPlayingLibTrackNumber]);
+  }, [playingPlaylist, playingPlaylistLibTrackNumber]);
 
   return (
     <div>
       <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-      <Body setSelectedPlaylistUuid={setSelectedPlaylistUuid}/>
-      {selectedPlaylist ? 
-        (selectedPlaylist.libraryTracks.length > selectedPlaylistPlayingLibTrackNumber + 1 ?
-          (selectedPlaylist.libraryTracks[selectedPlaylistPlayingLibTrackNumber + 1].artist ? 
-            selectedPlaylist.libraryTracks[selectedPlaylistPlayingLibTrackNumber + 1].artist.name + ' - ' 
+      <Body setPlayingPlaylistUuid={setPlayingPlaylistUuid} playState={playState} playingPlaylist={playingPlaylist}/>
+      {playingPlaylist ? 
+        (playingPlaylist.libraryTracks.length > playingPlaylistLibTrackNumber + 1 ?
+          (playingPlaylist.libraryTracks[playingPlaylistLibTrackNumber + 1].artist ? 
+            playingPlaylist.libraryTracks[playingPlaylistLibTrackNumber + 1].artist.name + ' - ' 
             : null)
-          + selectedPlaylist.libraryTracks[selectedPlaylistPlayingLibTrackNumber + 1].title
+          + playingPlaylist.libraryTracks[playingPlaylistLibTrackNumber + 1].title
           : null)
       : null}
       {playerTrackObject ? 
