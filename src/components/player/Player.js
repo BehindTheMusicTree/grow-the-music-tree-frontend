@@ -47,14 +47,6 @@ export default function Player ({playerTrackObject, playState, setPlayState, sho
     setShouldResetSeek(true);
   }, [playerTrackObject])
 
-  useEffect(() => {
-    console.log('Render player');
-
-    return () => {
-      console.log('Unmount player');
-    }
-  }, [])
-
   return (
     <div className={styles.PlayerContainer}>
       <div className={styles.PlayerLeft}>

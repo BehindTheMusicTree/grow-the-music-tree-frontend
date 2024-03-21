@@ -25,16 +25,8 @@ export default function App() {
 
   const setNextTrack = () => {
     setShouldResetSeek(true);
-    // console.log('next track');
     setSelectedPlaylistPlayingLibTrackNumber(prev => prev + 1);
   }
-
-  useEffect(() => {
-    // console.log('App mounted');
-    return () => {
-      // console.log('App unmounted');
-    }
-  }, [])
 
   useEffect(() => {
     const setPlayingLibTrack = async (playingLibTrackObject) => {
@@ -46,13 +38,7 @@ export default function App() {
       });
     };
 
-    if (selectedPlaylist) {
-      // console.log('selectedPlaylistPlayingLibTrackNumber', selectedPlaylistPlayingLibTrackNumber);
-      // console.log('selectedPlaylist', selectedPlaylist.uuid);
-      // console.log('selectedPlaylist.libraryTracks.length', selectedPlaylist.libraryTracks.length);
-    }
     if (selectedPlaylist && selectedPlaylist.libraryTracks.length > selectedPlaylistPlayingLibTrackNumber) {
-      // console.log('setPlayingLibTrack');
       setPlayingLibTrack(selectedPlaylist.libraryTracks[selectedPlaylistPlayingLibTrackNumber]);
     }
   }, [selectedPlaylist, selectedPlaylistPlayingLibTrackNumber]);
