@@ -1,5 +1,6 @@
 export const PlayStates = {
     PLAYING: 'PLAYING',
     PAUSED: 'PAUSED',
-    STOPPED: 'STOPPED'
+    STOPPED: 'STOPPED',
+    LOADING: 'LOADING'
   };

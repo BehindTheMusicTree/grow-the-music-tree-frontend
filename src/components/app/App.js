@@ -13,7 +13,7 @@ export default function App() {
 
   const [searchSubmitted, setSearchSubmitted] = useState('')
   const [playerTrackObject, setPlayerTrackObject] = useState(null);
-  const [playingPlaylistUuidWithLoadingState, setPlayingPlaylistUuidWithLoadingState] = useState(null);
+  const [playingPlaylistUuidWithPlayState, setPlayingPlaylistUuidWithLoadingState] = useState(null);
   const [playingPlaylistObject, setPlayingPlaylistObject] = useState(null);
   const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
 
@@ -40,7 +40,7 @@ export default function App() {
       });
     };
 
-    if (playingPlaylistUuidWithLoadingState && playingPlaylistUuidWithLoadingState.isLoading) {
+    if (playingPlaylistUuidWithPlayState && playingPlaylistUuidWithPlayState.isLoading) {
       setPlayingPlaylistLibTrackNumber(0);
     }
 
@@ -51,8 +51,9 @@ export default function App() {
 
   useEffect(() => {
     if (playerTrackObject) {
-      if (playingPlaylistUuidWithLoadingState.isLoading) {
-        setPlayingPlaylistUuidWithLoadingState({...playingPlaylistUuidWithLoadingState,  isLoading: false});
+      if (playingPlaylistUuidWithPlayState.isLoading) {
+        setPlayingPlaylistUuidWithLoadingState({...playingPlaylistUuidWithPlayState,  isLoading: false});
+        setPlayState(PlayStates.PLAYING);
       }
     }
   }, [playerTrackObject]);
@@ -63,7 +64,7 @@ export default function App() {
       <Body 
         selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
         playState={playState} 
-        playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}/>
+        playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}/>
       {playingPlaylistObject ? 
         (playingPlaylistObject.libraryTracks.length > playingPlaylistLibTrackNumber + 1 ?
           (playingPlaylistObject.libraryTracks[playingPlaylistLibTrackNumber + 1].artist ? 
