@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Button from '../button/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons'
-import { FaPlay, FaPause, FaForward } from 'react-icons/fa';
+import { FaPlay, FaPause, FaStepForward } from 'react-icons/fa';
 import TrackProgress from './TrackProgress/TrackProgress';
 import { PlayStates } from '../../constants';
 import albumCover from '../../assets/images/album-cover-default.png';
@@ -61,16 +61,18 @@ export default function Player ({playerTrackObject, playState, setPlayState, sho
         </div>
       </div>
       <div className={styles.Controls1}>
-        <Button 
-          className={playState === PlayStates.PLAYING ? styles.PauseButton : styles.PlayButton} onClick={handlePlayPause}>
-            {playState === PlayStates.PLAYING ? <FaPause /> : <FaPlay />}
-        </Button>
-        <Button
-          className={styles.NextButton}
-          onClick={handleNextClick}
-          disabled={!playerTrackObject.hasNext}>
-            <FaForward />
-        </Button>
+        <div className={styles.Buttons}>
+          <Button 
+            className={playState === PlayStates.PLAYING ? styles.PauseButtonContainer : styles.PlayButtonContainer} onClick={handlePlayPause}>
+              {playState === PlayStates.PLAYING ? <FaPause /> : <FaPlay />}
+          </Button>
+          <Button
+            className={styles.NextButtonContainer}            
+            onClick={handleNextClick}
+            disabled={!playerTrackObject.hasNext}>
+              <FaStepForward />
+          </Button>
+        </div>
         <TrackProgress 
           playState={playState} 
           setPlayState={setPlayState} 
