@@ -46,8 +46,6 @@ export default function Player ({playerTrackObject, playState, setPlayState, sho
   }
 
   const handleBackwardClick = () => {
-    console.log('previous');
-    console.log('previous');
     if (!playerTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
       setShouldResetSeek(true);
     }
