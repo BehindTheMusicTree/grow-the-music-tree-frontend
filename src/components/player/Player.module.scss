@@ -51,7 +51,7 @@
         justify-content: center;
         width: 100%;
 
-        .PlayButtonContainer, .PauseButtonContainer, .NextButtonContainer {
+        .PlayButtonContainer, .PauseButtonContainer, .NextButtonContainer, .PreviousButtonContainer {
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -74,13 +74,17 @@
             height: 37px;
         }
 
-        .NextButtonContainer {
+        .NextButtonContainer, .PreviousButtonContainer {
             width: 25px;
             height: 25px;
     
             svg {
-                transform: translateX(1px) scale(0.9);
+                transform: scale(0.9);
             }
+        }
+
+        .NextButtonContainer svg {
+            transform: translateX(1px);
         }
         
         .NextButtonContainer:disabled {
@@ -88,12 +92,12 @@
             pointer-events: none;
         
             &:hover {
-                width: 25px; // Garde la même largeur lors du survol
-                height: 25px; // Garde la même hauteur lors du survol
+                width: 25px;
+                height: 25px;
             }
         }
     
-        .NextButtonContainer:hover {
+        .NextButtonContainer:hover, .PreviousButtonContainer:hover {
             width: 30px;
             height: 30px;
         }

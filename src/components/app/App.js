@@ -25,6 +25,11 @@ export default function App() {
     setPlayingPlaylistObject(await ApiService.retrievePlaylist(uuid))
   }
 
+  const setPreviousTrack = () => {
+    setShouldResetSeek(true);
+    setPlayingPlaylistLibTrackNumber(prev => prev - 1);
+  }
+
   const setNextTrack = () => {
     setShouldResetSeek(true);
     setPlayingPlaylistLibTrackNumber(prev => prev + 1);
@@ -36,7 +41,8 @@ export default function App() {
       setPlayerTrackObject({
         ...playingLibTrackObject, 
         blobUrl: playingLibTrackBlobUrl,
-        hasNext: playingPlaylistObject.libraryTracks.length > playingPlaylistLibTrackNumber + 1
+        hasNext: playingPlaylistObject.libraryTracks.length > playingPlaylistLibTrackNumber + 1,
+        hasPrevious: playingPlaylistLibTrackNumber > 0
       });
     };
 
@@ -81,6 +87,7 @@ export default function App() {
           shouldResetSeek={shouldResetSeek} 
           setShouldResetSeek={setShouldResetSeek}
           setNextTrack={setNextTrack}
+          setPreviousTrack={setPreviousTrack}
         /> 
       : null}
     </div>
