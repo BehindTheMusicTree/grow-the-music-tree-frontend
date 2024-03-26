@@ -20,13 +20,15 @@ export default function TrackProgress ({
     setShouldResetSeek,
     playerTrackObject,
     volume,
-    handleTrackEnd}) {
+    handleTrackEnd,
+    seek,
+    setSeek}) {
 
-  const [seek, setSeek] = useState(0);
   const [isSeeking, setIsSeeking] = useState(false);
 
   const playerRef = useRef(null);
   let rafIdRef = useRef(null);
+  let previousSeekRef = useRef(null);
 
   const handleLoadError = (id, err) => {
     console.log(`Error loading track of blob url ${playerTrackObject.blobUrl}: ${err}`);
@@ -42,27 +44,29 @@ export default function TrackProgress ({
 
   const handleLeaveSeeking = (event) => {
     if (isSeeking) {
+      previousSeekRef.current = null;
+      setSeek(parseFloat(event.target.value));
       setIsSeeking(false);
-      playerRef.current.seek(event.target.value);
     }
   }
 
   const renderSeekPos = () => {
-    if (!isSeeking) {
-      setSeek(playerRef.current.seek())
+    const currentSeek = playerRef.current.seek();
+    if (previousSeekRef.current != undefined) {
+      const deltaSeek =  currentSeek -  previousSeekRef.current;
+      setSeek(seek => seek + deltaSeek)
     }
 
-    if (playState === PlayStates.PLAYING && !rafIdRef.current) {
-      rafIdRef.current = raf(() => {
-        rafIdRef.current = null;
-        renderSeekPos();
+    previousSeekRef.current = currentSeek
+    if (playState === PlayStates.PLAYING && !isSeeking) {
+        rafIdRef.current = raf(() => {
+          renderSeekPos();
       });
     }
   }
 
   const cancelRaf = () => {
     raf.cancel(rafIdRef.current);
-    rafIdRef.current = null;
   }
 
   useEffect(() => {
@@ -72,37 +76,25 @@ export default function TrackProgress ({
   }, [])
 
   useEffect(() => {
-  }, [shouldResetSeek, playerTrackObject, playState])
-
-  useEffect(() => {
-    if (playState === PlayStates.PLAYING) {
-      renderSeekPos();
-    }
-    else {
-      cancelRaf();
-    }
-  }, [playState])
-
-  useEffect(() => {
     if (playState === PlayStates.PLAYING) {
       if (isSeeking) {
         cancelRaf();
-      }
-      else if (seek >= Math.floor(playerTrackObject.duration)) {
+      } else if (seek >= Math.floor(playerTrackObject.duration)) {
         handleTrackEnd()
-      }
-      else {
+      } else {
+        playerRef.current.seek(seek);
         renderSeekPos();
       }
-    }
-    else if (playState === PlayStates.STOPPED) {
+    } else if (playState === PlayStates.STOPPED) {
       setPlayState(PlayStates.PAUSED);
     }
-  }, [isSeeking])
+  }, [isSeeking, playState])
 
   useEffect(() => {
     if (shouldResetSeek) {
+      previousSeekRef.current = null;
       setSeek(0);
+      playerRef.current.seek(0);
       setShouldResetSeek(false);
     }
   }, [shouldResetSeek])
@@ -110,29 +102,30 @@ export default function TrackProgress ({
   return (
     <div className={styles.TrackProgress}>
         <ReactHowler
-        ref={playerRef}
-        src={[playerTrackObject.blobUrl]}
-        html5={true}
-        playing={playState === PlayStates.PLAYING}
-        format={[playerTrackObject.fileExtension.replace('.', '')]}
-        onLoadError={handleLoadError}
-        onEnd={handleTrackEnd}
-        volume={volume}
-        />
+          ref={playerRef}
+          src={[playerTrackObject.blobUrl]}
+          html5={true}
+          playing={playState === PlayStates.PLAYING}
+          format={[playerTrackObject.fileExtension.replace('.', '')]}
+          onLoadError={handleLoadError}
+          onEnd={handleTrackEnd}
+          volume={volume}/>
       <div className={styles.CurrentTime}>
         {formatTime(seek)}
       </div>
-      {playerRef.current ? <input
-        className={styles.ProgressBar}
-        type="range"
-        min="0"
-        max={Math.floor(playerRef.current.duration())}
-        value={seek}
-        onChange={handleSeekingChange}
-        onMouseDown={handleSeekMouseDown}
-        onMouseUp={handleLeaveSeeking}
-        onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
-      /> : null}
+      {playerRef.current ? 
+        <input
+          className={styles.ProgressBar}
+          type="range"
+          min="0"
+          max={Math.floor(playerRef.current.duration())}
+          value={seek}
+          onChange={handleSeekingChange}
+          onMouseDown={handleSeekMouseDown}
+          onMouseUp={handleLeaveSeeking}
+          onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
+        /> 
+        : null}
       <div className={styles.TotalTime}>
         {formatTime(playerRef.current ? playerRef.current.duration() : 0)}
       </div>
@@ -141,10 +134,12 @@ export default function TrackProgress ({
 }
 
 TrackProgress.propTypes = {
-    playState: PropTypes.string,
-    setPlayState: PropTypes.func,
-    shouldResetSeek: PropTypes.bool,
-    setShouldResetSeek: PropTypes.func,
-    playerTrackObject: PropTypes.object,
-    volume: PropTypes.number,
-    handleTrackEnd: PropTypes.func};
+    playState: PropTypes.string.isRequired,
+    setPlayState: PropTypes.func.isRequired,
+    shouldResetSeek: PropTypes.bool.isRequired,
+    setShouldResetSeek: PropTypes.func.isRequired,
+    playerTrackObject: PropTypes.object.isRequired,
+    volume: PropTypes.number.isRequired,
+    handleTrackEnd: PropTypes.func.isRequired,
+    seek: PropTypes.number.isRequired,
+    setSeek: PropTypes.func.isRequired};

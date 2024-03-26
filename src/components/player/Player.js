@@ -4,13 +4,15 @@ import PropTypes from 'prop-types';
 import Button from '../button/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons'
-import { FaPlay, FaPause, FaStepForward } from 'react-icons/fa';
+import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
 import TrackProgress from './TrackProgress/TrackProgress';
 import { PlayStates } from '../../constants';
 import albumCover from '../../assets/images/album-cover-default.png';
 
-export default function Player ({playerTrackObject, playState, setPlayState, shouldResetSeek, setShouldResetSeek, setNextTrack}) {
+export default function Player ({playerTrackObject, playState, setPlayState, shouldResetSeek, setShouldResetSeek, setNextTrack, setPreviousTrack}) {
+  const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
+  const [seek, setSeek] = useState(0);
   const [volume, setVolume] = useState(0.5);
   
   const handlePlayPause = () => {
@@ -27,7 +29,7 @@ export default function Player ({playerTrackObject, playState, setPlayState, sho
   }
 
   const handleVolumeChange = (event) => {
-    setVolume(event.target.value);
+    setVolume(Number(event.target.value));
   };
 
   const handleTrackEnd = () => {
@@ -39,8 +41,19 @@ export default function Player ({playerTrackObject, playState, setPlayState, sho
     }
   }
 
-  const handleNextClick = () => {
+  const handleForwardClick = () => {
     setNextTrack();
+  }
+
+  const handleBackwardClick = () => {
+    console.log('previous');
+    console.log('previous');
+    if (!playerTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
+      setShouldResetSeek(true);
+    }
+    else {
+      setPreviousTrack(prev => prev - 1);
+    }
   }
 
   useEffect(() => {
@@ -62,13 +75,18 @@ export default function Player ({playerTrackObject, playState, setPlayState, sho
       </div>
       <div className={styles.Controls1}>
         <div className={styles.Buttons}>
+          <Button
+            className={styles.PreviousButtonContainer}            
+            onClick={handleBackwardClick}>
+              <FaStepBackward />
+          </Button>
           <Button 
             className={playState === PlayStates.PLAYING ? styles.PauseButtonContainer : styles.PlayButtonContainer} onClick={handlePlayPause}>
               {playState === PlayStates.PLAYING ? <FaPause /> : <FaPlay />}
           </Button>
           <Button
             className={styles.NextButtonContainer}            
-            onClick={handleNextClick}
+            onClick={handleForwardClick}
             disabled={!playerTrackObject.hasNext}>
               <FaStepForward />
           </Button>
@@ -80,7 +98,9 @@ export default function Player ({playerTrackObject, playState, setPlayState, sho
           setShouldResetSeek={setShouldResetSeek}
           playerTrackObject={playerTrackObject}
           volume={volume}
-          handleTrackEnd={handleTrackEnd}/>
+          handleTrackEnd={handleTrackEnd}
+          seek={seek}
+          setSeek={setSeek}/>
       </div>
       <div className={styles.Controls2}>
         <div className={styles.Volume}>
@@ -105,5 +125,6 @@ Player.propTypes = {
   setPlayState: PropTypes.func.isRequired,
   shouldResetSeek: PropTypes.bool.isRequired,
   setShouldResetSeek: PropTypes.func.isRequired,
-  setNextTrack: PropTypes.func.isRequired
+  setNextTrack: PropTypes.func.isRequired,
+  setPreviousTrack: PropTypes.func.isRequired
 };
