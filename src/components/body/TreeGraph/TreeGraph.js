@@ -188,11 +188,15 @@ export default function TreeGraph (
       })
 
     nodes.on('mouseover', function() {
-        d3.select(this).select('.plus-button').style('display', 'block');
+        d3.select(this).select("." + styles.PlusButton).style('display', 'block');
       })
       .on('mouseout', function() {
-        d3.select(this).select('.plus-button').style('display', 'none');
+        d3.select(this).select("." + styles.PlusButton).style('display', 'none');
       });
+
+    return () => {
+      svg.selectAll('*').remove();
+    }
   }, [genres, playState, playingPlaylistUuidWithLoadingState]);
 
   return (
