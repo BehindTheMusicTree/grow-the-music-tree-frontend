@@ -193,6 +193,10 @@ export default function TreeGraph (
       .on('mouseout', function() {
         d3.select(this).select("." + styles.PlusButton).style('display', 'none');
       });
+
+    return () => {
+      svg.selectAll('*').remove();
+    }
   }, [genres, playState, playingPlaylistUuidWithLoadingState]);
 
   return (

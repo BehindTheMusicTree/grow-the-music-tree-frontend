@@ -55,10 +55,9 @@ export default function Body ({selectPlaylistUuidToPlay, playState, playingPlayl
       <div id={styles.GenreTreeContainer}>
         <h1>Genre Tree</h1>
         {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
-          const key = `${uuid}`;
           return (
             <TreeGraph 
-              key={key} 
+              key={`${uuid}`} 
               genres={genreTree} 
               postGenreAndRefresh={postGenreAndRefresh} 
               selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}

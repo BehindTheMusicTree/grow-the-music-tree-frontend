@@ -85,7 +85,7 @@ export default function TrackProgress ({
         playerRef.current.seek(seek);
         renderSeekPos();
       }
-    } else if (playState === PlayStates.STOPPED) {
+    } else if (playState === PlayStates.STOPPED && !isSeeking) {
       setPlayState(PlayStates.PAUSED);
     }
   }, [isSeeking, playState])
