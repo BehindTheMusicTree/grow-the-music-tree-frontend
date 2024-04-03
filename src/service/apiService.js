@@ -150,6 +150,11 @@ const ApiService = {
   retrievePlaylist: async (playlistUuid) => {
     return await ApiService.fetchData(`playlists/${playlistUuid}/`, 'GET', null, null);
   },
+
+  postPlay: async (contentObjectUuid) => {
+    const data = {'contentObjectUuid': contentObjectUuid}
+    return await ApiService.fetchData(`plays/`, 'POST', data, null);
+  }
 };
 
 export default ApiService;
