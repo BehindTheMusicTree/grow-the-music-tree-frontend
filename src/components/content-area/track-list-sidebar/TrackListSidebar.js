@@ -1,11 +1,11 @@
-// import styles from './PlaylistSidebar.module.css';
+import styles from './TrackListSidebar.module.scss';
 import React from 'react';
 import PropTypes from 'prop-types';
 import TrackElement from './track-element/TrackElement';
 
-export default function PlaylistSidebar({playlistPlayObject}) {
+export default function TrackListSidebar({playlistPlayObject}) {
     return (
-        <div>
+        <div className={styles.TrackListSidebar}>
             <ul>
                 {playlistPlayObject.contentObject.libraryTracks.map((track, index) => (
                     <li key={index}>
@@ -17,6 +17,6 @@ export default function PlaylistSidebar({playlistPlayObject}) {
     );
 }
 
-PlaylistSidebar.propTypes = {
+TrackListSidebar.propTypes = {
     playlistPlayObject: PropTypes.object
 };

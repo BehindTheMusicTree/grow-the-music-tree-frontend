@@ -17,14 +17,14 @@ export default function Player ({
     setShouldResetSeek, 
     setNextTrack, 
     setPreviousTrack, 
-    setIsPlaylistSidebarVisible}) {
+    setIsTrackListSidebarVisible}) {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
   const [seek, setSeek] = useState(0);
   const [volume, setVolume] = useState(0.5);
 
   const handlePlaylistIconClick = () => {
-    setIsPlaylistSidebarVisible(b => !b);
+    setIsTrackListSidebarVisible(b => !b);
   }
   
   const handlePlayPause = () => {
@@ -140,5 +140,5 @@ Player.propTypes = {
   setShouldResetSeek: PropTypes.func.isRequired,
   setNextTrack: PropTypes.func.isRequired,
   setPreviousTrack: PropTypes.func.isRequired,
-  setIsPlaylistSidebarVisible: PropTypes.func.isRequired
+  setIsTrackListSidebarVisible: PropTypes.func.isRequired
 };

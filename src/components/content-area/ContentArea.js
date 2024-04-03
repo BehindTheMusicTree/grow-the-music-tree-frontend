@@ -3,10 +3,10 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import ApiService from '../../service/apiService';
 import TreeGraph from './TreeGraph/TreeGraph';
-import PlaylistSidebar from './PlaylistSidebar/PlaylistSidebar';
+import TrackListSidebar from './track-list-sidebar/TrackListSidebar';
 
 export default function ContentArea (
-  {isPlaylistSidebarVisible, selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState, playlistPlayObject}) {
+  {isTrackListSidebarVisible, selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState, playlistPlayObject}) {
   const [groupedGenres, setGroupedGenres] = useState(null);
   const areGenreLoading = useRef(false);
 
@@ -70,9 +70,9 @@ export default function ContentArea (
           <p>Loading data.</p>
         )}
       </div>
-      {isPlaylistSidebarVisible ? (
+      {isTrackListSidebarVisible ? (
         <div className={styles.RightSidebarContainer}>
-          <PlaylistSidebar playlistPlayObject={playlistPlayObject}/>
+          <TrackListSidebar playlistPlayObject={playlistPlayObject}/>
         </div>
         ) : null}
     </div>
@@ -80,7 +80,7 @@ export default function ContentArea (
 }
 
 ContentArea.propTypes = {
-  isPlaylistSidebarVisible: PropTypes.string.isRequired,
+  isTrackListSidebarVisible: PropTypes.string.isRequired,
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
   playState: PropTypes.string.isRequired,
   playingPlaylistUuidWithLoadingState: PropTypes.object,
