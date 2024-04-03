@@ -1,6 +1,7 @@
 // import styles from './PlaylistSidebar.module.css';
 import React from 'react';
 import PropTypes from 'prop-types';
+import TrackElement from './track-element/TrackElement';
 
 export default function PlaylistSidebar({playlistPlayObject}) {
     return (
@@ -8,7 +9,7 @@ export default function PlaylistSidebar({playlistPlayObject}) {
             <ul>
                 {playlistPlayObject.contentObject.libraryTracks.map((track, index) => (
                     <li key={index}>
-                        {track.title}
+                        <TrackElement trackObject={track} />
                     </li>
                 ))}
             </ul>
