@@ -24,10 +24,24 @@
             color: rgb(187, 184, 184);
         }
     }
-
-    .AlbumName {
-        font-size: 12px;
+    
+    .AlbumGenreContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+        width: 100%;
         margin-left: 10px;
+        font-size: 12px;
         color: rgb(187, 184, 184);
+
+        .AlbumName {
+            margin-bottom: 3px;
+        }
+
+        .GenreName {
+            font-weight: bold;
+            padding: 1px;
+            border: 1px solid rgb(187, 184, 184);
+        }
     }
 }
