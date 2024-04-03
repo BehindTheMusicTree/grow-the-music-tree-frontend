@@ -68,22 +68,15 @@ export default function App() {
   }, [playerTrackObject]);
 
   return (
-    <div>
+    <div className={styles.App}>
       <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
       <div className={styles.Body}>
         <ContentArea 
           isPlaylistSidebarVisible={isPlaylistSidebarVisible}
           selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
           playState={playState} 
-          playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}/>
-        {playlistPlayObject ? 
-          (playlistPlayObject.contentObject.libraryTracks.length > playingPlaylistLibTrackNumber + 1 ?
-            (playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber + 1].artist ? 
-              playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber + 1].artist.name + ' - ' 
-              : null)
-            + playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber + 1].title
-            : null)
-        : null}
+          playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}
+          playlistPlayObject={playlistPlayObject}/>
         {playerTrackObject ? 
           <Player 
             playerTrackObject={playerTrackObject}

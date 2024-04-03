@@ -6,7 +6,7 @@ import TreeGraph from './TreeGraph/TreeGraph';
 import PlaylistSidebar from './PlaylistSidebar/PlaylistSidebar';
 
 export default function ContentArea (
-  {isPlaylistSidebarVisible, selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState}) {
+  {isPlaylistSidebarVisible, selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState, playlistPlayObject}) {
   const [groupedGenres, setGroupedGenres] = useState(null);
   const areGenreLoading = useRef(false);
 
@@ -72,7 +72,7 @@ export default function ContentArea (
       </div>
       {isPlaylistSidebarVisible ? (
         <div className={styles.RightSidebarContainer}>
-          <PlaylistSidebar/>
+          <PlaylistSidebar playlistPlayObject={playlistPlayObject}/>
         </div>
         ) : null}
     </div>
@@ -83,5 +83,6 @@ ContentArea.propTypes = {
   isPlaylistSidebarVisible: PropTypes.string.isRequired,
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
   playState: PropTypes.string.isRequired,
-  playingPlaylistUuidWithLoadingState: PropTypes.object
+  playingPlaylistUuidWithLoadingState: PropTypes.object,
+  playlistPlayObject: PropTypes.object
 };
