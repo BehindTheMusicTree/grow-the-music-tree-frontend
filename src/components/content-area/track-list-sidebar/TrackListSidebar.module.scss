@@ -1,4 +1,16 @@
-.TrackListSidebar ul {
-    list-style-type: none;
-    padding: 0px;
+.TrackListSidebar {
+
+    .PlaylistName {
+        padding: 10px;
+        text-align: center;
+        color: rgb(230, 227, 227);
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0px;
+        margin: 0px;
+    }
 }
