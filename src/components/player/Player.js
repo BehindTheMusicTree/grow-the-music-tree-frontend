@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types';
 import Button from '../button/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faVolumeUp } from '@fortawesome/free-solid-svg-icons'
+import { faVolumeUp, faListUl } from '@fortawesome/free-solid-svg-icons'
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
 import TrackProgress from './TrackProgress/TrackProgress';
 import { PlayStates } from '../../constants';
@@ -101,9 +101,10 @@ export default function Player ({playerTrackObject, playState, setPlayState, sho
           setSeek={setSeek}/>
       </div>
       <div className={styles.Controls2}>
-        <div className={styles.Volume}>
-          <FontAwesomeIcon icon={faVolumeUp} />
-          <input 
+        <FontAwesomeIcon className={styles.PlaylistIcon} icon={faListUl} />
+        <div className={styles.VolumeContainer}>
+          <FontAwesomeIcon icon={faVolumeUp} className={styles.VolumeIcon}/>
+          <input className={styles.VolumeSlider}
             type='range' 
             min='0' 
             max='1' 
