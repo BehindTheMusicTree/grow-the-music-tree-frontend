@@ -1,10 +1,10 @@
-import styles from './Body.module.scss';
+import styles from './ContentArea.module.scss';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import ApiService from '../../service/apiService';
 import TreeGraph from './TreeGraph/TreeGraph';
 
-export default function Body ({selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState}) {
+export default function ContentArea ({selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState}) {
   const [groupedGenres, setGroupedGenres] = useState(null);
   const areGenreLoading = useRef(false);
 
@@ -51,7 +51,7 @@ export default function Body ({selectPlaylistUuidToPlay, playState, playingPlayl
   }, [groupedGenres]);
 
   return (
-    <div id={styles.Body}>
+    <div id={styles.ContentArea}>
       <div id={styles.GenreTreeContainer}>
         <h1>Genre Tree</h1>
         {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
@@ -72,7 +72,7 @@ export default function Body ({selectPlaylistUuidToPlay, playState, playingPlayl
   );
 }
 
-Body.propTypes = {
+ContentArea.propTypes = {
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
   playState: PropTypes.string.isRequired,
   playingPlaylistUuidWithLoadingState: PropTypes.object

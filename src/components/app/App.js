@@ -1,5 +1,6 @@
+import styles from './App.module.scss';
 import React, { useState, useEffect } from 'react';
-import Body from '../body/Body'
+import ContentArea from '../content-area/ContentArea'
 import Banner from '../banner/Banner'
 import { Howler } from 'howler';
 import Player from '../player/Player';
@@ -22,9 +23,7 @@ export default function App() {
 
   const selectPlaylistUuidToPlay = async (uuid) => {
     setPlayingPlaylistUuidWithLoadingState({uuid: uuid, isLoading: true});
-    // setPlaylistPlayObject(await ApiService.postPlay(uuid))
-    const a = await ApiService.postPlay(uuid)
-    setPlaylistPlayObject(a)
+    setPlaylistPlayObject(await ApiService.postPlay(uuid))
   }
 
   const setPreviousTrack = () => {
@@ -69,29 +68,31 @@ export default function App() {
   return (
     <div>
       <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-      <Body 
-        selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
-        playState={playState} 
-        playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}/>
-      {playlistPlayObject ? 
-        (playlistPlayObject.contentObject.libraryTracks.length > playingPlaylistLibTrackNumber + 1 ?
-          (playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber + 1].artist ? 
-            playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber + 1].artist.name + ' - ' 
+      <div className={styles.Body}>
+        <ContentArea 
+          selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
+          playState={playState} 
+          playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}/>
+        {playlistPlayObject ? 
+          (playlistPlayObject.contentObject.libraryTracks.length > playingPlaylistLibTrackNumber + 1 ?
+            (playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber + 1].artist ? 
+              playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber + 1].artist.name + ' - ' 
+              : null)
+            + playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber + 1].title
             : null)
-          + playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber + 1].title
-          : null)
-      : null}
-      {playerTrackObject ? 
-        <Player 
-          playerTrackObject={playerTrackObject}
-          playState={playState}
-          setPlayState={setPlayState}
-          shouldResetSeek={shouldResetSeek} 
-          setShouldResetSeek={setShouldResetSeek}
-          setNextTrack={setNextTrack}
-          setPreviousTrack={setPreviousTrack}
-        /> 
-      : null}
+        : null}
+        {playerTrackObject ? 
+          <Player 
+            playerTrackObject={playerTrackObject}
+            playState={playState}
+            setPlayState={setPlayState}
+            shouldResetSeek={shouldResetSeek} 
+            setShouldResetSeek={setShouldResetSeek}
+            setNextTrack={setNextTrack}
+            setPreviousTrack={setPreviousTrack}
+          /> 
+        : null}
+        </div>
     </div>
   );
 }
