@@ -144,7 +144,9 @@ export default function TreeGraph (
         return '►';
       })
       .on('click', function(event, d) {
-        if (!playingPlaylistUuidWithLoadingState || playingPlaylistUuidWithLoadingState.uuid !== d.data.criteriaPlaylist.uuid) {
+        if (!playingPlaylistUuidWithLoadingState || 
+          playState === PlayStates.STOPPED || 
+          playingPlaylistUuidWithLoadingState.uuid !== d.data.criteriaPlaylist.uuid) {
           if (d.data.criteriaPlaylist.libraryTracksCount > 0) {
             event.stopPropagation();
             selectPlaylistUuidToPlay(d.data.criteriaPlaylist.uuid);

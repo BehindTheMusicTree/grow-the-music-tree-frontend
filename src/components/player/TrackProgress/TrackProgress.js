@@ -88,7 +88,7 @@ export default function TrackProgress ({
     } else if (playState === PlayStates.STOPPED && !isSeeking) {
       setPlayState(PlayStates.PAUSED);
     }
-  }, [isSeeking, playState])
+  }, [isSeeking])
 
   useEffect(() => {
     if (shouldResetSeek) {
