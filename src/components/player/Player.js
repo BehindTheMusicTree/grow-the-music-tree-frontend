@@ -9,11 +9,23 @@ import TrackProgress from './TrackProgress/TrackProgress';
 import { PlayStates } from '../../constants';
 import albumCover from '../../assets/images/album-cover-default.png';
 
-export default function Player ({playerTrackObject, playState, setPlayState, shouldResetSeek, setShouldResetSeek, setNextTrack, setPreviousTrack}) {
+export default function Player ({
+    playerTrackObject, 
+    playState, 
+    setPlayState, 
+    shouldResetSeek, 
+    setShouldResetSeek, 
+    setNextTrack, 
+    setPreviousTrack, 
+    setIsPlaylistSidebarVisible}) {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
   const [seek, setSeek] = useState(0);
   const [volume, setVolume] = useState(0.5);
+
+  const handlePlaylistIconClick = () => {
+    setIsPlaylistSidebarVisible(b => !b);
+  }
   
   const handlePlayPause = () => {
     if (playState === PlayStates.STOPPED) {
@@ -102,7 +114,7 @@ export default function Player ({playerTrackObject, playState, setPlayState, sho
       </div>
       <div className={styles.Controls2}>
         <div className={styles.PlaylistIconContainer}>
-          <FontAwesomeIcon icon={faListUl} />
+          <FontAwesomeIcon icon={faListUl} onClick={handlePlaylistIconClick}/>
         </div>
         <div className={styles.VolumeContainer}>
           <FontAwesomeIcon icon={faVolumeUp} className={styles.VolumeIcon}/>
@@ -127,5 +139,6 @@ Player.propTypes = {
   shouldResetSeek: PropTypes.bool.isRequired,
   setShouldResetSeek: PropTypes.func.isRequired,
   setNextTrack: PropTypes.func.isRequired,
-  setPreviousTrack: PropTypes.func.isRequired
+  setPreviousTrack: PropTypes.func.isRequired,
+  setIsPlaylistSidebarVisible: PropTypes.func.isRequired
 };

@@ -18,6 +18,8 @@ export default function App() {
   const [playlistPlayObject, setPlaylistPlayObject] = useState(null);
   const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
 
+  const [isPlaylistSidebarVisible, setIsPlaylistSidebarVisible] = useState(false);
+
   const [playState, setPlayState] = useState(PlayStates.PLAYING);
   const [shouldResetSeek, setShouldResetSeek] = useState(false);
 
@@ -70,6 +72,7 @@ export default function App() {
       <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
       <div className={styles.Body}>
         <ContentArea 
+          isPlaylistSidebarVisible={isPlaylistSidebarVisible}
           selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
           playState={playState} 
           playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}/>
@@ -90,6 +93,7 @@ export default function App() {
             setShouldResetSeek={setShouldResetSeek}
             setNextTrack={setNextTrack}
             setPreviousTrack={setPreviousTrack}
+            setIsPlaylistSidebarVisible={setIsPlaylistSidebarVisible}
           /> 
         : null}
         </div>

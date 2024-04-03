@@ -1,14 +1,20 @@
-#ContentArea {
+.ContentArea {
     display: flex;
+    flex-direction: row;
     background-color: #f4f4f4;
     color: #333;
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 30px;
-}
 
-#GenreTreeContainer {
-    background-color: #c5c5c5;
-    margin: 0;
-    padding: 30px;
+    .GenreTreeContainer {
+        background-color: #c5c5c5;
+        margin: 0;
+        padding: 30px;
+    }
+
+    .RightSidebarContainer {
+        width: 400px;
+        background-color: rgb(47, 218, 218);
+    }
 }
