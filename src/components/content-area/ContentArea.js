@@ -2,7 +2,7 @@ import styles from './ContentArea.module.scss';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import ApiService from '../../service/apiService';
-import TreeGraph from './TreeGraph/TreeGraph';
+import TreeGraph from './tree-graph/TreeGraph';
 import TrackListSidebar from './track-list-sidebar/TrackListSidebar';
 
 export default function ContentArea (
