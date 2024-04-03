@@ -92,8 +92,7 @@
             pointer-events: none;
         
             &:hover {
-                width: 25px;
-                height: 25px;
+                transform: scale(1.2);
             }
         }
     
@@ -120,10 +119,15 @@
     align-items: center;
     justify-content: center;
 
-    .PlaylistIcon {
+    .PlaylistIconContainer {
         width: 17px;
         height: 17px;
         margin-right: 5px;
+
+        &:hover {
+            transform: scale(1.2);
+            cursor: pointer;
+        }
     }
 
     .VolumeContainer {

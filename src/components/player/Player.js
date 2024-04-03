@@ -101,7 +101,9 @@ export default function Player ({playerTrackObject, playState, setPlayState, sho
           setSeek={setSeek}/>
       </div>
       <div className={styles.Controls2}>
-        <FontAwesomeIcon className={styles.PlaylistIcon} icon={faListUl} />
+        <div className={styles.PlaylistIconContainer}>
+          <FontAwesomeIcon icon={faListUl} />
+        </div>
         <div className={styles.VolumeContainer}>
           <FontAwesomeIcon icon={faVolumeUp} className={styles.VolumeIcon}/>
           <input className={styles.VolumeSlider}
