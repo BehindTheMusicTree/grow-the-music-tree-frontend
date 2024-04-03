@@ -6,7 +6,10 @@ import TrackElement from './track-element/TrackElement';
 export default function TrackListSidebar({playlistPlayObject}) {
     return (
         <div className={styles.TrackListSidebar}>
-            <div className={styles.PlaylistName}>{playlistPlayObject.contentObject.name}</div>
+            <div className={styles.Header}>
+                <div className={styles.Name}>{playlistPlayObject.contentObject.name}</div>
+                <div className={styles.Info}>{playlistPlayObject.contentObject.libraryTracksCount + " tracks"}</div>
+            </div>
             <div>
                 <ul>
                     {playlistPlayObject.contentObject.libraryTracks.map((track, index) => (
