@@ -3,17 +3,29 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types';
 import Button from '../button/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faVolumeUp } from '@fortawesome/free-solid-svg-icons'
+import { faVolumeUp, faListUl } from '@fortawesome/free-solid-svg-icons'
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
 import TrackProgress from './TrackProgress/TrackProgress';
 import { PlayStates } from '../../constants';
 import albumCover from '../../assets/images/album-cover-default.png';
 
-export default function Player ({playerTrackObject, playState, setPlayState, shouldResetSeek, setShouldResetSeek, setNextTrack, setPreviousTrack}) {
+export default function Player ({
+    playerTrackObject, 
+    playState, 
+    setPlayState, 
+    shouldResetSeek, 
+    setShouldResetSeek, 
+    setNextTrack, 
+    setPreviousTrack, 
+    setIsTrackListSidebarVisible}) {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
   const [seek, setSeek] = useState(0);
   const [volume, setVolume] = useState(0.5);
+
+  const handlePlaylistIconClick = () => {
+    setIsTrackListSidebarVisible(b => !b);
+  }
   
   const handlePlayPause = () => {
     if (playState === PlayStates.STOPPED) {
@@ -101,9 +113,12 @@ export default function Player ({playerTrackObject, playState, setPlayState, sho
           setSeek={setSeek}/>
       </div>
       <div className={styles.Controls2}>
-        <div className={styles.Volume}>
-          <FontAwesomeIcon icon={faVolumeUp} />
-          <input 
+        <div className={styles.PlaylistIconContainer}>
+          <FontAwesomeIcon icon={faListUl} onClick={handlePlaylistIconClick}/>
+        </div>
+        <div className={styles.VolumeContainer}>
+          <FontAwesomeIcon icon={faVolumeUp} className={styles.VolumeIcon}/>
+          <input className={styles.VolumeSlider}
             type='range' 
             min='0' 
             max='1' 
@@ -124,5 +139,6 @@ Player.propTypes = {
   shouldResetSeek: PropTypes.bool.isRequired,
   setShouldResetSeek: PropTypes.func.isRequired,
   setNextTrack: PropTypes.func.isRequired,
-  setPreviousTrack: PropTypes.func.isRequired
+  setPreviousTrack: PropTypes.func.isRequired,
+  setIsTrackListSidebarVisible: PropTypes.func.isRequired
 };

@@ -1,10 +1,12 @@
-import styles from './Body.module.scss';
+import styles from './ContentArea.module.scss';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import ApiService from '../../service/apiService';
 import TreeGraph from './TreeGraph/TreeGraph';
+import TrackListSidebar from './track-list-sidebar/TrackListSidebar';
 
-export default function Body ({selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState}) {
+export default function ContentArea (
+  {isTrackListSidebarVisible, selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState, playlistPlayObject}) {
   const [groupedGenres, setGroupedGenres] = useState(null);
   const areGenreLoading = useRef(false);
 
@@ -51,8 +53,8 @@ export default function Body ({selectPlaylistUuidToPlay, playState, playingPlayl
   }, [groupedGenres]);
 
   return (
-    <div id={styles.Body}>
-      <div id={styles.GenreTreeContainer}>
+    <div className={styles.ContentArea}>
+      <div className={styles.GenreTreeContainer}>
         <h1>Genre Tree</h1>
         {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
           return (
@@ -68,12 +70,19 @@ export default function Body ({selectPlaylistUuidToPlay, playState, playingPlayl
           <p>Loading data.</p>
         )}
       </div>
+      {isTrackListSidebarVisible ? (
+        <div className={styles.RightSidebarContainer}>
+          <TrackListSidebar playlistPlayObject={playlistPlayObject}/>
+        </div>
+        ) : null}
     </div>
   );
 }
 
-Body.propTypes = {
+ContentArea.propTypes = {
+  isTrackListSidebarVisible: PropTypes.string.isRequired,
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
   playState: PropTypes.string.isRequired,
-  playingPlaylistUuidWithLoadingState: PropTypes.object
+  playingPlaylistUuidWithLoadingState: PropTypes.object,
+  playlistPlayObject: PropTypes.object
 };

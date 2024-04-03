@@ -3,4 +3,4 @@ export const PlayStates = {
     PAUSED: 'PAUSED',
     STOPPED: 'STOPPED',
     LOADING: 'LOADING'
-  };
+};

@@ -1,5 +1,6 @@
+import styles from './App.module.scss';
 import React, { useState, useEffect } from 'react';
-import Body from '../body/Body'
+import ContentArea from '../content-area/ContentArea'
 import Banner from '../banner/Banner'
 import { Howler } from 'howler';
 import Player from '../player/Player';
@@ -17,14 +18,14 @@ export default function App() {
   const [playlistPlayObject, setPlaylistPlayObject] = useState(null);
   const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
 
+  const [isTrackListSidebarVisible, setIsTrackListSidebarVisible] = useState(false);
+
   const [playState, setPlayState] = useState(PlayStates.PLAYING);
   const [shouldResetSeek, setShouldResetSeek] = useState(false);
 
   const selectPlaylistUuidToPlay = async (uuid) => {
     setPlayingPlaylistUuidWithLoadingState({uuid: uuid, isLoading: true});
-    // setPlaylistPlayObject(await ApiService.postPlay(uuid))
-    const a = await ApiService.postPlay(uuid)
-    setPlaylistPlayObject(a)
+    setPlaylistPlayObject(await ApiService.postPlay(uuid))
   }
 
   const setPreviousTrack = () => {
@@ -67,31 +68,28 @@ export default function App() {
   }, [playerTrackObject]);
 
   return (
-    <div>
+    <div className={styles.App}>
       <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-      <Body 
-        selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
-        playState={playState} 
-        playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}/>
-      {playlistPlayObject ? 
-        (playlistPlayObject.contentObject.libraryTracks.length > playingPlaylistLibTrackNumber + 1 ?
-          (playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber + 1].artist ? 
-            playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber + 1].artist.name + ' - ' 
-            : null)
-          + playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber + 1].title
-          : null)
-      : null}
-      {playerTrackObject ? 
-        <Player 
-          playerTrackObject={playerTrackObject}
-          playState={playState}
-          setPlayState={setPlayState}
-          shouldResetSeek={shouldResetSeek} 
-          setShouldResetSeek={setShouldResetSeek}
-          setNextTrack={setNextTrack}
-          setPreviousTrack={setPreviousTrack}
-        /> 
-      : null}
+      <div className={styles.Body}>
+        <ContentArea 
+          isTrackListSidebarVisible={isTrackListSidebarVisible}
+          selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
+          playState={playState} 
+          playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}
+          playlistPlayObject={playlistPlayObject}/>
+        {playerTrackObject ? 
+          <Player 
+            playerTrackObject={playerTrackObject}
+            playState={playState}
+            setPlayState={setPlayState}
+            shouldResetSeek={shouldResetSeek} 
+            setShouldResetSeek={setShouldResetSeek}
+            setNextTrack={setNextTrack}
+            setPreviousTrack={setPreviousTrack}
+            setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}
+          /> 
+        : null}
+        </div>
     </div>
   );
 }
