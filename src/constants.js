@@ -1,6 +1,11 @@
-export const PlayStates = {
+export const PLAY_STATES = {
     PLAYING: 'PLAYING',
     PAUSED: 'PAUSED',
     STOPPED: 'STOPPED',
     LOADING: 'LOADING'
 };
+
+export const GENRE_TREE_RECT_DIMENSIONS = {
+    WIDTH: 180,
+    HEIGHT: 30
+}

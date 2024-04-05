@@ -8,11 +8,14 @@
     margin: 0;
     padding-left: 30px;
 
-    .GenreTreeContainer {
-        background-color: #c5c5c5;
-        margin: 0;
-        padding: 30px;
-        color: #333;
+    .GenreArea {
+        display: flex;
+        flex-direction: column;
+
+        .GenreTreeContainer {
+            background-color: #c5c5c5;
+            color: #333;
+        }
     }
 
     .RightSidebarContainer {
