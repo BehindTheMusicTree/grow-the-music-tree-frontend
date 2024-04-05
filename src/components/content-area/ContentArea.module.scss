@@ -12,6 +12,13 @@
         display: flex;
         flex-direction: column;
 
+        .GenreRectangle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
         .GenreTreeContainer {
             background-color: #c5c5c5;
             color: #333;

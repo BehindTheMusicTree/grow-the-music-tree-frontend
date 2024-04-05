@@ -61,11 +61,11 @@ export default function ContentArea ({
     <div className={styles.ContentArea}>
       <div className={styles.GenreArea}> 
         <h1>Genre Tree</h1>
-        <div style={{
+        <div className={styles.GenreRectangle} style={{
             width: GENRE_TREE_RECT_DIMENSIONS.WIDTH + 'px',
             height: GENRE_TREE_RECT_DIMENSIONS.HEIGHT + 'px',
             border: '1px solid black'
-        }}></div>
+        }}>+</div>
         <div className={styles.GenreTreeContainer}>
           {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
             return (
