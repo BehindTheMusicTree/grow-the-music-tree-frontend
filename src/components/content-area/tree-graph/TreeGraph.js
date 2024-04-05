@@ -7,7 +7,7 @@ import ReactDOMServer from 'react-dom/server';
 import { FaSpinner } from 'react-icons/fa';
 
 export default function TreeGraph (
-  { genres, postGenreAndRefresh, selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState }) {
+  { genres, handleGenreAddClick, selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState }) {
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const VERTICAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const HORIZONTAL_SEPARATOON_BETWEEN_NODES = (
@@ -180,15 +180,7 @@ export default function TreeGraph (
       .attr('y', 0)
       .text('+')
       .on('click', function(event, d) {
-        event.stopPropagation();
-        const name = prompt('New genre name:');
-        if (!name) {
-          return;
-        }
-        postGenreAndRefresh({
-          name: name,
-          parent: d.data.uuid
-        })
+        handleGenreAddClick(event, d.data.uuid);
       })
 
     nodes.on('mouseover', function() {
@@ -210,7 +202,7 @@ export default function TreeGraph (
 
 TreeGraph.propTypes = {
   genres: PropTypes.array.isRequired,
-  postGenreAndRefresh: PropTypes.func.isRequired,
+  handleGenreAddClick: PropTypes.func.isRequired,
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
   playState: PropTypes.string.isRequired,
   playingPlaylistUuidWithLoadingState: PropTypes.object,

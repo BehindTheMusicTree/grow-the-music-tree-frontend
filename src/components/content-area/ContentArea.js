@@ -20,6 +20,18 @@ export default function ContentArea ({
     fetchGenresIfNotLoading();
   };
 
+  const handleGenreAddClick = (event, parentUuid) => {
+    event.stopPropagation();
+    const name = prompt('New genre name:');
+    if (!name) {
+      return;
+    }
+    postGenreAndRefresh({
+      name: name,
+      parent: parentUuid
+    })
+  }
+
   const getGenresGroupedByRoot = (genres) => {
     const groupedGenres = {}
     genres.forEach(genre => {
@@ -61,18 +73,21 @@ export default function ContentArea ({
     <div className={styles.ContentArea}>
       <div className={styles.GenreArea}> 
         <h1>Genre Tree</h1>
-        <div className={styles.GenreRectangle} style={{
+        <div 
+        className={styles.GenreRectangle} 
+        style={{
             width: GENRE_TREE_RECT_DIMENSIONS.WIDTH + 'px',
             height: GENRE_TREE_RECT_DIMENSIONS.HEIGHT + 'px',
             border: '1px solid black'
-        }}>+</div>
+        }}
+        onClick={handleGenreAddClick}>+</div>
         <div className={styles.GenreTreeContainer}>
           {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
             return (
               <TreeGraph 
                 key={`${uuid}`} 
                 genres={genreTree} 
-                postGenreAndRefresh={postGenreAndRefresh} 
+                handleGenreAddClick={handleGenreAddClick} 
                 selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
                 playState={playState}
                 playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}/>
