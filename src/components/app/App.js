@@ -5,7 +5,7 @@ import Banner from '../banner/Banner'
 import { Howler } from 'howler';
 import Player from '../player/Player';
 import ApiService from '../../service/apiService';
-import { PlayStates } from '../../constants';
+import { PLAY_STATES } from '../../constants';
 
 Howler.html5PoolSize = 100;
 Howler.autoUnlock = true;
@@ -20,7 +20,7 @@ export default function App() {
 
   const [isTrackListSidebarVisible, setIsTrackListSidebarVisible] = useState(false);
 
-  const [playState, setPlayState] = useState(PlayStates.PLAYING);
+  const [playState, setPlayState] = useState(PLAY_STATES.PLAYING);
   const [shouldResetSeek, setShouldResetSeek] = useState(false);
 
   const selectPlaylistUuidToPlay = async (uuid) => {
@@ -62,7 +62,7 @@ export default function App() {
     if (playerTrackObject) {
       if (playingPlaylistUuidWithPlayState.isLoading) {
         setPlayingPlaylistUuidWithLoadingState({...playingPlaylistUuidWithPlayState,  isLoading: false});
-        setPlayState(PlayStates.PLAYING);
+        setPlayState(PLAY_STATES.PLAYING);
       }
     }
   }, [playerTrackObject]);

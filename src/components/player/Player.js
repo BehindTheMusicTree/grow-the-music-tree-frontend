@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faVolumeUp, faListUl } from '@fortawesome/free-solid-svg-icons'
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
 import TrackProgress from './TrackProgress/TrackProgress';
-import { PlayStates } from '../../constants';
+import { PLAY_STATES } from '../../constants';
 import albumCover from '../../assets/images/album-cover-default.png';
 
 export default function Player ({
@@ -28,15 +28,15 @@ export default function Player ({
   }
   
   const handlePlayPause = () => {
-    if (playState === PlayStates.STOPPED) {
+    if (playState === PLAY_STATES.STOPPED) {
       setShouldResetSeek(true);
-      setPlayState(PlayStates.PLAYING);
+      setPlayState(PLAY_STATES.PLAYING);
     }
-    else if (playState === PlayStates.PLAYING) {
-      setPlayState(PlayStates.PAUSED);
+    else if (playState === PLAY_STATES.PLAYING) {
+      setPlayState(PLAY_STATES.PAUSED);
     }
     else {
-      setPlayState(PlayStates.PLAYING);
+      setPlayState(PLAY_STATES.PLAYING);
     }
   }
 
@@ -49,7 +49,7 @@ export default function Player ({
       setNextTrack();
     }
     else {
-      setPlayState(PlayStates.STOPPED);
+      setPlayState(PLAY_STATES.STOPPED);
     }
   }
 
@@ -91,8 +91,8 @@ export default function Player ({
               <FaStepBackward />
           </Button>
           <Button 
-            className={playState === PlayStates.PLAYING ? styles.PauseButtonContainer : styles.PlayButtonContainer} onClick={handlePlayPause}>
-              {playState === PlayStates.PLAYING ? <FaPause /> : <FaPlay />}
+            className={playState === PLAY_STATES.PLAYING ? styles.PauseButtonContainer : styles.PlayButtonContainer} onClick={handlePlayPause}>
+              {playState === PLAY_STATES.PLAYING ? <FaPause /> : <FaPlay />}
           </Button>
           <Button
             className={styles.NextButtonContainer}            

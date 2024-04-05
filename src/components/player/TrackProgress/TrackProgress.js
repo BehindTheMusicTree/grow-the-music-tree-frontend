@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import raf from 'raf';
 import ReactHowler from 'react-howler';
-import { PlayStates } from '../../../constants';
+import { PLAY_STATES } from '../../../constants';
   
 const formatTime = (seconds) => {
     let minutes = Math.floor(seconds / 60);
@@ -58,7 +58,7 @@ export default function TrackProgress ({
     }
 
     previousSeekRef.current = currentSeek
-    if (playState === PlayStates.PLAYING && !isSeeking) {
+    if (playState === PLAY_STATES.PLAYING && !isSeeking) {
         rafIdRef.current = raf(() => {
           renderSeekPos();
       });
@@ -76,7 +76,7 @@ export default function TrackProgress ({
   }, [])
 
   useEffect(() => {
-    if (playState === PlayStates.PLAYING) {
+    if (playState === PLAY_STATES.PLAYING) {
       if (isSeeking) {
         cancelRaf();
       } else if (seek >= Math.floor(playerTrackObject.duration)) {
@@ -85,8 +85,8 @@ export default function TrackProgress ({
         playerRef.current.seek(seek);
         renderSeekPos();
       }
-    } else if (playState === PlayStates.STOPPED && !isSeeking) {
-      setPlayState(PlayStates.PAUSED);
+    } else if (playState === PLAY_STATES.STOPPED && !isSeeking) {
+      setPlayState(PLAY_STATES.PAUSED);
     }
   }, [isSeeking])
 
@@ -105,7 +105,7 @@ export default function TrackProgress ({
           ref={playerRef}
           src={[playerTrackObject.blobUrl]}
           html5={true}
-          playing={playState === PlayStates.PLAYING}
+          playing={playState === PLAY_STATES.PLAYING}
           format={[playerTrackObject.fileExtension.replace('.', '')]}
           onLoadError={handleLoadError}
           onEnd={handleTrackEnd}
