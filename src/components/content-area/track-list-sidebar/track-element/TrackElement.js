@@ -1,6 +1,7 @@
 import styles from './TrackElement.module.scss';
 import React from 'react';
 import PropTypes from 'prop-types';
+import { formatTime } from '../../../../utils';
 
 export default function TrackElement({playlistTrackRelationObject}) {
     return (
@@ -17,6 +18,7 @@ export default function TrackElement({playlistTrackRelationObject}) {
                 <div className={styles.GenreName}>{playlistTrackRelationObject.libraryTrack.genre 
                     ? playlistTrackRelationObject.libraryTrack.genre.name : ''}</div>
             </div>
+            <div className={styles.Duration}>{formatTime(playlistTrackRelationObject.libraryTrack.duration)}</div>
         </div>
     );
 }
