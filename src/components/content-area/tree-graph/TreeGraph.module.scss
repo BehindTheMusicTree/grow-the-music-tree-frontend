@@ -1,57 +1,65 @@
 .TreeGraphSvg {
     margin-top: 20px;
-}
 
-.node {
-    background-color: #bababa;
-    stroke-width: 1px;
-}
+    .PlayPauseButton {
+        font-size: 12px;
+        fill: #ffffff;
+        text-anchor: middle;
+    }
 
-.Link {
-    fill: none;
-    stroke: #555;
-    stroke-opacity: 0.4;
-    stroke-width: 2px;
-}
+    .PlaylistTracksCountText {
+        font-size: 12px;
+        fill: #ffffff;
+        text-anchor: middle;
+    }
 
-.PlayPauseButton {
-    font-size: 12px;
-    fill: #ffffff;
-    text-anchor: middle;
-}
+    .PlusButton, .TrackUploadButtonContainer {
+        display: none;
+        cursor: pointer;
+    }
 
-.PlaylistTracksCountText {
-    font-size: 12px;
-    fill: #ffffff;
-    text-anchor: middle;
-}
+    .PlusButton {
+        fill: red;
+    }
 
-.PlusButton {
-    fill: red;
-    display: none;
-    cursor: pointer;
-}
+    .TrackUploadIconContainer{
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-.NodeLabel {
-    font-size: 12px;
-    fill: #ffffff;
-    text-anchor: middle;
-}
+        svg {
+            fill: rgb(255, 255, 255);
+        }
+    }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+    .NodeLabel {
+        font-size: 12px;
+        fill: #ffffff;
+        text-anchor: middle;
+    }
 
-.SpinnerContainer {
-    width: 14px;
-    height: 14px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 
-.Spinner {
-    animation: spin 2s linear infinite;
-    fill: white;
+    .SpinnerContainer {
+        width: 14px;
+        height: 14px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .Spinner {
+        animation: spin 2s linear infinite;
+        fill: white;
+    }
+
+    .Link {
+        fill: none;
+        stroke: #555;
+        stroke-opacity: 0.4;
+        stroke-width: 2px;
+    }
 }

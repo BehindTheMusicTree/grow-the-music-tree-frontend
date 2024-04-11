@@ -40,9 +40,9 @@ export default function App() {
 
   useEffect(() => {
     const setPlayingLibTrack = async (playingLibTrackObject) => {
-      const playingLibTrackBlobUrl = await ApiService.getLoadAudioAndGetLibTrackBlobUrl(playingLibTrackObject.relativeUrl)
+      const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(playingLibTrackObject.libraryTrack.relativeUrl)
       setPlayerTrackObject({
-        ...playingLibTrackObject, 
+        ...playingLibTrackObject.libraryTrack, 
         blobUrl: playingLibTrackBlobUrl,
         hasNext: playlistPlayObject.contentObject.libraryTracks.length > playingPlaylistLibTrackNumber + 1,
         hasPrevious: playingPlaylistLibTrackNumber > 0

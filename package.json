@@ -23,7 +23,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "cp ./env/.env.development.api.test .env.development && react-scripts start",
+    "start:local": "cp ./env/.env.development.api.local .env.development && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

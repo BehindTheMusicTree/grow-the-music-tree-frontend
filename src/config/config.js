@@ -1,8 +1,7 @@
 const config = {
-  apiBaseUrl: 'https://bodzify.com/api/v1/',
-  // eslint-disable-next-line no-undef
+  apiBaseUrl: process.env.REACT_APP_BODZIFY_API_BASE_URL,
+  // apiBaseUrl: 'https://bodzify.com/api/v1/',
   username: process.env.REACT_APP_BODZIFY_API_UMG_USERNAME,
-  // eslint-disable-next-line no-undef
   password: process.env.REACT_APP_BODZIFY_API_UMG_USER_PASSWORD,
 }
   
