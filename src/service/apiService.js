@@ -78,6 +78,7 @@ const ApiService = {
       throw new Error(`Login failed with status: ${response.status}`);
     }
     const responseJson = await response.json()
+    console.log('Logged in:', responseJson);
     ApiService.setToken(responseJson);
   },
 
@@ -88,20 +89,31 @@ const ApiService = {
     }
 
     const headers = await ApiService.getHeaders();
+
+    if (data instanceof FormData) {
+      delete headers['Content-Type'];
+    }
+
     const response = await fetch(url, {
       method,
       headers: headers,
-      body: data ? JSON.stringify(data) : null,
+      body: data ? (data instanceof FormData ? data : JSON.stringify(data)) : null,
     })
 
     if (!response.ok) {
-      throw new Error(`Request failed with status: ${response.status}`);
+      let errorMessage = null
+      if (response.status === 400) {
+        const responseJson = await response.json();
+        errorMessage = JSON.stringify(responseJson);
+      }
+      throw new Error(`Request failed with status: ${response.status}` 
+        + (errorMessage ? ` and message: ${errorMessage}` : ''));
     }
 
     const responseJson = await response.json();
     return responseJson;
   },
-    
+
   retrieveLibraryTrack: async (libraryTrackUuid) => {
     return await ApiService.fetchData(`tracks/${libraryTrackUuid}/`, 'GET', null, null);
   },
@@ -154,6 +166,13 @@ const ApiService = {
   postPlay: async (contentObjectUuid) => {
     const data = {'contentObjectUuid': contentObjectUuid}
     return await ApiService.fetchData(`plays/`, 'POST', data, null);
+  },
+
+  postLibTracks: async (file, genreUuid) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('genreUuid', genreUuid);
+    return await ApiService.fetchData('tracks/', 'POST', formData, null);
   }
 };
 

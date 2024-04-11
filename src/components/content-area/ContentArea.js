@@ -19,6 +19,10 @@ export default function ContentArea ({
     await ApiService.postGenre(genreDataToPost);
     fetchGenresIfNotLoading();
   };
+  const postLibTracksAndRefresh = async (file, genreUuid) => {
+    await ApiService.postLibTracks(file, genreUuid);
+    fetchGenresIfNotLoading();
+  }
 
   const handleGenreAddClick = (event, parentUuid) => {
     event.stopPropagation();
@@ -90,7 +94,8 @@ export default function ContentArea ({
                 handleGenreAddClick={handleGenreAddClick} 
                 selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
                 playState={playState}
-                playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}/>
+                playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
+                postLibTracksAndRefresh={postLibTracksAndRefresh}/>
             );
           }) : (
             <p>Loading data.</p>

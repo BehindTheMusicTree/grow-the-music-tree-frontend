@@ -7,7 +7,12 @@ import ReactDOMServer from 'react-dom/server';
 import { FaSpinner, FaFileUpload } from 'react-icons/fa';
 
 export default function TreeGraph (
-  { genres, handleGenreAddClick, selectPlaylistUuidToPlay, playState, playingPlaylistUuidWithLoadingState }) {
+  { genres, 
+    handleGenreAddClick, 
+    selectPlaylistUuidToPlay, 
+    playState, 
+    playingPlaylistUuidWithLoadingState,
+    postLibTracksAndRefresh }) {
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const VERTICAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const HORIZONTAL_SEPARATOON_BETWEEN_NODES = (
@@ -23,7 +28,7 @@ export default function TreeGraph (
 
   function handleFileChange(event) {
     const file = event.target.files[0];
-    alert('File ' + file.name + ' has been selected');
+    postLibTracksAndRefresh(file, selectingFileGenreUuidRef.current);
   }
 
   const buildTreeHierarchy = () => {
@@ -248,4 +253,5 @@ TreeGraph.propTypes = {
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
   playState: PropTypes.string.isRequired,
   playingPlaylistUuidWithLoadingState: PropTypes.object,
+  postLibTracksAndRefresh: PropTypes.func.isRequired,
 };
