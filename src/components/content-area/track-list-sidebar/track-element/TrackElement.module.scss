@@ -2,10 +2,18 @@
     display: flex;
     flex-direction: row;
     height: 34px;
-    padding-left: 20px;
     padding-right: 20px;
     padding-top: 7px;
     padding-bottom: 7px;
+
+    .TrackPosition {
+        display: flex;
+        font-size: 18px;
+        width: 60px;
+        color: rgb(187, 184, 184);
+        align-items: center;
+        justify-content: center;
+    }
 
     .TitleArtistContainer {
         display: flex;
