@@ -36,7 +36,7 @@ export default function ContentArea ({
 }
 
 ContentArea.propTypes = {
-  contentAreaTypeWithObject: PropTypes.string.isRequired,
+  contentAreaTypeWithObject: PropTypes.object.isRequired,
   setContentAreaTypeWithObject: PropTypes.func.isRequired,
   isTrackListSidebarVisible: PropTypes.bool.isRequired,
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
