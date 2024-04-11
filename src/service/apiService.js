@@ -114,23 +114,22 @@ const ApiService = {
     return responseJson;
   },
 
-  retrieveLibraryTrack: async (libraryTrackUuid) => {
-    return await ApiService.fetchData(`tracks/${libraryTrackUuid}/`, 'GET', null, null);
+  retrieveLibTrack: async (libTrackUuid) => {
+    return await ApiService.fetchData(`tracks/${libTrackUuid}/`, 'GET', null, null);
   },
 
-  getLoadAudioAndGetLibTrackBlobUrl: async (libraryTrackRelativeUrl) => {
+  loadAudioAndGetLibTrackBlobUrl: async (libTrackRelativeUrl) => {
     const headers = {'Authorization': `Bearer ${ApiService.getToken().access}`}
-    return await ApiService.getTrackAudio(`${config.apiBaseUrl}${libraryTrackRelativeUrl}download/`, headers);
+    return await ApiService.getTrackAudioBlobUrl(`${config.apiBaseUrl}${libTrackRelativeUrl}download/`, headers);
   },
 
-  getTrackAudio: async (trackUrl, headers) => {
+  getTrackAudioBlobUrl: async (trackUrl, headers) => {
     return await axios.get(trackUrl, {
       headers: headers,
       responseType: 'arraybuffer'
     }).then(response => {
       const blob = new Blob([response.data], {type: 'audio/*'});
-      const url = URL.createObjectURL(blob);
-      return url
+      return URL.createObjectURL(blob);
     }).catch(error => {
       console.error('Error fetching audio:', error);
     });
