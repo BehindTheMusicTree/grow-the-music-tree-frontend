@@ -2,7 +2,7 @@ import styles from './TreeGraph.module.scss'
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import PropTypes from 'prop-types';
-import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from '../../../constants';
+import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from '../../../../constants';
 import ReactDOMServer from 'react-dom/server';
 import { FaSpinner, FaFileUpload } from 'react-icons/fa';
 
