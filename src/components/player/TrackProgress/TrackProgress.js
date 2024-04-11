@@ -106,7 +106,7 @@ export default function TrackProgress ({
           src={[playerTrackObject.blobUrl]}
           html5={true}
           playing={playState === PLAY_STATES.PLAYING}
-          format={[playerTrackObject.libraryTrack.fileExtension.replace('.', '')]}
+          format={[playerTrackObject.fileExtension.replace('.', '')]}
           onLoadError={handleLoadError}
           onEnd={handleTrackEnd}
           volume={volume}/>
