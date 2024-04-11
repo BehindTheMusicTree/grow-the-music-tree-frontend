@@ -2,6 +2,7 @@ import styles from './TrackElement.module.scss';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { formatTime } from '../../../../utils';
+import { MdMoreVert } from 'react-icons/md';
 
 export default function TrackElement({playlistTrackRelationObject}) {
     return (
@@ -19,6 +20,7 @@ export default function TrackElement({playlistTrackRelationObject}) {
                     ? playlistTrackRelationObject.libraryTrack.genre.name : ''}</div>
             </div>
             <div className={styles.Duration}>{formatTime(playlistTrackRelationObject.libraryTrack.duration)}</div>
+            <div className={styles.Edit}><MdMoreVert size={20}/></div>
         </div>
     );
 }
