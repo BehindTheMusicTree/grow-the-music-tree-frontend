@@ -1,18 +1,19 @@
 .TreeGraphSvg {
     margin-top: 20px;
 
-    .GenreNameContainer {
+    .GenreNameContainer, .PlayPauseIconContainer, .PlaylistTracksCountContainer {
         font-size: 12px;
         color: #ffffff;
+
+        div {
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100%;
+        }
     }
 
-    .PlayPauseButton {
-        font-size: 12px;
-        fill: #ffffff;
-        text-anchor: middle;
-    }
-
-    .PlaylistTracksCountText {
+    .PlaylistTracksCountContainer {
         font-size: 12px;
         fill: #ffffff;
         text-anchor: middle;

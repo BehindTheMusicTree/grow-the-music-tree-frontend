@@ -110,8 +110,8 @@ export default function TreeGraph (
       .attr('y', -GENRE_TREE_RECT_DIMENSIONS.HEIGHT / 2);
   
     const TRACK_UPLOAD_ICON_OFFSET = 10;
-    const GENRE_ADD_ICON_OFFSET = TRACK_UPLOAD_ICON_OFFSET + 13;
-    const PLAYLIST_TRACKS_COUNT_TEXT_OFFSET = GENRE_ADD_ICON_OFFSET + 13;
+    const GENRE_ADD_ICON_OFFSET = TRACK_UPLOAD_ICON_OFFSET + 17;
+    const PLAYLIST_TRACKS_COUNT_TEXT_OFFSET = GENRE_ADD_ICON_OFFSET + 20;
     const PLAY_PAUSE_BUTTON_OFFSET = PLAYLIST_TRACKS_COUNT_TEXT_OFFSET + 13;
 
     const GENRE_NAME_DIMENSIONS = {
@@ -125,7 +125,7 @@ export default function TreeGraph (
       .attr('x',  - GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2)
       .attr('y',  - GENRE_TREE_RECT_DIMENSIONS.HEIGHT / 2)
       .html(function(d) {
-        return `<div style="display: flex; justify-content: center; align-items: center; height: 100%;">${d.data.name}</div>`;
+        return `<div>${d.data.name}</div>`;
       });
 
     const SPINNER_ICON_SIZE = 14;
@@ -144,18 +144,22 @@ export default function TreeGraph (
           }
       })
 
-    nodes.append('text')
-      .attr('class', styles.PlayPauseButton)
-      .attr('dominant-baseline', 'middle')
-      .attr('text-anchor', 'middle')
+    const PLAY_PAUSE_ICON_DIMENSIONS = {
+      WIDTH: 14,
+      HEIGHT: 16,
+    }
+    nodes.append('foreignObject')
+      .attr('class', styles.PlayPauseIconContainer)
+      .attr('width', PLAY_PAUSE_ICON_DIMENSIONS.WIDTH)
+      .attr('height', PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT)
       .attr('x', GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET)
-      .attr('y', 0)
+      .attr('y', - GENRE_TREE_RECT_DIMENSIONS.HEIGHT / 2 + PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT / 2)
       .style('visibility', function(d) {
         playingPlaylistUuidWithLoadingState 
           && playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid
           && playingPlaylistUuidWithLoadingState.isLoading ? 'hidden' : 'visible';
       })
-      .text(function(d) {
+      .html(function(d) {
         if (d.data.criteriaPlaylist.libraryTracksCount === 0) {
           return '';
         }
@@ -185,14 +189,18 @@ export default function TreeGraph (
         return 'default';
       })
 
-    nodes.append('text')
-      .attr('class', styles.PlaylistTracksCountText)
-      .attr('dominant-baseline', 'middle')
-      .attr('text-anchor', 'middle')
+    const PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS = {
+      WIDTH: 14,
+      HEIGHT: 16,
+    }
+    nodes.append('foreignObject')
+      .attr('class', styles.PlaylistTracksCountContainer)
+      .attr('width', PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.WIDTH)
+      .attr('height', PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT)
       .attr('x', GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAYLIST_TRACKS_COUNT_TEXT_OFFSET)
-      .attr('y', 0)
-      .text(function(d) {
-        return d.data.criteriaPlaylist.libraryTracksCount;
+      .attr('y', - GENRE_TREE_RECT_DIMENSIONS.HEIGHT / 2 + PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT / 2)
+      .html(function(d) {
+        return "<div>" + d.data.criteriaPlaylist.libraryTracksCount + "</div>";
       })
   
 
