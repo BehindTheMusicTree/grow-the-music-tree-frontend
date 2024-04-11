@@ -19,9 +19,9 @@ export default function TrackListSidebar({playlistPlayObject}) {
             </div>
             <div>
                 <ul>
-                    {playlistPlayObject.contentObject.libraryTracks.map((track, index) => (
+                    {playlistPlayObject.contentObject.libraryTracks.map((playlistTrackRelation, index) => (
                         <li key={index}>
-                            <TrackElement trackObject={track} />
+                            <TrackElement playlistTrackRelationObject={playlistTrackRelation} />
                         </li>
                     ))}
                 </ul>
