@@ -42,7 +42,8 @@ const ApiService = {
   },
 
   getHeaders: async () => {
-    let accessToken = ApiService.getToken().access;
+    const token = ApiService.getToken();
+    let accessToken = token ? token.access : null;
     if (accessToken) {
       try {
         const payload = JSON.parse(atob(accessToken.split('.')[1]));
@@ -78,7 +79,6 @@ const ApiService = {
       throw new Error(`Login failed with status: ${response.status}`);
     }
     const responseJson = await response.json()
-    console.log('Logged in:', responseJson);
     ApiService.setToken(responseJson);
   },
 

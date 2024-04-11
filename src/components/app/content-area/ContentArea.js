@@ -2,13 +2,12 @@ import styles from './ContentArea.module.scss';
 import React from 'react';
 import PropTypes from 'prop-types';
 import TrackListSidebar from './track-list-sidebar/TrackListSidebar';
-import {CONTENT_AREA_TYPES} from '../../constants';
+import {CONTENT_AREA_TYPES} from '../../../constants';
 import GenresView from './genres-view/GenresView';
-import LibTrackEdition from './lib-track-edition/LibTrackEdition';
 
 export default function ContentArea ({
+    setEditingTrack,
     contentAreaTypeWithObject,
-    setContentAreaTypeWithObject,
     isTrackListSidebarVisible, 
     selectPlaylistUuidToPlay, 
     playState, 
@@ -17,18 +16,18 @@ export default function ContentArea ({
 
   return (
     <div className={styles.ContentArea}>
-      {contentAreaTypeWithObject.type === CONTENT_AREA_TYPES.GENRES ? (
+      {contentAreaTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES ? (
         <GenresView 
           selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
           playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState} 
           playState={playState} 
         />
       ) : (
-        <LibTrackEdition libTrack={contentAreaTypeWithObject.contentObject}/>
+        <div>Unknown content area type</div>
       )}
       {isTrackListSidebarVisible ? (
         <div className={styles.RightSidebarContainer}>
-          <TrackListSidebar playlistPlayObject={playlistPlayObject} setContentAreaTypeWithObject={setContentAreaTypeWithObject}/>
+          <TrackListSidebar playlistPlayObject={playlistPlayObject} setEditingTrack={setEditingTrack}/>
         </div>
         ) : null}
     </div>
@@ -36,8 +35,8 @@ export default function ContentArea ({
 }
 
 ContentArea.propTypes = {
+  setEditingTrack: PropTypes.func.isRequired,
   contentAreaTypeWithObject: PropTypes.object.isRequired,
-  setContentAreaTypeWithObject: PropTypes.func.isRequired,
   isTrackListSidebarVisible: PropTypes.bool.isRequired,
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
   playState: PropTypes.string.isRequired,

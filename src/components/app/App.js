@@ -1,14 +1,14 @@
 import styles from './App.module.scss';
-import React, { useState, useEffect } from 'react';
-import ContentArea from '../content-area/ContentArea'
-import Banner from '../banner/Banner'
+import React, { useState, useEffect, useRef } from 'react';
 import { Howler } from 'howler';
-import Player from '../player/Player';
+import Banner from './banner/Banner'
+import ContentArea from './content-area/ContentArea'
+import Player from './player/Player';
+import LibTrackEdition from './popup/lib-track-edition/LibTrackEdition';
 import ApiService from '../../service/apiService';
 import { PLAY_STATES } from '../../constants';
 import {CONTENT_AREA_TYPES} from '../../constants';
 
-Howler.html5PoolSize = 100;
 Howler.autoUnlock = true;
 
 export default function App() {
@@ -18,15 +18,15 @@ export default function App() {
   const [playingPlaylistUuidWithPlayState, setPlayingPlaylistUuidWithLoadingState] = useState(null);
   const [playlistPlayObject, setPlaylistPlayObject] = useState(null);
   const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
-  const [contentAreaTypeWithObject, setContentAreaTypeWithObject] = useState({
-    type: CONTENT_AREA_TYPES.GENRES,
-    contentObject: null
-  });
-
+  const [editingTrack, setEditingTrack] = useState(null);
   const [isTrackListSidebarVisible, setIsTrackListSidebarVisible] = useState(false);
-
   const [playState, setPlayState] = useState(PLAY_STATES.PLAYING);
   const [shouldResetSeek, setShouldResetSeek] = useState(false);
+
+  const contentAreaTypeWithObject = useRef({
+    type: CONTENT_AREA_TYPES.GENRES,
+    contentObject: null
+  })
 
   const selectPlaylistUuidToPlay = async (uuid) => {
     setPlayingPlaylistUuidWithLoadingState({uuid: uuid, isLoading: true});
@@ -76,15 +76,15 @@ export default function App() {
     <div className={styles.App}>
       <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
       <div className={styles.Body}>
-        <ContentArea 
+        <ContentArea
+          setEditingTrack={setEditingTrack}
           contentAreaTypeWithObject={contentAreaTypeWithObject}
-          setContentAreaTypeWithObject={setContentAreaTypeWithObject}
           isTrackListSidebarVisible={isTrackListSidebarVisible}
           selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
           playState={playState} 
           playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}
           playlistPlayObject={playlistPlayObject}/>
-        {playerTrackObject ? 
+        {playerTrackObject &&
           <Player 
             playerTrackObject={playerTrackObject}
             playState={playState}
@@ -94,8 +94,12 @@ export default function App() {
             setNextTrack={setNextTrack}
             setPreviousTrack={setPreviousTrack}
             setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}
-          /> 
-        : null}
+          />}
+        {editingTrack && 
+          <LibTrackEdition 
+            editingTrack={editingTrack}
+            onClose={() => setEditingTrack(null)} />
+        }
         </div>
     </div>
   );

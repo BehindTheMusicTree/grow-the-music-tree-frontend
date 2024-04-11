@@ -1,6 +1,11 @@
 .TreeGraphSvg {
     margin-top: 20px;
 
+    .GenreNameContainer {
+        font-size: 12px;
+        color: #ffffff;
+    }
+
     .PlayPauseButton {
         font-size: 12px;
         fill: #ffffff;
@@ -13,29 +18,15 @@
         text-anchor: middle;
     }
 
-    .PlusButton, .TrackUploadButtonContainer {
+    .GenreAddIconContainer, .TrackUploadIconContainer {
         display: none;
-        cursor: pointer;
-    }
-
-    .PlusButton {
-        fill: red;
-    }
-
-    .TrackUploadIconContainer{
-        display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
 
         svg {
             fill: rgb(255, 255, 255);
         }
-    }
-
-    .NodeLabel {
-        font-size: 12px;
-        fill: #ffffff;
-        text-anchor: middle;
     }
 
     @keyframes spin {

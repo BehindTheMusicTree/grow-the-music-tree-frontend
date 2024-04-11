@@ -6,8 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faVolumeUp, faListUl } from '@fortawesome/free-solid-svg-icons'
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
 import TrackProgress from './TrackProgress/TrackProgress';
-import { PLAY_STATES } from '../../constants';
-import albumCover from '../../assets/images/album-cover-default.png';
+import { PLAY_STATES } from '../../../constants';
+import albumCover from '../../../assets/images/album-cover-default.png';
 
 export default function Player ({
     playerTrackObject, 

@@ -7,7 +7,7 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export default function TrackListSidebar({playlistPlayObject, setContentAreaTypeWithObject}) {
+export default function TrackListSidebar({playlistPlayObject, setEditingTrack}) {
     return (
         <div className={styles.TrackListSidebar}>
             <div className={styles.Header}>
@@ -21,7 +21,7 @@ export default function TrackListSidebar({playlistPlayObject, setContentAreaType
                 <ul>
                     {playlistPlayObject.contentObject.libraryTracks.map((playlistTrackRelation, index) => (
                         <li key={index}>
-                            <TrackElement playlistTrackRelationObject={playlistTrackRelation} setContentAreaTypeWithObject={setContentAreaTypeWithObject}/>
+                            <TrackElement playlistTrackRelationObject={playlistTrackRelation} setEditingTrack={setEditingTrack}/>
                         </li>
                     ))}
                 </ul>
@@ -32,5 +32,5 @@ export default function TrackListSidebar({playlistPlayObject, setContentAreaType
 
 TrackListSidebar.propTypes = {
     playlistPlayObject: PropTypes.object,
-    setContentAreaTypeWithObject: PropTypes.func.isRequired,
+    setEditingTrack: PropTypes.func.isRequired,
 };

@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import raf from 'raf';
 import ReactHowler from 'react-howler';
-import { PLAY_STATES } from '../../../constants';
-import { formatTime } from '../../../utils';
+import { PLAY_STATES } from '../../../../constants';
+import { formatTime } from '../../../../utils';
 
 export default function TrackProgress ({ 
     playState, 

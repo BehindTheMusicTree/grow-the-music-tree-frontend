@@ -1,19 +1,14 @@
 import styles from './TrackElement.module.scss';
 import React from 'react';
 import PropTypes from 'prop-types';
-import { formatTime } from '../../../../utils';
+import { formatTime } from '../../../../../utils';
 import { MdMoreVert } from 'react-icons/md';
-import { CONTENT_AREA_TYPES } from '../../../../constants';
 
-export default function TrackElement({playlistTrackRelationObject, setContentAreaTypeWithObject}) {
+export default function TrackElement({playlistTrackRelationObject, setEditingTrack}) {
 
     const handleEditClick = (event) => {
         event.stopPropagation();
-        setContentAreaTypeWithObject({
-            type: CONTENT_AREA_TYPES.LIB_TRACK_EDITION,
-            contentObject: playlistTrackRelationObject.libraryTrack
-        
-        });
+        setEditingTrack(playlistTrackRelationObject.libraryTrack);
     }
 
     return (
@@ -27,7 +22,7 @@ export default function TrackElement({playlistTrackRelationObject, setContentAre
             <div className={styles.AlbumGenreContainer}>
                 <div className={styles.AlbumName}>{playlistTrackRelationObject.libraryTrack.album ? 
                     playlistTrackRelationObject.libraryTrack.album.name : ''}</div>
-                <div className={styles.GenreName}>{playlistTrackRelationObject.libraryTrack.genre 
+                <div className={styles.GenreNameContainer}>{playlistTrackRelationObject.libraryTrack.genre 
                     ? playlistTrackRelationObject.libraryTrack.genre.name : ''}</div>
             </div>
             <div className={styles.Duration}>{formatTime(playlistTrackRelationObject.libraryTrack.duration)}</div>
@@ -38,5 +33,5 @@ export default function TrackElement({playlistTrackRelationObject, setContentAre
 
 TrackElement.propTypes = {
     playlistTrackRelationObject: PropTypes.object,
-    setContentAreaTypeWithObject: PropTypes.func.isRequired,
+    setEditingTrack: PropTypes.func.isRequired,
 };
