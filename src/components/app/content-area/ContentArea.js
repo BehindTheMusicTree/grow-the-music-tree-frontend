@@ -12,7 +12,8 @@ export default function ContentArea ({
     selectPlaylistUuidToPlay, 
     playState, 
     playingPlaylistUuidWithLoadingState, 
-    playlistPlayObject}) {
+    playlistPlayObject,
+    refreshGenresSignal}) {
 
   return (
     <div className={styles.ContentArea}>
@@ -20,7 +21,8 @@ export default function ContentArea ({
         <GenresView 
           selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
           playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState} 
-          playState={playState} 
+          playState={playState}
+          refreshGenresSignal={refreshGenresSignal}
         />
       ) : (
         <div>Unknown content area type</div>
@@ -41,5 +43,6 @@ ContentArea.propTypes = {
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
   playState: PropTypes.string.isRequired,
   playingPlaylistUuidWithLoadingState: PropTypes.object,
-  playlistPlayObject: PropTypes.object
+  playlistPlayObject: PropTypes.object,
+  refreshGenresSignal: PropTypes.number.isRequired
 };

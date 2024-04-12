@@ -5,7 +5,11 @@ import TreeGraph from './tree-graph/TreeGraph';
 import ApiService from '../../../../service/apiService';
 import PropTypes from 'prop-types';
 
-export default function GenresView({selectPlaylistUuidToPlay, playingPlaylistUuidWithLoadingState, playState}) {
+export default function GenresView({
+      selectPlaylistUuidToPlay, 
+      playingPlaylistUuidWithLoadingState,
+      playState,
+      refreshGenresSignal}) {
     const [groupedGenres, setGroupedGenres] = useState(null);
     const areGenreLoadingRef = useRef(false);
   
@@ -50,6 +54,10 @@ export default function GenresView({selectPlaylistUuidToPlay, playingPlaylistUui
         parent: parentUuid
       })
     }
+
+    useEffect(() => {
+      fetchGenresIfNotLoading();
+    }, [refreshGenresSignal]);
 
     useEffect(() => {
       const fetchAndSetGenres = async () => {
@@ -102,4 +110,5 @@ GenresView.propTypes = {
     selectPlaylistUuidToPlay: PropTypes.func.isRequired,
     playingPlaylistUuidWithLoadingState: PropTypes.object,
     playState: PropTypes.string.isRequired,
+    refreshGenresSignal: PropTypes.number.isRequired
 };

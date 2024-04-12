@@ -22,6 +22,7 @@ export default function App() {
   const [isTrackListSidebarVisible, setIsTrackListSidebarVisible] = useState(false);
   const [playState, setPlayState] = useState(PLAY_STATES.PLAYING);
   const [shouldResetSeek, setShouldResetSeek] = useState(false);
+  const [refreshGenresSignal, setRefreshGenresSignal] = useState(0);
 
   const contentAreaTypeWithObject = useRef({
     type: CONTENT_AREA_TYPES.GENRES,
@@ -36,6 +37,7 @@ export default function App() {
       );
       return newState;
     })
+    setRefreshGenresSignal(oldSignal => oldSignal + 1);
   }
 
   const selectPlaylistUuidToPlay = async (uuid) => {
@@ -93,7 +95,8 @@ export default function App() {
           selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
           playState={playState} 
           playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}
-          playlistPlayObject={playlistPlayObject}/>
+          playlistPlayObject={playlistPlayObject}
+          refreshGenresSignal={refreshGenresSignal}/>
         {playerTrackObject &&
           <Player 
             playerTrackObject={playerTrackObject}
