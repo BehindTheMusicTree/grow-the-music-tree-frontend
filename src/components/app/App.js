@@ -32,12 +32,19 @@ export default function App() {
   const handleUpdatedLibTrack = async (updatedLibTrack) => {
     setPlaylistPlayObject(currentState => {
       const newState = { ...currentState };
+      const oldTrack = newState.contentObject.libraryTracks.find(track => track.libraryTrack.uuid === updatedLibTrack.uuid);
+      const genreChanged = oldTrack && oldTrack.libraryTrack.genre !== updatedLibTrack.genre;
+
       newState.contentObject.libraryTracks = newState.contentObject.libraryTracks.map(playlistTrackRelation => 
         playlistTrackRelation.libraryTrack.uuid === updatedLibTrack.uuid ? {...playlistTrackRelation, libraryTrack: updatedLibTrack} : playlistTrackRelation
       );
+
+      if (genreChanged) {
+        setRefreshGenresSignal(oldSignal => oldSignal + 1);
+      }
+
       return newState;
     })
-    setRefreshGenresSignal(oldSignal => oldSignal + 1);
   }
 
   const selectPlaylistUuidToPlay = async (uuid) => {
