@@ -16,7 +16,7 @@ export default function TrackElement({playlistTrackRelationObject, setEditingTra
             <div className={styles.TrackPosition}>{playlistTrackRelationObject.position}</div>
             <div className={styles.TitleArtistContainer}>
                 <div className={styles.Title}>{playlistTrackRelationObject.libraryTrack.title}</div>
-                {playlistTrackRelationObject.artist ? 
+                {playlistTrackRelationObject.libraryTrack.artist ? 
                     (<div className={styles.Artist}>{playlistTrackRelationObject.libraryTrack.artist.name} </div>) : ''}
             </div>
             <div className={styles.AlbumGenreContainer}>

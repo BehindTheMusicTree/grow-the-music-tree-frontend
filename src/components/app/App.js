@@ -28,6 +28,16 @@ export default function App() {
     contentObject: null
   })
 
+  const handleUpdatedLibTrack = async (updatedLibTrack) => {
+    setPlaylistPlayObject(currentState => {
+      const newState = { ...currentState };
+      newState.contentObject.libraryTracks = newState.contentObject.libraryTracks.map(playlistTrackRelation => 
+        playlistTrackRelation.libraryTrack.uuid === updatedLibTrack.uuid ? {...playlistTrackRelation, libraryTrack: updatedLibTrack} : playlistTrackRelation
+      );
+      return newState;
+    })
+  }
+
   const selectPlaylistUuidToPlay = async (uuid) => {
     setPlayingPlaylistUuidWithLoadingState({uuid: uuid, isLoading: true});
     setPlaylistPlayObject(await ApiService.postPlay(uuid))
@@ -97,8 +107,9 @@ export default function App() {
           />}
         {editingTrack && 
           <LibTrackEdition 
-            editingTrack={editingTrack}
-            onClose={() => setEditingTrack(null)} />
+            libTrack={editingTrack}
+            onClose={() => setEditingTrack(null)}
+            handleUpdatedLibTrack={handleUpdatedLibTrack} />
         }
         </div>
     </div>

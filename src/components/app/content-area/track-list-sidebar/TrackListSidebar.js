@@ -2,10 +2,7 @@ import styles from './TrackListSidebar.module.scss';
 import React from 'react';
 import PropTypes from 'prop-types';
 import TrackElement from './track-element/TrackElement';
-
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
+import { capitalizeFirstLetter } from '../../../../utils';
 
 export default function TrackListSidebar({playlistPlayObject, setEditingTrack}) {
     return (
@@ -19,9 +16,11 @@ export default function TrackListSidebar({playlistPlayObject, setEditingTrack}) 
             </div>
             <div>
                 <ul>
-                    {playlistPlayObject.contentObject.libraryTracks.map((playlistTrackRelation, index) => (
-                        <li key={index}>
-                            <TrackElement playlistTrackRelationObject={playlistTrackRelation} setEditingTrack={setEditingTrack}/>
+                    {playlistPlayObject.contentObject.libraryTracks.map((playlistTrackRelation) => (
+                        <li key={playlistTrackRelation.libraryTrack.uuid}>
+                            <TrackElement 
+                                playlistTrackRelationObject={playlistTrackRelation} 
+                                setEditingTrack={setEditingTrack}/>
                         </li>
                     ))}
                 </ul>
