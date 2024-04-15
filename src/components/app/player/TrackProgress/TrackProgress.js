@@ -9,8 +9,8 @@ import { formatTime } from '../../../../utils';
 export default function TrackProgress ({ 
     playState, 
     setPlayState, 
-    shouldResetSeek, 
-    setShouldResetSeek,
+    shouldResetPlayerSeek, 
+    setshouldResetPlayerSeek,
     playerTrackObject,
     volume,
     handleTrackEnd,
@@ -84,13 +84,13 @@ export default function TrackProgress ({
   }, [isSeeking])
 
   useEffect(() => {
-    if (shouldResetSeek) {
+    if (shouldResetPlayerSeek) {
       previousSeekRef.current = null;
       setSeek(0);
       playerRef.current.seek(0);
-      setShouldResetSeek(false);
+      setshouldResetPlayerSeek(false);
     }
-  }, [shouldResetSeek])
+  }, [shouldResetPlayerSeek])
 
   return (
     <div className={styles.TrackProgress}>
@@ -129,8 +129,8 @@ export default function TrackProgress ({
 TrackProgress.propTypes = {
     playState: PropTypes.string.isRequired,
     setPlayState: PropTypes.func.isRequired,
-    shouldResetSeek: PropTypes.bool.isRequired,
-    setShouldResetSeek: PropTypes.func.isRequired,
+    shouldResetPlayerSeek: PropTypes.bool.isRequired,
+    setshouldResetPlayerSeek: PropTypes.func.isRequired,
     playerTrackObject: PropTypes.object.isRequired,
     volume: PropTypes.number.isRequired,
     handleTrackEnd: PropTypes.func.isRequired,
