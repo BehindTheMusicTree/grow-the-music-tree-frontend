@@ -17,16 +17,22 @@ export default function ContentArea ({
 
   return (
     <div className={styles.ContentArea}>
-      {contentAreaTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES ? (
+      {contentAreaTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES
+      ? (
         <GenresView 
           selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
           playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState} 
           playState={playState}
           refreshGenresSignal={refreshGenresSignal}
         />
-      ) : (
+      )
+      : (
         <div>Unknown content area type</div>
       )}
+      {/* { isPlayingTrack
+      ? <IconPlay dataTestId="play"/>
+      : <IconPause dataTestId="pause"/>
+        } */}
       {isTrackListSidebarVisible ? (
         <div className={styles.RightSidebarContainer}>
           <TrackListSidebar playlistPlayObject={playlistPlayObject} setEditingTrack={setEditingTrack}/>
