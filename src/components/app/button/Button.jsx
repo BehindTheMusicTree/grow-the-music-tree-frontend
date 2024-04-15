@@ -1,7 +1,6 @@
-import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import './Button.module.scss'
+import './Button.module.css'
 
 export default function Button ({ children, className, ...otherProps }) {
 

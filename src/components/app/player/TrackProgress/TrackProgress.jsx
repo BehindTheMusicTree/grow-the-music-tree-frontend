@@ -1,5 +1,5 @@
-import styles from './TrackProgress.module.scss'
-import React, { useState, useEffect, useRef } from 'react';
+import styles from './TrackProgress.module.css'
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import raf from 'raf';
 import ReactHowler from 'react-howler';

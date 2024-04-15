@@ -1,7 +1,7 @@
-import styles from './Player.module.scss'
-import React, { useState, useEffect } from 'react'
+import styles from './Player.module.css'
+import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types';
-import Button from '../button/Button';
+import Button from '../button/Button.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faVolumeUp, faListUl } from '@fortawesome/free-solid-svg-icons'
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';

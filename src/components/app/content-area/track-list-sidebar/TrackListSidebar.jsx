@@ -1,5 +1,4 @@
-import styles from './TrackListSidebar.module.scss';
-import React from 'react';
+import styles from './TrackListSidebar.module.css';
 import PropTypes from 'prop-types';
 import TrackElement from './track-element/TrackElement';
 import { capitalizeFirstLetter } from '../../../../utils';

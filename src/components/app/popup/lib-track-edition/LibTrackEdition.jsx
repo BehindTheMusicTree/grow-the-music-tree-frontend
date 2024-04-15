@@ -1,5 +1,4 @@
-import styles from './LibTrackEdition.module.scss'
-import React from 'react';
+import styles from './LibTrackEdition.module.css'
 import PropTypes from 'prop-types';
 import ApiService from '../../../../service/apiService';
 import { useForm } from 'react-hook-form';

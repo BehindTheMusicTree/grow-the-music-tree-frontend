@@ -1,5 +1,4 @@
-import styles from './TrackElement.module.scss';
-import React from 'react';
+import styles from './TrackElement.module.css';
 import PropTypes from 'prop-types';
 import { formatTime } from '../../../../../utils';
 import { MdMoreVert } from 'react-icons/md';
