@@ -1,5 +1,5 @@
-import styles from './App.module.scss';
-import React, { useState, useEffect, useRef } from 'react';
+import styles from './App.module.css';
+import { useState, useEffect, useRef } from 'react';
 import { Howler } from 'howler';
 import Banner from './banner/Banner'
 import ContentArea from './content-area/ContentArea'

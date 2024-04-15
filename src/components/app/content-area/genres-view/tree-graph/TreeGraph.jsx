@@ -1,5 +1,5 @@
-import styles from './TreeGraph.module.scss'
-import React, { useEffect, useRef } from 'react';
+import styles from './TreeGraph.module.css'
+import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOMServer from 'react-dom/server';
 import * as d3 from 'd3';
