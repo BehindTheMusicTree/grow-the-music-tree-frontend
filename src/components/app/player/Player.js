@@ -6,15 +6,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faVolumeUp, faListUl } from '@fortawesome/free-solid-svg-icons'
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
 import TrackProgress from './TrackProgress/TrackProgress';
-import { PLAY_STATES } from '../../constants';
-import albumCover from '../../assets/images/album-cover-default.png';
+import { PLAY_STATES } from '../../../constants';
+import albumCover from '../../../assets/images/album-cover-default.png';
 
 export default function Player ({
     playerTrackObject, 
     playState, 
     setPlayState, 
-    shouldResetSeek, 
-    setShouldResetSeek, 
+    shouldResetPlayerSeek, 
+    setshouldResetPlayerSeek, 
     setNextTrack, 
     setPreviousTrack, 
     setIsTrackListSidebarVisible}) {
@@ -29,7 +29,7 @@ export default function Player ({
   
   const handlePlayPause = () => {
     if (playState === PLAY_STATES.STOPPED) {
-      setShouldResetSeek(true);
+      setshouldResetPlayerSeek(true);
       setPlayState(PLAY_STATES.PLAYING);
     }
     else if (playState === PLAY_STATES.PLAYING) {
@@ -59,7 +59,7 @@ export default function Player ({
 
   const handleBackwardClick = () => {
     if (!playerTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
-      setShouldResetSeek(true);
+      setshouldResetPlayerSeek(true);
     }
     else {
       setPreviousTrack(prev => prev - 1);
@@ -67,7 +67,7 @@ export default function Player ({
   }
 
   useEffect(() => {
-    setShouldResetSeek(true);
+    setshouldResetPlayerSeek(true);
   }, [playerTrackObject])
 
   return (
@@ -104,8 +104,8 @@ export default function Player ({
         <TrackProgress 
           playState={playState} 
           setPlayState={setPlayState} 
-          shouldResetSeek={shouldResetSeek} 
-          setShouldResetSeek={setShouldResetSeek}
+          shouldResetPlayerSeek={shouldResetPlayerSeek} 
+          setshouldResetPlayerSeek={setshouldResetPlayerSeek}
           playerTrackObject={playerTrackObject}
           volume={volume}
           handleTrackEnd={handleTrackEnd}
@@ -136,8 +136,8 @@ Player.propTypes = {
   playerTrackObject: PropTypes.object,
   playState: PropTypes.string.isRequired,
   setPlayState: PropTypes.func.isRequired,
-  shouldResetSeek: PropTypes.bool.isRequired,
-  setShouldResetSeek: PropTypes.func.isRequired,
+  shouldResetPlayerSeek: PropTypes.bool.isRequired,
+  setshouldResetPlayerSeek: PropTypes.func.isRequired,
   setNextTrack: PropTypes.func.isRequired,
   setPreviousTrack: PropTypes.func.isRequired,
   setIsTrackListSidebarVisible: PropTypes.func.isRequired

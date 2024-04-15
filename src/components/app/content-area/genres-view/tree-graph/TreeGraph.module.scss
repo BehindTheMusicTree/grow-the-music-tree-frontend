@@ -1,41 +1,33 @@
 .TreeGraphSvg {
     margin-top: 20px;
 
-    .PlayPauseButton {
+    .GenreNameContainer, .PlayPauseIconContainer, .PlaylistTracksCountContainer {
+        font-size: 12px;
+        color: #ffffff;
+
+        div {
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100%;
+        }
+    }
+
+    .PlaylistTracksCountContainer {
         font-size: 12px;
         fill: #ffffff;
         text-anchor: middle;
     }
 
-    .PlaylistTracksCountText {
-        font-size: 12px;
-        fill: #ffffff;
-        text-anchor: middle;
-    }
-
-    .PlusButton, .TrackUploadButtonContainer {
+    .GenreAddIconContainer, .TrackUploadIconContainer {
         display: none;
-        cursor: pointer;
-    }
-
-    .PlusButton {
-        fill: red;
-    }
-
-    .TrackUploadIconContainer{
-        display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
 
         svg {
             fill: rgb(255, 255, 255);
         }
-    }
-
-    .NodeLabel {
-        font-size: 12px;
-        fill: #ffffff;
-        text-anchor: middle;
     }
 
     @keyframes spin {

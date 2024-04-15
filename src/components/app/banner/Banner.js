@@ -1,5 +1,4 @@
-import '../../styles/Banner.css'
-import logo from '../../assets/ouai.jpg'
+import './Banner.css'
 import React from 'react'
 import Header from './Header'
 import Description from './Description'
@@ -9,7 +8,6 @@ import PropTypes from 'prop-types';
 export default function Banner({searchSubmitted, setSearchSubmitted}) {
     return (
     <div className='banner'>
-        <img src={logo} className='banner-logo' alt='logo' />
         <Header />
         <Description />
         <SearchForm setSearchSubmitted={setSearchSubmitted}/>
