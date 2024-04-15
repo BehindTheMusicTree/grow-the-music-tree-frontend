@@ -12,16 +12,20 @@ import {CONTENT_AREA_TYPES} from '../../constants';
 Howler.autoUnlock = true;
 
 export default function App() {
-
   const [searchSubmitted, setSearchSubmitted] = useState('')
-  const [playerTrackObject, setPlayerTrackObject] = useState(null);
-  const [playingPlaylistUuidWithPlayState, setPlayingPlaylistUuidWithLoadingState] = useState(null);
-  const [playlistPlayObject, setPlaylistPlayObject] = useState(null);
-  const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
-  const [editingTrack, setEditingTrack] = useState(null);
+
   const [isTrackListSidebarVisible, setIsTrackListSidebarVisible] = useState(false);
+
+  const [playlistPlayObject, setPlaylistPlayObject] = useState(null)
+  const [playingPlaylistUuidWithPlayState, setPlayingPlaylistUuidWithLoadingState] = useState(null);
+  const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
+
+  const [playerTrackObject, setPlayerTrackObject] = useState(null);
   const [playState, setPlayState] = useState(PLAY_STATES.PLAYING);
-  const [shouldResetSeek, setShouldResetSeek] = useState(false);
+  const [shouldResetPlayerSeek, setshouldResetPlayerSeek] = useState(false);
+  
+  const [editingTrack, setEditingTrack] = useState(null);
+
   const [refreshGenresSignal, setRefreshGenresSignal] = useState(0);
 
   const contentAreaTypeWithObject = useRef({
@@ -53,20 +57,20 @@ export default function App() {
   }
 
   const setPreviousTrack = () => {
-    setShouldResetSeek(true);
+    setshouldResetPlayerSeek(true);
     setPlayingPlaylistLibTrackNumber(prev => prev - 1);
   }
 
   const setNextTrack = () => {
-    setShouldResetSeek(true);
+    setshouldResetPlayerSeek(true);
     setPlayingPlaylistLibTrackNumber(prev => prev + 1);
   }
 
   useEffect(() => {
-    const setPlayingLibTrack = async (playingLibTrackObject) => {
-      const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(playingLibTrackObject.libraryTrack.relativeUrl)
+    const setPlayingTrack = async (playingTrackObject) => {
+      const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(playingTrackObject.libraryTrack.relativeUrl)
       setPlayerTrackObject({
-        ...playingLibTrackObject.libraryTrack, 
+        ...playingTrackObject.libraryTrack, 
         blobUrl: playingLibTrackBlobUrl,
         hasNext: playlistPlayObject.contentObject.libraryTracks.length > playingPlaylistLibTrackNumber + 1,
         hasPrevious: playingPlaylistLibTrackNumber > 0
@@ -78,7 +82,7 @@ export default function App() {
     }
 
     if (playlistPlayObject && playlistPlayObject.contentObject.libraryTracks.length > playingPlaylistLibTrackNumber) {
-      setPlayingLibTrack(playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber]);
+      setPlayingTrack(playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber]);
     }
   }, [playlistPlayObject, playingPlaylistLibTrackNumber]);
 
@@ -95,6 +99,7 @@ export default function App() {
     <div className={styles.App}>
       <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
       <div className={styles.Body}>
+        
         <ContentArea
           setEditingTrack={setEditingTrack}
           contentAreaTypeWithObject={contentAreaTypeWithObject}
@@ -109,8 +114,8 @@ export default function App() {
             playerTrackObject={playerTrackObject}
             playState={playState}
             setPlayState={setPlayState}
-            shouldResetSeek={shouldResetSeek} 
-            setShouldResetSeek={setShouldResetSeek}
+            shouldResetPlayerSeek={shouldResetPlayerSeek} 
+            setshouldResetPlayerSeek={setshouldResetPlayerSeek}
             setNextTrack={setNextTrack}
             setPreviousTrack={setPreviousTrack}
             setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}
