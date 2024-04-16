@@ -4,6 +4,7 @@ on:
   push:
     branches: 
       - dev
+      - make-vite-work-on-test
   pull_request:
     branches: [ "dev" ]
 
