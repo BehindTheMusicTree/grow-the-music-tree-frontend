@@ -17,8 +17,6 @@ RUN npm install -g serve
 
 COPY . .
 
-RUN ls -la /usr/src/app
-
 RUN npm run build
 
 EXPOSE 5000
