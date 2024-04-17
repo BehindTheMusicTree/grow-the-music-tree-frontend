@@ -17,7 +17,7 @@ RUN npm install -g serve
 
 COPY . .
 
-RUN vite build
+RUN npm run build
 
 EXPOSE 5000
 
