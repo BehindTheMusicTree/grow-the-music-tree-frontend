@@ -3,10 +3,6 @@ FROM node:20-alpine AS build
 ARG bodzifyApiUmgUsername
 ARG bodzifyApiUmgUserPassword
 
-# React env variables have to be prefixed with VITE_
-ENV VITE_BODZIFY_API_UMG_USERNAME=${bodzifyApiUmgUsername}
-ENV VITE_BODZIFY_API_UMG_USER_PASSWORD=${bodzifyApiUmgUserPassword}
-
 WORKDIR /usr/src/app
 
 COPY package*.json ./
@@ -22,6 +18,10 @@ COPY . .
 RUN npm run build
 
 FROM node:20-alpine
+
+# React env variables have to be prefixed with VITE_
+ENV VITE_BODZIFY_API_UMG_USERNAME=${bodzifyApiUmgUsername}
+ENV VITE_BODZIFY_API_UMG_USER_PASSWORD=${bodzifyApiUmgUserPassword}
 
 WORKDIR /usr/src/app
 
