@@ -3,7 +3,7 @@ FROM node:14-alpine
 ARG bodzifyApiUmgUsername
 ARG bodzifyApiUmgUserPassword
 
-# react env variables have to be prefixed with VITE_
+# React env variables have to be prefixed with VITE_
 ENV VITE_BODZIFY_API_UMG_USERNAME=${bodzifyApiUmgUsername}
 ENV VITE_BODZIFY_API_UMG_USER_PASSWORD=${bodzifyApiUmgUserPassword}
 
@@ -16,6 +16,7 @@ RUN npm install
 COPY . .
 
 RUN npm run build
+RUN ls -la build
 
 RUN npm install -g serve
 CMD ["serve", "-s", "build", "-l", "5000"]
