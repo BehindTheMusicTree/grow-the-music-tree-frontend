@@ -17,7 +17,7 @@ RUN npm install -g serve
 
 COPY . .
 
-RUN npm run build
+RUN node build.js
 
 EXPOSE 5000
 
