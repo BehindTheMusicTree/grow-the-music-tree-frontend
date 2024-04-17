@@ -26,6 +26,7 @@ FROM node:20-alpine
 WORKDIR /usr/src/app
 
 COPY --from=build /usr/src/app/build ./build
+RUN cat /usr/src/app/build/index.html
 
 RUN npm install -g serve
 CMD ["serve", "-s", "build", "-l", "5000"]
