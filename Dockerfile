@@ -14,6 +14,7 @@ COPY package*.json ./
 RUN npm install -g npm@10.5.2
 RUN npm cache verify
 RUN npm cache clean --force
+RUN npm install is-fullwidth-code-point@3.0.0
 RUN npm install
 
 COPY . .
