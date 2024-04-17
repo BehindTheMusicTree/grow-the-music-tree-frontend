@@ -6,8 +6,14 @@ build({
   minify: true,
   sourcemap: true,
   outdir: 'build',
-  format: 'esm', // Ajoutez cette ligne
+  format: 'esm',
   loader: {
-    '.png': 'dataurl', // ou 'file'
+    '.png': 'dataurl',
+    '.jsx': 'jsx',
   },
-}).catch(() => process.exit(1))
+  jsxFactory: 'React.createElement',
+  jsxFragment: 'React.Fragment',
+}).catch((error) => {
+  console.error(error);
+  process.exit(1);
+})
