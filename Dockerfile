@@ -11,7 +11,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN `npm install -g npm@10.5.2` to update!
+RUN npm install -g npm@10.5.2
 RUN npm cache clean --force
 RUN npm install
 
