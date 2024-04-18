@@ -16,8 +16,6 @@ RUN npm install
 COPY . .
 
 RUN npm run build
-RUN mkdir './lolilol'
-RUN ls -la
 
 FROM node:20-alpine
 
@@ -28,7 +26,7 @@ ENV VITE_BODZIFY_API_UMG_USER_PASSWORD=${bodzifyApiUmgUserPassword}
 WORKDIR /usr/src/app
 
 COPY --from=build /usr/src/app/build ./dist
-RUN cat ./dist/index.html
+RUN mkdir './lolilol'
 RUN ls -la
 
 RUN npm install -g npm@10.5.2
