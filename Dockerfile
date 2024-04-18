@@ -17,6 +17,7 @@ COPY . .
 
 RUN npm run build
 RUN mkdir './lolilol'
+RUN ls -la
 
 FROM node:20-alpine
 
@@ -28,7 +29,7 @@ WORKDIR /usr/src/app
 
 COPY --from=build /usr/src/app/build ./dist
 RUN cat ./dist/index.html
-RUN ls -la ./dist
+RUN ls -la
 
 RUN npm install -g npm@10.5.2
 RUN npm install -g serve
