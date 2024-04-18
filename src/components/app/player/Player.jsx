@@ -1,0 +1,144 @@
+import styles from './Player.module.css'
+import { useState, useEffect } from 'react'
+import PropTypes from 'prop-types';
+import Button from '../button/Button.jsx';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faVolumeUp, faListUl } from '@fortawesome/free-solid-svg-icons'
+import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
+import TrackProgress from './TrackProgress/TrackProgress';
+import { PLAY_STATES } from '../../../constants';
+import albumCover from '../../../assets/images/album-cover-default.png';
+
+export default function Player ({
+    playerTrackObject, 
+    playState, 
+    setPlayState, 
+    shouldResetPlayerSeek, 
+    setshouldResetPlayerSeek, 
+    setNextTrack, 
+    setPreviousTrack, 
+    setIsTrackListSidebarVisible}) {
+  const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
+
+  const [seek, setSeek] = useState(0);
+  const [volume, setVolume] = useState(0.5);
+
+  const handlePlaylistIconClick = () => {
+    setIsTrackListSidebarVisible(b => !b);
+  }
+  
+  const handlePlayPause = () => {
+    if (playState === PLAY_STATES.STOPPED) {
+      setshouldResetPlayerSeek(true);
+      setPlayState(PLAY_STATES.PLAYING);
+    }
+    else if (playState === PLAY_STATES.PLAYING) {
+      setPlayState(PLAY_STATES.PAUSED);
+    }
+    else {
+      setPlayState(PLAY_STATES.PLAYING);
+    }
+  }
+
+  const handleVolumeChange = (event) => {
+    setVolume(Number(event.target.value));
+  };
+
+  const handleTrackEnd = () => {
+    if (playerTrackObject.hasNext) {
+      setNextTrack();
+    }
+    else {
+      setPlayState(PLAY_STATES.STOPPED);
+    }
+  }
+
+  const handleForwardClick = () => {
+    setNextTrack();
+  }
+
+  const handleBackwardClick = () => {
+    if (!playerTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
+      setshouldResetPlayerSeek(true);
+    }
+    else {
+      setPreviousTrack(prev => prev - 1);
+    }
+  }
+
+  useEffect(() => {
+    setshouldResetPlayerSeek(true);
+  }, [playerTrackObject])
+
+  return (
+    <div className={styles.PlayerContainer}>
+      <div className={styles.PlayerLeft}>
+        <img className={styles.AlbumCover} src={albumCover} alt="Album Cover" />
+        <div className={styles.TrackInfo}>
+          <div className={styles.TrackTitle}>
+            {playerTrackObject ? playerTrackObject.title : ''}
+          </div>
+          <div className={styles.ArtistName}>
+            {playerTrackObject ? (playerTrackObject.artist ? playerTrackObject.artist.name : '')  : ''}
+          </div>
+        </div>
+      </div>
+      <div className={styles.Controls1}>
+        <div className={styles.Buttons}>
+          <Button
+            className={styles.PreviousButtonContainer}            
+            onClick={handleBackwardClick}>
+              <FaStepBackward />
+          </Button>
+          <Button 
+            className={playState === PLAY_STATES.PLAYING ? styles.PauseButtonContainer : styles.PlayButtonContainer} onClick={handlePlayPause}>
+              {playState === PLAY_STATES.PLAYING ? <FaPause /> : <FaPlay />}
+          </Button>
+          <Button
+            className={styles.NextButtonContainer}            
+            onClick={handleForwardClick}
+            disabled={!playerTrackObject.hasNext}>
+              <FaStepForward />
+          </Button>
+        </div>
+        <TrackProgress 
+          playState={playState} 
+          setPlayState={setPlayState} 
+          shouldResetPlayerSeek={shouldResetPlayerSeek} 
+          setshouldResetPlayerSeek={setshouldResetPlayerSeek}
+          playerTrackObject={playerTrackObject}
+          volume={volume}
+          handleTrackEnd={handleTrackEnd}
+          seek={seek}
+          setSeek={setSeek}/>
+      </div>
+      <div className={styles.Controls2}>
+        <div className={styles.PlaylistIconContainer}>
+          <FontAwesomeIcon icon={faListUl} onClick={handlePlaylistIconClick}/>
+        </div>
+        <div className={styles.VolumeContainer}>
+          <FontAwesomeIcon icon={faVolumeUp} className={styles.VolumeIcon}/>
+          <input className={styles.VolumeSlider}
+            type='range' 
+            min='0' 
+            max='1' 
+            step='.01' 
+            value={volume} 
+            onChange={handleVolumeChange} 
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+Player.propTypes = {
+  playerTrackObject: PropTypes.object,
+  playState: PropTypes.string.isRequired,
+  setPlayState: PropTypes.func.isRequired,
+  shouldResetPlayerSeek: PropTypes.bool.isRequired,
+  setshouldResetPlayerSeek: PropTypes.func.isRequired,
+  setNextTrack: PropTypes.func.isRequired,
+  setPreviousTrack: PropTypes.func.isRequired,
+  setIsTrackListSidebarVisible: PropTypes.func.isRequired
+};
