@@ -4,6 +4,7 @@ on:
   push:
     branches: 
       - dev
+      - make-vite-work-on-test
   pull_request:
     branches: [ "dev" ]
 
@@ -34,4 +35,4 @@ jobs:
       - name: Deploy docker container webhook
         uses: joelwmale/webhook-action@master
         with:
-          url: ${{ secrets.DEPLOY_WEBHOOK_URL  }}
+          url: ${{ secrets.BODZIFY_REDEPLOY_WEBHOOK_URL  }}
