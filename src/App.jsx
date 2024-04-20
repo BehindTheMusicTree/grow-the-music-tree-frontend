@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Howler } from 'howler';
-import * as Sentry from "@sentry/react";
 
 import styles from './App.module.css';
 
@@ -15,21 +14,6 @@ import ApiService from './service/apiService';
 import { PLAY_STATES, CONTENT_AREA_TYPES } from './constants';
 
 Howler.autoUnlock = true;
-
-Sentry.init({
-  dsn: "https://7f17fcd9feebfb634ad7ba2f638ba69a@o4507119053832192.ingest.de.sentry.io/4507119058026576",
-  integrations: [
-    Sentry.browserTracingIntegration(),
-    Sentry.replayIntegration(),
-  ],
-  // Performance Monitoring
-  tracesSampleRate: 1.0, //  Capture 100% of the transactions
-  // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-  tracePropagationTargets: ["localhost", /^https:\/\/bodzify\.com\/api\/v1/],
-  // Session Replay
-  replaysSessionSampleRate: 1.0, // Set sample at a lower rate in production (e.g. 0.1 for 10% of sessions)
-  replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
-});
 
 export default function App() {
   const [searchSubmitted, setSearchSubmitted] = useState('')
@@ -116,45 +100,43 @@ export default function App() {
   }, [playerTrackObject]);
 
   return (
-    <Sentry.ErrorBoundary fallback={"An error has occurred"}>
-      <Router>
-        <Routes>
-          <Route path="/" element={
-            <div className={styles.App}>
-              <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-              <div className={styles.Body}>
-                <ContentArea
-                  setEditingTrack={setEditingTrack}
-                  contentAreaTypeWithObject={contentAreaTypeWithObject}
-                  isTrackListSidebarVisible={isTrackListSidebarVisible}
-                  selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
-                  playState={playState} 
-                  playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}
-                  playlistPlayObject={playlistPlayObject}
-                  refreshGenresSignal={refreshGenresSignal}/>
-                {playerTrackObject &&
-                  <Player 
-                    playerTrackObject={playerTrackObject}
-                    playState={playState}
-                    setPlayState={setPlayState}
-                    shouldResetPlayerSeek={shouldResetPlayerSeek} 
-                    setshouldResetPlayerSeek={setshouldResetPlayerSeek}
-                    setNextTrack={setNextTrack}
-                    setPreviousTrack={setPreviousTrack}
-                    setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}
-                  />}
-                {editingTrack && 
-                  <LibTrackEdition 
-                    libTrack={editingTrack}
-                    onClose={() => setEditingTrack(null)}
-                    handleUpdatedLibTrack={handleUpdatedLibTrack} />
-                }
-              </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={
+          <div className={styles.App}>
+            <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
+            <div className={styles.Body}>
+              <ContentArea
+                setEditingTrack={setEditingTrack}
+                contentAreaTypeWithObject={contentAreaTypeWithObject}
+                isTrackListSidebarVisible={isTrackListSidebarVisible}
+                selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
+                playState={playState} 
+                playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}
+                playlistPlayObject={playlistPlayObject}
+                refreshGenresSignal={refreshGenresSignal}/>
+              {playerTrackObject &&
+                <Player 
+                  playerTrackObject={playerTrackObject}
+                  playState={playState}
+                  setPlayState={setPlayState}
+                  shouldResetPlayerSeek={shouldResetPlayerSeek} 
+                  setshouldResetPlayerSeek={setshouldResetPlayerSeek}
+                  setNextTrack={setNextTrack}
+                  setPreviousTrack={setPreviousTrack}
+                  setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}
+                />}
+              {editingTrack && 
+                <LibTrackEdition 
+                  libTrack={editingTrack}
+                  onClose={() => setEditingTrack(null)}
+                  handleUpdatedLibTrack={handleUpdatedLibTrack} />
+              }
             </div>
-          }/>
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </Router>
-    </Sentry.ErrorBoundary>
+          </div>
+        }/>
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </Router>
   );
 }

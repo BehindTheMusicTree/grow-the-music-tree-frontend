@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "cp ./env/.env.development.api.test .env.development && vite",
-    "dev:local": "cp ./env/.env.development.api.local .env.development && vite",
+    "dev": "cp ./env/.env.dev.api.test .env.dev && vite",
+    "dev:local": "cp ./env/.env.dev.api.local .env.dev && vite",
     "serve": "vite",
-    "build": "vite build",
+    "build": "env-cmd -f .env.test vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -21,6 +21,7 @@
     "axios": "^1.6.8",
     "classnames": "^2.5.1",
     "d3": "^7.8.5",
+    "env-cmd": "^10.1.0",
     "howler": "^2.2.4",
     "raf": "^3.4.1",
     "react": "^18.2.0",
