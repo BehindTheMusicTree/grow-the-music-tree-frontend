@@ -7,7 +7,7 @@
     "dev": "cp ./env/.env.dev.api.test .env.dev && vite",
     "dev:local": "cp ./env/.env.dev.api.local .env.dev && vite",
     "serve": "vite",
-    "build": "env-cmd -f .env/.env.test vite build",
+    "build": "env-cmd -f ./env/.env.test vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
