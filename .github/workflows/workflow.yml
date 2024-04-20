@@ -4,6 +4,7 @@ on:
   push:
     branches: 
       - dev
+      - add-sentry-logging-tool
   pull_request:
     branches: [ "dev" ]
 
