@@ -1,8 +1,8 @@
 import styles from './LibTrackEdition.module.css'
 import PropTypes from 'prop-types';
-import ApiService from '../../../../service/apiService';
+import ApiService from '../../../service/apiService';
 import { useForm } from 'react-hook-form';
-import { formatTime } from '../../../../utils';
+import { formatTime } from '../../../utils';
 
 export default function LibTrackEdition ({ libTrack, onClose, handleUpdatedLibTrack }) {
   const { register, handleSubmit } = useForm({

@@ -1,7 +1,7 @@
 import styles from './TrackListSidebar.module.css';
 import PropTypes from 'prop-types';
 import TrackElement from './track-element/TrackElement';
-import { capitalizeFirstLetter } from '../../../../utils';
+import { capitalizeFirstLetter } from '../../../utils';
 
 export default function TrackListSidebar({playlistPlayObject, setEditingTrack}) {
     return (

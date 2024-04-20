@@ -1,7 +1,7 @@
 import styles from './ContentArea.module.css';
 import PropTypes from 'prop-types';
 import TrackListSidebar from './track-list-sidebar/TrackListSidebar';
-import {CONTENT_AREA_TYPES} from '../../../constants';
+import {CONTENT_AREA_TYPES} from '../../constants';
 import GenresView from './genres-view/GenresView';
 
 export default function ContentArea ({

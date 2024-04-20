@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOMServer from 'react-dom/server';
 import * as d3 from 'd3';
-import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from '../../../../../constants';
+import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from '../../../../constants';
 import { FaSpinner, FaFileUpload, FaPlus } from 'react-icons/fa';
 
 export default function TreeGraph (

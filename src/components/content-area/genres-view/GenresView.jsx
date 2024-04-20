@@ -1,8 +1,8 @@
 import {useState, useRef, useCallback, useEffect} from 'react';
 import styles from './GenresView.module.css';
-import { GENRE_TREE_RECT_DIMENSIONS } from '../../../../constants';
+import { GENRE_TREE_RECT_DIMENSIONS } from '../../../constants';
 import TreeGraph from './tree-graph/TreeGraph';
-import ApiService from '../../../../service/apiService';
+import ApiService from '../../../service/apiService';
 import PropTypes from 'prop-types';
 
 export default function GenresView({
