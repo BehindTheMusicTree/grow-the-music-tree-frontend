@@ -1,6 +1,6 @@
 import styles from './TrackElement.module.css';
 import PropTypes from 'prop-types';
-import { formatTime } from '../../../../../utils';
+import { formatTime } from '../../../../utils';
 import { MdMoreVert } from 'react-icons/md';
 
 export default function TrackElement({playlistTrackRelationObject, setEditingTrack}) {
