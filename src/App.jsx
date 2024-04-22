@@ -3,8 +3,6 @@ import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Howler } from 'howler';
 
-import styles from './App.module.css';
-
 import Banner from './components/banner/Banner'
 import ContentArea from './components/content-area/ContentArea'
 import Player from './components/player/Player';
@@ -103,9 +101,9 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={
-          <div className={styles.App}>
+          <div className="App flex flex-col h-full">
             <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-            <div className={styles.Body}>
+            <div className="Body flex h-full">
               <ContentArea
                 setEditingTrack={setEditingTrack}
                 contentAreaTypeWithObject={contentAreaTypeWithObject}
