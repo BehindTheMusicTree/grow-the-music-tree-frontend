@@ -6,15 +6,22 @@ const parseJson = async (response) => {
   try {
     return await response.json();
   } catch (error) {
-    throw new Error(`Failed to parse response. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error}`);
+    throw new Error(`Failed to parse response. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}.`);
   }
 }
 
-const getResponseErrorMessageWhenNotOk = async (response) => {
+const getResponseNotOkErrorMessage = async (url, response) => {
   if (response.status >= 400 && response.status < 600) {
-    const responseJson = await parseJson(response);
-    const errorMessage = JSON.stringify(responseJson);
-    throw new Error(`${response.status} ${errorMessage ? ` - ${errorMessage}` : ''}`);
+    let errorMessage = '';
+    const errorMessagePrefixe = `url ${url} - status ${response.status}`
+    try {
+      const responseJson = await parseJson(response);
+      errorMessage = JSON.stringify(responseJson);
+      return `${errorMessagePrefixe} ${errorMessage ? ` - ${errorMessage}` : ''}`;
+    }
+    catch (error) {
+      return `${errorMessagePrefixe} - the response message could not be analysed. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`;
+    }
   }
   return '';
 }
@@ -42,7 +49,8 @@ const ApiService = {
     const refreshToken = ApiService.getToken().refresh;
     try {
       if (refreshToken) {
-        const response = await fetch(`${config.apiBaseUrl}auth/token/refresh/`, {
+        const url = `${config.apiBaseUrl}auth/token/refresh/`;
+        const response = await fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -60,7 +68,7 @@ const ApiService = {
           await ApiService.login();
         }
         else {
-          throw new Error(getResponseErrorMessageWhenNotOk(response));
+          throw new Error(getResponseNotOkErrorMessage(url, response));
         }
       }
       else {
@@ -102,7 +110,8 @@ const ApiService = {
 
   login: async () => {
     try {
-      const response = await fetch(`${config.apiBaseUrl}auth/token/`, {
+      const url = `${config.apiBaseUrl}auth/token/`;
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,10 +120,11 @@ const ApiService = {
       })
   
       if (!response.ok) {
-        throw Error(getResponseErrorMessageWhenNotOk(response));
+        const errorMessage = await getResponseNotOkErrorMessage(url, response);
+        throw Error(errorMessage)
       }
       else {
-        const responseJson = parseJson(response);
+        const responseJson = await parseJson(response);
         ApiService.setToken(responseJson);
       }
     } catch (error) {
@@ -142,7 +152,7 @@ const ApiService = {
       })
     
       if (!response.ok) {
-        throw new Error(getResponseErrorMessageWhenNotOk(response));
+        throw Error(getResponseNotOkErrorMessage(url, response));
       }
       else {
         return parseJson(response);
