@@ -7,7 +7,8 @@ import eslintPlugin from 'vite-plugin-eslint'
 export default defineConfig({
   plugins: [react(), eslintPlugin(), sentryVitePlugin({
     org: "bodzify",
-    project: "javascript-react"
+    project: "javascript-react",
+    telemetry: false,
   })],
   build: {
     outDir: 'build',
