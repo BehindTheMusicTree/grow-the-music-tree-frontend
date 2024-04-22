@@ -1,6 +1,5 @@
 import './Banner.css'
 import Header from './Header'
-import Description from './Description'
 import SearchForm from './SearchForm'
 import PropTypes from 'prop-types';
 
@@ -8,7 +7,6 @@ export default function Banner({searchSubmitted, setSearchSubmitted}) {
     return (
     <div className='banner'>
         <Header />
-        <Description />
         <SearchForm setSearchSubmitted={setSearchSubmitted}/>
         <span>Search term: {searchSubmitted}</span>
     </div>)
