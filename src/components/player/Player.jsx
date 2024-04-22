@@ -99,9 +99,8 @@ export default function Player ({
               {playState === PLAY_STATES.PLAYING ? <FaPause /> : <FaPlay />}
             </div>
           </Button>
-          <Button className="player-control-button"
-            onClick={handleForwardClick}
-            disabled={!playerTrackObject.hasNext}>
+          <Button className={playerTrackObject.hasNext ? "player-control-button" : "player-control-button-disabled"}
+            onClick={handleForwardClick}>
               <FaStepForward />
           </Button>
         </div>

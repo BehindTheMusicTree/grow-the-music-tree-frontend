@@ -30,6 +30,10 @@ export default {
         '.player-control-button': {
           '@apply rounded-full flex items-center justify-center text-black bg-gray-200 mb-2 border-none': {},
         },
+        '.player-control-button-disabled': {
+          '@apply rounded-full flex items-center justify-center text-black bg-gray-500 mb-2 border-none': {},
+          '@apply pointer-events-none hover:scale-105': {},
+        },
       }
 
       addComponents(newComponents)
