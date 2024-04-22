@@ -1,12 +1,12 @@
-import styles from './TreeGraph.module.css'
 import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOMServer from 'react-dom/server';
 import * as d3 from 'd3';
-import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from '../../../../constants';
 import { FaSpinner, FaFileUpload, FaPlus } from 'react-icons/fa';
 
-export default function TreeGraph (
+import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from '../../../../constants';
+
+export default function GenreTree (
   { genres, 
     handleGenreAddClick, 
     selectPlaylistUuidToPlay, 
@@ -90,14 +90,13 @@ export default function TreeGraph (
       .data(treeData.links())
       .enter()
       .append('path')
-      .attr('class', styles.Link)
+      .attr('class', 'fill-current stroke-current stroke-opacity-40 stroke-2')
       .attr('d', linkGenerator);
 
     const nodes = svg.selectAll('g.node')
       .data(treeData.descendants())
       .enter()
       .append('g')
-      .attr('class', styles.Node)
       .attr('transform', function(d) {
         nodeY = GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 + HORIZONTAL_SEPARATOON_BETWEEN_NODES * d.depth;
         return 'translate(' + nodeY + ',' + (d.x - firstNodeXCorrected + svgHeight / 2) + ')';
@@ -119,18 +118,18 @@ export default function TreeGraph (
       HEIGHT: GENRE_TREE_RECT_DIMENSIONS.HEIGHT,
     }
     nodes.append('foreignObject')
-      .attr('class', styles.GenreNameContainer)
+      .attr('class', 'tree-node-info-container')
       .attr('width', GENRE_NAME_DIMENSIONS.WIDTH)
       .attr('height', GENRE_NAME_DIMENSIONS.HEIGHT)
       .attr('x',  - GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2)
       .attr('y',  - GENRE_TREE_RECT_DIMENSIONS.HEIGHT / 2)
       .html(function(d) {
-        return `<div>${d.data.name}</div>`;
+        return `<div class="tree-node-info">${d.data.name}</div>`;
       });
 
     const SPINNER_ICON_SIZE = 14;
     nodes.append('foreignObject')
-      .attr('class', styles.SpinnerContainer)
+      .attr('class', 'w-3.5 h-3.5 flex justify-center items-center')
       .attr('width', SPINNER_ICON_SIZE)
       .attr('height', SPINNER_ICON_SIZE)
       .attr('dominant-baseline', 'middle')
@@ -140,7 +139,8 @@ export default function TreeGraph (
         if (playingPlaylistUuidWithLoadingState 
           && playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid
           && playingPlaylistUuidWithLoadingState.isLoading) {
-            return ReactDOMServer.renderToString(<FaSpinner size={SPINNER_ICON_SIZE} className={styles.Spinner}/>)
+            return ReactDOMServer.renderToString(<FaSpinner size={SPINNER_ICON_SIZE} 
+              className='animate-spin fill-current text-white'/>)
           }
       })
 
@@ -149,7 +149,7 @@ export default function TreeGraph (
       HEIGHT: 16,
     }
     nodes.append('foreignObject')
-      .attr('class', styles.PlayPauseIconContainer)
+      .attr('class', 'tree-node-info-container')
       .attr('width', PLAY_PAUSE_ICON_DIMENSIONS.WIDTH)
       .attr('height', PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT)
       .attr('x', GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET)
@@ -194,13 +194,13 @@ export default function TreeGraph (
       HEIGHT: 16,
     }
     nodes.append('foreignObject')
-      .attr('class', styles.PlaylistTracksCountContainer)
+      .attr('class', 'tree-node-info-container')
       .attr('width', PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.WIDTH)
       .attr('height', PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT)
       .attr('x', GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAYLIST_TRACKS_COUNT_TEXT_OFFSET)
       .attr('y', - GENRE_TREE_RECT_DIMENSIONS.HEIGHT / 2 + PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT / 2)
       .html(function(d) {
-        return "<div>" + d.data.criteriaPlaylist.libraryTracksCount + "</div>";
+        return `<div class="tree-node-info">` + d.data.criteriaPlaylist.libraryTracksCount + "</div>";
       })
   
 
@@ -210,7 +210,7 @@ export default function TreeGraph (
     }
 
     nodes.append('foreignObject')
-      .attr('class', styles.GenreAddIconContainer)
+      .attr('class', 'tree-node-icon-container')
       .attr('width', GENRE_ADD_PLUS_ICON_DIMENSIONS.WIDTH)
       .attr('height', GENRE_ADD_PLUS_ICON_DIMENSIONS.HEIGHT)
       .attr('dominant-baseline', 'middle')
@@ -218,7 +218,7 @@ export default function TreeGraph (
       .attr('x', GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - GENRE_ADD_ICON_OFFSET - GENRE_ADD_PLUS_ICON_DIMENSIONS.WIDTH / 2)
       .attr('y', - (GENRE_TREE_RECT_DIMENSIONS.HEIGHT - GENRE_ADD_PLUS_ICON_DIMENSIONS.HEIGHT) / 2)
       .html(function() {
-        return ReactDOMServer.renderToString(<FaPlus size={GENRE_ADD_PLUS_ICON_DIMENSIONS.WIDTH} />
+        return ReactDOMServer.renderToString(<FaPlus className='tree-node-icon' size={GENRE_ADD_PLUS_ICON_DIMENSIONS.WIDTH} />
       )})
       .on('click', function(event, d) {
         handleGenreAddClick(event, d.data.uuid);
@@ -230,14 +230,15 @@ export default function TreeGraph (
     }
 
     nodes.append('foreignObject')
-      .attr('class', styles.TrackUploadIconContainer)
+      .attr('class', 'tree-node-icon-container')
       .attr('width', TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH)
       .attr('height', TRACK_UPLOAD_ICON_DIMENSIONS.HEIGHT)
       .attr('dominant-baseline', 'middle')
       .attr('x', GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - TRACK_UPLOAD_ICON_OFFSET - TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH / 2)
       .attr('y', - (GENRE_TREE_RECT_DIMENSIONS.HEIGHT - TRACK_UPLOAD_ICON_DIMENSIONS.HEIGHT) / 2)
       .html(function() {
-        return ReactDOMServer.renderToString(<FaFileUpload size={TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH} />
+        return ReactDOMServer.renderToString(<FaFileUpload className='tree-node-icon' 
+          size={TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH} />
       )})
       .on('click', function(event, d) {
         event.stopPropagation();
@@ -246,17 +247,11 @@ export default function TreeGraph (
       })
 
     nodes.on('mouseover', function() {
-      for (let className of [styles.GenreAddIconContainer, styles.TrackUploadIconContainer]) {
-        d3.select(this).select("." + className).style('display', 'flex');
-      }
+      d3.select(this).selectAll('.tree-node-icon-container').style('display', 'flex');
     })
     .on('mouseout', function() {
-      for (let className of [styles.GenreAddIconContainer, styles.TrackUploadIconContainer]) {
-        d3.select(this).select("." + className).style('display', 'none');
-      }
+      d3.select(this).selectAll('.tree-node-icon-container').style('display', 'none');
     })
-
-
 
     return () => {
       svg.selectAll('*').remove();
@@ -266,12 +261,12 @@ export default function TreeGraph (
   return (
     <div>
       <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
-      <svg ref={svgRef} width="600" height="400" className={styles.TreeGraphSvg}></svg>
+      <svg ref={svgRef} width="600" height="400" className="mt-5"></svg>
     </div>
   );
 }
 
-TreeGraph.propTypes = {
+GenreTree.propTypes = {
   genres: PropTypes.array.isRequired,
   handleGenreAddClick: PropTypes.func.isRequired,
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,

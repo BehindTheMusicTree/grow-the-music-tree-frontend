@@ -3,15 +3,14 @@ import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Howler } from 'howler';
 
-import styles from './App.module.css';
+import { PLAY_STATES, CONTENT_AREA_TYPES } from './constants';
+import ApiService from './service/apiService';
 
 import Banner from './components/banner/Banner'
-import ContentArea from './components/content-area/ContentArea'
+import PageContainer from './components/page-container/PageContainer'
 import Player from './components/player/Player';
 import LibTrackEdition from './components/popup/lib-track-edition/LibTrackEdition';
 import NotFoundPage from './components/NotFoundPage';
-import ApiService from './service/apiService';
-import { PLAY_STATES, CONTENT_AREA_TYPES } from './constants';
 
 Howler.autoUnlock = true;
 
@@ -103,10 +102,10 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={
-          <div className={styles.App}>
+          <div className="App flex flex-col h-full">
             <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-            <div className={styles.Body}>
-              <ContentArea
+            <div className="Body flex h-full">
+              <PageContainer
                 setEditingTrack={setEditingTrack}
                 contentAreaTypeWithObject={contentAreaTypeWithObject}
                 isTrackListSidebarVisible={isTrackListSidebarVisible}

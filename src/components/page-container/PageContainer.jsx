@@ -1,10 +1,9 @@
-import styles from './ContentArea.module.css';
 import PropTypes from 'prop-types';
 import TrackListSidebar from './track-list-sidebar/TrackListSidebar';
 import {CONTENT_AREA_TYPES} from '../../constants';
-import GenresView from './genres-view/GenresView';
+import GenresPage from './genres-page/GenresPage';
 
-export default function ContentArea ({
+export default function PageContainer ({
     setEditingTrack,
     contentAreaTypeWithObject,
     isTrackListSidebarVisible, 
@@ -15,10 +14,10 @@ export default function ContentArea ({
     refreshGenresSignal}) {
 
   return (
-    <div className={styles.ContentArea}>
+    <div className="relative w-full h-full flex bg-gray-200 font-sans m-0 pl-8">
       {contentAreaTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES
       ? (
-        <GenresView 
+        <GenresPage 
           selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
           playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState} 
           playState={playState}
@@ -33,7 +32,7 @@ export default function ContentArea ({
       : <IconPause dataTestId="pause"/>
         } */}
       {isTrackListSidebarVisible ? (
-        <div className={styles.RightSidebarContainer}>
+        <div className="absolute right-0 w-150 h-full bg-black bg-opacity-95">
           <TrackListSidebar playlistPlayObject={playlistPlayObject} setEditingTrack={setEditingTrack}/>
         </div>
         ) : null}
@@ -41,7 +40,7 @@ export default function ContentArea ({
   );
 }
 
-ContentArea.propTypes = {
+PageContainer.propTypes = {
   setEditingTrack: PropTypes.func.isRequired,
   contentAreaTypeWithObject: PropTypes.object.isRequired,
   isTrackListSidebarVisible: PropTypes.bool.isRequired,
