@@ -2,7 +2,15 @@
 export default {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      fontSize: {
+        '1.5xl': '1.1rem',
+      },
+      spacing: {
+        'play-l-offset': '17px',
+        'play-r-offset': '15px',
+      }
+    },
   },
   plugins: [
     function({ addComponents }) {
@@ -18,6 +26,13 @@ export default {
         },
         '.tree-node-icon': {
           '@apply fill-current text-white': {},
+        },
+        '.player-control-button': {
+          '@apply rounded-full flex items-center justify-center text-black bg-gray-200 mb-2 border-none': {},
+        },
+        '.player-control-button-disabled': {
+          '@apply rounded-full flex items-center justify-center text-black bg-gray-500 mb-2 border-none': {},
+          '@apply pointer-events-none hover:scale-105': {},
         },
       }
 
