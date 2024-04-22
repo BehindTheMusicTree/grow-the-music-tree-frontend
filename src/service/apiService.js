@@ -10,17 +10,17 @@ const parseJson = async (response) => {
   }
 }
 
-const getResponseErrorMessageWhenNotOk = async (response) => {
+const getResponseNotOkErrorMessage = async (url, response) => {
   if (response.status >= 400 && response.status < 600) {
     let errorMessage = '';
+    const errorMessagePrefixe = `url ${url} - status ${response.status}`
     try {
       const responseJson = await parseJson(response);
       errorMessage = JSON.stringify(responseJson);
-      return `${response.status} ${errorMessage ? ` - ${errorMessage}` : ''}`;
+      return `${errorMessagePrefixe} ${errorMessage ? ` - ${errorMessage}` : ''}`;
     }
     catch (error) {
-      return `${response.status} - ${response.statusText}.` +
-        `The response message could not be analysed. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`;
+      return `${errorMessagePrefixe} - the response message could not be analysed. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`;
     }
   }
   return '';
@@ -49,7 +49,8 @@ const ApiService = {
     const refreshToken = ApiService.getToken().refresh;
     try {
       if (refreshToken) {
-        const response = await fetch(`${config.apiBaseUrl}auth/token/refresh/`, {
+        const url = `${config.apiBaseUrl}auth/token/refresh/`;
+        const response = await fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -67,7 +68,7 @@ const ApiService = {
           await ApiService.login();
         }
         else {
-          throw new Error(getResponseErrorMessageWhenNotOk(response));
+          throw new Error(getResponseNotOkErrorMessage(url, response));
         }
       }
       else {
@@ -109,7 +110,9 @@ const ApiService = {
 
   login: async () => {
     try {
-      const response = await fetch(`${config.apiBaseUrl}auth/token/`, {
+      const url = `${config.apiBaseUrl}auth/token/`;
+      console.log('import.meta.env.VITE_BODZIFY_API_BASE_URL', import.meta.env.VITE_BODZIFY_API_BASE_URL);
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +121,7 @@ const ApiService = {
       })
   
       if (!response.ok) {
-        const errorMessage = await getResponseErrorMessageWhenNotOk(response);
+        const errorMessage = await getResponseNotOkErrorMessage(url, response);
         throw Error(errorMessage)
       }
       else {
@@ -150,7 +153,7 @@ const ApiService = {
       })
     
       if (!response.ok) {
-        throw Error(getResponseErrorMessageWhenNotOk(response));
+        throw Error(getResponseNotOkErrorMessage(url, response));
       }
       else {
         return parseJson(response);
