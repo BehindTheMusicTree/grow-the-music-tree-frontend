@@ -1,11 +1,12 @@
 import config from '../config/config'; 
 import axios from 'axios';
+import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from '../constants';
 
 const parseJson = async (response) => {
   try {
     return await response.json();
   } catch (error) {
-    throw new Error(`Failed to parse response: ${error}`);
+    throw new Error(`Failed to parse response. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error}`);
   }
 }
 
@@ -66,7 +67,7 @@ const ApiService = {
         await ApiService.login();
       }
     } catch (error) {
-      throw Error(`Failed to refresh token. Error occurred during previous operation: ${getFetchErrorMessage(error)}`);
+      throw Error(`Failed to refresh token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${getFetchErrorMessage(error)}`);
     }
   },
 
@@ -83,7 +84,7 @@ const ApiService = {
             accessToken = ApiService.getToken().access;
           }
         } catch (error) {
-          throw Error(`Error setting access token. Error occurred during previous operation: ${error.message}`);
+          throw Error(`Error setting access token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`);
         }
         return {
           'Authorization': `Bearer ${accessToken}`,
@@ -95,7 +96,7 @@ const ApiService = {
         return ApiService.getHeaders();
       }
     } catch (error) {
-      throw Error(`Failed to get headers. Error occurred during previous operation: ${error.message}`);  
+      throw Error(`Failed to get headers. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`);  
     }
   },
 
@@ -110,14 +111,14 @@ const ApiService = {
       })
   
       if (!response.ok) {
-        throw new Error(getResponseErrorMessageWhenNotOk(response));
+        throw Error(getResponseErrorMessageWhenNotOk(response));
       }
       else {
         const responseJson = parseJson(response);
         ApiService.setToken(responseJson);
       }
     } catch (error) {
-      throw Error(`Failed to login. Error occurred during previous operation: ${getFetchErrorMessage(error)}`);
+      throw Error(`Failed to login. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${getFetchErrorMessage(error)}`);
     }
   },
 
@@ -148,7 +149,7 @@ const ApiService = {
       }
     }
     catch (error) {
-      throw Error(`Failed to fetch data. Error occurred during previous operation: ${getFetchErrorMessage(error)}`);
+      throw Error(`Failed to fetch data. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${getFetchErrorMessage(error)}`);
     }
   },
 
@@ -173,7 +174,7 @@ const ApiService = {
       const blob = new Blob([response.data], {type: 'audio/*'});
       return URL.createObjectURL(blob);
     }).catch(error => {
-      throw new Error('Failed to fetch audio. Error occurred during previous operation:', error.message);
+      throw new Error('Failed to fetch audio. ${DUE_TO_PREVIOUS_ERROR_MESSAGE}', error.message);
     });
   },
 
