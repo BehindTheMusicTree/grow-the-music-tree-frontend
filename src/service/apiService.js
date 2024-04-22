@@ -6,15 +6,22 @@ const parseJson = async (response) => {
   try {
     return await response.json();
   } catch (error) {
-    throw new Error(`Failed to parse response. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error}`);
+    throw new Error(`Failed to parse response. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}.`);
   }
 }
 
 const getResponseErrorMessageWhenNotOk = async (response) => {
   if (response.status >= 400 && response.status < 600) {
-    const responseJson = await parseJson(response);
-    const errorMessage = JSON.stringify(responseJson);
-    throw new Error(`${response.status} ${errorMessage ? ` - ${errorMessage}` : ''}`);
+    let errorMessage = '';
+    try {
+      const responseJson = await parseJson(response);
+      errorMessage = JSON.stringify(responseJson);
+      return `${response.status} ${errorMessage ? ` - ${errorMessage}` : ''}`;
+    }
+    catch (error) {
+      return `${response.status} - ${response.statusText}.` +
+        `The response message could not be analysed. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`;
+    }
   }
   return '';
 }
@@ -111,10 +118,11 @@ const ApiService = {
       })
   
       if (!response.ok) {
-        throw Error(getResponseErrorMessageWhenNotOk(response));
+        const errorMessage = await getResponseErrorMessageWhenNotOk(response);
+        throw Error(errorMessage)
       }
       else {
-        const responseJson = parseJson(response);
+        const responseJson = await parseJson(response);
         ApiService.setToken(responseJson);
       }
     } catch (error) {
@@ -142,7 +150,7 @@ const ApiService = {
       })
     
       if (!response.ok) {
-        throw new Error(getResponseErrorMessageWhenNotOk(response));
+        throw Error(getResponseErrorMessageWhenNotOk(response));
       }
       else {
         return parseJson(response);
