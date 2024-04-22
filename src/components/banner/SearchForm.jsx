@@ -32,7 +32,7 @@ export default function SearchForm({setSearchSubmitted}) {
     return (
         <form onSubmit={handleSubmit}>
             <input
-                className='search-form text-gray-900 p-2 rounded-md border-2 border-gray-900 w-60 h-10'
+                className='text-gray-900 p-2 rounded-md border-2 border-gray-900 w-60 h-10'
                 type="text"
                 name="search"
                 onChange={handleChange}

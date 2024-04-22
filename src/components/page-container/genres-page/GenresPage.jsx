@@ -1,11 +1,12 @@
 import {useState, useRef, useCallback, useEffect} from 'react';
-import styles from './GenresView.module.css';
-import { GENRE_TREE_RECT_DIMENSIONS } from '../../../constants';
-import TreeGraph from './tree-graph/TreeGraph';
-import ApiService from '../../../service/apiService';
 import PropTypes from 'prop-types';
 
-export default function GenresView({
+import { GENRE_TREE_RECT_DIMENSIONS } from '../../../constants';
+import ApiService from '../../../service/apiService';
+
+import GenreTree from './genre-tree/GenreTree';
+
+export default function GenresPage({
       selectPlaylistUuidToPlay, 
       playingPlaylistUuidWithLoadingState,
       playState,
@@ -76,20 +77,20 @@ export default function GenresView({
     }, [groupedGenres]);
 
     return (
-        <div className={styles.GenreView}> 
+        <div className="flex flex-col"> 
           <h1>Genre Tree</h1>
           <div 
-          className={styles.GenreRectangle} 
+          className="flex justify-center items-center text-center hover:bg-gray-400 hover:text-gray-800 cursor-pointer"
           style={{
               width: GENRE_TREE_RECT_DIMENSIONS.WIDTH + 'px',
               height: GENRE_TREE_RECT_DIMENSIONS.HEIGHT + 'px',
               border: '1px solid black'
           }}
           onClick={handleGenreAddClick}>+</div>
-          <div className={styles.GenreTreeContainer}>
+          <div className="flex flex-col bg-gray-400 text-gray-800">
             {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
               return (
-                <TreeGraph 
+                <GenreTree 
                   key={`${uuid}`} 
                   genres={genreTree} 
                   handleGenreAddClick={handleGenreAddClick} 
@@ -106,7 +107,7 @@ export default function GenresView({
     );
 } 
 
-GenresView.propTypes = {
+GenresPage.propTypes = {
     selectPlaylistUuidToPlay: PropTypes.func.isRequired,
     playingPlaylistUuidWithLoadingState: PropTypes.object,
     playState: PropTypes.string.isRequired,
