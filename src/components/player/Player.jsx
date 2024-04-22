@@ -92,7 +92,7 @@ export default function Player ({
             onClick={handleBackwardClick}>
               <FaStepBackward />
           </Button>
-          <Button className={`player-control-button text-1.5xl py-4 
+          <Button className={`player-control-button text-1.5xl py-4 mx-1
             ${playState !== PLAY_STATES.PLAYING ? 'pl-play-l-offset pr-play-r-offset' : 'px-4'}`} 
             onClick={handlePlayPause}>
             <div className="text-1.5xl">
