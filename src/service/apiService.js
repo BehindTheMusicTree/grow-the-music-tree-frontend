@@ -111,7 +111,6 @@ const ApiService = {
   login: async () => {
     try {
       const url = `${config.apiBaseUrl}auth/token/`;
-      console.log('import.meta.env.VITE_BODZIFY_API_BASE_URL', import.meta.env.VITE_BODZIFY_API_BASE_URL);
       const response = await fetch(url, {
         method: 'POST',
         headers: {
