@@ -4,7 +4,11 @@ export default {
   theme: {
     extend: {
       fontSize: {
-        '1.5xl': '1.2rem',
+        '1.5xl': '1.1rem',
+      },
+      spacing: {
+        'play-l-offset': '17px',
+        'play-r-offset': '15px',
       }
     },
   },
@@ -24,7 +28,7 @@ export default {
           '@apply fill-current text-white': {},
         },
         '.player-control-button': {
-          '@apply rounded-full flex items-center justify-center text-black bg-gray-200 mb-2 transition-all duration-200 ease-in-out border-none': {},
+          '@apply rounded-full flex items-center justify-center text-black bg-gray-200 mb-2 border-none': {},
         },
       }
 

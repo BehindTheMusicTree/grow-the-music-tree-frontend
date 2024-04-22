@@ -88,17 +88,18 @@ export default function Player ({
       </div>
       <div className="flex-2 flex flex-col justify-center items-center">
         <div className="flex flex-row items-center justify-center w-full">
-          <Button
-            className="player-control-button"            
+          <Button className="player-control-button"            
             onClick={handleBackwardClick}>
               <FaStepBackward />
           </Button>
-          <Button 
-            className="player-control-button text-1.5xl" onClick={handlePlayPause}>
+          <Button className={`player-control-button text-1.5xl py-4 
+            ${playState !== PLAY_STATES.PLAYING ? 'pl-play-l-offset pr-play-r-offset' : 'px-4'}`} 
+            onClick={handlePlayPause}>
+            <div className="text-1.5xl">
               {playState === PLAY_STATES.PLAYING ? <FaPause /> : <FaPlay />}
+            </div>
           </Button>
-          <Button
-            className="player-control-button"          
+          <Button className="player-control-button"
             onClick={handleForwardClick}
             disabled={!playerTrackObject.hasNext}>
               <FaStepForward />
