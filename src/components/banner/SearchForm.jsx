@@ -1,15 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import PropTypes from 'prop-types';
 
 export default function SearchForm({setSearchSubmitted}) {
 
-    const [searchNumber, setSearchNumber] = useState(0)
     const [isFirstFocus, setIsFirstFocus] = useState(true)
     const [searchUnsubmitted, setSearchUnsubmitted] = useState('search')
-
-    useEffect(() => {
-        document.title = `${searchNumber} searches`
-    });
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -19,7 +14,6 @@ export default function SearchForm({setSearchSubmitted}) {
             return
         }
         else {
-            setSearchNumber(searchNumber + 1)
             setSearchSubmitted(searchUnsubmitted)
         }
     }
@@ -37,10 +31,8 @@ export default function SearchForm({setSearchSubmitted}) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <label>
-                Search no {searchNumber}:
-            </label>
             <input
+                className='search-form text-gray-900 p-2 rounded-md border-2 border-gray-900 w-60 h-10'
                 type="text"
                 name="search"
                 onChange={handleChange}
