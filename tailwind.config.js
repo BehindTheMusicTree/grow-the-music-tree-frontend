@@ -2,7 +2,11 @@
 export default {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      fontSize: {
+        '1.5xl': '1.2rem',
+      }
+    },
   },
   plugins: [
     function({ addComponents }) {
@@ -18,6 +22,9 @@ export default {
         },
         '.tree-node-icon': {
           '@apply fill-current text-white': {},
+        },
+        '.player-control-button': {
+          '@apply rounded-full flex items-center justify-center text-black bg-gray-200 mb-2 transition-all duration-200 ease-in-out border-none': {},
         },
       }
 

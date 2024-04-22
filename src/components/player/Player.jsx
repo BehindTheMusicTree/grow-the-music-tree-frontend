@@ -1,13 +1,16 @@
-import styles from './Player.module.css'
 import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types';
-import Button from '../button/Button.jsx';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faVolumeUp, faListUl } from '@fortawesome/free-solid-svg-icons'
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
-import TrackProgress from './TrackProgress/TrackProgress.jsx';
+
 import { PLAY_STATES } from '../../constants.js';
+
 import albumCover from '../../assets/images/album-cover-default.png';
+import Button from '../button/Button.jsx';
+
+import TrackProgress from './TrackProgress/TrackProgress.jsx';
 
 export default function Player ({
     playerTrackObject, 
@@ -71,31 +74,31 @@ export default function Player ({
   }, [playerTrackObject])
 
   return (
-    <div className={styles.PlayerContainer}>
-      <div className={styles.PlayerLeft}>
-        <img className={styles.AlbumCover} src={albumCover} alt="Album Cover" />
-        <div className={styles.TrackInfo}>
-          <div className={styles.TrackTitle}>
+    <div className="w-full fixed left-0 bottom-0 flex justify-between p-2 bg-black text-white text-sm">
+      <div className="flex-1 flex items-center justify-center">
+        <img className="flex-none w-16 h-16 overflow-hidden mr-5" src={albumCover} alt="Album Cover" />
+        <div className="flex-1 flex flex-col items-start justify-center w-full">
+          <div>
             {playerTrackObject ? playerTrackObject.title : ''}
           </div>
-          <div className={styles.ArtistName}>
+          <div>
             {playerTrackObject ? (playerTrackObject.artist ? playerTrackObject.artist.name : '')  : ''}
           </div>
         </div>
       </div>
-      <div className={styles.Controls1}>
-        <div className={styles.Buttons}>
+      <div className="flex-2 flex flex-col justify-center items-center">
+        <div className="flex flex-row items-center justify-center w-full">
           <Button
-            className={styles.PreviousButtonContainer}            
+            className="player-control-button"            
             onClick={handleBackwardClick}>
               <FaStepBackward />
           </Button>
           <Button 
-            className={playState === PLAY_STATES.PLAYING ? styles.PauseButtonContainer : styles.PlayButtonContainer} onClick={handlePlayPause}>
+            className="player-control-button text-1.5xl" onClick={handlePlayPause}>
               {playState === PLAY_STATES.PLAYING ? <FaPause /> : <FaPlay />}
           </Button>
           <Button
-            className={styles.NextButtonContainer}            
+            className="player-control-button"          
             onClick={handleForwardClick}
             disabled={!playerTrackObject.hasNext}>
               <FaStepForward />
@@ -112,13 +115,13 @@ export default function Player ({
           seek={seek}
           setSeek={setSeek}/>
       </div>
-      <div className={styles.Controls2}>
-        <div className={styles.PlaylistIconContainer}>
+      <div className="flex-1 w-full pl-10 flex items-center justify-center">
+        <div className="w-4 h-4 mr-1 transform hover:scale-120 cursor-pointer">
           <FontAwesomeIcon icon={faListUl} onClick={handlePlaylistIconClick}/>
         </div>
-        <div className={styles.VolumeContainer}>
-          <FontAwesomeIcon icon={faVolumeUp} className={styles.VolumeIcon}/>
-          <input className={styles.VolumeSlider}
+        <div className="flex items-center justify-center w-full">
+          <FontAwesomeIcon icon={faVolumeUp} className="w-5 h-5 mr-2"/>
+          <input className="w-24 mr-2"
             type='range' 
             min='0' 
             max='1' 
