@@ -9,12 +9,24 @@ export default {
       spacing: {
         'play-l-offset': '17px',
         'play-r-offset': '15px',
-      }
+      },
+      boxShadow: {
+        'progress-bar-blue': '-403px 0 0 400px #3B82F6', // blue-500
+      },
     },
   },
   plugins: [
     function({ addComponents }) {
       const newComponents = {
+        '.progress-bar': {
+          '@apply appearance-none w-full h-1.5 mt-0 mb-0 block border-transparent rounded-full overflow-hidden': {},
+          '&::-webkit-slider-thumb': {
+            '@apply appearance-none h-1.5 w-1.5 bg-blue-500 rounded-full shadow-inner shadow-progress-bar-blue': {},
+          },
+          '&::-moz-range-thumb': {
+            '@apply appearance-none h-1.5 w-1.5 bg-blue-500 rounded-full shadow-inner shadow-progress-bar-blue': {},
+          },
+        },
         '.tree-node-info-container': {
           '@apply text-xs text-white': {},
         },
