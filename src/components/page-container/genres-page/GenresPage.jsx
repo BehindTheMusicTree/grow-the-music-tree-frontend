@@ -77,17 +77,16 @@ export default function GenresPage({
     }, [groupedGenres]);
 
     return (
-        <div className="flex flex-col"> 
+        <div className="mt-5 flex flex-col"> 
           <h1>Genre Tree</h1>
-          <div 
-          className="flex justify-center items-center text-center hover:bg-gray-400 hover:text-gray-800 cursor-pointer"
+          <div className="mt-5 flex justify-center items-center text-center hover:bg-gray-400 hover:text-gray-800 cursor-pointer"
           style={{
               width: GENRE_TREE_RECT_DIMENSIONS.WIDTH + 'px',
               height: GENRE_TREE_RECT_DIMENSIONS.HEIGHT + 'px',
               border: '1px solid black'
           }}
           onClick={handleGenreAddClick}>+</div>
-          <div className="flex flex-col bg-gray-400 text-gray-800">
+          <div className="flex flex-col text-gray-800">
             {groupedGenres ? Object.entries(groupedGenres).map(([uuid, genreTree]) => {
               return (
                 <GenreTree 
