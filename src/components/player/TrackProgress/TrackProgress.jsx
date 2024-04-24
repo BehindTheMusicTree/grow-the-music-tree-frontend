@@ -1,4 +1,3 @@
-import styles from './TrackProgress.module.css'
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import raf from 'raf';
@@ -24,7 +23,7 @@ export default function TrackProgress ({
   let previousSeekRef = useRef(null);
 
   const handleLoadError = (id, err) => {
-    console.error();(`Error loading track of blob url ${playerTrackObject.blobUrl}: ${err}`);
+    console.error(`Error loading track of blob url ${playerTrackObject.blobUrl}: ${err}`);
   }
 
   const handleSeekingChange = (event) => {
@@ -93,7 +92,7 @@ export default function TrackProgress ({
   }, [shouldResetPlayerSeek])
 
   return (
-    <div className={styles.TrackProgress}>
+    <div className="flex flex-row justify-center items-center w-full">
         <ReactHowler
           ref={playerRef}
           src={[playerTrackObject.blobUrl]}
@@ -103,12 +102,12 @@ export default function TrackProgress ({
           onLoadError={handleLoadError}
           onEnd={handleTrackEnd}
           volume={volume}/>
-      <div className={styles.CurrentTime}>
+      <div className="w-10">
         {formatTime(seek)}
       </div>
       {playerRef.current ? 
         <input
-          className={styles.ProgressBar}
+          className="progress-bar flex-grow-0 flex-shrink-0 w-4/5 ml-2.5 mr-2.5"
           type="range"
           min="0"
           max={Math.floor(playerRef.current.duration())}
@@ -119,7 +118,7 @@ export default function TrackProgress ({
           onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
         /> 
         : null}
-      <div className={styles.TotalTime}>
+      <div className="w-10">
         {formatTime(playerRef.current ? playerRef.current.duration() : 0)}
       </div>
     </div>
