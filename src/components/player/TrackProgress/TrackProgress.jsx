@@ -24,7 +24,7 @@ export default function TrackProgress ({
   let previousSeekRef = useRef(null);
 
   const handleLoadError = (id, err) => {
-    console.log(`Error loading track of blob url ${playerTrackObject.blobUrl}: ${err}`);
+    console.error();(`Error loading track of blob url ${playerTrackObject.blobUrl}: ${err}`);
   }
 
   const handleSeekingChange = (event) => {
@@ -99,7 +99,7 @@ export default function TrackProgress ({
           src={[playerTrackObject.blobUrl]}
           html5={true}
           playing={playState === PLAY_STATES.PLAYING}
-          format={[playerTrackObject.fileExtension.replace('.', '')]}
+          format={[playerTrackObject.file.extension.replace('.', '')]}
           onLoadError={handleLoadError}
           onEnd={handleTrackEnd}
           volume={volume}/>
