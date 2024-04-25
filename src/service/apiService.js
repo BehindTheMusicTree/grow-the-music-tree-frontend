@@ -1,5 +1,4 @@
 import config from '../config/config'; 
-import axios from 'axios';
 import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from '../constants';
 
 const parseJson = async (response) => {
@@ -28,7 +27,7 @@ const getResponseNotOkErrorMessage = async (url, response) => {
 
 const getFetchErrorMessage = (error) => {
   if (error instanceof TypeError) {
-    return `${error.message} probably because of network error.`;
+    return `${error.message} probably because of a network error.`;
   } else {
     return error.message;
   }
@@ -75,7 +74,7 @@ const ApiService = {
         await ApiService.login();
       }
     } catch (error) {
-      throw Error(`Failed to refresh token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${getFetchErrorMessage(error)}`);
+      throw new Error(`Failed to refresh token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${getFetchErrorMessage(error)}`);
     }
   },
 
@@ -92,7 +91,7 @@ const ApiService = {
             accessToken = ApiService.getToken().access;
           }
         } catch (error) {
-          throw Error(`Error setting access token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`);
+          throw new Error(`Error setting access token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`);
         }
         return {
           'Authorization': `Bearer ${accessToken}`,
@@ -104,7 +103,7 @@ const ApiService = {
         return ApiService.getHeaders();
       }
     } catch (error) {
-      throw Error(`Failed to get headers. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`);  
+      throw new Error(`Failed to get headers. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`);  
     }
   },
 
@@ -121,14 +120,14 @@ const ApiService = {
   
       if (!response.ok) {
         const errorMessage = await getResponseNotOkErrorMessage(url, response);
-        throw Error(errorMessage)
+        throw new Error(errorMessage)
       }
       else {
         const responseJson = await parseJson(response);
         ApiService.setToken(responseJson);
       }
     } catch (error) {
-      throw Error(`Failed to login. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${getFetchErrorMessage(error)}`);
+      throw new Error(`Failed to login. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${getFetchErrorMessage(error)}`);
     }
   },
 
@@ -155,11 +154,12 @@ const ApiService = {
         throw Error(getResponseNotOkErrorMessage(url, response));
       }
       else {
-        return parseJson(response);
+        const resonseJson = await parseJson(response);
+        return resonseJson;
       }
     }
     catch (error) {
-      throw Error(`Failed to fetch data. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${getFetchErrorMessage(error)}`);
+      throw new Error(`Failed to fetch data from endpoint ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${getFetchErrorMessage(error)}`);
     }
   },
 
@@ -173,19 +173,36 @@ const ApiService = {
 
   loadAudioAndGetLibTrackBlobUrl: async (libTrackRelativeUrl) => {
     const headers = {'Authorization': `Bearer ${ApiService.getToken().access}`}
-    return await ApiService.getTrackAudioBlobUrl(`${config.apiBaseUrl}${libTrackRelativeUrl}download/`, headers);
+    const blob = await ApiService.streamAudio(`${config.apiBaseUrl}${libTrackRelativeUrl}download/`, headers);
+    return URL.createObjectURL(blob);
   },
-
-  getTrackAudioBlobUrl: async (trackUrl, headers) => {
-    return await axios.get(trackUrl, {
-      headers: headers,
-      responseType: 'arraybuffer'
-    }).then(response => {
-      const blob = new Blob([response.data], {type: 'audio/*'});
-      return URL.createObjectURL(blob);
-    }).catch(error => {
-      throw new Error('Failed to fetch audio. ${DUE_TO_PREVIOUS_ERROR_MESSAGE}', error.message);
+  
+  streamAudio: async (trackUrl) => {
+    const headers = await ApiService.getHeaders(); 
+    const response = await fetch(trackUrl, { headers });
+  
+    if (!response.ok) {
+      throw new Error(getResponseNotOkErrorMessage(trackUrl, response));
+    }
+  
+    const reader = response.body.getReader();
+    const stream = new ReadableStream({
+      start(controller) {
+        function push() {
+          reader.read().then(({ done, value }) => {
+            if (done) {
+              controller.close();
+              return;
+            }
+            controller.enqueue(value);
+            push();
+          });
+        }
+        push();
+      }
     });
+  
+    return new Response(stream, { headers: { "Content-Type": "audio/*" } }).blob();
   },
 
   getGenres: async () => {
