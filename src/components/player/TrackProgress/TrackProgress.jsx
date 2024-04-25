@@ -22,8 +22,27 @@ export default function TrackProgress ({
   let rafIdRef = useRef(null);
   let previousSeekRef = useRef(null);
 
-  const handleLoadError = (id, err) => {
-    console.error(`Error loading track of blob url ${playerTrackObject.blobUrl}: ${err}`);
+  const handleLoadError = (id, error) => {
+    let errorMessage = '';
+  
+    switch (error) {
+      case 1:
+        errorMessage = 'The fetching process for the media resource was aborted by the user agent at the user\'s request.';
+        break;
+      case 2:
+        errorMessage = 'A network error of some description caused the user agent to stop fetching the media resource, after the resource was established to be usable.';
+        break;
+      case 3:
+        errorMessage = 'An error of some description occurred while decoding the media resource, after the resource was established to be usable.';
+        break;
+      case 4:
+        errorMessage = 'The media resource indicated by the src attribute or assigned media provider object was not suitable.';
+        break;
+      default:
+        errorMessage = 'An unknown error occurred.';
+    }
+  
+    console.error(`Error loading track of blob url ${playerTrackObject.blobUrl}: ${errorMessage}`);
   }
 
   const handleSeekingChange = (event) => {
