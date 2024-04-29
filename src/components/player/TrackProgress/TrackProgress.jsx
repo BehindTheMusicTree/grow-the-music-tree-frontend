@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import raf from 'raf';
 import ReactHowler from 'react-howler';
+
 import { PLAY_STATES } from '../../../constants';
 import { formatTime } from '../../../utils';
 
@@ -22,10 +23,10 @@ export default function TrackProgress ({
   let rafIdRef = useRef(null);
   let previousSeekRef = useRef(null);
 
-  const handleLoadError = (id, error) => {
+  const handleLoadError = (id, errorCode) => {
     let errorMessage = '';
   
-    switch (error) {
+    switch (errorCode) {
       case 1:
         errorMessage = 'The fetching process for the media resource was aborted by the user agent at the user\'s request.';
         break;
@@ -42,7 +43,7 @@ export default function TrackProgress ({
         errorMessage = 'An unknown error occurred.';
     }
   
-    console.error(`Error loading track of blob url ${playerTrackObject.blobUrl}: ${errorMessage}`);
+    console.error(`Error loading track of url ${playerTrackObject.blobUrl}: ${errorCode} - ${errorMessage}`);
   }
 
   const handleSeekingChange = (event) => {
