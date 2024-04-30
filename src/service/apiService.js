@@ -67,14 +67,16 @@ const ApiService = {
           await ApiService.login();
         }
         else {
-          throw new Error(getResponseNotOkErrorMessage(url, response));
+          const errorMessage = await getResponseNotOkErrorMessage(url, response);
+          throw new Error(errorMessage);
         }
       }
       else {
         await ApiService.login();
       }
     } catch (error) {
-      throw new Error(`Failed to refresh token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${getFetchErrorMessage(error)}`);
+      const fetchErrorMessage = await getFetchErrorMessage(error);
+      throw new Error(`Failed to refresh token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
     }
   },
 
@@ -127,7 +129,8 @@ const ApiService = {
         ApiService.setToken(responseJson);
       }
     } catch (error) {
-      throw new Error(`Failed to login. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${getFetchErrorMessage(error)}`);
+      const fetchErrorMessage = await getFetchErrorMessage(error);
+      throw new Error(`Failed to login. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
     }
   },
 
@@ -151,7 +154,8 @@ const ApiService = {
       })
     
       if (!response.ok) {
-        throw Error(getResponseNotOkErrorMessage(url, response));
+        const errorMessage = await getResponseNotOkErrorMessage(url, response);
+        throw Error(errorMessage);
       }
       else {
         const resonseJson = await parseJson(response);
@@ -159,7 +163,8 @@ const ApiService = {
       }
     }
     catch (error) {
-      throw new Error(`Failed to fetch data from endpoint ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${getFetchErrorMessage(error)}`);
+      const fetchErrorMessage = await getFetchErrorMessage(error)
+      throw new Error(`Failed to fetch data from endpoint ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
     }
   },
 
@@ -182,7 +187,8 @@ const ApiService = {
     const response = await fetch(trackUrl, { headers });
   
     if (!response.ok) {
-      throw new Error(getResponseNotOkErrorMessage(trackUrl, response));
+      const errorMessage = await getResponseNotOkErrorMessage(trackUrl, response);
+      throw new Error(errorMessage);
     }
   
     const reader = response.body.getReader();
