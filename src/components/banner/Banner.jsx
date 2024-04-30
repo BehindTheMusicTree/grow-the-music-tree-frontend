@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types'
 
 import SearchForm from './SearchForm'
-import logo from '../../assets/images/logos/umg-logo-maze-100.png'
+import logo from '../../assets/images/logos/umg-logo-maze-100.svg'
 
 
 export default function Banner({searchSubmitted, setSearchSubmitted}) {
     return (
-    <div className='p-3 flex flex bg-black text-gray-300'>
+    <div className='p-3 flex flex bg-black text-gray-100'>
         <div className='mr-3 flex flex-col justify-center'>
             <img src={logo} alt='logo' />
         </div>
