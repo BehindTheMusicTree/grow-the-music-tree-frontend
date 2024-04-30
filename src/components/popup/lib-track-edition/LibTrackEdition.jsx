@@ -1,6 +1,6 @@
 import styles from './LibTrackEdition.module.css'
 import PropTypes from 'prop-types';
-import ApiService from '../../../service/apiService';
+import ApiService from '../../../utils/service/apiService';
 import { useForm } from 'react-hook-form';
 import { formatTime } from '../../../utils';
 

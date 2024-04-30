@@ -1,5 +1,6 @@
-import config from '../config/config'; 
-import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from '../constants';
+import config from '../../config/config'; 
+import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from '../../constants';
+import { BadRequestError } from '../error/BadRequestError';
 
 const parseJson = async (response) => {
   try {
@@ -25,7 +26,7 @@ const getResponseNotOkErrorMessage = async (url, response) => {
   return '';
 }
 
-const getFetchErrorMessage = (error) => {
+const getFetchErrorMessageOtherThanBadRequest = (error) => {
   if (error instanceof TypeError) {
     return `${error.message} probably because of a network error.`;
   } else {
@@ -75,7 +76,7 @@ const ApiService = {
         await ApiService.login();
       }
     } catch (error) {
-      const fetchErrorMessage = await getFetchErrorMessage(error);
+      const fetchErrorMessage = await getFetchErrorMessageOtherThanBadRequest(error);
       throw new Error(`Failed to refresh token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
     }
   },
@@ -129,7 +130,7 @@ const ApiService = {
         ApiService.setToken(responseJson);
       }
     } catch (error) {
-      const fetchErrorMessage = await getFetchErrorMessage(error);
+      const fetchErrorMessage = await getFetchErrorMessageOtherThanBadRequest(error);
       throw new Error(`Failed to login. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
     }
   },
@@ -155,7 +156,12 @@ const ApiService = {
     
       if (!response.ok) {
         const errorMessage = await getResponseNotOkErrorMessage(url, response);
-        throw Error(errorMessage);
+        if (response.status === 400) {
+          throw new BadRequestError(errorMessage);
+        }
+        else {
+          throw new Error(errorMessage);
+        }
       }
       else {
         const resonseJson = await parseJson(response);
@@ -163,8 +169,13 @@ const ApiService = {
       }
     }
     catch (error) {
-      const fetchErrorMessage = await getFetchErrorMessage(error)
-      throw new Error(`Failed to fetch data from endpoint ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
+      if (error instanceof BadRequestError) {
+        throw error;
+      }
+      else {
+        const fetchErrorMessage = await getFetchErrorMessageOtherThanBadRequest(error)
+        throw new Error(`Failed to fetch data from endpoint ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
+      }
     }
   },
 

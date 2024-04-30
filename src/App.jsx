@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Howler } from 'howler';
 
 import { PLAY_STATES, CONTENT_AREA_TYPES } from './constants';
-import ApiService from './service/apiService';
+import ApiService from './utils/service/apiService';
 
 import Banner from './components/banner/Banner'
 import PageContainer from './components/page-container/PageContainer'

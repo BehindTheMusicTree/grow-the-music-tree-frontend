@@ -2,7 +2,7 @@ import {useState, useRef, useCallback, useEffect} from 'react';
 import PropTypes from 'prop-types';
 
 import { GENRE_TREE_RECT_DIMENSIONS } from '../../../constants';
-import ApiService from '../../../service/apiService';
+import ApiService from '../../../utils/service/apiService';
 
 import GenreTree from './genre-tree/GenreTree';
 
