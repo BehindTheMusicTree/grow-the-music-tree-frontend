@@ -37,7 +37,8 @@ export default function GenreTree (
       await postLibTracksAndRefresh(file, selectingFileGenreUuidRef.current);
     } catch (error) {
       if (error instanceof BadRequestError) {
-        const contentObject = new BadRequestPopupContentObject('Uploading track', error.message);
+        const messages = error.message
+        const contentObject = new BadRequestPopupContentObject('uploading track', messages);
         showPopup(contentObject);
       }
     }
