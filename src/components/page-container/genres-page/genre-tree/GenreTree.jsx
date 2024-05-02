@@ -4,7 +4,10 @@ import ReactDOMServer from 'react-dom/server';
 import * as d3 from 'd3';
 import { FaSpinner, FaFileUpload, FaPlus } from 'react-icons/fa';
 
+import { usePopup } from '../../../../contexts/usePopup.jsx'; // Assurez-vous d'utiliser le bon chemin
 import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from '../../../../constants';
+import { BadRequestError } from '../../../../utils/errors/BadRequestError';
+import BadRequestPopupContentObject from '../../../../models/popup-content-object/BadRequestPopupContentObject.js';
 
 export default function GenreTree (
   { genres, 
@@ -23,13 +26,22 @@ export default function GenreTree (
     GENRE_TREE_RECT_DIMENSIONS.HEIGHT + VERTICAL_SEPARATOON_BETWEEN_RECTANGLES
   )
 
+  const { showPopup } = usePopup();
   const svgRef = useRef(null);
   const fileInputRef = useRef(null);
   const selectingFileGenreUuidRef = useRef(null);
 
-  function handleFileChange(event) {
+  async function handleFileChange(event) {
     const file = event.target.files[0];
-    postLibTracksAndRefresh(file, selectingFileGenreUuidRef.current);
+    try {
+      await postLibTracksAndRefresh(file, selectingFileGenreUuidRef.current);
+    } catch (error) {
+      if (error instanceof BadRequestError) {
+        const messages = error.message
+        const contentObject = new BadRequestPopupContentObject('uploading track', messages);
+        showPopup(contentObject);
+      }
+    }
   }
 
   const buildTreeHierarchy = () => {
@@ -237,9 +249,9 @@ export default function GenreTree (
       .attr('x', GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - TRACK_UPLOAD_ICON_OFFSET - TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH / 2)
       .attr('y', - (GENRE_TREE_RECT_DIMENSIONS.HEIGHT - TRACK_UPLOAD_ICON_DIMENSIONS.HEIGHT) / 2)
       .html(function() {
-        return ReactDOMServer.renderToString(<FaFileUpload className='tree-node-icon' 
-          size={TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH} />
-      )})
+        return ReactDOMServer.renderToString(
+          <FaFileUpload className='tree-node-icon' size={TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH} />)
+      })
       .on('click', function(event, d) {
         event.stopPropagation();
         selectingFileGenreUuidRef.current = d.data.uuid;
