@@ -1,17 +1,17 @@
 import PropTypes from 'prop-types';
 
-export default function BadRequestErrorComponent ({ badRequestPopupObject }) {
+export default function BadRequestErrorComponent ({ popupContentObject }) {
     return (
         <div>
-            <h1>{badRequestPopupObject.operation}</h1>
-            <p>{badRequestPopupObject.message}</p>
+            <h1>{popupContentObject.title}</h1>
+            <p>{popupContentObject.message}</p>
         </div>
     );
 }
 
 BadRequestErrorComponent.propTypes = {
-    badRequestPopupObject: PropTypes.shape({
-        operation: PropTypes.string.isRequired,
+    popupContentObject: PropTypes.shape({
+        title: PropTypes.string.isRequired,
         message: PropTypes.string.isRequired,
     }).isRequired,
 }

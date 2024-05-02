@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 export const PopupContext = createContext();
 
 export function PopupProvider({ children }) {
-    const [popupObject, setPopupObject] = useState(null);
+    const [popupContentObject, setPopupObject] = useState(null);
 
     const showPopup = (object) => {
         setPopupObject(object);
@@ -15,7 +15,7 @@ export function PopupProvider({ children }) {
     };
 
     return (
-        <PopupContext.Provider value={{ popupObject, showPopup, hidePopup }}>
+        <PopupContext.Provider value={{ popupContentObject, showPopup, hidePopup }}>
             {children}
         </PopupContext.Provider>
     );

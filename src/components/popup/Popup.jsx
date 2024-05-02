@@ -4,15 +4,15 @@ import BadRequestPopup from './BadRequestPopup';
 
 
 export default function Popup() {
-  const { popupObject, hidePopup } = usePopup();
+  const { popupContentObject, hidePopup } = usePopup();
 
-  if (!popupObject) {
+  if (!popupContentObject) {
     return null;
   }
 
   let Component;
-  switch (popupObject.type) {
-    case 'BadRequestError':
+  switch (popupContentObject.constructor.name) {
+    case 'BadRequestPopupContentObject':
       Component = BadRequestPopup;
       break;
     // case 'type2':
@@ -27,7 +27,7 @@ export default function Popup() {
     <div className="popup">
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white p-5 rounded-lg max-w-md w-full relative">
-                {Component && <Component badRequestPopupObject={popupObject} />}
+                {Component && <Component popupContentObject={popupContentObject} />}
                 <button onClick={hidePopup}>Fermer</button>
             </div>
         </div>

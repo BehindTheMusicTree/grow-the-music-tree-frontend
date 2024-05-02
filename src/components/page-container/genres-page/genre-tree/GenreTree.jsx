@@ -7,6 +7,7 @@ import { FaSpinner, FaFileUpload, FaPlus } from 'react-icons/fa';
 import { usePopup } from '../../../../contexts/usePopup.jsx'; // Assurez-vous d'utiliser le bon chemin
 import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from '../../../../constants';
 import { BadRequestError } from '../../../../utils/errors/BadRequestError';
+import BadRequestPopupContentObject from '../../../../models/popup-content-object/BadRequestPopupContentObject.js';
 
 export default function GenreTree (
   { genres, 
@@ -36,11 +37,8 @@ export default function GenreTree (
       await postLibTracksAndRefresh(file, selectingFileGenreUuidRef.current);
     } catch (error) {
       if (error instanceof BadRequestError) {
-        showPopup({
-          type: 'BadRequestError',
-          operation: 'Uploading track',
-          message: error.message,
-        });
+        const contentObject = new BadRequestPopupContentObject('Uploading track', error.message);
+        showPopup(contentObject);
       }
     }
   }
