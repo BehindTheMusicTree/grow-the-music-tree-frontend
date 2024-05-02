@@ -4,8 +4,9 @@ import ReactDOMServer from 'react-dom/server';
 import * as d3 from 'd3';
 import { FaSpinner, FaFileUpload, FaPlus } from 'react-icons/fa';
 
+import { usePopup } from '../../../../contexts/usePopup.jsx'; // Assurez-vous d'utiliser le bon chemin
 import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from '../../../../constants';
-import { BadRequestError } from '../../../../utils/error/BadRequestError';
+import { BadRequestError } from '../../../../utils/errors/BadRequestError';
 
 export default function GenreTree (
   { genres, 
@@ -24,6 +25,7 @@ export default function GenreTree (
     GENRE_TREE_RECT_DIMENSIONS.HEIGHT + VERTICAL_SEPARATOON_BETWEEN_RECTANGLES
   )
 
+  const { showPopup } = usePopup();
   const svgRef = useRef(null);
   const fileInputRef = useRef(null);
   const selectingFileGenreUuidRef = useRef(null);
@@ -34,8 +36,10 @@ export default function GenreTree (
       await postLibTracksAndRefresh(file, selectingFileGenreUuidRef.current);
     } catch (error) {
       if (error instanceof BadRequestError) {
-        console.log('wech');
-        console.log(error.message);
+        showPopup({
+          title: 'Erreur',
+          message: error.message,
+        });
       }
     }
   }

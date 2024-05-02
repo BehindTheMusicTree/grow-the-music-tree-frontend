@@ -1,6 +1,6 @@
 import config from '../../config/config'; 
 import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from '../../constants';
-import { BadRequestError } from '../error/BadRequestError';
+import { BadRequestError } from '../errors/BadRequestError';
 
 const parseJson = async (response) => {
   try {

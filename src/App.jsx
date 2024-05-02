@@ -3,6 +3,9 @@ import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Howler } from 'howler';
 
+import { PopupProvider } from './contexts/PopupContext';
+import Popup from './components/popup/Popup'
+
 import { PLAY_STATES, CONTENT_AREA_TYPES } from './constants';
 import ApiService from './utils/service/apiService';
 
@@ -99,43 +102,46 @@ export default function App() {
   }, [playerTrackObject]);
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={
-          <div className="App flex flex-col h-full">
-            <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-            <div className="Body flex h-full">
-              <PageContainer
-                setEditingTrack={setEditingTrack}
-                contentAreaTypeWithObject={contentAreaTypeWithObject}
-                isTrackListSidebarVisible={isTrackListSidebarVisible}
-                selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
-                playState={playState} 
-                playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}
-                playlistPlayObject={playlistPlayObject}
-                refreshGenresSignal={refreshGenresSignal}/>
-              {playerTrackObject &&
-                <Player 
-                  playerTrackObject={playerTrackObject}
-                  playState={playState}
-                  setPlayState={setPlayState}
-                  shouldResetPlayerSeek={shouldResetPlayerSeek} 
-                  setshouldResetPlayerSeek={setshouldResetPlayerSeek}
-                  setNextTrack={setNextTrack}
-                  setPreviousTrack={setPreviousTrack}
-                  setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}
-                />}
-              {editingTrack && 
-                <LibTrackEdition 
-                  libTrack={editingTrack}
-                  onClose={() => setEditingTrack(null)}
-                  handleUpdatedLibTrack={handleUpdatedLibTrack} />
-              }
+    <PopupProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={
+            <div className="App flex flex-col h-full">
+              <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
+              <div className="Body flex h-full">
+                <PageContainer
+                  setEditingTrack={setEditingTrack}
+                  contentAreaTypeWithObject={contentAreaTypeWithObject}
+                  isTrackListSidebarVisible={isTrackListSidebarVisible}
+                  selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
+                  playState={playState} 
+                  playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}
+                  playlistPlayObject={playlistPlayObject}
+                  refreshGenresSignal={refreshGenresSignal}/>
+                {playerTrackObject &&
+                  <Player 
+                    playerTrackObject={playerTrackObject}
+                    playState={playState}
+                    setPlayState={setPlayState}
+                    shouldResetPlayerSeek={shouldResetPlayerSeek} 
+                    setshouldResetPlayerSeek={setshouldResetPlayerSeek}
+                    setNextTrack={setNextTrack}
+                    setPreviousTrack={setPreviousTrack}
+                    setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}
+                  />}
+                {editingTrack && 
+                  <LibTrackEdition 
+                    libTrack={editingTrack}
+                    onClose={() => setEditingTrack(null)}
+                    handleUpdatedLibTrack={handleUpdatedLibTrack} />
+                }
+              </div>
+              <Popup />
             </div>
-          </div>
-        }/>
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </Router>
+          }/>
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Router>
+    </PopupProvider>
   );
 }
