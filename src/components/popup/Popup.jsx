@@ -25,13 +25,22 @@ export default function Popup() {
 
   return (
     <div className="popup">
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-5 rounded-lg max-w-md w-full relative">
-                <h2>{popupContentObject.title}</h2>
-                {Component && <Component popupContentObject={popupContentObject} />}
-                <button onClick={hidePopup}>Fermer</button>
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="bg-white p-3 rounded-lg max-w-md w-full relative">
+          <div className="flex justify-between items-center mb-1">
+            <h2>{popupContentObject.title}</h2>
+            <div 
+              style={{ 
+                cursor: 'pointer' 
+              }} 
+              onClick={hidePopup}
+            >
+              &#10005;
             </div>
+          </div>
+          {Component && <Component popupContentObject={popupContentObject} />}
         </div>
+      </div>
     </div>
   );
 }
