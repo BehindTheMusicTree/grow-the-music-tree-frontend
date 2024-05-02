@@ -37,7 +37,8 @@ export default function GenreTree (
     } catch (error) {
       if (error instanceof BadRequestError) {
         showPopup({
-          title: 'Erreur',
+          type: 'BadRequestError',
+          operation: 'Uploading track',
           message: error.message,
         });
       }
