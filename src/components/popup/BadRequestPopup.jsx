@@ -5,10 +5,11 @@ export default function BadRequestErrorComponent ({ popupContentObject }) {
         <div>
             {popupContentObject.operationErrors.map((errorObject, index) => (
                 <div key={index}>
-                    <h3>{errorObject.name}</h3>
-                    {errorObject.errors.map((error, index) => (
-                        <div key={index}>{error}</div>
-                    ))}
+                    <ul className="list-none pl-4">
+                        {errorObject.errors.map((error, index) => (
+                            <li key={index} className="text-red-500">❌ {error}</li>
+                        ))}
+                    </ul>
                 </div>
             ))}
         </div>
