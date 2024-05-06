@@ -6,15 +6,17 @@ import { capitalizeFirstLetter } from '../../../utils';
 export default function TrackListSidebar({playlistPlayObject, setEditingTrack}) {
     return (
         <div className={styles.TrackListSidebar}>
-            <div className={styles.Header}>
-                <div className={styles.Name}>{playlistPlayObject.contentObject.name}</div>
-                <div className={styles.Info}>
+            <div className="Header flex flex-row p-2">
+                <div className="Name flex flex-col justify-center items-center text-gray-300 text-xl font-bold pr-5">
+                    {playlistPlayObject.contentObject.name}
+                </div>
+                <div className="Info flex flex-col justify-center items-center text-gray-400 text-sm pt-1">
                     {"• " + capitalizeFirstLetter(playlistPlayObject.contentObject.type) + " playlist • "}
                     {playlistPlayObject.contentObject.libraryTracksCount + " tracks •"}
                 </div>
             </div>
             <div>
-                <ul>
+                <ul className="list-none p-0 m-0">
                     {playlistPlayObject.contentObject.libraryTracks.map((playlistTrackRelation) => (
                         <li key={playlistTrackRelation.libraryTrack.uuid}>
                             <TrackElement 
