@@ -1,12 +1,11 @@
-import styles from './TrackListSidebar.module.css';
 import PropTypes from 'prop-types';
 import TrackElement from './track-element/TrackElement';
 import { capitalizeFirstLetter } from '../../../utils';
 
 export default function TrackListSidebar({playlistPlayObject, setEditingTrack}) {
     return (
-        <div className={styles.TrackListSidebar}>
-            <div className="Header flex flex-row p-2">
+        <div>
+            <div className="Header flex flex-row px-4 py-2">
                 <div className="Name flex flex-col justify-center items-center text-gray-300 text-xl font-bold pr-5">
                     {playlistPlayObject.contentObject.name}
                 </div>
