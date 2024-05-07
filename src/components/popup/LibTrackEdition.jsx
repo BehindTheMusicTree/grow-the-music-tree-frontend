@@ -22,8 +22,7 @@ export default function LibTrackEdition({ popupContentObject }) {
   };
 
   return (
-    <div className="TrackEdition w-full max-w-2xl mx-auto p-5 shadow-md">
-      <h2 className="Title text-center mb-5">Edit Track</h2>
+    <div className="TrackEdition w-full max-w-2xl mx-auto px-5 shadow-md">
       <form className="Form flex flex-wrap justify-between" onSubmit={handleSubmit(onSubmit)}>
         <div className="popup-content-column">
           <label className="popup-content-label">

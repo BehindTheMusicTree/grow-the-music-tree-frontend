@@ -26,14 +26,9 @@ export default function Popup() {
     <div className="popup">
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
         <div className="bg-white p-3 rounded-lg max-w-md w-full relative">
-          <div className="flex justify-between items-center mb-1">
+          <div className="flex justify-between pl-2 mb-1">
             <h2>{popupContentObject.title}</h2>
-            <div
-              style={{
-                cursor: "pointer",
-              }}
-              onClick={hidePopup}
-            >
+            <div className="flex flex-col items-start justify-start h-full cursor-pointer" onClick={hidePopup}>
               &#10005;
             </div>
           </div>
