@@ -47,7 +47,10 @@ export default function TrackItem({ playlistTrackRelationObject, handleUpdatedLi
       <div className="duration flex text-base w-16 items-center justify-center">
         {formatTime(playlistTrackRelationObject.libraryTrack.duration)}
       </div>
-      <div className="edit flex text-base w-6 items-center justify-center mr-2" onClick={handleEditClick}>
+      <div
+        className="edit flex text-base w-6 items-center justify-center mr-2 cursor-pointer"
+        onClick={handleEditClick}
+      >
         <MdMoreVert size={20} />
       </div>
     </div>
