@@ -23,30 +23,35 @@ export default function LibTrackEdition({ popupContentObject }) {
 
   return (
     <div className="TrackEdition w-full max-w-2xl mx-auto px-5 shadow-md">
-      <form className="Form flex flex-wrap justify-between" onSubmit={handleSubmit(onSubmit)}>
-        <div className="popup-content-column">
-          <label className="popup-content-label">
-            <span>Title:</span>
-            <input className="popup-content-input" type="text" {...register("title")} />
-          </label>
-          <label className="popup-content-label">
-            <span>Artist:</span>
-            <input className="popup-content-input" type="text" {...register("artistName")} />
-          </label>
-          <label className="popup-content-label">
-            <span>Genre:</span>
-            <input className="popup-content-input" type="text" {...register("genreName")} />
-          </label>
-        </div>
-        <div className="popup-content-column">
-          <label className="popup-content-label">
-            <span>Duration:</span>
-            <div className="popup-content-input">{formatTime(popupContentObject.libTrack.duration)}</div>
-          </label>
-          <label className="popup-content-label">
-            <span>Album:</span>
-            <input className="popup-content-input" type="text" {...register("albumName")} />
-          </label>
+      <form className="Form flex flex-col" onSubmit={handleSubmit(onSubmit)}>
+        <div className="columns flex justify-between">
+          <div className="popup-content-column">
+            <label className="popup-content-label">
+              <span>Title:</span>
+              <input className="popup-content-input" type="text" {...register("title")} />
+            </label>
+            <label className="popup-content-label">
+              <span>Artist:</span>
+              <input className="popup-content-input" type="text" {...register("artistName")} />
+            </label>
+            <label className="popup-content-label">
+              <span>Genre:</span>
+              <input className="popup-content-input" type="text" {...register("genreName")} />
+            </label>
+          </div>
+          <div className="popup-content-column">
+            <label className="popup-content-label">
+              <span>Duration:</span>
+              <div className="popup-content-input-readonly inline-block">
+                {formatTime(popupContentObject.libTrack.duration)}
+              </div>
+              <span className="flex-grow"></span>
+            </label>
+            <label className="popup-content-label">
+              <span>Album:</span>
+              <input className="popup-content-input" type="text" {...register("albumName")} />
+            </label>
+          </div>
         </div>
         <button className="popup-content-button" type="submit">
           Save

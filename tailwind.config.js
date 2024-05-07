@@ -65,7 +65,7 @@ export default {
           "@apply p-2 border border-gray-300 rounded-md mt-1 flex-grow": {},
         },
         ".popup-content-input-readonly": {
-          "@apply p-2 bg-gray-200 rounded-md mt-1 flex-grow h-full": {},
+          "@apply p-2 bg-gray-200 rounded-md mt-1 h-full": {},
         },
         ".popup-content-button": {
           "@apply p-2 px-5 border-none bg-blue-500 text-white rounded-md cursor-pointer mt-5 w-full": {},
