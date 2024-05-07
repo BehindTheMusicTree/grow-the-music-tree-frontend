@@ -1,30 +1,30 @@
-import PropTypes from 'prop-types';
-import TrackListSidebar from './track-list-sidebar/TrackListSidebar';
-import {CONTENT_AREA_TYPES} from '../../constants';
-import GenresPage from './genres-page/GenresPage';
+import PropTypes from "prop-types";
+import TrackListSidebar from "./track-list-sidebar/TrackListSidebar";
+import { CONTENT_AREA_TYPES } from "../../constants";
+import GenresPage from "./genres-page/GenresPage";
 
-export default function PageContainer ({
-    setEditingTrack,
-    contentAreaTypeWithObject,
-    isTrackListSidebarVisible, 
-    selectPlaylistUuidToPlay, 
-    playState, 
-    playingPlaylistUuidWithLoadingState, 
-    playlistPlayObject,
-    refreshGenresSignal}) {
-
+export default function PageContainer({
+  setEditingTrack,
+  contentAreaTypeWithObject,
+  isTrackListSidebarVisible,
+  selectPlaylistUuidToPlay,
+  playState,
+  playingPlaylistUuidWithLoadingState,
+  playlistPlayObject,
+  refreshGenresSignal,
+}) {
   return (
     <div className="relative w-full h-full flex bg-gray-200 font-sans m-0 pl-8">
-      {contentAreaTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES
-      ? (
-        <GenresPage 
-          selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
-          playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState} 
+      {contentAreaTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES ? (
+        <GenresPage
+          selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
+          playingPlaylistUuidWithLoadingState={
+            playingPlaylistUuidWithLoadingState
+          }
           playState={playState}
           refreshGenresSignal={refreshGenresSignal}
         />
-      )
-      : (
+      ) : (
         <div>Unknown content area type</div>
       )}
       {/* { isPlayingTrack
@@ -32,10 +32,13 @@ export default function PageContainer ({
       : <IconPause dataTestId="pause"/>
         } */}
       {isTrackListSidebarVisible ? (
-        <div className="absolute right-0 w-150 h-full bg-black bg-opacity-95">
-          <TrackListSidebar playlistPlayObject={playlistPlayObject} setEditingTrack={setEditingTrack}/>
+        <div className="TrackListSidebarContainer absolute right-0 w-144 h-full bg-black bg-opacity-95">
+          <TrackListSidebar
+            playlistPlayObject={playlistPlayObject}
+            setEditingTrack={setEditingTrack}
+          />
         </div>
-        ) : null}
+      ) : null}
     </div>
   );
 }
@@ -48,5 +51,5 @@ PageContainer.propTypes = {
   playState: PropTypes.string.isRequired,
   playingPlaylistUuidWithLoadingState: PropTypes.object,
   playlistPlayObject: PropTypes.object,
-  refreshGenresSignal: PropTypes.number.isRequired
+  refreshGenresSignal: PropTypes.number.isRequired,
 };
