@@ -22,7 +22,7 @@ export default function LibTrackEdition({ popupContentObject }) {
   };
 
   return (
-    <div className="TrackEdition w-full max-w-2xl mx-auto px-5 shadow-md">
+    <div className="TrackEdition w-full max-w-2xl mx-auto px-5 py-2 shadow-md">
       <form className="Form flex flex-col" onSubmit={handleSubmit(onSubmit)}>
         <label className="popup-content-label">
           <span>Filename:</span>
@@ -62,9 +62,13 @@ export default function LibTrackEdition({ popupContentObject }) {
             </label>
           </div>
         </div>
-        <button className="popup-content-button" type="submit">
-          Save
-        </button>
+        <div className="flex">
+          <span className="flex-grow"></span>
+          <button className="popup-content-button" type="submit">
+            Save
+          </button>
+          <span className="flex-grow"></span>
+        </div>
       </form>
     </div>
   );
