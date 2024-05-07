@@ -2,14 +2,14 @@ import PropTypes from "prop-types";
 import { formatTime } from "../../../../utils";
 import { MdMoreVert } from "react-icons/md";
 
-export default function TrackElement({ playlistTrackRelationObject, setEditingTrack }) {
+export default function TrackItem({ playlistTrackRelationObject, setEditingTrack }) {
   const handleEditClick = (event) => {
     event.stopPropagation();
     setEditingTrack(playlistTrackRelationObject.libraryTrack);
   };
 
   return (
-    <div className="TrackElement flex h-15 pt-2 text-gray-400">
+    <div className="TrackItem flex h-15 pt-2 text-gray-400">
       <div className="TrackPosition flex items-center justify-center text-lg w-16">
         {playlistTrackRelationObject.position}
       </div>
@@ -45,7 +45,7 @@ export default function TrackElement({ playlistTrackRelationObject, setEditingTr
   );
 }
 
-TrackElement.propTypes = {
+TrackItem.propTypes = {
   playlistTrackRelationObject: PropTypes.object,
   setEditingTrack: PropTypes.func.isRequired,
 };
