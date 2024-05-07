@@ -16,6 +16,9 @@ export default {
       width: {
         144: "50rem",
       },
+      maxWidth: {
+        xl: "44rem",
+      },
     },
   },
   plugins: [

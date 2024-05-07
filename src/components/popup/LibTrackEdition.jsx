@@ -24,17 +24,21 @@ export default function LibTrackEdition({ popupContentObject }) {
   return (
     <div className="TrackEdition w-full max-w-2xl mx-auto px-5 shadow-md">
       <form className="Form flex flex-col" onSubmit={handleSubmit(onSubmit)}>
+        <label className="popup-content-label">
+          <span>Filename:</span>
+          <div className="popup-content-input-readonly inline-block">{popupContentObject.libTrack.file.filename}</div>
+        </label>
         <div className="columns flex justify-between">
-          <div className="popup-content-column">
+          <div className="title popup-content-column">
             <label className="popup-content-label">
               <span>Title:</span>
               <input className="popup-content-input" type="text" {...register("title")} />
             </label>
-            <label className="popup-content-label">
+            <label className="artist popup-content-label">
               <span>Artist:</span>
               <input className="popup-content-input" type="text" {...register("artistName")} />
             </label>
-            <label className="popup-content-label">
+            <label className="genre popup-content-label">
               <span>Genre:</span>
               <input className="popup-content-input" type="text" {...register("genreName")} />
             </label>
