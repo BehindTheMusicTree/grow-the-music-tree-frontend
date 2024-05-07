@@ -42,14 +42,14 @@ export default function TrackElement({
           ""
         )}
       </div>
-      <div className="Duration flex text-base w-20 items-center justify-center">
+      <div className="Duration flex text-base w-16 items-center justify-center">
         {formatTime(playlistTrackRelationObject.libraryTrack.duration)}
       </div>
       <div
-        className="Edit flex text-base w-7.5 items-center justify-center mr-2.5"
+        className="Edit flex text-base w-6 items-center justify-center"
         onClick={handleEditClick}
       >
-        <MdMoreVert size={20} />
+        <MdMoreVert size={18} />
       </div>
     </div>
   );
