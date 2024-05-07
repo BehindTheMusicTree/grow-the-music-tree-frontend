@@ -4,7 +4,7 @@ import { capitalizeFirstLetter } from '../../../utils';
 
 export default function TrackListSidebar({playlistPlayObject, setEditingTrack}) {
     return (
-        <div>
+        <div className='TrackListSideBar'>
             <div className="Header flex flex-row px-4 py-2">
                 <div className="Name flex flex-col justify-center items-center text-gray-300 text-xl font-bold pr-5">
                     {playlistPlayObject.contentObject.name}
@@ -15,11 +15,10 @@ export default function TrackListSidebar({playlistPlayObject, setEditingTrack}) 
                 </div>
             </div>
             <div>
-                <ul className="list-none p-0 m-0">
+                <ul className="TrackList list-none p-0 m-0">
                     {playlistPlayObject.contentObject.libraryTracks.map((playlistTrackRelation) => (
                         <li key={playlistTrackRelation.libraryTrack.uuid}>
-                            <TrackElement 
-                                playlistTrackRelationObject={playlistTrackRelation} 
+                            <TrackElement playlistTrackRelationObject={playlistTrackRelation} 
                                 setEditingTrack={setEditingTrack}/>
                         </li>
                     ))}
