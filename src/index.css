@@ -120,10 +120,3 @@ button:focus-visible {
 .read-the-docs {
   color: #888;
 }
-
-.text-overflow {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
-}

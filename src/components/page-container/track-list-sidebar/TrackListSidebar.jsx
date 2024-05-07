@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import TrackItem from "./track-item/TrackItem";
 import { capitalizeFirstLetter } from "../../../utils";
 
-export default function TrackListSidebar({ playlistPlayObject, setEditingTrack }) {
+export default function TrackListSidebar({ playlistPlayObject, handleUpdatedLibTrack }) {
   return (
     <div className="TrackListSideBar">
       <div className="Header flex flex-row px-4 py-2">
@@ -20,7 +20,10 @@ export default function TrackListSidebar({ playlistPlayObject, setEditingTrack }
         <ul className="TrackList list-none p-0 m-0">
           {playlistPlayObject.contentObject.libraryTracks.map((playlistTrackRelation) => (
             <li key={playlistTrackRelation.libraryTrack.uuid}>
-              <TrackItem playlistTrackRelationObject={playlistTrackRelation} setEditingTrack={setEditingTrack} />
+              <TrackItem
+                playlistTrackRelationObject={playlistTrackRelation}
+                handleUpdatedLibTrack={handleUpdatedLibTrack}
+              />
             </li>
           ))}
         </ul>
@@ -31,5 +34,5 @@ export default function TrackListSidebar({ playlistPlayObject, setEditingTrack }
 
 TrackListSidebar.propTypes = {
   playlistPlayObject: PropTypes.object,
-  setEditingTrack: PropTypes.func.isRequired,
+  handleUpdatedLibTrack: PropTypes.func.isRequired,
 };

@@ -1,7 +1,7 @@
-import { usePopup } from '../../contexts/usePopup';
+import { usePopup } from "../../contexts/usePopup";
 
-import BadRequestPopup from './BadRequestPopup';
-
+import BadRequestErrorView from "./BadRequestErrorView";
+import LibTrackEdition from "./LibTrackEdition";
 
 export default function Popup() {
   const { popupContentObject, hidePopup } = usePopup();
@@ -12,13 +12,12 @@ export default function Popup() {
 
   let Component;
   switch (popupContentObject.constructor.name) {
-    case 'BadRequestPopupContentObject':
-      Component = BadRequestPopup;
+    case "BadRequestPopupContentObject":
+      Component = BadRequestErrorView;
       break;
-    // case 'type2':
-    //   Component = ComponentType2;
-    //   break;
-    // Ajoutez d'autres cas au besoin
+    case "LibTrackEditionPopupContentObject":
+      Component = LibTrackEdition;
+      break;
     default:
       Component = null;
   }
@@ -29,10 +28,10 @@ export default function Popup() {
         <div className="bg-white p-3 rounded-lg max-w-md w-full relative">
           <div className="flex justify-between items-center mb-1">
             <h2>{popupContentObject.title}</h2>
-            <div 
-              style={{ 
-                cursor: 'pointer' 
-              }} 
+            <div
+              style={{
+                cursor: "pointer",
+              }}
               onClick={hidePopup}
             >
               &#10005;
