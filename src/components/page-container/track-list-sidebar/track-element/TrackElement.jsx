@@ -12,7 +12,7 @@ export default function TrackElement({
   };
 
   return (
-    <div className="TrackElement flex h-15 pt-2 p-2 text-gray-400">
+    <div className="TrackElement flex h-15 pt-2 text-gray-400">
       <div className="TrackPosition flex items-center justify-center text-lg w-16">
         {playlistTrackRelationObject.position}
       </div>
