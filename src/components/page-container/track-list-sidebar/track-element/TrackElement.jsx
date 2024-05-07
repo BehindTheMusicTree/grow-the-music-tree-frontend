@@ -17,11 +17,11 @@ export default function TrackElement({
         {playlistTrackRelationObject.position}
       </div>
       <div className="TitleArtistContainer flex flex-col items-start w-1/2">
-        <div className="Title text-lg font-bold text-gray-300 overflow-hidden overflow-ellipsis">
+        <div className="Title text-lg font-bold text-gray-300 text-overflow">
           {playlistTrackRelationObject.libraryTrack.title}
         </div>
         {playlistTrackRelationObject.libraryTrack.artist ? (
-          <div className="Artist text-base">
+          <div className="Artist text-base text-overflow">
             {playlistTrackRelationObject.libraryTrack.artist.name}{" "}
           </div>
         ) : (
@@ -29,13 +29,13 @@ export default function TrackElement({
         )}
       </div>
       <div className="AlbumGenreContainer flex flex-col items-end justify-center w-1/2 ml-2 text-xs">
-        <div className="AlbumName mb-1">
+        <div className="AlbumName mb-1 text-overflow">
           {playlistTrackRelationObject.libraryTrack.album
             ? playlistTrackRelationObject.libraryTrack.album.name
             : ""}
         </div>
         {playlistTrackRelationObject.libraryTrack.genre ? (
-          <div className="GenreNameContainer font-bold p-1 border border-gray-400">
+          <div className="GenreNameContainer font-bold p-1 border border-gray-400 text-overflow">
             {playlistTrackRelationObject.libraryTrack.genre.name}
           </div>
         ) : (
