@@ -45,9 +45,14 @@ export default function LibTrackEdition({ popupContentObject }) {
           </div>
           <div className="popup-content-column">
             <label className="popup-content-label">
-              <span>Duration:</span>
-              <div className="popup-content-input-readonly inline-block">
+              <div className="popup-content-input-readonly inline-block mr-1">
                 {formatTime(popupContentObject.libTrack.duration)}
+              </div>
+              <div className="popup-content-input-readonly inline-block mr-1">
+                {popupContentObject.libTrack.file.sizeInMo} Mo
+              </div>
+              <div className="popup-content-input-readonly inline-block">
+                {popupContentObject.libTrack.file.bitrateInKbps} kbps
               </div>
               <span className="flex-grow"></span>
             </label>
