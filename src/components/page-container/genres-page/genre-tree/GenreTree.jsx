@@ -1,8 +1,11 @@
 import { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import ReactDOMServer from "react-dom/server";
+
 import * as d3 from "d3";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FaSpinner, FaFileUpload, FaPlus } from "react-icons/fa";
+import { faPlay, faPause } from "@fortawesome/free-solid-svg-icons";
 
 import { usePopup } from "../../../../contexts/usePopup.jsx";
 import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from "../../../../constants";
@@ -167,7 +170,7 @@ export default function GenreTree({
     };
     nodes
       .append("foreignObject")
-      .attr("class", "tree-node-info-container")
+      .attr("class", "playpause tree-node-icon-container")
       .attr("width", PLAY_PAUSE_ICON_DIMENSIONS.WIDTH)
       .attr("height", PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT)
       .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET)
@@ -191,9 +194,15 @@ export default function GenreTree({
           if (playingPlaylistUuidWithLoadingState.isLoading) {
             return "";
           }
-          return playState === PLAY_STATES.PLAYING ? "⏸" : "►";
+          return playState === PLAY_STATES.PLAYING
+            ? ReactDOMServer.renderToString(<FontAwesomeIcon size="1x" icon={faPlay} className="play tree-node-icon" />)
+            : ReactDOMServer.renderToString(
+                <FontAwesomeIcon size="1x" icon={faPause} className="pause tree-node-icon" />
+              );
         }
-        return "►";
+        return ReactDOMServer.renderToString(
+          <FontAwesomeIcon size="1x" icon={faPlay} className="play tree-node-icon" />
+        );
       })
       .on("click", function (event, d) {
         if (
@@ -220,7 +229,7 @@ export default function GenreTree({
     };
     nodes
       .append("foreignObject")
-      .attr("class", "tree-node-info-container")
+      .attr("class", "playlist-count tree-node-info-container")
       .attr("width", PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.WIDTH)
       .attr("height", PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT)
       .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAYLIST_TRACKS_COUNT_TEXT_OFFSET)
@@ -236,7 +245,7 @@ export default function GenreTree({
 
     nodes
       .append("foreignObject")
-      .attr("class", "tree-node-icon-container")
+      .attr("class", "genre-add tree-node-icon-container")
       .attr("width", GENRE_ADD_PLUS_ICON_DIMENSIONS.WIDTH)
       .attr("height", GENRE_ADD_PLUS_ICON_DIMENSIONS.HEIGHT)
       .attr("dominant-baseline", "middle")
@@ -251,6 +260,7 @@ export default function GenreTree({
           <FaPlus className="tree-node-icon" size={GENRE_ADD_PLUS_ICON_DIMENSIONS.WIDTH} />
         );
       })
+      .style("display", "none")
       .on("click", function (event, d) {
         handleGenreAddClick(event, d.data.uuid);
       });
@@ -262,7 +272,7 @@ export default function GenreTree({
 
     nodes
       .append("foreignObject")
-      .attr("class", "tree-node-icon-container")
+      .attr("class", "track-upload tree-node-icon-container")
       .attr("width", TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH)
       .attr("height", TRACK_UPLOAD_ICON_DIMENSIONS.HEIGHT)
       .attr("dominant-baseline", "middle")
@@ -276,18 +286,20 @@ export default function GenreTree({
           <FaFileUpload className="tree-node-icon" size={TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH} />
         );
       })
+      .style("display", "none")
       .on("click", function (event, d) {
         event.stopPropagation();
         selectingFileGenreUuidRef.current = d.data.uuid;
         fileInputRef.current.click();
       });
 
+    const iconClassesToShowOnHover = ".genre-add, .track-upload";
     nodes
       .on("mouseover", function () {
-        d3.select(this).selectAll(".tree-node-icon-container").style("display", "flex");
+        d3.select(this).selectAll(iconClassesToShowOnHover).style("display", "flex");
       })
       .on("mouseout", function () {
-        d3.select(this).selectAll(".tree-node-icon-container").style("display", "none");
+        d3.select(this).selectAll(iconClassesToShowOnHover).style("display", "none");
       });
 
     return () => {

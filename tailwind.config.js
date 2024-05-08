@@ -45,7 +45,7 @@ export default {
           "@apply flex justify-center items-center h-full": {},
         },
         ".tree-node-icon-container": {
-          "@apply hidden justify-center items-center cursor-pointer": {},
+          "@apply justify-center items-center cursor-pointer": {},
         },
         ".tree-node-icon": {
           "@apply fill-current text-white": {},
