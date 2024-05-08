@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
-import { AiFillStar } from "react-icons/ai";
+import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 
 import ApiService from "../../../utils/service/apiService";
 import { formatTime } from "../../../utils";
@@ -98,16 +98,24 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
                       className="w-6 h-6 opacity-0"
                       type="radio"
                       name="rating"
-                      value={i + 5}
-                      checked={formValues.rating === i + 5}
+                      value={i === 0 ? null : i + 5}
+                      checked={formValues.rating === (i === 0 ? null : i + 5)}
                       onChange={handleChange}
                     />
                     <label htmlFor={`star-${i}`} className="cursor-pointer">
-                      <AiFillStar
-                        className={`w-6 h-6 absolute top-0 left-0 ${
-                          formValues.rating >= i + 5 ? "text-yellow-500" : "text-gray-500"
-                        }`}
-                      />
+                      {i === 0 ? (
+                        <AiOutlineStar
+                          className={`w-6 h-6 absolute top-0 left-0 ${
+                            formValues.rating === null ? "text-yellow-500" : "text-gray-500"
+                          }`}
+                        />
+                      ) : (
+                        <AiFillStar
+                          className={`w-6 h-6 absolute top-0 left-0 ${
+                            formValues.rating >= i + 5 ? "text-yellow-500" : "text-gray-500"
+                          }`}
+                        />
+                      )}
                     </label>
                   </div>
                 ))}
