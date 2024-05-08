@@ -7,8 +7,8 @@ export default {
         "1.5xl": "1.1rem",
       },
       spacing: {
-        "play-l-offset": "17px",
-        "play-r-offset": "15px",
+        "play-l-offset": "15px",
+        "play-r-offset": "13px",
       },
       boxShadow: {
         "progress-bar-blue": "-403px 0 0 400px #3B82F6", // blue-500
