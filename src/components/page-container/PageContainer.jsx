@@ -4,7 +4,6 @@ import { CONTENT_AREA_TYPES } from "../../constants";
 import GenresPage from "./genres-page/GenresPage";
 
 export default function PageContainer({
-  setEditingTrack,
   contentAreaTypeWithObject,
   isTrackListSidebarVisible,
   selectPlaylistUuidToPlay,
@@ -12,15 +11,14 @@ export default function PageContainer({
   playingPlaylistUuidWithLoadingState,
   playlistPlayObject,
   refreshGenresSignal,
+  handleUpdatedLibTrack,
 }) {
   return (
     <div className="relative w-full h-full flex bg-gray-200 font-sans m-0 pl-8">
       {contentAreaTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES ? (
         <GenresPage
           selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
-          playingPlaylistUuidWithLoadingState={
-            playingPlaylistUuidWithLoadingState
-          }
+          playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
           playState={playState}
           refreshGenresSignal={refreshGenresSignal}
         />
@@ -33,10 +31,7 @@ export default function PageContainer({
         } */}
       {isTrackListSidebarVisible ? (
         <div className="TrackListSidebarContainer absolute right-0 w-144 h-full bg-black bg-opacity-95">
-          <TrackListSidebar
-            playlistPlayObject={playlistPlayObject}
-            setEditingTrack={setEditingTrack}
-          />
+          <TrackListSidebar playlistPlayObject={playlistPlayObject} handleUpdatedLibTrack={handleUpdatedLibTrack} />
         </div>
       ) : null}
     </div>
@@ -44,7 +39,6 @@ export default function PageContainer({
 }
 
 PageContainer.propTypes = {
-  setEditingTrack: PropTypes.func.isRequired,
   contentAreaTypeWithObject: PropTypes.object.isRequired,
   isTrackListSidebarVisible: PropTypes.bool.isRequired,
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
@@ -52,4 +46,5 @@ PageContainer.propTypes = {
   playingPlaylistUuidWithLoadingState: PropTypes.object,
   playlistPlayObject: PropTypes.object,
   refreshGenresSignal: PropTypes.number.isRequired,
+  handleUpdatedLibTrack: PropTypes.func.isRequired,
 };

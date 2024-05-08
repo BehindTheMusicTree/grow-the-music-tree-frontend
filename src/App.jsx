@@ -1,85 +1,87 @@
+import { useState, useEffect, useRef } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Howler } from "howler";
 
-import { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { Howler } from 'howler';
+import { PopupProvider } from "./contexts/PopupContext";
+import Popup from "./components/popup/Popup";
 
-import { PopupProvider } from './contexts/PopupContext';
-import Popup from './components/popup/Popup'
+import { PLAY_STATES, CONTENT_AREA_TYPES } from "./constants";
+import ApiService from "./utils/service/apiService";
 
-import { PLAY_STATES, CONTENT_AREA_TYPES } from './constants';
-import ApiService from './utils/service/apiService';
-
-import Banner from './components/banner/Banner'
-import PageContainer from './components/page-container/PageContainer'
-import Player from './components/player/Player';
-import LibTrackEdition from './components/popup/lib-track-edition/LibTrackEdition';
-import NotFoundPage from './components/NotFoundPage';
+import Banner from "./components/banner/Banner";
+import PageContainer from "./components/page-container/PageContainer";
+import Player from "./components/player/Player";
+import NotFoundPage from "./components/NotFoundPage";
 
 Howler.autoUnlock = true;
 
 export default function App() {
-  const [searchSubmitted, setSearchSubmitted] = useState('')
+  const [searchSubmitted, setSearchSubmitted] = useState("");
 
   const [isTrackListSidebarVisible, setIsTrackListSidebarVisible] = useState(false);
 
-  const [playlistPlayObject, setPlaylistPlayObject] = useState(null)
+  const [playlistPlayObject, setPlaylistPlayObject] = useState(null);
   const [playingPlaylistUuidWithPlayState, setPlayingPlaylistUuidWithLoadingState] = useState(null);
   const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
 
   const [playerTrackObject, setPlayerTrackObject] = useState(null);
   const [playState, setPlayState] = useState(PLAY_STATES.PLAYING);
   const [shouldResetPlayerSeek, setshouldResetPlayerSeek] = useState(false);
-  
-  const [editingTrack, setEditingTrack] = useState(null);
 
   const [refreshGenresSignal, setRefreshGenresSignal] = useState(0);
 
   const contentAreaTypeWithObject = useRef({
     type: CONTENT_AREA_TYPES.GENRES,
-    contentObject: null
-  })
+    contentObject: null,
+  });
 
   const handleUpdatedLibTrack = async (updatedLibTrack) => {
-    setPlaylistPlayObject(currentState => {
+    setPlaylistPlayObject((currentState) => {
       const newState = { ...currentState };
-      const oldTrack = newState.contentObject.libraryTracks.find(track => track.libraryTrack.uuid === updatedLibTrack.uuid);
+      const oldTrack = newState.contentObject.libraryTracks.find(
+        (track) => track.libraryTrack.uuid === updatedLibTrack.uuid
+      );
       const genreChanged = oldTrack && oldTrack.libraryTrack.genre !== updatedLibTrack.genre;
 
-      newState.contentObject.libraryTracks = newState.contentObject.libraryTracks.map(playlistTrackRelation => 
-        playlistTrackRelation.libraryTrack.uuid === updatedLibTrack.uuid ? {...playlistTrackRelation, libraryTrack: updatedLibTrack} : playlistTrackRelation
+      newState.contentObject.libraryTracks = newState.contentObject.libraryTracks.map((playlistTrackRelation) =>
+        playlistTrackRelation.libraryTrack.uuid === updatedLibTrack.uuid
+          ? { ...playlistTrackRelation, libraryTrack: updatedLibTrack }
+          : playlistTrackRelation
       );
 
       if (genreChanged) {
-        setRefreshGenresSignal(oldSignal => oldSignal + 1);
+        setRefreshGenresSignal((oldSignal) => oldSignal + 1);
       }
 
       return newState;
-    })
-  }
+    });
+  };
 
   const selectPlaylistUuidToPlay = async (uuid) => {
-    setPlayingPlaylistUuidWithLoadingState({uuid: uuid, isLoading: true});
-    setPlaylistPlayObject(await ApiService.postPlay(uuid))
-  }
+    setPlayingPlaylistUuidWithLoadingState({ uuid: uuid, isLoading: true });
+    setPlaylistPlayObject(await ApiService.postPlay(uuid));
+  };
 
   const setPreviousTrack = () => {
     setshouldResetPlayerSeek(true);
-    setPlayingPlaylistLibTrackNumber(prev => prev - 1);
-  }
+    setPlayingPlaylistLibTrackNumber((prev) => prev - 1);
+  };
 
   const setNextTrack = () => {
     setshouldResetPlayerSeek(true);
-    setPlayingPlaylistLibTrackNumber(prev => prev + 1);
-  }
+    setPlayingPlaylistLibTrackNumber((prev) => prev + 1);
+  };
 
   useEffect(() => {
     const setPlayingTrack = async (playingTrackObject) => {
-      const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(playingTrackObject.libraryTrack.relativeUrl)
+      const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(
+        playingTrackObject.libraryTrack.relativeUrl
+      );
       setPlayerTrackObject({
-        ...playingTrackObject.libraryTrack, 
+        ...playingTrackObject.libraryTrack,
         blobUrl: playingLibTrackBlobUrl,
         hasNext: playlistPlayObject.contentObject.libraryTracks.length > playingPlaylistLibTrackNumber + 1,
-        hasPrevious: playingPlaylistLibTrackNumber > 0
+        hasPrevious: playingPlaylistLibTrackNumber > 0,
       });
     };
 
@@ -95,7 +97,7 @@ export default function App() {
   useEffect(() => {
     if (playerTrackObject) {
       if (playingPlaylistUuidWithPlayState.isLoading) {
-        setPlayingPlaylistUuidWithLoadingState({...playingPlaylistUuidWithPlayState,  isLoading: false});
+        setPlayingPlaylistUuidWithLoadingState({ ...playingPlaylistUuidWithPlayState, isLoading: false });
         setPlayState(PLAY_STATES.PLAYING);
       }
     }
@@ -105,40 +107,39 @@ export default function App() {
     <PopupProvider>
       <Router>
         <Routes>
-          <Route path="/" element={
-            <div className="App flex flex-col h-full">
-              <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-              <div className="Body flex h-full">
-                <PageContainer
-                  setEditingTrack={setEditingTrack}
-                  contentAreaTypeWithObject={contentAreaTypeWithObject}
-                  isTrackListSidebarVisible={isTrackListSidebarVisible}
-                  selectPlaylistUuidToPlay={selectPlaylistUuidToPlay} 
-                  playState={playState} 
-                  playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}
-                  playlistPlayObject={playlistPlayObject}
-                  refreshGenresSignal={refreshGenresSignal}/>
-                {playerTrackObject &&
-                  <Player 
-                    playerTrackObject={playerTrackObject}
+          <Route
+            path="/"
+            element={
+              <div className="App flex flex-col h-full">
+                <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
+                <div className="Body flex h-full">
+                  <PageContainer
+                    contentAreaTypeWithObject={contentAreaTypeWithObject}
+                    isTrackListSidebarVisible={isTrackListSidebarVisible}
+                    selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
                     playState={playState}
-                    setPlayState={setPlayState}
-                    shouldResetPlayerSeek={shouldResetPlayerSeek} 
-                    setshouldResetPlayerSeek={setshouldResetPlayerSeek}
-                    setNextTrack={setNextTrack}
-                    setPreviousTrack={setPreviousTrack}
-                    setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}
-                  />}
-                {editingTrack && 
-                  <LibTrackEdition 
-                    libTrack={editingTrack}
-                    onClose={() => setEditingTrack(null)}
-                    handleUpdatedLibTrack={handleUpdatedLibTrack} />
-                }
+                    playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}
+                    playlistPlayObject={playlistPlayObject}
+                    refreshGenresSignal={refreshGenresSignal}
+                    handleUpdatedLibTrack={handleUpdatedLibTrack}
+                  />
+                  {playerTrackObject && (
+                    <Player
+                      playerTrackObject={playerTrackObject}
+                      playState={playState}
+                      setPlayState={setPlayState}
+                      shouldResetPlayerSeek={shouldResetPlayerSeek}
+                      setshouldResetPlayerSeek={setshouldResetPlayerSeek}
+                      setNextTrack={setNextTrack}
+                      setPreviousTrack={setPreviousTrack}
+                      setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}
+                    />
+                  )}
+                </div>
+                <Popup />
               </div>
-              <Popup />
-            </div>
-          }/>
+            }
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>

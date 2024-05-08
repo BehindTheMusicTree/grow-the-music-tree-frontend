@@ -1,7 +1,7 @@
-import { usePopup } from '../../contexts/usePopup';
+import { usePopup } from "../../contexts/usePopup";
 
-import BadRequestPopup from './BadRequestPopup';
-
+import BadRequestErrorPopupChild from "./child/BadRequestPopupChild";
+import LibTrackEditionPopupChild from "./child/LibTrackEditionPopupChild";
 
 export default function Popup() {
   const { popupContentObject, hidePopup } = usePopup();
@@ -10,36 +10,28 @@ export default function Popup() {
     return null;
   }
 
-  let Component;
+  let PopupChild;
   switch (popupContentObject.constructor.name) {
-    case 'BadRequestPopupContentObject':
-      Component = BadRequestPopup;
+    case "BadRequestPopupContentObject":
+      PopupChild = BadRequestErrorPopupChild;
       break;
-    // case 'type2':
-    //   Component = ComponentType2;
-    //   break;
-    // Ajoutez d'autres cas au besoin
+    case "LibTrackEditionPopupContentObject":
+      PopupChild = LibTrackEditionPopupChild;
+      break;
     default:
-      Component = null;
+      PopupChild = null;
   }
 
   return (
-    <div className="popup">
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div className="bg-white p-3 rounded-lg max-w-md w-full relative">
-          <div className="flex justify-between items-center mb-1">
-            <h2>{popupContentObject.title}</h2>
-            <div 
-              style={{ 
-                cursor: 'pointer' 
-              }} 
-              onClick={hidePopup}
-            >
-              &#10005;
-            </div>
+    <div className="popup fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-3 rounded-lg max-w-xl w-full relative">
+        <div className="flex justify-between pl-2 mb-1">
+          <h2>{popupContentObject.title}</h2>
+          <div className="flex flex-col items-start justify-start h-full cursor-pointer" onClick={hidePopup}>
+            &#10005;
           </div>
-          {Component && <Component popupContentObject={popupContentObject} />}
         </div>
+        {PopupChild && <PopupChild popupContentObject={popupContentObject} hidePopup={hidePopup} />}
       </div>
     </div>
   );
