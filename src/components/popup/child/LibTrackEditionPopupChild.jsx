@@ -88,11 +88,11 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
                 onChange={handleChange}
               />
             </label>
-            <label className="popup-content-label flex flex-col mb-4">
+            <label className="popup-content-label flex flex mb-4">
               <span>Rating:</span>
-              <div className="flex">
+              <div className="flex items-center">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="relative">
+                  <div key={i} className={`relative ${i === 0 ? "mr-4" : ""}`}>
                     <input
                       id={`star-${i}`}
                       className="w-6 h-6 opacity-0"
@@ -104,14 +104,17 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
                     />
                     <label htmlFor={`star-${i}`} className="cursor-pointer">
                       {i === 0 ? (
-                        <AiOutlineStar
-                          className={`w-6 h-6 absolute top-0 left-0 ${
-                            formValues.rating === null ? "text-yellow-500" : "text-gray-500"
-                          }`}
-                        />
+                        <div className="flex">
+                          <AiOutlineStar
+                            className={`w-7 h-7 absolute top-0 left-0 ${
+                              formValues.rating === null ? "text-yellow-500" : "text-gray-500"
+                            }`}
+                          />
+                          <span className="flex-grow w-8"></span>{" "}
+                        </div>
                       ) : (
                         <AiFillStar
-                          className={`w-6 h-6 absolute top-0 left-0 ${
+                          className={`w-7 h-7 absolute top-0 left-0 ${
                             formValues.rating >= i + 5 ? "text-yellow-500" : "text-gray-500"
                           }`}
                         />
@@ -120,6 +123,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
                   </div>
                 ))}
               </div>
+              <span className="flex-grow"></span>
             </label>
           </div>
         </div>
