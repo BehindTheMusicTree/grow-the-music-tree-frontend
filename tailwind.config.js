@@ -51,7 +51,9 @@ export default {
           "@apply fill-current text-white": {},
         },
         ".player-control-button": {
-          "@apply rounded-full flex items-center justify-center text-black bg-gray-200 mb-2 border-none": {},
+          "@apply rounded-full flex items-center justify-center text-black bg-gray-200 mb-2 border-none transition-transform duration-200":
+            {},
+          "@apply hover:scale-105": {},
         },
         ".player-control-button-disabled": {
           "@apply rounded-full flex items-center justify-center text-black bg-gray-500 mb-2 border-none": {},
