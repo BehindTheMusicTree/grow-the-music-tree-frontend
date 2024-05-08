@@ -21,6 +21,11 @@ export default {
       },
     },
   },
+  variants: {
+    extend: {
+      display: ["checked"],
+    },
+  },
   plugins: [
     function ({ addComponents }) {
       const newComponents = {
