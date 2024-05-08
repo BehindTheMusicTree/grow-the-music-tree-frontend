@@ -88,11 +88,12 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
                 onChange={handleChange}
               />
             </label>
-            <label className="popup-content-label flex flex mb-4">
-              <span>Rating:</span>
+            <div className="flex items-center h-10">
+              {" "}
+              <span className="mr-2">Rating:</span>
               <div className="flex items-center">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className={`relative ${i === 0 ? "mr-4" : ""}`}>
+                  <div key={i} className={`relative ${i === 0 ? "mr-4" : "mr-1"}`}>
                     <input
                       id={`star-${i}`}
                       className="w-6 h-6 opacity-0"
@@ -124,7 +125,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
                 ))}
               </div>
               <span className="flex-grow"></span>
-            </label>
+            </div>
           </div>
         </div>
         <div className="flex">

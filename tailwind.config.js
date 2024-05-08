@@ -64,7 +64,7 @@ export default {
           "@apply mr-0": {},
         },
         ".popup-content-label": {
-          "@apply flex items-center mb-2": {},
+          "@apply flex items-center mb-2 h-10": {},
           span: {
             "@apply mr-2": {},
           },
