@@ -1,7 +1,7 @@
 import { usePopup } from "../../contexts/usePopup";
 
-import BadRequestErrorView from "./BadRequestErrorView";
-import LibTrackEdition from "./LibTrackEdition";
+import BadRequestErrorView from "./child/BadRequestPopupChild";
+import LibTrackEdition from "./child/LibTrackEditionPopupChild";
 
 export default function Popup() {
   const { popupContentObject, hidePopup } = usePopup();
@@ -10,16 +10,16 @@ export default function Popup() {
     return null;
   }
 
-  let Component;
+  let PopupChild;
   switch (popupContentObject.constructor.name) {
     case "BadRequestPopupContentObject":
-      Component = BadRequestErrorView;
+      PopupChild = BadRequestErrorView;
       break;
     case "LibTrackEditionPopupContentObject":
-      Component = LibTrackEdition;
+      PopupChild = LibTrackEdition;
       break;
     default:
-      Component = null;
+      PopupChild = null;
   }
 
   return (
@@ -31,7 +31,7 @@ export default function Popup() {
             &#10005;
           </div>
         </div>
-        {Component && <Component popupContentObject={popupContentObject} />}
+        {PopupChild && <PopupChild popupContentObject={popupContentObject} hidePopup={hidePopup} />}
       </div>
     </div>
   );

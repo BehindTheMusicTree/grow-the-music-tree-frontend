@@ -2,10 +2,10 @@ import PropTypes from "prop-types";
 
 import { useForm } from "react-hook-form";
 
-import ApiService from "../../utils/service/apiService";
-import { formatTime } from "../../utils";
+import ApiService from "../../../utils/service/apiService";
+import { formatTime } from "../../../utils";
 
-export default function LibTrackEdition({ popupContentObject }) {
+export default function LibTrackEdition({ popupContentObject, hidePopup }) {
   const { register, handleSubmit } = useForm({
     defaultValues: {
       title: popupContentObject.libTrack.title,
@@ -18,7 +18,7 @@ export default function LibTrackEdition({ popupContentObject }) {
   const onSubmit = async (data) => {
     const response = await ApiService.putLibTrack(popupContentObject.libTrack.uuid, data);
     popupContentObject.handleUpdatedLibTrack(response);
-    // libTrackEditionPopupContentObject.onClose();
+    hidePopup();
   };
 
   return (
@@ -76,4 +76,5 @@ export default function LibTrackEdition({ popupContentObject }) {
 
 LibTrackEdition.propTypes = {
   popupContentObject: PropTypes.object.isRequired,
+  hidePopup: PropTypes.func.isRequired,
 };
