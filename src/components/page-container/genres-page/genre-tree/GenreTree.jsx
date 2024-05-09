@@ -144,12 +144,12 @@ export default function GenreTree({
     const SPINNER_ICON_SIZE = 14;
     nodes
       .append("foreignObject")
-      .attr("class", "w-3.5 h-3.5 flex justify-center items-center")
+      .attr("class", "w-4 h-4 flex justify-center items-center")
       .attr("width", SPINNER_ICON_SIZE)
       .attr("height", SPINNER_ICON_SIZE)
       .attr("dominant-baseline", "middle")
-      .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET - SPINNER_ICON_SIZE / 2)
-      .attr("y", -GENRE_TREE_RECT_DIMENSIONS.HEIGHT / 2 + SPINNER_ICON_SIZE / 2)
+      .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET)
+      .attr("y", -SPINNER_ICON_SIZE / 2)
       .html(function (d) {
         if (
           playingPlaylistUuidWithLoadingState &&
@@ -196,11 +196,13 @@ export default function GenreTree({
             playState === PLAY_STATES.PLAYING ? (
               <FaPause size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="pause tree-node-icon" />
             ) : (
-              <FaPlay size={PLAY_PAUSE_ICON_DIMENSIONS.WIDTH} className="play tree-node-icon" />
+              <FaPlay size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="play tree-node-icon" />
             );
           return ReactDOMServer.renderToString(element);
         }
-        return ReactDOMServer.renderToString(<FaPlay size={14} className="play tree-node-icon" />);
+        return ReactDOMServer.renderToString(
+          <FaPlay size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="play tree-node-icon" />
+        );
       })
       .on("click", function (event, d) {
         if (
