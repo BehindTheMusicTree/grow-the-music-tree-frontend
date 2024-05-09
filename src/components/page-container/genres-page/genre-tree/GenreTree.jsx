@@ -3,9 +3,7 @@ import PropTypes from "prop-types";
 import ReactDOMServer from "react-dom/server";
 
 import * as d3 from "d3";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FaSpinner, FaFileUpload, FaPlus } from "react-icons/fa";
-import { faPlay, faPause } from "@fortawesome/free-solid-svg-icons";
+import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause } from "react-icons/fa";
 
 import { usePopup } from "../../../../contexts/usePopup.jsx";
 import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from "../../../../constants";
@@ -165,8 +163,8 @@ export default function GenreTree({
       });
 
     const PLAY_PAUSE_ICON_DIMENSIONS = {
-      WIDTH: 14,
-      HEIGHT: 16,
+      WIDTH: 12,
+      HEIGHT: 12,
     };
     nodes
       .append("foreignObject")
@@ -174,7 +172,7 @@ export default function GenreTree({
       .attr("width", PLAY_PAUSE_ICON_DIMENSIONS.WIDTH)
       .attr("height", PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT)
       .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET)
-      .attr("y", -GENRE_TREE_RECT_DIMENSIONS.HEIGHT / 2 + PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT / 2)
+      .attr("y", -PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT / 2)
       .style("visibility", function (d) {
         playingPlaylistUuidWithLoadingState &&
         playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid &&
@@ -194,15 +192,15 @@ export default function GenreTree({
           if (playingPlaylistUuidWithLoadingState.isLoading) {
             return "";
           }
-          return playState === PLAY_STATES.PLAYING
-            ? ReactDOMServer.renderToString(<FontAwesomeIcon size="1x" icon={faPlay} className="play tree-node-icon" />)
-            : ReactDOMServer.renderToString(
-                <FontAwesomeIcon size="1x" icon={faPause} className="pause tree-node-icon" />
-              );
+          const element =
+            playState === PLAY_STATES.PLAYING ? (
+              <FaPause size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="pause tree-node-icon" />
+            ) : (
+              <FaPlay size={PLAY_PAUSE_ICON_DIMENSIONS.WIDTH} className="play tree-node-icon" />
+            );
+          return ReactDOMServer.renderToString(element);
         }
-        return ReactDOMServer.renderToString(
-          <FontAwesomeIcon size="1x" icon={faPlay} className="play tree-node-icon" />
-        );
+        return ReactDOMServer.renderToString(<FaPlay size={14} className="play tree-node-icon" />);
       })
       .on("click", function (event, d) {
         if (
@@ -233,7 +231,7 @@ export default function GenreTree({
       .attr("width", PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.WIDTH)
       .attr("height", PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT)
       .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAYLIST_TRACKS_COUNT_TEXT_OFFSET)
-      .attr("y", -GENRE_TREE_RECT_DIMENSIONS.HEIGHT / 2 + PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT / 2)
+      .attr("y", -PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT / 2)
       .html(function (d) {
         return `<div class="tree-node-info">` + d.data.criteriaPlaylist.libraryTracksCount + "</div>";
       });
