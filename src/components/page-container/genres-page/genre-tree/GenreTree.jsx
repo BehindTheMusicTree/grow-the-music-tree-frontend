@@ -144,11 +144,11 @@ export default function GenreTree({
     const SPINNER_ICON_SIZE = 14;
     nodes
       .append("foreignObject")
-      .attr("class", "w-3.5 h-3.5 flex justify-center items-center")
+      .attr("class", "w-4 h-4 flex justify-center items-center")
       .attr("width", SPINNER_ICON_SIZE)
       .attr("height", SPINNER_ICON_SIZE)
       .attr("dominant-baseline", "middle")
-      .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET - SPINNER_ICON_SIZE / 2)
+      .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET)
       .attr("y", -SPINNER_ICON_SIZE / 2)
       .html(function (d) {
         if (
