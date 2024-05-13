@@ -9,7 +9,6 @@ export default function PageContainer({
   selectPlaylistUuidToPlay,
   playState,
   playingPlaylistUuidWithLoadingState,
-  playlistPlayObject,
   refreshGenresSignal,
   handleUpdatedLibTrack,
 }) {
@@ -31,7 +30,7 @@ export default function PageContainer({
         } */}
       {isTrackListSidebarVisible ? (
         <div className="TrackListSidebarContainer absolute right-0 w-144 h-full bg-black bg-opacity-95">
-          <TrackListSidebar playlistPlayObject={playlistPlayObject} handleUpdatedLibTrack={handleUpdatedLibTrack} />
+          <TrackListSidebar handleUpdatedLibTrack={handleUpdatedLibTrack} />
         </div>
       ) : null}
     </div>
@@ -44,7 +43,6 @@ PageContainer.propTypes = {
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
   playState: PropTypes.string.isRequired,
   playingPlaylistUuidWithLoadingState: PropTypes.object,
-  playlistPlayObject: PropTypes.object,
   refreshGenresSignal: PropTypes.number.isRequired,
   handleUpdatedLibTrack: PropTypes.func.isRequired,
 };
