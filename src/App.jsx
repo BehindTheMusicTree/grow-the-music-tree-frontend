@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Howler } from "howler";
 
-import { PopupProvider } from "./contexts/PopupContext";
-import Popup from "./components/popup/Popup";
+import { PopupProvider } from "./contexts/popup/PopupContext";
 
 import { PLAY_STATES, CONTENT_AREA_TYPES } from "./constants";
 import ApiService from "./utils/service/apiService";
+import { usePlayerTrackObject } from "./contexts/player-track-object/usePlayerTrackObject.jsx";
 
+import Popup from "./components/popup/Popup";
 import Banner from "./components/banner/Banner";
 import PageContainer from "./components/page-container/PageContainer";
 import Player from "./components/player/Player";
@@ -16,6 +17,8 @@ import NotFoundPage from "./components/NotFoundPage";
 Howler.autoUnlock = true;
 
 export default function App() {
+  const { playerTrackObject, setPlayerTrackObject } = usePlayerTrackObject();
+
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
   const [isTrackListSidebarVisible, setIsTrackListSidebarVisible] = useState(false);
@@ -24,7 +27,6 @@ export default function App() {
   const [playingPlaylistUuidWithPlayState, setPlayingPlaylistUuidWithLoadingState] = useState(null);
   const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
 
-  const [playerTrackObject, setPlayerTrackObject] = useState(null);
   const [playState, setPlayState] = useState(PLAY_STATES.PLAYING);
   const [shouldResetPlayerSeek, setshouldResetPlayerSeek] = useState(false);
 
@@ -125,7 +127,6 @@ export default function App() {
                   />
                   {playerTrackObject && (
                     <Player
-                      playerTrackObject={playerTrackObject}
                       playState={playState}
                       setPlayState={setPlayState}
                       shouldResetPlayerSeek={shouldResetPlayerSeek}

@@ -5,7 +5,7 @@ import ReactDOMServer from "react-dom/server";
 import * as d3 from "d3";
 import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause } from "react-icons/fa";
 
-import { usePopup } from "../../../../contexts/usePopup.jsx";
+import { usePopup } from "../../../../contexts/popup/usePopup.jsx";
 import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from "../../../../constants";
 import { BadRequestError } from "../../../../utils/errors/BadRequestError";
 import BadRequestPopupContentObject from "../../../../models/popup-content-object/BadRequestPopupContentObject.js";

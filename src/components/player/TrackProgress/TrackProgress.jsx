@@ -1,22 +1,23 @@
-import { useState, useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
-import raf from 'raf';
-import ReactHowler from 'react-howler';
+import { useState, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
+import raf from "raf";
+import ReactHowler from "react-howler";
 
-import { PLAY_STATES } from '../../../constants';
-import { formatTime } from '../../../utils';
+import { usePlayerTrackObject } from "../../../contexts/player-track-object/usePlayerTrackObject.jsx";
+import { PLAY_STATES } from "../../../constants";
+import { formatTime } from "../../../utils";
 
-export default function TrackProgress ({ 
-    playState, 
-    setPlayState, 
-    shouldResetPlayerSeek, 
-    setshouldResetPlayerSeek,
-    playerTrackObject,
-    volume,
-    handleTrackEnd,
-    seek,
-    setSeek}) {
-
+export default function TrackProgress({
+  playState,
+  setPlayState,
+  shouldResetPlayerSeek,
+  setshouldResetPlayerSeek,
+  volume,
+  handleTrackEnd,
+  seek,
+  setSeek,
+}) {
+  const { playerTrackObject } = usePlayerTrackObject();
   const [isSeeking, setIsSeeking] = useState(false);
 
   const playerRef = useRef(null);
@@ -24,35 +25,39 @@ export default function TrackProgress ({
   let previousSeekRef = useRef(null);
 
   const handleLoadError = (id, errorCode) => {
-    let errorMessage = '';
-  
+    let errorMessage = "";
+
     switch (errorCode) {
       case 1:
-        errorMessage = 'The fetching process for the media resource was aborted by the user agent at the user\'s request.';
+        errorMessage =
+          "The fetching process for the media resource was aborted by the user agent at the user's request.";
         break;
       case 2:
-        errorMessage = 'A network error of some description caused the user agent to stop fetching the media resource, after the resource was established to be usable.';
+        errorMessage =
+          "A network error of some description caused the user agent to stop fetching the media resource, after the resource was established to be usable.";
         break;
       case 3:
-        errorMessage = 'An error of some description occurred while decoding the media resource, after the resource was established to be usable.';
+        errorMessage =
+          "An error of some description occurred while decoding the media resource, after the resource was established to be usable.";
         break;
       case 4:
-        errorMessage = 'The media resource indicated by the src attribute or assigned media provider object was not suitable.';
+        errorMessage =
+          "The media resource indicated by the src attribute or assigned media provider object was not suitable.";
         break;
       default:
-        errorMessage = 'An unknown error occurred.';
+        errorMessage = "An unknown error occurred.";
     }
-  
+
     console.error(`Error loading track of url ${playerTrackObject.blobUrl}: ${errorCode} - ${errorMessage}`);
-  }
+  };
 
   const handleSeekingChange = (event) => {
     setSeek(parseFloat(event.target.value));
-  }
+  };
 
   const handleSeekMouseDown = () => {
-    setIsSeeking(true)
-  }
+    setIsSeeking(true);
+  };
 
   const handleLeaveSeeking = (event) => {
     if (isSeeking) {
@@ -60,39 +65,39 @@ export default function TrackProgress ({
       setSeek(parseFloat(event.target.value));
       setIsSeeking(false);
     }
-  }
+  };
 
   const renderSeekPos = () => {
     const currentSeek = playerRef.current.seek();
     if (previousSeekRef.current != undefined) {
-      const deltaSeek =  currentSeek -  previousSeekRef.current;
-      setSeek(seek => seek + deltaSeek)
+      const deltaSeek = currentSeek - previousSeekRef.current;
+      setSeek((seek) => seek + deltaSeek);
     }
 
-    previousSeekRef.current = currentSeek
+    previousSeekRef.current = currentSeek;
     if (playState === PLAY_STATES.PLAYING && !isSeeking) {
-        rafIdRef.current = raf(() => {
-          renderSeekPos();
+      rafIdRef.current = raf(() => {
+        renderSeekPos();
       });
     }
-  }
+  };
 
   const cancelRaf = () => {
     raf.cancel(rafIdRef.current);
-  }
+  };
 
   useEffect(() => {
     return () => {
       cancelRaf();
-    }
-  }, [])
+    };
+  }, []);
 
   useEffect(() => {
     if (playState === PLAY_STATES.PLAYING) {
       if (isSeeking) {
         cancelRaf();
       } else if (seek >= Math.floor(playerTrackObject.duration)) {
-        handleTrackEnd()
+        handleTrackEnd();
       } else {
         playerRef.current.seek(seek);
         renderSeekPos();
@@ -100,7 +105,7 @@ export default function TrackProgress ({
     } else if (playState === PLAY_STATES.STOPPED && !isSeeking) {
       setPlayState(PLAY_STATES.PAUSED);
     }
-  }, [isSeeking])
+  }, [isSeeking]);
 
   useEffect(() => {
     if (shouldResetPlayerSeek) {
@@ -109,23 +114,22 @@ export default function TrackProgress ({
       playerRef.current.seek(0);
       setshouldResetPlayerSeek(false);
     }
-  }, [shouldResetPlayerSeek])
+  }, [shouldResetPlayerSeek]);
 
   return (
     <div className="flex flex-row justify-center items-center w-full">
-        <ReactHowler
-          ref={playerRef}
-          src={[playerTrackObject.blobUrl]}
-          html5={true}
-          playing={playState === PLAY_STATES.PLAYING}
-          format={[playerTrackObject.file.extension.replace('.', '')]}
-          onLoadError={handleLoadError}
-          onEnd={handleTrackEnd}
-          volume={volume}/>
-      <div className="w-10">
-        {formatTime(seek)}
-      </div>
-      {playerRef.current ? 
+      <ReactHowler
+        ref={playerRef}
+        src={[playerTrackObject.blobUrl]}
+        html5={true}
+        playing={playState === PLAY_STATES.PLAYING}
+        format={[playerTrackObject.file.extension.replace(".", "")]}
+        onLoadError={handleLoadError}
+        onEnd={handleTrackEnd}
+        volume={volume}
+      />
+      <div className="w-10">{formatTime(seek)}</div>
+      {playerRef.current ? (
         <input
           className="progress-bar flex-grow-0 flex-shrink-0 w-4/5 ml-2.5 mr-2.5"
           type="range"
@@ -136,22 +140,20 @@ export default function TrackProgress ({
           onMouseDown={handleSeekMouseDown}
           onMouseUp={handleLeaveSeeking}
           onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
-        /> 
-        : null}
-      <div className="w-10">
-        {formatTime(playerRef.current ? playerRef.current.duration() : 0)}
-      </div>
+        />
+      ) : null}
+      <div className="w-10">{formatTime(playerRef.current ? playerRef.current.duration() : 0)}</div>
     </div>
-  )
+  );
 }
 
 TrackProgress.propTypes = {
-    playState: PropTypes.string.isRequired,
-    setPlayState: PropTypes.func.isRequired,
-    shouldResetPlayerSeek: PropTypes.bool.isRequired,
-    setshouldResetPlayerSeek: PropTypes.func.isRequired,
-    playerTrackObject: PropTypes.object.isRequired,
-    volume: PropTypes.number.isRequired,
-    handleTrackEnd: PropTypes.func.isRequired,
-    seek: PropTypes.number.isRequired,
-    setSeek: PropTypes.func.isRequired};
+  playState: PropTypes.string.isRequired,
+  setPlayState: PropTypes.func.isRequired,
+  shouldResetPlayerSeek: PropTypes.bool.isRequired,
+  setshouldResetPlayerSeek: PropTypes.func.isRequired,
+  volume: PropTypes.number.isRequired,
+  handleTrackEnd: PropTypes.func.isRequired,
+  seek: PropTypes.number.isRequired,
+  setSeek: PropTypes.func.isRequired,
+};

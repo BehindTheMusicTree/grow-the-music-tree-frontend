@@ -1,17 +1,16 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React from "react";
+import ReactDOM from "react-dom/client";
 import * as Sentry from "@sentry/react";
 
-import App from './App.jsx'
-import './index.css'
+import App from "./App.jsx";
+import "./index.css";
+
+import { PlayerTrackObjectProvider } from "./contexts/player-track-object/PlayerTrackObjectContext.jsx";
 
 if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
   Sentry.init({
     dsn: "https://7f17fcd9feebfb634ad7ba2f638ba69a@o4507119053832192.ingest.de.sentry.io/4507119058026576",
-    integrations: [
-      Sentry.browserTracingIntegration(),
-      Sentry.replayIntegration(),
-    ],
+    integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
     // Performance Monitoring
     tracesSampleRate: 1.0, //  Capture 100% of the transactions
     // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
@@ -22,16 +21,16 @@ if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
   });
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    {
-      import.meta.env.VITE_SENTRY_ACTIVE === true ? (
+    <PlayerTrackObjectProvider>
+      {import.meta.env.VITE_SENTRY_ACTIVE === true ? (
         <Sentry.ErrorBoundary fallback={"An error has occurred"}>
           <App />
         </Sentry.ErrorBoundary>
       ) : (
         <App />
-      )
-    }
-  </React.StrictMode>,
-)
+      )}
+    </PlayerTrackObjectProvider>
+  </React.StrictMode>
+);

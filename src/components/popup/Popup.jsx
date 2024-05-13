@@ -1,4 +1,4 @@
-import { usePopup } from "../../contexts/usePopup";
+import { usePopup } from "../../contexts/popup/usePopup";
 
 import BadRequestErrorPopupChild from "./child/BadRequestPopupChild";
 import LibTrackEditionPopupChild from "./child/LibTrackEditionPopupChild";

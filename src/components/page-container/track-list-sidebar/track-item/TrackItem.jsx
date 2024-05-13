@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { MdMoreVert } from "react-icons/md";
 
-import { usePopup } from "../../../../contexts/usePopup.jsx";
+import { usePopup } from "../../../../contexts/popup/usePopup.jsx";
 import { formatTime } from "../../../../utils";
 import LibTrackEditionPopupContentObject from "../../../../models/popup-content-object/LibTrackEditionPopupContentObject.js";
 
