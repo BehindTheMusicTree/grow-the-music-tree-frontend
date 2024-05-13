@@ -4,12 +4,11 @@ import raf from "raf";
 import ReactHowler from "react-howler";
 
 import { usePlayerTrackObject } from "../../../contexts/player-track-object/usePlayerTrackObject.jsx";
+import { usePlayState } from "../../../contexts/play-state/usePlayState.jsx";
 import { PLAY_STATES } from "../../../constants";
 import { formatTime } from "../../../utils";
 
 export default function TrackProgress({
-  playState,
-  setPlayState,
   shouldResetPlayerSeek,
   setshouldResetPlayerSeek,
   volume,
@@ -18,6 +17,7 @@ export default function TrackProgress({
   setSeek,
 }) {
   const { playerTrackObject } = usePlayerTrackObject();
+  const { playState, setPlayState } = usePlayState();
   const [isSeeking, setIsSeeking] = useState(false);
 
   const playerRef = useRef(null);
@@ -67,7 +67,7 @@ export default function TrackProgress({
     }
   };
 
-  const renderSeekPos = () => {
+  const renderSeekPosition = () => {
     const currentSeek = playerRef.current.seek();
     if (previousSeekRef.current != undefined) {
       const deltaSeek = currentSeek - previousSeekRef.current;
@@ -77,7 +77,7 @@ export default function TrackProgress({
     previousSeekRef.current = currentSeek;
     if (playState === PLAY_STATES.PLAYING && !isSeeking) {
       rafIdRef.current = raf(() => {
-        renderSeekPos();
+        renderSeekPosition();
       });
     }
   };
@@ -100,12 +100,12 @@ export default function TrackProgress({
         handleTrackEnd();
       } else {
         playerRef.current.seek(seek);
-        renderSeekPos();
+        renderSeekPosition();
       }
     } else if (playState === PLAY_STATES.STOPPED && !isSeeking) {
       setPlayState(PLAY_STATES.PAUSED);
     }
-  }, [isSeeking]);
+  }, [isSeeking, playState]);
 
   useEffect(() => {
     if (shouldResetPlayerSeek) {
@@ -148,8 +148,6 @@ export default function TrackProgress({
 }
 
 TrackProgress.propTypes = {
-  playState: PropTypes.string.isRequired,
-  setPlayState: PropTypes.func.isRequired,
   shouldResetPlayerSeek: PropTypes.bool.isRequired,
   setshouldResetPlayerSeek: PropTypes.func.isRequired,
   volume: PropTypes.number.isRequired,
