@@ -27,7 +27,7 @@ export default function App() {
 
   const [isTrackListSidebarVisible, setIsTrackListSidebarVisible] = useState(false);
 
-  const [playingPlaylistUuidWithPlayState, setPlayingPlaylistUuidWithLoadingState] = useState(null);
+  const [playingPlaylistUuidWithLoadingState, setPlayingPlaylistUuidWithLoadingState] = useState(null);
   const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
 
   const [refreshGenresSignal, setRefreshGenresSignal] = useState(0);
@@ -85,7 +85,7 @@ export default function App() {
       });
     };
 
-    if (playingPlaylistUuidWithPlayState && playingPlaylistUuidWithPlayState.isLoading) {
+    if (playingPlaylistUuidWithLoadingState && playingPlaylistUuidWithLoadingState.isLoading) {
       setPlayingPlaylistLibTrackNumber(0);
     }
 
@@ -96,8 +96,8 @@ export default function App() {
 
   useEffect(() => {
     if (playerTrackObject) {
-      if (playingPlaylistUuidWithPlayState.isLoading) {
-        setPlayingPlaylistUuidWithLoadingState({ ...playingPlaylistUuidWithPlayState, isLoading: false });
+      if (playingPlaylistUuidWithLoadingState.isLoading) {
+        setPlayingPlaylistUuidWithLoadingState({ ...playingPlaylistUuidWithLoadingState, isLoading: false });
         setPlayState(PLAY_STATES.PLAYING);
       }
     }
@@ -117,7 +117,7 @@ export default function App() {
                     pageTypeWithObject={pageTypeWithObject}
                     isTrackListSidebarVisible={isTrackListSidebarVisible}
                     selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
-                    playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}
+                    playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
                     refreshGenresSignal={refreshGenresSignal}
                     handleUpdatedLibTrack={handleUpdatedLibTrack}
                   />
