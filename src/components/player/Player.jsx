@@ -7,22 +7,18 @@ import { FaPlay, FaPause, FaStepForward, FaStepBackward } from "react-icons/fa";
 
 import { PLAY_STATES } from "../../constants.js";
 import { usePlayerTrackObject } from "../../contexts/player-track-object/usePlayerTrackObject.jsx";
+import { usePlayState } from "../../contexts/play-state/usePlayState.jsx";
 
 import albumCover from "../../assets/images/album-cover-default.png";
 import Button from "../button/Button.jsx";
 
 import TrackProgress from "./TrackProgress/TrackProgress.jsx";
 
-export default function Player({
-  playState,
-  setPlayState,
-  setNextTrack,
-  setPreviousTrack,
-  setIsTrackListSidebarVisible,
-}) {
+export default function Player({ setNextTrack, setPreviousTrack, setIsTrackListSidebarVisible }) {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
   const { playerTrackObject } = usePlayerTrackObject();
+  const { playState, setPlayState } = usePlayState();
   const [shouldResetPlayerSeek, setshouldResetPlayerSeek] = useState(false);
   const [seek, setSeek] = useState(0);
   const [volume, setVolume] = useState(0.5);
@@ -99,8 +95,6 @@ export default function Player({
           </Button>
         </div>
         <TrackProgress
-          playState={playState}
-          setPlayState={setPlayState}
           shouldResetPlayerSeek={shouldResetPlayerSeek}
           setshouldResetPlayerSeek={setshouldResetPlayerSeek}
           volume={volume}
@@ -131,9 +125,6 @@ export default function Player({
 }
 
 Player.propTypes = {
-  playerTrackObject: PropTypes.object,
-  playState: PropTypes.string.isRequired,
-  setPlayState: PropTypes.func.isRequired,
   setNextTrack: PropTypes.func.isRequired,
   setPreviousTrack: PropTypes.func.isRequired,
   setIsTrackListSidebarVisible: PropTypes.func.isRequired,

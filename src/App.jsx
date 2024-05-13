@@ -8,6 +8,7 @@ import { PLAY_STATES, CONTENT_AREA_TYPES } from "./constants";
 import ApiService from "./utils/service/apiService";
 import { usePlayerTrackObject } from "./contexts/player-track-object/usePlayerTrackObject.jsx";
 import { usePlaylistPlayObject } from "./contexts/playlist-play-object/usePlaylistPlayObject.jsx";
+import { usePlayState } from "./contexts/play-state/usePlayState.jsx";
 
 import Popup from "./components/popup/Popup";
 import Banner from "./components/banner/Banner";
@@ -20,6 +21,7 @@ Howler.autoUnlock = true;
 export default function App() {
   const { playerTrackObject, setPlayerTrackObject } = usePlayerTrackObject();
   const { playlistPlayObject, setPlaylistPlayObject } = usePlaylistPlayObject();
+  const { playState, setPlayState } = usePlayState(PLAY_STATES.PLAYING);
 
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
@@ -27,8 +29,6 @@ export default function App() {
 
   const [playingPlaylistUuidWithPlayState, setPlayingPlaylistUuidWithLoadingState] = useState(null);
   const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
-
-  const [playState, setPlayState] = useState(PLAY_STATES.PLAYING);
 
   const [refreshGenresSignal, setRefreshGenresSignal] = useState(0);
 
@@ -117,7 +117,6 @@ export default function App() {
                     pageTypeWithObject={pageTypeWithObject}
                     isTrackListSidebarVisible={isTrackListSidebarVisible}
                     selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
-                    playState={playState}
                     playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}
                     refreshGenresSignal={refreshGenresSignal}
                     handleUpdatedLibTrack={handleUpdatedLibTrack}

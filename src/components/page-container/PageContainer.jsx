@@ -7,7 +7,6 @@ export default function PageContainer({
   pageTypeWithObject,
   isTrackListSidebarVisible,
   selectPlaylistUuidToPlay,
-  playState,
   playingPlaylistUuidWithLoadingState,
   refreshGenresSignal,
   handleUpdatedLibTrack,
@@ -18,7 +17,6 @@ export default function PageContainer({
         <GenresPage
           selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
           playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
-          playState={playState}
           refreshGenresSignal={refreshGenresSignal}
         />
       ) : (
@@ -41,7 +39,6 @@ PageContainer.propTypes = {
   pageTypeWithObject: PropTypes.object.isRequired,
   isTrackListSidebarVisible: PropTypes.bool.isRequired,
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
-  playState: PropTypes.string.isRequired,
   playingPlaylistUuidWithLoadingState: PropTypes.object,
   refreshGenresSignal: PropTypes.number.isRequired,
   handleUpdatedLibTrack: PropTypes.func.isRequired,

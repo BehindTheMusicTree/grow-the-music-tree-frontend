@@ -6,6 +6,7 @@ import * as d3 from "d3";
 import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause } from "react-icons/fa";
 
 import { usePopup } from "../../../../contexts/popup/usePopup.jsx";
+import { usePlayState } from "../../../../contexts/play-state/usePlayState.jsx";
 import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from "../../../../constants";
 import { BadRequestError } from "../../../../utils/errors/BadRequestError";
 import BadRequestPopupContentObject from "../../../../models/popup-content-object/BadRequestPopupContentObject.js";
@@ -14,7 +15,6 @@ export default function GenreTree({
   genres,
   handleGenreAddClick,
   selectPlaylistUuidToPlay,
-  playState,
   playingPlaylistUuidWithLoadingState,
   postLibTracksAndRefresh,
 }) {
@@ -24,6 +24,7 @@ export default function GenreTree({
     GENRE_TREE_RECT_DIMENSIONS.WIDTH + HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES;
   const VERTICAL_SEPARATOON_BETWEEN_NODES = GENRE_TREE_RECT_DIMENSIONS.HEIGHT + VERTICAL_SEPARATOON_BETWEEN_RECTANGLES;
 
+  const { playState } = usePlayState();
   const { showPopup } = usePopup();
   const svgRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -319,7 +320,6 @@ GenreTree.propTypes = {
   genres: PropTypes.array.isRequired,
   handleGenreAddClick: PropTypes.func.isRequired,
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
-  playState: PropTypes.string.isRequired,
   playingPlaylistUuidWithLoadingState: PropTypes.object,
   postLibTracksAndRefresh: PropTypes.func.isRequired,
 };
