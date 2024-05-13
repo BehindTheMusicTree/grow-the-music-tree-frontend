@@ -29,13 +29,12 @@ export default function App() {
   const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
 
   const [playState, setPlayState] = useState(PLAY_STATES.PLAYING);
-  const [shouldResetPlayerSeek, setshouldResetPlayerSeek] = useState(false);
 
   const [refreshGenresSignal, setRefreshGenresSignal] = useState(0);
 
-  const contentAreaTypeWithObject = useRef({
+  const pageTypeWithObject = useRef({
     type: CONTENT_AREA_TYPES.GENRES,
-    contentObject: null,
+    pageObject: null,
   });
 
   const handleUpdatedLibTrack = async (updatedLibTrack) => {
@@ -66,12 +65,10 @@ export default function App() {
   };
 
   const setPreviousTrack = () => {
-    setshouldResetPlayerSeek(true);
     setPlayingPlaylistLibTrackNumber((prev) => prev - 1);
   };
 
   const setNextTrack = () => {
-    setshouldResetPlayerSeek(true);
     setPlayingPlaylistLibTrackNumber((prev) => prev + 1);
   };
 
@@ -117,7 +114,7 @@ export default function App() {
                 <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
                 <div className="Body flex h-full">
                   <PageContainer
-                    contentAreaTypeWithObject={contentAreaTypeWithObject}
+                    pageTypeWithObject={pageTypeWithObject}
                     isTrackListSidebarVisible={isTrackListSidebarVisible}
                     selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
                     playState={playState}
@@ -129,8 +126,6 @@ export default function App() {
                     <Player
                       playState={playState}
                       setPlayState={setPlayState}
-                      shouldResetPlayerSeek={shouldResetPlayerSeek}
-                      setshouldResetPlayerSeek={setshouldResetPlayerSeek}
                       setNextTrack={setNextTrack}
                       setPreviousTrack={setPreviousTrack}
                       setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}

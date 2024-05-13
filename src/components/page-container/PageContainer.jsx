@@ -4,7 +4,7 @@ import { CONTENT_AREA_TYPES } from "../../constants";
 import GenresPage from "./genres-page/GenresPage";
 
 export default function PageContainer({
-  contentAreaTypeWithObject,
+  pageTypeWithObject,
   isTrackListSidebarVisible,
   selectPlaylistUuidToPlay,
   playState,
@@ -14,7 +14,7 @@ export default function PageContainer({
 }) {
   return (
     <div className="relative w-full h-full flex bg-gray-200 font-sans m-0 pl-8">
-      {contentAreaTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES ? (
+      {pageTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES ? (
         <GenresPage
           selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
           playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
@@ -38,7 +38,7 @@ export default function PageContainer({
 }
 
 PageContainer.propTypes = {
-  contentAreaTypeWithObject: PropTypes.object.isRequired,
+  pageTypeWithObject: PropTypes.object.isRequired,
   isTrackListSidebarVisible: PropTypes.bool.isRequired,
   selectPlaylistUuidToPlay: PropTypes.func.isRequired,
   playState: PropTypes.string.isRequired,

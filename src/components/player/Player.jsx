@@ -16,8 +16,6 @@ import TrackProgress from "./TrackProgress/TrackProgress.jsx";
 export default function Player({
   playState,
   setPlayState,
-  shouldResetPlayerSeek,
-  setshouldResetPlayerSeek,
   setNextTrack,
   setPreviousTrack,
   setIsTrackListSidebarVisible,
@@ -25,6 +23,7 @@ export default function Player({
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
   const { playerTrackObject } = usePlayerTrackObject();
+  const [shouldResetPlayerSeek, setshouldResetPlayerSeek] = useState(false);
   const [seek, setSeek] = useState(0);
   const [volume, setVolume] = useState(0.5);
 
@@ -136,8 +135,6 @@ Player.propTypes = {
   playerTrackObject: PropTypes.object,
   playState: PropTypes.string.isRequired,
   setPlayState: PropTypes.func.isRequired,
-  shouldResetPlayerSeek: PropTypes.bool.isRequired,
-  setshouldResetPlayerSeek: PropTypes.func.isRequired,
   setNextTrack: PropTypes.func.isRequired,
   setPreviousTrack: PropTypes.func.isRequired,
   setIsTrackListSidebarVisible: PropTypes.func.isRequired,
