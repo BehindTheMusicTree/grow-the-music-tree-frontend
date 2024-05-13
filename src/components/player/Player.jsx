@@ -103,7 +103,6 @@ export default function Player({
           setPlayState={setPlayState}
           shouldResetPlayerSeek={shouldResetPlayerSeek}
           setshouldResetPlayerSeek={setshouldResetPlayerSeek}
-          playerTrackObject={playerTrackObject}
           volume={volume}
           handleTrackEnd={handleTrackEnd}
           seek={seek}

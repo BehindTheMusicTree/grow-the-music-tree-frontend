@@ -117,7 +117,7 @@ export default function TrackProgress({
   }, [shouldResetPlayerSeek]);
 
   return (
-    <div className="flex flex-row justify-center items-center w-full">
+    <div className="flex flex justify-center items-center w-full">
       <ReactHowler
         ref={playerRef}
         src={[playerTrackObject.blobUrl]}
@@ -128,10 +128,10 @@ export default function TrackProgress({
         onEnd={handleTrackEnd}
         volume={volume}
       />
-      <div className="w-10">{formatTime(seek)}</div>
+      <div className="w-14 text-right">{formatTime(seek)}</div>
       {playerRef.current ? (
         <input
-          className="progress-bar flex-grow-0 flex-shrink-0 w-4/5 ml-2.5 mr-2.5"
+          className="progress-bar ml-2.5 mr-2.5 w-full"
           type="range"
           min="0"
           max={Math.floor(playerRef.current.duration())}
@@ -142,7 +142,7 @@ export default function TrackProgress({
           onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
         />
       ) : null}
-      <div className="w-10">{formatTime(playerRef.current ? playerRef.current.duration() : 0)}</div>
+      <div className="w-14 text-left">{formatTime(playerRef.current ? playerRef.current.duration() : 0)}</div>
     </div>
   );
 }
