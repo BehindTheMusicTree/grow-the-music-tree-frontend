@@ -1,8 +1,11 @@
 import PropTypes from "prop-types";
+
 import TrackItem from "./track-item/TrackItem";
 import { capitalizeFirstLetter } from "../../../utils";
+import { usePlaylistPlayObject } from "../../../contexts/playlist-play-object/usePlaylistPlayObject.jsx";
 
-export default function TrackListSidebar({ playlistPlayObject, handleUpdatedLibTrack }) {
+export default function TrackListSidebar({ handleUpdatedLibTrack }) {
+  const { playlistPlayObject } = usePlaylistPlayObject();
   return (
     <div className="TrackListSideBar">
       <div className="Header flex flex-row px-4 py-2">
@@ -33,6 +36,5 @@ export default function TrackListSidebar({ playlistPlayObject, handleUpdatedLibT
 }
 
 TrackListSidebar.propTypes = {
-  playlistPlayObject: PropTypes.object,
   handleUpdatedLibTrack: PropTypes.func.isRequired,
 };

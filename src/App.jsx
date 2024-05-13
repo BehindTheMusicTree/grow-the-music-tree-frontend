@@ -7,6 +7,7 @@ import { PopupProvider } from "./contexts/popup/PopupContext";
 import { PLAY_STATES, CONTENT_AREA_TYPES } from "./constants";
 import ApiService from "./utils/service/apiService";
 import { usePlayerTrackObject } from "./contexts/player-track-object/usePlayerTrackObject.jsx";
+import { usePlaylistPlayObject } from "./contexts/playlist-play-object/usePlaylistPlayObject.jsx";
 
 import Popup from "./components/popup/Popup";
 import Banner from "./components/banner/Banner";
@@ -18,12 +19,12 @@ Howler.autoUnlock = true;
 
 export default function App() {
   const { playerTrackObject, setPlayerTrackObject } = usePlayerTrackObject();
+  const { playlistPlayObject, setPlaylistPlayObject } = usePlaylistPlayObject();
 
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
   const [isTrackListSidebarVisible, setIsTrackListSidebarVisible] = useState(false);
 
-  const [playlistPlayObject, setPlaylistPlayObject] = useState(null);
   const [playingPlaylistUuidWithPlayState, setPlayingPlaylistUuidWithLoadingState] = useState(null);
   const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
 
@@ -121,7 +122,6 @@ export default function App() {
                     selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
                     playState={playState}
                     playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithPlayState}
-                    playlistPlayObject={playlistPlayObject}
                     refreshGenresSignal={refreshGenresSignal}
                     handleUpdatedLibTrack={handleUpdatedLibTrack}
                   />
