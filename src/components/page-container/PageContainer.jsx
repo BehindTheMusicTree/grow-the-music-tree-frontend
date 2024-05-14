@@ -3,20 +3,11 @@ import TrackListSidebar from "./track-list-sidebar/TrackListSidebar";
 import { CONTENT_AREA_TYPES } from "../../constants";
 import GenresPage from "./genres-page/GenresPage";
 
-export default function PageContainer({
-  pageTypeWithObject,
-  isTrackListSidebarVisible,
-  playingPlaylistUuidWithLoadingState,
-  refreshGenresSignal,
-  handleUpdatedLibTrack,
-}) {
+export default function PageContainer({ pageTypeWithObject, isTrackListSidebarVisible, handleUpdatedLibTrack }) {
   return (
     <div className="relative w-full h-full flex bg-gray-200 font-sans m-0 pl-8">
       {pageTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES ? (
-        <GenresPage
-          playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
-          refreshGenresSignal={refreshGenresSignal}
-        />
+        <GenresPage />
       ) : (
         <div>Unknown content area type</div>
       )}
@@ -36,7 +27,5 @@ export default function PageContainer({
 PageContainer.propTypes = {
   pageTypeWithObject: PropTypes.object.isRequired,
   isTrackListSidebarVisible: PropTypes.bool.isRequired,
-  playingPlaylistUuidWithLoadingState: PropTypes.object,
-  refreshGenresSignal: PropTypes.number.isRequired,
   handleUpdatedLibTrack: PropTypes.func.isRequired,
 };
