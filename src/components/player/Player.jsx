@@ -7,6 +7,7 @@ import { FaPlay, FaPause, FaStepForward, FaStepBackward } from "react-icons/fa";
 
 import { PLAY_STATES } from "../../constants.js";
 import { usePlayerTrackObject } from "../../contexts/player-track-object/usePlayerTrackObject.jsx";
+import { usePlaylistPlayObject } from "../../contexts/playlist-play-object/usePlaylistPlayObject.jsx";
 import { usePlayState } from "../../contexts/play-state/usePlayState.jsx";
 
 import albumCover from "../../assets/images/album-cover-default.png";
@@ -14,10 +15,13 @@ import Button from "../button/Button.jsx";
 
 import TrackProgress from "./TrackProgress/TrackProgress.jsx";
 
-export default function Player({ setNextTrack, setPreviousTrack, setIsTrackListSidebarVisible }) {
+export default function Player({ setIsTrackListSidebarVisible }) {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
   const { playerTrackObject } = usePlayerTrackObject();
+
+  const { toNextTrack, toPreviousTrack } = usePlaylistPlayObject();
+
   const { playState, setPlayState } = usePlayState();
   const [shouldResetPlayerSeek, setshouldResetPlayerSeek] = useState(false);
   const [seek, setSeek] = useState(0);
@@ -44,21 +48,21 @@ export default function Player({ setNextTrack, setPreviousTrack, setIsTrackListS
 
   const handleTrackEnd = () => {
     if (playerTrackObject.hasNext) {
-      setNextTrack();
+      toNextTrack();
     } else {
       setPlayState(PLAY_STATES.STOPPED);
     }
   };
 
   const handleForwardClick = () => {
-    setNextTrack();
+    toNextTrack();
   };
 
   const handleBackwardClick = () => {
     if (!playerTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
       setshouldResetPlayerSeek(true);
     } else {
-      setPreviousTrack((prev) => prev - 1);
+      toPreviousTrack();
     }
   };
 
@@ -125,7 +129,5 @@ export default function Player({ setNextTrack, setPreviousTrack, setIsTrackListS
 }
 
 Player.propTypes = {
-  setNextTrack: PropTypes.func.isRequired,
-  setPreviousTrack: PropTypes.func.isRequired,
   setIsTrackListSidebarVisible: PropTypes.func.isRequired,
 };

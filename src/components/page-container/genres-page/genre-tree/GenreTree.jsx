@@ -7,17 +7,12 @@ import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause } from "react-icons/fa
 
 import { usePopup } from "../../../../contexts/popup/usePopup.jsx";
 import { usePlayState } from "../../../../contexts/play-state/usePlayState.jsx";
+import { usePlaylistPlayObject } from "../../../../contexts/playlist-play-object/usePlaylistPlayObject.jsx";
 import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from "../../../../constants";
 import { BadRequestError } from "../../../../utils/errors/BadRequestError";
 import BadRequestPopupContentObject from "../../../../models/popup-content-object/BadRequestPopupContentObject.js";
 
-export default function GenreTree({
-  genres,
-  handleGenreAddClick,
-  selectPlaylistUuidToPlay,
-  playingPlaylistUuidWithLoadingState,
-  postLibTracksAndRefresh,
-}) {
+export default function GenreTree({ genres, handleGenreAddClick, postLibTracksAndRefresh }) {
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const VERTICAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const HORIZONTAL_SEPARATOON_BETWEEN_NODES =
@@ -26,6 +21,7 @@ export default function GenreTree({
 
   const { playState } = usePlayState();
   const { showPopup } = usePopup();
+  const { playingPlaylistUuidWithLoadingState, selectPlaylistUuidToPlay } = usePlaylistPlayObject();
   const svgRef = useRef(null);
   const fileInputRef = useRef(null);
   const selectingFileGenreUuidRef = useRef(null);
@@ -175,9 +171,9 @@ export default function GenreTree({
       .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET)
       .attr("y", -PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT / 2)
       .style("visibility", function (d) {
-        playingPlaylistUuidWithLoadingState &&
-        playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid &&
-        playingPlaylistUuidWithLoadingState.isLoading
+        return playingPlaylistUuidWithLoadingState &&
+          playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid &&
+          playingPlaylistUuidWithLoadingState.isLoading
           ? "hidden"
           : "visible";
       })
@@ -319,7 +315,5 @@ export default function GenreTree({
 GenreTree.propTypes = {
   genres: PropTypes.array.isRequired,
   handleGenreAddClick: PropTypes.func.isRequired,
-  selectPlaylistUuidToPlay: PropTypes.func.isRequired,
-  playingPlaylistUuidWithLoadingState: PropTypes.object,
   postLibTracksAndRefresh: PropTypes.func.isRequired,
 };
