@@ -25,14 +25,15 @@ export default function App() {
     setPlaylistPlayObject,
     playingPlaylistUuidWithLoadingState,
     setPlayingPlaylistUuidWithLoadingState,
+    trackNumber,
+    setTrackNumber,
   } = usePlaylistPlayObject();
+
   const { playState, setPlayState } = usePlayState(PLAY_STATES.PLAYING);
 
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
   const [isTrackListSidebarVisible, setIsTrackListSidebarVisible] = useState(false);
-
-  const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
 
   const [refreshGenresSignal, setRefreshGenresSignal] = useState(0);
 
@@ -63,14 +64,6 @@ export default function App() {
     });
   };
 
-  const setPreviousTrack = () => {
-    setPlayingPlaylistLibTrackNumber((prev) => prev - 1);
-  };
-
-  const setNextTrack = () => {
-    setPlayingPlaylistLibTrackNumber((prev) => prev + 1);
-  };
-
   useEffect(() => {
     const setPlayingTrack = async (playingTrackObject) => {
       const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(
@@ -79,19 +72,19 @@ export default function App() {
       setPlayerTrackObject({
         ...playingTrackObject.libraryTrack,
         blobUrl: playingLibTrackBlobUrl,
-        hasNext: playlistPlayObject.contentObject.libraryTracks.length > playingPlaylistLibTrackNumber + 1,
-        hasPrevious: playingPlaylistLibTrackNumber > 0,
+        hasNext: playlistPlayObject.contentObject.libraryTracks.length > trackNumber + 1,
+        hasPrevious: trackNumber > 0,
       });
     };
 
     if (playingPlaylistUuidWithLoadingState && playingPlaylistUuidWithLoadingState.isLoading) {
-      setPlayingPlaylistLibTrackNumber(0);
+      setTrackNumber(0);
     }
 
-    if (playlistPlayObject && playlistPlayObject.contentObject.libraryTracks.length > playingPlaylistLibTrackNumber) {
-      setPlayingTrack(playlistPlayObject.contentObject.libraryTracks[playingPlaylistLibTrackNumber]);
+    if (playlistPlayObject && playlistPlayObject.contentObject.libraryTracks.length > trackNumber) {
+      setPlayingTrack(playlistPlayObject.contentObject.libraryTracks[trackNumber]);
     }
-  }, [playlistPlayObject, playingPlaylistLibTrackNumber]);
+  }, [playlistPlayObject, trackNumber]);
 
   useEffect(() => {
     if (playerTrackObject) {
@@ -123,8 +116,6 @@ export default function App() {
                     <Player
                       playState={playState}
                       setPlayState={setPlayState}
-                      setNextTrack={setNextTrack}
-                      setPreviousTrack={setPreviousTrack}
                       setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}
                     />
                   )}
