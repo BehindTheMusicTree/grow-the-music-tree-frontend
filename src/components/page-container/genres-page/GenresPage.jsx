@@ -6,11 +6,7 @@ import ApiService from "../../../utils/service/apiService";
 
 import GenreTree from "./genre-tree/GenreTree";
 
-export default function GenresPage({
-  selectPlaylistUuidToPlay,
-  playingPlaylistUuidWithLoadingState,
-  refreshGenresSignal,
-}) {
+export default function GenresPage({ refreshGenresSignal }) {
   const [groupedGenres, setGroupedGenres] = useState(null);
   const areGenreLoadingRef = useRef(false);
 
@@ -98,8 +94,6 @@ export default function GenresPage({
                 key={`${uuid}`}
                 genres={genreTree}
                 handleGenreAddClick={handleGenreAddClick}
-                selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
-                playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
                 postLibTracksAndRefresh={postLibTracksAndRefresh}
               />
             );
@@ -113,7 +107,5 @@ export default function GenresPage({
 }
 
 GenresPage.propTypes = {
-  selectPlaylistUuidToPlay: PropTypes.func.isRequired,
-  playingPlaylistUuidWithLoadingState: PropTypes.object,
   refreshGenresSignal: PropTypes.number.isRequired,
 };

@@ -20,14 +20,18 @@ Howler.autoUnlock = true;
 
 export default function App() {
   const { playerTrackObject, setPlayerTrackObject } = usePlayerTrackObject();
-  const { playlistPlayObject, setPlaylistPlayObject } = usePlaylistPlayObject();
+  const {
+    playlistPlayObject,
+    setPlaylistPlayObject,
+    playingPlaylistUuidWithLoadingState,
+    setPlayingPlaylistUuidWithLoadingState,
+  } = usePlaylistPlayObject();
   const { playState, setPlayState } = usePlayState(PLAY_STATES.PLAYING);
 
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
   const [isTrackListSidebarVisible, setIsTrackListSidebarVisible] = useState(false);
 
-  const [playingPlaylistUuidWithLoadingState, setPlayingPlaylistUuidWithLoadingState] = useState(null);
   const [playingPlaylistLibTrackNumber, setPlayingPlaylistLibTrackNumber] = useState(0);
 
   const [refreshGenresSignal, setRefreshGenresSignal] = useState(0);
@@ -57,11 +61,6 @@ export default function App() {
 
       return newState;
     });
-  };
-
-  const selectPlaylistUuidToPlay = async (uuid) => {
-    setPlayingPlaylistUuidWithLoadingState({ uuid: uuid, isLoading: true });
-    setPlaylistPlayObject(await ApiService.postPlay(uuid));
   };
 
   const setPreviousTrack = () => {
@@ -116,7 +115,6 @@ export default function App() {
                   <PageContainer
                     pageTypeWithObject={pageTypeWithObject}
                     isTrackListSidebarVisible={isTrackListSidebarVisible}
-                    selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
                     playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
                     refreshGenresSignal={refreshGenresSignal}
                     handleUpdatedLibTrack={handleUpdatedLibTrack}

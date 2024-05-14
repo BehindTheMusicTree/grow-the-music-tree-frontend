@@ -6,7 +6,6 @@ import GenresPage from "./genres-page/GenresPage";
 export default function PageContainer({
   pageTypeWithObject,
   isTrackListSidebarVisible,
-  selectPlaylistUuidToPlay,
   playingPlaylistUuidWithLoadingState,
   refreshGenresSignal,
   handleUpdatedLibTrack,
@@ -15,7 +14,6 @@ export default function PageContainer({
     <div className="relative w-full h-full flex bg-gray-200 font-sans m-0 pl-8">
       {pageTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES ? (
         <GenresPage
-          selectPlaylistUuidToPlay={selectPlaylistUuidToPlay}
           playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
           refreshGenresSignal={refreshGenresSignal}
         />
@@ -38,7 +36,6 @@ export default function PageContainer({
 PageContainer.propTypes = {
   pageTypeWithObject: PropTypes.object.isRequired,
   isTrackListSidebarVisible: PropTypes.bool.isRequired,
-  selectPlaylistUuidToPlay: PropTypes.func.isRequired,
   playingPlaylistUuidWithLoadingState: PropTypes.object,
   refreshGenresSignal: PropTypes.number.isRequired,
   handleUpdatedLibTrack: PropTypes.func.isRequired,
