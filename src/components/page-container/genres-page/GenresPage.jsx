@@ -1,12 +1,13 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import PropTypes from "prop-types";
 
 import { GENRE_TREE_RECT_DIMENSIONS } from "../../../constants";
 import ApiService from "../../../utils/service/apiService";
+import { useRefreshGenresSignal } from "../../../contexts/refresh-genres-signal/useRefreshGenresSignal.jsx";
 
 import GenreTree from "./genre-tree/GenreTree";
 
-export default function GenresPage({ refreshGenresSignal }) {
+export default function GenresPage() {
+  const { refreshGenresSignal } = useRefreshGenresSignal();
   const [groupedGenres, setGroupedGenres] = useState(null);
   const areGenreLoadingRef = useRef(false);
 
@@ -105,7 +106,3 @@ export default function GenresPage({ refreshGenresSignal }) {
     </div>
   );
 }
-
-GenresPage.propTypes = {
-  refreshGenresSignal: PropTypes.number.isRequired,
-};

@@ -8,6 +8,7 @@ import "./index.css";
 import { PlayerTrackObjectProvider } from "./contexts/player-track-object/PlayerTrackObjectContext.jsx";
 import { PlaylistPlayObjectProvider } from "./contexts/playlist-play-object/PlaylistPlayObjectContext.jsx";
 import { PlayStateProvider } from "./contexts/play-state/PlayStateContext";
+import { RefreshGenresSignalProvider } from "./contexts/refresh-genres-signal/RefreshGenresSignalContext";
 
 if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
   Sentry.init({
@@ -25,18 +26,20 @@ if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <PlayStateProvider>
-      <PlayerTrackObjectProvider>
-        <PlaylistPlayObjectProvider>
-          {import.meta.env.VITE_SENTRY_ACTIVE === true ? (
-            <Sentry.ErrorBoundary fallback={"An error has occurred"}>
+    <RefreshGenresSignalProvider>
+      <PlayStateProvider>
+        <PlayerTrackObjectProvider>
+          <PlaylistPlayObjectProvider>
+            {import.meta.env.VITE_SENTRY_ACTIVE === true ? (
+              <Sentry.ErrorBoundary fallback={"An error has occurred"}>
+                <App />
+              </Sentry.ErrorBoundary>
+            ) : (
               <App />
-            </Sentry.ErrorBoundary>
-          ) : (
-            <App />
-          )}
-        </PlaylistPlayObjectProvider>
-      </PlayerTrackObjectProvider>
-    </PlayStateProvider>
+            )}
+          </PlaylistPlayObjectProvider>
+        </PlayerTrackObjectProvider>
+      </PlayStateProvider>
+    </RefreshGenresSignalProvider>
   </React.StrictMode>
 );

@@ -9,6 +9,7 @@ import ApiService from "./utils/service/apiService";
 import { usePlayerTrackObject } from "./contexts/player-track-object/usePlayerTrackObject.jsx";
 import { usePlaylistPlayObject } from "./contexts/playlist-play-object/usePlaylistPlayObject.jsx";
 import { usePlayState } from "./contexts/play-state/usePlayState.jsx";
+import { useRefreshGenresSignal } from "./contexts/refresh-genres-signal/useRefreshGenresSignal.jsx";
 
 import Popup from "./components/popup/Popup";
 import Banner from "./components/banner/Banner";
@@ -29,13 +30,12 @@ export default function App() {
     setTrackNumber,
   } = usePlaylistPlayObject();
 
-  const { playState, setPlayState } = usePlayState(PLAY_STATES.PLAYING);
+  const { playState, setPlayState } = usePlayState();
+  const { setRefreshGenresSignal } = useRefreshGenresSignal();
 
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
   const [isTrackListSidebarVisible, setIsTrackListSidebarVisible] = useState(false);
-
-  const [refreshGenresSignal, setRefreshGenresSignal] = useState(0);
 
   const pageTypeWithObject = useRef({
     type: CONTENT_AREA_TYPES.GENRES,
@@ -109,7 +109,6 @@ export default function App() {
                     pageTypeWithObject={pageTypeWithObject}
                     isTrackListSidebarVisible={isTrackListSidebarVisible}
                     playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
-                    refreshGenresSignal={refreshGenresSignal}
                     handleUpdatedLibTrack={handleUpdatedLibTrack}
                   />
                   {playerTrackObject && (
