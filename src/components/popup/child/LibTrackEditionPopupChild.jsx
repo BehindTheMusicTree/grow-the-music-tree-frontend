@@ -6,12 +6,13 @@ import ApiService from "../../../utils/service/apiService";
 import { formatTime } from "../../../utils";
 
 export default function LibTrackEditionPopupChild({ popupContentObject, hidePopup }) {
+  const FORM_RATING_NULL_VALUE = -1;
   const [formValues, setFormValues] = useState({
     title: popupContentObject.libTrack.title,
     artistName: popupContentObject.libTrack.artist ? popupContentObject.libTrack.artist.name : "",
     genreName: popupContentObject.libTrack.genre ? popupContentObject.libTrack.genre.name : "",
     albumName: popupContentObject.libTrack.album ? popupContentObject.libTrack.album.name : "",
-    rating: popupContentObject.libTrack.rating ? popupContentObject.libTrack.rating : null,
+    rating: popupContentObject.libTrack.rating,
   });
 
   const handleChange = (event) => {
@@ -23,6 +24,10 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    let submittedValues = { ...formValues };
+    if (submittedValues.rating === FORM_RATING_NULL_VALUE) {
+      submittedValues.rating = null;
+    }
     const response = await ApiService.putLibTrack(popupContentObject.libTrack.uuid, formValues);
     popupContentObject.handleUpdatedLibTrack(response);
     hidePopup();
@@ -99,7 +104,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
                       className="w-6 h-6 opacity-0"
                       type="radio"
                       name="rating"
-                      value={i === 0 ? null : i + 5}
+                      value={i === 0 ? FORM_RATING_NULL_VALUE : i + 5}
                       checked={formValues.rating === (i === 0 ? null : i + 5)}
                       onChange={handleChange}
                     />
@@ -108,7 +113,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
                         <div className="flex">
                           <AiOutlineStar
                             className={`w-7 h-7 absolute top-0 left-0 ${
-                              formValues.rating === null ? "text-yellow-500" : "text-gray-500"
+                              formValues.rating === FORM_RATING_NULL_VALUE ? "text-yellow-500" : "text-gray-500"
                             }`}
                           />
                           <span className="flex-grow w-8"></span>{" "}
