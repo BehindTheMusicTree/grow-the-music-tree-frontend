@@ -9,7 +9,7 @@ import ApiService from "./utils/service/apiService";
 import { usePlayerTrackObject } from "./contexts/player-track-object/usePlayerTrackObject.jsx";
 import { usePlaylistPlayObject } from "./contexts/playlist-play-object/usePlaylistPlayObject.jsx";
 import { usePlayState } from "./contexts/play-state/usePlayState.jsx";
-import { useRefreshGenresSignal } from "./contexts/refresh-genres-signal/useRefreshGenresSignal.jsx";
+import { useRefreshGenrePlaylistsSignal } from "./contexts/refresh-genre-playlists-signal/useRefreshGenrePlaylistsSignal.jsx";
 
 import Popup from "./components/popup/Popup";
 import Banner from "./components/banner/Banner";
@@ -31,7 +31,7 @@ export default function App() {
   } = usePlaylistPlayObject();
 
   const { playState, setPlayState } = usePlayState();
-  const { setRefreshGenresSignal } = useRefreshGenresSignal();
+  const { setRefreshGenrePlaylistsSignal } = useRefreshGenrePlaylistsSignal();
 
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
@@ -57,7 +57,7 @@ export default function App() {
       );
 
       if (genreChanged) {
-        setRefreshGenresSignal((oldSignal) => oldSignal + 1);
+        setRefreshGenrePlaylistsSignal(1);
       }
 
       return newState;
