@@ -2,6 +2,7 @@ import { usePopup } from "../../contexts/popup/usePopup";
 
 import BadRequestErrorPopupChild from "./child/BadRequestPopupChild";
 import LibTrackEditionPopupChild from "./child/LibTrackEditionPopupChild";
+import LibTrackUploadingPopupChild from "./child/LibTrackUploadingPopupChild";
 
 export default function Popup() {
   const { popupContentObject, hidePopup } = usePopup();
@@ -17,6 +18,9 @@ export default function Popup() {
       break;
     case "LibTrackEditionPopupContentObject":
       PopupChild = LibTrackEditionPopupChild;
+      break;
+    case "LibTrackUploadingPopupContentObject":
+      PopupChild = LibTrackUploadingPopupChild;
       break;
     default:
       PopupChild = null;

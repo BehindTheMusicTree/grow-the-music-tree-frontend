@@ -1,15 +1,15 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import { GENRE_TREE_RECT_DIMENSIONS } from "../../../constants";
 import ApiService from "../../../utils/service/apiService";
-import { useRefreshGenresSignal } from "../../../contexts/refresh-genres-signal/useRefreshGenresSignal.jsx";
+import { useRefreshGenrePlaylistsSignal as useRefreshGenrePlaylistsSignal } from "../../../contexts/refresh-genre-playlists-signal/useRefreshGenrePlaylistsSignal.jsx";
 
 import GenreTree from "./genre-tree/GenreTree";
 
 export default function GenresPage() {
-  const { refreshGenresSignal } = useRefreshGenresSignal();
+  const { refreshGenrePlaylistsSignal, setRefreshGenrePlaylistsSignal } = useRefreshGenrePlaylistsSignal();
   const [groupedGenrePlaylists, setGroupedGenrePlaylists] = useState(null);
-  const areGenreLoadingRef = useRef(false);
+  const areGenrePlaylistsFetchingRef = useRef(false);
 
   const getGenrePlaylistsGroupedByRoot = (genrePlaylists) => {
     const groupedGenrePlaylists = {};
@@ -24,53 +24,35 @@ export default function GenresPage() {
     return groupedGenrePlaylists;
   };
 
-  const postGenreAndRefresh = async (genreDataToPost) => {
-    await ApiService.postGenre(genreDataToPost);
-    fetchGenresIfNotLoading();
-  };
-  const postLibTracksAndRefresh = async (file, genreUuid) => {
-    await ApiService.postLibTracks(file, genreUuid);
-    fetchGenresIfNotLoading();
-  };
-
-  const fetchGenresIfNotLoading = useCallback(async () => {
-    if (!areGenreLoadingRef.current) {
-      areGenreLoadingRef.current = true;
-      const genres = await ApiService.getGenrePlaylists();
-      setGroupedGenrePlaylists(getGenrePlaylistsGroupedByRoot(genres));
-    }
-  }, []);
-
-  const handleGenreAddClick = (event, parentUuid) => {
+  const handleGenreAddClick = async (event, parentUuid) => {
     event.stopPropagation();
     const name = prompt("New genre name:");
     if (!name) {
       return;
     }
-    postGenreAndRefresh({
+    await ApiService.postGenre({
       name: name,
       parent: parentUuid,
     });
+    setRefreshGenrePlaylistsSignal(1);
   };
 
   useEffect(() => {
-    fetchGenresIfNotLoading();
-  }, [refreshGenresSignal]);
-
-  useEffect(() => {
-    const fetchAndSetGenres = async () => {
-      const genres = await ApiService.getGenres();
-      setGroupedGenrePlaylists(getGenrePlaylistsGroupedByRoot(genres));
+    const fetchGenrePlaylists = async () => {
+      const genrePlaylists = await ApiService.getGenrePlaylists();
+      setGroupedGenrePlaylists(getGenrePlaylistsGroupedByRoot(genrePlaylists));
     };
 
-    if (!areGenreLoadingRef.current) {
-      areGenreLoadingRef.current = true;
-      fetchAndSetGenres();
+    if (refreshGenrePlaylistsSignal == 1 && !areGenrePlaylistsFetchingRef.current) {
+      areGenrePlaylistsFetchingRef.current = true;
+      fetchGenrePlaylists();
+      areGenrePlaylistsFetchingRef.current = false;
+      setRefreshGenrePlaylistsSignal(0);
     }
-  }, [fetchGenresIfNotLoading]);
+  }, [refreshGenrePlaylistsSignal]);
 
   useEffect(() => {
-    areGenreLoadingRef.current = false;
+    areGenrePlaylistsFetchingRef.current = false;
   }, [groupedGenrePlaylists]);
 
   return (
@@ -90,14 +72,7 @@ export default function GenresPage() {
       <div className="flex flex-col text-gray-800">
         {groupedGenrePlaylists ? (
           Object.entries(groupedGenrePlaylists).map(([uuid, genreTree]) => {
-            return (
-              <GenreTree
-                key={`${uuid}`}
-                genres={genreTree}
-                handleGenreAddClick={handleGenreAddClick}
-                postLibTracksAndRefresh={postLibTracksAndRefresh}
-              />
-            );
+            return <GenreTree key={`${uuid}`} genres={genreTree} handleGenreAddClick={handleGenreAddClick} />;
           })
         ) : (
           <p>Loading data.</p>

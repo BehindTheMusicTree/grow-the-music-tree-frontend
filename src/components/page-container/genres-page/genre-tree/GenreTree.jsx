@@ -11,8 +11,9 @@ import { usePlaylistPlayObject } from "../../../../contexts/playlist-play-object
 import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from "../../../../constants";
 import { BadRequestError } from "../../../../utils/errors/BadRequestError";
 import BadRequestPopupContentObject from "../../../../models/popup-content-object/BadRequestPopupContentObject.js";
+import LibTrackUploadingPopupContentObject from "../../../../models/popup-content-object/LibTrackUploadingPopupContentObject.js";
 
-export default function GenreTree({ genres, handleGenreAddClick, postLibTracksAndRefresh }) {
+export default function GenreTree({ genres, handleGenreAddClick }) {
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const VERTICAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const HORIZONTAL_SEPARATOON_BETWEEN_NODES =
@@ -29,7 +30,7 @@ export default function GenreTree({ genres, handleGenreAddClick, postLibTracksAn
   async function handleFileChange(event) {
     const file = event.target.files[0];
     try {
-      await postLibTracksAndRefresh(file, selectingFileGenreUuidRef.current);
+      await postLibTrack(file, selectingFileGenreUuidRef.current);
     } catch (error) {
       if (error instanceof BadRequestError) {
         const messages = error.message;
@@ -64,6 +65,11 @@ export default function GenreTree({ genres, handleGenreAddClick, postLibTracksAn
       }
     });
     return xMax;
+  };
+
+  const postLibTrack = async (file, genreUuid) => {
+    const popupContentObject = new LibTrackUploadingPopupContentObject(file, genreUuid);
+    showPopup(popupContentObject);
   };
 
   useEffect(() => {
@@ -312,5 +318,4 @@ export default function GenreTree({ genres, handleGenreAddClick, postLibTracksAn
 GenreTree.propTypes = {
   genres: PropTypes.array.isRequired,
   handleGenreAddClick: PropTypes.func.isRequired,
-  postLibTracksAndRefresh: PropTypes.func.isRequired,
 };
