@@ -8,20 +8,20 @@ import GenreTree from "./genre-tree/GenreTree";
 
 export default function GenresPage() {
   const { refreshGenresSignal } = useRefreshGenresSignal();
-  const [groupedGenres, setGroupedGenres] = useState(null);
+  const [groupedGenrePlaylists, setGroupedGenrePlaylists] = useState(null);
   const areGenreLoadingRef = useRef(false);
 
-  const getGenresGroupedByRoot = (genres) => {
-    const groupedGenres = {};
-    genres.forEach((genre) => {
-      const rootUuid = genre.root.uuid;
-      if (!groupedGenres[rootUuid]) {
-        groupedGenres[rootUuid] = [];
+  const getGenrePlaylistsGroupedByRoot = (genrePlaylists) => {
+    const groupedGenrePlaylists = {};
+    genrePlaylists.forEach((genrePlaylist) => {
+      const rootUuid = genrePlaylist.root.uuid;
+      if (!groupedGenrePlaylists[rootUuid]) {
+        groupedGenrePlaylists[rootUuid] = [];
       }
-      groupedGenres[rootUuid].push(genre);
+      groupedGenrePlaylists[rootUuid].push(genrePlaylist);
     });
 
-    return groupedGenres;
+    return groupedGenrePlaylists;
   };
 
   const postGenreAndRefresh = async (genreDataToPost) => {
@@ -36,8 +36,8 @@ export default function GenresPage() {
   const fetchGenresIfNotLoading = useCallback(async () => {
     if (!areGenreLoadingRef.current) {
       areGenreLoadingRef.current = true;
-      const genres = await ApiService.getGenres();
-      setGroupedGenres(getGenresGroupedByRoot(genres));
+      const genres = await ApiService.getGenrePlaylists();
+      setGroupedGenrePlaylists(getGenrePlaylistsGroupedByRoot(genres));
     }
   }, []);
 
@@ -60,7 +60,7 @@ export default function GenresPage() {
   useEffect(() => {
     const fetchAndSetGenres = async () => {
       const genres = await ApiService.getGenres();
-      setGroupedGenres(getGenresGroupedByRoot(genres));
+      setGroupedGenrePlaylists(getGenrePlaylistsGroupedByRoot(genres));
     };
 
     if (!areGenreLoadingRef.current) {
@@ -71,7 +71,7 @@ export default function GenresPage() {
 
   useEffect(() => {
     areGenreLoadingRef.current = false;
-  }, [groupedGenres]);
+  }, [groupedGenrePlaylists]);
 
   return (
     <div className="mt-5 flex flex-col">
@@ -88,8 +88,8 @@ export default function GenresPage() {
         +
       </div>
       <div className="flex flex-col text-gray-800">
-        {groupedGenres ? (
-          Object.entries(groupedGenres).map(([uuid, genreTree]) => {
+        {groupedGenrePlaylists ? (
+          Object.entries(groupedGenrePlaylists).map(([uuid, genreTree]) => {
             return (
               <GenreTree
                 key={`${uuid}`}
