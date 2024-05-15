@@ -237,6 +237,25 @@ const ApiService = {
     return await ApiService.fetchData("genres/", "POST", genreData, null);
   },
 
+  getGenrePlaylists: async () => {
+    let results = [];
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore) {
+      const data = await ApiService.fetchData("genre-playlists/", "GET", null, page);
+      results = results.concat(data.results);
+
+      if (data.next) {
+        page++;
+      } else {
+        hasMore = false;
+      }
+    }
+
+    return results;
+  },
+
   retrievePlaylist: async (playlistUuid) => {
     return await ApiService.fetchData(`playlists/${playlistUuid}/`, "GET", null, null);
   },

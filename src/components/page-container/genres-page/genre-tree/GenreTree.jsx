@@ -150,7 +150,7 @@ export default function GenreTree({ genres, handleGenreAddClick, postLibTracksAn
       .html(function (d) {
         if (
           playingPlaylistUuidWithLoadingState &&
-          playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid &&
+          playingPlaylistUuidWithLoadingState.uuid === d.data.uuid &&
           playingPlaylistUuidWithLoadingState.isLoading
         ) {
           return ReactDOMServer.renderToString(
@@ -172,20 +172,17 @@ export default function GenreTree({ genres, handleGenreAddClick, postLibTracksAn
       .attr("y", -PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT / 2)
       .style("visibility", function (d) {
         return playingPlaylistUuidWithLoadingState &&
-          playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid &&
+          playingPlaylistUuidWithLoadingState.uuid === d.data.uuid &&
           playingPlaylistUuidWithLoadingState.isLoading
           ? "hidden"
           : "visible";
       })
       .html(function (d) {
-        if (d.data.criteriaPlaylist.libraryTracksCount === 0) {
+        if (d.data.libraryTracksCount === 0) {
           return "";
         }
 
-        if (
-          playingPlaylistUuidWithLoadingState &&
-          playingPlaylistUuidWithLoadingState.uuid === d.data.criteriaPlaylist.uuid
-        ) {
+        if (playingPlaylistUuidWithLoadingState && playingPlaylistUuidWithLoadingState.uuid === d.data.uuid) {
           if (playingPlaylistUuidWithLoadingState.isLoading) {
             return "";
           }
@@ -205,16 +202,16 @@ export default function GenreTree({ genres, handleGenreAddClick, postLibTracksAn
         if (
           !playingPlaylistUuidWithLoadingState ||
           playState === PLAY_STATES.STOPPED ||
-          playingPlaylistUuidWithLoadingState.uuid !== d.data.criteriaPlaylist.uuid
+          playingPlaylistUuidWithLoadingState.uuid !== d.data.uuid
         ) {
-          if (d.data.criteriaPlaylist.libraryTracksCount > 0) {
+          if (d.data.libraryTracksCount > 0) {
             event.stopPropagation();
-            selectPlaylistUuidToPlay(d.data.criteriaPlaylist.uuid);
+            selectPlaylistUuidToPlay(d.data.uuid);
           }
         }
       })
       .style("cursor", function (d) {
-        if (d.data.criteriaPlaylist.libraryTracksCount > 0) {
+        if (d.data.libraryTracksCount > 0) {
           return "pointer";
         }
         return "default";
@@ -232,7 +229,7 @@ export default function GenreTree({ genres, handleGenreAddClick, postLibTracksAn
       .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAYLIST_TRACKS_COUNT_TEXT_OFFSET)
       .attr("y", -PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT / 2)
       .html(function (d) {
-        return `<div class="tree-node-info">` + d.data.criteriaPlaylist.libraryTracksCount + "</div>";
+        return `<div class="tree-node-info">` + d.data.libraryTracksCount + "</div>";
       });
 
     const GENRE_ADD_PLUS_ICON_DIMENSIONS = {
@@ -259,7 +256,7 @@ export default function GenreTree({ genres, handleGenreAddClick, postLibTracksAn
       })
       .style("display", "none")
       .on("click", function (event, d) {
-        handleGenreAddClick(event, d.data.uuid);
+        handleGenreAddClick(event, d.data.criteria.uuid);
       });
 
     const TRACK_UPLOAD_ICON_DIMENSIONS = {
@@ -286,7 +283,7 @@ export default function GenreTree({ genres, handleGenreAddClick, postLibTracksAn
       .style("display", "none")
       .on("click", function (event, d) {
         event.stopPropagation();
-        selectingFileGenreUuidRef.current = d.data.uuid;
+        selectingFileGenreUuidRef.current = d.data.criteria.uuid;
         fileInputRef.current.click();
       });
 
