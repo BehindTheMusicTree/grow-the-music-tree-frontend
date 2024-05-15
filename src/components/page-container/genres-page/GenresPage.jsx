@@ -1,28 +1,11 @@
-import { useState, useRef, useEffect } from "react";
-
 import { GENRE_TREE_RECT_DIMENSIONS } from "../../../constants";
 import ApiService from "../../../utils/service/apiService";
-import { useRefreshGenrePlaylistsSignal as useRefreshGenrePlaylistsSignal } from "../../../contexts/refresh-genre-playlists-signal/useRefreshGenrePlaylistsSignal.jsx";
+import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePlaylists";
 
 import GenreTree from "./genre-tree/GenreTree";
 
 export default function GenresPage() {
-  const { refreshGenrePlaylistsSignal, setRefreshGenrePlaylistsSignal } = useRefreshGenrePlaylistsSignal();
-  const [groupedGenrePlaylists, setGroupedGenrePlaylists] = useState(null);
-  const areGenrePlaylistsFetchingRef = useRef(false);
-
-  const getGenrePlaylistsGroupedByRoot = (genrePlaylists) => {
-    const groupedGenrePlaylists = {};
-    genrePlaylists.forEach((genrePlaylist) => {
-      const rootUuid = genrePlaylist.root.uuid;
-      if (!groupedGenrePlaylists[rootUuid]) {
-        groupedGenrePlaylists[rootUuid] = [];
-      }
-      groupedGenrePlaylists[rootUuid].push(genrePlaylist);
-    });
-
-    return groupedGenrePlaylists;
-  };
+  const { groupedGenrePlaylists, setRefreshGenrePlaylists } = useGenrePlaylists();
 
   const handleGenreAddClick = async (event, parentUuid) => {
     event.stopPropagation();
@@ -34,26 +17,8 @@ export default function GenresPage() {
       name: name,
       parent: parentUuid,
     });
-    setRefreshGenrePlaylistsSignal(1);
+    setRefreshGenrePlaylists(1);
   };
-
-  useEffect(() => {
-    const fetchGenrePlaylists = async () => {
-      const genrePlaylists = await ApiService.getGenrePlaylists();
-      setGroupedGenrePlaylists(getGenrePlaylistsGroupedByRoot(genrePlaylists));
-    };
-
-    if (refreshGenrePlaylistsSignal == 1 && !areGenrePlaylistsFetchingRef.current) {
-      areGenrePlaylistsFetchingRef.current = true;
-      fetchGenrePlaylists();
-      areGenrePlaylistsFetchingRef.current = false;
-      setRefreshGenrePlaylistsSignal(0);
-    }
-  }, [refreshGenrePlaylistsSignal]);
-
-  useEffect(() => {
-    areGenrePlaylistsFetchingRef.current = false;
-  }, [groupedGenrePlaylists]);
 
   return (
     <div className="mt-5 flex flex-col">

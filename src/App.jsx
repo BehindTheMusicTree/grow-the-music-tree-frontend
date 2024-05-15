@@ -6,10 +6,9 @@ import { PopupProvider } from "./contexts/popup/PopupContext";
 
 import { PLAY_STATES, CONTENT_AREA_TYPES } from "./constants";
 import ApiService from "./utils/service/apiService";
-import { usePlayerTrackObject } from "./contexts/player-track-object/usePlayerTrackObject.jsx";
-import { usePlaylistPlayObject } from "./contexts/playlist-play-object/usePlaylistPlayObject.jsx";
-import { usePlayState } from "./contexts/play-state/usePlayState.jsx";
-import { useRefreshGenrePlaylistsSignal } from "./contexts/refresh-genre-playlists-signal/useRefreshGenrePlaylistsSignal.jsx";
+import { usePlayerTrackObject } from "./contexts/player-track-object/usePlayerTrackObject";
+import { usePlaylistPlayObject } from "./contexts/playlist-play-object/usePlaylistPlayObject";
+import { usePlayState } from "./contexts/play-state/usePlayState";
 
 import Popup from "./components/popup/Popup";
 import Banner from "./components/banner/Banner";
@@ -23,7 +22,6 @@ export default function App() {
   const { playerTrackObject, setPlayerTrackObject } = usePlayerTrackObject();
   const {
     playlistPlayObject,
-    setPlaylistPlayObject,
     playingPlaylistUuidWithLoadingState,
     setPlayingPlaylistUuidWithLoadingState,
     trackNumber,
@@ -31,7 +29,6 @@ export default function App() {
   } = usePlaylistPlayObject();
 
   const { playState, setPlayState } = usePlayState();
-  const { setRefreshGenrePlaylistsSignal } = useRefreshGenrePlaylistsSignal();
 
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
@@ -41,28 +38,6 @@ export default function App() {
     type: CONTENT_AREA_TYPES.GENRES,
     pageObject: null,
   });
-
-  const handleUpdatedLibTrack = async (updatedLibTrack) => {
-    setPlaylistPlayObject((currentState) => {
-      const newState = { ...currentState };
-      const oldTrack = newState.contentObject.libraryTracks.find(
-        (track) => track.libraryTrack.uuid === updatedLibTrack.uuid
-      );
-      const genreChanged = oldTrack && oldTrack.libraryTrack.genre !== updatedLibTrack.genre;
-
-      newState.contentObject.libraryTracks = newState.contentObject.libraryTracks.map((playlistTrackRelation) =>
-        playlistTrackRelation.libraryTrack.uuid === updatedLibTrack.uuid
-          ? { ...playlistTrackRelation, libraryTrack: updatedLibTrack }
-          : playlistTrackRelation
-      );
-
-      if (genreChanged) {
-        setRefreshGenrePlaylistsSignal(1);
-      }
-
-      return newState;
-    });
-  };
 
   useEffect(() => {
     const setPlayingTrack = async (playingTrackObject) => {
@@ -109,7 +84,6 @@ export default function App() {
                     pageTypeWithObject={pageTypeWithObject}
                     isTrackListSidebarVisible={isTrackListSidebarVisible}
                     playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
-                    handleUpdatedLibTrack={handleUpdatedLibTrack}
                   />
                   {playerTrackObject && (
                     <Player

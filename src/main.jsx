@@ -5,10 +5,10 @@ import * as Sentry from "@sentry/react";
 import App from "./App.jsx";
 import "./index.css";
 
-import { PlayerTrackObjectProvider } from "./contexts/player-track-object/PlayerTrackObjectContext.jsx";
-import { PlaylistPlayObjectProvider } from "./contexts/playlist-play-object/PlaylistPlayObjectContext.jsx";
+import { PlayerTrackObjectProvider } from "./contexts/player-track-object/PlayerTrackObjectContext";
+import { PlaylistPlayObjectProvider } from "./contexts/playlist-play-object/PlaylistPlayObjectContext";
 import { PlayStateProvider } from "./contexts/play-state/PlayStateContext";
-import { RefreshGenrePlaylistsSignalProvider } from "./contexts/refresh-genre-playlists-signal/RefreshGenrePlaylistsSignalContext";
+import { GenrePlaylistsProvider } from "./contexts/genre-playlists/GenrePlaylistsContext";
 
 if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
   Sentry.init({
@@ -26,7 +26,7 @@ if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RefreshGenrePlaylistsSignalProvider>
+    <GenrePlaylistsProvider>
       <PlayStateProvider>
         <PlayerTrackObjectProvider>
           <PlaylistPlayObjectProvider>
@@ -40,6 +40,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           </PlaylistPlayObjectProvider>
         </PlayerTrackObjectProvider>
       </PlayStateProvider>
-    </RefreshGenrePlaylistsSignalProvider>
+    </GenrePlaylistsProvider>
   </React.StrictMode>
 );
