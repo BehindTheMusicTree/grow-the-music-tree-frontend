@@ -3,10 +3,14 @@ import { useState } from "react";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 
 import ApiService from "../../../utils/service/apiService";
+import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePlaylists";
+import { usePlaylistPlayObject } from "../../../contexts/playlist-play-object/usePlaylistPlayObject";
 import { formatTime } from "../../../utils";
 
 export default function LibTrackEditionPopupChild({ popupContentObject, hidePopup }) {
   const FORM_RATING_NULL_VALUE = -1;
+  const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
+  const { setPlaylistPlayObject } = usePlaylistPlayObject();
   const [formValues, setFormValues] = useState({
     title: popupContentObject.libTrack.title,
     artistName: popupContentObject.libTrack.artist ? popupContentObject.libTrack.artist.name : "",
@@ -22,6 +26,28 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
     });
   };
 
+  const handleUpdatedLibTrack = async (updatedLibTrack) => {
+    setPlaylistPlayObject((currentState) => {
+      const newState = { ...currentState };
+      const oldTrack = newState.contentObject.libraryTracks.find(
+        (track) => track.libraryTrack.uuid === updatedLibTrack.uuid
+      );
+      const genreChanged = oldTrack && oldTrack.libraryTrack.genre !== updatedLibTrack.genre;
+
+      newState.contentObject.libraryTracks = newState.contentObject.libraryTracks.map((playlistTrackRelation) =>
+        playlistTrackRelation.libraryTrack.uuid === updatedLibTrack.uuid
+          ? { ...playlistTrackRelation, libraryTrack: updatedLibTrack }
+          : playlistTrackRelation
+      );
+
+      if (genreChanged) {
+        setRefreshGenrePlaylistsSignal(1);
+      }
+
+      return newState;
+    });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     let submittedValues = { ...formValues };
@@ -29,7 +55,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
       submittedValues.rating = null;
     }
     const response = await ApiService.putLibTrack(popupContentObject.libTrack.uuid, formValues);
-    popupContentObject.handleUpdatedLibTrack(response);
+    handleUpdatedLibTrack(response);
     hidePopup();
   };
 

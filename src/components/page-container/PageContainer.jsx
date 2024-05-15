@@ -3,7 +3,7 @@ import TrackListSidebar from "./track-list-sidebar/TrackListSidebar";
 import { CONTENT_AREA_TYPES } from "../../constants";
 import GenresPage from "./genres-page/GenresPage";
 
-export default function PageContainer({ pageTypeWithObject, isTrackListSidebarVisible, handleUpdatedLibTrack }) {
+export default function PageContainer({ pageTypeWithObject, isTrackListSidebarVisible }) {
   return (
     <div className="relative w-full h-full flex bg-gray-200 font-sans m-0 pl-8">
       {pageTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES ? (
@@ -17,7 +17,7 @@ export default function PageContainer({ pageTypeWithObject, isTrackListSidebarVi
         } */}
       {isTrackListSidebarVisible ? (
         <div className="TrackListSidebarContainer absolute right-0 w-144 h-full bg-black bg-opacity-95">
-          <TrackListSidebar handleUpdatedLibTrack={handleUpdatedLibTrack} />
+          <TrackListSidebar />
         </div>
       ) : null}
     </div>
@@ -27,5 +27,4 @@ export default function PageContainer({ pageTypeWithObject, isTrackListSidebarVi
 PageContainer.propTypes = {
   pageTypeWithObject: PropTypes.object.isRequired,
   isTrackListSidebarVisible: PropTypes.bool.isRequired,
-  handleUpdatedLibTrack: PropTypes.func.isRequired,
 };

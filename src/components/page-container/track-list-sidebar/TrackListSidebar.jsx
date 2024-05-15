@@ -1,10 +1,8 @@
-import PropTypes from "prop-types";
-
 import TrackItem from "./track-item/TrackItem";
 import { capitalizeFirstLetter } from "../../../utils";
 import { usePlaylistPlayObject } from "../../../contexts/playlist-play-object/usePlaylistPlayObject.jsx";
 
-export default function TrackListSidebar({ handleUpdatedLibTrack }) {
+export default function TrackListSidebar() {
   const { playlistPlayObject } = usePlaylistPlayObject();
   return (
     <div className="TrackListSideBar">
@@ -23,10 +21,7 @@ export default function TrackListSidebar({ handleUpdatedLibTrack }) {
         <ul className="TrackList list-none p-0 m-0">
           {playlistPlayObject.contentObject.libraryTracks.map((playlistTrackRelation) => (
             <li key={playlistTrackRelation.libraryTrack.uuid}>
-              <TrackItem
-                playlistTrackRelationObject={playlistTrackRelation}
-                handleUpdatedLibTrack={handleUpdatedLibTrack}
-              />
+              <TrackItem playlistTrackRelationObject={playlistTrackRelation} />
             </li>
           ))}
         </ul>
@@ -35,6 +30,4 @@ export default function TrackListSidebar({ handleUpdatedLibTrack }) {
   );
 }
 
-TrackListSidebar.propTypes = {
-  handleUpdatedLibTrack: PropTypes.func.isRequired,
-};
+TrackListSidebar.propTypes = {};

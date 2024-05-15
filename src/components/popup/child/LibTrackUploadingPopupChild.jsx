@@ -2,10 +2,10 @@ import PropTypes from "prop-types";
 import { useEffect, useRef } from "react";
 
 import ApiService from "../../../utils/service/apiService";
-import { useRefreshGenrePlaylistsSignal } from "../../../contexts/refresh-genre-playlists-signal/useRefreshGenrePlaylistsSignal.jsx";
+import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePlaylists";
 
 export default function LibTrackUploadingPopupChild({ popupContentObject, hidePopup }) {
-  const { setRefreshGenrePlaylistsSignal } = useRefreshGenrePlaylistsSignal();
+  const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
   const isPostingRef = useRef(false);
 
   useEffect(() => {

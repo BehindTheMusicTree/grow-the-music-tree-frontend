@@ -5,15 +5,12 @@ import { usePopup } from "../../../../contexts/popup/usePopup.jsx";
 import { formatTime } from "../../../../utils";
 import LibTrackEditionPopupContentObject from "../../../../models/popup-content-object/LibTrackEditionPopupContentObject.js";
 
-export default function TrackItem({ playlistTrackRelationObject, handleUpdatedLibTrack }) {
+export default function TrackItem({ playlistTrackRelationObject }) {
   const { showPopup } = usePopup();
 
   const handleEditClick = (event) => {
     event.stopPropagation();
-    const popupContentObject = new LibTrackEditionPopupContentObject(
-      playlistTrackRelationObject.libraryTrack,
-      handleUpdatedLibTrack
-    );
+    const popupContentObject = new LibTrackEditionPopupContentObject(playlistTrackRelationObject.libraryTrack);
     showPopup(popupContentObject);
   };
 
@@ -59,5 +56,4 @@ export default function TrackItem({ playlistTrackRelationObject, handleUpdatedLi
 
 TrackItem.propTypes = {
   playlistTrackRelationObject: PropTypes.object,
-  handleUpdatedLibTrack: PropTypes.func.isRequired,
 };
