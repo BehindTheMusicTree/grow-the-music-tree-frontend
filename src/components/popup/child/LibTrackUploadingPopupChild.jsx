@@ -28,7 +28,7 @@ export default function LibTrackUploadingPopupChild({ popupContentObject, hidePo
       isPostingRef.current = true;
       postLibTracks(popupContentObject.file, popupContentObject.genreUuid);
     }
-  }, [popupContentObject]);
+  }, []);
 
   return (
     <div>

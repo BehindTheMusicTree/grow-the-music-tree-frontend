@@ -29,6 +29,7 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
     const file = event.target.files[0];
     const popupContentObject = new LibTrackUploadingPopupContentObject(file, selectingFileGenreUuidRef.current);
     showPopup(popupContentObject);
+    event.target.value = null;
   }
 
   const buildTreeHierarchy = () => {
