@@ -2,6 +2,7 @@ import { createContext, useState } from "react";
 import PropTypes from "prop-types";
 
 import { PLAY_STATES } from "../../constants.js";
+import ApiService from "../../utils/service/apiService";
 
 export const PlayerTrackObjectContext = createContext();
 
@@ -9,6 +10,19 @@ export function PlayerTrackObjectProvider({ children }) {
   const [playerTrackObject, setPlayerTrackObject] = useState(null);
   const [resetPlayerSeekSignal, setResetPlayerSeekSignal] = useState(false);
   const [playState, setPlayState] = useState();
+
+  const setPlayingTrack = async (playingTrackObject, hasNext, hasPrevious) => {
+    const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(
+      playingTrackObject.libraryTrack.relativeUrl
+    );
+    setPlayState(PLAY_STATES.PLAYING);
+    setPlayerTrackObject({
+      ...playingTrackObject.libraryTrack,
+      blobUrl: playingLibTrackBlobUrl,
+      hasNext: hasNext,
+      hasPrevious: hasPrevious,
+    });
+  };
 
   const handlePlayPauseAction = (event) => {
     event.stopPropagation();
@@ -20,7 +34,6 @@ export function PlayerTrackObjectProvider({ children }) {
     } else {
       setPlayState(PLAY_STATES.PLAYING);
     }
-    console.log("handlePlayPauseAction " + playState);
   };
 
   return (
@@ -33,6 +46,7 @@ export function PlayerTrackObjectProvider({ children }) {
         handlePlayPauseAction,
         resetPlayerSeekSignal,
         setResetPlayerSeekSignal,
+        setPlayingTrack,
       }}
     >
       {children}
