@@ -15,11 +15,11 @@ export default function TrackItem({ playlistTrackRelationObject }) {
   };
 
   return (
-    <div className="track-item flex h-15 pt-2 text-gray-400">
+    <div className="track-item flex h-14 pt-2 text-gray-400">
       <div className="track-position flex items-center justify-center text-lg w-16">
         {playlistTrackRelationObject.position}
       </div>
-      <div className="title-artist-container flex flex-col items-start w-1/2">
+      <div className="title-artist-container flex flex-col items-start justify-center w-1/2 text-overflow">
         <div className="title text-lg font-bold text-gray-300 text-overflow">
           {playlistTrackRelationObject.libraryTrack.title}
         </div>
@@ -29,12 +29,12 @@ export default function TrackItem({ playlistTrackRelationObject }) {
           ""
         )}
       </div>
-      <div className="album-genre-container flex flex-col items-end justify-center w-1/2 ml-2 text-xs">
-        <div className="album-name mb-1 text-overflow">
-          {playlistTrackRelationObject.libraryTrack.album ? playlistTrackRelationObject.libraryTrack.album.name : ""}
-        </div>
+      <div className="album-name items-start justify-center w-1/3 ml-2 text-overflow ">
+        {playlistTrackRelationObject.libraryTrack.album ? playlistTrackRelationObject.libraryTrack.album.name : ""}
+      </div>
+      <div className="genre-name-container flex items-center justify-end w-1/6">
         {playlistTrackRelationObject.libraryTrack.genre ? (
-          <div className="genre-name-container font-bold p-1 border border-gray-400 text-overflow">
+          <div className="genre-name font-bold p-1 border border-gray-400 text-xs text-overflow">
             {playlistTrackRelationObject.libraryTrack.genre.name}
           </div>
         ) : (
