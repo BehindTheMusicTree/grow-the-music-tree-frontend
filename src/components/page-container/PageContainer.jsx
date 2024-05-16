@@ -6,7 +6,7 @@ import GenresPage from "./genres-page/GenresPage";
 export default function PageContainer({ pageTypeWithObject, isTrackListSidebarVisible }) {
   return (
     /* 180px being the sum of the banner and player heights */
-    <div className="page-container flex-grow overflow-auto max-h-[calc(100%-180px)] flex flex-col bg-gray-200 m-0 pl-8">
+    <div className="page-container flex-grow overflow-auto max-h-[calc(100%-180px)] flex flex-col bg-gray-200 m-0 px-8 pb-5">
       {pageTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES ? (
         <GenresPage />
       ) : (
