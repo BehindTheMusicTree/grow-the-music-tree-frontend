@@ -10,7 +10,8 @@ export function PlayerTrackObjectProvider({ children }) {
   const [resetPlayerSeekSignal, setResetPlayerSeekSignal] = useState(false);
   const [playState, setPlayState] = useState();
 
-  const handlePlayPauseAction = () => {
+  const handlePlayPauseAction = (event) => {
+    event.stopPropagation();
     if (playState === PLAY_STATES.STOPPED) {
       setResetPlayerSeekSignal(true);
       setPlayState(PLAY_STATES.PLAYING);

@@ -9,7 +9,7 @@ import LibTrackEditionPopupContentObject from "../../../../models/popup-content-
 
 export default function TrackItem({ playlistTrackRelationObject }) {
   const { showPopup } = usePopup();
-  const { handlePlayPauseClick, playerTrackObject } = usePlayerTrackObject();
+  const { handlePlayPauseAction, playerTrackObject } = usePlayerTrackObject();
 
   const handleEditClick = (event) => {
     event.stopPropagation();
@@ -21,7 +21,7 @@ export default function TrackItem({ playlistTrackRelationObject }) {
     <div className="track-item flex h-14 text-gray-400 hover:bg-gray-900 group">
       <div
         className="track-position-play-pause flex items-center justify-center text-lg w-16"
-        onClick={handlePlayPauseClick}
+        onClick={handlePlayPauseAction}
       >
         <div className="group-hover:hidden">
           {playerTrackObject.uuid == playlistTrackRelationObject.libraryTrack.uuid ? (
