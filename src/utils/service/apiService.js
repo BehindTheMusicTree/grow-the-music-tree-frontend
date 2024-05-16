@@ -10,16 +10,24 @@ const parseJson = async (response) => {
   }
 };
 
-const getResponseNotOkErrorMessage = async (url, response) => {
+const handleNotOkResponse = async (url, response) => {
   if (response.status >= 400 && response.status < 600) {
     let errorMessage = "";
     const errorMessagePrefixe = `url ${url} - status ${response.status}`;
     try {
-      const responseJson = await parseJson(response);
-      errorMessage = JSON.stringify(responseJson);
-      return `${errorMessagePrefixe} ${errorMessage ? ` - ${errorMessage}` : ""}`;
+      const responseObj = await parseJson(response);
+      if (response.status === 400) {
+        throw new BadRequestError(responseObj.errors);
+      }
+      errorMessage = JSON.stringify(responseObj);
+      throw new Error(`${errorMessagePrefixe} ${errorMessage ? ` - ${errorMessage}` : ""}`);
     } catch (error) {
-      return `${errorMessagePrefixe} - the response message could not be analysed. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`;
+      if (error instanceof BadRequestError) {
+        throw error;
+      }
+      throw new Error(
+        `${errorMessagePrefixe} - the response message could not be analysed. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`
+      );
     }
   }
   return "";
@@ -65,8 +73,7 @@ const ApiService = {
         } else if (response.status === 401) {
           await ApiService.login();
         } else {
-          const errorMessage = await getResponseNotOkErrorMessage(url, response);
-          throw new Error(errorMessage);
+          await handleNotOkResponse(url, response);
         }
       } else {
         await ApiService.login();
@@ -117,8 +124,7 @@ const ApiService = {
       });
 
       if (!response.ok) {
-        const errorMessage = await getResponseNotOkErrorMessage(url, response);
-        throw new Error(errorMessage);
+        await handleNotOkResponse(url, response);
       } else {
         const responseJson = await parseJson(response);
         ApiService.setToken(responseJson);
@@ -149,12 +155,7 @@ const ApiService = {
       });
 
       if (!response.ok) {
-        const errorMessage = await getResponseNotOkErrorMessage(url, response);
-        if (response.status === 400) {
-          throw new BadRequestError(errorMessage);
-        } else {
-          throw new Error(errorMessage);
-        }
+        await handleNotOkResponse(url, response);
       } else {
         const resonseJson = await parseJson(response);
         return resonseJson;
@@ -188,8 +189,7 @@ const ApiService = {
     const response = await fetch(trackUrl, { headers });
 
     if (!response.ok) {
-      const errorMessage = await getResponseNotOkErrorMessage(trackUrl, response);
-      throw new Error(errorMessage);
+      await handleNotOkResponse(trackUrl, response);
     }
 
     const reader = response.body.getReader();

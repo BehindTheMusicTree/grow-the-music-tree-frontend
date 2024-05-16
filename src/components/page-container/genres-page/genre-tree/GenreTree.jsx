@@ -9,8 +9,6 @@ import { usePopup } from "../../../../contexts/popup/usePopup.jsx";
 import { usePlayState } from "../../../../contexts/play-state/usePlayState.jsx";
 import { usePlaylistPlayObject } from "../../../../contexts/playlist-play-object/usePlaylistPlayObject.jsx";
 import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from "../../../../constants";
-import { BadRequestError } from "../../../../utils/errors/BadRequestError";
-import BadRequestPopupContentObject from "../../../../models/popup-content-object/BadRequestPopupContentObject.js";
 import LibTrackUploadingPopupContentObject from "../../../../models/popup-content-object/LibTrackUploadingPopupContentObject.js";
 
 export default function GenreTree({ genres, handleGenreAddClick }) {
@@ -29,15 +27,9 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
 
   async function handleFileChange(event) {
     const file = event.target.files[0];
-    try {
-      await postLibTrack(file, selectingFileGenreUuidRef.current);
-    } catch (error) {
-      if (error instanceof BadRequestError) {
-        const messages = error.message;
-        const popupContentObject = new BadRequestPopupContentObject("uploading track", messages);
-        showPopup(popupContentObject);
-      }
-    }
+    const popupContentObject = new LibTrackUploadingPopupContentObject(file, selectingFileGenreUuidRef.current);
+    showPopup(popupContentObject);
+    event.target.value = null;
   }
 
   const buildTreeHierarchy = () => {
@@ -65,11 +57,6 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
       }
     });
     return xMax;
-  };
-
-  const postLibTrack = async (file, genreUuid) => {
-    const popupContentObject = new LibTrackUploadingPopupContentObject(file, genreUuid);
-    showPopup(popupContentObject);
   };
 
   useEffect(() => {
