@@ -5,9 +5,12 @@ export const PlayerTrackObjectContext = createContext();
 
 export function PlayerTrackObjectProvider({ children }) {
   const [playerTrackObject, setPlayerTrackObject] = useState(null);
+  const setPlayState = (playState) => {
+    setPlayerTrackObject((prev) => ({ ...prev, playState }));
+  };
 
   return (
-    <PlayerTrackObjectContext.Provider value={{ playerTrackObject, setPlayerTrackObject }}>
+    <PlayerTrackObjectContext.Provider value={{ playerTrackObject, setPlayerTrackObject, setPlayState }}>
       {children}
     </PlayerTrackObjectContext.Provider>
   );
