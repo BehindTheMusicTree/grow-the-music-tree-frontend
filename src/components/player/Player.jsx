@@ -1,23 +1,24 @@
 import { useState, useEffect } from "react";
-import PropTypes from "prop-types";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolumeUp, faListUl } from "@fortawesome/free-solid-svg-icons";
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from "react-icons/fa";
 
 import { PLAY_STATES } from "../../constants.js";
-import { usePlayerTrackObject } from "../../contexts/player-track-object/usePlayerTrackObject.jsx";
-import { usePlaylistPlayObject } from "../../contexts/playlist-play-object/usePlaylistPlayObject.jsx";
+import { usePlayerTrackObject } from "../../contexts/player-track-object/usePlayerTrackObject";
+import { usePlaylistPlayObject } from "../../contexts/playlist-play-object/usePlaylistPlayObject";
 import { usePlayState } from "../../contexts/play-state/usePlayState.jsx";
+import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility.jsx";
 
 import albumCover from "../../assets/images/album-cover-default.png";
 import Button from "../button/Button.jsx";
 
 import TrackProgress from "./TrackProgress/TrackProgress.jsx";
 
-export default function Player({ setIsTrackListSidebarVisible }) {
+export default function Player() {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
+  const { setIsTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const { playerTrackObject } = usePlayerTrackObject();
 
   const { toNextTrack, toPreviousTrack } = usePlaylistPlayObject();
@@ -27,7 +28,7 @@ export default function Player({ setIsTrackListSidebarVisible }) {
   const [seek, setSeek] = useState(0);
   const [volume, setVolume] = useState(0.5);
 
-  const handlePlaylistIconClick = () => {
+  const handleTrackListIconClick = () => {
     setIsTrackListSidebarVisible((b) => !b);
   };
 
@@ -109,7 +110,7 @@ export default function Player({ setIsTrackListSidebarVisible }) {
       </div>
       <div className="flex-1 w-full pl-10 flex items-center justify-center">
         <div className="w-4 h-4 mr-1 transform hover:scale-120 cursor-pointer">
-          <FontAwesomeIcon icon={faListUl} onClick={handlePlaylistIconClick} />
+          <FontAwesomeIcon icon={faListUl} onClick={handleTrackListIconClick} />
         </div>
         <div className="flex items-center justify-center w-full">
           <FontAwesomeIcon icon={faVolumeUp} className="w-5 h-5 mr-2" />
@@ -128,6 +129,4 @@ export default function Player({ setIsTrackListSidebarVisible }) {
   );
 }
 
-Player.propTypes = {
-  setIsTrackListSidebarVisible: PropTypes.func.isRequired,
-};
+Player.propTypes = {};

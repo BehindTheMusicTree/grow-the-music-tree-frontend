@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Howler } from "howler";
 
 import { PopupProvider } from "./contexts/popup/PopupContext";
+import { TrackListSidebarVisibilityProvider } from "./contexts/track-list-sidebar-visibility/TrackListSidebarVisibilityContext";
 
 import { PLAY_STATES, CONTENT_AREA_TYPES } from "./constants";
 import ApiService from "./utils/service/apiService";
@@ -29,10 +30,7 @@ export default function App() {
   } = usePlaylistPlayObject();
 
   const { playState, setPlayState } = usePlayState();
-
   const [searchSubmitted, setSearchSubmitted] = useState("");
-
-  const [isTrackListSidebarVisible, setIsTrackListSidebarVisible] = useState(false);
 
   const pageTypeWithObject = useRef({
     type: CONTENT_AREA_TYPES.GENRES,
@@ -72,32 +70,27 @@ export default function App() {
 
   return (
     <PopupProvider>
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <div className="app flex flex-col h-screen">
-                <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-                <PageContainer
-                  pageTypeWithObject={pageTypeWithObject}
-                  isTrackListSidebarVisible={isTrackListSidebarVisible}
-                  playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
-                />
-                {playerTrackObject && (
-                  <Player
-                    playState={playState}
-                    setPlayState={setPlayState}
-                    setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}
+      <TrackListSidebarVisibilityProvider>
+        <Router>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <div className="app flex flex-col h-screen">
+                  <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
+                  <PageContainer
+                    pageTypeWithObject={pageTypeWithObject}
+                    playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
                   />
-                )}
-                <Popup />
-              </div>
-            }
-          />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </Router>
+                  {playerTrackObject && <Player playState={playState} setPlayState={setPlayState} />}
+                  <Popup />
+                </div>
+              }
+            />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Router>
+      </TrackListSidebarVisibilityProvider>
     </PopupProvider>
   );
 }

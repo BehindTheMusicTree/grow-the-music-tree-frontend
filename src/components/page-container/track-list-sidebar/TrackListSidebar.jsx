@@ -1,12 +1,15 @@
 import TrackItem from "./track-item/TrackItem";
 import { capitalizeFirstLetter } from "../../../utils";
-import { usePlaylistPlayObject } from "../../../contexts/playlist-play-object/usePlaylistPlayObject.jsx";
+import { usePlaylistPlayObject } from "../../../contexts/playlist-play-object/usePlaylistPlayObject";
+import { useTrackListSidebarVisibility } from "../../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
 
 export default function TrackListSidebar() {
   const { playlistPlayObject } = usePlaylistPlayObject();
+  const { setIsTrackListSidebarVisible } = useTrackListSidebarVisibility();
+
   return (
-    <div className="track-list-sidebar rounded-2xl bg-red-500">
-      <div className="header flex flex-row px-4 py-2">
+    <div className="track-list-sidebar">
+      <div className="header flex px-4 py-2">
         <div className="name flex flex-col justify-center items-center text-gray-300 text-xl font-bold pr-2">
           {playlistPlayObject.contentObject.name}
         </div>
@@ -15,6 +18,12 @@ export default function TrackListSidebar() {
           {playlistPlayObject.contentObject.libraryTracksCount +
             " track" +
             (playlistPlayObject.contentObject.libraryTracksCount > 1 ? "s •" : " •")}
+        </div>
+        <div
+          className="flex-grow flex flex-col items-end justify-center h-full cursor-pointer"
+          onClick={() => setIsTrackListSidebarVisible(false)}
+        >
+          &#10005;
         </div>
       </div>
       <div>
