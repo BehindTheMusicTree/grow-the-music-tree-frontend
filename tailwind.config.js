@@ -37,7 +37,7 @@ export default {
   },
   variants: {
     extend: {
-      display: ["checked"],
+      display: ["checked", "group-hover"],
     },
   },
   plugins: [

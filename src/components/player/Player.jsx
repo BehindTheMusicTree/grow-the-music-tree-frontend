@@ -7,7 +7,6 @@ import { FaPlay, FaPause, FaStepForward, FaStepBackward } from "react-icons/fa";
 import { PLAY_STATES } from "../../constants.js";
 import { usePlayerTrackObject } from "../../contexts/player-track-object/usePlayerTrackObject";
 import { usePlaylistPlayObject } from "../../contexts/playlist-play-object/usePlaylistPlayObject";
-import { usePlayState } from "../../contexts/play-state/usePlayState.jsx";
 import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility.jsx";
 
 import albumCover from "../../assets/images/album-cover-default.png";
@@ -19,28 +18,16 @@ export default function Player() {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
   const { setIsTrackListSidebarVisible } = useTrackListSidebarVisibility();
-  const { playerTrackObject } = usePlayerTrackObject();
+  const { playerTrackObject, handlePlayPauseAction, playState, setPlayState, setResetPlayerSeekSignal } =
+    usePlayerTrackObject();
 
   const { toNextTrack, toPreviousTrack } = usePlaylistPlayObject();
 
-  const { playState, setPlayState } = usePlayState();
-  const [shouldResetPlayerSeek, setshouldResetPlayerSeek] = useState(false);
   const [seek, setSeek] = useState(0);
   const [volume, setVolume] = useState(0.5);
 
   const handleTrackListIconClick = () => {
     setIsTrackListSidebarVisible((b) => !b);
-  };
-
-  const handlePlayPause = () => {
-    if (playState === PLAY_STATES.STOPPED) {
-      setshouldResetPlayerSeek(true);
-      setPlayState(PLAY_STATES.PLAYING);
-    } else if (playState === PLAY_STATES.PLAYING) {
-      setPlayState(PLAY_STATES.PAUSED);
-    } else {
-      setPlayState(PLAY_STATES.PLAYING);
-    }
   };
 
   const handleVolumeChange = (event) => {
@@ -61,14 +48,14 @@ export default function Player() {
 
   const handleBackwardClick = () => {
     if (!playerTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
-      setshouldResetPlayerSeek(true);
+      setResetPlayerSeekSignal(true);
     } else {
       toPreviousTrack();
     }
   };
 
   useEffect(() => {
-    setshouldResetPlayerSeek(true);
+    setResetPlayerSeekSignal(true);
   }, [playerTrackObject]);
 
   return (
@@ -88,7 +75,7 @@ export default function Player() {
           <Button
             className={`player-control-button text-1.5xl py-4 mx-1
             ${playState !== PLAY_STATES.PLAYING ? "pl-play-l-offset pr-play-r-offset" : "px-4"}`}
-            onClick={handlePlayPause}
+            onClick={handlePlayPauseAction}
           >
             <div className="text-1.5xl">{playState === PLAY_STATES.PLAYING ? <FaPause /> : <FaPlay />}</div>
           </Button>
@@ -99,14 +86,7 @@ export default function Player() {
             <FaStepForward />
           </Button>
         </div>
-        <TrackProgress
-          shouldResetPlayerSeek={shouldResetPlayerSeek}
-          setshouldResetPlayerSeek={setshouldResetPlayerSeek}
-          volume={volume}
-          handleTrackEnd={handleTrackEnd}
-          seek={seek}
-          setSeek={setSeek}
-        />
+        <TrackProgress volume={volume} handleTrackEnd={handleTrackEnd} seek={seek} setSeek={setSeek} />
       </div>
       <div className="flex-1 w-full pl-10 flex items-center justify-center">
         <div className="w-4 h-4 mr-1 transform hover:scale-120 cursor-pointer">

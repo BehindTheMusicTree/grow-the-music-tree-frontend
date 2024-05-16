@@ -9,7 +9,6 @@ import { PLAY_STATES, CONTENT_AREA_TYPES } from "./constants";
 import ApiService from "./utils/service/apiService";
 import { usePlayerTrackObject } from "./contexts/player-track-object/usePlayerTrackObject";
 import { usePlaylistPlayObject } from "./contexts/playlist-play-object/usePlaylistPlayObject";
-import { usePlayState } from "./contexts/play-state/usePlayState";
 
 import Popup from "./components/popup/Popup";
 import Banner from "./components/banner/Banner";
@@ -20,7 +19,7 @@ import NotFoundPage from "./components/NotFoundPage";
 Howler.autoUnlock = true;
 
 export default function App() {
-  const { playerTrackObject, setPlayerTrackObject } = usePlayerTrackObject();
+  const { playerTrackObject, setPlayerTrackObject, setPlayState } = usePlayerTrackObject();
   const {
     playlistPlayObject,
     playingPlaylistUuidWithLoadingState,
@@ -29,7 +28,6 @@ export default function App() {
     setTrackNumber,
   } = usePlaylistPlayObject();
 
-  const { playState, setPlayState } = usePlayState();
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
   const pageTypeWithObject = useRef({
@@ -42,6 +40,7 @@ export default function App() {
       const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(
         playingTrackObject.libraryTrack.relativeUrl
       );
+      setPlayState(PLAY_STATES.PLAYING);
       setPlayerTrackObject({
         ...playingTrackObject.libraryTrack,
         blobUrl: playingLibTrackBlobUrl,
@@ -82,7 +81,7 @@ export default function App() {
                     pageTypeWithObject={pageTypeWithObject}
                     playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
                   />
-                  {playerTrackObject && <Player playState={playState} setPlayState={setPlayState} />}
+                  {playerTrackObject && <Player />}
                   <Popup />
                 </div>
               }

@@ -1,7 +1,8 @@
 import PropTypes from "prop-types";
 import { MdMoreVert } from "react-icons/md";
-import { useEffect } from "react";
+import { FaPlay, FaPause } from "react-icons/fa";
 
+import { PLAY_STATES } from "../../../../constants.js";
 import { usePopup } from "../../../../contexts/popup/usePopup.jsx";
 import { usePlayerTrackObject } from "../../../../contexts/player-track-object/usePlayerTrackObject";
 import { formatTime } from "../../../../utils";
@@ -9,8 +10,7 @@ import LibTrackEditionPopupContentObject from "../../../../models/popup-content-
 
 export default function TrackItem({ playlistTrackRelationObject }) {
   const { showPopup } = usePopup();
-  // const { setPlayState, playerTrackObject } = usePlayerTrackObject();
-  const { playerTrackObject } = usePlayerTrackObject();
+  const { setPlayState, playerTrackObject } = usePlayerTrackObject();
 
   const handleEditClick = (event) => {
     event.stopPropagation();
@@ -18,28 +18,42 @@ export default function TrackItem({ playlistTrackRelationObject }) {
     showPopup(popupContentObject);
   };
 
-  useEffect(() => {
-    console.log("TrackItem useEffect playerTrackObject", playerTrackObject);
-  }, [playerTrackObject]);
+  const handlePlayPauseClick = () => {
+    if (playerTrackObject.uuid == playlistTrackRelationObject.libraryTrack.uuid) {
+      if (playerTrackObject.isPlaying) {
+        setPlayState(PLAY_STATES.PAUSED);
+      } else {
+        setPlayState(PLAY_STATES.PLAYING);
+      }
+    }
+  };
 
   return (
-    <div className="track-item flex h-14 text-gray-400 hover:bg-gray-700">
-      <div className="track-position-play-pause flex items-center justify-center text-lg w-16">
-        {playerTrackObject.uuid == playlistTrackRelationObject.libraryTrack.uuid ? (
-          <div className="flex space-x-1 items-end">
-            <div className="w-playingbar bg-green-500 h-3 animate-scale-pulse origin-bottom"></div>
-            <div
-              className="w-playingbar bg-green-500 h-4 animate-scale-pulse delay-200 origin-bottom"
-              style={{ animationDelay: "0.2s" }}
-            ></div>
-            <div
-              className="w-playingbar bg-green-500 h-3 animate-scale-pulse delay-400 origin-bottom"
-              style={{ animationDelay: "0.3s" }}
-            ></div>
-          </div>
-        ) : (
-          playlistTrackRelationObject.position
-        )}
+    <div className="track-item flex h-14 text-gray-400 hover:bg-gray-900 group">
+      <div
+        className="track-position-play-pause flex items-center justify-center text-lg w-16"
+        onClick={handlePlayPauseClick}
+      >
+        <div className="group-hover:hidden">
+          {playerTrackObject.uuid == playlistTrackRelationObject.libraryTrack.uuid ? (
+            <div className="flex space-x-1 items-end">
+              <div className="w-playingbar bg-green-500 h-3 animate-scale-pulse origin-bottom"></div>
+              <div
+                className="w-playingbar bg-green-500 h-4 animate-scale-pulse delay-200 origin-bottom"
+                style={{ animationDelay: "0.2s" }}
+              ></div>
+              <div
+                className="w-playingbar bg-green-500 h-3 animate-scale-pulse delay-400 origin-bottom"
+                style={{ animationDelay: "0.3s" }}
+              ></div>
+            </div>
+          ) : (
+            playlistTrackRelationObject.position
+          )}
+        </div>
+        <div className="hidden group-hover:flex items-center justify-center">
+          {playerTrackObject.uuid == playlistTrackRelationObject.libraryTrack.uuid ? <FaPause /> : <FaPlay />}
+        </div>
       </div>
       <div className="title-artist-container flex flex-col items-start justify-center w-1/2 text-overflow">
         <div className="title text-lg font-bold tnbvmm ext-gray-300 text-overflow">
