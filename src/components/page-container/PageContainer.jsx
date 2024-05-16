@@ -1,11 +1,26 @@
 import PropTypes from "prop-types";
+
 import TrackListSidebar from "./track-list-sidebar/TrackListSidebar";
 import { CONTENT_AREA_TYPES } from "../../constants";
 import GenresPage from "./genres-page/GenresPage";
+import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
+import { usePlayerTrackObject } from "../../contexts/player-track-object/usePlayerTrackObject";
 
-export default function PageContainer({ pageTypeWithObject, isTrackListSidebarVisible }) {
+export default function PageContainer({ pageTypeWithObject }) {
+  const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
+  const { playerTrackObject } = usePlayerTrackObject();
+
   return (
-    <div className="relative w-full h-full flex bg-gray-200 font-sans m-0 pl-8">
+    /* 180px being the sum of the banner and player heights, 100px being the height of the banner alone */
+    <div
+      className={
+        "page-container flex-grow overflow-auto max-h-[calc(100%-" +
+        (playerTrackObject ? "180px" : "100px") +
+        ")] flex flex-col bg-gray-200 m-0 px-8 pb-5"
+      }
+    >
+      {/* <div className="page-container flex-grow overflow-auto max-h-[calc(100%-180px)] flex flex-col bg-gray-200 m-0 px-8 pb-5"> */}
+
       {pageTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES ? (
         <GenresPage />
       ) : (
@@ -16,7 +31,7 @@ export default function PageContainer({ pageTypeWithObject, isTrackListSidebarVi
       : <IconPause dataTestId="pause"/>
         } */}
       {isTrackListSidebarVisible ? (
-        <div className="TrackListSidebarContainer absolute right-0 w-144 h-full bg-black bg-opacity-95">
+        <div className="track-list-sidebar-container absolute right-0 w-144 overflow-auto max-h-[calc(100%-180px)] rounded-2xl bg-gray-950">
           <TrackListSidebar />
         </div>
       ) : null}
@@ -26,5 +41,4 @@ export default function PageContainer({ pageTypeWithObject, isTrackListSidebarVi
 
 PageContainer.propTypes = {
   pageTypeWithObject: PropTypes.object.isRequired,
-  isTrackListSidebarVisible: PropTypes.bool.isRequired,
 };

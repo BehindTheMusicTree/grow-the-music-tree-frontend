@@ -9,7 +9,7 @@ import { formatTime } from "../../../utils";
 
 export default function LibTrackEditionPopupChild({ popupContentObject, hidePopup }) {
   const FORM_RATING_NULL_VALUE = -1;
-  const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
+  const { setRefreshGenrePlaylistsSignalSignalSignal } = useGenrePlaylists();
   const { setPlaylistPlayObject } = usePlaylistPlayObject();
   const [formValues, setFormValues] = useState({
     title: popupContentObject.libTrack.title,
@@ -41,7 +41,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
       );
 
       if (genreChanged) {
-        setRefreshGenrePlaylistsSignal(1);
+        setRefreshGenrePlaylistsSignalSignalSignal(1);
       }
 
       return newState;
