@@ -7,7 +7,6 @@ import "./index.css";
 
 import { PlayerTrackObjectProvider } from "./contexts/player-track-object/PlayerTrackObjectContext";
 import { PlaylistPlayObjectProvider } from "./contexts/playlist-play-object/PlaylistPlayObjectContext";
-import { PlayStateProvider } from "./contexts/play-state/PlayStateContext";
 import { GenrePlaylistsProvider } from "./contexts/genre-playlists/GenrePlaylistsContext";
 
 if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
@@ -27,19 +26,17 @@ if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <GenrePlaylistsProvider>
-      <PlayStateProvider>
-        <PlayerTrackObjectProvider>
-          <PlaylistPlayObjectProvider>
-            {import.meta.env.VITE_SENTRY_ACTIVE === true ? (
-              <Sentry.ErrorBoundary fallback={"An error has occurred"}>
-                <App />
-              </Sentry.ErrorBoundary>
-            ) : (
+      <PlayerTrackObjectProvider>
+        <PlaylistPlayObjectProvider>
+          {import.meta.env.VITE_SENTRY_ACTIVE === true ? (
+            <Sentry.ErrorBoundary fallback={"An error has occurred"}>
               <App />
-            )}
-          </PlaylistPlayObjectProvider>
-        </PlayerTrackObjectProvider>
-      </PlayStateProvider>
+            </Sentry.ErrorBoundary>
+          ) : (
+            <App />
+          )}
+        </PlaylistPlayObjectProvider>
+      </PlayerTrackObjectProvider>
     </GenrePlaylistsProvider>
   </React.StrictMode>
 );

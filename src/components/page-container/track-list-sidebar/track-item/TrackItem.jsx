@@ -2,7 +2,6 @@ import PropTypes from "prop-types";
 import { MdMoreVert } from "react-icons/md";
 import { FaPlay, FaPause } from "react-icons/fa";
 
-import { PLAY_STATES } from "../../../../constants.js";
 import { usePopup } from "../../../../contexts/popup/usePopup.jsx";
 import { usePlayerTrackObject } from "../../../../contexts/player-track-object/usePlayerTrackObject";
 import { formatTime } from "../../../../utils";
@@ -10,22 +9,12 @@ import LibTrackEditionPopupContentObject from "../../../../models/popup-content-
 
 export default function TrackItem({ playlistTrackRelationObject }) {
   const { showPopup } = usePopup();
-  const { setPlayState, playerTrackObject } = usePlayerTrackObject();
+  const { handlePlayPauseClick, playerTrackObject } = usePlayerTrackObject();
 
   const handleEditClick = (event) => {
     event.stopPropagation();
     const popupContentObject = new LibTrackEditionPopupContentObject(playlistTrackRelationObject.libraryTrack);
     showPopup(popupContentObject);
-  };
-
-  const handlePlayPauseClick = () => {
-    if (playerTrackObject.uuid == playlistTrackRelationObject.libraryTrack.uuid) {
-      if (playerTrackObject.isPlaying) {
-        setPlayState(PLAY_STATES.PAUSED);
-      } else {
-        setPlayState(PLAY_STATES.PLAYING);
-      }
-    }
   };
 
   return (
