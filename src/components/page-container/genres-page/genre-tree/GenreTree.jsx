@@ -5,9 +5,9 @@ import ReactDOMServer from "react-dom/server";
 import * as d3 from "d3";
 import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause } from "react-icons/fa";
 
-import { usePopup } from "../../../../contexts/popup/usePopup.jsx";
-import { usePlayState } from "../../../../contexts/play-state/usePlayState.jsx";
-import { usePlaylistPlayObject } from "../../../../contexts/playlist-play-object/usePlaylistPlayObject.jsx";
+import { usePopup } from "../../../../contexts/popup/usePopup";
+import { usePlaylistPlayObject } from "../../../../contexts/playlist-play-object/usePlaylistPlayObject";
+import { usePlayerTrackObject } from "../../../../contexts/player-track-object/usePlayerTrackObject";
 import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from "../../../../constants";
 import LibTrackUploadingPopupContentObject from "../../../../models/popup-content-object/LibTrackUploadingPopupContentObject.js";
 
@@ -18,7 +18,7 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
     GENRE_TREE_RECT_DIMENSIONS.WIDTH + HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES;
   const VERTICAL_SEPARATOON_BETWEEN_NODES = GENRE_TREE_RECT_DIMENSIONS.HEIGHT + VERTICAL_SEPARATOON_BETWEEN_RECTANGLES;
 
-  const { playState } = usePlayState();
+  const { playState } = usePlayerTrackObject();
   const { showPopup } = usePopup();
   const { playingPlaylistUuidWithLoadingState, selectPlaylistUuidToPlay } = usePlaylistPlayObject();
   const svgRef = useRef(null);

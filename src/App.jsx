@@ -6,10 +6,8 @@ import { PopupProvider } from "./contexts/popup/PopupContext";
 import { TrackListSidebarVisibilityProvider } from "./contexts/track-list-sidebar-visibility/TrackListSidebarVisibilityContext";
 
 import { PLAY_STATES, CONTENT_AREA_TYPES } from "./constants";
-import ApiService from "./utils/service/apiService";
 import { usePlayerTrackObject } from "./contexts/player-track-object/usePlayerTrackObject";
 import { usePlaylistPlayObject } from "./contexts/playlist-play-object/usePlaylistPlayObject";
-import { usePlayState } from "./contexts/play-state/usePlayState";
 
 import Popup from "./components/popup/Popup";
 import Banner from "./components/banner/Banner";
@@ -20,16 +18,15 @@ import NotFoundPage from "./components/NotFoundPage";
 Howler.autoUnlock = true;
 
 export default function App() {
-  const { playerTrackObject, setPlayerTrackObject } = usePlayerTrackObject();
+  const { playerTrackObject, setPlayState, setPlayingTrack } = usePlayerTrackObject();
   const {
     playlistPlayObject,
     playingPlaylistUuidWithLoadingState,
     setPlayingPlaylistUuidWithLoadingState,
-    trackNumber,
-    setTrackNumber,
+    trackPosition,
+    setTrackPosition,
   } = usePlaylistPlayObject();
 
-  const { playState, setPlayState } = usePlayState();
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
   const pageTypeWithObject = useRef({
@@ -38,26 +35,18 @@ export default function App() {
   });
 
   useEffect(() => {
-    const setPlayingTrack = async (playingTrackObject) => {
-      const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(
-        playingTrackObject.libraryTrack.relativeUrl
-      );
-      setPlayerTrackObject({
-        ...playingTrackObject.libraryTrack,
-        blobUrl: playingLibTrackBlobUrl,
-        hasNext: playlistPlayObject.contentObject.libraryTracks.length > trackNumber + 1,
-        hasPrevious: trackNumber > 0,
-      });
-    };
-
     if (playingPlaylistUuidWithLoadingState && playingPlaylistUuidWithLoadingState.isLoading) {
-      setTrackNumber(0);
+      setTrackPosition(1);
     }
 
-    if (playlistPlayObject && playlistPlayObject.contentObject.libraryTracks.length > trackNumber) {
-      setPlayingTrack(playlistPlayObject.contentObject.libraryTracks[trackNumber]);
+    if (playlistPlayObject && playlistPlayObject.contentObject.libraryTracks.length > trackPosition - 1) {
+      setPlayingTrack(
+        playlistPlayObject.contentObject.libraryTracks[trackPosition - 1],
+        playlistPlayObject.contentObject.libraryTracks.length > trackPosition,
+        trackPosition > 1
+      );
     }
-  }, [playlistPlayObject, trackNumber]);
+  }, [playlistPlayObject, trackPosition]);
 
   useEffect(() => {
     if (playerTrackObject) {
@@ -82,7 +71,7 @@ export default function App() {
                     pageTypeWithObject={pageTypeWithObject}
                     playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
                   />
-                  {playerTrackObject && <Player playState={playState} setPlayState={setPlayState} />}
+                  {playerTrackObject && <Player />}
                   <Popup />
                 </div>
               }

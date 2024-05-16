@@ -4,20 +4,12 @@ import raf from "raf";
 import ReactHowler from "react-howler";
 
 import { usePlayerTrackObject } from "../../../contexts/player-track-object/usePlayerTrackObject.jsx";
-import { usePlayState } from "../../../contexts/play-state/usePlayState.jsx";
 import { PLAY_STATES } from "../../../constants";
 import { formatTime } from "../../../utils";
 
-export default function TrackProgress({
-  shouldResetPlayerSeek,
-  setshouldResetPlayerSeek,
-  volume,
-  handleTrackEnd,
-  seek,
-  setSeek,
-}) {
-  const { playerTrackObject } = usePlayerTrackObject();
-  const { playState, setPlayState } = usePlayState();
+export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek }) {
+  const { playerTrackObject, resetPlayerSeekSignal, setResetPlayerSeekSignal, playState, setPlayState } =
+    usePlayerTrackObject();
   const [isSeeking, setIsSeeking] = useState(false);
 
   const playerRef = useRef(null);
@@ -108,13 +100,13 @@ export default function TrackProgress({
   }, [isSeeking, playState]);
 
   useEffect(() => {
-    if (shouldResetPlayerSeek) {
+    if (resetPlayerSeekSignal) {
       previousSeekRef.current = null;
       setSeek(0);
       playerRef.current.seek(0);
-      setshouldResetPlayerSeek(false);
+      setResetPlayerSeekSignal(false);
     }
-  }, [shouldResetPlayerSeek]);
+  }, [resetPlayerSeekSignal]);
 
   return (
     <div className="flex flex justify-center items-center w-full">
@@ -148,8 +140,6 @@ export default function TrackProgress({
 }
 
 TrackProgress.propTypes = {
-  shouldResetPlayerSeek: PropTypes.bool.isRequired,
-  setshouldResetPlayerSeek: PropTypes.func.isRequired,
   volume: PropTypes.number.isRequired,
   handleTrackEnd: PropTypes.func.isRequired,
   seek: PropTypes.number.isRequired,

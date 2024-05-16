@@ -19,15 +19,25 @@ export default {
       },
       width: {
         144: "50rem",
+        playingbar: "5px",
       },
       maxWidth: {
         xl: "44rem",
+      },
+      keyframes: {
+        "scale-pulse": {
+          "0%, 100%": { transform: "scaleY(0.75)" },
+          "50%": { transform: "scaleY(1)" },
+        },
+      },
+      animation: {
+        "scale-pulse": "scale-pulse 0.5s infinite",
       },
     },
   },
   variants: {
     extend: {
-      display: ["checked"],
+      display: ["checked", "group-hover"],
     },
   },
   plugins: [
