@@ -5,7 +5,8 @@ import GenresPage from "./genres-page/GenresPage";
 
 export default function PageContainer({ pageTypeWithObject, isTrackListSidebarVisible }) {
   return (
-    <div className="relative w-full h-full flex bg-gray-200 font-sans m-0 pl-8">
+    /* 180px being the sum of the banner and player heights */
+    <div className="page-container flex-grow overflow-auto max-h-[calc(100%-180px)] flex flex-col bg-gray-200 m-0 pl-8">
       {pageTypeWithObject.current.type === CONTENT_AREA_TYPES.GENRES ? (
         <GenresPage />
       ) : (
@@ -16,7 +17,7 @@ export default function PageContainer({ pageTypeWithObject, isTrackListSidebarVi
       : <IconPause dataTestId="pause"/>
         } */}
       {isTrackListSidebarVisible ? (
-        <div className="TrackListSidebarContainer absolute right-0 w-144 h-full bg-black bg-opacity-95">
+        <div className="track-list-sidebar-container absolute right-0 w-144 h-full bg-black bg-opacity-95">
           <TrackListSidebar />
         </div>
       ) : null}

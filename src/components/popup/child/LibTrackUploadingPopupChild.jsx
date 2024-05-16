@@ -8,7 +8,7 @@ import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePla
 import { BadRequestError } from "../../../utils/errors/BadRequestError";
 
 export default function LibTrackUploadingPopupChild({ popupContentObject, hidePopup }) {
-  const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
+  const { setRefreshGenrePlaylistsSignalSignalSignal } = useGenrePlaylists();
   const [requestErrors, setRequestErrors] = useState();
   const isPostingRef = useRef(false);
 
@@ -16,7 +16,7 @@ export default function LibTrackUploadingPopupChild({ popupContentObject, hidePo
     async function postLibTracks(file, genreUuid) {
       try {
         await ApiService.postLibTracks(file, genreUuid);
-        setRefreshGenrePlaylistsSignal(1);
+        setRefreshGenrePlaylistsSignalSignalSignal(1);
         hidePopup();
       } catch (error) {
         if (error instanceof BadRequestError) {

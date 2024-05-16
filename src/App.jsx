@@ -77,22 +77,20 @@ export default function App() {
           <Route
             path="/"
             element={
-              <div className="App flex flex-col h-full">
+              <div className="app flex flex-col h-screen">
                 <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-                <div className="Body flex h-full">
-                  <PageContainer
-                    pageTypeWithObject={pageTypeWithObject}
-                    isTrackListSidebarVisible={isTrackListSidebarVisible}
-                    playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
+                <PageContainer
+                  pageTypeWithObject={pageTypeWithObject}
+                  isTrackListSidebarVisible={isTrackListSidebarVisible}
+                  playingPlaylistUuidWithLoadingState={playingPlaylistUuidWithLoadingState}
+                />
+                {playerTrackObject && (
+                  <Player
+                    playState={playState}
+                    setPlayState={setPlayState}
+                    setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}
                   />
-                  {playerTrackObject && (
-                    <Player
-                      playState={playState}
-                      setPlayState={setPlayState}
-                      setIsTrackListSidebarVisible={setIsTrackListSidebarVisible}
-                    />
-                  )}
-                </div>
+                )}
                 <Popup />
               </div>
             }

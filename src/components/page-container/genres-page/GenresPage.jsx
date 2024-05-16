@@ -5,7 +5,7 @@ import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePla
 import GenreTree from "./genre-tree/GenreTree";
 
 export default function GenresPage() {
-  const { groupedGenrePlaylists, setRefreshGenrePlaylists } = useGenrePlaylists();
+  const { groupedGenrePlaylists, setRefreshGenrePlaylistsSignalSignal } = useGenrePlaylists();
 
   const handleGenreAddClick = async (event, parentUuid) => {
     event.stopPropagation();
@@ -17,7 +17,7 @@ export default function GenresPage() {
       name: name,
       parent: parentUuid,
     });
-    setRefreshGenrePlaylists(1);
+    setRefreshGenrePlaylistsSignalSignal(1);
   };
 
   return (

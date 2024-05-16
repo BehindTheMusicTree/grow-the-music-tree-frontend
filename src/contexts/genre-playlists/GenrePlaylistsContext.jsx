@@ -7,7 +7,7 @@ export const GenrePlaylistsContext = createContext();
 
 export function GenrePlaylistsProvider({ children }) {
   const [groupedGenrePlaylists, setGroupedGenrePlaylists] = useState();
-  const [refreshGenrePlaylistsSignal, setRefreshGenrePlaylistsSignal] = useState(1);
+  const [refreshGenrePlaylistsSignal, setRefreshGenrePlaylistsSignalSignalSignal] = useState(1);
 
   const areGenrePlaylistsFetchingRef = { current: false };
 
@@ -21,7 +21,7 @@ export function GenrePlaylistsProvider({ children }) {
       areGenrePlaylistsFetchingRef.current = true;
       fetchGenrePlaylists();
       areGenrePlaylistsFetchingRef.current = false;
-      setRefreshGenrePlaylistsSignal(0);
+      setRefreshGenrePlaylistsSignalSignalSignal(0);
     }
   }, [refreshGenrePlaylistsSignal]);
 
@@ -39,7 +39,7 @@ export function GenrePlaylistsProvider({ children }) {
   };
 
   return (
-    <GenrePlaylistsContext.Provider value={{ groupedGenrePlaylists, setRefreshGenrePlaylistsSignal }}>
+    <GenrePlaylistsContext.Provider value={{ groupedGenrePlaylists, setRefreshGenrePlaylistsSignalSignalSignal }}>
       {children}
     </GenrePlaylistsContext.Provider>
   );

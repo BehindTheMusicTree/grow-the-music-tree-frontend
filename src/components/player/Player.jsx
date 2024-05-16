@@ -71,7 +71,7 @@ export default function Player({ setIsTrackListSidebarVisible }) {
   }, [playerTrackObject]);
 
   return (
-    <div className="w-full fixed left-0 bottom-0 flex justify-between p-2 bg-black text-white text-sm">
+    <div className="w-full h-player fixed bottom-0 flex justify-between p-2 bg-black text-white text-sm">
       <div className="flex-1 flex items-center justify-center">
         <img className="flex-none w-16 h-16 overflow-hidden mr-5" src={albumCover} alt="Album Cover" />
         <div className="flex-1 flex flex-col items-start justify-center w-full">

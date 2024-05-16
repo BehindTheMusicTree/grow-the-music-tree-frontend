@@ -5,12 +5,12 @@ import { usePlaylistPlayObject } from "../../../contexts/playlist-play-object/us
 export default function TrackListSidebar() {
   const { playlistPlayObject } = usePlaylistPlayObject();
   return (
-    <div className="TrackListSideBar">
-      <div className="Header flex flex-row px-4 py-2">
-        <div className="Name flex flex-col justify-center items-center text-gray-300 text-xl font-bold pr-2">
+    <div className="track-list-sidebar rounded-2xl bg-red-500">
+      <div className="header flex flex-row px-4 py-2">
+        <div className="name flex flex-col justify-center items-center text-gray-300 text-xl font-bold pr-2">
           {playlistPlayObject.contentObject.name}
         </div>
-        <div className="Info flex flex-col justify-center items-center text-gray-400 text-m pt-1">
+        <div className="info flex flex-col justify-center items-center text-gray-400 text-m pt-1">
           {"• " + capitalizeFirstLetter(playlistPlayObject.contentObject.type) + " playlist • "}
           {playlistPlayObject.contentObject.libraryTracksCount +
             " track" +
@@ -18,7 +18,7 @@ export default function TrackListSidebar() {
         </div>
       </div>
       <div>
-        <ul className="TrackList list-none p-0 m-0">
+        <ul className="track-list list-none p-0 m-0">
           {playlistPlayObject.contentObject.libraryTracks.map((playlistTrackRelation) => (
             <li key={playlistTrackRelation.libraryTrack.uuid}>
               <TrackItem playlistTrackRelationObject={playlistTrackRelation} />

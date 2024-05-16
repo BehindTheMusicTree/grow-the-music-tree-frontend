@@ -13,6 +13,10 @@ export default {
       boxShadow: {
         "progress-bar-blue": "-403px 0 0 400px #3B82F6", // blue-500
       },
+      height: {
+        banner: "100px",
+        player: "80px",
+      },
       width: {
         144: "50rem",
       },
