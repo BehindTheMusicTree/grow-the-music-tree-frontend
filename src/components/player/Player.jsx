@@ -5,8 +5,8 @@ import { faVolumeUp, faListUl } from "@fortawesome/free-solid-svg-icons";
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from "react-icons/fa";
 
 import { PLAY_STATES } from "../../constants.js";
-import { usePlayerTrackObject } from "../../contexts/player-track-object/usePlayerTrackObject";
-import { usePlaylistPlayObject } from "../../contexts/playlist-play-object/usePlaylistPlayObject";
+import { usePlayerTrackObject } from "../../contexts/player-lib-track-object/usePlayerLibTrackObject.jsx";
+import { useTrackList } from "../../contexts/track-list/useTrackList";
 import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility.jsx";
 
 import albumCover from "../../assets/images/album-cover-default.png";
@@ -18,10 +18,10 @@ export default function Player() {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
   const { setIsTrackListSidebarVisible } = useTrackListSidebarVisibility();
-  const { playerTrackObject, handlePlayPauseAction, playState, setPlayState, setResetPlayerSeekSignal } =
+  const { playerLibTrackObject, handlePlayPauseAction, playState, setPlayState, setResetPlayerSeekSignal } =
     usePlayerTrackObject();
 
-  const { toNextTrack, toPreviousTrack } = usePlaylistPlayObject();
+  const { toNextTrack, toPreviousTrack } = useTrackList();
 
   const [seek, setSeek] = useState(0);
   const [volume, setVolume] = useState(0.5);
@@ -35,7 +35,7 @@ export default function Player() {
   };
 
   const handleTrackEnd = () => {
-    if (playerTrackObject.hasNext) {
+    if (playerLibTrackObject.hasNext) {
       toNextTrack();
     } else {
       setPlayState(PLAY_STATES.STOPPED);
@@ -47,7 +47,7 @@ export default function Player() {
   };
 
   const handleBackwardClick = () => {
-    if (!playerTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
+    if (!playerLibTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
       setResetPlayerSeekSignal(true);
     } else {
       toPreviousTrack();
@@ -56,15 +56,21 @@ export default function Player() {
 
   useEffect(() => {
     setResetPlayerSeekSignal(true);
-  }, [playerTrackObject]);
+  }, [playerLibTrackObject]);
 
   return (
     <div className="w-full h-player fixed bottom-0 flex justify-between p-2 bg-black text-white text-sm">
       <div className="flex-1 flex items-center justify-center">
         <img className="flex-none w-16 h-16 overflow-hidden mr-5" src={albumCover} alt="Album Cover" />
         <div className="flex-1 flex flex-col items-start justify-center w-full">
-          <div>{playerTrackObject ? playerTrackObject.title : ""}</div>
-          <div>{playerTrackObject ? (playerTrackObject.artist ? playerTrackObject.artist.name : "") : ""}</div>
+          <div>{playerLibTrackObject ? playerLibTrackObject.libraryTrack.title : ""}</div>
+          <div>
+            {playerLibTrackObject
+              ? playerLibTrackObject.libraryTrack.artist
+                ? playerLibTrackObject.libraryTrack.artist.name
+                : ""
+              : ""}
+          </div>
         </div>
       </div>
       <div className="flex-2 flex flex-col justify-center items-center">
@@ -80,7 +86,7 @@ export default function Player() {
             <div className="text-1.5xl">{playState === PLAY_STATES.PLAYING ? <FaPause /> : <FaPlay />}</div>
           </Button>
           <Button
-            className={playerTrackObject.hasNext ? "player-control-button" : "player-control-button-disabled"}
+            className={playerLibTrackObject.hasNext ? "player-control-button" : "player-control-button-disabled"}
             onClick={handleForwardClick}
           >
             <FaStepForward />

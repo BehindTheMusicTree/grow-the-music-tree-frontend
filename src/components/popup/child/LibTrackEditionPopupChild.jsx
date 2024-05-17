@@ -4,13 +4,13 @@ import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 
 import ApiService from "../../../utils/service/apiService";
 import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePlaylists";
-import { usePlaylistPlayObject } from "../../../contexts/playlist-play-object/usePlaylistPlayObject";
+import { useTrackList } from "../../../contexts/track-list/useTrackList";
 import { formatTime } from "../../../utils";
 
 export default function LibTrackEditionPopupChild({ popupContentObject, hidePopup }) {
   const FORM_RATING_NULL_VALUE = -1;
   const { setRefreshGenrePlaylistsSignalSignalSignal } = useGenrePlaylists();
-  const { setPlaylistPlayObject } = usePlaylistPlayObject();
+  const { setTrackList } = useTrackList();
   const [formValues, setFormValues] = useState({
     title: popupContentObject.libTrack.title,
     artistName: popupContentObject.libTrack.artist ? popupContentObject.libTrack.artist.name : "",
@@ -27,7 +27,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
   };
 
   const handleUpdatedLibTrack = async (updatedLibTrack) => {
-    setPlaylistPlayObject((currentState) => {
+    setTrackList((currentState) => {
       const newState = { ...currentState };
       const oldTrack = newState.contentObject.libraryTracks.find(
         (track) => track.libraryTrack.uuid === updatedLibTrack.uuid

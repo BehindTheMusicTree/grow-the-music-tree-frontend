@@ -3,12 +3,12 @@ import PropTypes from "prop-types";
 import raf from "raf";
 import ReactHowler from "react-howler";
 
-import { usePlayerTrackObject } from "../../../contexts/player-track-object/usePlayerTrackObject.jsx";
+import { usePlayerTrackObject } from "../../../contexts/player-lib-track-object/usePlayerLibTrackObject.jsx";
 import { PLAY_STATES } from "../../../constants";
 import { formatTime } from "../../../utils";
 
 export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek }) {
-  const { playerTrackObject, resetPlayerSeekSignal, setResetPlayerSeekSignal, playState, setPlayState } =
+  const { playerLibTrackObject, resetPlayerSeekSignal, setResetPlayerSeekSignal, playState, setPlayState } =
     usePlayerTrackObject();
   const [isSeeking, setIsSeeking] = useState(false);
 
@@ -40,7 +40,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
         errorMessage = "An unknown error occurred.";
     }
 
-    console.error(`Error loading track of url ${playerTrackObject.blobUrl}: ${errorCode} - ${errorMessage}`);
+    console.error(`Error loading track of url ${playerLibTrackObject.blobUrl}: ${errorCode} - ${errorMessage}`);
   };
 
   const handleSeekingChange = (event) => {
@@ -88,7 +88,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
     if (playState === PLAY_STATES.PLAYING) {
       if (isSeeking) {
         cancelRaf();
-      } else if (seek >= Math.floor(playerTrackObject.duration)) {
+      } else if (seek >= Math.floor(playerLibTrackObject.duration)) {
         handleTrackEnd();
       } else {
         playerRef.current.seek(seek);
@@ -112,10 +112,10 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
     <div className="flex flex justify-center items-center w-full">
       <ReactHowler
         ref={playerRef}
-        src={[playerTrackObject.blobUrl]}
+        src={[playerLibTrackObject.blobUrl]}
         html5={true}
         playing={playState === PLAY_STATES.PLAYING}
-        format={[playerTrackObject.file.extension.replace(".", "")]}
+        format={[playerLibTrackObject.libraryTrack.file.extension.replace(".", "")]}
         onLoadError={handleLoadError}
         onEnd={handleTrackEnd}
         volume={volume}

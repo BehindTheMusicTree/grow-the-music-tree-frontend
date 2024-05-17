@@ -1,23 +1,24 @@
 import TrackItem from "./track-item/TrackItem";
 import { capitalizeFirstLetter } from "../../../utils";
-import { usePlaylistPlayObject } from "../../../contexts/playlist-play-object/usePlaylistPlayObject";
+import { useTrackList } from "../../../contexts/track-list/useTrackList";
 import { useTrackListSidebarVisibility } from "../../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
 
 export default function TrackListSidebar() {
-  const { playlistPlayObject } = usePlaylistPlayObject();
+  const { trackList, trackListOrigin } = useTrackList();
   const { setIsTrackListSidebarVisible } = useTrackListSidebarVisibility();
 
   return (
     <div className="track-list-sidebar">
-      <div className="header flex px-4 py-2">
-        <div className="name flex flex-col justify-center items-center text-gray-300 text-xl font-bold pr-2">
-          {playlistPlayObject.contentObject.name}
+      <div className="header flex px-4 py-2 text-gray-400">
+        <div className="origin flex text-xl ">
+          <div className="from h-auto flex flex-col justify-center items-center mr-2">From</div>
+          <div className="name flex flex-col justify-center items-center text-gray-300  font-bold pr-2">
+            {trackListOrigin.originObject.name}
+          </div>
         </div>
-        <div className="info flex flex-col justify-center items-center text-gray-400 text-m pt-1">
-          {"• " + capitalizeFirstLetter(playlistPlayObject.contentObject.type) + " playlist • "}
-          {playlistPlayObject.contentObject.libraryTracksCount +
-            " track" +
-            (playlistPlayObject.contentObject.libraryTracksCount > 1 ? "s •" : " •")}
+        <div className="info flex flex-col justify-center items-center text-m pt-1">
+          {"• " + capitalizeFirstLetter(trackListOrigin.originObject.type) + " playlist • "}
+          {trackList.length + " track" + (trackList.length > 1 ? "s •" : " •")}
         </div>
         <div
           className="flex-grow flex flex-col items-end justify-center h-full cursor-pointer"
@@ -28,9 +29,9 @@ export default function TrackListSidebar() {
       </div>
       <div>
         <ul className="track-list list-none p-0 m-0">
-          {playlistPlayObject.contentObject.libraryTracks.map((playlistTrackRelation) => (
+          {trackList.map((playlistTrackRelation) => (
             <li key={playlistTrackRelation.libraryTrack.uuid}>
-              <TrackItem playlistTrackRelationObject={playlistTrackRelation} />
+              <TrackItem playlistLibTrackRelationObject={playlistTrackRelation} />
             </li>
           ))}
         </ul>

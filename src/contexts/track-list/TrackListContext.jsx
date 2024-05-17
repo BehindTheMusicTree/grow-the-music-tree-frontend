@@ -1,0 +1,72 @@
+import { createContext, useEffect, useState } from "react";
+import PropTypes from "prop-types";
+
+import ApiService from "../../utils/service/apiService";
+import { usePlayerTrackObject } from "../player-lib-track-object/usePlayerLibTrackObject";
+import { TRACK_LIST_ORIGIN_TYPE, PLAY_STATES } from "../../constants";
+import TrackListOrigin from "../../models/TrackListOrigin";
+
+export const TrackListContext = createContext();
+
+export function TrackListProvider({ children }) {
+  const [trackList, setTrackList] = useState(null);
+  const [trackListOrigin, setTrackListOrigin] = useState(null);
+  const [playingTrackPosition, setLibTrackToPlayPosition] = useState(1);
+
+  const { playState, setPlayState, setLibTrackToPlay } = usePlayerTrackObject();
+
+  const setNewTrackListFromPlaylistUuid = async (uuid) => {
+    setPlayState(PLAY_STATES.LOADING);
+    const newPlaylistPlayObject = await ApiService.postPlay(uuid);
+    setTrackListOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.PLAYLIST, newPlaylistPlayObject.contentObject));
+    setTrackList(newPlaylistPlayObject.contentObject.libraryTracks);
+  };
+
+  const toPreviousTrack = () => {
+    setLibTrackToPlayPosition((prev) => prev - 1);
+  };
+
+  const toNextTrack = () => {
+    setLibTrackToPlayPosition((prev) => prev + 1);
+  };
+
+  const toTrackAtPosition = (position) => {
+    setLibTrackToPlayPosition(position);
+  };
+
+  useEffect(() => {
+    if (trackList && playState === PLAY_STATES.LOADING) {
+      setLibTrackToPlayPosition(1);
+    }
+
+    if (trackList && trackList.length > playingTrackPosition - 1) {
+      setLibTrackToPlay(
+        trackList[playingTrackPosition - 1].libraryTrack,
+        trackList.length > playingTrackPosition,
+        playingTrackPosition > 1
+      );
+    }
+  }, [trackList, playingTrackPosition]);
+
+  return (
+    <TrackListContext.Provider
+      value={{
+        setNewTrackListFromPlaylistUuid,
+        trackList,
+        setTrackList,
+        trackListOrigin,
+        playingTrackPosition,
+        setLibTrackToPlayPosition,
+        toPreviousTrack,
+        toNextTrack,
+        toTrackAtPosition,
+      }}
+    >
+      {children}
+    </TrackListContext.Provider>
+  );
+}
+
+TrackListProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};

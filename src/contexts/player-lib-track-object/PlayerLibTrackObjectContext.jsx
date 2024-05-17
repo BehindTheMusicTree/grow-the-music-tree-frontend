@@ -1,23 +1,21 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 import { PLAY_STATES } from "../../constants.js";
-import ApiService from "../../utils/service/apiService";
+import ApiService from "../../utils/service/apiService.js";
 
 export const PlayerTrackObjectContext = createContext();
 
 export function PlayerTrackObjectProvider({ children }) {
-  const [playerTrackObject, setPlayerTrackObject] = useState(null);
+  const [playerLibTrackObject, setPlayerLibTrackObject] = useState(null);
   const [resetPlayerSeekSignal, setResetPlayerSeekSignal] = useState(false);
   const [playState, setPlayState] = useState();
 
-  const setPlayingTrack = async (playingTrackObject, hasNext, hasPrevious) => {
-    const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(
-      playingTrackObject.libraryTrack.relativeUrl
-    );
+  const setLibTrackToPlay = async (libTrack, hasNext, hasPrevious) => {
+    const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(libTrack.relativeUrl);
     setPlayState(PLAY_STATES.PLAYING);
-    setPlayerTrackObject({
-      ...playingTrackObject.libraryTrack,
+    setPlayerLibTrackObject({
+      libraryTrack: libTrack,
       blobUrl: playingLibTrackBlobUrl,
       hasNext: hasNext,
       hasPrevious: hasPrevious,
@@ -36,17 +34,25 @@ export function PlayerTrackObjectProvider({ children }) {
     }
   };
 
+  useEffect(() => {
+    if (playerLibTrackObject) {
+      if (playState === PLAY_STATES.LOADING) {
+        setPlayState(PLAY_STATES.PLAYING);
+      }
+    }
+  }, [playerLibTrackObject]);
+
   return (
     <PlayerTrackObjectContext.Provider
       value={{
-        playerTrackObject,
-        setPlayerTrackObject,
+        playerLibTrackObject,
+        setPlayerLibTrackObject,
         playState,
         setPlayState,
         handlePlayPauseAction,
         resetPlayerSeekSignal,
         setResetPlayerSeekSignal,
-        setPlayingTrack,
+        setLibTrackToPlay,
       }}
     >
       {children}
