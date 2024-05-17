@@ -5,13 +5,14 @@ import ReactDOMServer from "react-dom/server";
 import * as d3 from "d3";
 import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause } from "react-icons/fa";
 
-import { usePopup } from "../../../../contexts/popup/usePopup";
-import { useTrackList } from "../../../../contexts/track-list/useTrackList";
+import { usePopup } from "../../../../contexts/popup/usePopup.jsx";
+import { useTrackList } from "../../../../contexts/track-list/useTrackList.jsx";
+import { useGenrePlaylists } from "../../../../contexts/genre-playlists/useGenrePlaylists";
 import { usePlayerTrackObject } from "../../../../contexts/player-lib-track-object/usePlayerLibTrackObject.jsx";
-import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS, TRACK_LIST_ORIGIN_TYPE } from "../../../../constants";
+import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS, TRACK_LIST_ORIGIN_TYPE } from "../../../../constants.js";
 import LibTrackUploadingPopupContentObject from "../../../../models/popup-content-object/LibTrackUploadingPopupContentObject.js";
 
-export default function GenreTree({ genres, handleGenreAddClick }) {
+export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const VERTICAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const HORIZONTAL_SEPARATOON_BETWEEN_NODES =
@@ -20,6 +21,7 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
 
   const { playState } = usePlayerTrackObject();
   const { showPopup } = usePopup();
+  const { handleGenreAddAction } = useGenrePlaylists();
   const { setNewTrackListFromPlaylistUuid, trackListOrigin } = useTrackList();
   const svgRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -36,7 +38,7 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
     return d3
       .stratify()
       .id((d) => d.uuid)
-      .parentId((d) => d.parent?.uuid || null)(genres);
+      .parentId((d) => d.parent?.uuid || null)(genrePlaylistsTree);
   };
 
   const calculateHighestNodeX = (treeData) => {
@@ -60,6 +62,7 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
   };
 
   useEffect(() => {
+    console.log("GenrePlaylistsTree useEffect");
     const root = buildTreeHierarchy();
     const treeData = d3.tree().nodeSize([VERTICAL_SEPARATOON_BETWEEN_NODES, HORIZONTAL_SEPARATOON_BETWEEN_NODES])(root);
 
@@ -256,7 +259,7 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
       })
       .style("display", "none")
       .on("click", function (event, d) {
-        handleGenreAddClick(event, d.data.criteria.uuid);
+        handleGenreAddAction(event, d.data.criteria.uuid);
       });
 
     const TRACK_UPLOAD_ICON_DIMENSIONS = {
@@ -299,7 +302,7 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
     return () => {
       svg.selectAll("*").remove();
     };
-  }, [genres, playState, trackListOrigin]);
+  }, [genrePlaylistsTree, playState, trackListOrigin]);
 
   return (
     <div>
@@ -309,7 +312,6 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
   );
 }
 
-GenreTree.propTypes = {
-  genres: PropTypes.array.isRequired,
-  handleGenreAddClick: PropTypes.func.isRequired,
+GenrePlaylistsTree.propTypes = {
+  genrePlaylistsTree: PropTypes.array.isRequired,
 };

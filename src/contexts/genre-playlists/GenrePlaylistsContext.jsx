@@ -11,6 +11,19 @@ export function GenrePlaylistsProvider({ children }) {
 
   const areGenrePlaylistsFetchingRef = { current: false };
 
+  const handleGenreAddAction = async (event, parentUuid) => {
+    event.stopPropagation();
+    const name = prompt("New genre name:");
+    if (!name) {
+      return;
+    }
+    await ApiService.postGenre({
+      name: name,
+      parent: parentUuid,
+    });
+    setRefreshGenrePlaylistsSignal(1);
+  };
+
   useEffect(() => {
     const fetchGenrePlaylists = async () => {
       const genrePlaylists = await ApiService.getGenrePlaylists();
@@ -39,7 +52,9 @@ export function GenrePlaylistsProvider({ children }) {
   };
 
   return (
-    <GenrePlaylistsContext.Provider value={{ groupedGenrePlaylists, setRefreshGenrePlaylistsSignal }}>
+    <GenrePlaylistsContext.Provider
+      value={{ groupedGenrePlaylists, handleGenreAddAction, setRefreshGenrePlaylistsSignal }}
+    >
       {children}
     </GenrePlaylistsContext.Provider>
   );

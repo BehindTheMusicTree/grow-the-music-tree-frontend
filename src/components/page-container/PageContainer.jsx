@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 
 import TrackListSidebar from "./track-list-sidebar/TrackListSidebar";
 import { CONTENT_AREA_TYPES } from "../../constants";
-import GenresPage from "./genres-page/GenresPage";
+import GenresPage from "./genre-playlists-page/GenrePlaylistsPage";
 import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
 import { usePlayerTrackObject } from "../../contexts/player-lib-track-object/usePlayerLibTrackObject";
 
