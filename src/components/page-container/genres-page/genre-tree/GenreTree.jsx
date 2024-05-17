@@ -144,7 +144,7 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
         if (
           trackListOrigin &&
           trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
-          trackListOrigin.originObject.uuid === d.data.uuid &&
+          trackListOrigin.object.uuid === d.data.uuid &&
           playState === PLAY_STATES.LOADING
         ) {
           return ReactDOMServer.renderToString(
@@ -167,7 +167,7 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
       .style("visibility", function (d) {
         return trackListOrigin &&
           trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
-          trackListOrigin.originObject.uuid === d.data.uuid &&
+          trackListOrigin.object.uuid === d.data.uuid &&
           playState === PLAY_STATES.LOADING
           ? "hidden"
           : "visible";
@@ -180,7 +180,7 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
         if (
           trackListOrigin &&
           trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
-          trackListOrigin.originObject.uuid === d.data.uuid
+          trackListOrigin.object.uuid === d.data.uuid
         ) {
           if (playState === PLAY_STATES.LOADING) {
             return "";

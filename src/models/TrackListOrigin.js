@@ -1,6 +1,6 @@
 export default class TrackListOrigin {
-  constructor(trackListOriginType, originObject) {
-    this.trackListOrigin = trackListOriginType;
-    this.originObject = originObject;
+  constructor(type, object) {
+    this.type = type;
+    this.object = object;
   }
 }

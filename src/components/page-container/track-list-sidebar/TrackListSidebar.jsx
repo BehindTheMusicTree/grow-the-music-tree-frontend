@@ -13,11 +13,11 @@ export default function TrackListSidebar() {
         <div className="origin flex text-xl ">
           <div className="from h-auto flex flex-col justify-center items-center mr-2">From</div>
           <div className="name flex flex-col justify-center items-center text-gray-300  font-bold pr-2">
-            {trackListOrigin.originObject.name}
+            {trackListOrigin.object.name}
           </div>
         </div>
         <div className="info flex flex-col justify-center items-center text-m pt-1">
-          {"• " + capitalizeFirstLetter(trackListOrigin.originObject.type) + " playlist • "}
+          {"• " + capitalizeFirstLetter(trackListOrigin.object.type) + " playlist • "}
           {trackList.length + " track" + (trackList.length > 1 ? "s •" : " •")}
         </div>
         <div
