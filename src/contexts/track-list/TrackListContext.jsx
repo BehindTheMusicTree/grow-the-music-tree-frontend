@@ -59,7 +59,7 @@ export function TrackListProvider({ children }) {
         playingTrackPosition > 1
       );
     }
-  }, [trackList, playingTrackPosition]);
+  }, [trackListOrigin, playingTrackPosition]);
 
   return (
     <TrackListContext.Provider
