@@ -6,9 +6,9 @@ import * as d3 from "d3";
 import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause } from "react-icons/fa";
 
 import { usePopup } from "../../../../contexts/popup/usePopup";
-import { usePlaylistPlayObject } from "../../../../contexts/playlist-play-object/usePlaylistPlayObject";
-import { usePlayerTrackObject } from "../../../../contexts/player-track-object/usePlayerTrackObject";
-import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS } from "../../../../constants";
+import { useTrackList } from "../../../../contexts/track-list/useTrackList";
+import { usePlayerTrackObject } from "../../../../contexts/player-lib-track-object/usePlayerLibTrackObject.jsx";
+import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS, TRACK_LIST_ORIGIN_TYPE } from "../../../../constants";
 import LibTrackUploadingPopupContentObject from "../../../../models/popup-content-object/LibTrackUploadingPopupContentObject.js";
 
 export default function GenreTree({ genres, handleGenreAddClick }) {
@@ -20,7 +20,7 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
 
   const { playState } = usePlayerTrackObject();
   const { showPopup } = usePopup();
-  const { playingPlaylistUuidWithLoadingState, selectPlaylistUuidToPlay } = usePlaylistPlayObject();
+  const { setNewTrackListFromPlaylistUuid, trackListOrigin } = useTrackList();
   const svgRef = useRef(null);
   const fileInputRef = useRef(null);
   const selectingFileGenreUuidRef = useRef(null);
@@ -142,9 +142,10 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
       .attr("y", -SPINNER_ICON_SIZE / 2)
       .html(function (d) {
         if (
-          playingPlaylistUuidWithLoadingState &&
-          playingPlaylistUuidWithLoadingState.uuid === d.data.uuid &&
-          playingPlaylistUuidWithLoadingState.isLoading
+          trackListOrigin &&
+          trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
+          trackListOrigin.object.uuid === d.data.uuid &&
+          playState === PLAY_STATES.LOADING
         ) {
           return ReactDOMServer.renderToString(
             <FaSpinner size={SPINNER_ICON_SIZE} className="animate-spin fill-current text-white" />
@@ -164,9 +165,10 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
       .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET)
       .attr("y", -PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT / 2)
       .style("visibility", function (d) {
-        return playingPlaylistUuidWithLoadingState &&
-          playingPlaylistUuidWithLoadingState.uuid === d.data.uuid &&
-          playingPlaylistUuidWithLoadingState.isLoading
+        return trackListOrigin &&
+          trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
+          trackListOrigin.object.uuid === d.data.uuid &&
+          playState === PLAY_STATES.LOADING
           ? "hidden"
           : "visible";
       })
@@ -175,8 +177,12 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
           return "";
         }
 
-        if (playingPlaylistUuidWithLoadingState && playingPlaylistUuidWithLoadingState.uuid === d.data.uuid) {
-          if (playingPlaylistUuidWithLoadingState.isLoading) {
+        if (
+          trackListOrigin &&
+          trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
+          trackListOrigin.object.uuid === d.data.uuid
+        ) {
+          if (playState === PLAY_STATES.LOADING) {
             return "";
           }
           const element =
@@ -193,13 +199,14 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
       })
       .on("click", function (event, d) {
         if (
-          !playingPlaylistUuidWithLoadingState ||
+          !trackListOrigin ||
           playState === PLAY_STATES.STOPPED ||
-          playingPlaylistUuidWithLoadingState.uuid !== d.data.uuid
+          trackListOrigin.type !== TRACK_LIST_ORIGIN_TYPE.PLAYLIST ||
+          trackListOrigin.uuid !== d.data.uuid
         ) {
           if (d.data.libraryTracksCount > 0) {
             event.stopPropagation();
-            selectPlaylistUuidToPlay(d.data.uuid);
+            setNewTrackListFromPlaylistUuid(d.data.uuid);
           }
         }
       })
@@ -292,7 +299,7 @@ export default function GenreTree({ genres, handleGenreAddClick }) {
     return () => {
       svg.selectAll("*").remove();
     };
-  }, [genres, playState, playingPlaylistUuidWithLoadingState]);
+  }, [genres, playState, trackListOrigin]);
 
   return (
     <div>

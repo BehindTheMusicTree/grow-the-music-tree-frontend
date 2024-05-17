@@ -5,8 +5,8 @@ import * as Sentry from "@sentry/react";
 import App from "./App.jsx";
 import "./index.css";
 
-import { PlayerTrackObjectProvider } from "./contexts/player-track-object/PlayerTrackObjectContext";
-import { PlaylistPlayObjectProvider } from "./contexts/playlist-play-object/PlaylistPlayObjectContext";
+import { PlayerTrackObjectProvider } from "./contexts/player-lib-track-object/PlayerLibTrackObjectContext.jsx";
+import { TrackListProvider } from "./contexts/track-list/TrackListContext";
 import { GenrePlaylistsProvider } from "./contexts/genre-playlists/GenrePlaylistsContext";
 
 if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
@@ -27,7 +27,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <GenrePlaylistsProvider>
       <PlayerTrackObjectProvider>
-        <PlaylistPlayObjectProvider>
+        <TrackListProvider>
           {import.meta.env.VITE_SENTRY_ACTIVE === true ? (
             <Sentry.ErrorBoundary fallback={"An error has occurred"}>
               <App />
@@ -35,7 +35,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           ) : (
             <App />
           )}
-        </PlaylistPlayObjectProvider>
+        </TrackListProvider>
       </PlayerTrackObjectProvider>
     </GenrePlaylistsProvider>
   </React.StrictMode>
