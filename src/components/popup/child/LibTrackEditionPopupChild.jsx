@@ -9,8 +9,8 @@ import { formatTime } from "../../../utils";
 
 export default function LibTrackEditionPopupChild({ popupContentObject, hidePopup }) {
   const FORM_RATING_NULL_VALUE = -1;
-  const { setRefreshGenrePlaylistsSignalSignalSignal } = useGenrePlaylists();
-  const { setTrackList } = useTrackList();
+  const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
+  const { refreshLibTrack } = useTrackList();
   const [formValues, setFormValues] = useState({
     title: popupContentObject.libTrack.title,
     artistName: popupContentObject.libTrack.artist ? popupContentObject.libTrack.artist.name : "",
@@ -18,33 +18,12 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
     albumName: popupContentObject.libTrack.album ? popupContentObject.libTrack.album.name : "",
     rating: popupContentObject.libTrack.rating,
   });
+  const genreNameBeforeEdition = popupContentObject.libTrack.genre.name;
 
   const handleChange = (event) => {
     setFormValues({
       ...formValues,
       [event.target.name]: event.target.value,
-    });
-  };
-
-  const handleUpdatedLibTrack = async (updatedLibTrack) => {
-    setTrackList((currentState) => {
-      const newState = { ...currentState };
-      const oldTrack = newState.contentObject.libraryTracks.find(
-        (track) => track.libraryTrack.uuid === updatedLibTrack.uuid
-      );
-      const genreChanged = oldTrack && oldTrack.libraryTrack.genre !== updatedLibTrack.genre;
-
-      newState.contentObject.libraryTracks = newState.contentObject.libraryTracks.map((playlistTrackRelation) =>
-        playlistTrackRelation.libraryTrack.uuid === updatedLibTrack.uuid
-          ? { ...playlistTrackRelation, libraryTrack: updatedLibTrack }
-          : playlistTrackRelation
-      );
-
-      if (genreChanged) {
-        setRefreshGenrePlaylistsSignalSignalSignal(1);
-      }
-
-      return newState;
     });
   };
 
@@ -54,8 +33,11 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
     if (submittedValues.rating === FORM_RATING_NULL_VALUE) {
       submittedValues.rating = null;
     }
-    const response = await ApiService.putLibTrack(popupContentObject.libTrack.uuid, formValues);
-    handleUpdatedLibTrack(response);
+    const updatedLibTrack = await ApiService.putLibTrack(popupContentObject.libTrack.uuid, formValues);
+    refreshLibTrack(updatedLibTrack);
+    if (genreNameBeforeEdition !== updatedLibTrack.genre.name) {
+      setRefreshGenrePlaylistsSignal(1);
+    }
     hidePopup();
   };
 
