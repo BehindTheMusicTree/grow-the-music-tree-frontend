@@ -106,7 +106,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
       previousSeekRef.current = null;
       setSeek(0);
       playerRef.current.seek(0);
-      setResetPlayerSeekSignal(false);
+      setResetPlayerSeekSignal(0);
     }
   }, [resetPlayerSeekSignal]);
 

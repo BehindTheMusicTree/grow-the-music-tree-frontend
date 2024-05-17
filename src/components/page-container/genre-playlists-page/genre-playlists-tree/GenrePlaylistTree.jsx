@@ -61,8 +61,20 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     return xMax;
   };
 
+  const handlePlayPauseIconAction = (genrePlaylist) => {
+    if (
+      !trackListOrigin ||
+      playState === PLAY_STATES.STOPPED ||
+      trackListOrigin.type !== TRACK_LIST_ORIGIN_TYPE.PLAYLIST ||
+      trackListOrigin.uuid !== genrePlaylist.uuid
+    ) {
+      if (genrePlaylist.libraryTracksCount > 0) {
+        setNewTrackListFromPlaylistUuid(genrePlaylist.uuid);
+      }
+    }
+  };
+
   useEffect(() => {
-    console.log("GenrePlaylistsTree useEffect");
     const root = buildTreeHierarchy();
     const treeData = d3.tree().nodeSize([VERTICAL_SEPARATOON_BETWEEN_NODES, HORIZONTAL_SEPARATOON_BETWEEN_NODES])(root);
 
@@ -201,17 +213,8 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         );
       })
       .on("click", function (event, d) {
-        if (
-          !trackListOrigin ||
-          playState === PLAY_STATES.STOPPED ||
-          trackListOrigin.type !== TRACK_LIST_ORIGIN_TYPE.PLAYLIST ||
-          trackListOrigin.uuid !== d.data.uuid
-        ) {
-          if (d.data.libraryTracksCount > 0) {
-            event.stopPropagation();
-            setNewTrackListFromPlaylistUuid(d.data.uuid);
-          }
-        }
+        event.stopPropagation();
+        handlePlayPauseIconAction(d.data);
       })
       .style("cursor", function (d) {
         if (d.data.libraryTracksCount > 0) {

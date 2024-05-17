@@ -30,9 +30,10 @@ export function TrackListProvider({ children }) {
 
   const setNewTrackListFromPlaylistUuid = async (uuid) => {
     setPlayState(PLAY_STATES.LOADING);
+    setTrackListOrigin(null);
     const newPlaylistPlayObject = await ApiService.postPlay(uuid);
-    setTrackListOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.PLAYLIST, newPlaylistPlayObject.contentObject));
     setTrackList(newPlaylistPlayObject.contentObject.libraryTracks);
+    setTrackListOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.PLAYLIST, newPlaylistPlayObject.contentObject));
   };
 
   const toPreviousTrack = () => {

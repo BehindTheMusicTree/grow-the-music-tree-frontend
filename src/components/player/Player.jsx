@@ -48,14 +48,14 @@ export default function Player() {
 
   const handleBackwardClick = () => {
     if (!playerLibTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
-      setResetPlayerSeekSignal(true);
+      setResetPlayerSeekSignal(1);
     } else {
       toPreviousTrack();
     }
   };
 
   useEffect(() => {
-    setResetPlayerSeekSignal(true);
+    setResetPlayerSeekSignal(1);
   }, [playerLibTrackObject]);
 
   return (

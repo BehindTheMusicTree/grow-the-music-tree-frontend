@@ -8,8 +8,8 @@ export const PlayerTrackObjectContext = createContext();
 
 export function PlayerTrackObjectProvider({ children }) {
   const [playerLibTrackObject, setPlayerLibTrackObject] = useState(null);
-  const [resetPlayerSeekSignal, setResetPlayerSeekSignal] = useState(false);
-  const [playState, setPlayState] = useState();
+  const [resetPlayerSeekSignal, setResetPlayerSeekSignal] = useState(0);
+  const [playState, setPlayState] = useState(PLAY_STATES.STOPPED);
 
   const setLibTrackToPlay = async (libTrack, hasNext, hasPrevious) => {
     const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(libTrack.relativeUrl);
@@ -25,7 +25,7 @@ export function PlayerTrackObjectProvider({ children }) {
   const handlePlayPauseAction = (event) => {
     event.stopPropagation();
     if (playState === PLAY_STATES.STOPPED) {
-      setResetPlayerSeekSignal(true);
+      setResetPlayerSeekSignal(1);
       setPlayState(PLAY_STATES.PLAYING);
     } else if (playState === PLAY_STATES.PLAYING) {
       setPlayState(PLAY_STATES.PAUSED);

@@ -2,14 +2,9 @@ import { GENRE_TREE_RECT_DIMENSIONS } from "../../../constants";
 import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePlaylists";
 
 import GenrePlaylistsTree from "./genre-playlists-tree/GenrePlaylistTree";
-import { useEffect } from "react";
 
 export default function GenrePlaylistsPage() {
   const { groupedGenrePlaylists, handleGenreAddAction } = useGenrePlaylists();
-
-  useEffect(() => {
-    console.log("GenresPage mounted");
-  }, []);
 
   return (
     <div className="mt-5 flex flex-col">
