@@ -2,12 +2,13 @@ import PropTypes from "prop-types";
 import { MdMoreVert } from "react-icons/md";
 import { FaPlay, FaPause } from "react-icons/fa";
 
-import { usePopup } from "../../../../contexts/popup/usePopup.jsx";
-import { usePlayerTrackObject } from "../../../../contexts/player-lib-track-object/usePlayerLibTrackObject.jsx";
-import { useTrackList } from "../../../../contexts/track-list/useTrackList";
 import { formatTime } from "../../../../utils";
-import LibTrackEditionPopupContentObject from "../../../../models/popup-content-object/LibTrackEditionPopupContentObject.js";
-import { PLAY_STATES } from "../../../../constants.js";
+import LibTrackEditionPopupContentObject from "../../../../models/popup-content-object/LibTrackEditionPopupContentObject";
+import { PLAY_STATES } from "../../../../constants";
+import { usePopup } from "../../../../contexts/popup/usePopup";
+import { usePlayerTrackObject } from "../../../../contexts/player-lib-track-object/usePlayerLibTrackObject";
+import { useTrackList } from "../../../../contexts/track-list/useTrackList";
+import LibTrackPosition from "../../../utils/LibTrackPosition";
 
 export default function TrackItem({ playlistLibTrackRelationObject }) {
   const { showPopup } = usePopup();
@@ -36,29 +37,10 @@ export default function TrackItem({ playlistLibTrackRelationObject }) {
         onClick={handlePlayPauseClick}
       >
         <div className="group-hover:hidden">
-          {playerLibTrackObject.libraryTrack.uuid == playlistLibTrackRelationObject.libraryTrack.uuid ? (
-            <div className="flex space-x-1 items-end">
-              <div
-                className={`w-playingbar bg-green-500 h-3 origin-bottom ${
-                  playState === PLAY_STATES.PLAYING ? "animate-scale-pulse" : ""
-                }`}
-              ></div>
-              <div
-                className={`w-playingbar bg-green-500 h-4 origin-bottom ${
-                  playState === PLAY_STATES.PLAYING ? "animate-scale-pulse delay-200" : ""
-                }`}
-                style={{ animationDelay: "0.2s" }}
-              ></div>
-              <div
-                className={`w-playingbar bg-green-500 h-3 origin-bottom ${
-                  playState === PLAY_STATES.PLAYING ? "animate-scale-pulse delay-400" : ""
-                }`}
-                style={{ animationDelay: "0.3s" }}
-              ></div>
-            </div>
-          ) : (
-            playlistLibTrackRelationObject.position
-          )}
+          <LibTrackPosition
+            position={playlistLibTrackRelationObject.position}
+            uuid={playlistLibTrackRelationObject.libraryTrack.uuid}
+          />
         </div>
         <div className="hidden group-hover:flex items-center justify-center">
           {playerLibTrackObject.libraryTrack.uuid == playlistLibTrackRelationObject.libraryTrack.uuid &&

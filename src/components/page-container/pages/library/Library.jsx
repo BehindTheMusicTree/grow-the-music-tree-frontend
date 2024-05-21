@@ -2,6 +2,7 @@ import { useLibTracks } from "../../../../contexts/lib-tracks/useLibTracks";
 import { formatTime } from "../../../../utils";
 import { FaRegClock } from "react-icons/fa";
 import Rating from "../../../utils/Rating";
+import LibTrackPosition from "../../../utils/LibTrackPosition";
 
 export default function Library() {
   const { libTracks } = useLibTracks();
@@ -29,7 +30,9 @@ export default function Library() {
       <tbody className="space-y-10">
         {libTracks?.map((libTrack, index) => (
           <tr key={libTrack.id} className="hover:bg-gray-300">
-            <td className="library-item pl-3">{index + 1}</td>
+            <td className="library-item w-4 text-center pl-4 pr-1">
+              <LibTrackPosition position={index + 1} uuid={libTrack.uuid} />
+            </td>
             <td className="library-item max-w-64">{libTrack.title}</td>
             <td className="library-item">{libTrack.artist ? libTrack.artist.name : ""}</td>
             <td className="library-item">{libTrack.album ? libTrack.album.name : ""}</td>

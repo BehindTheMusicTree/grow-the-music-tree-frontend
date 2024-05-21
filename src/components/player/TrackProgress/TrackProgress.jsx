@@ -60,17 +60,19 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
   };
 
   const renderSeekPosition = () => {
-    const currentSeek = playerRef.current.seek();
-    if (previousSeekRef.current != undefined) {
-      const deltaSeek = currentSeek - previousSeekRef.current;
-      setSeek((seek) => seek + deltaSeek);
-    }
+    if (playerRef.current) {
+      const currentSeek = playerRef.current.seek();
+      if (previousSeekRef.current != undefined) {
+        const deltaSeek = currentSeek - previousSeekRef.current;
+        setSeek((seek) => seek + deltaSeek);
+      }
 
-    previousSeekRef.current = currentSeek;
-    if (playState === PLAY_STATES.PLAYING && !isSeeking) {
-      rafIdRef.current = raf(() => {
-        renderSeekPosition();
-      });
+      previousSeekRef.current = currentSeek;
+      if (playState === PLAY_STATES.PLAYING && !isSeeking) {
+        rafIdRef.current = raf(() => {
+          renderSeekPosition();
+        });
+      }
     }
   };
 
