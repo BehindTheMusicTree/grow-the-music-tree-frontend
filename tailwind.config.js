@@ -43,6 +43,9 @@ export default {
   plugins: [
     function ({ addComponents }) {
       const newComponents = {
+        ".menu-item": {
+          "@apply text-white cursor-pointer text-4xl rounded-md hover:bg-gray-800 p-1": {},
+        },
         ".progress-bar": {
           "@apply appearance-none w-full h-1.5 mt-0 mb-0 block border-transparent rounded-full overflow-hidden": {},
           "&::-webkit-slider-thumb": {

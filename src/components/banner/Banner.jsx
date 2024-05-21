@@ -9,11 +9,12 @@ export default function Banner({ searchSubmitted, setSearchSubmitted }) {
       <div className="mr-3 flex flex-col justify-center">
         <img src={logo} alt="logo" />
       </div>
-      <div className="flex flex-col justify-center w-4/5">
+      <div className="flex flex-col justify-center">
         <h1 className="text-4xl font-bold">Ultimate Music Guide</h1>
         <h3>by Bodzify</h3>
       </div>
-      <div className="flex flex-col justify-center">
+      <div className="filler flex-grow" />
+      <div className="search w-64 flex flex-col justify-center">
         <SearchForm setSearchSubmitted={setSearchSubmitted} />
         <span>Search term: {searchSubmitted}</span>
       </div>
