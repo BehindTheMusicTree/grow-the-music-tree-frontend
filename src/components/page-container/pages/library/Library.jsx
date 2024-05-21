@@ -3,16 +3,16 @@ import { formatTime } from "../../../../utils";
 import { FaRegClock } from "react-icons/fa";
 import Rating from "../../../utils/Rating";
 import LibTrackPositionPlayPause from "../../../utils/LibTrackPositionPlayPause";
-import { usePlayerTrackObject } from "../../../../contexts/player-lib-track-object/usePlayerLibTrackObject";
+import { usePlayer } from "../../../../contexts/player/usePlayer";
 import { useTrackList } from "../../../../contexts/track-list/useTrackList";
 
 export default function Library() {
   const { libTracks } = useLibTracks();
-  const { playerLibTrackObject, handlePlayPauseAction } = usePlayerTrackObject();
+  const { libTrackObject, handlePlayPauseAction } = usePlayer();
   const { setNewTrackListFromLibTrackUuid } = useTrackList();
 
   const handlePlayPauseClick = (libTrackUuid) => {
-    if (playerLibTrackObject && playerLibTrackObject.libraryTrack.uuid == libTrackUuid) {
+    if (libTrackObject && libTrackObject.libraryTrack.uuid == libTrackUuid) {
       handlePlayPauseAction();
     } else {
       setNewTrackListFromLibTrackUuid(libTrackUuid);

@@ -2,7 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
 import ApiService from "../../utils/service/apiService";
-import { usePlayerTrackObject } from "../player-lib-track-object/usePlayerLibTrackObject";
+import { usePlayer } from "../player/usePlayer";
 import { TRACK_LIST_ORIGIN_TYPE, PLAY_STATES } from "../../constants";
 import TrackListOrigin from "../../models/TrackListOrigin";
 
@@ -13,7 +13,7 @@ export function TrackListProvider({ children }) {
   const [trackListOrigin, setTrackListOrigin] = useState(null);
   const [playingTrackPosition, setLibTrackToPlayPosition] = useState(1);
 
-  const { playState, setPlayState, setLibTrackToPlay } = usePlayerTrackObject();
+  const { playState, setPlayState, setLibTrackToPlay } = usePlayer();
 
   const refreshLibTrack = async (updatedLibTrack) => {
     const newTrackList = trackList.map((oldPlaylistTrackRelation) => {

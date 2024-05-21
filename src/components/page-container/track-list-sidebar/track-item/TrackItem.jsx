@@ -4,13 +4,13 @@ import { MdMoreVert } from "react-icons/md";
 import { formatTime } from "../../../../utils";
 import LibTrackEditionPopupContentObject from "../../../../models/popup-content-object/LibTrackEditionPopupContentObject";
 import { usePopup } from "../../../../contexts/popup/usePopup";
-import { usePlayerTrackObject } from "../../../../contexts/player-lib-track-object/usePlayerLibTrackObject";
+import { usePlayer } from "../../../../contexts/player/usePlayer";
 import { useTrackList } from "../../../../contexts/track-list/useTrackList";
 import LibTrackPositionPlayPause from "../../../utils/LibTrackPositionPlayPause";
 
 export default function TrackItem({ playlistLibTrackRelationObject }) {
   const { showPopup } = usePopup();
-  const { handlePlayPauseAction, playerLibTrackObject } = usePlayerTrackObject();
+  const { handlePlayPauseAction, libTrackObject } = usePlayer();
   const { toTrackAtPosition } = useTrackList();
 
   const handleEditClick = (event) => {
@@ -21,7 +21,7 @@ export default function TrackItem({ playlistLibTrackRelationObject }) {
 
   const handlePlayPauseClick = (event) => {
     event.stopPropagation();
-    if (playerLibTrackObject.libraryTrack.uuid == playlistLibTrackRelationObject.libraryTrack.uuid) {
+    if (libTrackObject.libraryTrack.uuid == playlistLibTrackRelationObject.libraryTrack.uuid) {
       handlePlayPauseAction(event);
     } else {
       toTrackAtPosition(playlistLibTrackRelationObject.position);

@@ -8,7 +8,7 @@ import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause } from "react-icons/fa
 import { usePopup } from "../../../../../contexts/popup/usePopup.jsx";
 import { useTrackList } from "../../../../../contexts/track-list/useTrackList.jsx";
 import { useGenrePlaylists } from "../../../../../contexts/genre-playlists/useGenrePlaylists.jsx";
-import { usePlayerTrackObject } from "../../../../../contexts/player-lib-track-object/usePlayerLibTrackObject.jsx";
+import { usePlayer } from "../../../../../contexts/player/usePlayer.jsx";
 import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS, TRACK_LIST_ORIGIN_TYPE } from "../../../../../constants.js";
 import LibTrackUploadingPopupContentObject from "../../../../../models/popup-content-object/LibTrackUploadingPopupContentObject.js";
 
@@ -19,7 +19,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     GENRE_TREE_RECT_DIMENSIONS.WIDTH + HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES;
   const VERTICAL_SEPARATOON_BETWEEN_NODES = GENRE_TREE_RECT_DIMENSIONS.HEIGHT + VERTICAL_SEPARATOON_BETWEEN_RECTANGLES;
 
-  const { playState } = usePlayerTrackObject();
+  const { playState } = usePlayer();
   const { showPopup } = usePopup();
   const { handleGenreAddAction } = useGenrePlaylists();
   const { setNewTrackListFromPlaylistUuid, trackListOrigin } = useTrackList();
