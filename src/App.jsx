@@ -10,6 +10,7 @@ import { usePlayerTrackObject } from "./contexts/player-lib-track-object/usePlay
 
 import Popup from "./components/popup/Popup";
 import Banner from "./components/banner/Banner";
+import Menu from "./components/menu/Menu";
 import PageContainer from "./components/page-container/PageContainer";
 import Player from "./components/player/Player";
 import NotFoundPage from "./components/NotFoundPage";
@@ -36,7 +37,10 @@ export default function App() {
               element={
                 <div className="app flex flex-col h-screen">
                   <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-                  <PageContainer pageTypeWithObject={pageTypeWithObject} />
+                  <div className="center flex">
+                    <Menu />
+                    <PageContainer pageTypeWithObject={pageTypeWithObject} />
+                  </div>
                   {playerLibTrackObject && <Player />}
                   <Popup />
                 </div>
