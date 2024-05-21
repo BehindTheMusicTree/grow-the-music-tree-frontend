@@ -14,7 +14,9 @@ export default function LibTrackPositionPlayPause({ position, uuid, handlePlayPa
     >
       <div className="group-hover:hidden">
         <div>
-          {playerLibTrackObject && playerLibTrackObject.libraryTrack.uuid == uuid ? (
+          {playerLibTrackObject &&
+          playerLibTrackObject.libraryTrack.uuid === uuid &&
+          playState !== PLAY_STATES.STOPPED ? (
             <div className="flex space-x-1 items-end">
               <div
                 className={`w-playingbar bg-green-500 h-3 origin-bottom ${
@@ -40,7 +42,9 @@ export default function LibTrackPositionPlayPause({ position, uuid, handlePlayPa
         </div>
       </div>
       <div className="hidden group-hover:flex items-center justify-center">
-        {playerLibTrackObject && playerLibTrackObject.libraryTrack.uuid == uuid && playState == PLAY_STATES.PLAYING ? (
+        {playerLibTrackObject &&
+        playerLibTrackObject.libraryTrack.uuid === uuid &&
+        playState === PLAY_STATES.PLAYING ? (
           <FaPause />
         ) : (
           <FaPlay />
