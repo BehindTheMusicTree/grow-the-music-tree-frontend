@@ -7,7 +7,7 @@ import { LibTracksProvider } from "./contexts/lib-tracks/LibTracksContext";
 import { PopupProvider } from "./contexts/popup/PopupContext";
 import { TrackListSidebarVisibilityProvider } from "./contexts/track-list-sidebar-visibility/TrackListSidebarVisibilityContext";
 
-import { usePlayerTrackObject } from "./contexts/player-lib-track-object/usePlayerLibTrackObject";
+import { usePlayer } from "./contexts/player/usePlayer";
 
 import Popup from "./components/popup/Popup";
 import Banner from "./components/banner/Banner";
@@ -19,7 +19,7 @@ import NotFoundPage from "./components/NotFoundPage";
 Howler.autoUnlock = true;
 
 export default function App() {
-  const { playerLibTrackObject } = usePlayerTrackObject();
+  const { libTrackObject: playerLibTrackObject } = usePlayer();
 
   const [searchSubmitted, setSearchSubmitted] = useState("");
 

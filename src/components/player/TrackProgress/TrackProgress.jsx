@@ -3,13 +3,12 @@ import PropTypes from "prop-types";
 import raf from "raf";
 import ReactHowler from "react-howler";
 
-import { usePlayerTrackObject } from "../../../contexts/player-lib-track-object/usePlayerLibTrackObject.jsx";
+import { usePlayer } from "../../../contexts/player/usePlayer.jsx";
 import { PLAY_STATES } from "../../../constants";
 import { formatTime } from "../../../utils";
 
 export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek }) {
-  const { playerLibTrackObject, resetPlayerSeekSignal, setResetPlayerSeekSignal, playState, setPlayState } =
-    usePlayerTrackObject();
+  const { libTrackObject, resetPlayerSeekSignal, setResetPlayerSeekSignal, playState, setPlayState } = usePlayer();
   const [isSeeking, setIsSeeking] = useState(false);
 
   const playerRef = useRef(null);
@@ -40,7 +39,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
         errorMessage = "An unknown error occurred.";
     }
 
-    console.error(`Error loading track of url ${playerLibTrackObject.blobUrl}: ${errorCode} - ${errorMessage}`);
+    console.error(`Error loading track of url ${libTrackObject.blobUrl}: ${errorCode} - ${errorMessage}`);
   };
 
   const handleSeekingChange = (event) => {
@@ -90,7 +89,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
     if (playState === PLAY_STATES.PLAYING) {
       if (isSeeking) {
         cancelRaf();
-      } else if (seek >= Math.floor(playerLibTrackObject.duration)) {
+      } else if (seek >= Math.floor(libTrackObject.duration)) {
         handleTrackEnd();
       } else {
         playerRef.current.seek(seek);
@@ -98,7 +97,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
       }
     } else if (playState === PLAY_STATES.PAUSED && !isSeeking) {
       playerRef.current.seek(seek);
-    } else if (playState === PLAY_STATES.STOPPED && !isSeeking) {
+    } else if (playState === PLAY_STATES.STOPPED && !isSeeking && seek > 0) {
       setPlayState(PLAY_STATES.PAUSED);
     }
   }, [isSeeking, playState]);
@@ -116,10 +115,10 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
     <div className="flex flex justify-center items-center w-full">
       <ReactHowler
         ref={playerRef}
-        src={[playerLibTrackObject.blobUrl]}
+        src={[libTrackObject.blobUrl]}
         html5={true}
         playing={playState === PLAY_STATES.PLAYING}
-        format={[playerLibTrackObject.libraryTrack.file.extension.replace(".", "")]}
+        format={[libTrackObject.libraryTrack.file.extension.replace(".", "")]}
         onLoadError={handleLoadError}
         onEnd={handleTrackEnd}
         volume={volume}

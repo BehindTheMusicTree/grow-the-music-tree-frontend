@@ -5,7 +5,7 @@ import { faVolumeUp, faListUl } from "@fortawesome/free-solid-svg-icons";
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from "react-icons/fa";
 
 import { PLAY_STATES } from "../../constants.js";
-import { usePlayerTrackObject } from "../../contexts/player-lib-track-object/usePlayerLibTrackObject.jsx";
+import { usePlayer as usePlayer } from "../../contexts/player/usePlayer.jsx";
 import { useTrackList } from "../../contexts/track-list/useTrackList";
 import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility.jsx";
 
@@ -18,8 +18,7 @@ export default function Player() {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
   const { setIsTrackListSidebarVisible } = useTrackListSidebarVisibility();
-  const { playerLibTrackObject, handlePlayPauseAction, playState, setPlayState, setResetPlayerSeekSignal } =
-    usePlayerTrackObject();
+  const { libTrackObject, handlePlayPauseAction, playState, setPlayState, setResetPlayerSeekSignal } = usePlayer();
 
   const { toNextTrack, toPreviousTrack } = useTrackList();
 
@@ -35,10 +34,12 @@ export default function Player() {
   };
 
   const handleTrackEnd = () => {
-    if (playerLibTrackObject.hasNext) {
+    if (libTrackObject.hasNext) {
       toNextTrack();
     } else {
+      console.log("Track end " + playState);
       setPlayState(PLAY_STATES.STOPPED);
+      setResetPlayerSeekSignal(1);
     }
   };
 
@@ -47,7 +48,7 @@ export default function Player() {
   };
 
   const handleBackwardClick = () => {
-    if (!playerLibTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
+    if (!libTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
       setResetPlayerSeekSignal(1);
     } else {
       toPreviousTrack();
@@ -56,21 +57,15 @@ export default function Player() {
 
   useEffect(() => {
     setResetPlayerSeekSignal(1);
-  }, [playerLibTrackObject]);
+  }, [libTrackObject]);
 
   return (
     <div className="w-full h-player fixed bottom-0 flex justify-between p-2 bg-black text-white text-sm">
       <div className="flex-1 flex items-center justify-center">
         <img className="flex-none w-16 h-16 overflow-hidden mr-5" src={albumCover} alt="Album Cover" />
         <div className="flex-1 flex flex-col items-start justify-center w-full">
-          <div>{playerLibTrackObject ? playerLibTrackObject.libraryTrack.title : ""}</div>
-          <div>
-            {playerLibTrackObject
-              ? playerLibTrackObject.libraryTrack.artist
-                ? playerLibTrackObject.libraryTrack.artist.name
-                : ""
-              : ""}
-          </div>
+          <div>{libTrackObject?.libraryTrack.title}</div>
+          <div>{libTrackObject?.libraryTrack.artist?.name}</div>
         </div>
       </div>
       <div className="flex-2 flex flex-col justify-center items-center">
@@ -86,7 +81,7 @@ export default function Player() {
             <div className="text-1.5xl">{playState === PLAY_STATES.PLAYING ? <FaPause /> : <FaPlay />}</div>
           </Button>
           <Button
-            className={playerLibTrackObject.hasNext ? "player-control-button" : "player-control-button-disabled"}
+            className={libTrackObject.hasNext ? "player-control-button" : "player-control-button-disabled"}
             onClick={handleForwardClick}
           >
             <FaStepForward />

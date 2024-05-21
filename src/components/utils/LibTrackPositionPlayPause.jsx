@@ -1,11 +1,16 @@
 import PropTypes from "prop-types";
 import { FaPlay, FaPause } from "react-icons/fa";
 
-import { usePlayerTrackObject } from "../../contexts/player-lib-track-object/usePlayerLibTrackObject.jsx";
+import { usePlayer } from "../../contexts/player/usePlayer.jsx";
 import { PLAY_STATES } from "../../constants.js";
+import { useEffect } from "react";
 
 export default function LibTrackPositionPlayPause({ position, uuid, handlePlayPauseClick }) {
-  const { playerLibTrackObject, playState } = usePlayerTrackObject();
+  const { libTrackObject, playState } = usePlayer();
+
+  useEffect(() => {
+    console.log("playState " + playState);
+  }, [playState]);
 
   return (
     <div
@@ -14,9 +19,7 @@ export default function LibTrackPositionPlayPause({ position, uuid, handlePlayPa
     >
       <div className="group-hover:hidden">
         <div>
-          {playerLibTrackObject &&
-          playerLibTrackObject.libraryTrack.uuid === uuid &&
-          playState !== PLAY_STATES.STOPPED ? (
+          {libTrackObject && libTrackObject.libraryTrack.uuid === uuid && playState !== PLAY_STATES.STOPPED ? (
             <div className="flex space-x-1 items-end">
               <div
                 className={`w-playingbar bg-green-500 h-3 origin-bottom ${
@@ -42,9 +45,7 @@ export default function LibTrackPositionPlayPause({ position, uuid, handlePlayPa
         </div>
       </div>
       <div className="hidden group-hover:flex items-center justify-center">
-        {playerLibTrackObject &&
-        playerLibTrackObject.libraryTrack.uuid === uuid &&
-        playState === PLAY_STATES.PLAYING ? (
+        {libTrackObject && libTrackObject.libraryTrack.uuid === uuid && playState === PLAY_STATES.PLAYING ? (
           <FaPause />
         ) : (
           <FaPlay />

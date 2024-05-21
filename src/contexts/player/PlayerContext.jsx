@@ -4,17 +4,17 @@ import PropTypes from "prop-types";
 import { PLAY_STATES } from "../../constants.js";
 import ApiService from "../../utils/service/apiService.js";
 
-export const PlayerTrackObjectContext = createContext();
+export const PlayerContext = createContext();
 
-export function PlayerTrackObjectProvider({ children }) {
-  const [playerLibTrackObject, setPlayerLibTrackObject] = useState(null);
-  const [resetPlayerSeekSignal, setResetPlayerSeekSignal] = useState(0);
+export function PlayerProvider({ children }) {
+  const [libTrackObject, setLibTrackObject] = useState(null);
+  const [resetSeekSignal, setResetSeekSignal] = useState(0);
   const [playState, setPlayState] = useState(PLAY_STATES.STOPPED);
 
   const setLibTrackToPlay = async (libTrack, hasNext, hasPrevious) => {
     const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(libTrack.relativeUrl);
     setPlayState(PLAY_STATES.PLAYING);
-    setPlayerLibTrackObject({
+    setLibTrackObject({
       libraryTrack: libTrack,
       blobUrl: playingLibTrackBlobUrl,
       hasNext: hasNext,
@@ -25,7 +25,7 @@ export function PlayerTrackObjectProvider({ children }) {
   const handlePlayPauseAction = (event) => {
     event.stopPropagation();
     if (playState === PLAY_STATES.STOPPED) {
-      setResetPlayerSeekSignal(1);
+      setResetSeekSignal(1);
       setPlayState(PLAY_STATES.PLAYING);
     } else if (playState === PLAY_STATES.PLAYING) {
       setPlayState(PLAY_STATES.PAUSED);
@@ -35,31 +35,31 @@ export function PlayerTrackObjectProvider({ children }) {
   };
 
   useEffect(() => {
-    if (playerLibTrackObject) {
+    if (libTrackObject) {
       if (playState === PLAY_STATES.LOADING) {
         setPlayState(PLAY_STATES.PLAYING);
       }
     }
-  }, [playerLibTrackObject]);
+  }, [libTrackObject]);
 
   return (
-    <PlayerTrackObjectContext.Provider
+    <PlayerContext.Provider
       value={{
-        playerLibTrackObject,
-        setPlayerLibTrackObject,
+        libTrackObject,
+        setlibTrackObject: setLibTrackObject,
         playState,
         setPlayState,
         handlePlayPauseAction,
-        resetPlayerSeekSignal,
-        setResetPlayerSeekSignal,
+        resetSeekSignal,
+        setResetPlayerSeekSignal: setResetSeekSignal,
         setLibTrackToPlay,
       }}
     >
       {children}
-    </PlayerTrackObjectContext.Provider>
+    </PlayerContext.Provider>
   );
 }
 
-PlayerTrackObjectProvider.propTypes = {
+PlayerProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
