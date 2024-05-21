@@ -12,7 +12,7 @@ export default function TrackListSidebar() {
       <div className="header flex px-4 py-2 text-gray-400">
         <div className="origin flex text-xl ">
           <div className="from h-auto flex flex-col justify-center items-center mr-2">From</div>
-          <div className="name flex flex-col justify-center items-center text-gray-300  font-bold pr-2">
+          <div className="name flex flex-col justify-center items-center text-gray-300 font-bold pr-2">
             {trackListOrigin.object.name}
           </div>
         </div>

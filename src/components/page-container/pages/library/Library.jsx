@@ -1,4 +1,6 @@
 import { useLibTracks } from "../../../../contexts/lib-tracks/useLibTracks";
+import { formatTime } from "../../../../utils";
+import { FaRegClock } from "react-icons/fa";
 
 export default function Library() {
   const { libTracks } = useLibTracks();
@@ -9,19 +11,35 @@ export default function Library() {
       <table className="table-auto w-full border-gray-500">
         <thead>
           <tr>
-            <th className="border-b border-gray-500">Title</th>
-            <th className="border-b border-gray-500">Artist</th>
-            <th className="border-b border-gray-500">Album</th>
-            <th className="border-b border-gray-500">Genre</th>
+            <th className="library-item">#</th>
+            <th className="library-item">Title</th>
+            <th className="library-item">Artist</th>
+            <th className="library-item">Album</th>
+            <th className="library-item">Genre</th>
+            <th className="library-item">Rating</th>
+            <th className="library-item">
+              <div className="flex justify-center items-center">
+                <FaRegClock />
+              </div>
+            </th>
+            <th className="library-item">Format</th>
+            <th className="library-item">Bitrate</th>
+            <th className="library-item">Plays</th>
           </tr>
         </thead>
         <tbody className="space-y-10">
-          {libTracks?.map((track) => (
+          {libTracks?.map((track, index) => (
             <tr key={track.id}>
-              <td className="border-b border-gray-500 py-2">{track.title}</td>
-              <td className="border-b border-gray-500">{track.artist ? track.artist.name : ""}</td>
-              <td className="border-b border-gray-500">{track.album ? track.album.name : ""}</td>
-              <td className="border-b border-gray-500">{track.genre ? track.genre.name : ""}</td>
+              <td className="library-item">{index + 1}</td>
+              <td className="library-item">{track.title}</td>
+              <td className="library-item">{track.artist ? track.artist.name : ""}</td>
+              <td className="library-item">{track.album ? track.album.name : ""}</td>
+              <td className="library-item">{track.genre ? track.genre.name : ""}</td>
+              <td className="library-item">{track.rating}</td>
+              <td className="library-item">{formatTime(track.duration)}</td>
+              <td className="library-item">{track.file.extension.replace(".", "")}</td>
+              <td className="library-item">{track.file.bitrateInKbps} kbps</td>
+              <td className="library-item">{track.playCount}</td>
             </tr>
           ))}
         </tbody>
