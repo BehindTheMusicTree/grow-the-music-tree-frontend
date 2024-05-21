@@ -37,7 +37,6 @@ export default function Player() {
     if (libTrackObject.hasNext) {
       toNextTrack();
     } else {
-      console.log("Track end " + playState);
       setPlayState(PLAY_STATES.STOPPED);
       setResetPlayerSeekSignal(1);
     }
