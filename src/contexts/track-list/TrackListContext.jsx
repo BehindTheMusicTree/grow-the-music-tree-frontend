@@ -28,12 +28,20 @@ export function TrackListProvider({ children }) {
     setTrackList(newTrackList);
   };
 
+  const setNewTrackListFromLibTrackUuid = async (uuid) => {
+    setPlayState(PLAY_STATES.LOADING);
+    setTrackListOrigin(null);
+    const newLibTrackPlayObject = await ApiService.postPlay(uuid);
+    setTrackListOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.LIB_TRACK, newLibTrackPlayObject.contentObject));
+    setTrackList([{ potition: "1", libraryTrack: newLibTrackPlayObject.contentObject }]);
+  };
+
   const setNewTrackListFromPlaylistUuid = async (uuid) => {
     setPlayState(PLAY_STATES.LOADING);
     setTrackListOrigin(null);
     const newPlaylistPlayObject = await ApiService.postPlay(uuid);
-    setTrackList(newPlaylistPlayObject.contentObject.libraryTracks);
     setTrackListOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.PLAYLIST, newPlaylistPlayObject.contentObject));
+    setTrackList(newPlaylistPlayObject.contentObject.libraryTracks);
   };
 
   const toPreviousTrack = () => {
@@ -70,6 +78,7 @@ export function TrackListProvider({ children }) {
         trackListOrigin,
         playingTrackPosition,
         refreshLibTrack,
+        setNewTrackListFromLibTrackUuid,
         setNewTrackListFromPlaylistUuid,
         setLibTrackToPlayPosition,
         toPreviousTrack,

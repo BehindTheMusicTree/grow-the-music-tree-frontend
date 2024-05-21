@@ -7,7 +7,7 @@ export const PLAY_STATES = {
 
 export const TRACK_LIST_ORIGIN_TYPE = {
   PLAYLIST: "PLAYLIST",
-  TRACK: "TRACK",
+  LIB_TRACK: "LIB_TRACK",
 };
 
 export const GENRE_TREE_RECT_DIMENSIONS = {
