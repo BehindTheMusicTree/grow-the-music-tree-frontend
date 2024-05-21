@@ -7,51 +7,48 @@ export default function Library() {
   const { libTracks } = useLibTracks();
 
   return (
-    <div className="flex flex-col">
-      <h1>Library</h1>
-      <table className="table-auto w-full border-gray-500">
-        <thead>
-          <tr>
-            <th className="library-item">#</th>
-            <th className="library-item">Title</th>
-            <th className="library-item">Artist</th>
-            <th className="library-item">Album</th>
-            <th className="library-item">Genre</th>
-            <th className="library-item">Rating</th>
-            <th className="library-item">
-              <div className="flex justify-center items-center">
-                <FaRegClock />
-              </div>
-            </th>
-            <th className="library-item">Format</th>
-            <th className="library-item">Bitrate</th>
-            <th className="library-item">Plays</th>
+    <table className="table-auto w-full border-gray-500">
+      <thead>
+        <tr>
+          <th className="library-item">#</th>
+          <th className="library-item">Title</th>
+          <th className="library-item">Artist</th>
+          <th className="library-item">Album</th>
+          <th className="library-item">Genre</th>
+          <th className="library-item">Rating</th>
+          <th className="library-item">
+            <div className="flex justify-center items-center">
+              <FaRegClock />
+            </div>
+          </th>
+          <th className="library-item">Format</th>
+          <th className="library-item">Bitrate</th>
+          <th className="library-item">Plays</th>
+        </tr>
+      </thead>
+      <tbody className="space-y-10">
+        {libTracks?.map((libTrack, index) => (
+          <tr key={libTrack.id} className="hover:bg-gray-300">
+            <td className="library-item pl-3">{index + 1}</td>
+            <td className="library-item max-w-64">{libTrack.title}</td>
+            <td className="library-item">{libTrack.artist ? libTrack.artist.name : ""}</td>
+            <td className="library-item">{libTrack.album ? libTrack.album.name : ""}</td>
+            <td className="library-item">{libTrack.genre ? libTrack.genre.name : ""}</td>
+            <td className="library-item text-center">
+              <Rating
+                rating={libTrack.rating}
+                handleChange={() => {
+                  return;
+                }}
+              />
+            </td>
+            <td className="library-item">{formatTime(libTrack.duration)}</td>
+            <td className="library-item text-center">{libTrack.file.extension.replace(".", "")}</td>
+            <td className="library-item text-center">{libTrack.file.bitrateInKbps} kbps</td>
+            <td className="library-item text-center">{libTrack.playCount}</td>
           </tr>
-        </thead>
-        <tbody className="space-y-10">
-          {libTracks?.map((libTrack, index) => (
-            <tr key={libTrack.id} className="hover:bg-gray-300">
-              <td className="library-item pl-2">{index + 1}</td>
-              <td className="library-item max-w-64">{libTrack.title}</td>
-              <td className="library-item">{libTrack.artist ? libTrack.artist.name : ""}</td>
-              <td className="library-item">{libTrack.album ? libTrack.album.name : ""}</td>
-              <td className="library-item">{libTrack.genre ? libTrack.genre.name : ""}</td>
-              <td className="library-item text-center">
-                <Rating
-                  rating={libTrack.rating}
-                  handleChange={() => {
-                    return;
-                  }}
-                />
-              </td>
-              <td className="library-item">{formatTime(libTrack.duration)}</td>
-              <td className="library-item text-center">{libTrack.file.extension.replace(".", "")}</td>
-              <td className="library-item text-center">{libTrack.file.bitrateInKbps} kbps</td>
-              <td className="library-item text-center">{libTrack.playCount}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        ))}
+      </tbody>
+    </table>
   );
 }
