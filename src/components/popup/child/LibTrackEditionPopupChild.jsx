@@ -1,14 +1,14 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
-import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 
 import ApiService from "../../../utils/service/apiService";
 import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePlaylists";
 import { useTrackList } from "../../../contexts/track-list/useTrackList";
 import { formatTime } from "../../../utils";
+import { FORM_RATING_NULL_VALUE } from "../../../constants";
+import Rating from "../../utils/Rating";
 
 export default function LibTrackEditionPopupChild({ popupContentObject, hidePopup }) {
-  const FORM_RATING_NULL_VALUE = -1;
   const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
   const { refreshLibTrack } = useTrackList();
   const [formValues, setFormValues] = useState({
@@ -18,7 +18,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
     albumName: popupContentObject.libTrack.album ? popupContentObject.libTrack.album.name : "",
     rating: popupContentObject.libTrack.rating,
   });
-  const genreNameBeforeEdition = popupContentObject.libTrack.genre.name;
+  const genreNameBeforeEdition = popupContentObject.libTrack.genre?.name;
 
   const handleChange = (event) => {
     setFormValues({
@@ -35,7 +35,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
     }
     const updatedLibTrack = await ApiService.putLibTrack(popupContentObject.libTrack.uuid, formValues);
     refreshLibTrack(updatedLibTrack);
-    if (genreNameBeforeEdition !== updatedLibTrack.genre.name) {
+    if (genreNameBeforeEdition !== updatedLibTrack.genre?.name) {
       setRefreshGenrePlaylistsSignal(1);
     }
     hidePopup();
@@ -104,39 +104,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
             <div className="flex items-center h-10">
               {" "}
               <span className="mr-2">Rating:</span>
-              <div className="flex items-center">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className={`relative ${i === 0 ? "mr-4" : "mr-1"}`}>
-                    <input
-                      id={`star-${i}`}
-                      className="w-6 h-6 opacity-0"
-                      type="radio"
-                      name="rating"
-                      value={i === 0 ? FORM_RATING_NULL_VALUE : i + 5}
-                      checked={formValues.rating === (i === 0 ? null : i + 5)}
-                      onChange={handleChange}
-                    />
-                    <label htmlFor={`star-${i}`} className="cursor-pointer">
-                      {i === 0 ? (
-                        <div className="flex">
-                          <AiOutlineStar
-                            className={`w-7 h-7 absolute top-0 left-0 ${
-                              formValues.rating === FORM_RATING_NULL_VALUE ? "text-yellow-500" : "text-gray-500"
-                            }`}
-                          />
-                          <span className="flex-grow w-8"></span>{" "}
-                        </div>
-                      ) : (
-                        <AiFillStar
-                          className={`w-7 h-7 absolute top-0 left-0 ${
-                            formValues.rating >= i + 5 ? "text-yellow-500" : "text-gray-500"
-                          }`}
-                        />
-                      )}
-                    </label>
-                  </div>
-                ))}
-              </div>
+              <Rating rating={formValues.rating} handleChange={handleChange} />
               <span className="flex-grow"></span>
             </div>
           </div>

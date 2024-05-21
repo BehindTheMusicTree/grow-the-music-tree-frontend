@@ -1,17 +1,16 @@
 import PropTypes from "prop-types";
 import { MdMoreVert } from "react-icons/md";
-import { FaPlay, FaPause } from "react-icons/fa";
 
-import { usePopup } from "../../../../contexts/popup/usePopup.jsx";
-import { usePlayerTrackObject } from "../../../../contexts/player-lib-track-object/usePlayerLibTrackObject.jsx";
-import { useTrackList } from "../../../../contexts/track-list/useTrackList";
 import { formatTime } from "../../../../utils";
-import LibTrackEditionPopupContentObject from "../../../../models/popup-content-object/LibTrackEditionPopupContentObject.js";
-import { PLAY_STATES } from "../../../../constants.js";
+import LibTrackEditionPopupContentObject from "../../../../models/popup-content-object/LibTrackEditionPopupContentObject";
+import { usePopup } from "../../../../contexts/popup/usePopup";
+import { usePlayerTrackObject } from "../../../../contexts/player-lib-track-object/usePlayerLibTrackObject";
+import { useTrackList } from "../../../../contexts/track-list/useTrackList";
+import LibTrackPositionPlayPause from "../../../utils/LibTrackPositionPlayPause";
 
 export default function TrackItem({ playlistLibTrackRelationObject }) {
   const { showPopup } = usePopup();
-  const { handlePlayPauseAction, playerLibTrackObject, playState } = usePlayerTrackObject();
+  const { handlePlayPauseAction, playerLibTrackObject } = usePlayerTrackObject();
   const { toTrackAtPosition } = useTrackList();
 
   const handleEditClick = (event) => {
@@ -31,44 +30,11 @@ export default function TrackItem({ playlistLibTrackRelationObject }) {
 
   return (
     <div className="track-item flex h-14 text-gray-400 hover:bg-gray-900 group">
-      <div
-        className="track-position-play-pause flex items-center justify-center text-lg w-16"
-        onClick={handlePlayPauseClick}
-      >
-        <div className="group-hover:hidden">
-          {playerLibTrackObject.libraryTrack.uuid == playlistLibTrackRelationObject.libraryTrack.uuid ? (
-            <div className="flex space-x-1 items-end">
-              <div
-                className={`w-playingbar bg-green-500 h-3 origin-bottom ${
-                  playState === PLAY_STATES.PLAYING ? "animate-scale-pulse" : ""
-                }`}
-              ></div>
-              <div
-                className={`w-playingbar bg-green-500 h-4 origin-bottom ${
-                  playState === PLAY_STATES.PLAYING ? "animate-scale-pulse delay-200" : ""
-                }`}
-                style={{ animationDelay: "0.2s" }}
-              ></div>
-              <div
-                className={`w-playingbar bg-green-500 h-3 origin-bottom ${
-                  playState === PLAY_STATES.PLAYING ? "animate-scale-pulse delay-400" : ""
-                }`}
-                style={{ animationDelay: "0.3s" }}
-              ></div>
-            </div>
-          ) : (
-            playlistLibTrackRelationObject.position
-          )}
-        </div>
-        <div className="hidden group-hover:flex items-center justify-center">
-          {playerLibTrackObject.libraryTrack.uuid == playlistLibTrackRelationObject.libraryTrack.uuid &&
-          playState == PLAY_STATES.PLAYING ? (
-            <FaPause />
-          ) : (
-            <FaPlay />
-          )}
-        </div>
-      </div>
+      <LibTrackPositionPlayPause
+        position={playlistLibTrackRelationObject.position}
+        uuid={playlistLibTrackRelationObject.libraryTrack.uuid}
+        handlePlayPauseClick={handlePlayPauseClick}
+      />
       <div className="title-artist-container flex flex-col items-start justify-center w-1/2 text-overflow">
         <div className="title text-lg font-bold tnbvmm ext-gray-300 text-overflow">
           {playlistLibTrackRelationObject.libraryTrack.title}

@@ -46,6 +46,11 @@ export default {
         ".menu-item": {
           "@apply text-white cursor-pointer text-4xl rounded-md hover:bg-gray-800 p-1": {},
         },
+
+        ".library-item": {
+          "@apply border-b border-gray-500 py-2 text-overflow": {},
+        },
+
         ".progress-bar": {
           "@apply appearance-none w-full h-1.5 mt-0 mb-0 block border-transparent rounded-full overflow-hidden": {},
           "&::-webkit-slider-thumb": {
@@ -67,6 +72,7 @@ export default {
         ".tree-node-icon": {
           "@apply fill-current text-white": {},
         },
+
         ".player-control-button": {
           "@apply rounded-full flex items-center justify-center text-black bg-gray-200 mb-2 border-none transition-transform duration-200":
             {},
@@ -76,6 +82,7 @@ export default {
           "@apply rounded-full flex items-center justify-center text-black bg-gray-500 mb-2 border-none": {},
           "@apply pointer-events-none hover:scale-105": {},
         },
+
         ".popup-content-column": {
           "@apply flex-1 mr-2": {},
         },
@@ -97,6 +104,7 @@ export default {
         ".popup-content-button": {
           "@apply p-2 px-5 border-none bg-blue-500 text-white rounded-md cursor-pointer mt-5": {},
         },
+
         ".text-overflow": {
           overflow: "hidden",
           textOverflow: "ellipsis",

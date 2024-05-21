@@ -10,7 +10,7 @@ import { useTrackList } from "../../contexts/track-list/useTrackList";
 import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility.jsx";
 
 import albumCover from "../../assets/images/album-cover-default.png";
-import Button from "../button/Button.jsx";
+import Button from "../utils/Button.jsx";
 
 import TrackProgress from "./TrackProgress/TrackProgress.jsx";
 
