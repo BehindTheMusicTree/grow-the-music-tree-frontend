@@ -32,8 +32,18 @@ export default function App() {
                 path="/"
                 element={
                   <div className="app flex flex-col h-screen">
-                    <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-                    <div className="center flex">
+                    <Banner
+                      className="fixed top-0 z-50"
+                      searchSubmitted={searchSubmitted}
+                      setSearchSubmitted={setSearchSubmitted}
+                    />
+                    <div
+                      className={
+                        "center bg-green-500 flex-grow flex overflow-y-auto max-h-[calc(100%-" +
+                        (playerLibTrackObject ? "180px" : "100px") +
+                        ")]"
+                      }
+                    >
                       <Menu />
                       <PageContainer />
                     </div>
