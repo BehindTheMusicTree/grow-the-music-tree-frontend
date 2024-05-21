@@ -1,11 +1,11 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Howler } from "howler";
 
+import { PageProvider } from "./contexts/page/PageContext";
 import { PopupProvider } from "./contexts/popup/PopupContext";
 import { TrackListSidebarVisibilityProvider } from "./contexts/track-list-sidebar-visibility/TrackListSidebarVisibilityContext";
 
-import { CONTENT_AREA_TYPES } from "./constants";
 import { usePlayerTrackObject } from "./contexts/player-lib-track-object/usePlayerLibTrackObject";
 
 import Popup from "./components/popup/Popup";
@@ -22,34 +22,31 @@ export default function App() {
 
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
-  const pageTypeWithObject = useRef({
-    type: CONTENT_AREA_TYPES.GENRES,
-    pageObject: null,
-  });
-
   return (
-    <PopupProvider>
-      <TrackListSidebarVisibilityProvider>
-        <Router>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <div className="app flex flex-col h-screen">
-                  <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-                  <div className="center flex">
-                    <Menu />
-                    <PageContainer pageTypeWithObject={pageTypeWithObject} />
+    <PageProvider>
+      <PopupProvider>
+        <TrackListSidebarVisibilityProvider>
+          <Router>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <div className="app flex flex-col h-screen">
+                    <Banner searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
+                    <div className="center flex">
+                      <Menu />
+                      <PageContainer />
+                    </div>
+                    {playerLibTrackObject && <Player />}
+                    <Popup />
                   </div>
-                  {playerLibTrackObject && <Player />}
-                  <Popup />
-                </div>
-              }
-            />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </Router>
-      </TrackListSidebarVisibilityProvider>
-    </PopupProvider>
+                }
+              />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Router>
+        </TrackListSidebarVisibilityProvider>
+      </PopupProvider>
+    </PageProvider>
   );
 }
