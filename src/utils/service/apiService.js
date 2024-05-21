@@ -170,6 +170,25 @@ const ApiService = {
     }
   },
 
+  getLibTracks: async () => {
+    let results = [];
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore) {
+      const data = await ApiService.fetchData("tracks/", "GET", null, page);
+      results = results.concat(data.results);
+
+      if (data.next) {
+        page++;
+      } else {
+        hasMore = false;
+      }
+    }
+
+    return results;
+  },
+
   retrieveLibTrack: async (libTrackUuid) => {
     return await ApiService.fetchData(`tracks/${libTrackUuid}/`, "GET", null, null);
   },

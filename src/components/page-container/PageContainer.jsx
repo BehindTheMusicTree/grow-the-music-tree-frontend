@@ -11,7 +11,7 @@ export default function PageContainer() {
 
   return (
     /* 180px being the sum of the banner and player heights, 100px being the height of the banner alone */
-    <div className={"page-container w-full flex-grow pb-5 overflow-auto flex flex-col bg-gray-200 m-0"}>
+    <div className={"page-container w-full flex-grow p-5 overflow-auto flex flex-col bg-gray-200 m-0"}>
       {(() => {
         switch (page.type) {
           case PAGE_TYPES.GENRE_PLAYLISTS:
