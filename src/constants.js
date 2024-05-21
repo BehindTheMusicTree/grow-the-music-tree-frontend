@@ -21,3 +21,5 @@ export const PAGE_TYPES = {
 };
 
 export const DUE_TO_PREVIOUS_ERROR_MESSAGE = "Error occurred during previous operation:";
+
+export const FORM_RATING_NULL_VALUE = -1;
