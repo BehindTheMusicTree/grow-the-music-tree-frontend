@@ -29,17 +29,17 @@ export default function Library() {
         </thead>
         <tbody className="space-y-10">
           {libTracks?.map((track, index) => (
-            <tr key={track.id}>
-              <td className="library-item">{index + 1}</td>
+            <tr key={track.id} className="hover:bg-gray-300">
+              <td className="library-item pl-2">{index + 1}</td>
               <td className="library-item">{track.title}</td>
               <td className="library-item">{track.artist ? track.artist.name : ""}</td>
               <td className="library-item">{track.album ? track.album.name : ""}</td>
               <td className="library-item">{track.genre ? track.genre.name : ""}</td>
-              <td className="library-item">{track.rating}</td>
+              <td className="library-item text-center">{track.rating}</td>
               <td className="library-item">{formatTime(track.duration)}</td>
-              <td className="library-item">{track.file.extension.replace(".", "")}</td>
-              <td className="library-item">{track.file.bitrateInKbps} kbps</td>
-              <td className="library-item">{track.playCount}</td>
+              <td className="library-item text-center">{track.file.extension.replace(".", "")}</td>
+              <td className="library-item text-center">{track.file.bitrateInKbps} kbps</td>
+              <td className="library-item text-center">{track.playCount}</td>
             </tr>
           ))}
         </tbody>
