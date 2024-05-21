@@ -18,7 +18,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
     albumName: popupContentObject.libTrack.album ? popupContentObject.libTrack.album.name : "",
     rating: popupContentObject.libTrack.rating,
   });
-  const genreNameBeforeEdition = popupContentObject.libTrack.genre.name;
+  const genreNameBeforeEdition = popupContentObject.libTrack.genre?.name;
 
   const handleChange = (event) => {
     setFormValues({
@@ -35,7 +35,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
     }
     const updatedLibTrack = await ApiService.putLibTrack(popupContentObject.libTrack.uuid, formValues);
     refreshLibTrack(updatedLibTrack);
-    if (genreNameBeforeEdition !== updatedLibTrack.genre.name) {
+    if (genreNameBeforeEdition !== updatedLibTrack.genre?.name) {
       setRefreshGenrePlaylistsSignal(1);
     }
     hidePopup();
