@@ -23,7 +23,10 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
     async function handleLibTrackToPost(file, genreUuid) {
       try {
         await postLibTrack(file, genreUuid, (progress) =>
-          setUploadProgress((prevProgress) => ({ ...prevProgress, [file.name]: progress }))
+          setUploadProgress((prevProgress) => ({
+            ...prevProgress,
+            [file.name]: { size: file.size, progress: progress },
+          }))
         );
       } catch (error) {
         // console.log("Error posting file " + file.name);
@@ -55,12 +58,13 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
       {isPosting ? (
         <div>
           <div>
-            {Object.entries(uploadProgress).map(([fileName, progress]) => (
+            {Object.entries(uploadProgress).map(([fileName, { size, progress }]) => (
               <div key={fileName} className="flex items-center">
-                <div className="w-1/2">{fileName}</div>
-                <div className="w-1/2 h-3 bg-gray-200 rounded-md overflow-hidden">
+                <div className="w-128 mr-4">{fileName}</div>
+                <div className="flex-grow h-3 bg-gray-200 rounded-md overflow-hidden mr-4">
                   <div className="bg-blue-500 h-full" style={{ width: `${progress}%` }} />
                 </div>
+                <div className="w-16">{(size / 1048576).toFixed(2)} Mo</div>{" "}
               </div>
             ))}
             {/* <div key={id} className="flex">
