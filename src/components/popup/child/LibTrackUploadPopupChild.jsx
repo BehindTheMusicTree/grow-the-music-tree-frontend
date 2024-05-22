@@ -3,71 +3,82 @@ import { useEffect, useState } from "react";
 
 import { MdError } from "react-icons/md";
 
-import ApiService from "../../../utils/service/apiService";
-import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePlaylists";
+import { useLibTracks } from "../../../contexts/lib-tracks/useLibTracks";
 import { BadRequestError } from "../../../utils/errors/BadRequestError";
 
-export default function LibTrackUploadPopupChild({ popupContentObject, hide }) {
-  const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
-  const [requestErrors, setRequestErrors] = useState();
+export default function LibTrackUploadPopupChild({ popupContentObject }) {
+  const { postLibTrack } = useLibTracks();
+  const [requestErrorsByFilename, setRequestErrorsByFilename] = useState([]);
   const [isPosting, setIsPosting] = useState(false);
 
   useEffect(() => {
-    async function postLibTrack(file, genreUuid) {
+    if (popupContentObject && !isPosting) {
+      setIsPosting(true);
+    }
+  }, [popupContentObject, isPosting]);
+
+  useEffect(() => {
+    async function handleLibTrackToPost(file, genreUuid) {
       try {
-        await ApiService.postLibTracks(file, genreUuid);
-        setRefreshGenrePlaylistsSignal(1);
+        console.log("file " + file.name);
+        await postLibTrack(file, genreUuid);
       } catch (error) {
         if (error instanceof BadRequestError) {
-          setRequestErrors((requestErrors) => {
-            return requestErrors.concat(error.requestErrors);
+          setRequestErrorsByFilename((requestErrorsByFilename) => {
+            return requestErrorsByFilename.concat({ filename: file.name, requestErrors: error.requestErrors });
           });
         }
       }
-      setIsPosting(false);
     }
 
-    async function postLibTracks(files, genreUuid) {
-      await Promise.all(files.map((file) => postLibTrack(file, genreUuid)));
+    async function handleLibTrackToPosts(files, genreUuid) {
+      await Promise.all(files.map((file) => handleLibTrackToPost(file, genreUuid)));
     }
 
-    if (popupContentObject && !isPosting.current) {
-      setIsPosting(true);
-      postLibTracks(popupContentObject.files, popupContentObject.genreUuid).then(() => {
-        hide();
+    if (isPosting) {
+      handleLibTrackToPosts(popupContentObject.files, popupContentObject.genreUuid).then(() => {
+        setIsPosting(false);
       });
     }
-  }, [popupContentObject]);
+  }, [isPosting, postLibTrack]);
 
   return (
     <div>
       {isPosting ? (
         <div>
-          <h3>Uploading...</h3>
           <div>
             {popupContentObject.files.map((file, id) => {
-              return <div key={id}>{file.name}</div>;
+              return (
+                <div key={id} className="flex">
+                  <div>Name: {file.name}</div>
+                  <div>Size: {file.size} bytes</div>
+                  <div>Last Modified: {new Date(file.lastModified).toLocaleString()}</div>
+                </div>
+              );
             })}
           </div>
         </div>
-      ) : requestErrors ? (
+      ) : requestErrorsByFilename.length > 0 ? (
         <div>
           <div className="flex items-center">
             <MdError size={20} color="red" />
             <h3 className="ml-1">An error occured</h3>
           </div>
-          {requestErrors.map((operationError) =>
-            Object.entries(operationError).map(([fieldName, fieldErrors]) => (
-              <div key={fieldName} className="flex">
-                <h3 className="mr-2">{fieldName}</h3>
-                <ul>
-                  {fieldErrors.map((error) => (
-                    <li key={error}>- {error}</li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          )}
+          {requestErrorsByFilename.map(({ filename, requestErrors }) => (
+            <div key={filename}>
+              <div>{filename}</div>
+              {requestErrors.map(([fieldName, fieldErrors]) => (
+                <div key={fieldName} className="flex">
+                  <h3 className="mr-2">{fieldName}</h3>
+                  <ul>
+                    {fieldErrors.map((error) => (
+                      <li key={error}>- {error}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
       ) : null}
     </div>
@@ -76,5 +87,4 @@ export default function LibTrackUploadPopupChild({ popupContentObject, hide }) {
 
 LibTrackUploadPopupChild.propTypes = {
   popupContentObject: PropTypes.object.isRequired,
-  hide: PropTypes.func.isRequired,
 };

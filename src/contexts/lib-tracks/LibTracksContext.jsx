@@ -2,21 +2,29 @@ import { createContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 import ApiService from "../../utils/service/apiService";
+import { useGenrePlaylists } from "../../contexts/genre-playlists/useGenrePlaylists";
 
 export const LibTracksContext = createContext();
 
 export function LibTracksProvider({ children }) {
+  const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
   const [libTracks, setlibTracks] = useState();
   const [refreshlibTracksSignal, setRefreshlibTracksSignal] = useState(1);
 
   const areLibTrackFetchingRef = { current: false };
 
-  useEffect(() => {
-    const fetchLibTracks = async () => {
-      const libTracks = await ApiService.getLibTracks();
-      setlibTracks(libTracks);
-    };
+  async function postLibTrack(file, genreUuid) {
+    await ApiService.postLibTracks(file, genreUuid);
+    setRefreshGenrePlaylistsSignal(1);
+    fetchLibTracks();
+  }
 
+  async function fetchLibTracks() {
+    const libTracks = await ApiService.getLibTracks();
+    setlibTracks(libTracks);
+  }
+
+  useEffect(() => {
     if (refreshlibTracksSignal == 1 && !areLibTrackFetchingRef.current) {
       areLibTrackFetchingRef.current = true;
       fetchLibTracks();
@@ -26,7 +34,9 @@ export function LibTracksProvider({ children }) {
   }, [refreshlibTracksSignal]);
 
   return (
-    <LibTracksContext.Provider value={{ libTracks, setRefreshlibTracksSignal }}>{children}</LibTracksContext.Provider>
+    <LibTracksContext.Provider value={{ libTracks, postLibTrack, setRefreshlibTracksSignal }}>
+      {children}
+    </LibTracksContext.Provider>
   );
 }
 
