@@ -1,26 +1,22 @@
-import { createContext, useState } from 'react';
-import PropTypes from 'prop-types';
+import { createContext, useState } from "react";
+import PropTypes from "prop-types";
 
 export const PopupContext = createContext();
 
-export function PopupProvider({ children }) {
-    const [popupContentObject, setPopupObject] = useState(null);
+export const PopupProvider = ({ children }) => {
+  const [popupContentObject, setPopupContentObject] = useState();
 
-    const showPopup = (object) => {
-        setPopupObject(object);
-    };
+  const showPopup = (popupContentObject) => {
+    setPopupContentObject(popupContentObject);
+  };
 
-    const hidePopup = () => {
-        setPopupObject(null);
-    };
+  const hidePopup = () => {
+    setPopupContentObject(null);
+  };
 
-    return (
-        <PopupContext.Provider value={{ popupContentObject, showPopup, hidePopup }}>
-            {children}
-        </PopupContext.Provider>
-    );
-}
+  return <PopupContext.Provider value={{ popupContentObject, showPopup, hidePopup }}>{children}</PopupContext.Provider>;
+};
 
 PopupProvider.propTypes = {
-    children: PropTypes.node.isRequired,
-}
+  children: PropTypes.node.isRequired,
+};

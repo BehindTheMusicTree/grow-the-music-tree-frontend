@@ -1,7 +1,7 @@
 import { GENRE_TREE_RECT_DIMENSIONS } from "../../../../constants";
 import { useGenrePlaylists } from "../../../../contexts/genre-playlists/useGenrePlaylists";
 
-import GenrePlaylistsTree from "./genre-playlists-tree/GenrePlaylistTree";
+import GenrePlaylistsTree from "./tree/GenrePlaylistTree";
 
 export default function GenrePlaylists() {
   const { groupedGenrePlaylists, handleGenreAddAction } = useGenrePlaylists();

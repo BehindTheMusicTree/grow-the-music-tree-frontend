@@ -2,14 +2,10 @@ import { usePopup } from "../../contexts/popup/usePopup";
 
 import BadRequestErrorPopupChild from "./child/BadRequestPopupChild";
 import LibTrackEditionPopupChild from "./child/LibTrackEditionPopupChild";
-import LibTrackUploadingPopupChild from "./child/LibTrackUploadingPopupChild";
+import LibTrackUploadingPopupChild from "./child/LibTrackUploadPopupChild";
 
 export default function Popup() {
   const { popupContentObject, hidePopup } = usePopup();
-
-  if (!popupContentObject) {
-    return null;
-  }
 
   let PopupChild;
   switch (popupContentObject.constructor.name) {
@@ -19,7 +15,7 @@ export default function Popup() {
     case "LibTrackEditionPopupContentObject":
       PopupChild = LibTrackEditionPopupChild;
       break;
-    case "LibTrackUploadingPopupContentObject":
+    case "LibTrackUploadPopupContentObject":
       PopupChild = LibTrackUploadingPopupChild;
       break;
     default:
@@ -35,7 +31,7 @@ export default function Popup() {
             &#10005;
           </div>
         </div>
-        {PopupChild && <PopupChild popupContentObject={popupContentObject} hidePopup={hidePopup} />}
+        {PopupChild && <PopupChild popupContentObject={popupContentObject} hide={hidePopup} />}
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import "./index.css";
 import { PlayerProvider } from "./contexts/player/PlayerContext";
 import { TrackListProvider } from "./contexts/track-list/TrackListContext";
 import { GenrePlaylistsProvider } from "./contexts/genre-playlists/GenrePlaylistsContext";
+import { PopupProvider } from "./contexts/popup/PopupContext";
 
 if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
   Sentry.init({
@@ -25,18 +26,20 @@ if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <GenrePlaylistsProvider>
-      <PlayerProvider>
-        <TrackListProvider>
-          {import.meta.env.VITE_SENTRY_ACTIVE === true ? (
-            <Sentry.ErrorBoundary fallback={"An error has occurred"}>
+    <PopupProvider>
+      <GenrePlaylistsProvider>
+        <PlayerProvider>
+          <TrackListProvider>
+            {import.meta.env.VITE_SENTRY_ACTIVE === true ? (
+              <Sentry.ErrorBoundary fallback={"An error has occurred"}>
+                <App />
+              </Sentry.ErrorBoundary>
+            ) : (
               <App />
-            </Sentry.ErrorBoundary>
-          ) : (
-            <App />
-          )}
-        </TrackListProvider>
-      </PlayerProvider>
-    </GenrePlaylistsProvider>
+            )}
+          </TrackListProvider>
+        </PlayerProvider>
+      </GenrePlaylistsProvider>
+    </PopupProvider>
   </React.StrictMode>
 );

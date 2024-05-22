@@ -10,8 +10,8 @@ export const TrackListContext = createContext();
 
 export function TrackListProvider({ children }) {
   const [trackList, setTrackList] = useState(null);
-  const [trackListOrigin, setTrackListOrigin] = useState(null);
-  const [playingTrackPosition, setLibTrackToPlayPosition] = useState(1);
+  const [origin, setOrigin] = useState(null);
+  const [playingLibTrackPosition, playLibTrackAtPosition] = useState(1);
 
   const { playState, setPlayState, setLibTrackToPlay } = usePlayer();
 
@@ -30,57 +30,57 @@ export function TrackListProvider({ children }) {
 
   const setNewTrackListFromLibTrackUuid = async (uuid) => {
     setPlayState(PLAY_STATES.LOADING);
-    setTrackListOrigin(null);
+    setOrigin(null);
     const newLibTrackPlayObject = await ApiService.postPlay(uuid);
-    setTrackListOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.LIB_TRACK, newLibTrackPlayObject.contentObject));
-    setTrackList([{ potition: "1", libraryTrack: newLibTrackPlayObject.contentObject }]);
+    setOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.LIB_TRACK, newLibTrackPlayObject.popupContentObject));
+    setTrackList([{ potition: "1", libraryTrack: newLibTrackPlayObject.popupContentObject }]);
   };
 
-  const setNewTrackListFromPlaylistUuid = async (uuid) => {
+  const playNewTrackListFromPlaylistUuid = async (uuid) => {
     setPlayState(PLAY_STATES.LOADING);
-    setTrackListOrigin(null);
+    setOrigin(null);
     const newPlaylistPlayObject = await ApiService.postPlay(uuid);
-    setTrackListOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.PLAYLIST, newPlaylistPlayObject.contentObject));
-    setTrackList(newPlaylistPlayObject.contentObject.libraryTracks);
+    setOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.PLAYLIST, newPlaylistPlayObject.popupContentObject));
+    setTrackList(newPlaylistPlayObject.popupContentObject.libraryTracks);
   };
 
   const toPreviousTrack = () => {
-    setLibTrackToPlayPosition((prev) => prev - 1);
+    playLibTrackAtPosition((prev) => prev - 1);
   };
 
   const toNextTrack = () => {
-    setLibTrackToPlayPosition((prev) => prev + 1);
+    playLibTrackAtPosition((prev) => prev + 1);
   };
 
   const toTrackAtPosition = (position) => {
-    setLibTrackToPlayPosition(position);
+    playLibTrackAtPosition(position);
   };
 
   useEffect(() => {
     if (trackList && playState === PLAY_STATES.LOADING) {
-      setLibTrackToPlayPosition(1);
+      playLibTrackAtPosition(1);
     }
 
-    if (trackList && trackList.length > playingTrackPosition - 1) {
+    if (trackList && trackList.length > playingLibTrackPosition - 1) {
       setLibTrackToPlay(
-        trackList[playingTrackPosition - 1].libraryTrack,
-        trackList.length > playingTrackPosition,
-        playingTrackPosition > 1
+        trackList[playingLibTrackPosition - 1].libraryTrack,
+        trackList.length > playingLibTrackPosition,
+        playingLibTrackPosition > 1
       );
     }
-  }, [trackListOrigin, playingTrackPosition]);
+  }, [origin, playingLibTrackPosition]);
 
   return (
     <TrackListContext.Provider
       value={{
         trackList,
         setTrackList,
-        trackListOrigin,
-        playingTrackPosition,
+        origin,
+        playingLibTrackPosition,
         refreshLibTrack,
         setNewTrackListFromLibTrackUuid,
-        setNewTrackListFromPlaylistUuid,
-        setLibTrackToPlayPosition,
+        playNewTrackListFromPlaylistUuid,
+        playLibTrackAtPosition,
         toPreviousTrack,
         toNextTrack,
         toTrackAtPosition,
