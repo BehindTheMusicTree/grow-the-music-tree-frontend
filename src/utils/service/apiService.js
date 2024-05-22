@@ -135,39 +135,64 @@ const ApiService = {
     }
   },
 
-  fetchData: async (endpoint, method, data = null, page = null) => {
+  fetchData: (endpoint, method, data = null, page = null, onProgress = null) => {
     let url = `${config.apiBaseUrl}${endpoint}`;
     if (page) {
       url += `?page=${page}`;
     }
 
-    try {
-      const headers = await ApiService.getHeaders();
+    return new Promise((resolve, reject) => {
+      ApiService.getHeaders()
+        .then((headers) => {
+          if (data instanceof FormData) {
+            delete headers["Content-Type"];
+          }
 
-      if (data instanceof FormData) {
-        delete headers["Content-Type"];
-      }
+          const xhr = new XMLHttpRequest();
+          xhr.open(method, url, true);
 
-      const response = await fetch(url, {
-        method,
-        headers: headers,
-        body: data ? (data instanceof FormData ? data : JSON.stringify(data)) : null,
-      });
+          Object.keys(headers).forEach((key) => {
+            xhr.setRequestHeader(key, headers[key]);
+          });
 
-      if (!response.ok) {
-        await handleNotOkResponse(url, response);
-      } else {
-        const resonseJson = await parseJson(response);
-        return resonseJson;
-      }
-    } catch (error) {
-      if (error instanceof BadRequestError) {
-        throw error;
-      } else {
-        const fetchErrorMessage = await getFetchErrorMessageOtherThanBadRequest(error);
-        throw new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
-      }
-    }
+          if (onProgress) {
+            xhr.upload.onprogress = (event) => {
+              if (event.lengthComputable) {
+                const progress = Math.round((event.loaded * 100) / event.total);
+                onProgress(progress);
+              }
+            };
+          }
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              const responseJson = JSON.parse(xhr.responseText);
+              resolve(responseJson);
+            } else {
+              handleNotOkResponse(url, xhr.response).then(() => {
+                reject(
+                  new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${xhr.statusText}`)
+                );
+              });
+            }
+          };
+
+          xhr.onerror = () => {
+            getFetchErrorMessageOtherThanBadRequest(xhr).then((fetchErrorMessage) => {
+              reject(
+                new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`)
+              );
+            });
+          };
+
+          xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
+        })
+        .catch((error) => {
+          getFetchErrorMessageOtherThanBadRequest(error).then((fetchErrorMessage) => {
+            reject(new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`));
+          });
+        });
+    });
   },
 
   getLibTracks: async () => {
@@ -284,11 +309,11 @@ const ApiService = {
     return await ApiService.fetchData(`plays/`, "POST", data, null);
   },
 
-  postLibTracks: async (file, genreUuid) => {
+  postLibTracks: async (file, genreUuid, onProgress) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("genreUuid", genreUuid);
-    return await ApiService.fetchData("tracks/", "POST", formData, null);
+    return await ApiService.fetchData("tracks/", "POST", formData, null, onProgress);
   },
 };
 

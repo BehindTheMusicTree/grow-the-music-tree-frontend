@@ -7,14 +7,14 @@ import ApiService from "../../utils/service/apiService";
 export const PlayerContext = createContext();
 
 export function PlayerProvider({ children }) {
-  const [playerLibTrackObject, setLibTrackObject] = useState(null);
+  const [playerLibTrackObject, setPlayerLibTrackObject] = useState();
   const [resetPlayerSeekSignal, setResetPlayerSeekSignal] = useState(0);
   const [playState, setPlayState] = useState(PLAY_STATES.STOPPED);
 
   const setLibTrackToPlay = async (libTrack, hasNext, hasPrevious) => {
     const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(libTrack.relativeUrl);
     setPlayState(PLAY_STATES.PLAYING);
-    setLibTrackObject({
+    setPlayerLibTrackObject({
       libraryTrack: libTrack,
       blobUrl: playingLibTrackBlobUrl,
       hasNext: hasNext,
@@ -46,7 +46,7 @@ export function PlayerProvider({ children }) {
     <PlayerContext.Provider
       value={{
         libTrackObject: playerLibTrackObject,
-        setlibTrackObject: setLibTrackObject,
+        setlibTrackObject: setPlayerLibTrackObject,
         playState,
         setPlayState,
         handlePlayPauseAction,

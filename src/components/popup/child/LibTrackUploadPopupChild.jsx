@@ -10,34 +10,42 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
   const { postLibTrack } = useLibTracks();
   const [requestErrorsByFilename, setRequestErrorsByFilename] = useState([]);
   const [isPosting, setIsPosting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({});
 
   useEffect(() => {
     if (popupContentObject && !isPosting) {
+      // console.log("set isPosting true");
       setIsPosting(true);
     }
-  }, [popupContentObject, isPosting]);
+  }, [popupContentObject]);
 
   useEffect(() => {
     async function handleLibTrackToPost(file, genreUuid) {
       try {
-        console.log("file " + file.name);
-        await postLibTrack(file, genreUuid);
+        await postLibTrack(file, genreUuid, (progress) =>
+          setUploadProgress((prevProgress) => ({ ...prevProgress, [file.name]: progress }))
+        );
       } catch (error) {
+        // console.log("Error posting file " + file.name);
         if (error instanceof BadRequestError) {
+          console.log("error " + error);
           setRequestErrorsByFilename((requestErrorsByFilename) => {
-            return requestErrorsByFilename.concat({ filename: file.name, requestErrors: error.requestErrors });
+            const res = requestErrorsByFilename.concat({ filename: file.name, requestErrors: error.requestErrors });
+            return res;
           });
         }
       }
     }
 
     async function handleLibTrackToPosts(files, genreUuid) {
-      await Promise.all(files.map((file) => handleLibTrackToPost(file, genreUuid)));
+      await Promise.allSettled(files.map((file) => handleLibTrackToPost(file, genreUuid)));
     }
 
     if (isPosting) {
       handleLibTrackToPosts(popupContentObject.files, popupContentObject.genreUuid).then(() => {
         setIsPosting(false);
+        // console.log("fini");
+        // console.log("requestErrorsByFilename " + requestErrorsByFilename);
       });
     }
   }, [isPosting, postLibTrack]);
@@ -47,15 +55,19 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
       {isPosting ? (
         <div>
           <div>
-            {popupContentObject.files.map((file, id) => {
-              return (
-                <div key={id} className="flex">
-                  <div>Name: {file.name}</div>
-                  <div>Size: {file.size} bytes</div>
-                  <div>Last Modified: {new Date(file.lastModified).toLocaleString()}</div>
+            {Object.entries(uploadProgress).map(([fileName, progress]) => (
+              <div key={fileName} className="flex items-center">
+                <div className="w-1/2">{fileName}</div>
+                <div className="w-1/2 h-3 bg-gray-200 rounded-md overflow-hidden">
+                  <div className="bg-blue-500 h-full" style={{ width: `${progress}%` }} />
                 </div>
-              );
-            })}
+              </div>
+            ))}
+            {/* <div key={id} className="flex">
+              <div>Name: {file.name}</div>
+              <div>Size: {(file.size / 1048576).toFixed(2)} Mo</div>{" "}
+              <div>Last Modified: {new Date(file.lastModified).toLocaleString()}</div>
+            </div> */}
           </div>
         </div>
       ) : requestErrorsByFilename.length > 0 ? (
@@ -64,7 +76,7 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
             <MdError size={20} color="red" />
             <h3 className="ml-1">An error occured</h3>
           </div>
-          {requestErrorsByFilename.map(({ filename, requestErrors }) => (
+          {/* {requestErrorsByFilename.map(({ filename, requestErrors }) => (
             <div key={filename}>
               <div>{filename}</div>
               {requestErrors.map(([fieldName, fieldErrors]) => (
@@ -78,7 +90,7 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
                 </div>
               ))}
             </div>
-          ))}
+          ))} */}
         </div>
       ) : null}
     </div>
