@@ -45,13 +45,13 @@ export function PlayerProvider({ children }) {
   return (
     <PlayerContext.Provider
       value={{
-        libTrackObject: playerLibTrackObject,
-        setlibTrackObject: setPlayerLibTrackObject,
+        playerLibTrackObject,
+        setPlayerLibTrackObject,
         playState,
         setPlayState,
         handlePlayPauseAction,
-        resetSeekSignal: resetPlayerSeekSignal,
-        setResetPlayerSeekSignal: setResetPlayerSeekSignal,
+        resetPlayerSeekSignal,
+        setResetPlayerSeekSignal,
         setLibTrackToPlay,
       }}
     >

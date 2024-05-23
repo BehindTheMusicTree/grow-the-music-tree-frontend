@@ -8,21 +8,9 @@ import { useLibTracks } from "../../../contexts/lib-tracks/useLibTracks";
 import BadRequestError from "../../../utils/errors/BadRequestError";
 
 export default function LibTrackUploadPopupChild({ popupContentObject }) {
-  const { postLibTrack } = useLibTracks();
+  const { postLibTrack, setRefreshLibTracksSignal } = useLibTracks();
   const [isPosting, setIsPosting] = useState(false);
   const [filesUploadObjs, setFilesUploadObjs] = useState({});
-
-  useEffect(() => {
-    if (popupContentObject && !isPosting) {
-      popupContentObject.files.forEach((file) => {
-        setFilesUploadObjs((prevUploadObj) => ({
-          ...prevUploadObj,
-          [file.name]: { size: file.size, progress: 0, isPosting: false, requestErrors: {} },
-        }));
-      });
-      setIsPosting(true);
-    }
-  }, [popupContentObject]);
 
   const setFileUploadObjIsPosting = (filename, isPosting) => {
     setFilesUploadObjs((prevFileUploadObj) => ({
@@ -30,6 +18,12 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
       [filename]: { ...prevFileUploadObj[filename], isPosting: isPosting },
     }));
   };
+
+  useEffect(() => {
+    if (popupContentObject && !isPosting) {
+      setIsPosting(true);
+    }
+  }, [popupContentObject]);
 
   useEffect(() => {
     async function handleLibTrackToPost(file, genreUuid) {
@@ -58,18 +52,24 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
     }
 
     if (isPosting) {
+      popupContentObject.files.forEach((file) => {
+        setFilesUploadObjs((prevUploadObj) => ({
+          ...prevUploadObj,
+          [file.name]: { size: file.size, progress: 0, isPosting: false, requestErrors: {} },
+        }));
+      });
       handleLibTrackToPosts(popupContentObject.files, popupContentObject.genreUuid).then(() => {
+        setRefreshLibTracksSignal(1);
         setIsPosting(false);
       });
     }
-  }, [isPosting, postLibTrack]);
+  }, [isPosting]);
 
   return (
     <div>
       <div>
         <div>
           {Object.entries(filesUploadObjs).map(([filename, uploadObj]) => {
-            console.log("uploadObj" + JSON.stringify(uploadObj));
             return (
               <div key={filename} className="h-8 flex items-center">
                 <div className="icon-container mr-2">
