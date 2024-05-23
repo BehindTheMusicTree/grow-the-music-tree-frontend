@@ -4,15 +4,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolumeUp, faListUl } from "@fortawesome/free-solid-svg-icons";
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from "react-icons/fa";
 
-import { PLAY_STATES } from "../../constants.js";
-import { usePlayer as usePlayer } from "../../contexts/player/usePlayer.jsx";
+import { PLAY_STATES } from "../../constants";
+import { usePlayer as usePlayer } from "../../contexts/player/usePlayer";
 import { useTrackList } from "../../contexts/track-list/useTrackList";
-import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility.jsx";
+import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
 
 import albumCover from "../../assets/images/album-cover-default.png";
-import Button from "../utils/Button.jsx";
+import Button from "../utils/Button";
 
-import TrackProgress from "./TrackProgress/TrackProgress.jsx";
+import TrackProgress from "./TrackProgress/TrackProgress";
 
 export default function Player() {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
@@ -37,7 +37,6 @@ export default function Player() {
     if (libTrackObject.hasNext) {
       toNextTrack();
     } else {
-      console.log("Track end " + playState);
       setPlayState(PLAY_STATES.STOPPED);
       setResetPlayerSeekSignal(1);
     }

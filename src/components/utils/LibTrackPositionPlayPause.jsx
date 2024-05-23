@@ -1,16 +1,11 @@
 import PropTypes from "prop-types";
 import { FaPlay, FaPause } from "react-icons/fa";
 
-import { usePlayer } from "../../contexts/player/usePlayer.jsx";
-import { PLAY_STATES } from "../../constants.js";
-import { useEffect } from "react";
+import { usePlayer } from "../../contexts/player/usePlayer";
+import { PLAY_STATES } from "../../constants";
 
 export default function LibTrackPositionPlayPause({ position, uuid, handlePlayPauseClick }) {
   const { libTrackObject, playState } = usePlayer();
-
-  useEffect(() => {
-    console.log("playState " + playState);
-  }, [playState]);
 
   return (
     <div

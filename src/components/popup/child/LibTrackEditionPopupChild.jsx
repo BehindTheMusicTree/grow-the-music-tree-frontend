@@ -8,7 +8,7 @@ import { formatTime } from "../../../utils";
 import { FORM_RATING_NULL_VALUE } from "../../../constants";
 import Rating from "../../utils/Rating";
 
-export default function LibTrackEditionPopupChild({ popupContentObject, hidePopup }) {
+export default function LibTrackEditionPopupChild({ popupContentObject, hide }) {
   const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
   const { refreshLibTrack } = useTrackList();
   const [formValues, setFormValues] = useState({
@@ -38,7 +38,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
     if (genreNameBeforeEdition !== updatedLibTrack.genre?.name) {
       setRefreshGenrePlaylistsSignal(1);
     }
-    hidePopup();
+    hide();
   };
 
   return (
@@ -136,5 +136,5 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hidePopu
 
 LibTrackEditionPopupChild.propTypes = {
   popupContentObject: PropTypes.object.isRequired,
-  hidePopup: PropTypes.func.isRequired,
+  hide: PropTypes.func.isRequired,
 };

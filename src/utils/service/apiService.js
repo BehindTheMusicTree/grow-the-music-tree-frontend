@@ -10,13 +10,29 @@ const parseJson = async (response) => {
   }
 };
 
+const getResponseObjFromXhr = (xhr) => {
+  return xhr.response;
+};
+
+const getResponseObjFromFetch = async (response) => {
+  const responseObj = await parseJson(response);
+  return responseObj;
+};
+
 const handleNotOkResponse = async (url, response) => {
-  if (response.status >= 400 && response.status < 600) {
+  const status = response.status;
+  if (status >= 400 && status < 600) {
     let errorMessage = "";
-    const errorMessagePrefixe = `url ${url} - status ${response.status}`;
+    const errorMessagePrefixe = `url ${url} - status ${status}`;
     try {
-      const responseObj = await parseJson(response);
-      if (response.status === 400) {
+      let responseObj;
+      if (response.json) {
+        responseObj = await getResponseObjFromFetch(response);
+      } else if (response.responseType && response.responseType === "json") {
+        responseObj = getResponseObjFromXhr(response);
+      }
+
+      if (status === 400) {
         throw new BadRequestError(responseObj.errors);
       }
       errorMessage = JSON.stringify(responseObj);
@@ -135,7 +151,8 @@ const ApiService = {
     }
   },
 
-  fetchData: async (endpoint, method, data = null, page = null) => {
+  fetchData: async (endpoint, method, data = null, page = null, onProgress = null) => {
+    console.log(`data: ${JSON.stringify(data, null, 2)}`);
     let url = `${config.apiBaseUrl}${endpoint}`;
     if (page) {
       url += `?page=${page}`;
@@ -148,25 +165,52 @@ const ApiService = {
         delete headers["Content-Type"];
       }
 
-      const response = await fetch(url, {
-        method,
-        headers: headers,
-        body: data ? (data instanceof FormData ? data : JSON.stringify(data)) : null,
+      /* We use XMLHttpRequest because fetch doesn't provide progression for file uploads */
+      const xhr = new XMLHttpRequest();
+      xhr.responseType = "json";
+      xhr.open(method, url, true);
+
+      Object.keys(headers).forEach((key) => {
+        xhr.setRequestHeader(key, headers[key]);
       });
 
-      if (!response.ok) {
-        await handleNotOkResponse(url, response);
-      } else {
-        const resonseJson = await parseJson(response);
-        return resonseJson;
+      if (onProgress) {
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const progress = Math.round((event.loaded * 100) / event.total);
+            onProgress(progress);
+          }
+        };
       }
+
+      return new Promise((resolve, reject) => {
+        xhr.onload = async () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(xhr.response);
+          } else {
+            try {
+              await handleNotOkResponse(url, xhr);
+              reject(new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${xhr.statusText}`));
+            } catch (error) {
+              reject(error);
+            }
+          }
+        };
+
+        xhr.onerror = async () => {
+          try {
+            const fetchErrorMessage = await getFetchErrorMessageOtherThanBadRequest(xhr);
+            reject(new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`));
+          } catch (error) {
+            reject(error);
+          }
+        };
+
+        xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
+      });
     } catch (error) {
-      if (error instanceof BadRequestError) {
-        throw error;
-      } else {
-        const fetchErrorMessage = await getFetchErrorMessageOtherThanBadRequest(error);
-        throw new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
-      }
+      const fetchErrorMessage = await getFetchErrorMessageOtherThanBadRequest(error);
+      throw new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
     }
   },
 
@@ -284,11 +328,11 @@ const ApiService = {
     return await ApiService.fetchData(`plays/`, "POST", data, null);
   },
 
-  postLibTracks: async (file, genreUuid) => {
+  postLibTracks: async (file, genreUuid, onProgress) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("genreUuid", genreUuid);
-    return await ApiService.fetchData("tracks/", "POST", formData, null);
+    return await ApiService.fetchData("tracks/", "POST", formData, null, onProgress);
   },
 };
 

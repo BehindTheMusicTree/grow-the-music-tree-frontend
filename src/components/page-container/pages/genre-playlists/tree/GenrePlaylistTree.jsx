@@ -5,12 +5,12 @@ import ReactDOMServer from "react-dom/server";
 import * as d3 from "d3";
 import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause } from "react-icons/fa";
 
-import { usePopup } from "../../../../../contexts/popup/usePopup.jsx";
-import { useTrackList } from "../../../../../contexts/track-list/useTrackList.jsx";
-import { useGenrePlaylists } from "../../../../../contexts/genre-playlists/useGenrePlaylists.jsx";
-import { usePlayer } from "../../../../../contexts/player/usePlayer.jsx";
-import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS, TRACK_LIST_ORIGIN_TYPE } from "../../../../../constants.js";
-import LibTrackUploadingPopupContentObject from "../../../../../models/popup-content-object/LibTrackUploadingPopupContentObject.js";
+import { usePopup } from "../../../../../contexts/popup/usePopup";
+import { useTrackList } from "../../../../../contexts/track-list/useTrackList";
+import { useGenrePlaylists } from "../../../../../contexts/genre-playlists/useGenrePlaylists";
+import { usePlayer } from "../../../../../contexts/player/usePlayer";
+import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS, TRACK_LIST_ORIGIN_TYPE } from "../../../../../constants";
+import LibTrackUploadPopupContentObject from "../../../../../models/popup-content-object/LibTrackUploadPopupContentObject";
 
 export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
@@ -22,14 +22,16 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   const { playState } = usePlayer();
   const { showPopup } = usePopup();
   const { handleGenreAddAction } = useGenrePlaylists();
-  const { setNewTrackListFromPlaylistUuid, trackListOrigin } = useTrackList();
+  const { playNewTrackListFromPlaylistUuid, origin: trackListOrigin } = useTrackList();
   const svgRef = useRef(null);
   const fileInputRef = useRef(null);
   const selectingFileGenreUuidRef = useRef(null);
 
   async function handleFileChange(event) {
-    const file = event.target.files[0];
-    const popupContentObject = new LibTrackUploadingPopupContentObject(file, selectingFileGenreUuidRef.current);
+    const popupContentObject = new LibTrackUploadPopupContentObject(
+      Array.from(event.target.files),
+      selectingFileGenreUuidRef.current
+    );
     showPopup(popupContentObject);
     event.target.value = null;
   }
@@ -69,7 +71,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       trackListOrigin.uuid !== genrePlaylist.uuid
     ) {
       if (genrePlaylist.libraryTracksCount > 0) {
-        setNewTrackListFromPlaylistUuid(genrePlaylist.uuid);
+        playNewTrackListFromPlaylistUuid(genrePlaylist.uuid);
       }
     }
   };

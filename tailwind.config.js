@@ -50,6 +50,9 @@ export default {
         ".library-item": {
           "@apply border-b border-gray-500 py-2 text-overflow": {},
         },
+        ".action-round-button": {
+          "@apply bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-2 rounded-full": {},
+        },
 
         ".progress-bar": {
           "@apply appearance-none w-full h-1.5 mt-0 mb-0 block border-transparent rounded-full overflow-hidden": {},

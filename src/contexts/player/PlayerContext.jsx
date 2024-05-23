@@ -1,20 +1,20 @@
 import { createContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
-import { PLAY_STATES } from "../../constants.js";
-import ApiService from "../../utils/service/apiService.js";
+import { PLAY_STATES } from "../../constants";
+import ApiService from "../../utils/service/apiService";
 
 export const PlayerContext = createContext();
 
 export function PlayerProvider({ children }) {
-  const [libTrackObject, setLibTrackObject] = useState(null);
-  const [resetSeekSignal, setResetSeekSignal] = useState(0);
+  const [playerLibTrackObject, setPlayerLibTrackObject] = useState();
+  const [resetPlayerSeekSignal, setResetPlayerSeekSignal] = useState(0);
   const [playState, setPlayState] = useState(PLAY_STATES.STOPPED);
 
   const setLibTrackToPlay = async (libTrack, hasNext, hasPrevious) => {
     const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(libTrack.relativeUrl);
     setPlayState(PLAY_STATES.PLAYING);
-    setLibTrackObject({
+    setPlayerLibTrackObject({
       libraryTrack: libTrack,
       blobUrl: playingLibTrackBlobUrl,
       hasNext: hasNext,
@@ -25,7 +25,7 @@ export function PlayerProvider({ children }) {
   const handlePlayPauseAction = (event) => {
     event.stopPropagation();
     if (playState === PLAY_STATES.STOPPED) {
-      setResetSeekSignal(1);
+      setResetPlayerSeekSignal(1);
       setPlayState(PLAY_STATES.PLAYING);
     } else if (playState === PLAY_STATES.PLAYING) {
       setPlayState(PLAY_STATES.PAUSED);
@@ -35,23 +35,23 @@ export function PlayerProvider({ children }) {
   };
 
   useEffect(() => {
-    if (libTrackObject) {
+    if (playerLibTrackObject) {
       if (playState === PLAY_STATES.LOADING) {
         setPlayState(PLAY_STATES.PLAYING);
       }
     }
-  }, [libTrackObject]);
+  }, [playerLibTrackObject]);
 
   return (
     <PlayerContext.Provider
       value={{
-        libTrackObject,
-        setlibTrackObject: setLibTrackObject,
+        libTrackObject: playerLibTrackObject,
+        setlibTrackObject: setPlayerLibTrackObject,
         playState,
         setPlayState,
         handlePlayPauseAction,
-        resetSeekSignal,
-        setResetPlayerSeekSignal: setResetSeekSignal,
+        resetSeekSignal: resetPlayerSeekSignal,
+        setResetPlayerSeekSignal: setResetPlayerSeekSignal,
         setLibTrackToPlay,
       }}
     >
