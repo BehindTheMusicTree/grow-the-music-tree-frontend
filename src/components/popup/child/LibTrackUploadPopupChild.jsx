@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 
 import { MdError, MdCheckCircle } from "react-icons/md";
+import { FaSpinner } from "react-icons/fa";
 
 import { useLibTracks } from "../../../contexts/lib-tracks/useLibTracks";
 import { BadRequestError } from "../../../utils/errors/BadRequestError";
@@ -23,8 +24,16 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
     }
   }, [popupContentObject]);
 
+  const setFileUploadObjIsPosting = (filename, isPosting) => {
+    setFilesUploadObjs((prevFileUploadObj) => ({
+      ...prevFileUploadObj,
+      [filename]: { ...prevFileUploadObj[filename], isPosting: isPosting },
+    }));
+  };
+
   useEffect(() => {
     async function handleLibTrackToPost(file, genreUuid) {
+      setFileUploadObjIsPosting(file.name, true);
       try {
         await postLibTrack(file, genreUuid, (progress) => {
           setFilesUploadObjs((prevFilesUploadObjs) => ({
@@ -32,13 +41,15 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
             [file.name]: { ...prevFilesUploadObjs[file.name], progress },
           }));
         });
+        setFileUploadObjIsPosting(file.name, false);
       } catch (error) {
         if (error instanceof BadRequestError) {
-          setFilesUploadObjs((fileUploadObj) => ({
-            ...fileUploadObj,
-            [file.name]: { ...fileUploadObj[file.name], requestErrors: error.requestErrors },
+          setFilesUploadObjs((prevFileUploadObj) => ({
+            ...prevFileUploadObj,
+            [file.name]: { ...prevFileUploadObj[file.name], requestErrors: error.requestErrors },
           }));
         }
+        setFileUploadObjIsPosting(file.name, false);
       }
     }
 
@@ -58,14 +69,18 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
       <div>
         <div>
           {Object.entries(filesUploadObjs).map(([filename, uploadObj]) => {
-            console.log(JSON.stringify(uploadObj, null, 2));
+            console.log("uploadObj" + JSON.stringify(uploadObj));
             return (
               <div key={filename} className="h-8 flex items-center">
-                {uploadObj.requestErrors.length > 0 ? (
-                  <MdError size={20} color="red" className="mr-1" />
-                ) : (
-                  <MdCheckCircle size={20} color="green" className="mr-1" />
-                )}
+                <div className="icon-container mr-2">
+                  {uploadObj.isPosting ? (
+                    <FaSpinner size={18} className="animate-spin fill-current text-gray-400" />
+                  ) : uploadObj.requestErrors.length > 0 ? (
+                    <MdError size={20} color="red" className="mr-1" />
+                  ) : (
+                    <MdCheckCircle size={20} color="green" className="mr-1" />
+                  )}
+                </div>
                 <div className="w-2/5 mr-4 text-overflow">{filename}</div>
                 <div className="center flex-grow mr-2">
                   {uploadObj.requestErrors.length > 0 ? (
@@ -97,38 +112,6 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
           })}
         </div>
       </div>
-      {/* requestErrorsByFilename.length > 0 ? (
-        <div>
-          {requestErrorsByFilename.map((errorObj) => {
-            const filename = Object.keys(errorObj)[0];
-            const fileErrors = errorObj[filename];
-
-            return (
-              <div key={filename} className="file-errors h-8 flex items-center">
-                <div className="mr-2 flex items-center">
-                  <MdError size={20} color="red" className="mr-1" />
-                  <div>{filename}</div>
-                </div>
-                {fileErrors.map((fileErrorObj) => {
-                  const fieldName = Object.keys(fileErrorObj)[0];
-                  const fieldErrors = fileErrorObj[fieldName];
-
-                  return (
-                    <div key={filename + fieldName} className="flex">
-                      <div className="mr-2">{fieldName}</div>
-                      <ul>
-                        {fieldErrors.map((error) => (
-                          <li key={error}>{error}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
-      ) : null} */}
     </div>
   );
 }

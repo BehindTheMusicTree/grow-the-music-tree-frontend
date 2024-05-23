@@ -152,6 +152,7 @@ const ApiService = {
   },
 
   fetchData: async (endpoint, method, data = null, page = null, onProgress = null) => {
+    console.log(`data: ${JSON.stringify(data, null, 2)}`);
     let url = `${config.apiBaseUrl}${endpoint}`;
     if (page) {
       url += `?page=${page}`;
