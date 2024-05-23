@@ -8,33 +8,36 @@ export const LibTracksContext = createContext();
 
 export function LibTracksProvider({ children }) {
   const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
-  const [libTracks, setlibTracks] = useState();
-  const [refreshlibTracksSignal, setRefreshlibTracksSignal] = useState(1);
+  const [libTracks, setLibTracks] = useState();
+  const [refreshlibTracksSignal, setRefreshLibTracksSignal] = useState(1);
 
   const areLibTrackFetchingRef = { current: false };
 
   async function postLibTrack(file, genreUuid, onProgress) {
     await ApiService.postLibTrack(file, genreUuid, onProgress);
     setRefreshGenrePlaylistsSignal(1);
-    fetchLibTracks();
   }
 
   async function fetchLibTracks() {
     const libTracks = await ApiService.getLibTracks();
-    setlibTracks(libTracks);
+    setLibTracks(libTracks);
   }
 
   useEffect(() => {
-    if (refreshlibTracksSignal == 1 && !areLibTrackFetchingRef.current) {
-      areLibTrackFetchingRef.current = true;
-      fetchLibTracks();
-      areLibTrackFetchingRef.current = false;
-      setRefreshlibTracksSignal(0);
-    }
+    const fetchLibTracksAsync = async () => {
+      if (refreshlibTracksSignal == 1 && !areLibTrackFetchingRef.current) {
+        areLibTrackFetchingRef.current = true;
+        await fetchLibTracks();
+        areLibTrackFetchingRef.current = false;
+        setRefreshLibTracksSignal(0);
+      }
+    };
+
+    fetchLibTracksAsync();
   }, [refreshlibTracksSignal]);
 
   return (
-    <LibTracksContext.Provider value={{ libTracks, postLibTrack, setRefreshlibTracksSignal }}>
+    <LibTracksContext.Provider value={{ libTracks, postLibTrack, setRefreshLibTracksSignal }}>
       {children}
     </LibTracksContext.Provider>
   );

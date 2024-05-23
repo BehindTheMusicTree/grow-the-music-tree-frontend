@@ -28,7 +28,7 @@ export function TrackListProvider({ children }) {
     setTrackList(newTrackList);
   };
 
-  const setNewTrackListFromLibTrackUuid = async (uuid) => {
+  const playNewTrackListFromLibTrackUuid = async (uuid) => {
     setPlayState(PLAY_STATES.LOADING);
     setOrigin(null);
     const newLibTrackPlayObject = await ApiService.postPlay(uuid);
@@ -78,7 +78,7 @@ export function TrackListProvider({ children }) {
         origin,
         playingLibTrackPosition,
         refreshLibTrack,
-        setNewTrackListFromLibTrackUuid,
+        playNewTrackListFromLibTrackUuid,
         playNewTrackListFromPlaylistUuid,
         playLibTrackAtPosition,
         toPreviousTrack,

@@ -8,15 +8,9 @@ import { useLibTracks } from "../../../contexts/lib-tracks/useLibTracks";
 import BadRequestError from "../../../utils/errors/BadRequestError";
 
 export default function LibTrackUploadPopupChild({ popupContentObject }) {
-  const { postLibTrack } = useLibTracks();
+  const { postLibTrack, setRefreshLibTracksSignal } = useLibTracks();
   const [isPosting, setIsPosting] = useState(false);
   const [filesUploadObjs, setFilesUploadObjs] = useState({});
-
-  useEffect(() => {
-    if (popupContentObject && !isPosting) {
-      setIsPosting(true);
-    }
-  }, [popupContentObject]);
 
   const setFileUploadObjIsPosting = (filename, isPosting) => {
     setFilesUploadObjs((prevFileUploadObj) => ({
@@ -24,6 +18,12 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
       [filename]: { ...prevFileUploadObj[filename], isPosting: isPosting },
     }));
   };
+
+  useEffect(() => {
+    if (popupContentObject && !isPosting) {
+      setIsPosting(true);
+    }
+  }, [popupContentObject]);
 
   useEffect(() => {
     async function handleLibTrackToPost(file, genreUuid) {
@@ -59,6 +59,7 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
         }));
       });
       handleLibTrackToPosts(popupContentObject.files, popupContentObject.genreUuid).then(() => {
+        setRefreshLibTracksSignal(1);
         setIsPosting(false);
       });
     }
