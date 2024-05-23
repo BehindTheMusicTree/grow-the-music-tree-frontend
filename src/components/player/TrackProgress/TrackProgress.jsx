@@ -8,7 +8,8 @@ import { PLAY_STATES } from "../../../constants";
 import { formatTime } from "../../../utils";
 
 export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek }) {
-  const { libTrackObject, resetPlayerSeekSignal, setResetPlayerSeekSignal, playState, setPlayState } = usePlayer();
+  const { playerLibTrackObject, resetPlayerSeekSignal, setResetPlayerSeekSignal, playState, setPlayState } =
+    usePlayer();
   const [isSeeking, setIsSeeking] = useState(false);
 
   const playerRef = useRef(null);
@@ -39,7 +40,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
         errorMessage = "An unknown error occurred.";
     }
 
-    console.error(`Error loading track of url ${libTrackObject.blobUrl}: ${errorCode} - ${errorMessage}`);
+    console.error(`Error loading track of url ${playerLibTrackObject.blobUrl}: ${errorCode} - ${errorMessage}`);
   };
 
   const handleSeekingChange = (event) => {
@@ -89,7 +90,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
     if (playState === PLAY_STATES.PLAYING) {
       if (isSeeking) {
         cancelRaf();
-      } else if (seek >= Math.floor(libTrackObject.duration)) {
+      } else if (seek >= Math.floor(playerLibTrackObject.duration)) {
         handleTrackEnd();
       } else {
         playerRef.current.seek(seek);
@@ -115,10 +116,10 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
     <div className="flex flex justify-center items-center w-full">
       <ReactHowler
         ref={playerRef}
-        src={[libTrackObject.blobUrl]}
+        src={[playerLibTrackObject.blobUrl]}
         html5={true}
         playing={playState === PLAY_STATES.PLAYING}
-        format={[libTrackObject.libraryTrack.file.extension.replace(".", "")]}
+        format={[playerLibTrackObject.libraryTrack.file.extension.replace(".", "")]}
         onLoadError={handleLoadError}
         onEnd={handleTrackEnd}
         volume={volume}

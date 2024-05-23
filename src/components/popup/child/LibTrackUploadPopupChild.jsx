@@ -13,13 +13,13 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
   const [filesUploadObjs, setFilesUploadObjs] = useState({});
 
   useEffect(() => {
+    return () => {
+      console.log("cleanup");
+    };
+  }, []);
+
+  useEffect(() => {
     if (popupContentObject && !isPosting) {
-      popupContentObject.files.forEach((file) => {
-        setFilesUploadObjs((prevUploadObj) => ({
-          ...prevUploadObj,
-          [file.name]: { size: file.size, progress: 0, isPosting: false, requestErrors: {} },
-        }));
-      });
       setIsPosting(true);
     }
   }, [popupContentObject]);
@@ -58,11 +58,18 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
     }
 
     if (isPosting) {
+      console.log("lancement");
+      popupContentObject.files.forEach((file) => {
+        setFilesUploadObjs((prevUploadObj) => ({
+          ...prevUploadObj,
+          [file.name]: { size: file.size, progress: 0, isPosting: false, requestErrors: {} },
+        }));
+      });
       handleLibTrackToPosts(popupContentObject.files, popupContentObject.genreUuid).then(() => {
         setIsPosting(false);
       });
     }
-  }, [isPosting, postLibTrack]);
+  }, [isPosting]);
 
   return (
     <div>
