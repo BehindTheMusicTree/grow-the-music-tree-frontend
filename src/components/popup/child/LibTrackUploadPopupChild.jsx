@@ -13,12 +13,6 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
   const [filesUploadObjs, setFilesUploadObjs] = useState({});
 
   useEffect(() => {
-    return () => {
-      console.log("cleanup");
-    };
-  }, []);
-
-  useEffect(() => {
     if (popupContentObject && !isPosting) {
       setIsPosting(true);
     }
@@ -58,7 +52,6 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
     }
 
     if (isPosting) {
-      console.log("lancement");
       popupContentObject.files.forEach((file) => {
         setFilesUploadObjs((prevUploadObj) => ({
           ...prevUploadObj,
