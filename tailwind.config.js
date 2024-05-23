@@ -6,6 +6,9 @@ export default {
       fontSize: {
         "1.5xl": "1.1rem",
       },
+      scale: {
+        120: "1.2",
+      },
       spacing: {
         "play-l-offset": "15px",
         "play-r-offset": "13px",
@@ -16,10 +19,12 @@ export default {
       height: {
         banner: "100px",
         player: "80px",
+        menuitem: "45px",
       },
       width: {
         144: "50rem",
         playingbar: "5px",
+        menuitem: "45px",
       },
       maxWidth: {
         xl: "44rem",
@@ -43,8 +48,15 @@ export default {
   plugins: [
     function ({ addComponents }) {
       const newComponents = {
-        ".menu-item": {
-          "@apply text-white cursor-pointer text-4xl rounded-md hover:bg-gray-800 p-1": {},
+        ".menu-item-container": {
+          "@apply flex justify-center items-center h-menuitem w-menuitem text-white text-4xl rounded-md hover:bg-gray-800 p-2 mx-2 cursor-pointer":
+            {},
+        },
+        ".menu-item-icon-container": {
+          "@apply text-gray-400": {},
+        },
+        ".menu-item-icon-container-active": {
+          "@apply scale-120": {},
         },
 
         ".library-item": {

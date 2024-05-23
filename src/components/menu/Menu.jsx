@@ -7,7 +7,7 @@ import { PAGE_TYPES } from "../../constants";
 import { usePage } from "../../contexts/page/usePage";
 
 export default function Menu() {
-  const { setPage } = usePage();
+  const { page, setPage } = usePage();
 
   const handleLibraryClick = () => {
     setPage(new Page(PAGE_TYPES.LIBRARY, null));
@@ -18,10 +18,28 @@ export default function Menu() {
   };
 
   return (
-    <div className="menu-container bg-black flex-col justify-center items-start px-1">
-      <PiGraphLight className="menu-item" onClick={handleGenrePlaylistsClick} />
-      <LuLibrary className="menu-item mt-1" onClick={handleLibraryClick} />
-      <CiUser className="menu-item mt-1" />
+    <div className="menu-container bg-black flex-col justify-center items-start pt-3 px-1">
+      <div className="menu-item-container" onClick={handleGenrePlaylistsClick}>
+        <div
+          className={
+            page.type === PAGE_TYPES.GENRE_PLAYLISTS ? "menu-item-icon-container-active" : "menu-item-icon-container"
+          }
+        >
+          <PiGraphLight />
+        </div>
+      </div>
+      <div className="menu-item-container" onClick={handleLibraryClick}>
+        <div
+          className={page.type === PAGE_TYPES.LIBRARY ? "menu-item-icon-container-active" : "menu-item-icon-container"}
+        >
+          <LuLibrary />
+        </div>
+      </div>
+      <div className="menu-item-container">
+        <div className="menu-item-icon-container">
+          <CiUser className="menu-item-icon" />
+        </div>
+      </div>
     </div>
   );
 }
