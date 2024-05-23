@@ -1,6 +1,8 @@
 import config from "../../config/config";
 import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "../../constants";
-import { BadRequestError } from "../errors/BadRequestError";
+import RequestError from "../errors/RequestError";
+import BadRequestError from "../errors/BadRequestError";
+import UnauthorizedRequestError from "../errors/UnauthorizedRequestError";
 
 const parseJson = async (response) => {
   try {
@@ -34,11 +36,14 @@ const handleNotOkResponse = async (url, response) => {
 
       if (status === 400) {
         throw new BadRequestError(responseObj.errors);
+      } else if (status === 401) {
+        throw new UnauthorizedRequestError(responseObj.errors);
       }
+
       errorMessage = JSON.stringify(responseObj);
       throw new Error(`${errorMessagePrefixe} ${errorMessage ? ` - ${errorMessage}` : ""}`);
     } catch (error) {
-      if (error instanceof BadRequestError) {
+      if (error instanceof RequestError) {
         throw error;
       }
       throw new Error(
@@ -151,6 +156,30 @@ const ApiService = {
     }
   },
 
+  getXhr: async (url, method, data, page, onProgress) => {
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = "json";
+    xhr.open(method, url, true);
+    const headers = await ApiService.getHeaders();
+    if (data instanceof FormData) {
+      delete headers["Content-Type"];
+    }
+
+    Object.keys(headers).forEach((key) => {
+      xhr.setRequestHeader(key, headers[key]);
+    });
+
+    if (onProgress) {
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded * 100) / event.total);
+          onProgress(progress);
+        }
+      };
+    }
+    return xhr;
+  },
+
   fetchData: async (endpoint, method, data = null, page = null, onProgress = null) => {
     console.log(`data: ${JSON.stringify(data, null, 2)}`);
     let url = `${config.apiBaseUrl}${endpoint}`;
@@ -159,31 +188,11 @@ const ApiService = {
     }
 
     try {
-      const headers = await ApiService.getHeaders();
-
-      if (data instanceof FormData) {
-        delete headers["Content-Type"];
-      }
-
       /* We use XMLHttpRequest because fetch doesn't provide progression for file uploads */
-      const xhr = new XMLHttpRequest();
-      xhr.responseType = "json";
-      xhr.open(method, url, true);
-
-      Object.keys(headers).forEach((key) => {
-        xhr.setRequestHeader(key, headers[key]);
-      });
-
-      if (onProgress) {
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const progress = Math.round((event.loaded * 100) / event.total);
-            onProgress(progress);
-          }
-        };
-      }
+      const xhr = await ApiService.getXhr(url, method, data, page, onProgress);
 
       return new Promise((resolve, reject) => {
+        let mustRetryIfUnauthorized = true;
         xhr.onload = async () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             resolve(xhr.response);
@@ -192,6 +201,12 @@ const ApiService = {
               await handleNotOkResponse(url, xhr);
               reject(new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${xhr.statusText}`));
             } catch (error) {
+              if (error instanceof UnauthorizedRequestError && mustRetryIfUnauthorized) {
+                mustRetryIfUnauthorized = false;
+                await ApiService.login();
+                const xhr = await ApiService.getXhr(url, method, data, page, onProgress);
+                xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
+              }
               reject(error);
             }
           }

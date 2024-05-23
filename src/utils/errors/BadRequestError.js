@@ -1,9 +1,7 @@
-export class BadRequestError extends Error {
-  constructor(requestErrors, entityLabel) {
-    super(JSON.stringify(requestErrors));
-    this.name = "BadRequestError";
-    this.statusCode = 400;
-    this.requestErrors = Array.isArray(requestErrors) ? requestErrors : [requestErrors];
-    this.entityLabel = entityLabel;
+import RequestError from "./RequestError";
+
+export default class BadRequestError extends RequestError {
+  constructor(requestErrorsObj, entityLabel) {
+    super("BadRequestError", 400, entityLabel, requestErrorsObj);
   }
 }
