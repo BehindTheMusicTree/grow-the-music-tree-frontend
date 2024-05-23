@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+
+const playerHeight = "80px";
 export default {
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   theme: {
@@ -12,13 +14,14 @@ export default {
       spacing: {
         "play-l-offset": "15px",
         "play-r-offset": "13px",
+        player: playerHeight,
       },
       boxShadow: {
         "progress-bar-blue": "-403px 0 0 400px #3B82F6", // blue-500
       },
       height: {
         banner: "100px",
-        player: "80px",
+        player: playerHeight,
         menuitem: "45px",
       },
       width: {
