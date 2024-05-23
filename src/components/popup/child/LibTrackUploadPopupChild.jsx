@@ -5,7 +5,7 @@ import { MdError, MdCheckCircle } from "react-icons/md";
 import { FaSpinner } from "react-icons/fa";
 
 import { useLibTracks } from "../../../contexts/lib-tracks/useLibTracks";
-import { BadRequestError } from "../../../utils/errors/BadRequestError";
+import BadRequestError from "../../../utils/errors/BadRequestError";
 
 export default function LibTrackUploadPopupChild({ popupContentObject }) {
   const { postLibTrack } = useLibTracks();
