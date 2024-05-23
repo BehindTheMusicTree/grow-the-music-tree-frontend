@@ -14,7 +14,6 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
 
   useEffect(() => {
     if (popupContentObject && !isPosting) {
-      // console.log("set isPosting true");
       setIsPosting(true);
     }
   }, [popupContentObject]);
@@ -29,9 +28,7 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
           }))
         );
       } catch (error) {
-        console.log("Error posting file " + file.name);
         if (error instanceof BadRequestError) {
-          console.log("error " + error);
           setRequestErrorsByFilename((requestErrorsByFilename) => [
             ...requestErrorsByFilename,
             { [file.name]: error.requestErrors },
@@ -51,13 +48,8 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
     }
   }, [isPosting, postLibTrack]);
 
-  useEffect(() => {
-    console.log("requestErrorsByFilename " + JSON.stringify(requestErrorsByFilename));
-  }, [requestErrorsByFilename]);
-
   return (
     <div>
-      {requestErrorsByFilename.length}
       {isPosting ? (
         <div>
           <div>
