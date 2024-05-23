@@ -29,13 +29,13 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
           }))
         );
       } catch (error) {
-        // console.log("Error posting file " + file.name);
+        console.log("Error posting file " + file.name);
         if (error instanceof BadRequestError) {
           console.log("error " + error);
-          setRequestErrorsByFilename((requestErrorsByFilename) => {
-            const res = requestErrorsByFilename.concat({ filename: file.name, requestErrors: error.requestErrors });
-            return res;
-          });
+          setRequestErrorsByFilename((requestErrorsByFilename) => [
+            ...requestErrorsByFilename,
+            { [file.name]: error.requestErrors },
+          ]);
         }
       }
     }
@@ -47,31 +47,32 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
     if (isPosting) {
       handleLibTrackToPosts(popupContentObject.files, popupContentObject.genreUuid).then(() => {
         setIsPosting(false);
-        // console.log("fini");
-        // console.log("requestErrorsByFilename " + requestErrorsByFilename);
       });
     }
   }, [isPosting, postLibTrack]);
 
+  useEffect(() => {
+    console.log("requestErrorsByFilename " + JSON.stringify(requestErrorsByFilename));
+  }, [requestErrorsByFilename]);
+
   return (
     <div>
+      {requestErrorsByFilename.length}
       {isPosting ? (
         <div>
           <div>
-            {Object.entries(uploadProgress).map(([fileName, { size, progress }]) => (
-              <div key={fileName} className="flex items-center">
-                <div className="w-128 mr-4">{fileName}</div>
-                <div className="flex-grow h-3 bg-gray-200 rounded-md overflow-hidden mr-4">
+            {Object.entries(uploadProgress).map(([filename, { size, progress }]) => (
+              <div key={filename} className="flex items-center">
+                <div className="w-1/2 mr-4">{filename}</div>
+                <div className="flex-grow h-4 bg-gray-200 rounded-md overflow-hidden mr-4 relative">
                   <div className="bg-blue-500 h-full" style={{ width: `${progress}%` }} />
+                  <div className="absolute inset-0 flex items-center justify-center text-sm text-white">
+                    {Math.round(progress)}%
+                  </div>
                 </div>
                 <div className="w-16">{(size / 1048576).toFixed(2)} Mo</div>{" "}
               </div>
             ))}
-            {/* <div key={id} className="flex">
-              <div>Name: {file.name}</div>
-              <div>Size: {(file.size / 1048576).toFixed(2)} Mo</div>{" "}
-              <div>Last Modified: {new Date(file.lastModified).toLocaleString()}</div>
-            </div> */}
           </div>
         </div>
       ) : requestErrorsByFilename.length > 0 ? (
@@ -80,21 +81,31 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
             <MdError size={20} color="red" />
             <h3 className="ml-1">An error occured</h3>
           </div>
-          {/* {requestErrorsByFilename.map(({ filename, requestErrors }) => (
-            <div key={filename}>
-              <div>{filename}</div>
-              {requestErrors.map(([fieldName, fieldErrors]) => (
-                <div key={fieldName} className="flex">
-                  <h3 className="mr-2">{fieldName}</h3>
-                  <ul>
-                    {fieldErrors.map((error) => (
-                      <li key={error}>- {error}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          ))} */}
+          {requestErrorsByFilename.map((errorObj) => {
+            const filename = Object.keys(errorObj)[0];
+            const fileErrors = errorObj[filename];
+
+            return (
+              <div key={filename}>
+                <div>{filename}</div>
+                {fileErrors.map((fileErrorObj) => {
+                  const fieldName = Object.keys(fileErrorObj)[0];
+                  const fieldErrors = fileErrorObj[fieldName];
+
+                  return (
+                    <div key={filename + fieldName} className="flex">
+                      <h3 className="mr-2">{fieldName}</h3>
+                      <ul>
+                        {fieldErrors.map((error) => (
+                          <li key={error}>- {error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
         </div>
       ) : null}
     </div>

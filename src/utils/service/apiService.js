@@ -10,13 +10,29 @@ const parseJson = async (response) => {
   }
 };
 
+const getResponseObjFromXhr = (xhr) => {
+  return xhr.response;
+};
+
+const getResponseObjFromFetch = async (response) => {
+  const responseObj = await parseJson(response);
+  return responseObj;
+};
+
 const handleNotOkResponse = async (url, response) => {
-  if (response.status >= 400 && response.status < 600) {
+  const status = response.status;
+  if (status >= 400 && status < 600) {
     let errorMessage = "";
-    const errorMessagePrefixe = `url ${url} - status ${response.status}`;
+    const errorMessagePrefixe = `url ${url} - status ${status}`;
     try {
-      const responseObj = await parseJson(response);
-      if (response.status === 400) {
+      let responseObj;
+      if (response.json) {
+        responseObj = await getResponseObjFromFetch(response);
+      } else if (response.responseType && response.responseType === "json") {
+        responseObj = getResponseObjFromXhr(response);
+      }
+
+      if (status === 400) {
         throw new BadRequestError(responseObj.errors);
       }
       errorMessage = JSON.stringify(responseObj);
@@ -135,64 +151,66 @@ const ApiService = {
     }
   },
 
-  fetchData: (endpoint, method, data = null, page = null, onProgress = null) => {
+  fetchData: async (endpoint, method, data = null, page = null, onProgress = null) => {
     let url = `${config.apiBaseUrl}${endpoint}`;
     if (page) {
       url += `?page=${page}`;
     }
 
-    return new Promise((resolve, reject) => {
-      ApiService.getHeaders()
-        .then((headers) => {
-          if (data instanceof FormData) {
-            delete headers["Content-Type"];
+    try {
+      const headers = await ApiService.getHeaders();
+
+      if (data instanceof FormData) {
+        delete headers["Content-Type"];
+      }
+
+      /* We use XMLHttpRequest because fetch doesn't provide progression for file uploads */
+      const xhr = new XMLHttpRequest();
+      xhr.responseType = "json";
+      xhr.open(method, url, true);
+
+      Object.keys(headers).forEach((key) => {
+        xhr.setRequestHeader(key, headers[key]);
+      });
+
+      if (onProgress) {
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const progress = Math.round((event.loaded * 100) / event.total);
+            onProgress(progress);
           }
+        };
+      }
 
-          const xhr = new XMLHttpRequest();
-          xhr.open(method, url, true);
-
-          Object.keys(headers).forEach((key) => {
-            xhr.setRequestHeader(key, headers[key]);
-          });
-
-          if (onProgress) {
-            xhr.upload.onprogress = (event) => {
-              if (event.lengthComputable) {
-                const progress = Math.round((event.loaded * 100) / event.total);
-                onProgress(progress);
-              }
-            };
-          }
-
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              const responseJson = JSON.parse(xhr.responseText);
-              resolve(responseJson);
-            } else {
-              handleNotOkResponse(url, xhr.response).then(() => {
-                reject(
-                  new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${xhr.statusText}`)
-                );
-              });
+      return new Promise((resolve, reject) => {
+        xhr.onload = async () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(xhr.response);
+          } else {
+            try {
+              await handleNotOkResponse(url, xhr);
+              reject(new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${xhr.statusText}`));
+            } catch (error) {
+              reject(error);
             }
-          };
+          }
+        };
 
-          xhr.onerror = () => {
-            getFetchErrorMessageOtherThanBadRequest(xhr).then((fetchErrorMessage) => {
-              reject(
-                new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`)
-              );
-            });
-          };
-
-          xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
-        })
-        .catch((error) => {
-          getFetchErrorMessageOtherThanBadRequest(error).then((fetchErrorMessage) => {
+        xhr.onerror = async () => {
+          try {
+            const fetchErrorMessage = await getFetchErrorMessageOtherThanBadRequest(xhr);
             reject(new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`));
-          });
-        });
-    });
+          } catch (error) {
+            reject(error);
+          }
+        };
+
+        xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
+      });
+    } catch (error) {
+      const fetchErrorMessage = await getFetchErrorMessageOtherThanBadRequest(error);
+      throw new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
+    }
   },
 
   getLibTracks: async () => {
