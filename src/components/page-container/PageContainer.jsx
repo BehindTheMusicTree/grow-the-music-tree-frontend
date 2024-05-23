@@ -28,11 +28,7 @@ export default function PageContainer() {
         } */}
 
       {/* bottom-20 corresponding to 80px which is the player's height */}
-      {isTrackListSidebarVisible ? (
-        <div className="track-list-sidebar-container absolute bottom-20 right-0 w-144 overflow-auto max-h-[calc(100%-180px)] min-h-[calc((100%-180px)/3)] rounded-2xl bg-gray-950">
-          <TrackListSidebar />
-        </div>
-      ) : null}
+      {isTrackListSidebarVisible ? <TrackListSidebar /> : null}
     </div>
   );
 }
