@@ -69,27 +69,26 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
         </div>
       ) : requestErrorsByFilename.length > 0 ? (
         <div>
-          <div className="flex items-center">
-            <MdError size={20} color="red" />
-            <h3 className="ml-1">An error occured</h3>
-          </div>
           {requestErrorsByFilename.map((errorObj) => {
             const filename = Object.keys(errorObj)[0];
             const fileErrors = errorObj[filename];
 
             return (
-              <div key={filename}>
-                <div>{filename}</div>
+              <div key={filename} className="file-errors h-8 flex items-center">
+                <div className="mr-2 flex items-center">
+                  <MdError size={20} color="red" className="mr-1" />
+                  <div>{filename}</div>
+                </div>
                 {fileErrors.map((fileErrorObj) => {
                   const fieldName = Object.keys(fileErrorObj)[0];
                   const fieldErrors = fileErrorObj[fieldName];
 
                   return (
                     <div key={filename + fieldName} className="flex">
-                      <h3 className="mr-2">{fieldName}</h3>
+                      <div className="mr-2">{fieldName}</div>
                       <ul>
                         {fieldErrors.map((error) => (
-                          <li key={error}>- {error}</li>
+                          <li key={error}>{error}</li>
                         ))}
                       </ul>
                     </div>
