@@ -252,6 +252,15 @@ const ApiService = {
     return await ApiService.fetchData(`tracks/${libTrackUuid}/`, "GET", null, null);
   },
 
+  postLibTrack: async (file, genreUuid, onProgress) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (genreUuid !== null) {
+      formData.append("genreUuid", genreUuid);
+    }
+    return await ApiService.fetchData("tracks/", "POST", formData, null, onProgress);
+  },
+
   putLibTrack: async (libTrackUuid, libTrackData) => {
     return await ApiService.fetchData(`tracks/${libTrackUuid}/`, "PUT", libTrackData, null);
   },
@@ -341,13 +350,6 @@ const ApiService = {
   postPlay: async (contentObjectUuid) => {
     const data = { contentObjectUuid: contentObjectUuid };
     return await ApiService.fetchData(`plays/`, "POST", data, null);
-  },
-
-  postLibTracks: async (file, genreUuid, onProgress) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("genreUuid", genreUuid);
-    return await ApiService.fetchData("tracks/", "POST", formData, null, onProgress);
   },
 };
 

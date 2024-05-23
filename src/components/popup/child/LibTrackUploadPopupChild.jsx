@@ -69,7 +69,6 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
       <div>
         <div>
           {Object.entries(filesUploadObjs).map(([filename, uploadObj]) => {
-            console.log("uploadObj" + JSON.stringify(uploadObj));
             return (
               <div key={filename} className="h-8 flex items-center">
                 <div className="icon-container mr-2">
