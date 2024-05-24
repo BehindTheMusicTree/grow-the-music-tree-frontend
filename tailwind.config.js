@@ -56,7 +56,6 @@ export default {
     },
   },
   plugins: [
-    require("tailwind-scrollbar"),
     function ({ addComponents }) {
       const newComponents = {
         ".menu-item-container": {
