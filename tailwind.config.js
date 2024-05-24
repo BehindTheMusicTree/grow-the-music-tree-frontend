@@ -5,19 +5,38 @@ export default {
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      colors: {
+        "scrollbar-base": "#your-base-color",
+        "scrollbar-light": "#your-thumb-color",
+      },
+      animation: {
+        "scale-pulse": "scale-pulse 0.5s infinite",
+      },
+      boxShadow: {
+        "progress-bar-blue": "-403px 0 0 400px #3B82F6", // blue-500
+      },
       fontSize: {
         "1.5xl": "1.1rem",
       },
+      keyframes: {
+        "scale-pulse": {
+          "0%, 100%": { transform: "scaleY(0.75)" },
+          "50%": { transform: "scaleY(1)" },
+        },
+      },
+      maxWidth: {
+        xl: "44rem",
+      },
       scale: {
         120: "1.2",
+      },
+      extend: {
+        scrollbar: ["rounded", "dark"],
       },
       spacing: {
         "play-l-offset": "15px",
         "play-r-offset": "13px",
         player: playerHeight,
-      },
-      boxShadow: {
-        "progress-bar-blue": "-403px 0 0 400px #3B82F6", // blue-500
       },
       height: {
         banner: "100px",
@@ -29,18 +48,6 @@ export default {
         playingbar: "5px",
         menuitem: "45px",
       },
-      maxWidth: {
-        xl: "44rem",
-      },
-      keyframes: {
-        "scale-pulse": {
-          "0%, 100%": { transform: "scaleY(0.75)" },
-          "50%": { transform: "scaleY(1)" },
-        },
-      },
-      animation: {
-        "scale-pulse": "scale-pulse 0.5s infinite",
-      },
     },
   },
   variants: {
@@ -49,6 +56,7 @@ export default {
     },
   },
   plugins: [
+    require("tailwind-scrollbar"),
     function ({ addComponents }) {
       const newComponents = {
         ".menu-item-container": {
