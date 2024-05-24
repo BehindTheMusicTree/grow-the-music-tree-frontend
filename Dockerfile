@@ -2,6 +2,7 @@ FROM node:20-alpine AS build
 
 ARG bodzifyApiUmgUsername
 ARG bodzifyApiUmgUserPassword
+ARG sentryAuthToken
 
 WORKDIR /usr/src/app
 
@@ -22,6 +23,7 @@ FROM node:20-alpine
 # React env variables have to be prefixed with VITE_
 ENV VITE_BODZIFY_API_UMG_USERNAME=${bodzifyApiUmgUsername}
 ENV VITE_BODZIFY_API_UMG_USER_PASSWORD=${bodzifyApiUmgUserPassword}
+ENV SENTRY_AUTH_TOKEN=${sentryAuthToken}
 
 WORKDIR /usr/src/app
 

@@ -4,7 +4,6 @@ on:
   push:
     branches: 
       - dev
-      - make-vite-work-on-test
   pull_request:
     branches: [ "dev" ]
 
@@ -20,6 +19,7 @@ jobs:
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_UMG_REACT_REPO_NAME }}:${{ secrets.DOCKERHUB_UMG_REACT_REPO_TAG }} .
           --build-arg bodzifyApiUmgUsername='${{ secrets.BODZIFY_API_UMG_USERNAME }}' 
           --build-arg bodzifyApiUmgUserPassword='${{ secrets.BODZIFY_API_UMG_USER_PASSWORD }}' 
+          --build-arg sentryAuthToken='${{ secrets.SENTRY_AUTH_TOKEN }}' 
   
       - name: Log in to Docker Hub
         run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_UMG_REACT_SECRET_KEY }}
