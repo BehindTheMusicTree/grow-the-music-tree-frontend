@@ -135,6 +135,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     nodes
       .append("rect")
+      .attr("class", "node-base-rect")
       .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
       .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
       .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
@@ -150,6 +151,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       WIDTH: RECT_BASE_DIMENSIONS.WIDTH - 20,
       HEIGHT: RECT_BASE_DIMENSIONS.HEIGHT,
     };
+
     nodes
       .append("foreignObject")
       .attr("class", "tree-node-info-container")
@@ -164,7 +166,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     const SPINNER_ICON_SIZE = 14;
     nodes
       .append("foreignObject")
-      .attr("class", "w-4 h-4 flex justify-center items-center")
+      .attr("class", "spinner w-4 h-4 flex justify-center items-center")
       .attr("width", SPINNER_ICON_SIZE)
       .attr("height", SPINNER_ICON_SIZE)
       .attr("dominant-baseline", "middle")
@@ -303,36 +305,40 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       });
 
     nodes
-      .on("mouseover", function () {
-        const group = d3.select(this);
-        group
-          .append("rect")
-          .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2)
-          .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
-          .attr("width", ACTIONS_EXTRA_RECT_WIDTH)
-          .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
-          .html(function () {
-            return ReactDOMServer.renderToString(
-              <div className="flex justify-center items-center">
-                <MdMoreVert size={20} color="white" />
-              </div>
-            );
-          })
-          .attr("class", "more-container");
-      })
-      .on("mouseout", function (event) {
-        const group = d3.select(this);
-        const rect = group.select(".more-container");
-        const rectBounds = rect.node().getBoundingClientRect();
-        const [mouseX, mouseY] = d3.pointer(event);
+      .append("rect")
+      .attr("class", "node-base-rect-mouseover")
+      .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
+      .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+      .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
+      .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+      .attr("fill", "rgba(0, 0, 0, 0)")
+      .on("mouseover", function (event, d) {
+        console.log("mouseover");
+        const group = d3.select(this.parentNode);
+        let rect = group.select("#more-container-" + d.id);
 
-        if (
-          mouseX < rectBounds.left ||
-          mouseX > rectBounds.right ||
-          mouseY < rectBounds.top ||
-          mouseY > rectBounds.bottom
-        ) {
-          rect.remove();
+        if (rect.empty()) {
+          console.log("append");
+          rect = group
+            .append("rect")
+            .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2)
+            .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+            .attr("width", ACTIONS_EXTRA_RECT_WIDTH)
+            .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+            .html(function () {
+              return ReactDOMServer.renderToString(
+                <div className="flex justify-center items-center">
+                  <MdMoreVert size={20} color="white" />
+                </div>
+              );
+            })
+            .attr("id", "more-container-" + d.id);
+
+          group.on("mouseleave", function (event, d) {
+            console.log("mouseleave");
+            const rect = d3.select("#more-container-" + d.id);
+            rect.remove();
+          });
         }
       });
 
