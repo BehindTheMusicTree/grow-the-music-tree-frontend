@@ -20,10 +20,18 @@ import LibTrackUploadPopupContentObject from "../../../../../models/popup-conten
 
 export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   const RECTANGLE_COLOR = PRIMARY_COLOR;
-  const MORE_ICON_WIDTH = 20;
-  const ACTIONS_CONTAINER_WIDTH = 40;
+  const ACTION_ICON_SIZE = 14;
+  const ACTION_ICON_CONTAINER_DIMENSIONS = {
+    WIDTH: ACTION_ICON_SIZE + 12,
+    HEIGHT: RECT_BASE_DIMENSIONS.HEIGHT,
+  };
+  const MORE_ICON_WIDTH = 22;
+  const ACTIONS_CONTAINER_DIMENSIONS = {
+    WIDTH: ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH,
+    HEIGHT: ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT * 3,
+  };
   const NODE_DIMENSIONS = {
-    WIDTH: RECT_BASE_DIMENSIONS.WIDTH + MORE_ICON_WIDTH + ACTIONS_CONTAINER_WIDTH,
+    WIDTH: RECT_BASE_DIMENSIONS.WIDTH + MORE_ICON_WIDTH + ACTIONS_CONTAINER_DIMENSIONS.WIDTH,
     HEIGHT: RECT_BASE_DIMENSIONS.HEIGHT,
   };
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
@@ -98,12 +106,12 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       numberOfLevels * HORIZONTAL_SEPARATOON_BETWEEN_NODES +
       RECT_BASE_DIMENSIONS.WIDTH +
       MORE_ICON_WIDTH +
-      ACTIONS_CONTAINER_WIDTH;
+      ACTIONS_CONTAINER_DIMENSIONS.WIDTH;
     const lowestNodeX = calculateLowestNodeX(treeData);
     const highestNodeX = calculateHighestNodeX(treeData);
 
     const xGap = lowestNodeX - highestNodeX;
-    const svgHeight = xGap + RECT_BASE_DIMENSIONS.HEIGHT;
+    const svgHeight = xGap + ACTIONS_CONTAINER_DIMENSIONS.HEIGHT;
 
     const xExtremum = Math.max(Math.abs(lowestNodeX), Math.abs(highestNodeX));
     const xShift = xExtremum - xGap / 2;
@@ -259,31 +267,6 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         return `<div class="tree-node-info">` + d.data.libraryTracksCount + "</div>";
       });
 
-    const TRACK_UPLOAD_ICON_DIMENSIONS = {
-      WIDTH: 14,
-      HEIGHT: 16,
-    };
-
-    nodes
-      .append("foreignObject")
-      .attr("class", "track-upload tree-node-icon-container")
-      .attr("width", TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH)
-      .attr("height", TRACK_UPLOAD_ICON_DIMENSIONS.HEIGHT)
-      .attr("dominant-baseline", "middle")
-      .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2 - TRACK_UPLOAD_ICON_OFFSET - TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH / 2)
-      .attr("y", -(RECT_BASE_DIMENSIONS.HEIGHT - TRACK_UPLOAD_ICON_DIMENSIONS.HEIGHT) / 2)
-      .html(function () {
-        return ReactDOMServer.renderToString(
-          <FaFileUpload className="tree-node-icon" size={TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH} />
-        );
-      })
-      .style("display", "none")
-      .on("click", function (event, d) {
-        event.stopPropagation();
-        selectingFileGenreUuidRef.current = d.data.criteria.uuid;
-        fileInputRef.current.click();
-      });
-
     const ACTIONS_CONTAINER_X_OFFSET = RECT_BASE_DIMENSIONS.WIDTH / 2 + MORE_ICON_WIDTH;
     nodes
       .append("rect")
@@ -298,7 +281,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         let moreIconContainer = group.select("#more-icon-container-" + d.id);
 
         if (moreIconContainer.empty()) {
-          const eistingContainer = group.append("g").attr("id", "more-icon-container-" + d.id);
+          const existingContainer = group.append("g").attr("id", "more-icon-container-" + d.id);
 
           const handleMoreClick = (event, d) => {
             event.stopPropagation();
@@ -314,9 +297,9 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
                 .append("rect")
                 .attr("id", "actions-container-" + d.id)
                 .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-                .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
-                .attr("width", ACTIONS_CONTAINER_WIDTH)
-                .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+                .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2)
+                .attr("width", ACTIONS_CONTAINER_DIMENSIONS.WIDTH)
+                .attr("height", ACTIONS_CONTAINER_DIMENSIONS.HEIGHT)
                 .attr("fill", RECTANGLE_COLOR);
 
               parent
@@ -324,12 +307,12 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
                 .attr("class", "genre-add")
                 .attr("x", ACTIONS_CONTAINER_X_OFFSET)
                 .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
-                .attr("width", MORE_ICON_WIDTH)
-                .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+                .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+                .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
                 .html(function () {
                   return ReactDOMServer.renderToString(
-                    <div className="w-full h-full flex justify-center items-center cursor-pointer">
-                      <FaPlus className="tree-node-icon" size={16} color="white" />
+                    <div className="tree-node-icon-container w-full h-full flex justify-center items-center cursor-pointer">
+                      <FaPlus className="tree-node-icon" size={ACTION_ICON_SIZE} color="white" />
                     </div>
                   );
                 })
@@ -337,10 +320,31 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
                   group.dispatch("mouseleave");
                   handleGenreAddAction(event, d.data.criteria.uuid);
                 });
+
+              parent
+                .append("foreignObject")
+                .attr("class", "upload-track")
+                .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+                .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2 - ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
+                .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+                .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
+                .html(function () {
+                  return ReactDOMServer.renderToString(
+                    <div className="tree-node-icon-container h-full w-full flex justify-center items-center cursor-pointer">
+                      <FaFileUpload className="tree-node-icon" size={ACTION_ICON_SIZE} color="white" />
+                    </div>
+                  );
+                })
+                .on("click", function (event, d) {
+                  event.stopPropagation();
+                  selectingFileGenreUuidRef.current = d.data.criteria.uuid;
+                  fileInputRef.current.click();
+                  group.dispatch("mouseleave");
+                });
             }
           };
 
-          eistingContainer
+          existingContainer
             .append("rect")
             .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2)
             .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
@@ -348,7 +352,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
             .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
             .attr("fill", RECTANGLE_COLOR);
 
-          eistingContainer
+          existingContainer
             .append("foreignObject")
             .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2)
             .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)

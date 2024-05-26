@@ -93,6 +93,9 @@ export default {
         },
         ".tree-node-icon-container": {
           "@apply justify-center items-center cursor-pointer": {},
+          "&:hover": {
+            "@apply bg-gray-500": {},
+          },
         },
         ".tree-node-icon": {
           "@apply fill-current text-white": {},
