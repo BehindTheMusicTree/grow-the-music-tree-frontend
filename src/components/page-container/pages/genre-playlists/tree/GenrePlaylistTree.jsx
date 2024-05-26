@@ -20,9 +20,10 @@ import LibTrackUploadPopupContentObject from "../../../../../models/popup-conten
 
 export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   const RECTANGLE_COLOR = PRIMARY_COLOR;
-  const ACTIONS_EXTRA_RECT_WIDTH = 20;
+  const MORE_ICON_WIDTH = 20;
+  const ACTIONS_CONTAINER_WIDTH = 40;
   const NODE_DIMENSIONS = {
-    WIDTH: RECT_BASE_DIMENSIONS.WIDTH + ACTIONS_EXTRA_RECT_WIDTH,
+    WIDTH: RECT_BASE_DIMENSIONS.WIDTH + MORE_ICON_WIDTH + ACTIONS_CONTAINER_WIDTH,
     HEIGHT: RECT_BASE_DIMENSIONS.HEIGHT,
   };
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
@@ -94,7 +95,10 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     const numberOfLevels = root.height;
 
     const svgWidth =
-      numberOfLevels * HORIZONTAL_SEPARATOON_BETWEEN_NODES + RECT_BASE_DIMENSIONS.WIDTH + ACTIONS_EXTRA_RECT_WIDTH;
+      numberOfLevels * HORIZONTAL_SEPARATOON_BETWEEN_NODES +
+      RECT_BASE_DIMENSIONS.WIDTH +
+      MORE_ICON_WIDTH +
+      ACTIONS_CONTAINER_WIDTH;
     const lowestNodeX = calculateLowestNodeX(treeData);
     const highestNodeX = calculateHighestNodeX(treeData);
 
@@ -221,12 +225,12 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
             playState === PLAY_STATES.PLAYING ? (
               <FaPause size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="pause tree-node-icon" />
             ) : (
-              <FaPlay size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="play tree-node-icon" />
+              <FaPlay size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="play tree-node-icon cursor-pointer" />
             );
           return ReactDOMServer.renderToString(element);
         }
         return ReactDOMServer.renderToString(
-          <FaPlay size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="play tree-node-icon" />
+          <FaPlay size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="play tree-node-icon cursor-pointer" />
         );
       })
       .on("click", function (event, d) {
@@ -255,30 +259,6 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         return `<div class="tree-node-info">` + d.data.libraryTracksCount + "</div>";
       });
 
-    const GENRE_ADD_PLUS_ICON_DIMENSIONS = {
-      WIDTH: 14,
-      HEIGHT: 16,
-    };
-
-    nodes
-      .append("foreignObject")
-      .attr("class", "genre-add tree-node-icon-container")
-      .attr("width", GENRE_ADD_PLUS_ICON_DIMENSIONS.WIDTH)
-      .attr("height", GENRE_ADD_PLUS_ICON_DIMENSIONS.HEIGHT)
-      .attr("dominant-baseline", "middle")
-      .attr("text-anchor", "middle")
-      .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2 - GENRE_ADD_ICON_OFFSET - GENRE_ADD_PLUS_ICON_DIMENSIONS.WIDTH / 2)
-      .attr("y", -(RECT_BASE_DIMENSIONS.HEIGHT - GENRE_ADD_PLUS_ICON_DIMENSIONS.HEIGHT) / 2)
-      .html(function () {
-        return ReactDOMServer.renderToString(
-          <FaPlus className="tree-node-icon" size={GENRE_ADD_PLUS_ICON_DIMENSIONS.WIDTH} />
-        );
-      })
-      .style("display", "none")
-      .on("click", function (event, d) {
-        handleGenreAddAction(event, d.data.criteria.uuid);
-      });
-
     const TRACK_UPLOAD_ICON_DIMENSIONS = {
       WIDTH: 14,
       HEIGHT: 16,
@@ -304,6 +284,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         fileInputRef.current.click();
       });
 
+    const ACTIONS_CONTAINER_X_OFFSET = RECT_BASE_DIMENSIONS.WIDTH / 2 + MORE_ICON_WIDTH;
     nodes
       .append("rect")
       .attr("class", "node-base-rect-mouseover")
@@ -319,11 +300,42 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         if (rect.empty()) {
           const container = group.append("g").attr("id", "more-container-" + d.id);
 
+          const handleMoreClick = (event) => {
+            event.stopPropagation();
+            const parent = d3.select(event.currentTarget.parentNode);
+            parent
+              .append("rect")
+              .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+              .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+              .attr("width", ACTIONS_CONTAINER_WIDTH)
+              .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+              .attr("fill", RECTANGLE_COLOR);
+
+            parent
+              .append("foreignObject")
+              .attr("class", "genre-add")
+              .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+              .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+              .attr("width", MORE_ICON_WIDTH)
+              .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+              .html(function () {
+                return ReactDOMServer.renderToString(
+                  <div className="w-full h-full flex justify-center items-center cursor-pointer">
+                    <FaPlus className="tree-node-icon" size={16} color="white" />
+                  </div>
+                );
+              })
+              .on("click", function (event, d) {
+                group.dispatch("mouseleave");
+                handleGenreAddAction(event, d.data.criteria.uuid);
+              });
+          };
+
           container
             .append("rect")
             .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2)
             .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
-            .attr("width", ACTIONS_EXTRA_RECT_WIDTH)
+            .attr("width", MORE_ICON_WIDTH)
             .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
             .attr("fill", RECTANGLE_COLOR);
 
@@ -331,15 +343,16 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
             .append("foreignObject")
             .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2)
             .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
-            .attr("width", ACTIONS_EXTRA_RECT_WIDTH)
+            .attr("width", MORE_ICON_WIDTH)
             .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
             .html(function () {
               return ReactDOMServer.renderToString(
-                <div className="w-full h-full flex justify-center items-center">
+                <div className="w-full h-full flex justify-center items-center cursor-pointer">
                   <MdMoreVert size={20} color="white" />
                 </div>
               );
-            });
+            })
+            .on("click", handleMoreClick);
 
           group.on("mouseleave", function (event, d) {
             const container = d3.select("#more-container-" + d.id);
@@ -347,15 +360,6 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
           });
         }
       });
-
-    // const iconClassesToShowOnHover = ".genre-add, .track-upload";
-    // nodes
-    //   .on("mouseover", function () {
-    //     d3.select(this).selectAll(iconClassesToShowOnHover).style("display", "flex");
-    //   })
-    //   .on("mouseout", function () {
-    //     d3.select(this).selectAll(iconClassesToShowOnHover).style("display", "none");
-    //   });
 
     return () => {
       svg.selectAll("*").remove();
