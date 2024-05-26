@@ -320,8 +320,20 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
           })
           .attr("class", "more-container");
       })
-      .on("mouseout", function () {
-        d3.select(this).select(".more-container").remove();
+      .on("mouseout", function (event) {
+        const group = d3.select(this);
+        const rect = group.select(".more-container");
+        const rectBounds = rect.node().getBoundingClientRect();
+        const [mouseX, mouseY] = d3.pointer(event);
+
+        if (
+          mouseX < rectBounds.left ||
+          mouseX > rectBounds.right ||
+          mouseY < rectBounds.top ||
+          mouseY > rectBounds.bottom
+        ) {
+          rect.remove();
+        }
       });
 
     // const iconClassesToShowOnHover = ".genre-add, .track-upload";
