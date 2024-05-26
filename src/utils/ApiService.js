@@ -1,8 +1,8 @@
-import config from "../../config/config";
-import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "../../constants";
-import RequestError from "../errors/RequestError";
-import BadRequestError from "../errors/BadRequestError";
-import UnauthorizedRequestError from "../errors/UnauthorizedRequestError";
+import config from "./config";
+import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "./constants";
+import RequestError from "./errors/RequestError";
+import BadRequestError from "./errors/BadRequestError";
+import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
 
 const parseJson = async (response) => {
   try {

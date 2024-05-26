@@ -2,7 +2,7 @@ import TrackItem from "./track-item/TrackItem";
 import { capitalizeFirstLetter } from "../../../utils";
 import { useTrackList } from "../../../contexts/track-list/useTrackList";
 import { useTrackListSidebarVisibility } from "../../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
-import { TRACK_LIST_ORIGIN_TYPE } from "../../../constants";
+import { TRACK_LIST_ORIGIN_TYPE } from "../../../utils/constants";
 
 export default function TrackListSidebar() {
   const { trackList, origin } = useTrackList();

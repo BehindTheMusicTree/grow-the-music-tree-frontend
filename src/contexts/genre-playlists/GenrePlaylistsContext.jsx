@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
-import ApiService from "../../utils/service/apiService";
+import ApiService from "../../utils//ApiService";
 
 export const GenrePlaylistsContext = createContext();
 

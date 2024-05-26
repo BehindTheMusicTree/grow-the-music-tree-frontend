@@ -10,7 +10,7 @@ export const TRACK_LIST_ORIGIN_TYPE = {
   LIB_TRACK: "LIB_TRACK",
 };
 
-export const GENRE_TREE_RECT_DIMENSIONS = {
+export const GENRE_PLAYLIST_TREE_RECT_DIMENSIONS = {
   WIDTH: 180,
   HEIGHT: 30,
 };

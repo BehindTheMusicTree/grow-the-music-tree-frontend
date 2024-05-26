@@ -2,7 +2,7 @@ import { createContext, useState } from "react";
 import PropTypes from "prop-types";
 
 import Page from "../../models/Page";
-import { PAGE_TYPES } from "../../constants";
+import { PAGE_TYPES } from "../../utils/constants";
 
 export const PageContext = createContext();
 

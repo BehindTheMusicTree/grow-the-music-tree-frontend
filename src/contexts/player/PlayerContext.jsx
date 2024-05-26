@@ -1,8 +1,8 @@
 import { createContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
-import { PLAY_STATES } from "../../constants";
-import ApiService from "../../utils/service/apiService";
+import { PLAY_STATES } from "../../utils/constants";
+import ApiService from "../../utils//ApiService";
 
 export const PlayerContext = createContext();
 

@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { FORM_RATING_NULL_VALUE } from "../../constants";
+import { FORM_RATING_NULL_VALUE } from "../../utils/constants";
 
 export default function Rating({ rating, handleChange }) {
   return (

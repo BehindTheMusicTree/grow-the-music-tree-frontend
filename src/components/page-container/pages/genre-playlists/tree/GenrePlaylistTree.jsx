@@ -4,20 +4,31 @@ import ReactDOMServer from "react-dom/server";
 
 import * as d3 from "d3";
 import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause } from "react-icons/fa";
+import { MdMoreVert } from "react-icons/md";
 
 import { usePopup } from "../../../../../contexts/popup/usePopup";
 import { useTrackList } from "../../../../../contexts/track-list/useTrackList";
 import { useGenrePlaylists } from "../../../../../contexts/genre-playlists/useGenrePlaylists";
 import { usePlayer } from "../../../../../contexts/player/usePlayer";
-import { PLAY_STATES, GENRE_TREE_RECT_DIMENSIONS, TRACK_LIST_ORIGIN_TYPE } from "../../../../../constants";
+import {
+  PLAY_STATES,
+  TRACK_LIST_ORIGIN_TYPE,
+  GENRE_PLAYLIST_TREE_RECT_DIMENSIONS as RECT_BASE_DIMENSIONS,
+} from "../../../../../utils/constants";
+import { PRIMARY_COLOR } from "../../../../../utils/theme";
 import LibTrackUploadPopupContentObject from "../../../../../models/popup-content-object/LibTrackUploadPopupContentObject";
 
 export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
+  const RECTANGLE_COLOR = PRIMARY_COLOR;
+  const ACTIONS_EXTRA_RECT_WIDTH = 20;
+  const NODE_DIMENSIONS = {
+    WIDTH: RECT_BASE_DIMENSIONS.WIDTH + ACTIONS_EXTRA_RECT_WIDTH,
+    HEIGHT: RECT_BASE_DIMENSIONS.HEIGHT,
+  };
   const HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
   const VERTICAL_SEPARATOON_BETWEEN_RECTANGLES = 20;
-  const HORIZONTAL_SEPARATOON_BETWEEN_NODES =
-    GENRE_TREE_RECT_DIMENSIONS.WIDTH + HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES;
-  const VERTICAL_SEPARATOON_BETWEEN_NODES = GENRE_TREE_RECT_DIMENSIONS.HEIGHT + VERTICAL_SEPARATOON_BETWEEN_RECTANGLES;
+  const HORIZONTAL_SEPARATOON_BETWEEN_NODES = NODE_DIMENSIONS.WIDTH + HORIZONTAL_SEPARATOON_BETWEEN_RECTANGLES;
+  const VERTICAL_SEPARATOON_BETWEEN_NODES = NODE_DIMENSIONS.HEIGHT + VERTICAL_SEPARATOON_BETWEEN_RECTANGLES;
 
   const { playState } = usePlayer();
   const { showPopup } = usePopup();
@@ -82,12 +93,13 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     const numberOfLevels = root.height;
 
-    const svgWidth = numberOfLevels * HORIZONTAL_SEPARATOON_BETWEEN_NODES + GENRE_TREE_RECT_DIMENSIONS.WIDTH;
+    const svgWidth =
+      numberOfLevels * HORIZONTAL_SEPARATOON_BETWEEN_NODES + RECT_BASE_DIMENSIONS.WIDTH + ACTIONS_EXTRA_RECT_WIDTH;
     const lowestNodeX = calculateLowestNodeX(treeData);
     const highestNodeX = calculateHighestNodeX(treeData);
 
     const xGap = lowestNodeX - highestNodeX;
-    const svgHeight = xGap + GENRE_TREE_RECT_DIMENSIONS.HEIGHT;
+    const svgHeight = xGap + RECT_BASE_DIMENSIONS.HEIGHT;
 
     const xExtremum = Math.max(Math.abs(lowestNodeX), Math.abs(highestNodeX));
     const xShift = xExtremum - xGap / 2;
@@ -100,7 +112,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     const linkGenerator = d3
       .linkHorizontal()
-      .x((d) => d.y + GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2)
+      .x((d) => d.y + RECT_BASE_DIMENSIONS.WIDTH / 2)
       .y((d) => d.x - firstNodeXCorrected + svgHeight / 2);
 
     svg
@@ -117,16 +129,25 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .enter()
       .append("g")
       .attr("transform", function (d) {
-        nodeY = GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 + HORIZONTAL_SEPARATOON_BETWEEN_NODES * d.depth;
+        nodeY = RECT_BASE_DIMENSIONS.WIDTH / 2 + HORIZONTAL_SEPARATOON_BETWEEN_NODES * d.depth;
         return "translate(" + nodeY + "," + (d.x - firstNodeXCorrected + svgHeight / 2) + ")";
       });
 
     nodes
       .append("rect")
-      .attr("width", GENRE_TREE_RECT_DIMENSIONS.WIDTH)
-      .attr("height", GENRE_TREE_RECT_DIMENSIONS.HEIGHT)
-      .attr("x", -GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2)
-      .attr("y", -GENRE_TREE_RECT_DIMENSIONS.HEIGHT / 2);
+      .attr("width", NODE_DIMENSIONS.WIDTH)
+      .attr("height", NODE_DIMENSIONS.HEIGHT)
+      .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
+      .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+      .attr("fill", "none");
+
+    nodes
+      .append("rect")
+      .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
+      .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+      .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
+      .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+      .attr("fill", RECTANGLE_COLOR);
 
     const TRACK_UPLOAD_ICON_OFFSET = 10;
     const GENRE_ADD_ICON_OFFSET = TRACK_UPLOAD_ICON_OFFSET + 17;
@@ -134,16 +155,16 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     const PLAY_PAUSE_BUTTON_OFFSET = PLAYLIST_TRACKS_COUNT_TEXT_OFFSET + 13;
 
     const GENRE_NAME_DIMENSIONS = {
-      WIDTH: GENRE_TREE_RECT_DIMENSIONS.WIDTH - 20,
-      HEIGHT: GENRE_TREE_RECT_DIMENSIONS.HEIGHT,
+      WIDTH: RECT_BASE_DIMENSIONS.WIDTH - 20,
+      HEIGHT: RECT_BASE_DIMENSIONS.HEIGHT,
     };
     nodes
       .append("foreignObject")
       .attr("class", "tree-node-info-container")
       .attr("width", GENRE_NAME_DIMENSIONS.WIDTH)
       .attr("height", GENRE_NAME_DIMENSIONS.HEIGHT)
-      .attr("x", -GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2)
-      .attr("y", -GENRE_TREE_RECT_DIMENSIONS.HEIGHT / 2)
+      .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
+      .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
       .html(function (d) {
         return `<div class="tree-node-info">${d.data.name}</div>`;
       });
@@ -155,7 +176,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("width", SPINNER_ICON_SIZE)
       .attr("height", SPINNER_ICON_SIZE)
       .attr("dominant-baseline", "middle")
-      .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET)
+      .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET)
       .attr("y", -SPINNER_ICON_SIZE / 2)
       .html(function (d) {
         if (
@@ -179,7 +200,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("class", "playpause tree-node-icon-container")
       .attr("width", PLAY_PAUSE_ICON_DIMENSIONS.WIDTH)
       .attr("height", PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT)
-      .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET)
+      .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2 - PLAY_PAUSE_BUTTON_OFFSET)
       .attr("y", -PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT / 2)
       .style("visibility", function (d) {
         return trackListOrigin &&
@@ -234,7 +255,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("class", "playlist-count tree-node-info-container")
       .attr("width", PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.WIDTH)
       .attr("height", PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT)
-      .attr("x", GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - PLAYLIST_TRACKS_COUNT_TEXT_OFFSET)
+      .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2 - PLAYLIST_TRACKS_COUNT_TEXT_OFFSET)
       .attr("y", -PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT / 2)
       .html(function (d) {
         return `<div class="tree-node-info">` + d.data.libraryTracksCount + "</div>";
@@ -252,11 +273,8 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("height", GENRE_ADD_PLUS_ICON_DIMENSIONS.HEIGHT)
       .attr("dominant-baseline", "middle")
       .attr("text-anchor", "middle")
-      .attr(
-        "x",
-        GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - GENRE_ADD_ICON_OFFSET - GENRE_ADD_PLUS_ICON_DIMENSIONS.WIDTH / 2
-      )
-      .attr("y", -(GENRE_TREE_RECT_DIMENSIONS.HEIGHT - GENRE_ADD_PLUS_ICON_DIMENSIONS.HEIGHT) / 2)
+      .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2 - GENRE_ADD_ICON_OFFSET - GENRE_ADD_PLUS_ICON_DIMENSIONS.WIDTH / 2)
+      .attr("y", -(RECT_BASE_DIMENSIONS.HEIGHT - GENRE_ADD_PLUS_ICON_DIMENSIONS.HEIGHT) / 2)
       .html(function () {
         return ReactDOMServer.renderToString(
           <FaPlus className="tree-node-icon" size={GENRE_ADD_PLUS_ICON_DIMENSIONS.WIDTH} />
@@ -278,11 +296,8 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("width", TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH)
       .attr("height", TRACK_UPLOAD_ICON_DIMENSIONS.HEIGHT)
       .attr("dominant-baseline", "middle")
-      .attr(
-        "x",
-        GENRE_TREE_RECT_DIMENSIONS.WIDTH / 2 - TRACK_UPLOAD_ICON_OFFSET - TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH / 2
-      )
-      .attr("y", -(GENRE_TREE_RECT_DIMENSIONS.HEIGHT - TRACK_UPLOAD_ICON_DIMENSIONS.HEIGHT) / 2)
+      .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2 - TRACK_UPLOAD_ICON_OFFSET - TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH / 2)
+      .attr("y", -(RECT_BASE_DIMENSIONS.HEIGHT - TRACK_UPLOAD_ICON_DIMENSIONS.HEIGHT) / 2)
       .html(function () {
         return ReactDOMServer.renderToString(
           <FaFileUpload className="tree-node-icon" size={TRACK_UPLOAD_ICON_DIMENSIONS.WIDTH} />
@@ -295,14 +310,36 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         fileInputRef.current.click();
       });
 
-    const iconClassesToShowOnHover = ".genre-add, .track-upload";
     nodes
       .on("mouseover", function () {
-        d3.select(this).selectAll(iconClassesToShowOnHover).style("display", "flex");
+        const group = d3.select(this);
+        group
+          .append("rect")
+          .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2)
+          .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+          .attr("width", ACTIONS_EXTRA_RECT_WIDTH)
+          .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+          .html(function () {
+            return ReactDOMServer.renderToString(
+              <div className="flex justify-center items-center">
+                <MdMoreVert size={20} color="white" />
+              </div>
+            );
+          })
+          .attr("class", "more-container");
       })
       .on("mouseout", function () {
-        d3.select(this).selectAll(iconClassesToShowOnHover).style("display", "none");
+        d3.select(this).select(".more-container").remove();
       });
+
+    // const iconClassesToShowOnHover = ".genre-add, .track-upload";
+    // nodes
+    //   .on("mouseover", function () {
+    //     d3.select(this).selectAll(iconClassesToShowOnHover).style("display", "flex");
+    //   })
+    //   .on("mouseout", function () {
+    //     d3.select(this).selectAll(iconClassesToShowOnHover).style("display", "none");
+    //   });
 
     return () => {
       svg.selectAll("*").remove();

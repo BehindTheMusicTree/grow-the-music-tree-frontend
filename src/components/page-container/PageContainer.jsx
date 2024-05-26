@@ -1,4 +1,4 @@
-import { PAGE_TYPES } from "../../constants";
+import { PAGE_TYPES } from "../../utils/constants";
 import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
 import { usePage } from "../../contexts/page/usePage";
 import TrackListSidebar from "./track-list-sidebar/TrackListSidebar";
