@@ -313,31 +313,37 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
       .attr("fill", "rgba(0, 0, 0, 0)")
       .on("mouseover", function (event, d) {
-        console.log("mouseover");
         const group = d3.select(this.parentNode);
         let rect = group.select("#more-container-" + d.id);
 
         if (rect.empty()) {
-          console.log("append");
-          rect = group
+          const container = group.append("g").attr("id", "more-container-" + d.id);
+
+          container
             .append("rect")
+            .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2)
+            .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+            .attr("width", ACTIONS_EXTRA_RECT_WIDTH)
+            .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+            .attr("fill", RECTANGLE_COLOR);
+
+          container
+            .append("foreignObject")
             .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2)
             .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
             .attr("width", ACTIONS_EXTRA_RECT_WIDTH)
             .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
             .html(function () {
               return ReactDOMServer.renderToString(
-                <div className="flex justify-center items-center">
+                <div className="w-full h-full flex justify-center items-center">
                   <MdMoreVert size={20} color="white" />
                 </div>
               );
-            })
-            .attr("id", "more-container-" + d.id);
+            });
 
           group.on("mouseleave", function (event, d) {
-            console.log("mouseleave");
-            const rect = d3.select("#more-container-" + d.id);
-            rect.remove();
+            const container = d3.select("#more-container-" + d.id);
+            container.remove();
           });
         }
       });
