@@ -135,14 +135,6 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     nodes
       .append("rect")
-      .attr("width", NODE_DIMENSIONS.WIDTH)
-      .attr("height", NODE_DIMENSIONS.HEIGHT)
-      .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
-      .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
-      .attr("fill", "none");
-
-    nodes
-      .append("rect")
       .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
       .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
       .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
