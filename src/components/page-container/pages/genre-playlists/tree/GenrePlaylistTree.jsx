@@ -148,7 +148,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     const uploadTrackGroup = actionsContainerGroup
       .append("g")
-      .attr("class", "upload-track-container tree-action-container")
+      .attr("class", "upload-track-container cursor-pointer")
       .on("click", function (event, d) {
         event.stopPropagation();
         selectingFileGenreUuidRef.current = d.data.criteria.uuid;
