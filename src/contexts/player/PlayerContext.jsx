@@ -22,8 +22,7 @@ export function PlayerProvider({ children }) {
     });
   };
 
-  const handlePlayPauseAction = (event) => {
-    event.stopPropagation();
+  const handlePlayPauseAction = () => {
     if (playState === PLAY_STATES.STOPPED) {
       setResetPlayerSeekSignal(1);
       setPlayState(PLAY_STATES.PLAYING);

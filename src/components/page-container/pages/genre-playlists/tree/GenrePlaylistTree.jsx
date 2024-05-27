@@ -29,7 +29,7 @@ import LibTrackUploadPopupContentObject from "../../../../../models/popup-conten
 export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   const RECTANGLE_COLOR = PRIMARY_COLOR;
 
-  const { playState } = usePlayer();
+  const { playState, handlePlayPauseAction } = usePlayer();
   const { showPopup } = usePopup();
   const { handleGenreAddAction: handleAddGenreAction } = useGenrePlaylists();
   const { playNewTrackListFromPlaylistUuid, origin: trackListOrigin } = useTrackList();
@@ -83,11 +83,17 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       !trackListOrigin ||
       playState === PLAY_STATES.STOPPED ||
       trackListOrigin.type !== TRACK_LIST_ORIGIN_TYPE.PLAYLIST ||
-      trackListOrigin.uuid !== genrePlaylist.uuid
+      trackListOrigin.object.uuid !== genrePlaylist.uuid
     ) {
       if (genrePlaylist.libraryTracksCount > 0) {
         playNewTrackListFromPlaylistUuid(genrePlaylist.uuid);
       }
+    } else if (
+      trackListOrigin &&
+      trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
+      trackListOrigin.object.uuid === genrePlaylist.uuid
+    ) {
+      handlePlayPauseAction();
     }
   };
 
