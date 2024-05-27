@@ -31,7 +31,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
   const { playState } = usePlayer();
   const { showPopup } = usePopup();
-  const { handleGenreAddAction } = useGenrePlaylists();
+  const { handleGenreAddAction: handleAddGenreAction } = useGenrePlaylists();
   const { playNewTrackListFromPlaylistUuid, origin: trackListOrigin } = useTrackList();
   const [
     previousRenderingVisibleActionsContainerGenrePlaylistUuid,
@@ -294,23 +294,44 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         );
       });
 
-    actionsContainerGroup
+    const addGenreContainerGroup = actionsContainerGroup
+      .append("g")
+      .attr("class", "add-genre-container cursor-pointer")
+      .on("click", function (event, d) {
+        group.dispatch("mouseleave");
+        handleAddGenreAction(event, d.data.criteria.uuid);
+      })
+      .on("mouseover", function () {
+        d3.select(this).selectAll("div").classed("bg-gray-500", true);
+      })
+      .on("mouseout", function () {
+        d3.select(this).selectAll("div").classed("bg-gray-500", false);
+      });
+
+    addGenreContainerGroup
       .append("foreignObject")
-      .attr("class", "genre-add")
       .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS / 2)
-      .attr("width", ACTION_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("height", ACTION_CONTAINER_DIMENSIONS.HEIGHT)
+      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 2)
+      .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
       .html(function () {
         return ReactDOMServer.renderToString(
           <div className="tree-action-container">
             <FaPlus className="tree-icon" size={ACTION_ICON_SIZE} color="white" />
           </div>
         );
-      })
-      .on("click", function (event, d) {
-        group.dispatch("mouseleave");
-        handleGenreAddAction(event, d.data.criteria.uuid);
+      });
+
+    addGenreContainerGroup
+      .append("foreignObject")
+      .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 2)
+      .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
+      .html(function () {
+        return ReactDOMServer.renderToString(
+          <div className="add-genre-label-container tree-action-label-container">Add genre child</div>
+        );
       });
   };
 
