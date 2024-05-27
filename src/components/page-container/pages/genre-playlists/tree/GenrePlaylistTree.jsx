@@ -28,7 +28,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   const MORE_ICON_WIDTH = 22;
   const ACTIONS_CONTAINER_DIMENSIONS = {
     WIDTH: ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH,
-    HEIGHT: ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT * 3,
+    HEIGHT: ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT * 4,
   };
   const NODE_DIMENSIONS = {
     WIDTH: RECT_BASE_DIMENSIONS.WIDTH + MORE_ICON_WIDTH + ACTIONS_CONTAINER_DIMENSIONS.WIDTH,
@@ -306,7 +306,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
                 .append("foreignObject")
                 .attr("class", "genre-add")
                 .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-                .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+                .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_ICON_CONTAINER_DIMENSIONS / 2)
                 .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
                 .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
                 .html(function () {
@@ -325,7 +325,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
                 .append("foreignObject")
                 .attr("class", "upload-track")
                 .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-                .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2 - ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
+                .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2)
                 .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
                 .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
                 .html(function () {
