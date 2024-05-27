@@ -101,7 +101,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     group
       .append("path")
-      .class("smooth-mouseover-upper-triangle")
+      .attr("class", "smooth-mouseover-upper-triangle")
       .attr(
         "d",
         "M " +
@@ -122,7 +122,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     group
       .append("path")
-      .class("smooth-mouseover-lower-triangle")
+      .attr("class", "smooth-mouseover-lower-triangle")
       .attr(
         "d",
         "M " +
