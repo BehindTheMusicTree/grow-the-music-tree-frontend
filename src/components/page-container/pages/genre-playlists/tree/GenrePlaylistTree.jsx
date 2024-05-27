@@ -10,12 +10,9 @@ import { usePopup } from "../../../../../contexts/popup/usePopup";
 import { useTrackList } from "../../../../../contexts/track-list/useTrackList";
 import { useGenrePlaylists } from "../../../../../contexts/genre-playlists/useGenrePlaylists";
 import { usePlayer } from "../../../../../contexts/player/usePlayer";
+import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "../../../../../utils/constants";
 import {
-  PLAY_STATES,
-  TRACK_LIST_ORIGIN_TYPE,
-  GENRE_PLAYLIST_TREE_RECT_DIMENSIONS as RECT_BASE_DIMENSIONS,
-} from "../../../../../utils/constants";
-import {
+  RECT_BASE_DIMENSIONS,
   VERTICAL_SEPARATOON_BETWEEN_NODES,
   HORIZONTAL_SEPARATOON_BETWEEN_NODES,
   MORE_ICON_WIDTH,
@@ -104,6 +101,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     group
       .append("path")
+      .class("smooth-mouseover-upper-triangle")
       .attr(
         "d",
         "M " +
@@ -124,6 +122,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     group
       .append("path")
+      .class("smooth-mouseover-lower-triangle")
       .attr(
         "d",
         "M " +
@@ -390,16 +389,11 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
       .attr("fill", RECTANGLE_COLOR);
 
-    const GENRE_NAME_DIMENSIONS = {
-      WIDTH: RECT_BASE_DIMENSIONS.WIDTH - 20,
-      HEIGHT: RECT_BASE_DIMENSIONS.HEIGHT,
-    };
-
     nodes
       .append("foreignObject")
       .attr("class", "tree-node-info-container")
-      .attr("width", GENRE_NAME_DIMENSIONS.WIDTH)
-      .attr("height", GENRE_NAME_DIMENSIONS.HEIGHT)
+      .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
+      .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
       .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
       .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
       .html(function (d) {

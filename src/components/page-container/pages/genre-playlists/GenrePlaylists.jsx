@@ -1,4 +1,4 @@
-import { GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "../../../../utils/constants";
+import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "../../../../utils/tree-dimensions";
 import { useGenrePlaylists } from "../../../../contexts/genre-playlists/useGenrePlaylists";
 
 import GenrePlaylistsTree from "./tree/GenrePlaylistTree";
