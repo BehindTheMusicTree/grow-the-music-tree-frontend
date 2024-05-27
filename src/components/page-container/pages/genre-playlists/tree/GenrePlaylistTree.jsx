@@ -90,15 +90,175 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     }
   };
 
-  const addMoreIconContainer = (nodes, moreIconContainerId) => {
-    let moreIconContainer = nodes.select("#more-icon-container-" + moreIconContainerId);
+  const addActionsContainer = (nodes, genrePlaylistId) => {
+    let group = nodes.append("g").attr("id", "actions-container-" + genrePlaylistId);
+
+    group
+      .append("rect")
+      .attr("id", "actions-background")
+      .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2)
+      .attr("width", ACTIONS_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("height", ACTIONS_CONTAINER_DIMENSIONS.HEIGHT)
+      .attr("fill", RECTANGLE_COLOR);
+
+    group
+      .append("foreignObject")
+      .attr("class", "upload-track")
+      .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2)
+      .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
+      .html(function () {
+        return ReactDOMServer.renderToString(
+          <div className="tree-node-icon-container">
+            <FaFileUpload className="tree-node-icon" size={ACTION_ICON_SIZE} color="white" />
+          </div>
+        );
+      })
+      .on("click", function (event, d) {
+        event.stopPropagation();
+        selectingFileGenreUuidRef.current = d.data.criteria.uuid;
+        fileInputRef.current.click();
+        nodes.dispatch("mouseleave");
+      });
+
+    const SPINNER_ICON_SIZE = 14;
+    const PLAY_PAUSE_SPINNER_Y = -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT;
+    group
+      .append("foreignObject")
+      .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+      .attr("y", PLAY_PAUSE_SPINNER_Y)
+      .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
+      .attr("dominant-baseline", "middle")
+      .html(function (d) {
+        if (
+          trackListOrigin &&
+          trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
+          trackListOrigin.object.uuid === d.data.uuid &&
+          playState === PLAY_STATES.LOADING
+        ) {
+          return ReactDOMServer.renderToString(
+            <div className="spinner-container tree-node-icon-container">
+              <FaSpinner size={SPINNER_ICON_SIZE} className="animate-spin fill-current text-white" />
+            </div>
+          );
+        }
+      });
+
+    const PLAY_PAUSE_ICON_DIMENSIONS = {
+      WIDTH: 12,
+      HEIGHT: 12,
+    };
+    group
+      .append("foreignObject")
+      .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+      .attr("y", PLAY_PAUSE_SPINNER_Y)
+      .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
+      .style("visibility", function (d) {
+        return trackListOrigin &&
+          trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
+          trackListOrigin.object.uuid === d.data.uuid &&
+          playState === PLAY_STATES.LOADING
+          ? "hidden"
+          : "visible";
+      })
+      .html(function (d) {
+        if (d.data.libraryTracksCount === 0) {
+          return "";
+        }
+
+        const playElement = (
+          <div className="playpause-container tree-node-icon-container">
+            <FaPlay size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="play tree-node-icon" color="white" />
+          </div>
+        );
+        const pauseElement = (
+          <div className="playpause-container tree-node-icon-container">
+            <FaPause size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="pause tree-node-icon" color="white" />
+          </div>
+        );
+
+        const isThisPlaylistPlaying =
+          trackListOrigin &&
+          trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
+          trackListOrigin.object.uuid === d.data.uuid;
+        let element;
+        if (isThisPlaylistPlaying) {
+          if (playState === PLAY_STATES.LOADING) {
+            return "";
+          }
+          element = playState === PLAY_STATES.PLAYING ? pauseElement : playElement;
+        } else {
+          element = playElement;
+        }
+        return ReactDOMServer.renderToString(element);
+      })
+      .on("click", function (event, d) {
+        event.stopPropagation();
+        handlePlayPauseIconAction(d.data);
+      })
+      .style("cursor", function (d) {
+        if (d.data.libraryTracksCount > 0) {
+          return "pointer";
+        }
+        return "default";
+      });
+
+    const PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS = {
+      WIDTH: 14,
+      HEIGHT: 16,
+    };
+
+    group
+      .append("foreignObject")
+      .attr("class", "playlist-count tree-node-info-container")
+      .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("y", -ACTION_ICON_CONTAINER_DIMENSIONS / 2)
+      .attr("width", PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.WIDTH)
+      .attr("height", PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT)
+      .html(function (d) {
+        return `<div class="tree-node-info">` + d.data.libraryTracksCount + "</div>";
+      });
+
+    group
+      .append("foreignObject")
+      .attr("class", "genre-add")
+      .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_ICON_CONTAINER_DIMENSIONS / 2)
+      .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
+      .html(function () {
+        return ReactDOMServer.renderToString(
+          <div className="tree-node-icon-container">
+            <FaPlus className="tree-node-icon" size={ACTION_ICON_SIZE} color="white" />
+          </div>
+        );
+      })
+      .on("click", function (event, d) {
+        nodes.dispatch("mouseleave");
+        handleGenreAddAction(event, d.data.criteria.uuid);
+      });
+  };
+
+  const addMoreIconContainer = (nodes, genrePlaylistId) => {
+    let moreIconContainer = nodes.select("#more-icon-container-" + genrePlaylistId);
 
     if (moreIconContainer.empty()) {
-      const moreIconContainer = nodes.append("g").attr("id", "more-icon-container-" + moreIconContainerId);
+      const moreIconContainer = nodes.append("g").attr("id", "more-icon-container-" + genrePlaylistId);
 
-      const handleMoreClick = (event, d) => {
+      const handleMoreAction = (event, d) => {
         event.stopPropagation();
-        addActionsContainer(nodes, d.id);
+        const actionsContainer = nodes.select("#actions-container-" + genrePlaylistId);
+        if (!actionsContainer.empty()) {
+          console.log("removing");
+          actionsContainer.remove();
+          return;
+        } else {
+          addActionsContainer(nodes, d.id);
+        }
       };
 
       moreIconContainer
@@ -122,174 +282,13 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
             </div>
           );
         })
-        .on("click", handleMoreClick);
+        .on("click", handleMoreAction);
 
       nodes.on("mouseleave", function (event, d) {
         setPreviousRenderingVisibleActionsContainerNodeId(null);
         d3.select("#more-icon-container-" + d.id).remove();
         d3.select("#actions-container-" + d.id).remove();
       });
-    }
-  };
-
-  const addActionsContainer = (nodes, actionsContainerId) => {
-    const actionsContainer = nodes.select("#actions-container-" + actionsContainerId);
-
-    if (!actionsContainer.empty()) {
-      console.log("removing");
-      nodes.dispatch("mouseleave");
-      return;
-    } else {
-      let group = nodes.append("g").attr("id", "actions-container-" + actionsContainerId);
-
-      group
-        .append("rect")
-        .attr("id", "actions-background")
-        .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-        .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2)
-        .attr("width", ACTIONS_CONTAINER_DIMENSIONS.WIDTH)
-        .attr("height", ACTIONS_CONTAINER_DIMENSIONS.HEIGHT)
-        .attr("fill", RECTANGLE_COLOR);
-
-      group
-        .append("foreignObject")
-        .attr("class", "upload-track")
-        .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-        .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2)
-        .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-        .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
-        .html(function () {
-          return ReactDOMServer.renderToString(
-            <div className="tree-node-icon-container">
-              <FaFileUpload className="tree-node-icon" size={ACTION_ICON_SIZE} color="white" />
-            </div>
-          );
-        })
-        .on("click", function (event, d) {
-          event.stopPropagation();
-          selectingFileGenreUuidRef.current = d.data.criteria.uuid;
-          fileInputRef.current.click();
-          nodes.dispatch("mouseleave");
-        });
-
-      const SPINNER_ICON_SIZE = 14;
-      const PLAY_PAUSE_SPINNER_Y = -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT;
-      group
-        .append("foreignObject")
-        .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-        .attr("y", PLAY_PAUSE_SPINNER_Y)
-        .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-        .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
-        .attr("dominant-baseline", "middle")
-        .html(function (d) {
-          if (
-            trackListOrigin &&
-            trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
-            trackListOrigin.object.uuid === d.data.uuid &&
-            playState === PLAY_STATES.LOADING
-          ) {
-            return ReactDOMServer.renderToString(
-              <div className="spinner-container tree-node-icon-container">
-                <FaSpinner size={SPINNER_ICON_SIZE} className="animate-spin fill-current text-white" />
-              </div>
-            );
-          }
-        });
-
-      const PLAY_PAUSE_ICON_DIMENSIONS = {
-        WIDTH: 12,
-        HEIGHT: 12,
-      };
-      group
-        .append("foreignObject")
-        .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-        .attr("y", PLAY_PAUSE_SPINNER_Y)
-        .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-        .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
-        .style("visibility", function (d) {
-          return trackListOrigin &&
-            trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
-            trackListOrigin.object.uuid === d.data.uuid &&
-            playState === PLAY_STATES.LOADING
-            ? "hidden"
-            : "visible";
-        })
-        .html(function (d) {
-          if (d.data.libraryTracksCount === 0) {
-            return "";
-          }
-
-          const playElement = (
-            <div className="playpause-container tree-node-icon-container">
-              <FaPlay size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="play tree-node-icon" color="white" />
-            </div>
-          );
-          const pauseElement = (
-            <div className="playpause-container tree-node-icon-container">
-              <FaPause size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="pause tree-node-icon" color="white" />
-            </div>
-          );
-
-          const isThisPlaylistPlaying =
-            trackListOrigin &&
-            trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
-            trackListOrigin.object.uuid === d.data.uuid;
-          let element;
-          if (isThisPlaylistPlaying) {
-            if (playState === PLAY_STATES.LOADING) {
-              return "";
-            }
-            element = playState === PLAY_STATES.PLAYING ? pauseElement : playElement;
-          } else {
-            element = playElement;
-          }
-          return ReactDOMServer.renderToString(element);
-        })
-        .on("click", function (event, d) {
-          event.stopPropagation();
-          handlePlayPauseIconAction(d.data);
-        })
-        .style("cursor", function (d) {
-          if (d.data.libraryTracksCount > 0) {
-            return "pointer";
-          }
-          return "default";
-        });
-
-      const PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS = {
-        WIDTH: 14,
-        HEIGHT: 16,
-      };
-
-      group
-        .append("foreignObject")
-        .attr("class", "playlist-count tree-node-info-container")
-        .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-        .attr("y", -ACTION_ICON_CONTAINER_DIMENSIONS / 2)
-        .attr("width", PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.WIDTH)
-        .attr("height", PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT)
-        .html(function (d) {
-          return `<div class="tree-node-info">` + d.data.libraryTracksCount + "</div>";
-        });
-
-      group
-        .append("foreignObject")
-        .attr("class", "genre-add")
-        .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-        .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_ICON_CONTAINER_DIMENSIONS / 2)
-        .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-        .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
-        .html(function () {
-          return ReactDOMServer.renderToString(
-            <div className="tree-node-icon-container">
-              <FaPlus className="tree-node-icon" size={ACTION_ICON_SIZE} color="white" />
-            </div>
-          );
-        })
-        .on("click", function (event, d) {
-          nodes.dispatch("mouseleave");
-          handleGenreAddAction(event, d.data.criteria.uuid);
-        });
     }
   };
 
