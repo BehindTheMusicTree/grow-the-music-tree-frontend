@@ -91,11 +91,8 @@ export default {
         ".tree-info": {
           "@apply flex justify-center items-center h-full": {},
         },
-        ".tree-action-container": {
-          "@apply flex justify-center items-center h-full cursor-pointer": {},
-          "&:hover": {
-            "@apply bg-gray-500": {},
-          },
+        ".tree-action-icon-container": {
+          "@apply flex justify-center items-center h-full": {},
         },
         ".tree-action-label-container": {
           "@apply h-full w-full flex items-center justify-start text-xs text-white": {},

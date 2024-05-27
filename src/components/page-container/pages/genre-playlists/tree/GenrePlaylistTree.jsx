@@ -194,16 +194,22 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     const playPauseContainerGroup = actionsContainerGroup
       .append("g")
-      .attr("class", "playpause-container cursor-pointer")
+      .attr("class", function (d) {
+        return "playpause-container" + (d.data.libraryTracksCount > 0 ? " cursor-pointer" : "");
+      })
       .on("click", function (event, d) {
         event.stopPropagation();
         handlePlayPauseIconAction(d.data);
       })
-      .on("mouseover", function () {
-        d3.select(this).selectAll("div").classed("bg-gray-500", true);
+      .on("mouseover", function (event, d) {
+        if (d.data.libraryTracksCount > 0) {
+          d3.select(this).selectAll("div").classed("bg-gray-500", true);
+        }
       })
-      .on("mouseout", function () {
-        d3.select(this).selectAll("div").classed("bg-gray-500", false);
+      .on("mouseout", function (event, d) {
+        if (d.data.libraryTracksCount > 0) {
+          d3.select(this).selectAll("div").classed("bg-gray-500", false);
+        }
       });
 
     const SPINNER_ICON_SIZE = 14;
@@ -223,7 +229,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
           playState === PLAY_STATES.LOADING
         ) {
           return ReactDOMServer.renderToString(
-            <div className="spinner-container tree-action-container">
+            <div className="spinner-container tree-action-icon-container">
               <FaSpinner size={SPINNER_ICON_SIZE} className="animate-spin fill-current text-white" />
             </div>
           );
@@ -249,17 +255,21 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
           : "visible";
       })
       .html(function (d) {
-        if (d.data.libraryTracksCount === 0) {
-          return "";
-        }
-
         const playElement = (
-          <div className="playpause-container tree-action-container">
-            <FaPlay size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="play tree-icon" color="white" />
+          <div
+            className={`playpause-container tree-action-icon-container ${
+              d.data.libraryTracksCount === 0 ? "text-gray-500" : ""
+            }`}
+          >
+            <FaPlay
+              size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT}
+              className="play-icon"
+              color={`${d.data.libraryTracksCount === 0 ? "grey" : "white"}`}
+            />
           </div>
         );
         const pauseElement = (
-          <div className="playpause-container tree-action-container">
+          <div className="playpause-container tree-action-icon-container">
             <FaPause size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT} className="pause tree-icon" color="white" />
           </div>
         );
@@ -322,7 +332,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
       .html(function () {
         return ReactDOMServer.renderToString(
-          <div className="tree-action-container">
+          <div className="tree-action-icon-container">
             <FaPlus className="tree-icon" size={ACTION_ICON_SIZE} color="white" />
           </div>
         );
