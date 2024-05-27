@@ -92,7 +92,7 @@ export default {
           "@apply flex justify-center items-center h-full": {},
         },
         ".tree-node-icon-container": {
-          "@apply justify-center items-center cursor-pointer": {},
+          "@apply w-full h-full flex justify-center items-center cursor-pointer": {},
           "&:hover": {
             "@apply bg-gray-500": {},
           },
