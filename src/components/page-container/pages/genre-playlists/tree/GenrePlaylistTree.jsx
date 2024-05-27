@@ -398,16 +398,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
       .html(function (d) {
         return `<div class="tree-node-info">${d.data.name}</div>`;
-      });
-
-    nodes
-      .append("rect")
-      .attr("class", "node-base-rect-mouseover")
-      .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
-      .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
-      .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
-      .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
-      .attr("fill", "rgba(0, 0, 0, 0)")
+      })
       .on("mouseover", function (event, d) {
         setPreviousRenderingVisibleActionsContainerNodeId(d.id);
         addMoreIconContainer(nodes, d.id);
