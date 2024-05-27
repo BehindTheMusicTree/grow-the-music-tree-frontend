@@ -85,19 +85,22 @@ export default {
             "@apply appearance-none h-1.5 w-1.5 bg-blue-500 rounded-full shadow-inner shadow-progress-bar-blue": {},
           },
         },
-        ".tree-node-info-container": {
+        ".tree-info-container": {
           "@apply text-xs text-white": {},
         },
-        ".tree-node-info": {
+        ".tree-info": {
           "@apply flex justify-center items-center h-full": {},
         },
-        ".tree-node-icon-container": {
-          "@apply w-full h-full flex justify-center items-center cursor-pointer": {},
+        ".tree-action-container": {
+          "@apply flex justify-center items-center h-full cursor-pointer": {},
           "&:hover": {
             "@apply bg-gray-500": {},
           },
         },
-        ".tree-node-icon": {
+        ".upload-track-label-container": {
+          "@apply h-full w-full flex items-center justify-start text-xs text-white": {},
+        },
+        ".tree-icon": {
           "@apply fill-current text-white": {},
         },
 
