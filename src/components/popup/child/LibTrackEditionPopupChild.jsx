@@ -1,11 +1,11 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 
-import ApiService from "../../../utils/service/apiService";
+import ApiService from "../../../utils//ApiService";
 import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePlaylists";
 import { useTrackList } from "../../../contexts/track-list/useTrackList";
 import { formatTime } from "../../../utils";
-import { FORM_RATING_NULL_VALUE } from "../../../constants";
+import { FORM_RATING_NULL_VALUE } from "../../../utils/constants";
 import Rating from "../../utils/Rating";
 
 export default function LibTrackEditionPopupChild({ popupContentObject, hide }) {

@@ -1,9 +1,9 @@
 import { createContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
-import ApiService from "../../utils/service/apiService";
+import ApiService from "../../utils//ApiService";
 import { usePlayer } from "../player/usePlayer";
-import { TRACK_LIST_ORIGIN_TYPE, PLAY_STATES } from "../../constants";
+import { TRACK_LIST_ORIGIN_TYPE, PLAY_STATES } from "../../utils/constants";
 import TrackListOrigin from "../../models/TrackListOrigin";
 
 export const TrackListContext = createContext();

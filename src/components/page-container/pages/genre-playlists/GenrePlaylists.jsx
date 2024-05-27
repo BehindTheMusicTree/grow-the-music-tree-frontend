@@ -1,4 +1,4 @@
-import { GENRE_TREE_RECT_DIMENSIONS } from "../../../../constants";
+import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "../../../../utils/tree-dimensions";
 import { useGenrePlaylists } from "../../../../contexts/genre-playlists/useGenrePlaylists";
 
 import GenrePlaylistsTree from "./tree/GenrePlaylistTree";
@@ -12,8 +12,8 @@ export default function GenrePlaylists() {
       <div
         className="mt-5 flex justify-center items-center text-center hover:bg-gray-400 hover:text-gray-800 cursor-pointer"
         style={{
-          width: GENRE_TREE_RECT_DIMENSIONS.WIDTH + "px",
-          height: GENRE_TREE_RECT_DIMENSIONS.HEIGHT + "px",
+          width: GENRE_PLAYLIST_TREE_RECT_DIMENSIONS.WIDTH + "px",
+          height: GENRE_PLAYLIST_TREE_RECT_DIMENSIONS.HEIGHT + "px",
           border: "1px solid black",
         }}
         onClick={handleGenreAddAction}
