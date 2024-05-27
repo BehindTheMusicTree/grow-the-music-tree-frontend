@@ -378,11 +378,11 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         })
         .on("click", handleMoreAction);
 
-      // group.on("mouseleave", function (event, d) {
-      //   setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(null);
-      //   d3.select("#more-icon-container-" + d.id).remove();
-      //   d3.select("#actions-container-" + d.id).remove();
-      // });
+      group.on("mouseleave", function (event, d) {
+        setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(null);
+        d3.select("#more-icon-container-" + d.id).remove();
+        d3.select("#actions-container-" + d.id).remove();
+      });
     }
   };
 
