@@ -103,6 +103,46 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("fill", RECTANGLE_COLOR);
 
     group
+      .append("path")
+      .attr(
+        "d",
+        "M " +
+          RECT_BASE_DIMENSIONS.WIDTH / 2 +
+          " -" +
+          RECT_BASE_DIMENSIONS.HEIGHT / 2 +
+          " L " +
+          ACTIONS_CONTAINER_X_OFFSET +
+          " -" +
+          ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 +
+          " L " +
+          ACTIONS_CONTAINER_X_OFFSET +
+          " -" +
+          RECT_BASE_DIMENSIONS.HEIGHT / 2 +
+          " Z"
+      )
+      .attr("fill", "RGBA(0, 0, 0, 0)");
+
+    group
+      .append("path")
+      .attr(
+        "d",
+        "M " +
+          RECT_BASE_DIMENSIONS.WIDTH / 2 +
+          " " +
+          RECT_BASE_DIMENSIONS.HEIGHT / 2 +
+          " L " +
+          ACTIONS_CONTAINER_X_OFFSET +
+          " " +
+          ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 +
+          " L " +
+          ACTIONS_CONTAINER_X_OFFSET +
+          " " +
+          RECT_BASE_DIMENSIONS.HEIGHT / 2 +
+          " Z"
+      )
+      .attr("fill", "RGBA(0, 0, 0, 0)");
+
+    group
       .append("foreignObject")
       .attr("class", "upload-track")
       .attr("x", ACTIONS_CONTAINER_X_OFFSET)
