@@ -183,12 +183,26 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
       .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
       .html(function () {
-        return ReactDOMServer.renderToString(<div className="upload-track-label-container">Upload track</div>);
+        return ReactDOMServer.renderToString(<div className="tree-action-label-container">Upload track</div>);
+      });
+
+    const playPauseContainerGroup = actionsContainerGroup
+      .append("g")
+      .attr("class", "playpause-container cursor-pointer")
+      .on("click", function (event, d) {
+        event.stopPropagation();
+        handlePlayPauseIconAction(d.data);
+      })
+      .on("mouseover", function () {
+        d3.select(this).selectAll("div").classed("bg-gray-500", true);
+      })
+      .on("mouseout", function () {
+        d3.select(this).selectAll("div").classed("bg-gray-500", false);
       });
 
     const SPINNER_ICON_SIZE = 14;
     const PLAY_PAUSE_SPINNER_Y = -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT;
-    actionsContainerGroup
+    playPauseContainerGroup
       .append("foreignObject")
       .attr("x", ACTIONS_CONTAINER_X_OFFSET)
       .attr("y", PLAY_PAUSE_SPINNER_Y)
@@ -214,12 +228,12 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       WIDTH: 12,
       HEIGHT: 12,
     };
-    actionsContainerGroup
+    playPauseContainerGroup
       .append("foreignObject")
       .attr("x", ACTIONS_CONTAINER_X_OFFSET)
       .attr("y", PLAY_PAUSE_SPINNER_Y)
-      .attr("width", ACTION_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("height", ACTION_CONTAINER_DIMENSIONS.HEIGHT)
+      .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
       .style("visibility", function (d) {
         return trackListOrigin &&
           trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
@@ -259,10 +273,6 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         }
         return ReactDOMServer.renderToString(element);
       })
-      .on("click", function (event, d) {
-        event.stopPropagation();
-        handlePlayPauseIconAction(d.data);
-      })
       .style("cursor", function (d) {
         if (d.data.libraryTracksCount > 0) {
           return "pointer";
@@ -270,20 +280,18 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         return "default";
       });
 
-    const PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS = {
-      WIDTH: 14,
-      HEIGHT: 16,
-    };
-
-    actionsContainerGroup
+    playPauseContainerGroup
       .append("foreignObject")
-      .attr("class", "playlist-count tree-info-container")
-      .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("y", -ACTION_CONTAINER_DIMENSIONS / 2)
-      .attr("width", PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.WIDTH)
-      .attr("height", PLAYLIST_TRACKS_COUNT_TEXT_DIMENSIONS.HEIGHT)
+      .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT)
+      .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
       .html(function (d) {
-        return `<div class="tree-info">` + d.data.libraryTracksCount + "</div>";
+        return ReactDOMServer.renderToString(
+          <div className="playpause-label-container tree-action-label-container">
+            {d.data.libraryTracksCount + " track" + (d.data.libraryTracksCount > 1 ? "s" : "")}
+          </div>
+        );
       });
 
     actionsContainerGroup

@@ -97,7 +97,7 @@ export default {
             "@apply bg-gray-500": {},
           },
         },
-        ".upload-track-label-container": {
+        ".tree-action-label-container": {
           "@apply h-full w-full flex items-center justify-start text-xs text-white": {},
         },
         ".tree-icon": {
