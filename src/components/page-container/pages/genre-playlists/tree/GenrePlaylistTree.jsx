@@ -513,8 +513,8 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
           : "none";
       })
       .style("stroke-width", function (d) {
-        return d.data.criteria &&
-          genreUuidGettingAssignedNewParent &&
+        return genreUuidGettingAssignedNewParent &&
+          d.data.criteria &&
           genreUuidGettingAssignedNewParent !== d.data.criteria.uuid
           ? "2px"
           : "0px";
@@ -531,8 +531,51 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         return `<div class="tree-info">${d.data.name}</div>`;
       })
       .on("mouseover", function (event, d) {
-        setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(d.data.uuid);
-        addMoreIconContainer(d.data.uuid);
+        if (genreUuidGettingAssignedNewParent) {
+          if (d.data.criteria && genreUuidGettingAssignedNewParent !== d.data.criteria.uuid) {
+            const parentNode = d3.select(this.parentNode);
+            let selectAsNewParentGroup = parentNode.select("#select-as-new-parent-group");
+            if (selectAsNewParentGroup.empty()) {
+              selectAsNewParentGroup = parentNode
+                .append("g")
+                .attr("class", "select-as-new-parent-group  cursor-pointer")
+                .on("mouseleave", function () {
+                  d3.select(this).remove();
+                });
+
+              selectAsNewParentGroup
+                .append("rect")
+                .attr("class", "select-as-new-parent-layer")
+                .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
+                .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+                .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
+                .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+                .attr("fill", "grey");
+
+              selectAsNewParentGroup
+                .append("foreignObject")
+                .attr("class", "select-as-new-parent-icon-foreign-obj")
+                .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
+                .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+                .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
+                .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+                .attr("fill", "grey")
+                .html(function () {
+                  return ReactDOMServer.renderToString(
+                    <div className="select-as-new-parent-layer-icon-container h-full w-full flex items-center justify-center">
+                      <PiGraphFill size={20} color="white" />
+                      <div className="select-as-new-parent-layer-icon-label text-white text-xs ml-2">
+                        Select as new parent
+                      </div>
+                    </div>
+                  );
+                });
+            }
+          }
+        } else {
+          setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(d.data.uuid);
+          addMoreIconContainer(d.data.uuid);
+        }
       });
 
     if (previousRenderingVisibleActionsContainerGenrePlaylistUuid) {
