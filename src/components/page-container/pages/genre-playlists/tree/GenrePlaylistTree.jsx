@@ -33,7 +33,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
   const { playState, handlePlayPauseAction } = usePlayer();
   const { showPopup } = usePopup();
-  const { handleGenreAddAction: handleAddGenreAction } = useGenrePlaylists();
+  const { handleGenreAddAction: handleAddGenreAction, updateGenreParent } = useGenrePlaylists();
   const { playNewTrackListFromPlaylistUuid, origin: trackListOrigin } = useTrackList();
   const [
     previousRenderingVisibleActionsContainerGenrePlaylistUuid,
@@ -569,6 +569,10 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
                       </div>
                     </div>
                   );
+                })
+                .on("click", function () {
+                  updateGenreParent(genreUuidGettingAssignedNewParent, d.data.criteria.uuid);
+                  setGenreUuidGettingAssignedNewParent(null);
                 });
             }
           }

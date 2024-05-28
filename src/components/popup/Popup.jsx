@@ -3,6 +3,7 @@ import { usePopup } from "../../contexts/popup/usePopup";
 import BadRequestErrorPopupChild from "./child/BadRequestPopupChild";
 import LibTrackEditionPopupChild from "./child/LibTrackEditionPopupChild";
 import LibTrackUploadingPopupChild from "./child/LibTrackUploadPopupChild";
+import ApiErrorPopupChild from "./child/ApiErrorPopupChild";
 
 export default function Popup() {
   const { popupContentObject, hidePopup } = usePopup();
@@ -17,6 +18,9 @@ export default function Popup() {
       break;
     case "LibTrackUploadPopupContentObject":
       PopupChild = LibTrackUploadingPopupChild;
+      break;
+    case "ApiErrorPopupContentObject":
+      PopupChild = ApiErrorPopupChild;
       break;
     default:
       PopupChild = null;

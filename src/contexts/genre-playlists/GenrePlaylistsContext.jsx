@@ -51,9 +51,16 @@ export function GenrePlaylistsProvider({ children }) {
     return groupedGenrePlaylists;
   };
 
+  const updateGenreParent = async (genreUuid, parentUuid) => {
+    await ApiService.putGenre(genreUuid, {
+      parent: parentUuid,
+    });
+    setRefreshGenrePlaylistsSignal(1);
+  };
+
   return (
     <GenrePlaylistsContext.Provider
-      value={{ groupedGenrePlaylists, handleGenreAddAction, setRefreshGenrePlaylistsSignal }}
+      value={{ groupedGenrePlaylists, handleGenreAddAction, setRefreshGenrePlaylistsSignal, updateGenreParent }}
     >
       {children}
     </GenrePlaylistsContext.Provider>

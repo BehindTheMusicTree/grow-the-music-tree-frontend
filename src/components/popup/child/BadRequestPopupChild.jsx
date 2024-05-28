@@ -1,20 +1,22 @@
 import PropTypes from "prop-types";
 
-export default function BadRequestErrorPopupChild({ popupContentObject }) {
+export default function BadRequestErrorPopupChild() {
+  // export default function BadRequestErrorPopupChild({ popupContentObject }) {
   return (
-    <div>
-      {popupContentObject.operationErrors.map((errorObject, index) => (
-        <div key={index}>
-          <ul className="list-none pl-4">
-            {errorObject.errors.map((error, index) => (
-              <li key={index} className="text-red-500">
-                ❌ {error}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
+    <div>Error</div>
+    // <div>
+    //   {popupContentObject.operationErrors.map((errorObject, index) => (
+    //     <div key={index}>
+    //       <ul className="list-none pl-4">
+    //         {errorObject.errors.map((error, index) => (
+    //           <li key={index} className="text-red-500">
+    //             ❌ {error}
+    //           </li>
+    //         ))}
+    //       </ul>
+    //     </div>
+    //   ))}
+    // </div>
   );
 }
 
