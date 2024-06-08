@@ -570,7 +570,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
                     </div>
                   );
                 })
-                .on("click", function () {
+                .on("click", function (event, d) {
                   updateGenreParent(genreUuidGettingAssignedNewParent, d.data.criteria.uuid);
                   setGenreUuidGettingAssignedNewParent(null);
                 });
