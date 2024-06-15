@@ -14,13 +14,13 @@ jobs:
     name: Build / Push to Dockerhub
     runs-on: ubuntu-latest
     env:
-      IMAGE_FULL_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.UMG_IMAGE_REPO }}:${{ vars.UMG_IMAGE_TAG }}
+      IMAGE_FULL_NAME: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.UMG_IMAGE_REPO }}:${{ vars.UMG_IMAGE_TAG }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Login to Dockerhub
-        run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ vars.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Build
         run: docker build -t $IMAGE_FULL_NAME .
