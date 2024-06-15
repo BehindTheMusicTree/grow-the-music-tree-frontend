@@ -3,10 +3,11 @@ name: Ultimate Music Guide CI
 on:
   push:
     branches:
+      - main
       - dev
       - implement-move-genre-parent
   pull_request:
-    branches: ["dev"]
+    branches: ["main", "dev"]
 
 jobs:
   build-and-push-to-dockerhub:
