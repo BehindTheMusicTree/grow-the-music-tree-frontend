@@ -46,7 +46,7 @@ jobs:
       # React env variables have to be prefixed with VITE_
       - name: Set environment variables on server
         run: |
-          ENV_FILE_PATH="${{ vars.TEST_SERVER_DOCKER_COMPOSE_DIR }}${{ vars.UMG_ENV_VARIABLES_FILENAME }}"
+          ENV_FILE_PATH="${{ vars.SERVER_DOCKER_COMPOSE_DIR }}${{ vars.UMG_ENV_VARIABLES_FILENAME }}"
           ssh ${{ secrets.TEST_SERVER_SSH_BODZIFY_USERNAME }}@${{ vars.TEST_SERVER_URL }} "
             rm -f $ENV_FILE_PATH &&
             echo 'ENV=TEST' >> $ENV_FILE_PATH &&
