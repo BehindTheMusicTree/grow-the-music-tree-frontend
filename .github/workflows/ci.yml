@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - dev
-      - implement-move-genre-parent
+      - implement-put-genre-parent
   pull_request:
     branches: ["main", "dev"]
 
