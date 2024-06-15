@@ -5,11 +5,13 @@ import ReactDOMServer from "react-dom/server";
 import * as d3 from "d3";
 import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause } from "react-icons/fa";
 import { MdMoreVert } from "react-icons/md";
+import { PiGraphFill } from "react-icons/pi";
 
 import { usePopup } from "../../../../../contexts/popup/usePopup";
 import { useTrackList } from "../../../../../contexts/track-list/useTrackList";
 import { useGenrePlaylists } from "../../../../../contexts/genre-playlists/useGenrePlaylists";
 import { usePlayer } from "../../../../../contexts/player/usePlayer";
+import { useGenreGettingAssignedNewParent } from "../../../../../contexts/genre-getting-assigned-new-parent/useGenreGettingAssignedNewParent";
 import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "../../../../../utils/constants";
 import {
   RECT_BASE_DIMENSIONS,
@@ -31,12 +33,14 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
   const { playState, handlePlayPauseAction } = usePlayer();
   const { showPopup } = usePopup();
-  const { handleGenreAddAction: handleAddGenreAction } = useGenrePlaylists();
+  const { handleGenreAddAction: handleAddGenreAction, updateGenreParent } = useGenrePlaylists();
   const { playNewTrackListFromPlaylistUuid, origin: trackListOrigin } = useTrackList();
   const [
     previousRenderingVisibleActionsContainerGenrePlaylistUuid,
     setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
   ] = useState(null);
+  const { genreUuidGettingAssignedNewParent, setGenreUuidGettingAssignedNewParent } =
+    useGenreGettingAssignedNewParent();
 
   const svgRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -349,6 +353,46 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
           <div className="add-genre-label-container tree-action-label-container">Add genre child</div>
         );
       });
+
+    const changeParentContainerGroup = actionsContainerGroup
+      .append("g")
+      .attr("class", "change-parent-container cursor-pointer")
+      .on("click", function (event, d) {
+        group.dispatch("mouseleave");
+        setGenreUuidGettingAssignedNewParent(d.data.criteria.uuid);
+      })
+      .on("mouseover", function () {
+        d3.select(this).selectAll("div").classed("bg-gray-500", true);
+      })
+      .on("mouseout", function () {
+        d3.select(this).selectAll("div").classed("bg-gray-500", false);
+      });
+
+    changeParentContainerGroup
+      .append("foreignObject")
+      .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 3)
+      .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
+      .html(function () {
+        return ReactDOMServer.renderToString(
+          <div className="tree-action-icon-container">
+            <PiGraphFill className="tree-icon" size={ACTION_ICON_SIZE} color="white" />
+          </div>
+        );
+      });
+
+    changeParentContainerGroup
+      .append("foreignObject")
+      .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 3)
+      .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
+      .html(function () {
+        return ReactDOMServer.renderToString(
+          <div className="change-parent-label-container tree-action-label-container">New genre parent</div>
+        );
+      });
   };
 
   const addMoreIconContainer = (genrePlaylistUuid) => {
@@ -460,7 +504,21 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
       .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
       .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
-      .attr("fill", RECTANGLE_COLOR);
+      .attr("fill", RECTANGLE_COLOR)
+      .style("stroke", function (d) {
+        return d.data.criteria &&
+          genreUuidGettingAssignedNewParent &&
+          genreUuidGettingAssignedNewParent !== d.data.criteria.uuid
+          ? "blue"
+          : "none";
+      })
+      .style("stroke-width", function (d) {
+        return genreUuidGettingAssignedNewParent &&
+          d.data.criteria &&
+          genreUuidGettingAssignedNewParent !== d.data.criteria.uuid
+          ? "2px"
+          : "0px";
+      });
 
     nodes
       .append("foreignObject")
@@ -473,8 +531,55 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         return `<div class="tree-info">${d.data.name}</div>`;
       })
       .on("mouseover", function (event, d) {
-        setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(d.data.uuid);
-        addMoreIconContainer(d.data.uuid);
+        if (genreUuidGettingAssignedNewParent) {
+          if (d.data.criteria && genreUuidGettingAssignedNewParent !== d.data.criteria.uuid) {
+            const parentNode = d3.select(this.parentNode);
+            let selectAsNewParentGroup = parentNode.select("#select-as-new-parent-group");
+            if (selectAsNewParentGroup.empty()) {
+              selectAsNewParentGroup = parentNode
+                .append("g")
+                .attr("class", "select-as-new-parent-group  cursor-pointer")
+                .on("mouseleave", function () {
+                  d3.select(this).remove();
+                });
+
+              selectAsNewParentGroup
+                .append("rect")
+                .attr("class", "select-as-new-parent-layer")
+                .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
+                .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+                .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
+                .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+                .attr("fill", "grey");
+
+              selectAsNewParentGroup
+                .append("foreignObject")
+                .attr("class", "select-as-new-parent-icon-foreign-obj")
+                .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
+                .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+                .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
+                .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+                .attr("fill", "grey")
+                .html(function () {
+                  return ReactDOMServer.renderToString(
+                    <div className="select-as-new-parent-layer-icon-container h-full w-full flex items-center justify-center">
+                      <PiGraphFill size={20} color="white" />
+                      <div className="select-as-new-parent-layer-icon-label text-white text-xs ml-2">
+                        Select as new parent
+                      </div>
+                    </div>
+                  );
+                })
+                .on("click", function (event, d) {
+                  updateGenreParent(genreUuidGettingAssignedNewParent, d.data.criteria.uuid);
+                  setGenreUuidGettingAssignedNewParent(null);
+                });
+            }
+          }
+        } else {
+          setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(d.data.uuid);
+          addMoreIconContainer(d.data.uuid);
+        }
       });
 
     if (previousRenderingVisibleActionsContainerGenrePlaylistUuid) {
@@ -485,7 +590,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     return () => {
       svg.selectAll("*").remove();
     };
-  }, [genrePlaylistsTree, playState, trackListOrigin]);
+  }, [genrePlaylistsTree, playState, trackListOrigin, genreUuidGettingAssignedNewParent]);
 
   return (
     <div>

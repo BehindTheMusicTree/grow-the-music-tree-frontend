@@ -13,8 +13,8 @@ export function LibTracksProvider({ children }) {
 
   const areLibTrackFetchingRef = { current: false };
 
-  async function postLibTrack(file, genreUuid, onProgress) {
-    await ApiService.postLibTrack(file, genreUuid, onProgress);
+  async function postLibTrack(file, genreUuid, onProgress, badRequestCatched) {
+    await ApiService.postLibTrack(file, genreUuid, onProgress, badRequestCatched);
     setRefreshGenrePlaylistsSignal(1);
   }
 

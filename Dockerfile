@@ -1,9 +1,5 @@
 FROM node:20-alpine AS build
 
-ARG bodzifyApiUmgUsername
-ARG bodzifyApiUmgUserPassword
-ARG sentryAuthToken
-
 WORKDIR /usr/src/app
 
 COPY package*.json ./

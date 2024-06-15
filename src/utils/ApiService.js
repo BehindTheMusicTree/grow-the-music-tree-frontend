@@ -3,77 +3,89 @@ import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "./constants";
 import RequestError from "./errors/RequestError";
 import BadRequestError from "./errors/BadRequestError";
 import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
+import InternalServerError from "./errors/InternalServerError";
 
-const parseJson = async (response) => {
-  try {
-    return await response.json();
-  } catch (error) {
-    throw new Error(`Failed to parse response. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}.`);
+export default class ApiService {
+  static credentials = { username: config.username, password: config.password };
+  static errorSubscribers = [];
+
+  static onError(callback) {
+    this.errorSubscribers.push(callback);
+
+    return () => {
+      this.errorSubscribers = this.errorSubscribers.filter((subscriber) => subscriber !== callback);
+    };
   }
-};
 
-const getResponseObjFromXhr = (xhr) => {
-  return xhr.response;
-};
-
-const getResponseObjFromFetch = async (response) => {
-  const responseObj = await parseJson(response);
-  return responseObj;
-};
-
-const handleNotOkResponse = async (url, response) => {
-  const status = response.status;
-  if (status >= 400 && status < 600) {
-    let errorMessage = "";
-    const errorMessagePrefixe = `url ${url} - status ${status}`;
+  static async parseJson(response) {
     try {
-      let responseObj;
-      if (response.json) {
-        responseObj = await getResponseObjFromFetch(response);
-      } else if (response.responseType && response.responseType === "json") {
-        responseObj = getResponseObjFromXhr(response);
-      }
-
-      if (status === 400) {
-        throw new BadRequestError(responseObj.errors);
-      } else if (status === 401) {
-        throw new UnauthorizedRequestError(responseObj.errors);
-      }
-
-      errorMessage = JSON.stringify(responseObj);
-      throw new Error(`${errorMessagePrefixe} ${errorMessage ? ` - ${errorMessage}` : ""}`);
+      return await response.json();
     } catch (error) {
-      if (error instanceof RequestError) {
-        throw error;
-      }
-      throw new Error(
-        `${errorMessagePrefixe} - the response message could not be analysed. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`
-      );
+      throw new Error(`Failed to parse response. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}.`);
     }
   }
-  return "";
-};
 
-const getFetchErrorMessageOtherThanBadRequest = (error) => {
-  if (error instanceof TypeError) {
-    return `${error.message} probably because of a network error.`;
-  } else {
-    return error.message;
+  static getResponseObjFromXhr(xhr) {
+    return xhr.response;
   }
-};
 
-const ApiService = {
-  credentials: { username: config.username, password: config.password },
+  static async getResponseObjFromFetch(response) {
+    const responseObj = await this.parseJson(response);
+    return responseObj;
+  }
 
-  getToken: () => {
+  static async handleNotOkResponse(url, response) {
+    const status = response.status;
+    if (status >= 400 && status < 600) {
+      let errorMessage = "";
+      const errorMessagePrefixe = `url ${url} - status ${status}`;
+      try {
+        let responseObj;
+        if (response.json) {
+          responseObj = await this.getResponseObjFromFetch(response);
+        } else if (response.responseType && response.responseType === "json") {
+          responseObj = this.getResponseObjFromXhr(response);
+        }
+
+        if (status === 400) {
+          throw new BadRequestError(responseObj.errors);
+        } else if (status === 401) {
+          throw new UnauthorizedRequestError(responseObj.errors);
+        } else if (status === 500) {
+          throw new InternalServerError(responseObj.errors);
+        }
+
+        errorMessage = JSON.stringify(responseObj);
+        throw new Error(`${errorMessagePrefixe} ${errorMessage ? ` - ${errorMessage}` : ""}`);
+      } catch (error) {
+        if (error instanceof RequestError) {
+          throw error;
+        }
+        throw new Error(
+          `${errorMessagePrefixe} - the response message could not be analysed. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`
+        );
+      }
+    }
+    return "";
+  }
+
+  static getFetchErrorMessageOtherThanBadRequest(error) {
+    if (error instanceof TypeError) {
+      return `${error.message} probably because of a network error.`;
+    } else {
+      return error.message;
+    }
+  }
+
+  static getToken() {
     return JSON.parse(localStorage.getItem("jwtToken"));
-  },
+  }
 
-  setToken: (jwtToken) => {
+  static setToken(jwtToken) {
     localStorage.setItem("jwtToken", JSON.stringify(jwtToken));
-  },
+  }
 
-  refreshToken: async () => {
+  static async refreshToken() {
     const refreshToken = ApiService.getToken().refresh;
     try {
       if (refreshToken) {
@@ -94,18 +106,18 @@ const ApiService = {
         } else if (response.status === 401) {
           await ApiService.login();
         } else {
-          await handleNotOkResponse(url, response);
+          await this.handleNotOkResponse(url, response);
         }
       } else {
         await ApiService.login();
       }
     } catch (error) {
-      const fetchErrorMessage = await getFetchErrorMessageOtherThanBadRequest(error);
+      const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(error);
       throw new Error(`Failed to refresh token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
     }
-  },
+  }
 
-  getHeaders: async () => {
+  static async getHeaders() {
     const token = ApiService.getToken();
     let accessToken = token ? token.access : null;
     try {
@@ -131,9 +143,9 @@ const ApiService = {
     } catch (error) {
       throw new Error(`Failed to get headers. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`);
     }
-  },
+  }
 
-  login: async () => {
+  static async login() {
     try {
       const url = `${config.apiBaseUrl}auth/token/`;
       const response = await fetch(url, {
@@ -145,18 +157,18 @@ const ApiService = {
       });
 
       if (!response.ok) {
-        await handleNotOkResponse(url, response);
+        await this.handleNotOkResponse(url, response);
       } else {
-        const responseJson = await parseJson(response);
+        const responseJson = await this.parseJson(response);
         ApiService.setToken(responseJson);
       }
     } catch (error) {
-      const fetchErrorMessage = await getFetchErrorMessageOtherThanBadRequest(error);
+      const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(error);
       throw new Error(`Failed to login. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
     }
-  },
+  }
 
-  getXhr: async (url, method, data, page, onProgress) => {
+  static async getXhr(url, method, data, page, onProgress) {
     const xhr = new XMLHttpRequest();
     xhr.responseType = "json";
     xhr.open(method, url, true);
@@ -178,9 +190,9 @@ const ApiService = {
       };
     }
     return xhr;
-  },
+  }
 
-  fetchData: async (endpoint, method, data = null, page = null, onProgress = null) => {
+  static async fetchData(endpoint, method, data = null, page = null, onProgress = null, badRequestCatched = false) {
     let url = `${config.apiBaseUrl}${endpoint}`;
     if (page) {
       url += `?page=${page}`;
@@ -197,7 +209,7 @@ const ApiService = {
             resolve(xhr.response);
           } else {
             try {
-              await handleNotOkResponse(url, xhr);
+              await this.handleNotOkResponse(url, xhr, badRequestCatched);
               reject(new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${xhr.statusText}`));
             } catch (error) {
               if (error instanceof UnauthorizedRequestError && mustRetryIfUnauthorized) {
@@ -205,15 +217,21 @@ const ApiService = {
                 await ApiService.login();
                 const xhr = await ApiService.getXhr(url, method, data, page, onProgress);
                 xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
+                reject(error);
+              } else if (error instanceof RequestError) {
+                if (!(error instanceof BadRequestError) || !badRequestCatched) {
+                  this.errorSubscribers.forEach((callback) => callback(error));
+                } else {
+                  reject(error);
+                }
               }
-              reject(error);
             }
           }
         };
 
         xhr.onerror = async () => {
           try {
-            const fetchErrorMessage = await getFetchErrorMessageOtherThanBadRequest(xhr);
+            const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(xhr);
             reject(new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`));
           } catch (error) {
             reject(error);
@@ -223,12 +241,12 @@ const ApiService = {
         xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
       });
     } catch (error) {
-      const fetchErrorMessage = await getFetchErrorMessageOtherThanBadRequest(error);
+      const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(error);
       throw new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
     }
-  },
+  }
 
-  getLibTracks: async () => {
+  static async getLibTracks() {
     let results = [];
     let page = 1;
     let hasMore = true;
@@ -245,37 +263,37 @@ const ApiService = {
     }
 
     return results;
-  },
+  }
 
-  retrieveLibTrack: async (libTrackUuid) => {
+  static async retrieveLibTrack(libTrackUuid) {
     return await ApiService.fetchData(`tracks/${libTrackUuid}/`, "GET", null, null);
-  },
+  }
 
-  postLibTrack: async (file, genreUuid, onProgress) => {
+  static async postLibTrack(file, genreUuid, onProgress, badRequestCatched = false) {
     const formData = new FormData();
     formData.append("file", file);
     if (genreUuid !== null) {
       formData.append("genreUuid", genreUuid);
     }
-    return await ApiService.fetchData("tracks/", "POST", formData, null, onProgress);
-  },
+    return await ApiService.fetchData("tracks/", "POST", formData, null, onProgress, badRequestCatched);
+  }
 
-  putLibTrack: async (libTrackUuid, libTrackData) => {
+  static async putLibTrack(libTrackUuid, libTrackData) {
     return await ApiService.fetchData(`tracks/${libTrackUuid}/`, "PUT", libTrackData, null);
-  },
+  }
 
-  loadAudioAndGetLibTrackBlobUrl: async (libTrackRelativeUrl) => {
+  static async loadAudioAndGetLibTrackBlobUrl(libTrackRelativeUrl) {
     const headers = { Authorization: `Bearer ${ApiService.getToken().access}` };
     const blob = await ApiService.streamAudio(`${config.apiBaseUrl}${libTrackRelativeUrl}download/`, headers);
     return URL.createObjectURL(blob);
-  },
+  }
 
-  streamAudio: async (trackUrl) => {
+  static async streamAudio(trackUrl) {
     const headers = await ApiService.getHeaders();
     const response = await fetch(trackUrl, { headers });
 
     if (!response.ok) {
-      await handleNotOkResponse(trackUrl, response);
+      await this.handleNotOkResponse(trackUrl, response);
     }
 
     const reader = response.body.getReader();
@@ -298,9 +316,9 @@ const ApiService = {
     return new Response(stream, {
       headers: { "Content-Type": "audio/*" },
     }).blob();
-  },
+  }
 
-  getGenres: async () => {
+  static async getGenres() {
     let results = [];
     let page = 1;
     let hasMore = true;
@@ -317,13 +335,17 @@ const ApiService = {
     }
 
     return results;
-  },
+  }
 
-  postGenre: async (genreData) => {
+  static async postGenre(genreData) {
     return await ApiService.fetchData("genres/", "POST", genreData, null);
-  },
+  }
 
-  getGenrePlaylists: async () => {
+  static async putGenre(genreUuid, genreData) {
+    return await ApiService.fetchData(`genres/${genreUuid}/`, "PUT", genreData, null);
+  }
+
+  static async getGenrePlaylists() {
     let results = [];
     let page = 1;
     let hasMore = true;
@@ -340,16 +362,14 @@ const ApiService = {
     }
 
     return results;
-  },
+  }
 
-  retrievePlaylist: async (playlistUuid) => {
+  static async retrievePlaylist(playlistUuid) {
     return await ApiService.fetchData(`playlists/${playlistUuid}/`, "GET", null, null);
-  },
+  }
 
-  postPlay: async (contentObjectUuid) => {
+  static async postPlay(contentObjectUuid) {
     const data = { contentObjectUuid: contentObjectUuid };
     return await ApiService.fetchData(`plays/`, "POST", data, null);
-  },
-};
-
-export default ApiService;
+  }
+}

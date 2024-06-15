@@ -1,0 +1,62 @@
+name: Ultimate Music Guide CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - implement-put-genre-parent
+  pull_request:
+    branches: ["main", "dev"]
+
+jobs:
+  build-and-push-to-dockerhub:
+    name: Build / Push to Dockerhub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Dockerhub
+        run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DB_IMAGE_REPO }}:${{ vars.DB_IMAGE_TAG }} .
+
+      - name: Push
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DB_IMAGE_REPO }}:${{ vars.DB_IMAGE_TAG }}
+
+  set-env-variables-on-server:
+    name: Set environment variables on server
+    runs-on: ubuntu-latest
+    needs: [build-and-push-to-dockerhub]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.TEST_SERVER_CI_SSH_BODZIFY_PRIVATE_KEY }}
+
+      - name: Add host to known_hosts
+        run: |
+          mkdir -p ~/.ssh &&
+          ssh-keyscan -H ${{ vars.TEST_SERVER_URL }} >> ~/.ssh/known_hosts
+
+      # React env variables have to be prefixed with VITE_
+      - name: Set environment variables on server
+        run: |
+          ENV_FILE_PATH="${{ secrets.TEST_SERVER_DOCKER_COMPOSE_DIR }}${{ vars.DB_ENV_VARIABLES_FILENAME }}"
+          ssh ${{ secrets.TEST_SERVER_SSH_BODZIFY_USERNAME }}@${{ vars.TEST_SERVER_URL }} "
+            rm -f $ENV_FILE_PATH &&
+            echo 'ENV=TEST' >> $ENV_FILE_PATH &&
+            echo 'VITE_BODZIFY_API_UMG_USERNAME=${{ secrets.BODZIFY_API_UMG_USERNAME }}' >> $ENV_FILE_PATH &&
+            echo 'VITE_BODZIFY_API_UMG_USER_PASSWORD=${{ secrets.BODZIFY_API_UMG_USER_PASSWORD }}' >> $ENV_FILE_PATH && 
+            echo 'SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}' >> $ENV_FILE_PATH 
+          "
+
+  redeploy-webhook-call:
+    name: Redeploy webhook call
+    needs: [set-env-variables-on-server]
+    uses: Bodzify/bodzify-redeploy-webhook-action/.github/workflows/workflow.yml@main
+    with:
+      env: TEST
+    secrets: inherit

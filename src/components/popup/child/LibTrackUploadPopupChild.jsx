@@ -29,12 +29,17 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
     async function handleLibTrackToPost(file, genreUuid) {
       setFileUploadObjIsPosting(file.name, true);
       try {
-        await postLibTrack(file, genreUuid, (progress) => {
-          setFilesUploadObjs((prevFilesUploadObjs) => ({
-            ...prevFilesUploadObjs,
-            [file.name]: { ...prevFilesUploadObjs[file.name], progress },
-          }));
-        });
+        await postLibTrack(
+          file,
+          genreUuid,
+          (progress) => {
+            setFilesUploadObjs((prevFilesUploadObjs) => ({
+              ...prevFilesUploadObjs,
+              [file.name]: { ...prevFilesUploadObjs[file.name], progress },
+            }));
+          },
+          true
+        );
         setFileUploadObjIsPosting(file.name, false);
       } catch (error) {
         if (error instanceof BadRequestError) {
