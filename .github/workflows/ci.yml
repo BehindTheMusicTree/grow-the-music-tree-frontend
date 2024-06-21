@@ -53,7 +53,7 @@ jobs:
       - name: Set environment variables on server
         run: |
           ENV_FILE_PATH="${{ vars.DOCKER_COMPOSE_DIR }}${{ env.ENV_VARIABLES_FILENAME }}"
-          ssh ${{ secrets.TEST_SERVER_SSH_BODZIFY_USERNAME }}@${{ vars.TEST_SERVER_URL }} "
+          ssh ${{ env.SSH_DESTINATION }} "
             rm -f $ENV_FILE_PATH &&
             echo 'ENV=TEST' >> $ENV_FILE_PATH &&
             echo 'VITE_BODZIFY_API_USERNAME=${{ secrets.BODZIFY_API_USERNAME }}' >> $ENV_FILE_PATH &&
