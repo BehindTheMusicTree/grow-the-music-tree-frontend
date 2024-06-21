@@ -84,7 +84,7 @@ jobs:
       - name: Generate partial docker compose file
         env:
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
-          APP_PORT: ${{ vars.APP_PORT }}
+          APP_PORT: ${{ secrets.APP_PORT }}
         run: |
           bash ${{ github.workspace }}/scripts/generate_docker_compose_part.sh
 
