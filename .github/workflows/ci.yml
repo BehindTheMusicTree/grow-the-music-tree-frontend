@@ -14,6 +14,7 @@ env:
   DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
   IMAGE_REPO: ${{ vars.API_IMAGE_REPO }}
   IMAGE_TAG: ${{ vars.IMAGE_TAG }}
+  ENV_VARIABLES_FILENAME: ${{ vars.ENV_VARIABLES_FILENAME }}
 
 jobs:
   build-and-push-to-dockerhub:
@@ -51,7 +52,7 @@ jobs:
       # React env variables have to be prefixed with VITE_
       - name: Set environment variables on server
         run: |
-          ENV_FILE_PATH="${{ vars.DOCKER_COMPOSE_DIR }}${{ vars.UMG_ENV_VARIABLES_FILENAME }}"
+          ENV_FILE_PATH="${{ vars.DOCKER_COMPOSE_DIR }}${{ env.ENV_VARIABLES_FILENAME }}"
           ssh ${{ secrets.TEST_SERVER_SSH_BODZIFY_USERNAME }}@${{ vars.TEST_SERVER_URL }} "
             rm -f $ENV_FILE_PATH &&
             echo 'ENV=TEST' >> $ENV_FILE_PATH &&
@@ -83,7 +84,6 @@ jobs:
       - name: Generate partial docker compose file
         env:
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
-          ENV_VARIABLES_FILENAME: ${{ vars.ENV_VARIABLES_FILENAME }}
         run: |
           bash ${{ github.workspace }}/scripts/generate_docker_compose_part.sh
 
