@@ -1,11 +1,11 @@
 {
   "name": "bodzify-ultimate-music-guide",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "cp ./env/.env.development.api-test .env.development && vite",
-    "dev:local": "cp ./env/.env.development.api-local .env.development && vite",
+    "dev": "cp ./env/.env.dev.api-test env/.env && vite",
+    "dev:local": "cp ./env/.env.dev.api-local env/.env && vite",
     "serve": "vite",
     "build": "env-cmd -f ./env/.env.test vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
