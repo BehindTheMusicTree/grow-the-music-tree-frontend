@@ -18,6 +18,7 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
+RUN ./scripts/install_dependencies.sh
 COPY --from=build /usr/src/app/build ./build
 
 RUN npm install -g npm@10.5.2
