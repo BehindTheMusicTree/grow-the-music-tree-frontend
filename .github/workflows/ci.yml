@@ -49,7 +49,7 @@ jobs:
           mkdir -p ~/.ssh &&
           ssh-keyscan -H ${{ vars.TEST_SERVER_URL }} >> ~/.ssh/known_hosts
 
-      # React env variables have to be prefixed with VITE_
+      # React env variables have to be prefixed with VITE_ in order to be accessible in the app
       - name: Set environment variables on server
         run: |
           ENV_FILE_PATH="${{ vars.DOCKER_COMPOSE_DIR }}${{ env.ENV_VARIABLES_FILENAME }}"
