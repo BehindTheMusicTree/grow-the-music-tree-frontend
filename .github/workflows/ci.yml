@@ -35,7 +35,7 @@ jobs:
           tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
 
   set-env-variables-on-server:
-    name: Set environment variables on server
+    name: Set environment vars on server
     runs-on: ubuntu-latest
     needs: [build-and-push-to-dockerhub]
     steps:
