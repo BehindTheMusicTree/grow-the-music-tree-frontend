@@ -8,6 +8,6 @@ cat << EOF > ${SCRPIT_DIR}$DOCKER_COMPOSE_PART_FILENAME
     expose:
       - $APP_PORT
     networks:
-      - bodzify-network
+      - $DOCKER_NETWORK_NAME
     env_file: $ENV_VARIABLES_FILENAME
 EOF

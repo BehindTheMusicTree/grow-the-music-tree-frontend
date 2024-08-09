@@ -86,6 +86,7 @@ jobs:
         env:
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           APP_PORT: ${{ secrets.APP_PORT }}
+          DOCKER_NETWORK_NAME: ${{ vars.DOCKER_NETWORK_NAME }}
         run: |
           bash ${{ github.workspace }}/scripts/generate_docker_compose_part.sh
 
