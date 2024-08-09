@@ -18,6 +18,7 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
+RUN chmod +x ./scripts/install_dependencies.sh
 RUN ./scripts/install_dependencies.sh
 COPY --from=build /usr/src/app/build ./build
 
