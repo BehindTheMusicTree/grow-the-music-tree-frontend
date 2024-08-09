@@ -6,6 +6,7 @@ on:
       - main
       - dev
       - implement-put-genre-parent
+      - improve-env-vars
   pull_request:
     branches: ["main", "dev"]
 
