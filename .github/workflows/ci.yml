@@ -12,10 +12,9 @@ on:
 
 env:
   SSH_DESTINATION: ${{ secrets.TEST_SERVER_BODZIFY_USERNAME }}@${{ vars.TEST_SERVER_URL }}
-  DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
   IMAGE_REPO: ${{ vars.UMG_IMAGE_REPO }}
   IMAGE_TAG: ${{ vars.IMAGE_TAG }}
-  ENV_VARIABLES_FILENAME: ${{ vars.ENV_VARIABLES_FILENAME }}
+  ENV_FILENAME: ${{ vars.ENV_FILENAME }}
   DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
 
 jobs:
@@ -27,14 +26,14 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Login to Dockerhub
-        run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ vars.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/${{ vars.UMG_IMAGE_REPO }}:${{ vars.UMG_IMAGE_TAG }}
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.UMG_IMAGE_REPO }}:${{ vars.UMG_IMAGE_TAG }}
 
   set-env-variables-on-server:
     name: Set environment vars on server
@@ -54,7 +53,7 @@ jobs:
       # React env variables have to be prefixed with VITE_ in order to be accessible in the app
       - name: SSH Set environment variables on server
         env:
-          ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ vars.ENV_VARIABLES_FILENAME }}
+          ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ vars.ENV_FILENAME }}
         run: |
           ssh ${{ env.SSH_DESTINATION }} "
             rm -f ${{ env.ENV_FILE }} &&
@@ -84,9 +83,14 @@ jobs:
 
       - name: Generate partial docker compose file
         env:
+          DOCKER_COMPOSE_PART_FILENAME: ${{ vars.DOCKER_COMPOSE_PART_FILENAME }}
+          DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+          IMAGE_REPO: ${{ vars.UMG_IMAGE_REPO }}
+          IMAGE_TAG: ${{ vars.IMAGE_TAG }}
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           APP_PORT: ${{ secrets.APP_PORT }}
           DOCKER_NETWORK_NAME: ${{ vars.DOCKER_NETWORK_NAME }}
+          ENV_FILENAME: ${{ vars.ENV_FILENAME }}
         run: |
           bash ${{ github.workspace }}/scripts/generate_docker_compose_part.sh
 
