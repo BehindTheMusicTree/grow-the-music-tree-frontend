@@ -52,6 +52,8 @@ jobs:
 
       # React env variables have to be prefixed with VITE_ in order to be accessible in the app
       - name: Set environment variables on server
+        env:
+          DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
         run: |
           ENV_FILE_PATH="${{ vars.DOCKER_COMPOSE_DIR }}${{ env.ENV_VARIABLES_FILENAME }}"
           ssh ${{ env.SSH_DESTINATION }} "
