@@ -16,6 +16,7 @@ env:
   IMAGE_REPO: ${{ vars.UMG_IMAGE_REPO }}
   IMAGE_TAG: ${{ vars.IMAGE_TAG }}
   ENV_VARIABLES_FILENAME: ${{ vars.ENV_VARIABLES_FILENAME }}
+  DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
 
 jobs:
   build-and-push-to-dockerhub:
@@ -51,9 +52,9 @@ jobs:
           ssh-keyscan -H ${{ vars.TEST_SERVER_URL }} >> ~/.ssh/known_hosts
 
       # React env variables have to be prefixed with VITE_ in order to be accessible in the app
-      - name: Set environment variables on server
+      - name: SSH Set environment variables on server
         env:
-          ENV_FILE: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/${{ vars.ENV_VARIABLES_FILENAME }}
+          ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ vars.ENV_VARIABLES_FILENAME }}
         run: |
           ssh ${{ env.SSH_DESTINATION }} "
             rm -f ${{ env.ENV_FILE }} &&
@@ -69,8 +70,6 @@ jobs:
     needs: [build-and-push-to-dockerhub]
     environment:
       name: TEST
-    env:
-      DOCKER_COMPOSE_PART_FILENAME: ${{ vars.DOCKER_COMPOSE_PART_FILENAME }}
 
     steps:
       - uses: actions/checkout@v4
@@ -92,9 +91,10 @@ jobs:
           bash ${{ github.workspace }}/scripts/generate_docker_compose_part.sh
 
       - name: Transfer partial docker-compose on server
+        env:
+          DOCKER_COMPOSE_PART_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ vars.DOCKER_COMPOSE_PART_FILENAME }}
         run: |
-          scp ${{ github.workspace }}/scripts/${{ env.DOCKER_COMPOSE_PART_FILENAME }} ${{ env.SSH_DESTINATION }}:\
-          ${{ vars.DOCKER_COMPOSE_DIR }}${{ vars.DOCKER_COMPOSE_PARTS_DIR_NAME }}/${{ env.DOCKER_COMPOSE_PART_FILENAME }}
+          scp ${{ github.workspace }}/scripts/${{ vars.DOCKER_COMPOSE_PART_FILENAME }} ${{ env.SSH_DESTINATION }}:${{ env.DOCKER_COMPOSE_PART_FILE }}
 
   redeploy-webhook-call:
     name: Redeploy webhook call
