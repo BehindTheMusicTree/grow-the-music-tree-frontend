@@ -84,6 +84,7 @@ jobs:
       - name: Generate partial docker compose file
         env:
           DOCKER_COMPOSE_PART_FILENAME: ${{ vars.DOCKER_COMPOSE_PART_FILENAME }}
+          SERVICE_NAME: ${{ vars.UMG_SERVICE_NAME }}
           PROJECT_DIR: ${{ env.CONTAINER_ROOT_DIR }}
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
           IMAGE_REPO: ${{ vars.UMG_IMAGE_REPO }}

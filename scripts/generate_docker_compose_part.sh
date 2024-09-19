@@ -2,6 +2,7 @@ script_dir=$(dirname $0)/
 
 required_vars=(
   DOCKER_COMPOSE_PART_FILENAME
+  SERVICE_NAME
   PROJECT_DIR
   DOCKERHUB_USERNAME
   IMAGE_REPO
@@ -19,7 +20,7 @@ for var in "${required_vars[@]}"; do
 done
 
 cat << EOF > ${script_dir}$DOCKER_COMPOSE_PART_FILENAME
-  umg:
+  $SERVICE_NAME:
     working_dir: $PROJECT_DIR
     image: $DOCKERHUB_USERNAME/$IMAGE_REPO:$IMAGE_TAG
     container_name: $CONTAINER_NAME
