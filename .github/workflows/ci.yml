@@ -12,10 +12,8 @@ on:
 
 env:
   SSH_DESTINATION: ${{ secrets.TEST_SERVER_BODZIFY_USERNAME }}@${{ vars.TEST_SERVER_URL }}
-  IMAGE_REPO: ${{ vars.UMG_IMAGE_REPO }}
-  IMAGE_TAG: ${{ vars.IMAGE_TAG }}
-  ENV_FILENAME: ${{ vars.ENV_FILENAME }}
   DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
+  CONTAINER_ROOT_DIR: /home/app/
 
 jobs:
   build-and-push-to-dockerhub:
@@ -34,6 +32,8 @@ jobs:
           context: .
           push: true
           tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.UMG_IMAGE_REPO }}:${{ vars.UMG_IMAGE_TAG }}
+          build-args: |
+            PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
 
   set-env-variables-on-server:
     name: Set environment vars on server
@@ -53,7 +53,7 @@ jobs:
       # React env variables have to be prefixed with VITE_ in order to be accessible in the app
       - name: SSH Set environment variables on server
         env:
-          ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ vars.ENV_FILENAME }}
+          ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ vars.DOCKERIZED_APP_ENV_FILENAME }}
         run: |
           ssh ${{ env.SSH_DESTINATION }} "
             rm -f ${{ env.ENV_FILE }} &&
@@ -84,13 +84,14 @@ jobs:
       - name: Generate partial docker compose file
         env:
           DOCKER_COMPOSE_PART_FILENAME: ${{ vars.DOCKER_COMPOSE_PART_FILENAME }}
+          PROJECT_DIR: ${{ env.CONTAINER_ROOT_DIR }}
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
           IMAGE_REPO: ${{ vars.UMG_IMAGE_REPO }}
           IMAGE_TAG: ${{ vars.IMAGE_TAG }}
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           APP_PORT: ${{ vars.UMG_PORT }}
           DOCKER_NETWORK_NAME: ${{ vars.DOCKER_NETWORK_NAME }}
-          ENV_FILENAME: ${{ vars.ENV_FILENAME }}
+          ENV_FILENAME: ${{ vars.DOCKERIZED_APP_ENV_FILENAME }}
         run: |
           bash ${{ github.workspace }}/scripts/generate_docker_compose_part.sh
 
