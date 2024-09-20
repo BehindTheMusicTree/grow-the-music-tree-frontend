@@ -31,7 +31,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.UMG_IMAGE_REPO }}:${{ vars.UMG_IMAGE_TAG }}
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.UMG_IMAGE_REPO }}:${{ vars.APP_VERSION }}
           build-args: |
             PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
             APP_PORT=${{ vars.UMG_PORT }}
@@ -91,7 +91,7 @@ jobs:
           PROJECT_DIR: ${{ env.CONTAINER_ROOT_DIR }}
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
           IMAGE_REPO: ${{ vars.UMG_IMAGE_REPO }}
-          IMAGE_TAG: ${{ vars.IMAGE_TAG }}
+          APP_VERSION: ${{ vars.APP_VERSION }}
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           APP_PORT: ${{ vars.UMG_PORT }}
           DOCKER_NETWORK_NAME: ${{ vars.DOCKER_NETWORK_NAME }}
