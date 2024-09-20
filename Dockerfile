@@ -1,16 +1,11 @@
 FROM node:20-alpine AS build
 
 ARG PROJECT_DIR
-ARG APP_PORT
 
-RUN for var in \
-		PROJECT_DIR \
-		APP_PORT; do \
-	if [ -z "$(eval echo \$$var)" ]; then \
-		echo "ERROR: The $var argument is not provided" >&2; \
-		exit 1; \
-	fi; \
-done
+RUN if [ -z "$PROJECT_DIR" ]; then \
+    echo "ERROR: The PROJECT_DIR argument is not provided" >&2; \
+    exit 1; \
+fi
 
 WORKDIR $PROJECT_DIR
 
@@ -40,6 +35,8 @@ RUN for var in \
 	fi; \
 done
 
+ENV APP_PORT=$APP_PORT
+
 WORKDIR $PROJECT_DIR
 
 COPY ./scripts/install_dependencies.sh ./scripts/install_dependencies.sh
@@ -50,4 +47,4 @@ COPY --from=build ${PROJECT_DIR}build ./build
 RUN npm install -g npm@10.5.2
 RUN npm install -g serve
 
-CMD ["serve", "-s", "build", "-l", "${APP_PORT}"]
+CMD ["sh", "-c", "serve -s build -l ${APP_PORT}"]
