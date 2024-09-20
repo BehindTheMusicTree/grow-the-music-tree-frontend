@@ -11,7 +11,7 @@ on:
     branches: ["main", "dev"]
 
 env:
-  SSH_DESTINATION: ${{ secrets.TEST_SERVER_BODZIFY_USERNAME }}@${{ vars.TEST_SERVER_URL }}
+  SSH_DESTINATION: ${{ secrets.TEST_SERVER_BODZIFY_USERNAME }}@${{ vars.DOMAIN_NAME }}
   DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
   CONTAINER_ROOT_DIR: /home/app/
 
@@ -48,7 +48,7 @@ jobs:
       - name: Add host to known_hosts
         run: |
           mkdir -p ~/.ssh &&
-          ssh-keyscan -H ${{ vars.TEST_SERVER_URL }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ vars.DOMAIN_NAME }} >> ~/.ssh/known_hosts
 
       # React env variables have to be prefixed with VITE_ in order to be accessible in the app
       - name: SSH Set environment variables on server
@@ -79,7 +79,7 @@ jobs:
       - name: Add host to known_hosts
         run: |
           mkdir -p ~/.ssh &&
-          ssh-keyscan -H ${{ vars.TEST_SERVER_URL }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ vars.DOMAIN_NAME }} >> ~/.ssh/known_hosts
 
       - name: Generate partial docker compose file
         env:
