@@ -14,6 +14,7 @@ env:
   SSH_DESTINATION: ${{ secrets.TEST_SERVER_BODZIFY_USERNAME }}@${{ vars.DOMAIN_NAME }}
   DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
   CONTAINER_ROOT_DIR: /home/app/
+  DOCKERIZED_APP_ENV_FILENAME: .env_umg
 
 jobs:
   build-and-push-to-dockerhub:
@@ -40,6 +41,8 @@ jobs:
     name: Set environment vars on server
     runs-on: ubuntu-latest
     needs: [build-and-push-to-dockerhub]
+    environment:
+      name: TEST
     steps:
       - uses: actions/checkout@v4
       - uses: webfactory/ssh-agent@v0.9.0
@@ -54,13 +57,13 @@ jobs:
       # React env variables have to be prefixed with VITE_ in order to be accessible in the app
       - name: SSH Set environment variables on server
         env:
-          ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ vars.DOCKERIZED_APP_ENV_FILENAME }}
+          ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKERIZED_APP_ENV_FILENAME }}
         run: |
           ssh ${{ env.SSH_DESTINATION }} "
             rm -f ${{ env.ENV_FILE }} &&
             echo 'ENV=TEST' >> $ENV_FILE &&
-            echo 'VITE_BODZIFY_API_USERNAME=${{ secrets.BODZIFY_API_USERNAME }}' >> ${{ env.ENV_FILE }} &&
-            echo 'VITE_BODZIFY_API_USER_PASSWORD=${{ secrets.BODZIFY_API_USER_PASSWORD }}' >> ${{ env.ENV_FILE }} && 
+            echo 'VITE_BODZIFY_API_USERNAME=${{ secrets.API_UMG_USERNAME }}' >> ${{ env.ENV_FILE }} &&
+            echo 'VITE_BODZIFY_API_USER_PASSWORD=${{ secrets.API_UMG_USER_PASSWORD }}' >> ${{ env.ENV_FILE }} && 
             echo 'SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}' >> ${{ env.ENV_FILE }} 
           "
 
@@ -95,7 +98,7 @@ jobs:
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           APP_PORT: ${{ vars.UMG_PORT }}
           DOCKER_NETWORK_NAME: ${{ vars.DOCKER_NETWORK_NAME }}
-          ENV_FILENAME: ${{ vars.DOCKERIZED_APP_ENV_FILENAME }}
+          ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}
         run: |
           bash ${{ github.workspace }}/scripts/generate_docker_compose_part.sh
 
