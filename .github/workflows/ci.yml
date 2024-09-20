@@ -70,6 +70,8 @@ jobs:
     needs: [build-and-push-to-dockerhub]
     environment:
       name: TEST
+    env:
+      DOCKER_COMPOSE_PART_FILENAME: umg-compose-part.yml
 
     steps:
       - uses: actions/checkout@v4
@@ -84,7 +86,7 @@ jobs:
 
       - name: Generate partial docker compose file
         env:
-          DOCKER_COMPOSE_PART_FILENAME: ${{ vars.DOCKER_COMPOSE_PART_FILENAME }}
+          DOCKER_COMPOSE_PART_FILENAME: ${{ env.DOCKER_COMPOSE_PART_FILENAME }}
           SERVICE_NAME: ${{ vars.UMG_SERVICE_NAME }}
           PROJECT_DIR: ${{ env.CONTAINER_ROOT_DIR }}
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
@@ -99,9 +101,9 @@ jobs:
 
       - name: Transfer partial docker-compose on server
         env:
-          DOCKER_COMPOSE_PART_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ vars.DOCKER_COMPOSE_PART_FILENAME }}
+          DOCKER_COMPOSE_PART_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ vars.DOCKER_COMPOSE_PARTS_DIR_NAME }}/${{ env.DOCKER_COMPOSE_PART_FILENAME }}
         run: |
-          scp ${{ github.workspace }}/scripts/${{ vars.DOCKER_COMPOSE_PART_FILENAME }} ${{ env.SSH_DESTINATION }}:${{ env.DOCKER_COMPOSE_PART_FILE }}
+          scp ${{ github.workspace }}/scripts/${{ env.DOCKER_COMPOSE_PART_FILENAME }} ${{ env.SSH_DESTINATION }}:${{ env.DOCKER_COMPOSE_PART_FILE }}
 
   redeploy-webhook-call:
     name: Redeploy webhook call
