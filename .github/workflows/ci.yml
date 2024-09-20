@@ -34,6 +34,7 @@ jobs:
           tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.UMG_IMAGE_REPO }}:${{ vars.UMG_IMAGE_TAG }}
           build-args: |
             PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
+            APP_PORT=${{ vars.UMG_PORT }}
 
   set-env-variables-on-server:
     name: Set environment vars on server
