@@ -74,7 +74,7 @@ jobs:
     environment:
       name: TEST
     env:
-      DOCKER_COMPOSE_PART_FILENAME: umg-compose-part.yml
+      DOCKER_COMPOSE_PART_FILENAME: umg${{ vars.DOCKER_COMPOSE_PART_FILENAME_SUFFIXE }}
 
     steps:
       - uses: actions/checkout@v4
@@ -97,10 +97,9 @@ jobs:
           APP_VERSION: ${{ vars.APP_VERSION }}
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           APP_PORT: ${{ vars.UMG_PORT }}
-          DOCKER_NETWORK_NAME: ${{ vars.DOCKER_NETWORK_NAME }}
           ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}
         run: |
-          bash ${{ github.workspace }}/scripts/generate_docker_compose_part.sh
+          bash ${{ github.workspace }}/scripts/generate-docker-compose-part.sh
 
       - name: Transfer partial docker-compose on server
         env:

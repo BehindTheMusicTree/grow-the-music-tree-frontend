@@ -1,4 +1,6 @@
-script_dir=$(dirname $0)/
+#!/bin/bash
+
+SCRIPT_DIR=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}" || echo "${BASH_SOURCE[0]}")")" && pwd)/
 
 required_vars=(
   DOCKER_COMPOSE_PART_FILENAME
@@ -9,7 +11,6 @@ required_vars=(
   APP_VERSION
   CONTAINER_NAME
   APP_PORT
-  DOCKER_NETWORK_NAME
   ENV_FILENAME
 )
 for var in "${required_vars[@]}"; do
@@ -19,14 +20,14 @@ for var in "${required_vars[@]}"; do
   fi
 done
 
-cat << EOF > ${script_dir}$DOCKER_COMPOSE_PART_FILENAME
+DOCKER_COMPOSE_PART_FILE="${SCRIPT_DIR}${DOCKER_COMPOSE_PART_FILENAME}"
+echo "Generating partial docker-compose file $DOCKER_COMPOSE_PART_FILE"
+cat << EOF > $DOCKER_COMPOSE_PART_FILE
   $SERVICE_NAME:
     working_dir: $PROJECT_DIR
     image: $DOCKERHUB_USERNAME/$IMAGE_REPO:$APP_VERSION
     container_name: $CONTAINER_NAME
     expose:
       - $APP_PORT
-    networks:
-      - $DOCKER_NETWORK_NAME
     env_file: $ENV_FILENAME
 EOF

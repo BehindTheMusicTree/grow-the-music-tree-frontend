@@ -39,9 +39,9 @@ ENV APP_PORT=$APP_PORT
 
 WORKDIR $PROJECT_DIR
 
-COPY ./scripts/install_dependencies.sh ./scripts/install_dependencies.sh
-RUN chmod +x ./scripts/install_dependencies.sh
-RUN ./scripts/install_dependencies.sh
+COPY ./scripts/install-dependencies.sh ./scripts/install-dependencies.sh
+RUN chmod +x ./scripts/install-dependencies.sh
+RUN ./scripts/install-dependencies.sh
 COPY --from=build ${PROJECT_DIR}build ./build
 
 RUN npm install -g npm@10.5.2
