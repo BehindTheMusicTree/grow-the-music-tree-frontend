@@ -2,7 +2,8 @@
 logs
 *.logsc
 
-env/dev/available/
+env/dev/available/*
+env/to-load/*
 .env.sentry-build-plugin
 
 npm-debug.log*
