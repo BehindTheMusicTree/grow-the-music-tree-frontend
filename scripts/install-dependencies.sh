@@ -1,4 +1,5 @@
 #!/bin/sh
+
 npm install -g npm@10.5.2
 npm cache verify
 npm cache clean --force

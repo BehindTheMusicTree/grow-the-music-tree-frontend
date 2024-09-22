@@ -4,16 +4,16 @@ import * as Sentry from "@sentry/react";
 
 import App from "./App.jsx";
 import "./index.css";
-import { checkRequiredEnvVars } from "./utils/check-env";
+import { checkRequiredConfigVars } from "./utils/config";
 
 import { PlayerProvider } from "./contexts/player/PlayerContext";
 import { TrackListProvider } from "./contexts/track-list/TrackListContext";
 import { GenrePlaylistsProvider } from "./contexts/genre-playlists/GenrePlaylistsContext";
 import { PopupProvider } from "./contexts/popup/PopupContext";
 
-checkRequiredEnvVars();
+checkRequiredConfigVars();
 
-if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
+if (import.meta.env.VITE_SENTRY_IS_ACTIVE == true) {
   Sentry.init({
     dsn: "https://7f17fcd9feebfb634ad7ba2f638ba69a@o4507119053832192.ingest.de.sentry.io/4507119058026576",
     integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
@@ -36,7 +36,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <GenrePlaylistsProvider>
         <PlayerProvider>
           <TrackListProvider>
-            {import.meta.env.VITE_SENTRY_ACTIVE === true ? (
+            {import.meta.env.VITE_SENTRY_IS_ACTIVE === true ? (
               <Sentry.ErrorBoundary fallback={"An error has occurred"}>
                 <App />
               </Sentry.ErrorBoundary>

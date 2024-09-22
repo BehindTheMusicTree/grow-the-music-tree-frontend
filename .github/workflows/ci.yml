@@ -63,11 +63,11 @@ jobs:
         run: |
           ssh ${{ env.SSH_DESTINATION }} "
             rm -f ${{ env.ENV_FILE }} &&
-            echo 'VITE_ENV=TEST' >> $ENV_FILE &&
-            echo 'VITE_API_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
-            echo 'VITE_API_BASE_URL=https://${{ vars.DOMAIN_NAME }}/api/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
-            echo 'VITE_API_UMG_USERNAME=${{ secrets.API_UMG_USERNAME }}' >> ${{ env.ENV_FILE }} &&
-            echo 'VITE_API_UMG_USER_PASSWORD=${{ secrets.API_UMG_USER_PASSWORD }}' >> ${{ env.ENV_FILE }}
+            echo 'ENV=TEST' >> $ENV_FILE &&
+            echo 'API_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
+            echo 'API_BASE_URL=https://${{ vars.DOMAIN_NAME }}/api/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
+            echo 'API_UMG_USERNAME=${{ secrets.API_UMG_USERNAME }}' >> ${{ env.ENV_FILE }} &&
+            echo 'API_UMG_USER_PASSWORD=${{ secrets.API_UMG_USER_PASSWORD }}' >> ${{ env.ENV_FILE }}
           "
 
   set-partial-docker-compose-on-server:
@@ -101,7 +101,7 @@ jobs:
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           APP_PORT: ${{ vars.UMG_PORT }}
           ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}
-        run: bash scripts/generate-docker-compose-part.sh
+        run: bash scripts/generate-partial-docker-compose.sh
 
       - name: Transfer partial docker-compose on server
         env:

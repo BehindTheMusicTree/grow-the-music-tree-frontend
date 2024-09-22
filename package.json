@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev:remote": "cp ./env/dev/available/.env.dev.api-remote ./env/to_load/.env.development && vite",
-    "dev:local": "cp ./env/dev/available/.env.dev.api-local ./env/to_load/.env.development && vite",
+    "dev:remote": "cp ./env/dev/available/.env.dev.api-remote ./env/to-load/.env.development && vite",
+    "dev:local": "cp ./env/dev/available/.env.dev.api-local ./env/to-load/.env.development && vite",
     "serve": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",

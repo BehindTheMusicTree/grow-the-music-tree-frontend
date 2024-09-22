@@ -13,16 +13,9 @@ fi
 WORKDIR $PROJECT_DIR
 
 COPY package*.json ./
-
-RUN npm install -g npm@10.5.2 && \
-    npm cache verify && \
-    npm cache clean --force && \
-    npm install is-fullwidth-code-point@3.0.0 && \
-    npm install
-
 COPY . .
 
-RUN npm run build
+RUN chmod +x ./scripts/* && ./scripts/install-dependencies.sh && npm run build
 
 FROM node:20-alpine
 
@@ -39,15 +32,16 @@ RUN for var in \
 done
 
 ENV PROJECT_DIR=$PROJECT_DIR \
-    VITE_ENV=TEST \
+    ENV=TEST \
     APP_PORT=$APP_PORT \
-    VITE_SENTRY_ACTIVE=true
+    SENTRY_IS_ACTIVE=true
 
 WORKDIR $PROJECT_DIR
 
-COPY ./scripts/install-dependencies.sh ./scripts/
-RUN chmod +x ./scripts/install-dependencies.sh && ./scripts/install-dependencies.sh
+COPY ./scripts/* ./scripts/
+RUN chmod +x ./scripts/* && ./scripts/install-dependencies.sh
 COPY --from=build ${PROJECT_DIR}build ./build
 RUN npm install -g npm@10.5.2 && npm install -g serve
 
-CMD ["sh", "-c", "serve -s build -l ${APP_PORT}"]
+# Set the entrypoint using shell form to allow environment variable expansion
+ENTRYPOINT ["sh", "-c", "./scripts/entrypoint.sh"]
