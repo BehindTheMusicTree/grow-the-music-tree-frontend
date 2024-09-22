@@ -4,11 +4,14 @@ import * as Sentry from "@sentry/react";
 
 import App from "./App.jsx";
 import "./index.css";
+import { checkRequiredEnvVars } from "./utils/check-env";
 
 import { PlayerProvider } from "./contexts/player/PlayerContext";
 import { TrackListProvider } from "./contexts/track-list/TrackListContext";
 import { GenrePlaylistsProvider } from "./contexts/genre-playlists/GenrePlaylistsContext";
 import { PopupProvider } from "./contexts/popup/PopupContext";
+
+checkRequiredEnvVars();
 
 if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
   Sentry.init({
