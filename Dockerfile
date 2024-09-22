@@ -1,4 +1,7 @@
+# syntax=docker/dockerfile:1
 FROM node:20-alpine AS build
+
+RUN --mount=type=secret,id=sentry_auth_token,env=SENTRY_AUTH_TOKEN
 
 ARG PROJECT_DIR
 
@@ -11,11 +14,11 @@ WORKDIR $PROJECT_DIR
 
 COPY package*.json ./
 
-RUN npm install -g npm@10.5.2
-RUN npm cache verify
-RUN npm cache clean --force
-RUN npm install is-fullwidth-code-point@3.0.0
-RUN npm install
+RUN npm install -g npm@10.5.2 && \
+    npm cache verify && \
+    npm cache clean --force && \
+    npm install is-fullwidth-code-point@3.0.0 && \
+    npm install
 
 COPY . .
 
@@ -35,16 +38,16 @@ RUN for var in \
 	fi; \
 done
 
-ENV APP_PORT=$APP_PORT
+ENV PROJECT_DIR=$PROJECT_DIR \
+    VITE_ENV=TEST \
+    APP_PORT=$APP_PORT \
+    VITE_SENTRY_ACTIVE=true
 
 WORKDIR $PROJECT_DIR
 
-COPY ./scripts/install-dependencies.sh ./scripts/install-dependencies.sh
-RUN chmod +x ./scripts/install-dependencies.sh
-RUN ./scripts/install-dependencies.sh
+COPY ./scripts/install-dependencies.sh ./scripts/
+RUN chmod +x ./scripts/install-dependencies.sh && ./scripts/install-dependencies.sh
 COPY --from=build ${PROJECT_DIR}build ./build
-
-RUN npm install -g npm@10.5.2
-RUN npm install -g serve
+RUN npm install -g npm@10.5.2 && npm install -g serve
 
 CMD ["sh", "-c", "serve -s build -l ${APP_PORT}"]

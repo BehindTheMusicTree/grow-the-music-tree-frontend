@@ -1,21 +1,27 @@
 import { sentryVitePlugin } from "@sentry/vite-plugin";
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import eslintPlugin from 'vite-plugin-eslint'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import eslintPlugin from "vite-plugin-eslint";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), eslintPlugin(), sentryVitePlugin({
-    org: "bodzify",
-    project: "javascript-react",
-    telemetry: false,
-  })],
+  envDir: "./env/to_load/",
+  plugins: [
+    react(),
+    eslintPlugin(),
+    sentryVitePlugin({
+      org: "bodzify",
+      project: "ultimate-music-guide-react-test",
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      telemetry: false,
+    }),
+  ],
   build: {
-    outDir: 'build',
-    sourcemap: true
+    outDir: "build",
+    sourcemap: true,
   },
   server: {
     host: true,
-    port: 5000, 
-  }
-})
+    port: 5000,
+  },
+});

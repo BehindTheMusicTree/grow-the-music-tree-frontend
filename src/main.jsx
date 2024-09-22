@@ -17,7 +17,10 @@ if (import.meta.env.VITE_SENTRY_ACTIVE == true) {
     // Performance Monitoring
     tracesSampleRate: 1.0, //  Capture 100% of the transactions
     // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-    tracePropagationTargets: ["localhost", /^https:\/\/bodzify\.com\/api\/v1/],
+    tracePropagationTargets: [
+      "localhost",
+      new RegExp(`^${import.meta.env.VITE_API_BASE_URL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+    ],
     // Session Replay
     replaysSessionSampleRate: 1.0, // Set sample at a lower rate in production (e.g. 0.1 for 10% of sessions)
     replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.

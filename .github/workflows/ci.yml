@@ -28,7 +28,7 @@ jobs:
         run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ vars.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
@@ -36,6 +36,8 @@ jobs:
           build-args: |
             PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
             APP_PORT=${{ vars.UMG_PORT }}
+          secrets: |
+            "sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}"
 
   set-env-variables-on-server:
     name: Set environment vars on server
@@ -55,16 +57,17 @@ jobs:
           ssh-keyscan -H ${{ vars.DOMAIN_NAME }} >> ~/.ssh/known_hosts
 
       # React env variables have to be prefixed with VITE_ in order to be accessible in the app
-      - name: SSH Set environment variables on server
+      - name: SSH Set UMG environment variables on server
         env:
           ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKERIZED_APP_ENV_FILENAME }}
         run: |
           ssh ${{ env.SSH_DESTINATION }} "
             rm -f ${{ env.ENV_FILE }} &&
-            echo 'ENV=TEST' >> $ENV_FILE &&
-            echo 'VITE_BODZIFY_API_USERNAME=${{ secrets.API_UMG_USERNAME }}' >> ${{ env.ENV_FILE }} &&
-            echo 'VITE_BODZIFY_API_USER_PASSWORD=${{ secrets.API_UMG_USER_PASSWORD }}' >> ${{ env.ENV_FILE }} && 
-            echo 'SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}' >> ${{ env.ENV_FILE }} 
+            echo 'VITE_ENV=TEST' >> $ENV_FILE &&
+            echo 'VITE_API_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
+            echo 'VITE_API_BASE_URL=https://${{ vars.DOMAIN_NAME }}/api/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
+            echo 'VITE_API_UMG_USERNAME=${{ secrets.API_UMG_USERNAME }}' >> ${{ env.ENV_FILE }} &&
+            echo 'VITE_API_UMG_USER_PASSWORD=${{ secrets.API_UMG_USER_PASSWORD }}' >> ${{ env.ENV_FILE }}
           "
 
   set-partial-docker-compose-on-server:
@@ -98,14 +101,12 @@ jobs:
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           APP_PORT: ${{ vars.UMG_PORT }}
           ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}
-        run: |
-          bash ${{ github.workspace }}/scripts/generate-docker-compose-part.sh
+        run: bash scripts/generate-docker-compose-part.sh
 
       - name: Transfer partial docker-compose on server
         env:
-          DOCKER_COMPOSE_PART_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ vars.DOCKER_COMPOSE_PARTS_DIR_NAME }}/${{ env.DOCKER_COMPOSE_PART_FILENAME }}
-        run: |
-          scp ${{ github.workspace }}/scripts/${{ env.DOCKER_COMPOSE_PART_FILENAME }} ${{ env.SSH_DESTINATION }}:${{ env.DOCKER_COMPOSE_PART_FILE }}
+          DOCKER_COMPOSE_PART_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKER_COMPOSE_PART_FILENAME }}
+        run: scp scripts/${{ env.DOCKER_COMPOSE_PART_FILENAME }} ${{ env.SSH_DESTINATION }}:${{ env.DOCKER_COMPOSE_DIR }}}
 
   redeploy-webhook-call:
     name: Redeploy webhook call
