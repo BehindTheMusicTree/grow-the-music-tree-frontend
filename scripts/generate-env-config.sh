@@ -35,5 +35,3 @@ window._env_ = {
   VITE_SENTRY_IS_ACTIVE: "${SENTRY_IS_ACTIVE}"
 };
 EOF
-log_with_script_suffixe "Generated $ENV_CONFIG_FILE with the following content:"
-cat $ENV_CONFIG_FILE
