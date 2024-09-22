@@ -19,6 +19,8 @@ RUN chmod +x ./scripts/* && ./scripts/install-dependencies.sh && npm run build
 
 FROM node:20-alpine
 
+RUN apk add --no-cache bash
+
 ARG PROJECT_DIR
 ARG APP_PORT
 
@@ -44,4 +46,4 @@ COPY --from=build ${PROJECT_DIR}build ./build
 RUN npm install -g npm@10.5.2 && npm install -g serve
 
 # Set the entrypoint using shell form to allow environment variable expansion
-ENTRYPOINT ["sh", "-c", "./scripts/entrypoint.sh"]
+ENTRYPOINT ["bash", "-c", "./scripts/entrypoint.sh"]
