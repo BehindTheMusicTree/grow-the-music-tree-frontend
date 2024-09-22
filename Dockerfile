@@ -41,6 +41,7 @@ ENV PROJECT_DIR=$PROJECT_DIR \
 WORKDIR $PROJECT_DIR
 
 COPY ./scripts/* ./scripts/
+COPY ./public ./public
 RUN chmod +x ./scripts/* && ./scripts/install-dependencies.sh
 COPY --from=build ${PROJECT_DIR}build ./build
 RUN npm install -g npm@10.5.2 && npm install -g serve
