@@ -32,5 +32,10 @@ $SERVICE_NAME:
 	expose:
 	- $APP_PORT
 	env_file: $ENV_FILENAME
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:$APP_PORT || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
 EOF
 log_with_script_suffixe "Partial docker-compose file generated successfully."
