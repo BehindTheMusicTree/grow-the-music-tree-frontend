@@ -6,7 +6,7 @@ import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
 import InternalServerError from "./errors/InternalServerError";
 
 export default class ApiService {
-  static credentials = { username: config.username, password: config.password };
+  static credentials = { username: config.apiUsername, password: config.apiUserPassword };
   static errorSubscribers = [];
 
   static onError(callback) {
