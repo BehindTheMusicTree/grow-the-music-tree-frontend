@@ -37,13 +37,13 @@ main() {
     # SENTRY_AUTH_TOKEN is not needed in the Vite env file.
     # Sentry simply reads it from the environment.
 
-    VITE_ENV_FILE="${VITE_ENV_FILE_DIR}.env.test"
+    VITE_ENV_FILE="${VITE_ENV_FILE_DIR}.env"
     log_with_script_suffixe "Generating the Vite env file $VITE_ENV_FILE ..."
     cat << EOF > $VITE_ENV_FILE
 VITE_CONTACT_EMAIL=$CONTACT_EMAIL
 VITE_API_BASE_URL=$API_BASE_URL
 VITE_API_UMG_USERNAME=$API_UMG_USERNAME
-VITE_API_UMG_USER_PASSWORD=$API_UMG_USER_PASSWORD
+VITE_API_UMG_USER_PASSWORD='$API_UMG_USER_PASSWORD'
 VITE_SENTRY_IS_ACTIVE=$SENTRY_IS_ACTIVE
 EOF
     if [ $? -ne 0 ]; then
