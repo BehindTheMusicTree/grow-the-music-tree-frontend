@@ -7,7 +7,7 @@ log_with_script_suffixe() {
 check_script_vars_are_set() {
     REQUIRED_ENV_VARS=(
         ENV
-        API_CONTACT_EMAIL
+        CONTACT_EMAIL
         API_BASE_URL
         API_UMG_USERNAME
         API_UMG_USER_PASSWORD
@@ -28,7 +28,7 @@ log_with_script_suffixe "Generating $ENV_CONFIG_FILE file..."
 cat <<EOF > $ENV_CONFIG_FILE
 window._env_ = {
   VITE_ENV: "${ENV}",
-  VITE_API_CONTACT_EMAIL: "${API_CONTACT_EMAIL}",
+  VITE_CONTACT_EMAIL: "${CONTACT_EMAIL}",
   VITE_API_BASE_URL: "${API_BASE_URL}",
   VITE_API_UMG_USERNAME: "${API_UMG_USERNAME}",
   VITE_API_UMG_USER_PASSWORD: "${API_UMG_USER_PASSWORD}",

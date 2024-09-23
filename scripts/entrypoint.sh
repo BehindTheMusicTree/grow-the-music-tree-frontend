@@ -6,12 +6,13 @@ log_with_script_suffixe() {
 
 check_script_vars_are_set() {
     REQUIRED_NON_BOOL_VARS=(
-        "APP_PORT"
-        "API_CONTACT_EMAIL"
-        "API_BASE_URL"
-        "API_UMG_USERNAME"
-        "API_UMG_USER_PASSWORD"
-        "SENTRY_IS_ACTIVE"
+        APP_PORT
+        CONTACT_EMAIL
+        API_BASE_URL
+        API_UMG_USERNAME
+        API_UMG_USER_PASSWORD
+        SENTRY_IS_ACTIVE
+        SENTRY_AUTH_TOKEN
     )
     check_vars_are_set ${REQUIRED_NON_BOOL_VARS[@]} 2>&1
     if [ $? -ne 0 ]; then
@@ -28,16 +29,36 @@ check_script_vars_are_set() {
 }
 
 main() {
-    SCRIPTS_DIR=${PROJECT_DIR}scripts/
+    SCRIPTS_DIR=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}" || echo "${BASH_SOURCE[0]}")")" && pwd)/
     source ${SCRIPTS_DIR}utils.sh
 
     check_script_vars_are_set 2>&1
 
-    bash ${SCRIPTS_DIR}generate-env-config.sh
+    # SENTRY_AUTH_TOKEN is not needed in the Vite env file.
+    # Sentry simply reads it from the environment.
+
+    VITE_ENV_FILE="${VITE_ENV_FILE_DIR}.env.test"
+    log_with_script_suffixe "Generating the Vite env file $VITE_ENV_FILE ..."
+    cat << EOF > $VITE_ENV_FILE
+VITE_CONTACT_EMAIL=$CONTACT_EMAIL
+VITE_API_BASE_URL=$API_BASE_URL
+VITE_API_UMG_USERNAME=$API_UMG_USERNAME
+VITE_API_UMG_USER_PASSWORD=$API_UMG_USER_PASSWORD
+VITE_SENTRY_IS_ACTIVE=$SENTRY_IS_ACTIVE
+EOF
     if [ $? -ne 0 ]; then
-        log_with_script_suffixe "Failed to generate env-config.js file."
+        log_with_script_suffixe "ERROR: Failed to generate the Vite env file." >&2
         exit 1
     fi
+    log_with_script_suffixe "Vite env file generated successfully."
+
+    log_with_script_suffixe "Building the application..."
+    npm run build
+    if [ $? -ne 0 ]; then
+        log_with_script_suffixe "ERROR: Failed to build the application." >&2
+        exit 1
+    fi
+    log_with_script_suffixe "Application built successfully."
 
     exec serve -s build -l "$APP_PORT"
 } 

@@ -64,10 +64,11 @@ jobs:
           ssh ${{ env.SSH_DESTINATION }} "
             rm -f ${{ env.ENV_FILE }} &&
             echo 'ENV=TEST' >> $ENV_FILE &&
-            echo 'API_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
+            echo 'CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
             echo 'API_BASE_URL=https://${{ vars.DOMAIN_NAME }}/api/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
             echo 'API_UMG_USERNAME=${{ secrets.API_UMG_USERNAME }}' >> ${{ env.ENV_FILE }} &&
-            echo 'API_UMG_USER_PASSWORD=${{ secrets.API_UMG_USER_PASSWORD }}' >> ${{ env.ENV_FILE }}
+            echo 'API_UMG_USER_PASSWORD=${{ secrets.API_UMG_USER_PASSWORD }}' >> ${{ env.ENV_FILE }} &&
+            echo 'SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}' >> ${{ env.ENV_FILE }}
           "
 
   set-partial-docker-compose-on-server:

@@ -1,33 +1,36 @@
 #!/bin/bash
 
-SCRIPT_DIR=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}" || echo "${BASH_SOURCE[0]}")")" && pwd)/
+log_with_script_suffixe() {
+  	log "[Partial docker compose generator] $1"
+}
 
-required_vars=(
-  DOCKER_COMPOSE_PART_FILENAME
-  SERVICE_NAME
-  PROJECT_DIR
-  DOCKERHUB_USERNAME
-  IMAGE_REPO
-  APP_VERSION
-  CONTAINER_NAME
-  APP_PORT
-  ENV_FILENAME
+SCRIPT_DIR=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}" || echo "${BASH_SOURCE[0]}")")" && pwd)/
+source ${SCRIPT_DIR}utils.sh
+
+REQUIRED_SCRIPT_VAR=(
+	DOCKER_COMPOSE_PART_FILENAME
+	SERVICE_NAME
+	PROJECT_DIR
+	DOCKERHUB_USERNAME
+	IMAGE_REPO
+	APP_VERSION
+	CONTAINER_NAME
+	APP_PORT
+	ENV_FILENAME
 )
-for var in "${required_vars[@]}"; do
-  if [ -z "${!var}" ]; then
-    echo "$var must be set." >&2
-    exit 1
-  fi
+for var in ${REQUIRED_SCRIPT_VAR[@]}; do
+  	check_var_is_set $var
 done
 
 DOCKER_COMPOSE_PART_FILE="${SCRIPT_DIR}${DOCKER_COMPOSE_PART_FILENAME}"
-echo "Generating partial docker-compose file $DOCKER_COMPOSE_PART_FILE"
+log_with_script_suffixe "Generating partial docker-compose file $DOCKER_COMPOSE_PART_FILE"
 cat << EOF > $DOCKER_COMPOSE_PART_FILE
-  $SERVICE_NAME:
-    working_dir: $PROJECT_DIR
-    image: $DOCKERHUB_USERNAME/$IMAGE_REPO:$APP_VERSION
-    container_name: $CONTAINER_NAME
-    expose:
-      - $APP_PORT
-    env_file: $ENV_FILENAME
+$SERVICE_NAME:
+	working_dir: $PROJECT_DIR
+	image: $DOCKERHUB_USERNAME/$IMAGE_REPO:$APP_VERSION
+	container_name: $CONTAINER_NAME
+	expose:
+	- $APP_PORT
+	env_file: $ENV_FILENAME
 EOF
+log_with_script_suffixe "Partial docker-compose file generated successfully."
