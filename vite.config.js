@@ -22,6 +22,6 @@ export default defineConfig({
   },
   server: {
     host: true,
-    port: 5000,
+    port: 5000, // For development server
   },
 });
