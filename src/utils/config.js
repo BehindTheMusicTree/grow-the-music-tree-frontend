@@ -15,7 +15,7 @@ const config = {
 export default config;
 
 export function checkRequiredConfigVars() {
-  const requiredEnvVars = ["env", "apiBaseUrl", "username", "password", "contactEmail", "sentryIsActive"];
+  const requiredEnvVars = ["env", "apiBaseUrl", "apiUsername", "apiUserPassword", "contactEmail", "sentryIsActive"];
   const missingEnvVars = requiredEnvVars.filter((envVar) => !config[envVar]);
 
   if (missingEnvVars.length > 0) {

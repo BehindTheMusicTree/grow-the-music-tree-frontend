@@ -36,8 +36,6 @@ jobs:
           build-args: |
             PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
             APP_PORT=${{ vars.UMG_PORT }}
-          secrets: |
-            "sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}"
 
   set-env-variables-on-server:
     name: Set environment vars on server

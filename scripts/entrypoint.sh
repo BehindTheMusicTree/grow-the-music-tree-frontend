@@ -40,6 +40,7 @@ main() {
     VITE_ENV_FILE="${VITE_ENV_FILE_DIR}.env"
     log_with_script_suffixe "Generating the Vite env file $VITE_ENV_FILE ..."
     cat << EOF > $VITE_ENV_FILE
+VITE_ENV=$ENV
 VITE_CONTACT_EMAIL=$CONTACT_EMAIL
 VITE_API_BASE_URL=$API_BASE_URL
 VITE_API_UMG_USERNAME=$API_UMG_USERNAME
