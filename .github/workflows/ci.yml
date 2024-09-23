@@ -15,6 +15,7 @@ env:
   DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
   CONTAINER_ROOT_DIR: /home/app/
   DOCKERIZED_APP_ENV_FILENAME: .env_umg
+  BUILD_COMPLETE_FILENAME: build-complete.txt
 
 jobs:
   build-and-push-to-dockerhub:
@@ -36,6 +37,7 @@ jobs:
           build-args: |
             PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
             APP_PORT=${{ vars.UMG_PORT }}
+            BUILD_COMPLETE_FILENAME=${{ env.BUILD_COMPLETE_FILENAME }}
 
   set-env-variables-on-server:
     name: Set environment vars on server
@@ -76,7 +78,7 @@ jobs:
     environment:
       name: TEST
     env:
-      DOCKER_COMPOSE_PART_FILENAME: umg${{ vars.DOCKER_COMPOSE_PART_FILENAME_SUFFIXE }}
+      DOCKER_COMPOSE_PARTIAL_FILENAME: umg${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
 
     steps:
       - uses: actions/checkout@v4
@@ -91,7 +93,7 @@ jobs:
 
       - name: Generate partial docker compose file
         env:
-          DOCKER_COMPOSE_PART_FILENAME: ${{ env.DOCKER_COMPOSE_PART_FILENAME }}
+          DOCKER_COMPOSE_PARTIAL_FILENAME: ${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }}
           SERVICE_NAME: ${{ vars.UMG_SERVICE_NAME }}
           PROJECT_DIR: ${{ env.CONTAINER_ROOT_DIR }}
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
@@ -100,12 +102,13 @@ jobs:
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           APP_PORT: ${{ vars.UMG_PORT }}
           ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}
+          BUILD_COMPLETE_FILENAME: ${{ env.BUILD_COMPLETE_FILENAME }}
         run: bash scripts/generate-partial-docker-compose.sh
 
       - name: Transfer partial docker-compose on server
         env:
-          DOCKER_COMPOSE_PART_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKER_COMPOSE_PART_FILENAME }}
-        run: scp scripts/${{ env.DOCKER_COMPOSE_PART_FILENAME }} ${{ env.SSH_DESTINATION }}:${{ env.DOCKER_COMPOSE_DIR }}}
+          DOCKER_COMPOSE_PARTIAL_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }}
+        run: scp scripts/${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }} ${{ env.SSH_DESTINATION }}:${{ env.DOCKER_COMPOSE_DIR }}
 
   redeploy-webhook-call:
     name: Redeploy webhook call

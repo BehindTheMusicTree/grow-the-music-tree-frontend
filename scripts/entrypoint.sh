@@ -13,6 +13,7 @@ check_script_vars_are_set() {
         API_UMG_USER_PASSWORD
         SENTRY_IS_ACTIVE
         SENTRY_AUTH_TOKEN
+        BUILD_COMPLETE_FILENAME
     )
     check_vars_are_set ${REQUIRED_NON_BOOL_VARS[@]} 2>&1
     if [ $? -ne 0 ]; then
@@ -30,6 +31,7 @@ check_script_vars_are_set() {
 
 main() {
     SCRIPTS_DIR=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}" || echo "${BASH_SOURCE[0]}")")" && pwd)/
+    PROJECT_DIR=$(realpath "${SCRIPTS_DIR}..")/
     source ${SCRIPTS_DIR}utils.sh
 
     check_script_vars_are_set 2>&1
@@ -61,7 +63,8 @@ EOF
     fi
     log_with_script_suffixe "Application built successfully."
 
-    exec serve -s build -l "$APP_PORT"
+
+    touch ${PROJECT_DIR}${BUIL_COMPLETE_FILENAME}
 } 
 
 main "$@" 2>&1
