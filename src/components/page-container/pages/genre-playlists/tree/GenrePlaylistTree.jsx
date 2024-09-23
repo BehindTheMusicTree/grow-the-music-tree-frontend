@@ -482,8 +482,11 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .data(treeData.links())
       .enter()
       .append("path")
-      .attr("class", "fill-current stroke-current stroke-opacity-40 stroke-2")
-      .attr("d", linkGenerator);
+      .attr("d", linkGenerator)
+      .style("fill", "none") // Ensure no fill
+      .style("stroke", "black") // Set stroke color to red
+      .style("stroke-opacity", 1) // Set stroke opacity
+      .style("stroke-width", 2); // Set stroke width
 
     const nodes = svg
       .selectAll("g.node")
