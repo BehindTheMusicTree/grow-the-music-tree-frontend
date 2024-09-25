@@ -9,8 +9,7 @@ export default function GenrePlaylists() {
 
   return (
     <GenreGettingAssignedNewParentProvider>
-      <div className="mt-5 flex flex-col">
-        <h1>Genre Tree</h1>
+      <div className="mt-2 flex flex-col">
         <div
           className="mt-5 flex justify-center items-center text-center hover:bg-gray-400 hover:text-gray-800 cursor-pointer"
           style={{
