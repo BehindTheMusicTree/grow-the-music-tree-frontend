@@ -332,7 +332,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
       .html(function () {
         return ReactDOMServer.renderToString(
-          <div className="add-genre-label-container tree-action-label-container">Add genre child</div>
+          <div className="add-genre-label-container tree-action-label-container">Add sub-genre</div>
         );
       });
 
@@ -372,7 +372,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
       .html(function () {
         return ReactDOMServer.renderToString(
-          <div className="change-parent-label-container tree-action-label-container">New genre parent</div>
+          <div className="change-parent-label-container tree-action-label-container">Change parent</div>
         );
       });
   };
@@ -428,51 +428,54 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   };
 
   // Function to create a grid
-  function createGrid(svg, width, height, spacing) {
-    const gridGroup = svg.append("g").attr("class", "grid");
+  function createGrid(svg, width, height, spacing, gridIsHidden) {
+    if (!gridIsHidden) {
+      const gridGroup = svg.append("g").attr("class", "grid");
 
-    // Add horizontal lines and numbers
-    for (let y = 0; y <= height; y += spacing) {
-      gridGroup
-        .append("line")
-        .attr("x1", 0)
-        .attr("y1", y)
-        .attr("x2", width)
-        .attr("y2", y)
-        .attr("stroke", "#ccc")
-        .attr("stroke-width", 1);
+      // Add horizontal lines and numbers
+      for (let y = 0; y <= height; y += spacing) {
+        gridGroup
+          .append("line")
+          .attr("x1", 0)
+          .attr("y1", y)
+          .attr("x2", width)
+          .attr("y2", y)
+          .attr("stroke", "#ccc")
+          .attr("stroke-width", 1);
 
-      gridGroup
-        .append("text")
-        .attr("x", 5)
-        .attr("y", y - 5)
-        .attr("fill", "#000")
-        .attr("font-size", "10px")
-        .text(y);
-    }
+        gridGroup
+          .append("text")
+          .attr("x", 5)
+          .attr("y", y - 5)
+          .attr("fill", "#000")
+          .attr("font-size", "10px")
+          .text(y);
+      }
 
-    // Add vertical lines and numbers
-    for (let x = 0; x <= width; x += spacing) {
-      gridGroup
-        .append("line")
-        .attr("x1", x)
-        .attr("y1", 0)
-        .attr("x2", x)
-        .attr("y2", height)
-        .attr("stroke", "#ccc")
-        .attr("stroke-width", 1);
+      // Add vertical lines and numbers
+      for (let x = 0; x <= width; x += spacing) {
+        gridGroup
+          .append("line")
+          .attr("x1", x)
+          .attr("y1", 0)
+          .attr("x2", x)
+          .attr("y2", height)
+          .attr("stroke", "#ccc")
+          .attr("stroke-width", 1);
 
-      gridGroup
-        .append("text")
-        .attr("x", x + 5)
-        .attr("y", 15)
-        .attr("fill", "#000")
-        .attr("font-size", "10px")
-        .text(x);
+        gridGroup
+          .append("text")
+          .attr("x", x + 5)
+          .attr("y", 15)
+          .attr("fill", "#000")
+          .attr("font-size", "10px")
+          .text(x);
+      }
     }
   }
 
   useEffect(() => {
+    console.log("GenrePlaylistsTree useEffect");
     const root = buildTreeHierarchy();
 
     // Here in the tree layout, x is vertical and y is horizontal.
@@ -503,8 +506,6 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     });
     // Now in the tree layout, x is horizontal and y is vertical as in the svg logic.
 
-    const gridSpacing = 50;
-
     const svg = d3
       .select(svgRef.current)
       .append("svg")
@@ -512,7 +513,9 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("height", svgHeight.current)
       .append("g");
 
-    createGrid(svg, svgWidth.current, svgHeight.current, gridSpacing);
+    const gridSpacing = 50;
+    const gridIsHidden = true;
+    createGrid(svg, svgWidth.current, svgHeight.current, gridSpacing, gridIsHidden);
 
     const linkGenerator = d3
       .linkHorizontal()
