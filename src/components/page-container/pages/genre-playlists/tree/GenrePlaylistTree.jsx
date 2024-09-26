@@ -43,6 +43,8 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     useGenreGettingAssignedNewParent();
 
   const svgRef = useRef(null);
+  let svgWidth = useRef(0);
+  let svgHeight = useRef(0);
   const fileInputRef = useRef(null);
   const selectingFileGenreUuidRef = useRef(null);
 
@@ -60,26 +62,6 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .stratify()
       .id((d) => d.uuid)
       .parentId((d) => d.parent?.uuid || null)(genrePlaylistsTree);
-  };
-
-  const calculateHighestNodeX = (treeData) => {
-    let xMin = treeData.descendants()[0].x;
-    treeData.each((node) => {
-      if (node.x < xMin) {
-        xMin = node.x;
-      }
-    });
-    return xMin;
-  };
-
-  const calculateLowestNodeX = (treeData) => {
-    let xMax = treeData.descendants()[0].x;
-    treeData.each((node) => {
-      if (node.x > xMax) {
-        xMax = node.x;
-      }
-    });
-    return xMax;
   };
 
   const handlePlayPauseIconAction = (genrePlaylist) => {
@@ -407,7 +389,6 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         event.stopPropagation();
         const actionsContainer = group.select("#actions-container-" + genrePlaylistUuid);
         if (!actionsContainer.empty()) {
-          console.log("removing");
           actionsContainer.remove();
           return;
         } else {
@@ -446,36 +427,97 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     }
   };
 
+  // Function to create a grid
+  function createGrid(svg, width, height, spacing) {
+    const gridGroup = svg.append("g").attr("class", "grid");
+
+    // Add horizontal lines and numbers
+    for (let y = 0; y <= height; y += spacing) {
+      gridGroup
+        .append("line")
+        .attr("x1", 0)
+        .attr("y1", y)
+        .attr("x2", width)
+        .attr("y2", y)
+        .attr("stroke", "#ccc")
+        .attr("stroke-width", 1);
+
+      gridGroup
+        .append("text")
+        .attr("x", 5)
+        .attr("y", y - 5)
+        .attr("fill", "#000")
+        .attr("font-size", "10px")
+        .text(y);
+    }
+
+    // Add vertical lines and numbers
+    for (let x = 0; x <= width; x += spacing) {
+      gridGroup
+        .append("line")
+        .attr("x1", x)
+        .attr("y1", 0)
+        .attr("x2", x)
+        .attr("y2", height)
+        .attr("stroke", "#ccc")
+        .attr("stroke-width", 1);
+
+      gridGroup
+        .append("text")
+        .attr("x", x + 5)
+        .attr("y", 15)
+        .attr("fill", "#000")
+        .attr("font-size", "10px")
+        .text(x);
+    }
+  }
+
   useEffect(() => {
     const root = buildTreeHierarchy();
-    const treeData = d3.tree().nodeSize([VERTICAL_SEPARATOON_BETWEEN_NODES, HORIZONTAL_SEPARATOON_BETWEEN_NODES])(root);
 
-    const numberOfLevels = root.height;
+    // Here in the tree layout, x is vertical and y is horizontal.
+    const treeLayout = d3.tree().nodeSize([VERTICAL_SEPARATOON_BETWEEN_NODES, HORIZONTAL_SEPARATOON_BETWEEN_NODES]);
+    const treeData = treeLayout(root);
 
-    const svgWidth =
-      numberOfLevels * HORIZONTAL_SEPARATOON_BETWEEN_NODES +
+    const highestNodeVerticalCoordinate = d3.min(treeData.descendants(), (d) => d.x);
+    const highestVerticalCoordinate =
+      highestNodeVerticalCoordinate + RECT_BASE_DIMENSIONS.HEIGHT / 2 - ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2;
+    const lowestNodeVerticalCoordinate = d3.max(treeData.descendants(), (d) => d.x);
+    const lowestVerticalCoordinate =
+      lowestNodeVerticalCoordinate + RECT_BASE_DIMENSIONS.HEIGHT / 2 + ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2;
+    svgHeight.current = lowestVerticalCoordinate - highestVerticalCoordinate;
+
+    const maximumLevel = d3.max(treeData.descendants(), (d) => d.depth);
+    svgWidth.current =
+      maximumLevel * HORIZONTAL_SEPARATOON_BETWEEN_NODES +
       RECT_BASE_DIMENSIONS.WIDTH +
       MORE_ICON_WIDTH +
       ACTIONS_CONTAINER_DIMENSIONS.WIDTH;
-    const lowestNodeX = calculateLowestNodeX(treeData);
-    const highestNodeX = calculateHighestNodeX(treeData);
 
-    const xGap = lowestNodeX - highestNodeX;
-    const svgHeight = xGap + ACTIONS_CONTAINER_DIMENSIONS.HEIGHT;
+    // The tree layout has x as vertical and y as horizontal whereas svg logic is the opposite.
+    // Therefore, we need to swap x and y.
+    treeData.each(function (d) {
+      const tempX = d.x;
+      d.x = d.y;
+      d.y = tempX - highestVerticalCoordinate;
+    });
+    // Now in the tree layout, x is horizontal and y is vertical as in the svg logic.
 
-    const xExtremum = Math.max(Math.abs(lowestNodeX), Math.abs(highestNodeX));
-    const xShift = xExtremum - xGap / 2;
+    const gridSpacing = 50;
 
-    const svg = d3.select(svgRef.current).attr("width", svgWidth).attr("height", svgHeight);
+    const svg = d3
+      .select(svgRef.current)
+      .append("svg")
+      .attr("width", svgWidth.current)
+      .attr("height", svgHeight.current)
+      .append("g");
 
-    let nodeY;
-
-    let firstNodeXCorrected = treeData.descendants()[0].x - xShift;
+    createGrid(svg, svgWidth.current, svgHeight.current, gridSpacing);
 
     const linkGenerator = d3
       .linkHorizontal()
-      .x((d) => d.y + RECT_BASE_DIMENSIONS.WIDTH / 2)
-      .y((d) => d.x - firstNodeXCorrected + svgHeight / 2);
+      .x((d) => d.x + RECT_BASE_DIMENSIONS.WIDTH / 2)
+      .y((d) => d.y + RECT_BASE_DIMENSIONS.HEIGHT / 2);
 
     svg
       .selectAll("path.link")
@@ -496,10 +538,10 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("class", "node")
       .attr("id", (d) => "group-" + d.data.uuid)
       .attr("transform", function (d) {
-        nodeY = RECT_BASE_DIMENSIONS.WIDTH / 2 + HORIZONTAL_SEPARATOON_BETWEEN_NODES * d.depth;
-        return "translate(" + nodeY + "," + (d.x - firstNodeXCorrected + svgHeight / 2) + ")";
+        const translateX = d.x + RECT_BASE_DIMENSIONS.WIDTH / 2;
+        const translateY = d.y + RECT_BASE_DIMENSIONS.HEIGHT / 2;
+        return `translate(${translateX}, ${translateY})`;
       });
-
     nodes
       .append("rect")
       .attr("class", "node-base-rect")
@@ -598,7 +640,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   return (
     <div>
       <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
-      <svg ref={svgRef} width="600" height="400" className="mt-5"></svg>
+      <svg ref={svgRef} width={svgWidth.current} height={svgHeight.current} className="mt-5"></svg>
     </div>
   );
 }
