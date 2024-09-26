@@ -5,8 +5,7 @@ on:
     branches:
       - main
       - dev
-      - implement-put-genre-parent
-      - improve-env-vars
+      - fix/tree-not-displaying
   pull_request:
     branches: ["main", "dev"]
 

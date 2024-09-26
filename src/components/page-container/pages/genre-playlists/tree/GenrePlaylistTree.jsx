@@ -41,10 +41,10 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   ] = useState(null);
   const { genreUuidGettingAssignedNewParent, setGenreUuidGettingAssignedNewParent } =
     useGenreGettingAssignedNewParent();
+  const [svgWidth, setSvgWidth] = useState(0);
+  const [svgHeight, setSvgHeight] = useState(0);
 
   const svgRef = useRef(null);
-  let svgWidth = useRef(0);
-  let svgHeight = useRef(0);
   const fileInputRef = useRef(null);
   const selectingFileGenreUuidRef = useRef(null);
 
@@ -475,7 +475,6 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   }
 
   useEffect(() => {
-    console.log("GenrePlaylistsTree useEffect");
     const root = buildTreeHierarchy();
 
     // Here in the tree layout, x is vertical and y is horizontal.
@@ -488,14 +487,15 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     const lowestNodeVerticalCoordinate = d3.max(treeData.descendants(), (d) => d.x);
     const lowestVerticalCoordinate =
       lowestNodeVerticalCoordinate + RECT_BASE_DIMENSIONS.HEIGHT / 2 + ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2;
-    svgHeight.current = lowestVerticalCoordinate - highestVerticalCoordinate;
+    setSvgHeight(lowestVerticalCoordinate - highestVerticalCoordinate);
 
     const maximumLevel = d3.max(treeData.descendants(), (d) => d.depth);
-    svgWidth.current =
+    setSvgWidth(
       maximumLevel * HORIZONTAL_SEPARATOON_BETWEEN_NODES +
-      RECT_BASE_DIMENSIONS.WIDTH +
-      MORE_ICON_WIDTH +
-      ACTIONS_CONTAINER_DIMENSIONS.WIDTH;
+        RECT_BASE_DIMENSIONS.WIDTH +
+        MORE_ICON_WIDTH +
+        ACTIONS_CONTAINER_DIMENSIONS.WIDTH
+    );
 
     // The tree layout has x as vertical and y as horizontal whereas svg logic is the opposite.
     // Therefore, we need to swap x and y.
@@ -506,16 +506,11 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     });
     // Now in the tree layout, x is horizontal and y is vertical as in the svg logic.
 
-    const svg = d3
-      .select(svgRef.current)
-      .append("svg")
-      .attr("width", svgWidth.current)
-      .attr("height", svgHeight.current)
-      .append("g");
+    const svg = d3.select(svgRef.current).append("svg").attr("width", svgWidth).attr("height", svgHeight).append("g");
 
     const gridSpacing = 50;
     const gridIsHidden = true;
-    createGrid(svg, svgWidth.current, svgHeight.current, gridSpacing, gridIsHidden);
+    createGrid(svg, svgWidth, svgHeight, gridSpacing, gridIsHidden);
 
     const linkGenerator = d3
       .linkHorizontal()
@@ -638,12 +633,13 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     return () => {
       svg.selectAll("*").remove();
     };
-  }, [genrePlaylistsTree, playState, trackListOrigin, genreUuidGettingAssignedNewParent]);
+  }, [genrePlaylistsTree, playState, trackListOrigin, genreUuidGettingAssignedNewParent, svgWidth, svgHeight]);
 
   return (
     <div>
       <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
-      <svg ref={svgRef} width={svgWidth.current} height={svgHeight.current} className="mt-5"></svg>
+      <svg ref={svgRef} width={svgWidth} height={svgHeight} className="mt-5"></svg>
+      {/* <svg ref={svgRef} width="1000" height="1000" className="mt-5"></svg> */}
     </div>
   );
 }
