@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - dev
-      - fix/tree-not-displaying
+      - fix/post-track-on-test
   pull_request:
     branches: ["main", "dev"]
 
