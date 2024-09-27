@@ -19,7 +19,6 @@ export default defineConfig({
   build: {
     outDir: "build",
     sourcemap: true,
-    minify: false, // Disable minification for debugging
   },
   server: {
     host: true,

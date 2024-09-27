@@ -9,7 +9,7 @@ export default function Popup() {
   const { popupContentObject, hidePopup } = usePopup();
 
   let PopupChild;
-  switch (popupContentObject.constructor.name) {
+  switch (popupContentObject.type) {
     case "BadRequestPopupContentObject":
       PopupChild = BadRequestErrorPopupChild;
       break;
