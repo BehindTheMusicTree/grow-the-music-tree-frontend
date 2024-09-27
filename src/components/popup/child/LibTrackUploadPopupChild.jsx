@@ -52,7 +52,7 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
       }
     }
 
-    async function handleLibTrackToPosts(files, genreUuid) {
+    async function handleLibTracksToPost(files, genreUuid) {
       await Promise.allSettled(files.map((file) => handleLibTrackToPost(file, genreUuid)));
     }
 
@@ -63,7 +63,7 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
           [file.name]: { size: file.size, progress: 0, isPosting: false, requestErrors: {} },
         }));
       });
-      handleLibTrackToPosts(popupContentObject.files, popupContentObject.genreUuid).then(() => {
+      handleLibTracksToPost(popupContentObject.files, popupContentObject.genreUuid).then(() => {
         setRefreshLibTracksSignal(1);
         setIsPosting(false);
       });
