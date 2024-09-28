@@ -32,10 +32,9 @@ export function PlayerProvider({ children }) {
   };
 
   useEffect(() => {
+    console.log("playerLibTrackObject: ", playerLibTrackObject);
     if (playerLibTrackObject) {
-      if (playState === PLAY_STATES.LOADING) {
-        setResetPlayerSeekSignal(1);
-      }
+      setResetPlayerSeekSignal(1);
     }
   }, [playerLibTrackObject]);
 

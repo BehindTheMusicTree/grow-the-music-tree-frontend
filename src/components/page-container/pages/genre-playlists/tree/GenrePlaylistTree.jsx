@@ -251,7 +251,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .append("foreignObject")
       .attr("x", ACTIONS_CONTAINER_X_OFFSET)
       .attr("y", actionsContainerY)
-      .attr("width", ACTION_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
       .attr("height", ACTION_CONTAINER_DIMENSIONS.HEIGHT)
       .attr("dominant-baseline", "middle")
       .html(function (d) {
