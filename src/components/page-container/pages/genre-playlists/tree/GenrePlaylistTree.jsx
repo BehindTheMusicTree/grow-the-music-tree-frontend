@@ -424,7 +424,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
             </div>
           );
         })
-        .on("click", handleMoreAction);
+        .on("mouseenter", handleMoreAction);
 
       group.on("mouseleave", function (event, d) {
         setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(null);
