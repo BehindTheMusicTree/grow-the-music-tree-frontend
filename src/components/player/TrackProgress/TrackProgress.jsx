@@ -16,6 +16,8 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
   let rafIdRef = useRef(null);
   let previousSeekRef = useRef(null);
 
+  const PROGRESS_SEEK_MAX_WHEN_NO_PLAYER = 1;
+
   const handleLoadError = (id, errorCode) => {
     let errorMessage = "";
 
@@ -87,6 +89,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
   };
 
   useEffect(() => {
+    console.log("playState: ", playState);
     if (playState === PLAY_STATES.PLAYING) {
       if (isSeeking) {
         cancelRaf();
@@ -109,6 +112,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
 
   useEffect(() => {
     if (resetPlayerSeekSignal) {
+      console.log("Resetting player seek");
       previousSeekRef.current = 0;
       setSeek(0);
       setResetPlayerSeekSignal(0);
@@ -130,30 +134,30 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
 
   return (
     <div className="flex flex justify-center items-center w-full">
-      <ReactHowler
-        ref={playerRef}
-        src={[playerLibTrackObject.blobUrl]}
-        html5={true}
-        playing={playState === PLAY_STATES.PLAYING}
-        format={[playerLibTrackObject.libraryTrack.file.extension.replace(".", "")]}
-        onLoadError={handleLoadError}
-        onEnd={handleTrackEnd}
-        volume={volume}
-      />
-      <div className="w-14 text-right">{formatTime(seek)}</div>
-      {playerRef.current ? (
-        <input
-          className="progress-bar ml-2.5 mr-2.5 w-full"
-          type="range"
-          min="0"
-          max={Math.floor(playerRef.current.duration())}
-          value={seek}
-          onChange={handleSeekingChange}
-          onMouseDown={handleSeekMouseDown}
-          onMouseUp={handleLeaveSeeking}
-          onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
+      {playState !== PLAY_STATES.LOADING ? (
+        <ReactHowler
+          ref={playerRef}
+          src={[playerLibTrackObject.blobUrl]}
+          html5={true}
+          playing={playState === PLAY_STATES.PLAYING}
+          format={[playerLibTrackObject.libraryTrack.file.extension.replace(".", "")]}
+          onLoadError={handleLoadError}
+          onEnd={handleTrackEnd}
+          volume={volume}
         />
       ) : null}
+      <div className="w-14 text-right">{formatTime(seek)}</div>
+      <input
+        className="progress-bar ml-2.5 mr-2.5 w-full"
+        type="range"
+        min="0"
+        max={playerRef ? Math.floor(playerLibTrackObject.libraryTrack.durationInSec) : PROGRESS_SEEK_MAX_WHEN_NO_PLAYER}
+        value={playerRef ? seek : PROGRESS_SEEK_MAX_WHEN_NO_PLAYER}
+        onChange={handleSeekingChange}
+        onMouseDown={handleSeekMouseDown}
+        onMouseUp={handleLeaveSeeking}
+        onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
+      />
       <div className="w-14 text-left">{formatTime(playerRef.current ? playerRef.current.duration() : 0)}</div>
     </div>
   );

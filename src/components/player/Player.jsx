@@ -18,7 +18,8 @@ export default function Player() {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
   const { setIsTrackListSidebarVisible } = useTrackListSidebarVisibility();
-  const { playerLibTrackObject, handlePlayPauseAction, playState, setResetPlayerSeekSignal } = usePlayer();
+  const { playerLibTrackObject, handlePlayPauseAction, playState, setPlayState, setResetPlayerSeekSignal } =
+    usePlayer();
 
   const { toNextTrack, toPreviousTrack } = useTrackList();
 
@@ -34,10 +35,13 @@ export default function Player() {
   };
 
   const handleTrackEnd = () => {
+    console.log("Track ended");
     if (playerLibTrackObject.hasNext) {
+      console.log("Has next");
       toNextTrack();
     } else {
-      setResetPlayerSeekSignal(1);
+      console.log("stop");
+      setPlayState(PLAY_STATES.STOPPED);
     }
   };
 
@@ -52,10 +56,6 @@ export default function Player() {
       toPreviousTrack();
     }
   };
-
-  // useEffect(() => {
-  //   setResetPlayerSeekSignal(1);
-  // }, [playerLibTrackObject]);
 
   return (
     <div className="w-full h-player fixed bottom-0 flex justify-between p-2 bg-black text-white text-sm">
