@@ -59,6 +59,16 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
     }
   };
 
+  const cancelRaf = () => {
+    raf.cancel(rafIdRef.current);
+  };
+
+  useEffect(() => {
+    return () => {
+      cancelRaf();
+    };
+  }, []);
+
   const renderSeekPosition = () => {
     if (playerRef.current) {
       const currentSeek = playerRef.current.seek();
@@ -76,16 +86,6 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
     }
   };
 
-  const cancelRaf = () => {
-    raf.cancel(rafIdRef.current);
-  };
-
-  useEffect(() => {
-    return () => {
-      cancelRaf();
-    };
-  }, []);
-
   useEffect(() => {
     if (playState === PLAY_STATES.PLAYING) {
       if (isSeeking) {
@@ -97,19 +97,36 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
         renderSeekPosition();
       }
     } else if (playState === PLAY_STATES.PAUSED && !isSeeking) {
-      playerRef.current.seek(seek);
+      cancelRaf();
     } else if (playState === PLAY_STATES.STOPPED && !isSeeking && seek > 0) {
       setPlayState(PLAY_STATES.PAUSED);
     }
+
+    return () => {
+      cancelRaf();
+    };
   }, [isSeeking, playState]);
 
   useEffect(() => {
     if (resetPlayerSeekSignal) {
-      previousSeekRef.current = null;
+      previousSeekRef.current = 0;
       setSeek(0);
       setResetPlayerSeekSignal(0);
     }
   }, [resetPlayerSeekSignal]);
+
+  useEffect(() => {
+    if (seek === 0) {
+      if (playState === PLAY_STATES.LOADING) {
+        setPlayState(PLAY_STATES.PLAYING);
+      } else if (playState === PLAY_STATES.PAUSED) {
+        playerRef.current.seek(0);
+        setPlayState(PLAY_STATES.STOPPED);
+      } else if (playState === PLAY_STATES.PLAYING) {
+        playerRef.current.seek(0);
+      }
+    }
+  }, [seek]);
 
   return (
     <div className="flex flex justify-center items-center w-full">
