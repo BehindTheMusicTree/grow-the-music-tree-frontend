@@ -59,16 +59,11 @@ export function TrackListProvider({ children }) {
   };
 
   useEffect(() => {
-    console.log(
-      `TrackListProvider useEffect origin: ${origin}, playingLibTrackPosition: ${playingLibTrackPosition} trackList: ${trackList}`
-    );
     if (trackList && playState === PLAY_STATES.LOADING) {
-      console.log("1st if");
       playLibTrackAtPosition(1);
     }
 
     if (trackList && trackList.length > playingLibTrackPosition - 1) {
-      console.log("2nd if");
       setLibTrackToPlay(
         trackList[playingLibTrackPosition - 1].libraryTrack,
         trackList.length > playingLibTrackPosition,

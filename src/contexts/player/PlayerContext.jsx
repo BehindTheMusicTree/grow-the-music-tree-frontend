@@ -13,7 +13,6 @@ export function PlayerProvider({ children }) {
 
   const setLibTrackToPlay = async (libTrack, hasNext, hasPrevious) => {
     const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(libTrack.relativeUrl);
-    setPlayState(PLAY_STATES.PLAYING);
     setPlayerLibTrackObject({
       libraryTrack: libTrack,
       blobUrl: playingLibTrackBlobUrl,
@@ -36,6 +35,7 @@ export function PlayerProvider({ children }) {
   useEffect(() => {
     if (playerLibTrackObject) {
       if (playState === PLAY_STATES.LOADING) {
+        console.log("setplaying");
         setPlayState(PLAY_STATES.PLAYING);
       }
     }
