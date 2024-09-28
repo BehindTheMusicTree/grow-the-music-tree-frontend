@@ -68,19 +68,32 @@ export default function Player() {
       </div>
       <div className="flex-2 flex flex-col justify-center items-center">
         <div className="flex flex-row items-center justify-center w-full">
-          <Button className="player-control-button" onClick={handleBackwardClick}>
+          <Button
+            className={`player-control-button ${
+              playState === PLAY_STATES.LOADING ? "player-control-button-disabled" : ""
+            }`}
+            onClick={playState === PLAY_STATES.LOADING ? null : handleBackwardClick}
+            disabled={playState === PLAY_STATES.LOADING}
+          >
             <FaStepBackward />
           </Button>
           <Button
             className={`player-control-button text-1.5xl py-4 mx-1
-            ${playState !== PLAY_STATES.PLAYING ? "pl-play-l-offset pr-play-r-offset" : "px-4"}`}
-            onClick={handlePlayPauseAction}
+            ${playState !== PLAY_STATES.PLAYING ? "pl-play-l-offset pr-play-r-offset" : "px-4"}
+            ${playState === PLAY_STATES.LOADING ? "player-control-button-disabled" : ""}`}
+            onClick={playState === PLAY_STATES.LOADING ? null : handlePlayPauseAction}
           >
             <div className="text-1.5xl">{playState === PLAY_STATES.PLAYING ? <FaPause /> : <FaPlay />}</div>
           </Button>
           <Button
-            className={playerLibTrackObject.hasNext ? "player-control-button" : "player-control-button-disabled"}
-            onClick={handleForwardClick}
+            className={
+              playState !== PLAY_STATES.LOADING
+                ? playerLibTrackObject.hasNext
+                  ? "player-control-button"
+                  : "player-control-button-disabled"
+                : "player-control-button-disabled"
+            }
+            onClick={playState === PLAY_STATES.LOADING ? null : handleForwardClick}
           >
             <FaStepForward />
           </Button>
