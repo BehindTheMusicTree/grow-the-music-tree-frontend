@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolumeUp, faListUl } from "@fortawesome/free-solid-svg-icons";
@@ -18,8 +18,14 @@ export default function Player() {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
   const { setIsTrackListSidebarVisible } = useTrackListSidebarVisibility();
-  const { playerLibTrackObject, handlePlayPauseAction, playState, setPlayState, setResetPlayerSeekSignal } =
-    usePlayer();
+  const {
+    playerLibTrackObject,
+    handlePlayPauseAction,
+    playState,
+    setPlayState,
+    setStopProgressAnimationSignal,
+    setResetSeekSignal,
+  } = usePlayer();
 
   const { toNextTrack, toPreviousTrack } = useTrackList();
 
@@ -46,16 +52,25 @@ export default function Player() {
   };
 
   const handleForwardClick = () => {
+    setStopProgressAnimationSignal(1);
     toNextTrack();
   };
 
   const handleBackwardClick = () => {
     if (!playerLibTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
-      setResetPlayerSeekSignal(1);
+      setStopProgressAnimationSignal(1);
+      setResetSeekSignal(1);
     } else {
       toPreviousTrack();
     }
   };
+
+  useEffect(() => {
+    if (playerLibTrackObject) {
+      console.log("Player lib track object changed, resetting seek");
+      setResetSeekSignal(1);
+    }
+  }, [playerLibTrackObject]);
 
   return (
     <div className="w-full h-player fixed bottom-0 flex justify-between p-2 bg-black text-white text-sm">
