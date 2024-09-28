@@ -8,8 +8,15 @@ import { PLAY_STATES } from "../../../utils/constants";
 import { formatTime } from "../../../utils";
 
 export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek }) {
-  const { playerLibTrackObject, resetPlayerSeekSignal, setResetPlayerSeekSignal, playState, setPlayState } =
-    usePlayer();
+  const {
+    playerLibTrackObject,
+    stopProgressAnimationSignal,
+    setStopProgressAnimationSignal,
+    resetSeekSignal,
+    setResetSeekSignal,
+    playState,
+    setPlayState,
+  } = usePlayer();
   const [isSeeking, setIsSeeking] = useState(false);
 
   const playerRef = useRef(null);
@@ -89,11 +96,10 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
   };
 
   useEffect(() => {
-    console.log("playState: ", playState);
     if (playState === PLAY_STATES.PLAYING) {
       if (isSeeking) {
         cancelRaf();
-      } else if (seek >= Math.floor(playerLibTrackObject.duration)) {
+      } else if (seek >= Math.floor(playerLibTrackObject.durationInSec)) {
         handleTrackEnd();
       } else {
         playerRef.current.seek(seek);
@@ -104,20 +110,22 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
     } else if (playState === PLAY_STATES.STOPPED && !isSeeking && seek > 0) {
       setPlayState(PLAY_STATES.PAUSED);
     }
-
-    return () => {
-      cancelRaf();
-    };
   }, [isSeeking, playState]);
 
   useEffect(() => {
-    if (resetPlayerSeekSignal) {
-      console.log("Resetting player seek");
+    if (stopProgressAnimationSignal) {
+      cancelRaf();
+      setStopProgressAnimationSignal(0);
+    }
+  }, [stopProgressAnimationSignal]);
+
+  useEffect(() => {
+    if (resetSeekSignal) {
       previousSeekRef.current = 0;
       setSeek(0);
-      setResetPlayerSeekSignal(0);
+      setResetSeekSignal(0);
     }
-  }, [resetPlayerSeekSignal]);
+  }, [resetSeekSignal]);
 
   useEffect(() => {
     if (seek === 0) {
@@ -128,6 +136,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
         setPlayState(PLAY_STATES.STOPPED);
       } else if (playState === PLAY_STATES.PLAYING) {
         playerRef.current.seek(0);
+        renderSeekPosition();
       }
     }
   }, [seek]);
@@ -158,7 +167,9 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
         onMouseUp={handleLeaveSeeking}
         onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
       />
-      <div className="w-14 text-left">{formatTime(playerRef.current ? playerRef.current.duration() : 0)}</div>
+      <div className="w-14 text-left">
+        {formatTime(playerRef.current ? playerLibTrackObject.libraryTrack.durationInSec : 0)}
+      </div>
     </div>
   );
 }

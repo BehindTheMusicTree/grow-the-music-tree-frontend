@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState } from "react";
 import PropTypes from "prop-types";
 
 import { PLAY_STATES } from "../../utils/constants";
@@ -8,7 +8,8 @@ export const PlayerContext = createContext();
 
 export function PlayerProvider({ children }) {
   const [playerLibTrackObject, setPlayerLibTrackObject] = useState();
-  const [resetPlayerSeekSignal, setResetPlayerSeekSignal] = useState(0);
+  const [stopProgressAnimationSignal, setStopProgressAnimationSignal] = useState(0);
+  const [resetSeekSignal, setResetSeekSignal] = useState(0);
   const [playState, setPlayState] = useState(PLAY_STATES.STOPPED);
 
   const setLibTrackToPlay = async (libTrack, hasNext, hasPrevious) => {
@@ -31,13 +32,6 @@ export function PlayerProvider({ children }) {
     }
   };
 
-  useEffect(() => {
-    console.log("playerLibTrackObject: ", playerLibTrackObject);
-    if (playerLibTrackObject) {
-      setResetPlayerSeekSignal(1);
-    }
-  }, [playerLibTrackObject]);
-
   return (
     <PlayerContext.Provider
       value={{
@@ -46,8 +40,10 @@ export function PlayerProvider({ children }) {
         playState,
         setPlayState,
         handlePlayPauseAction,
-        resetPlayerSeekSignal,
-        setResetPlayerSeekSignal,
+        resetSeekSignal,
+        setResetSeekSignal,
+        stopProgressAnimationSignal,
+        setStopProgressAnimationSignal,
         setLibTrackToPlay,
       }}
     >
