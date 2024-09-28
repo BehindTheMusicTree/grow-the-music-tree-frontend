@@ -31,6 +31,7 @@ export function TrackListProvider({ children }) {
   const playNewTrackListFromLibTrackUuid = async (uuid) => {
     setPlayState(PLAY_STATES.LOADING);
     setOrigin(null);
+    setTrackList(null);
     const newLibTrackPlayObject = await ApiService.postPlay(uuid);
     setOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.LIB_TRACK, newLibTrackPlayObject.contentObject));
     setTrackList([{ potition: "1", libraryTrack: newLibTrackPlayObject.contentObject }]);
@@ -39,6 +40,7 @@ export function TrackListProvider({ children }) {
   const playNewTrackListFromPlaylistUuid = async (uuid) => {
     setPlayState(PLAY_STATES.LOADING);
     setOrigin(null);
+    setTrackList(null);
     const newPlaylistPlayObject = await ApiService.postPlay(uuid);
     setOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.PLAYLIST, newPlaylistPlayObject.contentObject));
     setTrackList(newPlaylistPlayObject.contentObject.libraryTracks);
@@ -57,11 +59,16 @@ export function TrackListProvider({ children }) {
   };
 
   useEffect(() => {
+    console.log(
+      `TrackListProvider useEffect origin: ${origin}, playingLibTrackPosition: ${playingLibTrackPosition} trackList: ${trackList}`
+    );
     if (trackList && playState === PLAY_STATES.LOADING) {
+      console.log("1st if");
       playLibTrackAtPosition(1);
     }
 
     if (trackList && trackList.length > playingLibTrackPosition - 1) {
+      console.log("2nd if");
       setLibTrackToPlay(
         trackList[playingLibTrackPosition - 1].libraryTrack,
         trackList.length > playingLibTrackPosition,

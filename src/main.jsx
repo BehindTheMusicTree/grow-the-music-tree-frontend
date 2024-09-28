@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import ReactDOM from "react-dom/client";
 import * as Sentry from "@sentry/react";
 
@@ -31,21 +31,21 @@ if (import.meta.env.VITE_SENTRY_IS_ACTIVE == true) {
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <PopupProvider>
-      <GenrePlaylistsProvider>
-        <PlayerProvider>
-          <TrackListProvider>
-            {import.meta.env.VITE_SENTRY_IS_ACTIVE === true ? (
-              <Sentry.ErrorBoundary fallback={"An error has occurred"}>
-                <App />
-              </Sentry.ErrorBoundary>
-            ) : (
+  // <React.StrictMode>
+  <PopupProvider>
+    <GenrePlaylistsProvider>
+      <PlayerProvider>
+        <TrackListProvider>
+          {import.meta.env.VITE_SENTRY_IS_ACTIVE === true ? (
+            <Sentry.ErrorBoundary fallback={"An error has occurred"}>
               <App />
-            )}
-          </TrackListProvider>
-        </PlayerProvider>
-      </GenrePlaylistsProvider>
-    </PopupProvider>
-  </React.StrictMode>
+            </Sentry.ErrorBoundary>
+          ) : (
+            <App />
+          )}
+        </TrackListProvider>
+      </PlayerProvider>
+    </GenrePlaylistsProvider>
+  </PopupProvider>
+  // </React.StrictMode>
 );
