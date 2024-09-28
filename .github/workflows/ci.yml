@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - dev
-      - fix/post-track-on-test
+      - fix/rating-id
   pull_request:
     branches: ["main", "dev"]
 
