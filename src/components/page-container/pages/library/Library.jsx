@@ -100,7 +100,7 @@ export default function Library() {
                   }}
                 />
               </td>
-              <td className="library-item">{formatTime(libTrack.duration)}</td>
+              <td className="library-item">{formatTime(libTrack.durationInSec)}</td>
               <td className="library-item text-center">{libTrack.file.extension.replace(".", "")}</td>
               <td className="library-item text-center">{libTrack.file.bitrateInKbps} kbps</td>
               <td className="library-item text-center">{libTrack.playCount}</td>

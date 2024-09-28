@@ -62,7 +62,7 @@ export default function TrackItem({ playlistLibTrackRelationObject }) {
         )}
       </div>
       <div className="duration flex text-base w-16 items-center justify-center">
-        {formatTime(playlistLibTrackRelationObject.libraryTrack.duration)}
+        {formatTime(playlistLibTrackRelationObject.libraryTrack.durationInSec)}
       </div>
       <div
         className="edit flex text-base w-6 items-center justify-center mr-2 cursor-pointer"
