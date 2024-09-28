@@ -26,6 +26,7 @@ export default {
       },
       maxWidth: {
         xl: "44rem",
+        trackListName: "440px",
       },
       scale: {
         120: "1.2",

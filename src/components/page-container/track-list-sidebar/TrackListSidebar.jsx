@@ -1,4 +1,4 @@
-import TrackItem from "./track-item/TrackItem";
+import TrackItem from "./TrackItem";
 import { capitalizeFirstLetter } from "../../../utils";
 import { useTrackList } from "../../../contexts/track-list/useTrackList";
 import { useTrackListSidebarVisibility } from "../../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
@@ -13,13 +13,15 @@ export default function TrackListSidebar() {
       <div className="header flex h-16 px-4 py-2 text-gray-400">
         <div className="origin flex text-xl ">
           <div className="from h-auto flex flex-col justify-center items-center mr-2">From</div>
-          <div className="name flex flex-col justify-center items-center text-gray-300 font-bold pr-2">
-            {origin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST
-              ? origin.object.name
-              : `${origin.object.title} ` + (origin.object.artist ? `by ${origin.object.artist.name}` : "")}
+          <div className="name-container flex flex-col justify-center items-center text-gray-300 font-bold pr-2 max-w-trackListName text-overflow">
+            <div className="name text-overflow">
+              {origin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST
+                ? origin.object.name
+                : `${origin.object.title} ` + (origin.object.artist ? `by ${origin.object.artist.name}` : "")}
+            </div>
           </div>
         </div>
-        <div className="info flex flex-col justify-center items-center text-m pt-1">
+        <div className="info flex flex-col justify-center items-center text-m pt-1 mr-2">
           {origin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST
             ? "• " + capitalizeFirstLetter(origin.object.type) + " playlist • "
             : "• track playlist • "}
