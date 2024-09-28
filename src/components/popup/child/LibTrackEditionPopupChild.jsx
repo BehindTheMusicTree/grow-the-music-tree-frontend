@@ -87,7 +87,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hide }) 
             <label className="popup-content-label">
               <span>Added on:</span>
               <div className="popup-content-input-readonly inline-block mr-1">
-                {new Date(popupContentObject.libTrack.addedOn).toLocaleDateString()}
+                {new Date(popupContentObject.libTrack.createdOn).toLocaleDateString()}
               </div>
               <span className="flex-grow"></span>
             </label>
