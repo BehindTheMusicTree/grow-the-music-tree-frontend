@@ -23,7 +23,6 @@ export function PlayerProvider({ children }) {
 
   const handlePlayPauseAction = () => {
     if (playState === PLAY_STATES.STOPPED) {
-      setResetPlayerSeekSignal(1);
       setPlayState(PLAY_STATES.PLAYING);
     } else if (playState === PLAY_STATES.PLAYING) {
       setPlayState(PLAY_STATES.PAUSED);
@@ -35,8 +34,7 @@ export function PlayerProvider({ children }) {
   useEffect(() => {
     if (playerLibTrackObject) {
       if (playState === PLAY_STATES.LOADING) {
-        console.log("setplaying");
-        setPlayState(PLAY_STATES.PLAYING);
+        setResetPlayerSeekSignal(1);
       }
     }
   }, [playerLibTrackObject]);
