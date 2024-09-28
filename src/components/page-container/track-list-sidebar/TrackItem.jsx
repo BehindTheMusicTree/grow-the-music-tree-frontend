@@ -1,12 +1,12 @@
 import PropTypes from "prop-types";
 import { MdMoreVert } from "react-icons/md";
 
-import { formatTime } from "../../../../utils";
-import LibTrackEditionPopupContentObject from "../../../../models/popup-content-object/LibTrackEditionPopupContentObject";
-import { usePopup } from "../../../../contexts/popup/usePopup";
-import { usePlayer } from "../../../../contexts/player/usePlayer";
-import { useTrackList } from "../../../../contexts/track-list/useTrackList";
-import LibTrackPositionPlayPause from "../../../utils/LibTrackPositionPlayPause";
+import { formatTime } from "../../../utils";
+import LibTrackEditionPopupContentObject from "../../../models/popup-content-object/LibTrackEditionPopupContentObject";
+import { usePopup } from "../../../contexts/popup/usePopup";
+import { usePlayer } from "../../../contexts/player/usePlayer";
+import { useTrackList } from "../../../contexts/track-list/useTrackList";
+import LibTrackPositionPlayPause from "../../utils/LibTrackPositionPlayPause";
 
 export default function TrackItem({ playlistLibTrackRelationObject }) {
   const { showPopup } = usePopup();
@@ -35,7 +35,7 @@ export default function TrackItem({ playlistLibTrackRelationObject }) {
         uuid={playlistLibTrackRelationObject.libraryTrack.uuid}
         handlePlayPauseClick={handlePlayPauseClick}
       />
-      <div className="title-artist-container flex flex-col items-start justify-center w-1/2 text-overflow">
+      <div className="title-artist-container flex flex-col items-start justify-center w-1/2">
         <div className="title text-lg font-bold tnbvmm ext-gray-300 text-overflow">
           {playlistLibTrackRelationObject.libraryTrack.title}
         </div>
