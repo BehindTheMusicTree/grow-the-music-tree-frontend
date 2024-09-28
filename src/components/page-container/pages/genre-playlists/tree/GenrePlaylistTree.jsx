@@ -19,7 +19,7 @@ import {
   HORIZONTAL_SEPARATOON_BETWEEN_NODES,
   MORE_ICON_WIDTH,
   ACTIONS_CONTAINER_X_OFFSET,
-  ACTIONS_CONTAINER_DIMENSIONS,
+  ACTIONS_CONTAINER_DIMENSIONS_MAX,
   ACTION_CONTAINER_DIMENSIONS,
   ACTION_ICON_SIZE,
   ACTION_ICON_CONTAINER_DIMENSIONS,
@@ -36,7 +36,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   const { handleGenreAddAction: handleAddGenreAction, updateGenreParent } = useGenrePlaylists();
   const { playNewTrackListFromPlaylistUuid, origin: trackListOrigin } = useTrackList();
   const [
-    previousRenderingVisibleActionsContainerGenrePlaylistUuid,
+    previousRenderingVisibleActionsContainerGenrePlaylist,
     setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
   ] = useState(null);
   const { genreUuidGettingAssignedNewParent, setGenreUuidGettingAssignedNewParent } =
@@ -83,17 +83,23 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     }
   };
 
-  const addActionsContainer = (genrePlaylistUuid) => {
-    const group = d3.select("#group-" + genrePlaylistUuid);
-    let actionsContainerGroup = group.append("g").attr("id", "actions-container-" + genrePlaylistUuid);
+  const addActionsContainer = (genrePlaylist) => {
+    const group = d3.select("#group-" + genrePlaylist.uuid);
+    let actionsContainerGroup = group.append("g").attr("id", "actions-container-" + genrePlaylist.uuid);
+
+    const isGenreless = !genrePlaylist.criteria;
+    const actionsContainerHeight = isGenreless
+      ? ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT - 2 * ACTION_CONTAINER_DIMENSIONS.HEIGHT
+      : ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT;
+    const actionsContainerY = -actionsContainerHeight / 2;
 
     actionsContainerGroup
       .append("rect")
       .attr("id", "actions-background")
       .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2)
-      .attr("width", ACTIONS_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("height", ACTIONS_CONTAINER_DIMENSIONS.HEIGHT)
+      .attr("y", actionsContainerY)
+      .attr("width", ACTIONS_CONTAINER_DIMENSIONS_MAX.WIDTH)
+      .attr("height", actionsContainerHeight)
       .attr("fill", RECTANGLE_COLOR);
 
     actionsContainerGroup
@@ -108,7 +114,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
           " L " +
           ACTIONS_CONTAINER_X_OFFSET +
           " -" +
-          ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 +
+          actionsContainerHeight / 2 +
           " L " +
           ACTIONS_CONTAINER_X_OFFSET +
           " -" +
@@ -129,7 +135,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
           " L " +
           ACTIONS_CONTAINER_X_OFFSET +
           " " +
-          ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 +
+          actionsContainerHeight / 2 +
           " L " +
           ACTIONS_CONTAINER_X_OFFSET +
           " " +
@@ -138,45 +144,87 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       )
       .attr("fill", "RGBA(0, 0, 0, 0)");
 
-    const uploadTrackGroup = actionsContainerGroup
-      .append("g")
-      .attr("class", "upload-track-container cursor-pointer")
-      .on("click", function (event, d) {
-        event.stopPropagation();
-        selectingFileGenreUuidRef.current = d.data.criteria.uuid;
-        fileInputRef.current.click();
-        group.dispatch("mouseleave");
-      })
-      .on("mouseover", function () {
-        d3.select(this).selectAll("div").classed("bg-gray-500", true);
-      })
-      .on("mouseout", function () {
-        d3.select(this).selectAll("div").classed("bg-gray-500", false);
-      });
+    if (!isGenreless) {
+      const addGenreContainerGroup = actionsContainerGroup
+        .append("g")
+        .attr("class", "add-genre-container cursor-pointer")
+        .on("click", function (event, d) {
+          group.dispatch("mouseleave");
+          handleAddGenreAction(event, d.data.criteria.uuid);
+        })
+        .on("mouseover", function () {
+          d3.select(this).selectAll("div").classed("bg-gray-500", true);
+        })
+        .on("mouseout", function () {
+          d3.select(this).selectAll("div").classed("bg-gray-500", false);
+        });
 
-    uploadTrackGroup
-      .append("foreignObject")
-      .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2)
-      .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
-      .html(function () {
-        return ReactDOMServer.renderToString(
-          <div className="upload-track-icon-container h-full w-full flex items-center justify-center">
-            <FaFileUpload className="tree-icon" size={ACTION_ICON_SIZE} color="white" />
-          </div>
-        );
-      });
+      addGenreContainerGroup
+        .append("foreignObject")
+        .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+        .attr("y", -ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 2)
+        .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+        .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
+        .html(function () {
+          return ReactDOMServer.renderToString(
+            <div className="tree-action-icon-container">
+              <FaPlus className="tree-icon" size={ACTION_ICON_SIZE} color="white" />
+            </div>
+          );
+        });
 
-    uploadTrackGroup
-      .append("foreignObject")
-      .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2)
-      .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
-      .html(function () {
-        return ReactDOMServer.renderToString(<div className="tree-action-label-container">Upload track</div>);
-      });
+      addGenreContainerGroup
+        .append("foreignObject")
+        .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+        .attr("y", -ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 2)
+        .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
+        .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
+        .html(function () {
+          return ReactDOMServer.renderToString(
+            <div className="add-genre-label-container tree-action-label-container">Add sub-genre</div>
+          );
+        });
+
+      const changeParentContainerGroup = actionsContainerGroup
+        .append("g")
+        .attr("class", "change-parent-container cursor-pointer")
+        .on("click", function (event, d) {
+          group.dispatch("mouseleave");
+          setGenreUuidGettingAssignedNewParent(d.data.criteria.uuid);
+        })
+        .on("mouseover", function () {
+          d3.select(this).selectAll("div").classed("bg-gray-500", true);
+        })
+        .on("mouseout", function () {
+          d3.select(this).selectAll("div").classed("bg-gray-500", false);
+        });
+
+      changeParentContainerGroup
+        .append("foreignObject")
+        .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+        .attr("y", -ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 3)
+        .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+        .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
+        .html(function () {
+          return ReactDOMServer.renderToString(
+            <div className="tree-action-icon-container">
+              <PiGraphFill className="tree-icon" size={ACTION_ICON_SIZE} color="white" />
+            </div>
+          );
+        });
+
+      changeParentContainerGroup
+        .append("foreignObject")
+        .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+        .attr("y", -ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 3)
+        .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
+        .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
+        .html(function () {
+          return ReactDOMServer.renderToString(
+            <div className="change-parent-label-container tree-action-label-container">Change parent</div>
+          );
+        });
+    }
 
     const playPauseContainerGroup = actionsContainerGroup
       .append("g")
@@ -199,11 +247,10 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       });
 
     const SPINNER_ICON_SIZE = 14;
-    const PLAY_PAUSE_SPINNER_Y = -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT;
     playPauseContainerGroup
       .append("foreignObject")
       .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-      .attr("y", PLAY_PAUSE_SPINNER_Y)
+      .attr("y", actionsContainerY)
       .attr("width", ACTION_CONTAINER_DIMENSIONS.WIDTH)
       .attr("height", ACTION_CONTAINER_DIMENSIONS.HEIGHT)
       .attr("dominant-baseline", "middle")
@@ -229,7 +276,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     playPauseContainerGroup
       .append("foreignObject")
       .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-      .attr("y", PLAY_PAUSE_SPINNER_Y)
+      .attr("y", actionsContainerY)
       .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
       .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
       .style("visibility", function (d) {
@@ -285,7 +332,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     playPauseContainerGroup
       .append("foreignObject")
       .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT)
+      .attr("y", actionsContainerY)
       .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
       .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
       .html(function (d) {
@@ -296,12 +343,14 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         );
       });
 
-    const addGenreContainerGroup = actionsContainerGroup
+    const uploadTrackGroup = actionsContainerGroup
       .append("g")
-      .attr("class", "add-genre-container cursor-pointer")
+      .attr("class", "upload-track-container cursor-pointer")
       .on("click", function (event, d) {
+        event.stopPropagation();
+        selectingFileGenreUuidRef.current = d.data.criteria?.uuid;
+        fileInputRef.current.click();
         group.dispatch("mouseleave");
-        handleAddGenreAction(event, d.data.criteria.uuid);
       })
       .on("mouseover", function () {
         d3.select(this).selectAll("div").classed("bg-gray-500", true);
@@ -310,79 +359,37 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         d3.select(this).selectAll("div").classed("bg-gray-500", false);
       });
 
-    addGenreContainerGroup
+    uploadTrackGroup
       .append("foreignObject")
       .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 2)
+      .attr("y", actionsContainerY + ACTION_CONTAINER_DIMENSIONS.HEIGHT)
       .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
       .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
       .html(function () {
         return ReactDOMServer.renderToString(
-          <div className="tree-action-icon-container">
-            <FaPlus className="tree-icon" size={ACTION_ICON_SIZE} color="white" />
+          <div className="upload-track-icon-container h-full w-full flex items-center justify-center">
+            <FaFileUpload className="tree-icon" size={ACTION_ICON_SIZE} color="white" />
           </div>
         );
       });
 
-    addGenreContainerGroup
+    uploadTrackGroup
       .append("foreignObject")
       .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 2)
+      .attr("y", actionsContainerY + ACTION_CONTAINER_DIMENSIONS.HEIGHT)
       .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
       .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
       .html(function () {
-        return ReactDOMServer.renderToString(
-          <div className="add-genre-label-container tree-action-label-container">Add sub-genre</div>
-        );
-      });
-
-    const changeParentContainerGroup = actionsContainerGroup
-      .append("g")
-      .attr("class", "change-parent-container cursor-pointer")
-      .on("click", function (event, d) {
-        group.dispatch("mouseleave");
-        setGenreUuidGettingAssignedNewParent(d.data.criteria.uuid);
-      })
-      .on("mouseover", function () {
-        d3.select(this).selectAll("div").classed("bg-gray-500", true);
-      })
-      .on("mouseout", function () {
-        d3.select(this).selectAll("div").classed("bg-gray-500", false);
-      });
-
-    changeParentContainerGroup
-      .append("foreignObject")
-      .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 3)
-      .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
-      .html(function () {
-        return ReactDOMServer.renderToString(
-          <div className="tree-action-icon-container">
-            <PiGraphFill className="tree-icon" size={ACTION_ICON_SIZE} color="white" />
-          </div>
-        );
-      });
-
-    changeParentContainerGroup
-      .append("foreignObject")
-      .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("y", -ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 3)
-      .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
-      .html(function () {
-        return ReactDOMServer.renderToString(
-          <div className="change-parent-label-container tree-action-label-container">Change parent</div>
-        );
+        return ReactDOMServer.renderToString(<div className="tree-action-label-container">Upload track</div>);
       });
   };
 
-  const addMoreIconContainer = (genrePlaylistUuid) => {
-    const group = d3.select("#group-" + genrePlaylistUuid);
-    let moreIconContainer = group.select("#more-icon-container-" + genrePlaylistUuid);
+  const addMoreIconContainer = (genrePlaylist) => {
+    const group = d3.select("#group-" + genrePlaylist.uuid);
+    let moreIconContainer = group.select("#more-icon-container-" + genrePlaylist.uuid);
 
     if (moreIconContainer.empty()) {
-      const moreIconContainer = group.append("g").attr("id", "more-icon-container-" + genrePlaylistUuid);
+      const moreIconContainer = group.append("g").attr("id", "more-icon-container-" + genrePlaylist.uuid);
 
       const handleMoreAction = (event, d) => {
         const genrePlaylistUuid = d.data.uuid;
@@ -392,7 +399,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
           actionsContainer.remove();
           return;
         } else {
-          addActionsContainer(genrePlaylistUuid);
+          addActionsContainer(d.data);
         }
       };
 
@@ -427,7 +434,6 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     }
   };
 
-  // Function to create a grid
   function createGrid(svg, width, height, spacing, gridIsHidden) {
     if (!gridIsHidden) {
       const gridGroup = svg.append("g").attr("class", "grid");
@@ -483,10 +489,10 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     const highestNodeVerticalCoordinate = d3.min(treeData.descendants(), (d) => d.x);
     const highestVerticalCoordinate =
-      highestNodeVerticalCoordinate + RECT_BASE_DIMENSIONS.HEIGHT / 2 - ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2;
+      highestNodeVerticalCoordinate + RECT_BASE_DIMENSIONS.HEIGHT / 2 - ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2;
     const lowestNodeVerticalCoordinate = d3.max(treeData.descendants(), (d) => d.x);
     const lowestVerticalCoordinate =
-      lowestNodeVerticalCoordinate + RECT_BASE_DIMENSIONS.HEIGHT / 2 + ACTIONS_CONTAINER_DIMENSIONS.HEIGHT / 2;
+      lowestNodeVerticalCoordinate + RECT_BASE_DIMENSIONS.HEIGHT / 2 + ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2;
     setSvgHeight(lowestVerticalCoordinate - highestVerticalCoordinate);
 
     const maximumLevel = d3.max(treeData.descendants(), (d) => d.depth);
@@ -494,7 +500,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       maximumLevel * HORIZONTAL_SEPARATOON_BETWEEN_NODES +
         RECT_BASE_DIMENSIONS.WIDTH +
         MORE_ICON_WIDTH +
-        ACTIONS_CONTAINER_DIMENSIONS.WIDTH
+        ACTIONS_CONTAINER_DIMENSIONS_MAX.WIDTH
     );
 
     // The tree layout has x as vertical and y as horizontal whereas svg logic is the opposite.
@@ -523,10 +529,10 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .enter()
       .append("path")
       .attr("d", linkGenerator)
-      .style("fill", "none") // Ensure no fill
-      .style("stroke", "black") // Set stroke color to red
-      .style("stroke-opacity", 1) // Set stroke opacity
-      .style("stroke-width", 2); // Set stroke width
+      .style("fill", "none")
+      .style("stroke", "black")
+      .style("stroke-opacity", 1)
+      .style("stroke-width", 2);
 
     const nodes = svg
       .selectAll("g.node")
@@ -620,14 +626,14 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
             }
           }
         } else {
-          setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(d.data.uuid);
-          addMoreIconContainer(d.data.uuid);
+          setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(d.data);
+          addMoreIconContainer(d.data);
         }
       });
 
-    if (previousRenderingVisibleActionsContainerGenrePlaylistUuid) {
-      addMoreIconContainer(previousRenderingVisibleActionsContainerGenrePlaylistUuid);
-      addActionsContainer(previousRenderingVisibleActionsContainerGenrePlaylistUuid);
+    if (previousRenderingVisibleActionsContainerGenrePlaylist) {
+      addMoreIconContainer(previousRenderingVisibleActionsContainerGenrePlaylist);
+      addActionsContainer(previousRenderingVisibleActionsContainerGenrePlaylist);
     }
 
     return () => {

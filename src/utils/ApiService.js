@@ -272,7 +272,7 @@ export default class ApiService {
   static async postLibTrack(file, genreUuid, onProgress, badRequestCatched = false) {
     const formData = new FormData();
     formData.append("file", file);
-    if (genreUuid !== null) {
+    if (genreUuid) {
       formData.append("genreUuid", genreUuid);
     }
     return await ApiService.fetchData("tracks/", "POST", formData, null, onProgress, badRequestCatched);
