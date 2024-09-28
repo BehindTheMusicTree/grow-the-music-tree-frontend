@@ -13,7 +13,7 @@ export default function TrackListSidebar() {
       <div className="header flex h-16 px-4 py-2 text-gray-400">
         <div className="origin flex text-xl ">
           <div className="from h-auto flex flex-col justify-center items-center mr-2">From</div>
-          <div className="name-container flex flex-col justify-center items-center text-gray-300 font-bold pr-2 max-w-trackListName text-overflow">
+          <div className="name-container flex flex-col justify-center items-center text-gray-300 font-bold pr-2 max-w-trackListName">
             <div className="name text-overflow">
               {origin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST
                 ? origin.object.name
