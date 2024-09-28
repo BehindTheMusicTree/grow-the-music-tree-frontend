@@ -41,12 +41,9 @@ export default function Player() {
   };
 
   const handleTrackEnd = () => {
-    console.log("Track ended");
     if (playerLibTrackObject.hasNext) {
-      console.log("Has next");
       toNextTrack();
     } else {
-      console.log("stop");
       setPlayState(PLAY_STATES.STOPPED);
     }
   };
@@ -67,7 +64,6 @@ export default function Player() {
 
   useEffect(() => {
     if (playerLibTrackObject) {
-      console.log("Player lib track object changed, resetting seek");
       setResetSeekSignal(1);
     }
   }, [playerLibTrackObject]);

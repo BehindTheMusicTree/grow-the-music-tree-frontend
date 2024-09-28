@@ -43,7 +43,6 @@ export function TrackListProvider({ children }) {
   };
 
   const toNextTrack = () => {
-    console.log("toNext, next track position: ", playingLibTrackPosition + 1);
     setPlayingLibTrackPosition((prev) => prev + 1);
   };
 
@@ -53,6 +52,7 @@ export function TrackListProvider({ children }) {
 
   useEffect(() => {
     if (origin) {
+      setPlayingLibTrackPosition(1);
       if (origin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST) {
         setTrackList(origin.object.libraryTracks);
       } else if (origin.type === TRACK_LIST_ORIGIN_TYPE.LIB_TRACK) {
@@ -62,20 +62,13 @@ export function TrackListProvider({ children }) {
   }, [origin]);
 
   useEffect(() => {
-    if (trackList) {
-      setPlayingLibTrackPosition(1);
-    }
-  }, [trackList]);
-
-  useEffect(() => {
     if (trackList && trackList.length > playingLibTrackPosition - 1) {
       setPlayState(PLAY_STATES.LOADING);
     }
-  }, [playingLibTrackPosition]);
+  }, [origin, playingLibTrackPosition]);
 
   useEffect(() => {
     if (playState === PLAY_STATES.LOADING) {
-      console.log("Loading track at position: ", playingLibTrackPosition);
       setLibTrackToPlay(
         trackList[playingLibTrackPosition - 1].libraryTrack,
         trackList.length > playingLibTrackPosition,

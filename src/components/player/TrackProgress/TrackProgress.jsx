@@ -53,7 +53,6 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
   };
 
   const handleSeekingChange = (event) => {
-    console.log("Seeking change: ", event.target.value);
     setSeek(parseFloat(event.target.value));
   };
 
@@ -64,7 +63,6 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
   const handleLeaveSeeking = (event) => {
     if (isSeeking) {
       previousSeekRef.current = null;
-      console.log("Seeking leave: ", event.target.value);
       setSeek(parseFloat(event.target.value));
       setIsSeeking(false);
     }
@@ -98,14 +96,12 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
   };
 
   useEffect(() => {
-    console.log("playState: ", playState);
     if (playState === PLAY_STATES.PLAYING) {
       if (isSeeking) {
         cancelRaf();
       } else if (seek >= Math.floor(playerLibTrackObject.durationInSec)) {
         handleTrackEnd();
       } else {
-        console.log("renderSeekPosition", seek);
         playerRef.current.seek(seek);
         renderSeekPosition();
       }
@@ -118,14 +114,12 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
 
   useEffect(() => {
     if (stopProgressAnimationSignal) {
-      console.log("Stop progress animation signal");
       cancelRaf();
       setStopProgressAnimationSignal(0);
     }
   }, [stopProgressAnimationSignal]);
 
   useEffect(() => {
-    console.log("Reset seek signal: ", resetSeekSignal);
     if (resetSeekSignal) {
       previousSeekRef.current = 0;
       setSeek(0);
@@ -134,7 +128,6 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
   }, [resetSeekSignal]);
 
   useEffect(() => {
-    console.log("Seek: ", seek);
     if (seek === 0) {
       if (playState === PLAY_STATES.LOADING) {
         setPlayState(PLAY_STATES.PLAYING);
