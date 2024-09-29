@@ -25,6 +25,11 @@ export default function App() {
 
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
+  const centerMaxHeight = {
+    centerWithoutPlayer: "calc(100% - 100px)",
+    centerWithPlayer: "calc(100% - 180px)",
+  };
+
   return (
     <ApiErrorHandler>
       <LibTracksProvider>
@@ -42,11 +47,12 @@ export default function App() {
                         setSearchSubmitted={setSearchSubmitted}
                       />
                       <div
-                        className={
-                          "center bg-green-500 flex-grow flex overflow-y-auto max-h-[calc(100%-" +
-                          (playerLibTrackObject ? "180px" : "100px") +
-                          ")]"
-                        }
+                        className="center bg-green-500 flex-grow flex overflow-y-auto"
+                        style={{
+                          maxHeight: playerLibTrackObject
+                            ? centerMaxHeight.centerWithPlayer
+                            : centerMaxHeight.centerWithoutPlayer,
+                        }}
                       >
                         <Menu />
                         <PageContainer />
