@@ -19,7 +19,7 @@ export default function PageContainer() {
           case PAGE_TYPES.LIBRARY:
             return <Library />;
           default:
-            return <div>Unknown content area type</div>;
+            return <div>Unknown page type</div>;
         }
       })()}
       {/* { isPlayingTrack
