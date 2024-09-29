@@ -1,19 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import ReactDOMServer from "react-dom/server";
-
-import * as d3 from "d3";
 import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause } from "react-icons/fa";
 import { MdMoreVert } from "react-icons/md";
 import { PiGraphFill } from "react-icons/pi";
+import * as d3 from "d3";
 
 import { usePopup } from "../../../../../contexts/popup/usePopup";
 import { useTrackList } from "../../../../../contexts/track-list/useTrackList";
 import { useGenrePlaylists } from "../../../../../contexts/genre-playlists/useGenrePlaylists";
 import { usePlayer } from "../../../../../contexts/player/usePlayer";
 import { useGenreGettingAssignedNewParent } from "../../../../../contexts/genre-getting-assigned-new-parent/useGenreGettingAssignedNewParent";
+
+import { addGrid } from "../../../../utils/d3Helper";
+import { appendPaths } from "./TreeHelper";
 import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "../../../../../utils/constants";
 import {
+  RECTANGLE_COLOR,
   RECT_BASE_DIMENSIONS,
   VERTICAL_SEPARATOON_BETWEEN_NODES,
   HORIZONTAL_SEPARATOON_BETWEEN_NODES,
@@ -24,13 +27,11 @@ import {
   ACTION_ICON_SIZE,
   ACTION_ICON_CONTAINER_DIMENSIONS,
   ACTION_LABEL_CONTAINER_DIMENSIONS,
-} from "../../../../../utils/tree-dimensions";
-import { PRIMARY_COLOR } from "../../../../../utils/theme";
+  SPINNER_ICON_SIZE,
+} from "./tree-constants";
 import LibTrackUploadPopupContentObject from "../../../../../models/popup-content-object/LibTrackUploadPopupContentObject";
 
 export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
-  const RECTANGLE_COLOR = PRIMARY_COLOR;
-
   const { playState, handlePlayPauseAction } = usePlayer();
   const { showPopup } = usePopup();
   const { handleGenreAddAction: handleAddGenreAction, updateGenreParent } = useGenrePlaylists();
@@ -83,9 +84,58 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     }
   };
 
+  function addActionContainer(
+    actionsContainerHeight,
+    actionsContainerGroup,
+    position,
+    className,
+    onclick,
+    iconDiv,
+    labelFunction,
+    iconContainerVisibilityFunction = () => "visible"
+  ) {
+    const actionContainerGroup = actionsContainerGroup
+      .append("g")
+      .attr("class", `${className} cursor-pointer`)
+      .on("click", function (event, d) {
+        onclick(event, d);
+      })
+      .on("mouseover", function () {
+        d3.select(this).selectAll("div").classed("bg-gray-500", true);
+      })
+      .on("mouseout", function () {
+        d3.select(this).selectAll("div").classed("bg-gray-500", false);
+      });
+
+    actionContainerGroup
+      .append("foreignObject")
+      .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+      .attr("y", -actionsContainerHeight / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * (position - 1))
+      .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
+      .style("visibility", iconContainerVisibilityFunction)
+      .html(function () {
+        return ReactDOMServer.renderToString(<div className="tree-action-icon-container">{iconDiv}</div>);
+      });
+
+    actionContainerGroup
+      .append("foreignObject")
+      .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("y", -actionsContainerHeight / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * (position - 1))
+      .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
+      .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
+      .html(function (d) {
+        return ReactDOMServer.renderToString(
+          <div className="change-parent-label-container tree-action-label-container">{labelFunction(d)}</div>
+        );
+      });
+
+    return actionContainerGroup;
+  }
+
   const addActionsContainer = (genrePlaylist) => {
-    const group = d3.select("#group-" + genrePlaylist.uuid);
-    let actionsContainerGroup = group.append("g").attr("id", "actions-container-" + genrePlaylist.uuid);
+    const actionsGroup = d3.select("#group-" + genrePlaylist.uuid);
+    let actionsContainerGroup = actionsGroup.append("g").attr("id", "actions-container-" + genrePlaylist.uuid);
 
     const isGenreless = !genrePlaylist.criteria;
     const actionsContainerHeight = isGenreless
@@ -145,129 +195,60 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("fill", "RGBA(0, 0, 0, 0)");
 
     if (!isGenreless) {
-      const addGenreContainerGroup = actionsContainerGroup
-        .append("g")
-        .attr("class", "add-genre-container cursor-pointer")
-        .on("click", function (event, d) {
-          group.dispatch("mouseleave");
-          handleAddGenreAction(event, d.data.criteria.uuid);
-        })
-        .on("mouseover", function () {
-          d3.select(this).selectAll("div").classed("bg-gray-500", true);
-        })
-        .on("mouseout", function () {
-          d3.select(this).selectAll("div").classed("bg-gray-500", false);
-        });
+      const addChildActionOnclick = (event, d) => {
+        actionsGroup.dispatch("mouseleave");
+        handleAddGenreAction(event, d.data.criteria.uuid);
+      };
 
-      addGenreContainerGroup
-        .append("foreignObject")
-        .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-        .attr("y", -ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 2)
-        .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-        .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
-        .html(function () {
-          return ReactDOMServer.renderToString(
-            <div className="tree-action-icon-container">
-              <FaPlus className="tree-icon" size={ACTION_ICON_SIZE} color="white" />
-            </div>
-          );
-        });
+      addActionContainer(
+        actionsContainerHeight,
+        actionsContainerGroup,
+        3,
+        "add-child-container",
+        addChildActionOnclick,
+        <FaPlus className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
+        () => "Add sub-genre"
+      );
 
-      addGenreContainerGroup
-        .append("foreignObject")
-        .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-        .attr("y", -ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 2)
-        .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
-        .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
-        .html(function () {
-          return ReactDOMServer.renderToString(
-            <div className="add-genre-label-container tree-action-label-container">Add sub-genre</div>
-          );
-        });
+      const changeParentActionOnclick = (event, d) => {
+        actionsGroup.dispatch("mouseleave");
+        setGenreUuidGettingAssignedNewParent(d.data.criteria.uuid);
+      };
 
-      const changeParentContainerGroup = actionsContainerGroup
-        .append("g")
-        .attr("class", "change-parent-container cursor-pointer")
-        .on("click", function (event, d) {
-          group.dispatch("mouseleave");
-          setGenreUuidGettingAssignedNewParent(d.data.criteria.uuid);
-        })
-        .on("mouseover", function () {
-          d3.select(this).selectAll("div").classed("bg-gray-500", true);
-        })
-        .on("mouseout", function () {
-          d3.select(this).selectAll("div").classed("bg-gray-500", false);
-        });
-
-      changeParentContainerGroup
-        .append("foreignObject")
-        .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-        .attr("y", -ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 3)
-        .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-        .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
-        .html(function () {
-          return ReactDOMServer.renderToString(
-            <div className="tree-action-icon-container">
-              <PiGraphFill className="tree-icon" size={ACTION_ICON_SIZE} color="white" />
-            </div>
-          );
-        });
-
-      changeParentContainerGroup
-        .append("foreignObject")
-        .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-        .attr("y", -ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * 3)
-        .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
-        .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
-        .html(function () {
-          return ReactDOMServer.renderToString(
-            <div className="change-parent-label-container tree-action-label-container">Change parent</div>
-          );
-        });
+      addActionContainer(
+        actionsContainerHeight,
+        actionsContainerGroup,
+        4,
+        "change-parent-container",
+        changeParentActionOnclick,
+        <PiGraphFill className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
+        () => "Change parent"
+      );
     }
 
-    const playPauseContainerGroup = actionsContainerGroup
-      .append("g")
-      .attr("class", function (d) {
-        return "playpause-container" + (d.data.libraryTracksCount > 0 ? " cursor-pointer" : "");
-      })
-      .on("click", function (event, d) {
-        event.stopPropagation();
-        handlePlayPauseIconAction(d.data);
-      })
-      .on("mouseover", function (event, d) {
-        if (d.data.libraryTracksCount > 0) {
-          d3.select(this).selectAll("div").classed("bg-gray-500", true);
-        }
-      })
-      .on("mouseout", function (event, d) {
-        if (d.data.libraryTracksCount > 0) {
-          d3.select(this).selectAll("div").classed("bg-gray-500", false);
-        }
-      });
+    const playPauseActionOnclick = (event, d) => {
+      event.stopPropagation();
+      handlePlayPauseIconAction(d.data);
+    };
 
-    const SPINNER_ICON_SIZE = 14;
-    playPauseContainerGroup
-      .append("foreignObject")
-      .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-      .attr("y", actionsContainerY)
-      .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("height", ACTION_CONTAINER_DIMENSIONS.HEIGHT)
-      .attr("dominant-baseline", "middle")
-      .html(function (d) {
-        if (
-          trackListOrigin &&
-          trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
-          trackListOrigin.object.uuid === d.data.uuid &&
-          playState === PLAY_STATES.LOADING
-        ) {
-          return ReactDOMServer.renderToString(
-            <div className="spinner-container tree-action-icon-container">
-              <FaSpinner size={SPINNER_ICON_SIZE} className="animate-spin fill-current text-white" />
-            </div>
-          );
-        }
-      });
+    const spinnerVisibilityFunction = (d) =>
+      trackListOrigin &&
+      trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
+      trackListOrigin.object.uuid === d.data.uuid &&
+      playState === PLAY_STATES.LOADING
+        ? "visible"
+        : "hidden";
+
+    const playPauseContainerGroup = addActionContainer(
+      actionsContainerHeight,
+      actionsContainerGroup,
+      1,
+      "playpause-container",
+      playPauseActionOnclick,
+      <FaSpinner size={SPINNER_ICON_SIZE} className="animate-spin fill-current text-white" />,
+      (d) => d.data.libraryTracksCount + " track" + (d.data.libraryTracksCount > 1 ? "s" : ""),
+      spinnerVisibilityFunction
+    );
 
     const PLAY_PAUSE_ICON_DIMENSIONS = {
       WIDTH: 12,
@@ -329,59 +310,21 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         return "default";
       });
 
-    playPauseContainerGroup
-      .append("foreignObject")
-      .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("y", actionsContainerY)
-      .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
-      .html(function (d) {
-        return ReactDOMServer.renderToString(
-          <div className="playpause-label-container tree-action-label-container">
-            {d.data.libraryTracksCount + " track" + (d.data.libraryTracksCount > 1 ? "s" : "")}
-          </div>
-        );
-      });
-
-    const uploadTrackGroup = actionsContainerGroup
-      .append("g")
-      .attr("class", "upload-track-container cursor-pointer")
-      .on("click", function (event, d) {
-        event.stopPropagation();
-        selectingFileGenreUuidRef.current = d.data.criteria?.uuid;
-        fileInputRef.current.click();
-        group.dispatch("mouseleave");
-      })
-      .on("mouseover", function () {
-        d3.select(this).selectAll("div").classed("bg-gray-500", true);
-      })
-      .on("mouseout", function () {
-        d3.select(this).selectAll("div").classed("bg-gray-500", false);
-      });
-
-    uploadTrackGroup
-      .append("foreignObject")
-      .attr("x", ACTIONS_CONTAINER_X_OFFSET)
-      .attr("y", actionsContainerY + ACTION_CONTAINER_DIMENSIONS.HEIGHT)
-      .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
-      .html(function () {
-        return ReactDOMServer.renderToString(
-          <div className="upload-track-icon-container h-full w-full flex items-center justify-center">
-            <FaFileUpload className="tree-icon" size={ACTION_ICON_SIZE} color="white" />
-          </div>
-        );
-      });
-
-    uploadTrackGroup
-      .append("foreignObject")
-      .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("y", actionsContainerY + ACTION_CONTAINER_DIMENSIONS.HEIGHT)
-      .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
-      .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
-      .html(function () {
-        return ReactDOMServer.renderToString(<div className="tree-action-label-container">Upload track</div>);
-      });
+    const uploadTrackActionOnclick = (event, d) => {
+      event.stopPropagation();
+      selectingFileGenreUuidRef.current = d.data.criteria?.uuid;
+      fileInputRef.current.click();
+      actionsGroup.dispatch("mouseleave");
+    };
+    addActionContainer(
+      actionsContainerHeight,
+      actionsContainerGroup,
+      2,
+      "upload-track-container",
+      uploadTrackActionOnclick,
+      <FaFileUpload className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
+      () => "Upload track"
+    );
   };
 
   const addMoreIconContainer = (genrePlaylist) => {
@@ -434,52 +377,6 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     }
   };
 
-  function createGrid(svg, width, height, spacing, gridIsHidden) {
-    if (!gridIsHidden) {
-      const gridGroup = svg.append("g").attr("class", "grid");
-
-      // Add horizontal lines and numbers
-      for (let y = 0; y <= height; y += spacing) {
-        gridGroup
-          .append("line")
-          .attr("x1", 0)
-          .attr("y1", y)
-          .attr("x2", width)
-          .attr("y2", y)
-          .attr("stroke", "#ccc")
-          .attr("stroke-width", 1);
-
-        gridGroup
-          .append("text")
-          .attr("x", 5)
-          .attr("y", y - 5)
-          .attr("fill", "#000")
-          .attr("font-size", "10px")
-          .text(y);
-      }
-
-      // Add vertical lines and numbers
-      for (let x = 0; x <= width; x += spacing) {
-        gridGroup
-          .append("line")
-          .attr("x1", x)
-          .attr("y1", 0)
-          .attr("x2", x)
-          .attr("y2", height)
-          .attr("stroke", "#ccc")
-          .attr("stroke-width", 1);
-
-        gridGroup
-          .append("text")
-          .attr("x", x + 5)
-          .attr("y", 15)
-          .attr("fill", "#000")
-          .attr("font-size", "10px")
-          .text(x);
-      }
-    }
-  }
-
   useEffect(() => {
     const root = buildTreeHierarchy();
 
@@ -514,25 +411,9 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     const svg = d3.select(svgRef.current).append("svg").attr("width", svgWidth).attr("height", svgHeight).append("g");
 
-    const gridSpacing = 50;
-    const gridIsHidden = true;
-    createGrid(svg, svgWidth, svgHeight, gridSpacing, gridIsHidden);
+    addGrid(svg, svgWidth, svgHeight, true);
 
-    const linkGenerator = d3
-      .linkHorizontal()
-      .x((d) => d.x + RECT_BASE_DIMENSIONS.WIDTH / 2)
-      .y((d) => d.y + RECT_BASE_DIMENSIONS.HEIGHT / 2);
-
-    svg
-      .selectAll("path.link")
-      .data(treeData.links())
-      .enter()
-      .append("path")
-      .attr("d", linkGenerator)
-      .style("fill", "none")
-      .style("stroke", "black")
-      .style("stroke-opacity", 1)
-      .style("stroke-width", 2);
+    appendPaths(d3, svg, treeData, RECT_BASE_DIMENSIONS.WIDTH / 2, RECT_BASE_DIMENSIONS.HEIGHT / 2);
 
     const nodes = svg
       .selectAll("g.node")
