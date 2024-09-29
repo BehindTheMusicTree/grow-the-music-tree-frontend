@@ -133,9 +133,9 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     return actionContainerGroup;
   }
 
-  const addActionsContainer = (genrePlaylist) => {
-    const actionsGroup = d3.select("#group-" + genrePlaylist.uuid);
-    let actionsContainerGroup = actionsGroup.append("g").attr("id", "actions-container-" + genrePlaylist.uuid);
+  const addActionsGroup = (genrePlaylist) => {
+    const genrePlaylistGroup = d3.select("#group-" + genrePlaylist.uuid);
+    const actionsGroup = genrePlaylistGroup.append("g").attr("id", "actions-container-" + genrePlaylist.uuid);
 
     const isGenreless = !genrePlaylist.criteria;
     const actionsContainerHeight = isGenreless
@@ -143,7 +143,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       : ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT;
     const actionsContainerY = -actionsContainerHeight / 2;
 
-    actionsContainerGroup
+    actionsGroup
       .append("rect")
       .attr("id", "actions-background")
       .attr("x", ACTIONS_CONTAINER_X_OFFSET)
@@ -152,7 +152,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("height", actionsContainerHeight)
       .attr("fill", RECTANGLE_COLOR);
 
-    actionsContainerGroup
+    actionsGroup
       .append("path")
       .attr("class", "smooth-mouseover-upper-triangle")
       .attr(
@@ -173,7 +173,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       )
       .attr("fill", "RGBA(0, 0, 0, 0)");
 
-    actionsContainerGroup
+    actionsGroup
       .append("path")
       .attr("class", "smooth-mouseover-lower-triangle")
       .attr(
@@ -196,13 +196,13 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     if (!isGenreless) {
       const addChildActionOnclick = (event, d) => {
-        actionsGroup.dispatch("mouseleave");
+        genrePlaylistGroup.dispatch("mouseleave");
         handleAddGenreAction(event, d.data.criteria.uuid);
       };
 
       addActionContainer(
         actionsContainerHeight,
-        actionsContainerGroup,
+        actionsGroup,
         3,
         "add-child-container",
         addChildActionOnclick,
@@ -211,13 +211,13 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       );
 
       const changeParentActionOnclick = (event, d) => {
-        actionsGroup.dispatch("mouseleave");
+        genrePlaylistGroup.dispatch("mouseleave");
         setGenreUuidGettingAssignedNewParent(d.data.criteria.uuid);
       };
 
       addActionContainer(
         actionsContainerHeight,
-        actionsContainerGroup,
+        actionsGroup,
         4,
         "change-parent-container",
         changeParentActionOnclick,
@@ -241,7 +241,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     const playPauseContainerGroup = addActionContainer(
       actionsContainerHeight,
-      actionsContainerGroup,
+      actionsGroup,
       1,
       "playpause-container",
       playPauseActionOnclick,
@@ -314,17 +314,21 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       event.stopPropagation();
       selectingFileGenreUuidRef.current = d.data.criteria?.uuid;
       fileInputRef.current.click();
-      actionsGroup.dispatch("mouseleave");
+      genrePlaylistGroup.dispatch("mouseleave");
     };
     addActionContainer(
       actionsContainerHeight,
-      actionsContainerGroup,
+      actionsGroup,
       2,
       "upload-track-container",
       uploadTrackActionOnclick,
       <FaFileUpload className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
       () => "Upload track"
     );
+
+    actionsGroup.on("mouseenter", function () {
+      addMoreIconContainer(genrePlaylist);
+    });
   };
 
   const addMoreIconContainer = (genrePlaylist) => {
@@ -334,15 +338,13 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     if (moreIconContainer.empty()) {
       const moreIconContainer = group.append("g").attr("id", "more-icon-container-" + genrePlaylist.uuid);
 
-      const handleMoreAction = (event, d) => {
-        const genrePlaylistUuid = d.data.uuid;
+      const handleMoreActionEnterMouse = (event, d) => {
         event.stopPropagation();
+        const genrePlaylistUuid = d.data.uuid;
         const actionsContainer = group.select("#actions-container-" + genrePlaylistUuid);
-        if (!actionsContainer.empty()) {
-          actionsContainer.remove();
-          return;
-        } else {
-          addActionsContainer(d.data);
+        if (actionsContainer.empty()) {
+          addMoreIconContainer(d.data);
+          addActionsGroup(d.data);
         }
       };
 
@@ -367,7 +369,10 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
             </div>
           );
         })
-        .on("mouseenter", handleMoreAction);
+        .on("mouseenter", handleMoreActionEnterMouse)
+        .on("mouseleave", function () {
+          d3.select(this.parentNode).remove();
+        });
 
       group.on("mouseleave", function (event, d) {
         setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(null);
@@ -460,8 +465,19 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .html(function (d) {
         return `<div class="tree-info">${d.data.name}</div>`;
       })
+      .on("mouseleave", function (event, d) {
+        d3.select(this.parentNode)
+          .select("#more-icon-container-" + d.data.uuid)
+          .remove();
+        d3.select(this.parentNode)
+          .select("#actions-container-" + d.data.uuid)
+          .remove();
+      })
       .on("mouseover", function (event, d) {
-        if (genreUuidGettingAssignedNewParent) {
+        if (!genreUuidGettingAssignedNewParent) {
+          setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(d.data);
+          addMoreIconContainer(d.data);
+        } else {
           if (d.data.criteria && genreUuidGettingAssignedNewParent !== d.data.criteria.uuid) {
             const parentNode = d3.select(this.parentNode);
             let selectAsNewParentGroup = parentNode.select("#select-as-new-parent-group");
@@ -506,15 +522,12 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
                 });
             }
           }
-        } else {
-          setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(d.data);
-          addMoreIconContainer(d.data);
         }
       });
 
     if (previousRenderingVisibleActionsContainerGenrePlaylist) {
       addMoreIconContainer(previousRenderingVisibleActionsContainerGenrePlaylist);
-      addActionsContainer(previousRenderingVisibleActionsContainerGenrePlaylist);
+      addActionsGroup(previousRenderingVisibleActionsContainerGenrePlaylist);
     }
 
     return () => {
