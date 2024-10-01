@@ -34,13 +34,13 @@ import LibTrackUploadPopupContentObject from "../../../../../models/popup-conten
 export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   const { playState, handlePlayPauseAction } = usePlayer();
   const { showPopup } = usePopup();
-  const { handleGenreAddAction: handleAddGenreAction, updateGenreParent } = useGenrePlaylists();
+  const { handleGenreAddAction, updateGenreParent } = useGenrePlaylists();
   const { playNewTrackListFromPlaylistUuid, origin: trackListOrigin } = useTrackList();
   const [
     previousRenderingVisibleActionsContainerGenrePlaylist,
     setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
   ] = useState(null);
-  const { genreUuidGettingAssignedNewParent, setGenreUuidGettingAssignedNewParent } =
+  const { genreUuidGettingAssignedNewParent, forbiddenNewParentsUuids, setGenreGettingAssignedNewParent } =
     useGenreGettingAssignedNewParent();
   const [svgWidth, setSvgWidth] = useState(0);
   const [svgHeight, setSvgHeight] = useState(0);
@@ -197,7 +197,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     if (!isGenreless) {
       const addChildActionOnclick = (event, d) => {
         genrePlaylistGroup.dispatch("mouseleave");
-        handleAddGenreAction(event, d.data.criteria.uuid);
+        handleGenreAddAction(event, d.data.criteria.uuid);
       };
 
       addActionContainer(
@@ -212,7 +212,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
       const changeParentActionOnclick = (event, d) => {
         genrePlaylistGroup.dispatch("mouseleave");
-        setGenreUuidGettingAssignedNewParent(d.data.criteria.uuid);
+        setGenreGettingAssignedNewParent(d.data.criteria);
       };
 
       addActionContainer(
@@ -432,6 +432,10 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         const translateY = d.y + RECT_BASE_DIMENSIONS.HEIGHT / 2;
         return `translate(${translateX}, ${translateY})`;
       });
+
+    const aGenreIsGettingAssignedNewParent = forbiddenNewParentsUuids !== null;
+    const genreIsAPotentialChoiceForTheGenreGettingAssignedANewParent = (d) =>
+      d.data.criteria && aGenreIsGettingAssignedNewParent && !forbiddenNewParentsUuids.includes(d.data.criteria.uuid);
     nodes
       .append("rect")
       .attr("class", "node-base-rect")
@@ -441,18 +445,10 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
       .attr("fill", RECTANGLE_COLOR)
       .style("stroke", function (d) {
-        return d.data.criteria &&
-          genreUuidGettingAssignedNewParent &&
-          genreUuidGettingAssignedNewParent !== d.data.criteria.uuid
-          ? "blue"
-          : "none";
+        return genreIsAPotentialChoiceForTheGenreGettingAssignedANewParent(d) ? "blue" : "none";
       })
       .style("stroke-width", function (d) {
-        return genreUuidGettingAssignedNewParent &&
-          d.data.criteria &&
-          genreUuidGettingAssignedNewParent !== d.data.criteria.uuid
-          ? "2px"
-          : "0px";
+        return genreIsAPotentialChoiceForTheGenreGettingAssignedANewParent(d) ? "2px" : "0px";
       });
 
     nodes
@@ -474,11 +470,11 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
           .remove();
       })
       .on("mouseover", function (event, d) {
-        if (!genreUuidGettingAssignedNewParent) {
+        if (!aGenreIsGettingAssignedNewParent) {
           setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(d.data);
           addMoreIconContainer(d.data);
         } else {
-          if (d.data.criteria && genreUuidGettingAssignedNewParent !== d.data.criteria.uuid) {
+          if (genreIsAPotentialChoiceForTheGenreGettingAssignedANewParent(d)) {
             const parentNode = d3.select(this.parentNode);
             let selectAsNewParentGroup = parentNode.select("#select-as-new-parent-group");
             if (selectAsNewParentGroup.empty()) {
@@ -518,7 +514,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
                 })
                 .on("click", function (event, d) {
                   updateGenreParent(genreUuidGettingAssignedNewParent, d.data.criteria.uuid);
-                  setGenreUuidGettingAssignedNewParent(null);
+                  setGenreGettingAssignedNewParent(null);
                 });
             }
           }
