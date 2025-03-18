@@ -76,7 +76,27 @@ export default class ApiService {
         }
 
         if (status === 400) {
-          throw new BadRequestError(responseObj.errors);
+          // Format the error data according to the API response structure
+          const errorObj = {
+            code: responseObj.details?.code || "unknown_error",
+            message: responseObj.details?.message || "Bad Request",
+          };
+
+          // If fieldErrors exist, create a map with fieldname -> message, code
+          if (responseObj.details?.fieldErrors) {
+            const fieldErrorsMap = {};
+
+            Object.entries(responseObj.details.fieldErrors).forEach(([fieldName, errors]) => {
+              fieldErrorsMap[fieldName] = errors.map((error) => ({
+                message: error.message,
+                code: error.code,
+              }));
+            });
+
+            errorObj.fieldErrors = fieldErrorsMap;
+          }
+
+          throw new BadRequestError(errorObj);
         } else if (status === 401) {
           throw new UnauthorizedRequestError(responseObj.errors);
         } else if (status === 500) {
