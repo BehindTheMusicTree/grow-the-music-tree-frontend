@@ -29,9 +29,37 @@ export default class ApiService {
     return xhr.response;
   }
 
+  static extractErrorFromHtml(html) {
+    // Extract title content which usually contains the error type
+    const titleMatch = html.match(/<title>(.*?)<\/title>/);
+    if (titleMatch) {
+      return titleMatch[1].trim();
+    }
+
+    // Extract error message from explanation div if it exists
+    const explanationMatch = html.match(/<div id="explanation">(.*?)<\/div>/s);
+    if (explanationMatch) {
+      return explanationMatch[1].replace(/<[^>]*>/g, "").trim();
+    }
+
+    return "Unknown error occurred";
+  }
+
   static async getResponseObjFromFetch(response) {
-    const responseObj = await this.parseJson(response);
-    return responseObj;
+    const contentType = response.headers.get("content-type");
+
+    if (contentType && contentType.includes("application/json")) {
+      const json = await this.parseJson(response);
+      return json;
+    } else {
+      const text = await response.text();
+      // If the response is HTML, try to extract error message
+      if (contentType && contentType.includes("text/html")) {
+        const errors = { errors: this.extractErrorFromHtml(text) };
+        return errors;
+      }
+      return text;
+    }
   }
 
   static async handleNotOkResponse(url, response) {
