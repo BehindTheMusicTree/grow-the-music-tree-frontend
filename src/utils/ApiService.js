@@ -6,6 +6,9 @@ import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
 import InternalServerError from "./errors/InternalServerError";
 import CorsError from "./errors/CorsError";
 
+/**
+ * Core API service handling authentication, HTTP requests, and error management
+ */
 export default class ApiService {
   static credentials = { username: config.apiUsername, password: config.apiUserPassword };
   static errorSubscribers = [];
@@ -368,48 +371,6 @@ export default class ApiService {
     }
   }
 
-  static async getLibTracks() {
-    let results = [];
-    let page = 1;
-    let hasMore = true;
-
-    while (hasMore) {
-      const data = await ApiService.fetchData("tracks/", "GET", null, page);
-      results = results.concat(data.results);
-
-      if (data.next) {
-        page++;
-      } else {
-        hasMore = false;
-      }
-    }
-
-    return results;
-  }
-
-  static async retrieveLibTrack(libTrackUuid) {
-    return await ApiService.fetchData(`tracks/${libTrackUuid}/`, "GET", null, null);
-  }
-
-  static async postLibTrack(file, genreUuid, onProgress, badRequestCatched = false) {
-    const formData = new FormData();
-    formData.append("file", file);
-    if (genreUuid) {
-      formData.append("genreUuid", genreUuid);
-    }
-    return await ApiService.fetchData("tracks/", "POST", formData, null, onProgress, badRequestCatched);
-  }
-
-  static async putLibTrack(libTrackUuid, libTrackData) {
-    return await ApiService.fetchData(`tracks/${libTrackUuid}/`, "PUT", libTrackData, null);
-  }
-
-  static async loadAudioAndGetLibTrackBlobUrl(libTrackRelativeUrl) {
-    const headers = { Authorization: `Bearer ${ApiService.getToken().access}` };
-    const blob = await ApiService.streamAudio(`${config.apiBaseUrl}${libTrackRelativeUrl}download/`, headers);
-    return URL.createObjectURL(blob);
-  }
-
   static async streamAudio(trackUrl) {
     const headers = await ApiService.getHeaders();
     const response = await fetch(trackUrl, { headers });
@@ -438,60 +399,5 @@ export default class ApiService {
     return new Response(stream, {
       headers: { "Content-Type": "audio/*" },
     }).blob();
-  }
-
-  static async getGenres() {
-    let results = [];
-    let page = 1;
-    let hasMore = true;
-
-    while (hasMore) {
-      const data = await ApiService.fetchData("genres/", "GET", null, page);
-      results = results.concat(data.results);
-
-      if (data.next) {
-        page++;
-      } else {
-        hasMore = false;
-      }
-    }
-
-    return results;
-  }
-
-  static async postGenre(genreData) {
-    return await ApiService.fetchData("genres/", "POST", genreData, null);
-  }
-
-  static async putGenre(genreUuid, genreData) {
-    return await ApiService.fetchData(`genres/${genreUuid}/`, "PUT", genreData, null);
-  }
-
-  static async getGenrePlaylists() {
-    let results = [];
-    let page = 1;
-    let hasMore = true;
-
-    while (hasMore) {
-      const data = await ApiService.fetchData("genre-playlists/", "GET", null, page);
-      results = results.concat(data.results);
-
-      if (data.next) {
-        page++;
-      } else {
-        hasMore = false;
-      }
-    }
-
-    return results;
-  }
-
-  static async retrievePlaylist(playlistUuid) {
-    return await ApiService.fetchData(`playlists/${playlistUuid}/`, "GET", null, null);
-  }
-
-  static async postPlay(contentObjectUuid) {
-    const data = { contentObjectUuid: contentObjectUuid };
-    return await ApiService.fetchData(`plays/`, "POST", data, null);
   }
 }
