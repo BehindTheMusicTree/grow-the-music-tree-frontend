@@ -122,17 +122,50 @@ export default class ApiService {
   }
 
   static isCorsError(error) {
-    // Check if the error message contains CORS-related terms
+    // Check if the error message contains CORS-related terms in multiple languages
     const errorMessage = error.message ? error.message.toLowerCase() : "";
-    const isCorsErrorMessage =
-      errorMessage.includes("cors") ||
-      errorMessage.includes("cross-origin") ||
-      errorMessage.includes("access-control-allow-origin");
+    const corsTerms = [
+      // English terms
+      "cors",
+      "cross-origin",
+      "access-control-allow-origin",
+      "same origin policy",
+      // French terms
+      "requête multiorigine",
+      "politique same origin",
+      "cross-origin request",
+      "blocage d'une requête",
+      // Common network error terms
+      "failed to fetch",
+      "network error",
+      "status: (null)",
+      "status: null",
+      "status: 0",
+      // API unreachability terms
+      "networkerror when attempting to fetch resource",
+      "could not connect to the server",
+      "connection refused",
+      "no such host",
+      "dns lookup failed",
+      "connection timed out",
+      "unable to connect",
+      "unable to reach",
+      "unreachable",
+      "refused",
+      "timeout",
+    ];
+
+    const isCorsErrorMessage = corsTerms.some((term) => errorMessage.includes(term));
 
     // CORS errors often appear as TypeErrors with network error messages
     const isLikelyCorsError =
-      error instanceof TypeError &&
-      (errorMessage.includes("failed to fetch") || errorMessage.includes("network error"));
+      error instanceof TypeError ||
+      (error instanceof Error && errorMessage.includes("status: (null)")) ||
+      (error instanceof Error && errorMessage.includes("status: null")) ||
+      (error instanceof Error && errorMessage.includes("status: 0")) ||
+      // Check for network errors that might indicate API unreachability
+      (error instanceof Error && error.name === "TypeError" && error.message.includes("Failed to fetch")) ||
+      (error instanceof Error && error.name === "NetworkError");
 
     return isCorsErrorMessage || isLikelyCorsError;
   }
@@ -141,8 +174,13 @@ export default class ApiService {
     if (this.isCorsError(error)) {
       // Create a CORS error object with details
       const corsErrorObj = {
-        message: "Cross-Origin Request Blocked",
+        message: "API Connection Error",
         url: url || "Unknown URL",
+        details: {
+          type: "connection_error",
+          message: error.message,
+          expectedUrl: config.apiBaseUrl,
+        },
       };
 
       throw new CorsError(corsErrorObj);

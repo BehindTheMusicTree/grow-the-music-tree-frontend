@@ -1,8 +1,9 @@
 import PopupContentObject from "./PopupContentObject";
+import config from "../../utils/config";
 
 export default class CorsErrorPopupContentObject extends PopupContentObject {
   constructor(errorObj) {
-    super("Cross-Origin Request Error", "CorsErrorPopupContentObject");
+    super("API Connection Error", "CorsErrorPopupContentObject");
 
     this.code = "cors_error";
     this.message = errorObj.message || "Cross-Origin Request Blocked";
@@ -23,16 +24,27 @@ export default class CorsErrorPopupContentObject extends PopupContentObject {
       errors: [
         "A Cross-Origin Resource Sharing (CORS) error has occurred. This happens when a web page from one domain tries to access resources from another domain, but the server doesn't allow it.",
         `Attempted to access: ${this.url}`,
+        `Expected API URL: ${config.apiBaseUrl}`,
       ],
     });
 
     // Add possible solutions
     this.operationErrors.push({
-      name: "Possible Solutions",
+      name: "Troubleshooting Steps",
       errors: [
-        "Check that the API server is running and properly configured for CORS",
-        "Ensure you're using the correct API URL",
-        "Try refreshing the page or logging in again",
+        "1. Check if the API server is running",
+        "2. Verify the API URL is correct in your environment configuration",
+        "3. Ensure the API server has CORS properly configured",
+        "4. Try refreshing the page",
+        "5. Check your network connection",
+      ],
+    });
+
+    // Add contact information
+    this.operationErrors.push({
+      name: "Need Help?",
+      errors: [
+        `If the problem persists, please contact us at: <a href="mailto:${config.contactEmail}">${config.contactEmail}</a>`,
       ],
     });
   }
