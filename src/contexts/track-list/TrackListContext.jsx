@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
-import ApiService from "../../utils//ApiService";
+import { PlaylistService } from "../../utils/services";
 import { usePlayer } from "../player/usePlayer";
 import { TRACK_LIST_ORIGIN_TYPE, PLAY_STATES } from "../../utils/constants";
 import TrackListOrigin from "../../models/TrackListOrigin";
@@ -29,12 +29,12 @@ export function TrackListProvider({ children }) {
   };
 
   const playNewTrackListFromLibTrackUuid = async (uuid) => {
-    const newLibTrackPlayObject = await ApiService.postPlay(uuid);
+    const newLibTrackPlayObject = await PlaylistService.postPlay(uuid);
     setOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.LIB_TRACK, newLibTrackPlayObject.contentObject));
   };
 
   const playNewTrackListFromPlaylistUuid = async (uuid) => {
-    const newPlaylistPlayObject = await ApiService.postPlay(uuid);
+    const newPlaylistPlayObject = await PlaylistService.postPlay(uuid);
     setOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.PLAYLIST, newPlaylistPlayObject.contentObject));
   };
 
@@ -65,7 +65,7 @@ export function TrackListProvider({ children }) {
     if (trackList && trackList.length > playingLibTrackPosition - 1) {
       setPlayState(PLAY_STATES.LOADING);
     }
-  }, [origin, playingLibTrackPosition]);
+  }, [origin, playingLibTrackPosition, trackList, setPlayState]);
 
   useEffect(() => {
     if (playState === PLAY_STATES.LOADING) {
@@ -75,7 +75,7 @@ export function TrackListProvider({ children }) {
         playingLibTrackPosition > 1
       );
     }
-  }, [playState]);
+  }, [playState, trackList, playingLibTrackPosition, setLibTrackToPlay]);
 
   return (
     <TrackListContext.Provider
