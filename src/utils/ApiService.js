@@ -4,6 +4,7 @@ import RequestError from "./errors/RequestError";
 import BadRequestError from "./errors/BadRequestError";
 import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
 import InternalServerError from "./errors/InternalServerError";
+import CorsError from "./errors/CorsError";
 
 export default class ApiService {
   static credentials = { username: config.apiUsername, password: config.apiUserPassword };
@@ -117,8 +118,32 @@ export default class ApiService {
     return "";
   }
 
-  static getFetchErrorMessageOtherThanBadRequest(error) {
-    if (error instanceof TypeError) {
+  static isCorsError(error) {
+    // Check if the error message contains CORS-related terms
+    const errorMessage = error.message ? error.message.toLowerCase() : "";
+    const isCorsErrorMessage =
+      errorMessage.includes("cors") ||
+      errorMessage.includes("cross-origin") ||
+      errorMessage.includes("access-control-allow-origin");
+
+    // CORS errors often appear as TypeErrors with network error messages
+    const isLikelyCorsError =
+      error instanceof TypeError &&
+      (errorMessage.includes("failed to fetch") || errorMessage.includes("network error"));
+
+    return isCorsErrorMessage || isLikelyCorsError;
+  }
+
+  static getFetchErrorMessageOtherThanBadRequest(error, url) {
+    if (this.isCorsError(error)) {
+      // Create a CORS error object with details
+      const corsErrorObj = {
+        message: "Cross-Origin Request Blocked",
+        url: url || "Unknown URL",
+      };
+
+      throw new CorsError(corsErrorObj);
+    } else if (error instanceof TypeError) {
       return `${error.message} probably because of a network error.`;
     } else {
       return error.message;
@@ -160,8 +185,19 @@ export default class ApiService {
         await ApiService.login();
       }
     } catch (error) {
-      const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(error);
-      throw new Error(`Failed to refresh token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
+      try {
+        const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(
+          error,
+          `${config.apiBaseUrl}auth/token/refresh/`
+        );
+        throw new Error(`Failed to refresh token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
+      } catch (innerError) {
+        if (innerError instanceof CorsError) {
+          this.errorSubscribers.forEach((callback) => callback(innerError));
+        } else {
+          throw innerError;
+        }
+      }
     }
   }
 
@@ -211,8 +247,19 @@ export default class ApiService {
         ApiService.setToken(responseJson);
       }
     } catch (error) {
-      const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(error);
-      throw new Error(`Failed to login. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
+      try {
+        const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(
+          error,
+          `${config.apiBaseUrl}auth/token/`
+        );
+        throw new Error(`Failed to login. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
+      } catch (innerError) {
+        if (innerError instanceof CorsError) {
+          this.errorSubscribers.forEach((callback) => callback(innerError));
+        } else {
+          throw innerError;
+        }
+      }
     }
   }
 
@@ -267,7 +314,7 @@ export default class ApiService {
                 xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
                 reject(error);
               } else if (error instanceof RequestError) {
-                if (!(error instanceof BadRequestError) || !badRequestCatched) {
+                if (error instanceof CorsError || !(error instanceof BadRequestError) || !badRequestCatched) {
                   this.errorSubscribers.forEach((callback) => callback(error));
                 } else {
                   reject(error);
@@ -279,9 +326,27 @@ export default class ApiService {
 
         xhr.onerror = async () => {
           try {
-            const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(xhr);
-            reject(new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`));
+            // XMLHttpRequest errors are often CORS-related
+            if (xhr.status === 0) {
+              // Status 0 often indicates a CORS error
+              const corsErrorObj = {
+                message: "Cross-Origin Request Blocked",
+                url: url,
+              };
+
+              const corsError = new CorsError(corsErrorObj);
+              this.errorSubscribers.forEach((callback) => callback(corsError));
+              reject(corsError);
+            } else {
+              const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(xhr, url);
+              reject(
+                new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`)
+              );
+            }
           } catch (error) {
+            if (error instanceof CorsError) {
+              this.errorSubscribers.forEach((callback) => callback(error));
+            }
             reject(error);
           }
         };
@@ -289,8 +354,17 @@ export default class ApiService {
         xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
       });
     } catch (error) {
-      const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(error);
-      throw new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
+      try {
+        const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(error, url);
+        throw new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
+      } catch (innerError) {
+        if (innerError instanceof CorsError) {
+          this.errorSubscribers.forEach((callback) => callback(innerError));
+          throw innerError;
+        } else {
+          throw innerError;
+        }
+      }
     }
   }
 

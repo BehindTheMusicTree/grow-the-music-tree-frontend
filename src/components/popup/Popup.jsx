@@ -4,6 +4,7 @@ import BadRequestErrorPopupChild from "./child/BadRequestPopupChild";
 import LibTrackEditionPopupChild from "./child/LibTrackEditionPopupChild";
 import LibTrackUploadingPopupChild from "./child/LibTrackUploadPopupChild";
 import ApiErrorPopupChild from "./child/ApiErrorPopupChild";
+import CorsErrorPopupChild from "./child/CorsErrorPopupChild";
 
 export default function Popup() {
   const { popupContentObject, hidePopup } = usePopup();
@@ -21,6 +22,9 @@ export default function Popup() {
       break;
     case "ApiErrorPopupContentObject":
       PopupChild = ApiErrorPopupChild;
+      break;
+    case "CorsErrorPopupContentObject":
+      PopupChild = CorsErrorPopupChild;
       break;
     default:
       PopupChild = null;
