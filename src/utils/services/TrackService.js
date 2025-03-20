@@ -29,7 +29,7 @@ export default class TrackService {
     const formData = new FormData();
     formData.append("file", file);
     if (genreUuid) {
-      formData.append("genreUuid", genreUuid);
+      formData.append("genre", genreUuid); // API expects "genre" instead of "genreUuid"
     }
     return await ApiService.fetchData("tracks/", "POST", formData, null, onProgress, badRequestCatched);
   }
