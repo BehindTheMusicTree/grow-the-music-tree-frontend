@@ -2,6 +2,7 @@ import { createContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 import ApiService from "../../utils//ApiService";
+import { GenreService } from "../../utils/services";
 
 export const GenrePlaylistsContext = createContext();
 
@@ -26,7 +27,7 @@ export function GenrePlaylistsProvider({ children }) {
 
   useEffect(() => {
     const fetchGenrePlaylists = async () => {
-      const genrePlaylists = await ApiService.getGenrePlaylists();
+      const genrePlaylists = await GenreService.getGenrePlaylists();
       setGroupedGenrePlaylists(getGenrePlaylistsGroupedByRoot(genrePlaylists));
     };
 
