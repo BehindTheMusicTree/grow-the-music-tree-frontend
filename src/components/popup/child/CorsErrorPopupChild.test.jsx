@@ -2,13 +2,15 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import CorsErrorPopupChild from "./CorsErrorPopupChild";
 import CorsErrorPopupContentObject from "../../../models/popup-content-object/CorsErrorPopupContentObject";
+import config from "../../../utils/config";
 
 describe("CorsErrorPopupChild", () => {
   it("should render error messages with correct styling", () => {
     // Create sample CORS error data
     const corsErrorObj = {
       message: "Cross-Origin Request Blocked",
-      url: "http://localhost:8000/api/v0.1.1/auth/token/",
+      // Extract the path from apiBaseUrl but keep localhost domain
+      url: `http://localhost:8000${config.apiBaseUrl.replace(/^https?:\/\/[^/]+/, "")}auth/token/`,
     };
 
     // Create popup content object
@@ -27,7 +29,12 @@ describe("CorsErrorPopupChild", () => {
     expect(detailsHeading).toBeInTheDocument();
 
     // Check that the URL is displayed
-    const urlElement = screen.getByText(/http:\/\/localhost:8000\/api\/v0.1.1\/auth\/token\//);
+    const urlRegex = new RegExp(
+      `http:\\/\\/localhost:8000${config.apiBaseUrl
+        .replace(/^https?:\/\/[^/]+/, "")
+        .replace(/\//g, "\\/")}auth\\/token\\/`
+    );
+    const urlElement = screen.getByText(urlRegex);
     expect(urlElement).toBeInTheDocument();
 
     // Check that "Possible Solutions" section is rendered

@@ -1,17 +1,18 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render } from '@testing-library/react';
-import ApiErrorHandler from './ApiErrorHandler';
-import ApiService from '../../utils/ApiService';
-import { usePopup } from '../../contexts/popup/usePopup';
-import CorsError from '../../utils/errors/CorsError';
-import CorsErrorPopupContentObject from '../../models/popup-content-object/CorsErrorPopupContentObject';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render } from "@testing-library/react";
+import ApiErrorHandler from "./ApiErrorHandler";
+import ApiService from "../../utils/ApiService";
+import { usePopup } from "../../contexts/popup/usePopup";
+import CorsError from "../../utils/errors/CorsError";
+import CorsErrorPopupContentObject from "../../models/popup-content-object/CorsErrorPopupContentObject";
+import config from "../../utils/config";
 
 // Mock the usePopup hook
-vi.mock('../../contexts/popup/usePopup', () => ({
+vi.mock("../../contexts/popup/usePopup", () => ({
   usePopup: vi.fn(),
 }));
 
-describe('ApiErrorHandler', () => {
+describe("ApiErrorHandler", () => {
   let showPopupMock;
   let onErrorCallback;
 
@@ -31,7 +32,7 @@ describe('ApiErrorHandler', () => {
     });
   });
 
-  it('should handle CorsError correctly', () => {
+  it("should handle CorsError correctly", () => {
     // Render the component to setup error subscription
     render(
       <ApiErrorHandler>
@@ -41,12 +42,12 @@ describe('ApiErrorHandler', () => {
 
     // Verify that ApiService.onError was called
     expect(ApiService.onError).toHaveBeenCalled();
-    expect(typeof onErrorCallback).toBe('function');
+    expect(typeof onErrorCallback).toBe("function");
 
     // Create a CORS error
     const corsErrorObj = {
-      message: 'Cross-Origin Request Blocked',
-      url: 'http://localhost:8000/api/v0.1.1/auth/token/',
+      message: "Cross-Origin Request Blocked",
+      url: `http://localhost:8000${config.apiBaseUrl.replace(/^https?:\/\/[^/]+/, "")}auth/token/`,
     };
     const corsError = new CorsError(corsErrorObj);
 
@@ -55,14 +56,14 @@ describe('ApiErrorHandler', () => {
 
     // Verify showPopup was called with a CorsErrorPopupContentObject
     expect(showPopupMock).toHaveBeenCalled();
-    
+
     const popupContentArg = showPopupMock.mock.calls[0][0];
     expect(popupContentArg).toBeInstanceOf(CorsErrorPopupContentObject);
-    expect(popupContentArg.title).toBe('Cross-Origin Request Error');
-    expect(popupContentArg.type).toBe('CorsErrorPopupContentObject');
+    expect(popupContentArg.title).toBe("Cross-Origin Request Error");
+    expect(popupContentArg.type).toBe("CorsErrorPopupContentObject");
   });
 
-  it('should handle regular RequestErrors', () => {
+  it("should handle regular RequestErrors", () => {
     // Render the component to setup error subscription
     render(
       <ApiErrorHandler>
@@ -72,9 +73,9 @@ describe('ApiErrorHandler', () => {
 
     // Create a mock RequestError with status code 400
     const requestError = {
-      name: 'RequestError',
+      name: "RequestError",
       statusCode: 400,
-      requestErrors: [{ message: 'Bad Request' }],
+      requestErrors: [{ message: "Bad Request" }],
     };
 
     // Make sure it's treated as a RequestError instance
@@ -88,13 +89,13 @@ describe('ApiErrorHandler', () => {
     expect(showPopupMock).toHaveBeenCalled();
   });
 
-  it('should render children correctly', () => {
+  it("should render children correctly", () => {
     const { getByText } = render(
       <ApiErrorHandler>
         <div>Test Child Content</div>
       </ApiErrorHandler>
     );
 
-    expect(getByText('Test Child Content')).toBeInTheDocument();
+    expect(getByText("Test Child Content")).toBeInTheDocument();
   });
 });
