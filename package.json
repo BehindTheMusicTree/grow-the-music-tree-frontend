@@ -9,7 +9,12 @@
     "serve": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:cors": "vitest run src/utils/ApiService.test.js src/components/utils/ApiErrorHandler.test.jsx src/components/popup/child/CorsErrorPopupChild.test.jsx"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
@@ -33,6 +38,8 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
@@ -42,9 +49,11 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "jsdom": "^26.0.0",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
-    "vite": "^5.2.0",
-    "vite-plugin-eslint": "^1.8.1"
+    "vite": "^6.2.2",
+    "vite-plugin-eslint": "^1.8.1",
+    "vitest": "^3.0.9"
   }
 }
