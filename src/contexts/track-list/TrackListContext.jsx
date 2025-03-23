@@ -30,12 +30,12 @@ export function TrackListProvider({ children }) {
 
   const playNewTrackListFromLibTrackUuid = async (uuid) => {
     const newLibTrackPlayObject = await PlaylistService.postPlay(uuid);
-    setOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.LIB_TRACK, newLibTrackPlayObject.contentObject));
+    setOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.LIB_TRACK, newLibTrackPlayObject.content));
   };
 
   const playNewTrackListFromPlaylistUuid = async (uuid) => {
     const newPlaylistPlayObject = await PlaylistService.postPlay(uuid);
-    setOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.PLAYLIST, newPlaylistPlayObject.contentObject));
+    setOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.PLAYLIST, newPlaylistPlayObject.content));
   };
 
   const toPreviousTrack = () => {
