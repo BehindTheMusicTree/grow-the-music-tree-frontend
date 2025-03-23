@@ -50,7 +50,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["react", "react-dom", "howler", "prop-types", "hoist-non-react-statics"],
-    exclude: ["@sentry/react", "@sentry/tracing", "@sentry-internal/tracing", "@sentry/utils"],
+    // Allow Sentry packages to be optimized properly
     esbuildOptions: {
       sourcemap: true,
       minify: false,
@@ -72,10 +72,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "hoist-non-react-statics": "hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js",
-      "@sentry/utils": "@sentry/utils/esm/index.js",
-      "@sentry/core": "@sentry/core/esm/index.js",
-      "@sentry-internal/tracing": "@sentry-internal/tracing/esm/index.js",
-      "@sentry-internal/replay-canvas": "@sentry-internal/replay-canvas/esm/index.js",
+      // Removed direct ESM aliases for Sentry packages to fix source map issues
     },
   },
   css: {
