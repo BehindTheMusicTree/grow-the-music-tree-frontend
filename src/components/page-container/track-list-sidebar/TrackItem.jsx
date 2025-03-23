@@ -10,7 +10,7 @@ import LibTrackPositionPlayPause from "../../utils/LibTrackPositionPlayPause";
 
 export default function TrackItem({ libTrack, position }) {
   const { showPopup } = usePopup();
-  const { handlePlayPauseAction, libTrackObject } = usePlayer();
+  const { handlePlayPauseAction, playerLibTrackObject } = usePlayer();
   const { toTrackAtPosition } = useTrackList();
 
   const handleEditClick = (event) => {
@@ -21,7 +21,8 @@ export default function TrackItem({ libTrack, position }) {
 
   const handlePlayPauseClick = (event) => {
     event.stopPropagation();
-    if (libTrackObject.libTrack.uuid == libTrack.uuid) {
+    console.log("handlePlayPauseClick", { playerLibTrackObject, libTrack });
+    if (playerLibTrackObject.libTrack.uuid == libTrack.uuid) {
       handlePlayPauseAction(event);
     } else {
       toTrackAtPosition(position);
