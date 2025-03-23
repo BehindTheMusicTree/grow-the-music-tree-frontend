@@ -6,10 +6,10 @@ import App from "./App.jsx";
 import "./index.css";
 import { checkRequiredConfigVars } from "./utils/config";
 
-import { PlayerProvider } from "./contexts/player/PlayerContext";
-import { TrackListProvider } from "./contexts/track-list/TrackListContext";
-import { GenrePlaylistsProvider } from "./contexts/genre-playlists/GenrePlaylistsContext";
-import { PopupProvider } from "./contexts/popup/PopupContext";
+import PlayerProvider from "./contexts/player/PlayerContext";
+import TrackListProvider from "./contexts/track-list/TrackListContext";
+import GenrePlaylistsProvider from "./contexts/genre-playlists/GenrePlaylistsContext";
+import PopupProvider from "./contexts/popup/PopupContext";
 
 checkRequiredConfigVars();
 

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 export const PopupContext = createContext();
 
-export const PopupProvider = ({ children }) => {
+function PopupProvider({ children }) {
   const [popupContentObject, setPopupContentObject] = useState();
 
   const showPopup = (popupContentObject) => {
@@ -15,8 +15,10 @@ export const PopupProvider = ({ children }) => {
   };
 
   return <PopupContext.Provider value={{ popupContentObject, showPopup, hidePopup }}>{children}</PopupContext.Provider>;
-};
+}
 
 PopupProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export default PopupProvider;

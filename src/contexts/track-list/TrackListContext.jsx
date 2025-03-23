@@ -8,7 +8,7 @@ import TrackListOrigin from "../../models/TrackListOrigin";
 
 export const TrackListContext = createContext();
 
-export function TrackListProvider({ children }) {
+function TrackListProvider({ children }) {
   const [trackList, setTrackList] = useState(null);
   const [origin, setOrigin] = useState(null);
   const [playingLibTrackPosition, setPlayingLibTrackPosition] = useState(null);
@@ -101,3 +101,5 @@ export function TrackListProvider({ children }) {
 TrackListProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export default TrackListProvider;
