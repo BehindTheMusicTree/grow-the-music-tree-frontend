@@ -38,9 +38,9 @@ export default class TrackService {
     return {
       ...data,
       artistsNames: data.artistName ? [data.artistName] : data.artistsNames,
-      // Remove artistName if it exists as it's not needed in the API
       artistName: undefined,
-      genre: data.genre?.uuid || data.genre,
+      genre: data.genre?.uuid || data.genreName,
+      genreName: undefined,
     };
   }
 
