@@ -41,7 +41,7 @@ export default function Player() {
   };
 
   const handleTrackEnd = () => {
-    if (playerLibTrackObject.hasNext) {
+    if (playerLibTrackObject?.hasNext) {
       toNextTrack();
     } else {
       setPlayState(PLAY_STATES.STOPPED);
@@ -54,7 +54,7 @@ export default function Player() {
   };
 
   const handleBackwardClick = () => {
-    if (!playerLibTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
+    if (!playerLibTrackObject?.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
       setStopProgressAnimationSignal(1);
       setResetSeekSignal(1);
     } else {
@@ -73,8 +73,8 @@ export default function Player() {
       <div className="flex-1 flex items-center justify-center">
         <img className="flex-none w-16 h-16 overflow-hidden mr-5" src={albumCover} alt="Album Cover" />
         <div className="flex-1 flex flex-col items-start justify-center w-full">
-          <div>{playerLibTrackObject?.libraryTrack.title}</div>
-          <div>{playerLibTrackObject?.libraryTrack.artist?.name}</div>
+          <div>{playerLibTrackObject?.libTrack?.title}</div>
+          <div>{playerLibTrackObject?.libTrack?.artist?.name}</div>
         </div>
       </div>
       <div className="flex-2 flex flex-col justify-center items-center">
@@ -99,7 +99,7 @@ export default function Player() {
           <Button
             className={
               playState !== PLAY_STATES.LOADING
-                ? playerLibTrackObject.hasNext
+                ? playerLibTrackObject?.hasNext
                   ? "player-control-button"
                   : "player-control-button-disabled"
                 : "player-control-button-disabled"

@@ -149,7 +149,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
           src={[playerLibTrackObject.blobUrl]}
           html5={true}
           playing={playState === PLAY_STATES.PLAYING}
-          format={[playerLibTrackObject.libraryTrack.file.extension.replace(".", "")]}
+          format={[playerLibTrackObject.libTrack.file.extension.replace(".", "")]}
           onLoadError={handleLoadError}
           onEnd={handleTrackEnd}
           volume={volume}
@@ -161,9 +161,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
         type="range"
         min="0"
         max={
-          playerRef
-            ? Math.floor(playerLibTrackObject.libraryTrack.file.durationInSec)
-            : PROGRESS_SEEK_MAX_WHEN_NO_PLAYER
+          playerRef ? Math.floor(playerLibTrackObject.libTrack.file.durationInSec) : PROGRESS_SEEK_MAX_WHEN_NO_PLAYER
         }
         value={playerRef ? seek : PROGRESS_SEEK_MAX_WHEN_NO_PLAYER}
         onChange={handleSeekingChange}
@@ -172,7 +170,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
         onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
       />
       <div className="w-14 text-left">
-        {formatTime(playerRef.current ? playerLibTrackObject.libraryTrack.file.durationInSec : 0)}
+        {formatTime(playerRef.current ? playerLibTrackObject.libTrack.file.durationInSec : 0)}
       </div>
     </div>
   );

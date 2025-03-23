@@ -16,14 +16,11 @@ export function TrackListProvider({ children }) {
   const { playState, setPlayState, setLibTrackToPlay } = usePlayer();
 
   const refreshLibTrack = async (updatedLibTrack) => {
-    const newTrackList = trackList.map((oldPlaylistTrackRelation) => {
-      if (oldPlaylistTrackRelation.libraryTrack.uuid === updatedLibTrack.uuid) {
-        return {
-          ...oldPlaylistTrackRelation,
-          libraryTrack: updatedLibTrack,
-        };
+    const newTrackList = trackList.map((oldLibTrack) => {
+      if (oldLibTrack.uuid === updatedLibTrack.uuid) {
+        return updatedLibTrack;
       }
-      return oldPlaylistTrackRelation;
+      return oldLibTrack;
     });
     setTrackList(newTrackList);
   };

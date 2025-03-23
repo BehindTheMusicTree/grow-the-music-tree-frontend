@@ -35,7 +35,7 @@ export default function Library() {
   };
 
   const handlePlayPauseClick = (libTrackUuid) => {
-    if (playerLibTrackObject && playerLibTrackObject.libraryTrack.uuid == libTrackUuid) {
+    if (playerLibTrackObject && playerLibTrackObject.libTrack.uuid == libTrackUuid) {
       handlePlayPauseAction();
     } else {
       playNewTrackListFromLibTrackUuid(libTrackUuid);

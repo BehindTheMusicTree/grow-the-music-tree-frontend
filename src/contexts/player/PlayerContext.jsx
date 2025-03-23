@@ -15,7 +15,7 @@ export function PlayerProvider({ children }) {
   const setLibTrackToPlay = async (libTrack, hasNext, hasPrevious) => {
     const playingLibTrackBlobUrl = await TrackService.loadAudioAndGetLibTrackBlobUrl(libTrack.relativeUrl);
     setPlayerLibTrackObject({
-      libraryTrack: libTrack,
+      libTrack: libTrack,
       blobUrl: playingLibTrackBlobUrl,
       hasNext: hasNext,
       hasPrevious: hasPrevious,
