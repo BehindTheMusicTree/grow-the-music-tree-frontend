@@ -21,7 +21,7 @@ export default function TrackItem({ libTrack, position }) {
 
   const handlePlayPauseClick = (event) => {
     event.stopPropagation();
-    if (libTrackObject.libraryTrack.uuid == libTrack.uuid) {
+    if (libTrackObject.libTrack.uuid == libTrack.uuid) {
       handlePlayPauseAction(event);
     } else {
       toTrackAtPosition(position);
