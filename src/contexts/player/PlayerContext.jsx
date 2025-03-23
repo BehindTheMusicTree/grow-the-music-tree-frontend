@@ -2,7 +2,7 @@ import { createContext, useState } from "react";
 import PropTypes from "prop-types";
 
 import { PLAY_STATES } from "../../utils/constants";
-import ApiService from "../../utils//ApiService";
+import { TrackService } from "../../utils/services";
 
 export const PlayerContext = createContext();
 
@@ -13,7 +13,7 @@ export function PlayerProvider({ children }) {
   const [playState, setPlayState] = useState(PLAY_STATES.STOPPED);
 
   const setLibTrackToPlay = async (libTrack, hasNext, hasPrevious) => {
-    const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(libTrack.relativeUrl);
+    const playingLibTrackBlobUrl = await TrackService.loadAudioAndGetLibTrackBlobUrl(libTrack.file.relativeUrl);
     setPlayerLibTrackObject({
       libraryTrack: libTrack,
       blobUrl: playingLibTrackBlobUrl,
