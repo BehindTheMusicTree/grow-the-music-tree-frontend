@@ -6,7 +6,7 @@ import { TrackService } from "../../utils/services";
 
 export const PlayerContext = createContext();
 
-export function PlayerProvider({ children }) {
+function PlayerProvider({ children }) {
   const [playerLibTrackObject, setPlayerLibTrackObject] = useState();
   const [stopProgressAnimationSignal, setStopProgressAnimationSignal] = useState(0);
   const [resetSeekSignal, setResetSeekSignal] = useState(0);
@@ -55,3 +55,5 @@ export function PlayerProvider({ children }) {
 PlayerProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export default PlayerProvider;
