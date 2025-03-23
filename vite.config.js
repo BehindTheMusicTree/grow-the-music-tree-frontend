@@ -72,6 +72,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "hoist-non-react-statics": "hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js",
+      "@sentry/utils": "@sentry/utils/esm/index.js",
+      "@sentry/core": "@sentry/core/esm/index.js",
+      "@sentry-internal/tracing": "@sentry-internal/tracing/esm/index.js",
+      "@sentry-internal/replay-canvas": "@sentry-internal/replay-canvas/esm/index.js",
     },
   },
   css: {
