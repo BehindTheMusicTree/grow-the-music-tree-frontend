@@ -44,7 +44,7 @@ export default class TrackService {
       throw new Error("Track URL is undefined");
     }
     const headers = { Authorization: `Bearer ${ApiService.getToken().access}` };
-    const blob = await ApiService.streamAudio(`${config.apiBaseUrl}${libTrackRelativeUrl}/download/`, headers);
+    const blob = await ApiService.streamAudio(`${config.apiBaseUrl}${libTrackRelativeUrl}download/`, headers);
     return URL.createObjectURL(blob);
   }
 }

@@ -79,7 +79,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hide }) 
             <label className="genre popup-content-label">
               <span>Duration:</span>
               <div className="popup-content-input-readonly inline-block">
-                {formatTime(popupContentObject.libTrack.durationInSec)}
+                {formatTime(popupContentObject.libTrack.file.durationInSec)}
               </div>
             </label>
           </div>
