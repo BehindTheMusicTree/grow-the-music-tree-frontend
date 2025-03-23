@@ -34,8 +34,19 @@ export default class TrackService {
     return await ApiService.fetchData("tracks/", "POST", formData, null, onProgress, badRequestCatched);
   }
 
+  static transformTrackData(data) {
+    return {
+      ...data,
+      artistsNames: data.artistName ? [data.artistName] : data.artistsNames,
+      // Remove artistName if it exists as it's not needed in the API
+      artistName: undefined,
+      genre: data.genre?.uuid || data.genre,
+    };
+  }
+
   static async putLibTrack(libTrackUuid, libTrackData) {
-    return await ApiService.fetchData(`tracks/${libTrackUuid}/`, "PUT", libTrackData, null);
+    const transformedData = this.transformTrackData(libTrackData);
+    return await ApiService.fetchData(`tracks/${libTrackUuid}/`, "PUT", transformedData, null);
   }
 
   static async loadAudioAndGetLibTrackBlobUrl(libTrackRelativeUrl) {
