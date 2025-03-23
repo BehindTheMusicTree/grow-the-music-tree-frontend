@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 
-import ApiService from "../../../utils//ApiService";
+import { TrackService } from "../../../utils/services";
 import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePlaylists";
 import { useTrackList } from "../../../contexts/track-list/useTrackList";
 import { formatTime } from "../../../utils";
@@ -33,7 +33,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hide }) 
     if (submittedValues.rating === FORM_RATING_NULL_VALUE) {
       submittedValues.rating = null;
     }
-    const updatedLibTrack = await ApiService.putLibTrack(popupContentObject.libTrack.uuid, formValues);
+    const updatedLibTrack = await TrackService.putLibTrack(popupContentObject.libTrack.uuid, formValues);
     refreshLibTrack(updatedLibTrack);
     if (genreNameBeforeEdition !== updatedLibTrack.genre?.name) {
       setRefreshGenrePlaylistsSignal(1);
