@@ -4,7 +4,7 @@ import RequestError from "./errors/RequestError";
 import BadRequestError from "./errors/BadRequestError";
 import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
 import InternalServerError from "./errors/InternalServerError";
-import CorsError from "./errors/CorsError";
+import ConnectivityError from "./errors/ConnectivityError";
 
 /**
  * Core API service handling authentication, HTTP requests, and error management
@@ -121,16 +121,16 @@ export default class ApiService {
     return "";
   }
 
-  static isCorsError(error) {
-    // Check if the error message contains CORS-related terms in multiple languages
+  static isConnectivityError(error) {
+    // Check if the error message contains connectivity-related terms
     const errorMessage = error.message ? error.message.toLowerCase() : "";
-    const corsTerms = [
-      // English terms
+    const connectivityTerms = [
+      // CORS terms (English)
       "cors",
       "cross-origin",
       "access-control-allow-origin",
       "same origin policy",
-      // French terms
+      // CORS terms (French)
       "requête multiorigine",
       "politique same origin",
       "cross-origin request",
@@ -155,10 +155,10 @@ export default class ApiService {
       "timeout",
     ];
 
-    const isCorsErrorMessage = corsTerms.some((term) => errorMessage.includes(term));
+    const hasConnectivityErrorMessage = connectivityTerms.some((term) => errorMessage.includes(term));
 
-    // CORS errors often appear as TypeErrors with network error messages
-    const isLikelyCorsError =
+    // Connectivity errors often appear as TypeErrors with network error messages
+    const isLikelyConnectivityError =
       error instanceof TypeError ||
       (error instanceof Error && errorMessage.includes("status: (null)")) ||
       (error instanceof Error && errorMessage.includes("status: null")) ||
@@ -167,13 +167,13 @@ export default class ApiService {
       (error instanceof Error && error.name === "TypeError" && error.message.includes("Failed to fetch")) ||
       (error instanceof Error && error.name === "NetworkError");
 
-    return isCorsErrorMessage || isLikelyCorsError;
+    return hasConnectivityErrorMessage || isLikelyConnectivityError;
   }
 
   static getFetchErrorMessageOtherThanBadRequest(error, url) {
-    if (this.isCorsError(error)) {
-      // Create a CORS error object with details
-      const corsErrorObj = {
+    if (this.isConnectivityError(error)) {
+      // Create a connectivity error object with details
+      const connectivityErrorObj = {
         message: "API Connection Error",
         url: url || "Unknown URL",
         details: {
@@ -183,7 +183,7 @@ export default class ApiService {
         },
       };
 
-      throw new CorsError(corsErrorObj);
+      throw new ConnectivityError(connectivityErrorObj);
     } else if (error instanceof TypeError) {
       return `${error.message} probably because of a network error.`;
     } else {
@@ -233,7 +233,7 @@ export default class ApiService {
         );
         throw new Error(`Failed to refresh token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
       } catch (innerError) {
-        if (innerError instanceof CorsError) {
+        if (innerError instanceof ConnectivityError) {
           this.errorSubscribers.forEach((callback) => callback(innerError));
         } else {
           throw innerError;
@@ -295,7 +295,7 @@ export default class ApiService {
         );
         throw new Error(`Failed to login. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
       } catch (innerError) {
-        if (innerError instanceof CorsError) {
+        if (innerError instanceof ConnectivityError) {
           this.errorSubscribers.forEach((callback) => callback(innerError));
         } else {
           throw innerError;
@@ -355,7 +355,7 @@ export default class ApiService {
                 xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
                 reject(error);
               } else if (error instanceof RequestError) {
-                if (error instanceof CorsError || !(error instanceof BadRequestError) || !badRequestCatched) {
+                if (error instanceof ConnectivityError || !(error instanceof BadRequestError) || !badRequestCatched) {
                   this.errorSubscribers.forEach((callback) => callback(error));
                 } else {
                   reject(error);
@@ -375,9 +375,9 @@ export default class ApiService {
                 url: url,
               };
 
-              const corsError = new CorsError(corsErrorObj);
-              this.errorSubscribers.forEach((callback) => callback(corsError));
-              reject(corsError);
+              const connectivityError = new ConnectivityError(corsErrorObj);
+              this.errorSubscribers.forEach((callback) => callback(connectivityError));
+              reject(connectivityError);
             } else {
               const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(xhr, url);
               reject(
@@ -385,7 +385,7 @@ export default class ApiService {
               );
             }
           } catch (error) {
-            if (error instanceof CorsError) {
+            if (error instanceof ConnectivityError) {
               this.errorSubscribers.forEach((callback) => callback(error));
             }
             reject(error);
@@ -399,7 +399,7 @@ export default class ApiService {
         const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(error, url);
         throw new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
       } catch (innerError) {
-        if (innerError instanceof CorsError) {
+        if (innerError instanceof ConnectivityError) {
           this.errorSubscribers.forEach((callback) => callback(innerError));
           throw innerError;
         } else {

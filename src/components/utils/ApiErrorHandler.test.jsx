@@ -3,8 +3,8 @@ import { render } from "@testing-library/react";
 import ApiErrorHandler from "./ApiErrorHandler";
 import ApiService from "../../utils/ApiService";
 import { usePopup } from "../../contexts/popup/usePopup";
-import CorsError from "../../utils/errors/CorsError";
-import CorsErrorPopupContentObject from "../../models/popup-content-object/CorsErrorPopupContentObject";
+import ConnectivityError from "../../utils/errors/ConnectivityError";
+import ConnectivityErrorPopupContentObject from "../../models/popup-content-object/ConnectivityErrorPopupContentObject";
 import config from "../../utils/config";
 
 // Mock the usePopup hook
@@ -32,7 +32,7 @@ describe("ApiErrorHandler", () => {
     });
   });
 
-  it("should handle CorsError correctly", () => {
+  it("should handle ConnectivityError correctly", () => {
     // Render the component to setup error subscription
     render(
       <ApiErrorHandler>
@@ -44,23 +44,25 @@ describe("ApiErrorHandler", () => {
     expect(ApiService.onError).toHaveBeenCalled();
     expect(typeof onErrorCallback).toBe("function");
 
-    // Create a CORS error
-    const corsErrorObj = {
+    // Create a connectivity error with CORS-like properties
+    const connectivityErrorObj = {
       message: "Cross-Origin Request Blocked",
       url: `http://localhost:8000${config.apiBaseUrl.replace(/^https?:\/\/[^/]+/, "")}auth/token/`,
+      details: {
+        type: "cors_error",
+      },
     };
-    const corsError = new CorsError(corsErrorObj);
+    const connectivityError = new ConnectivityError(connectivityErrorObj);
 
     // Simulate error event
-    onErrorCallback(corsError);
+    onErrorCallback(connectivityError);
 
-    // Verify showPopup was called with a CorsErrorPopupContentObject
+    // Verify showPopup was called with a ConnectivityErrorPopupContentObject
     expect(showPopupMock).toHaveBeenCalled();
 
     const popupContentArg = showPopupMock.mock.calls[0][0];
-    expect(popupContentArg).toBeInstanceOf(CorsErrorPopupContentObject);
-    expect(popupContentArg.title).toBe("Cross-Origin Request Error");
-    expect(popupContentArg.type).toBe("CorsErrorPopupContentObject");
+    expect(popupContentArg).toBeInstanceOf(ConnectivityErrorPopupContentObject);
+    expect(popupContentArg.type).toBe("ConnectivityErrorPopupContentObject");
   });
 
   it("should handle regular RequestErrors", () => {
@@ -71,7 +73,7 @@ describe("ApiErrorHandler", () => {
       </ApiErrorHandler>
     );
 
-    // Create a mock RequestError with status code 400
+    // Create a mock RequestError with status code 400 (non-connectivity error)
     const requestError = {
       name: "RequestError",
       statusCode: 400,
