@@ -54,9 +54,12 @@ export function TrackListProvider({ children }) {
     if (origin) {
       setPlayingLibTrackPosition(1);
       if (origin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST) {
-        setTrackList(origin.object.libraryTracks);
+        const trackList = origin.object.libraryTrackPlaylistRelations
+          .sort((a, b) => a.position - b.position)
+          .map((relation) => relation.libraryTrack);
+        setTrackList(trackList);
       } else if (origin.type === TRACK_LIST_ORIGIN_TYPE.LIB_TRACK) {
-        setTrackList([{ potition: "1", libraryTrack: origin.object }]);
+        setTrackList([origin.object]);
       }
     }
   }, [origin]);
@@ -70,7 +73,7 @@ export function TrackListProvider({ children }) {
   useEffect(() => {
     if (playState === PLAY_STATES.LOADING) {
       setLibTrackToPlay(
-        trackList[playingLibTrackPosition - 1].libraryTrack,
+        trackList[playingLibTrackPosition - 1],
         trackList.length > playingLibTrackPosition,
         playingLibTrackPosition > 1
       );
