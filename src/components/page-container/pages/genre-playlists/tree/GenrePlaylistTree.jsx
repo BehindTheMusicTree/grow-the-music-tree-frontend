@@ -140,8 +140,10 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
 
     const isGenreless = !genrePlaylist.criteria;
     // Adjust container height based on whether it's genreless and how many actions are shown
+    // For genreless, we only show 2 actions (play/pause and upload track)
+    // For regular genres, we show 5 actions (play/pause, upload track, add sub-genre, change parent, delete)
     const actionsContainerHeight = isGenreless
-      ? ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT - 2 * ACTION_CONTAINER_DIMENSIONS.HEIGHT
+      ? ACTION_CONTAINER_DIMENSIONS.HEIGHT * 2 // Only 2 actions for genreless
       : ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT;
     const actionsContainerY = -actionsContainerHeight / 2;
 
