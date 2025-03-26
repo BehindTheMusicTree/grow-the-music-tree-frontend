@@ -35,7 +35,13 @@ export default defineConfig({
     host: true,
     port: 5000,
     proxy: {
-      "/api/v0.1.1": {
+      // Extract API version from base URL
+      [`/api/${(() => {
+        const baseUrl = process.env.VITE_API_BASE_URL;
+        if (!baseUrl) return null;
+        const versionMatch = baseUrl.match(/\/api\/(v[0-9]+\.[0-9]+\.[0-9]+)\//);
+        return versionMatch ? versionMatch[1] : null;
+      })()}`]: {
         target: "http://localhost:8000",
         changeOrigin: true,
         secure: false,
@@ -44,7 +50,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["react", "react-dom", "howler", "prop-types", "hoist-non-react-statics"],
-    exclude: ["@sentry/react", "@sentry/tracing", "@sentry-internal/tracing", "@sentry/utils"],
+    // Allow Sentry packages to be optimized properly
     esbuildOptions: {
       sourcemap: true,
       minify: false,
@@ -66,6 +72,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "hoist-non-react-statics": "hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js",
+      // Removed direct ESM aliases for Sentry packages to fix source map issues
     },
   },
   css: {

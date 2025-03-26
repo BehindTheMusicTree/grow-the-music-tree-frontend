@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-export default function CorsErrorPopupChild({ popupContentObject }) {
+export default function ConnectivityErrorPopupChild({ popupContentObject }) {
   return (
     <div className="space-y-4">
       {popupContentObject.operationErrors.map((errorObject, index) => (
@@ -27,7 +27,7 @@ export default function CorsErrorPopupChild({ popupContentObject }) {
   );
 }
 
-CorsErrorPopupChild.propTypes = {
+ConnectivityErrorPopupChild.propTypes = {
   popupContentObject: PropTypes.shape({
     title: PropTypes.string.isRequired,
     operationErrors: PropTypes.arrayOf(

@@ -4,8 +4,11 @@ import RequestError from "./errors/RequestError";
 import BadRequestError from "./errors/BadRequestError";
 import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
 import InternalServerError from "./errors/InternalServerError";
-import CorsError from "./errors/CorsError";
+import ConnectivityError from "./errors/ConnectivityError";
 
+/**
+ * Core API service handling authentication, HTTP requests, and error management
+ */
 export default class ApiService {
   static credentials = { username: config.apiUsername, password: config.apiUserPassword };
   static errorSubscribers = [];
@@ -118,31 +121,69 @@ export default class ApiService {
     return "";
   }
 
-  static isCorsError(error) {
-    // Check if the error message contains CORS-related terms
+  static isConnectivityError(error) {
+    // Check if the error message contains connectivity-related terms
     const errorMessage = error.message ? error.message.toLowerCase() : "";
-    const isCorsErrorMessage =
-      errorMessage.includes("cors") ||
-      errorMessage.includes("cross-origin") ||
-      errorMessage.includes("access-control-allow-origin");
+    const connectivityTerms = [
+      // CORS terms (English)
+      "cors",
+      "cross-origin",
+      "access-control-allow-origin",
+      "same origin policy",
+      // CORS terms (French)
+      "requête multiorigine",
+      "politique same origin",
+      "cross-origin request",
+      "blocage d'une requête",
+      // Common network error terms
+      "failed to fetch",
+      "network error",
+      "status: (null)",
+      "status: null",
+      "status: 0",
+      // API unreachability terms
+      "networkerror when attempting to fetch resource",
+      "could not connect to the server",
+      "connection refused",
+      "no such host",
+      "dns lookup failed",
+      "connection timed out",
+      "unable to connect",
+      "unable to reach",
+      "unreachable",
+      "refused",
+      "timeout",
+    ];
 
-    // CORS errors often appear as TypeErrors with network error messages
-    const isLikelyCorsError =
-      error instanceof TypeError &&
-      (errorMessage.includes("failed to fetch") || errorMessage.includes("network error"));
+    const hasConnectivityErrorMessage = connectivityTerms.some((term) => errorMessage.includes(term));
 
-    return isCorsErrorMessage || isLikelyCorsError;
+    // Connectivity errors often appear as TypeErrors with network error messages
+    const isLikelyConnectivityError =
+      error instanceof TypeError ||
+      (error instanceof Error && errorMessage.includes("status: (null)")) ||
+      (error instanceof Error && errorMessage.includes("status: null")) ||
+      (error instanceof Error && errorMessage.includes("status: 0")) ||
+      // Check for network errors that might indicate API unreachability
+      (error instanceof Error && error.name === "TypeError" && error.message.includes("Failed to fetch")) ||
+      (error instanceof Error && error.name === "NetworkError");
+
+    return hasConnectivityErrorMessage || isLikelyConnectivityError;
   }
 
   static getFetchErrorMessageOtherThanBadRequest(error, url) {
-    if (this.isCorsError(error)) {
-      // Create a CORS error object with details
-      const corsErrorObj = {
-        message: "Cross-Origin Request Blocked",
+    if (this.isConnectivityError(error)) {
+      // Create a connectivity error object with details
+      const connectivityErrorObj = {
+        message: "API Connection Error",
         url: url || "Unknown URL",
+        details: {
+          type: "connection_error",
+          message: error.message,
+          expectedUrl: config.apiBaseUrl,
+        },
       };
 
-      throw new CorsError(corsErrorObj);
+      throw new ConnectivityError(connectivityErrorObj);
     } else if (error instanceof TypeError) {
       return `${error.message} probably because of a network error.`;
     } else {
@@ -192,7 +233,7 @@ export default class ApiService {
         );
         throw new Error(`Failed to refresh token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
       } catch (innerError) {
-        if (innerError instanceof CorsError) {
+        if (innerError instanceof ConnectivityError) {
           this.errorSubscribers.forEach((callback) => callback(innerError));
         } else {
           throw innerError;
@@ -254,7 +295,7 @@ export default class ApiService {
         );
         throw new Error(`Failed to login. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
       } catch (innerError) {
-        if (innerError instanceof CorsError) {
+        if (innerError instanceof ConnectivityError) {
           this.errorSubscribers.forEach((callback) => callback(innerError));
         } else {
           throw innerError;
@@ -314,7 +355,7 @@ export default class ApiService {
                 xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
                 reject(error);
               } else if (error instanceof RequestError) {
-                if (error instanceof CorsError || !(error instanceof BadRequestError) || !badRequestCatched) {
+                if (error instanceof ConnectivityError || !(error instanceof BadRequestError) || !badRequestCatched) {
                   this.errorSubscribers.forEach((callback) => callback(error));
                 } else {
                   reject(error);
@@ -334,9 +375,9 @@ export default class ApiService {
                 url: url,
               };
 
-              const corsError = new CorsError(corsErrorObj);
-              this.errorSubscribers.forEach((callback) => callback(corsError));
-              reject(corsError);
+              const connectivityError = new ConnectivityError(corsErrorObj);
+              this.errorSubscribers.forEach((callback) => callback(connectivityError));
+              reject(connectivityError);
             } else {
               const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(xhr, url);
               reject(
@@ -344,7 +385,7 @@ export default class ApiService {
               );
             }
           } catch (error) {
-            if (error instanceof CorsError) {
+            if (error instanceof ConnectivityError) {
               this.errorSubscribers.forEach((callback) => callback(error));
             }
             reject(error);
@@ -358,7 +399,7 @@ export default class ApiService {
         const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(error, url);
         throw new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
       } catch (innerError) {
-        if (innerError instanceof CorsError) {
+        if (innerError instanceof ConnectivityError) {
           this.errorSubscribers.forEach((callback) => callback(innerError));
           throw innerError;
         } else {
@@ -366,48 +407,6 @@ export default class ApiService {
         }
       }
     }
-  }
-
-  static async getLibTracks() {
-    let results = [];
-    let page = 1;
-    let hasMore = true;
-
-    while (hasMore) {
-      const data = await ApiService.fetchData("tracks/", "GET", null, page);
-      results = results.concat(data.results);
-
-      if (data.next) {
-        page++;
-      } else {
-        hasMore = false;
-      }
-    }
-
-    return results;
-  }
-
-  static async retrieveLibTrack(libTrackUuid) {
-    return await ApiService.fetchData(`tracks/${libTrackUuid}/`, "GET", null, null);
-  }
-
-  static async postLibTrack(file, genreUuid, onProgress, badRequestCatched = false) {
-    const formData = new FormData();
-    formData.append("file", file);
-    if (genreUuid) {
-      formData.append("genreUuid", genreUuid);
-    }
-    return await ApiService.fetchData("tracks/", "POST", formData, null, onProgress, badRequestCatched);
-  }
-
-  static async putLibTrack(libTrackUuid, libTrackData) {
-    return await ApiService.fetchData(`tracks/${libTrackUuid}/`, "PUT", libTrackData, null);
-  }
-
-  static async loadAudioAndGetLibTrackBlobUrl(libTrackRelativeUrl) {
-    const headers = { Authorization: `Bearer ${ApiService.getToken().access}` };
-    const blob = await ApiService.streamAudio(`${config.apiBaseUrl}${libTrackRelativeUrl}download/`, headers);
-    return URL.createObjectURL(blob);
   }
 
   static async streamAudio(trackUrl) {
@@ -438,60 +437,5 @@ export default class ApiService {
     return new Response(stream, {
       headers: { "Content-Type": "audio/*" },
     }).blob();
-  }
-
-  static async getGenres() {
-    let results = [];
-    let page = 1;
-    let hasMore = true;
-
-    while (hasMore) {
-      const data = await ApiService.fetchData("genres/", "GET", null, page);
-      results = results.concat(data.results);
-
-      if (data.next) {
-        page++;
-      } else {
-        hasMore = false;
-      }
-    }
-
-    return results;
-  }
-
-  static async postGenre(genreData) {
-    return await ApiService.fetchData("genres/", "POST", genreData, null);
-  }
-
-  static async putGenre(genreUuid, genreData) {
-    return await ApiService.fetchData(`genres/${genreUuid}/`, "PUT", genreData, null);
-  }
-
-  static async getGenrePlaylists() {
-    let results = [];
-    let page = 1;
-    let hasMore = true;
-
-    while (hasMore) {
-      const data = await ApiService.fetchData("genre-playlists/", "GET", null, page);
-      results = results.concat(data.results);
-
-      if (data.next) {
-        page++;
-      } else {
-        hasMore = false;
-      }
-    }
-
-    return results;
-  }
-
-  static async retrievePlaylist(playlistUuid) {
-    return await ApiService.fetchData(`playlists/${playlistUuid}/`, "GET", null, null);
-  }
-
-  static async postPlay(contentObjectUuid) {
-    const data = { contentObjectUuid: contentObjectUuid };
-    return await ApiService.fetchData(`plays/`, "POST", data, null);
   }
 }

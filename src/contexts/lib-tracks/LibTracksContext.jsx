@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
-import ApiService from "../../utils//ApiService";
+import { TrackService } from "../../utils/services";
 import { useGenrePlaylists } from "../../contexts/genre-playlists/useGenrePlaylists";
 
 export const LibTracksContext = createContext();
@@ -14,12 +14,12 @@ export function LibTracksProvider({ children }) {
   const areLibTrackFetchingRef = { current: false };
 
   async function postLibTrack(file, genreUuid, onProgress, badRequestCatched) {
-    await ApiService.postLibTrack(file, genreUuid, onProgress, badRequestCatched);
+    await TrackService.postLibTrack(file, genreUuid, onProgress, badRequestCatched);
     setRefreshGenrePlaylistsSignal(1);
   }
 
   async function fetchLibTracks() {
-    const libTracks = await ApiService.getLibTracks();
+    const libTracks = await TrackService.getLibTracks();
     setLibTracks(libTracks);
   }
 

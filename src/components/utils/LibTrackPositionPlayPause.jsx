@@ -5,7 +5,7 @@ import { usePlayer } from "../../contexts/player/usePlayer";
 import { PLAY_STATES } from "../../utils/constants";
 
 export default function LibTrackPositionPlayPause({ position, uuid, handlePlayPauseClick }) {
-  const { libTrackObject, playState } = usePlayer();
+  const { playerLibTrackObject, playState } = usePlayer();
 
   return (
     <div
@@ -14,7 +14,7 @@ export default function LibTrackPositionPlayPause({ position, uuid, handlePlayPa
     >
       <div className="group-hover:hidden">
         <div>
-          {libTrackObject && libTrackObject.libraryTrack.uuid === uuid && playState !== PLAY_STATES.STOPPED ? (
+          {playerLibTrackObject && playerLibTrackObject.libTrack.uuid === uuid && playState !== PLAY_STATES.STOPPED ? (
             <div className="flex space-x-1 items-end">
               <div
                 className={`w-playingbar bg-green-500 h-3 origin-bottom ${
@@ -40,7 +40,7 @@ export default function LibTrackPositionPlayPause({ position, uuid, handlePlayPa
         </div>
       </div>
       <div className="hidden group-hover:flex items-center justify-center">
-        {libTrackObject && libTrackObject.libraryTrack.uuid === uuid && playState === PLAY_STATES.PLAYING ? (
+        {playerLibTrackObject && playerLibTrackObject.libTrack.uuid === uuid && playState === PLAY_STATES.PLAYING ? (
           <FaPause />
         ) : (
           <FaPlay />

@@ -1,15 +1,15 @@
 import PopupContentObject from "./PopupContentObject";
 import config from "../../utils/config";
 
-export default class CorsErrorPopupContentObject extends PopupContentObject {
+export default class ConnectivityErrorPopupContentObject extends PopupContentObject {
   constructor(errorObj) {
     // Determine the specific type of connectivity issue
-    const connectivityIssueType = CorsErrorPopupContentObject.detectConnectivityIssueType(errorObj);
+    const connectivityIssueType = ConnectivityErrorPopupContentObject.detectConnectivityIssueType(errorObj);
 
     // Set title based on the detected issue type
     const title = "API Connectivity Error";
 
-    super(title, "CorsErrorPopupContentObject");
+    super(title, "ConnectivityErrorPopupContentObject");
 
     this.code = connectivityIssueType.code;
     this.message = errorObj.message || connectivityIssueType.defaultMessage;
@@ -77,9 +77,9 @@ export default class CorsErrorPopupContentObject extends PopupContentObject {
       return {
         type: "server_unreachable",
         code: "server_unreachable",
-        defaultMessage: "Server Unreachable",
+        defaultMessage: "Connection Failed",
         detailsMessage:
-          "The application cannot connect to the server. This typically happens when the server is down, unreachable, or there are network connectivity issues.",
+          "The application cannot establish a connection to the service. This typically happens when the service is unavailable, there are network issues, or your internet connection is interrupted.",
         troubleshootingSteps: [
           "1. Check if the API server is running",
           "2. Verify your internet connection",
@@ -106,9 +106,9 @@ export default class CorsErrorPopupContentObject extends PopupContentObject {
       return {
         type: "cors_error",
         code: "cors_error",
-        defaultMessage: "Cross-Origin Request Blocked",
+        defaultMessage: "Connection Access Restricted",
         detailsMessage:
-          "A Cross-Origin Resource Sharing (CORS) error has occurred. This is one type of connectivity issue that happens when a web page from one domain tries to access resources from another domain, but the server doesn't allow it.",
+          "The browser prevented the connection due to security restrictions. This is one type of connectivity issue that happens when a web page from one domain tries to access resources from another domain, but the server doesn't allow it (also known as a CORS issue).",
         troubleshootingSteps: [
           "1. Check if the API server is running",
           "2. Verify the API URL is correct in your environment configuration",
@@ -123,9 +123,9 @@ export default class CorsErrorPopupContentObject extends PopupContentObject {
     return {
       type: "connectivity_error",
       code: "connectivity_error",
-      defaultMessage: "API Connection Error",
+      defaultMessage: "Network Connection Problem",
       detailsMessage:
-        "The application is experiencing connectivity issues with the API. This could be due to various reasons including network problems, server issues, or configuration errors.",
+        "The application is having trouble communicating with the service. This could be due to various reasons including network instability, service availability issues, or connection configuration problems.",
       troubleshootingSteps: [
         "1. Check if the API server is running",
         "2. Verify your internet connection",

@@ -4,7 +4,7 @@ import BadRequestErrorPopupChild from "./child/BadRequestPopupChild";
 import LibTrackEditionPopupChild from "./child/LibTrackEditionPopupChild";
 import LibTrackUploadingPopupChild from "./child/LibTrackUploadPopupChild";
 import ApiErrorPopupChild from "./child/ApiErrorPopupChild";
-import CorsErrorPopupChild from "./child/CorsErrorPopupChild";
+import ConnectivityErrorPopupChild from "./child/ConnectivityErrorPopupChild";
 
 export default function Popup() {
   const { popupContentObject, hidePopup } = usePopup();
@@ -23,8 +23,12 @@ export default function Popup() {
     case "ApiErrorPopupContentObject":
       PopupChild = ApiErrorPopupChild;
       break;
+    case "ConnectivityErrorPopupContentObject":
+      PopupChild = ConnectivityErrorPopupChild;
+      break;
     case "CorsErrorPopupContentObject":
-      PopupChild = CorsErrorPopupChild;
+      // For backward compatibility, use the new component for old type
+      PopupChild = ConnectivityErrorPopupChild;
       break;
     default:
       PopupChild = null;

@@ -6,10 +6,10 @@ import App from "./App.jsx";
 import "./index.css";
 import { checkRequiredConfigVars } from "./utils/config";
 
-import { PlayerProvider } from "./contexts/player/PlayerContext";
-import { TrackListProvider } from "./contexts/track-list/TrackListContext";
-import { GenrePlaylistsProvider } from "./contexts/genre-playlists/GenrePlaylistsContext";
-import { PopupProvider } from "./contexts/popup/PopupContext";
+import PlayerProvider from "./contexts/player/PlayerContext";
+import TrackListProvider from "./contexts/track-list/TrackListContext";
+import GenrePlaylistsProvider from "./contexts/genre-playlists/GenrePlaylistsContext";
+import PopupProvider from "./contexts/popup/PopupContext";
 
 checkRequiredConfigVars();
 
@@ -27,6 +27,10 @@ if (import.meta.env.VITE_SENTRY_IS_ACTIVE == true) {
     // Session Replay
     replaysSessionSampleRate: 1.0, // Set sample at a lower rate in production (e.g. 0.1 for 10% of sessions)
     replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+    // Development server configuration
+    environment: import.meta.env.VITE_ENV,
+    // Disable Sentry in development
+    enabled: import.meta.env.DEV ? false : import.meta.env.VITE_SENTRY_IS_ACTIVE === true,
   });
 }
 

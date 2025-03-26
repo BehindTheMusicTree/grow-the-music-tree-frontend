@@ -2,10 +2,11 @@ import { createContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 import ApiService from "../../utils//ApiService";
+import { GenreService } from "../../utils/services";
 
 export const GenrePlaylistsContext = createContext();
 
-export function GenrePlaylistsProvider({ children }) {
+function GenrePlaylistsProvider({ children }) {
   const [groupedGenrePlaylists, setGroupedGenrePlaylists] = useState();
   const [refreshGenrePlaylistsSignal, setRefreshGenrePlaylistsSignal] = useState(1);
 
@@ -26,7 +27,7 @@ export function GenrePlaylistsProvider({ children }) {
 
   useEffect(() => {
     const fetchGenrePlaylists = async () => {
-      const genrePlaylists = await ApiService.getGenrePlaylists();
+      const genrePlaylists = await GenreService.getGenrePlaylists();
       setGroupedGenrePlaylists(getGenrePlaylistsGroupedByRoot(genrePlaylists));
     };
 
@@ -70,3 +71,5 @@ export function GenrePlaylistsProvider({ children }) {
 GenrePlaylistsProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export default GenrePlaylistsProvider;

@@ -2,20 +2,20 @@ import { createContext, useState } from "react";
 import PropTypes from "prop-types";
 
 import { PLAY_STATES } from "../../utils/constants";
-import ApiService from "../../utils//ApiService";
+import { TrackService } from "../../utils/services";
 
 export const PlayerContext = createContext();
 
-export function PlayerProvider({ children }) {
+function PlayerProvider({ children }) {
   const [playerLibTrackObject, setPlayerLibTrackObject] = useState();
   const [stopProgressAnimationSignal, setStopProgressAnimationSignal] = useState(0);
   const [resetSeekSignal, setResetSeekSignal] = useState(0);
   const [playState, setPlayState] = useState(PLAY_STATES.STOPPED);
 
   const setLibTrackToPlay = async (libTrack, hasNext, hasPrevious) => {
-    const playingLibTrackBlobUrl = await ApiService.loadAudioAndGetLibTrackBlobUrl(libTrack.relativeUrl);
+    const playingLibTrackBlobUrl = await TrackService.loadAudioAndGetLibTrackBlobUrl(libTrack.relativeUrl);
     setPlayerLibTrackObject({
-      libraryTrack: libTrack,
+      libTrack: libTrack,
       blobUrl: playingLibTrackBlobUrl,
       hasNext: hasNext,
       hasPrevious: hasPrevious,
@@ -55,3 +55,5 @@ export function PlayerProvider({ children }) {
 PlayerProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export default PlayerProvider;
