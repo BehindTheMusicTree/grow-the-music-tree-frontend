@@ -1,8 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
-import ApiService from "../../utils//ApiService";
-import { GenreService } from "../../utils/services";
+import GenreService from "../../utils/services/GenreService";
 
 export const GenrePlaylistsContext = createContext();
 
@@ -18,7 +17,7 @@ function GenrePlaylistsProvider({ children }) {
     if (!name) {
       return;
     }
-    await ApiService.postGenre({
+    await GenreService.postGenre({
       name: name,
       parent: parentUuid,
     });
@@ -53,15 +52,26 @@ function GenrePlaylistsProvider({ children }) {
   };
 
   const updateGenreParent = async (genreUuid, parentUuid) => {
-    await ApiService.putGenre(genreUuid, {
+    await GenreService.putGenre(genreUuid, {
       parent: parentUuid,
     });
     setRefreshGenrePlaylistsSignal(1);
   };
 
+  const deleteGenre = async (genreUuid) => {
+    await GenreService.deleteGenre(genreUuid);
+    setRefreshGenrePlaylistsSignal(1);
+  };
+
   return (
     <GenrePlaylistsContext.Provider
-      value={{ groupedGenrePlaylists, handleGenreAddAction, setRefreshGenrePlaylistsSignal, updateGenreParent }}
+      value={{
+        groupedGenrePlaylists,
+        handleGenreAddAction,
+        setRefreshGenrePlaylistsSignal,
+        updateGenreParent,
+        deleteGenre,
+      }}
     >
       {children}
     </GenrePlaylistsContext.Provider>

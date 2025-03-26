@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import ReactDOMServer from "react-dom/server";
-import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause } from "react-icons/fa";
+import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause, FaTrashAlt } from "react-icons/fa";
 import { MdMoreVert } from "react-icons/md";
 import { PiGraphFill } from "react-icons/pi";
 import * as d3 from "d3";
@@ -30,6 +30,7 @@ import {
   SPINNER_ICON_SIZE,
 } from "./tree-constants";
 import LibTrackUploadPopupContentObject from "../../../../../models/popup-content-object/LibTrackUploadPopupContentObject";
+import GenreDeletionPopupContentObject from "../../../../../models/popup-content-object/GenreDeletionPopupContentObject";
 
 export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   const { playState, handlePlayPauseAction } = usePlayer();
@@ -138,6 +139,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     const actionsGroup = genrePlaylistGroup.append("g").attr("id", "actions-container-" + genrePlaylist.uuid);
 
     const isGenreless = !genrePlaylist.criteria;
+    // Adjust container height based on whether it's genreless and how many actions are shown
     const actionsContainerHeight = isGenreless
       ? ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT - 2 * ACTION_CONTAINER_DIMENSIONS.HEIGHT
       : ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT;
@@ -223,6 +225,22 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         changeParentActionOnclick,
         <PiGraphFill className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
         () => "Change parent"
+      );
+
+      const deleteGenreActionOnclick = (event, d) => {
+        genrePlaylistGroup.dispatch("mouseleave");
+        const popupContentObject = new GenreDeletionPopupContentObject(d.data.criteria);
+        showPopup(popupContentObject);
+      };
+
+      addActionContainer(
+        actionsContainerHeight,
+        actionsGroup,
+        5,
+        "delete-genre-container",
+        deleteGenreActionOnclick,
+        <FaTrashAlt className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
+        () => "Delete genre"
       );
     }
 

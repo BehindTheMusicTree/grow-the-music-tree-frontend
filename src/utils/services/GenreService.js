@@ -28,6 +28,10 @@ export default class GenreService {
     return await ApiService.fetchData(`genres/${genreUuid}/`, "PUT", genreData, null);
   }
 
+  static async deleteGenre(genreUuid) {
+    return await ApiService.fetchData(`genres/${genreUuid}/`, "DELETE", null, null);
+  }
+
   static async getGenrePlaylists() {
     let results = [];
     let page = 1;
