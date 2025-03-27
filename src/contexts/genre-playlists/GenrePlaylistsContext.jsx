@@ -58,6 +58,13 @@ function GenrePlaylistsProvider({ children }) {
     setRefreshGenrePlaylistsSignal(1);
   };
 
+  const renameGenre = async (genreUuid, newName) => {
+    await GenreService.putGenre(genreUuid, {
+      name: newName,
+    });
+    setRefreshGenrePlaylistsSignal(1);
+  };
+
   const deleteGenre = async (genreUuid) => {
     await GenreService.deleteGenre(genreUuid);
     setRefreshGenrePlaylistsSignal(1);
@@ -70,6 +77,7 @@ function GenrePlaylistsProvider({ children }) {
         handleGenreAddAction,
         setRefreshGenrePlaylistsSignal,
         updateGenreParent,
+        renameGenre,
         deleteGenre,
       }}
     >
