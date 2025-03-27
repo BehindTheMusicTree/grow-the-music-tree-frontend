@@ -10,6 +10,7 @@ import PlayerProvider from "./contexts/player/PlayerContext";
 import TrackListProvider from "./contexts/track-list/TrackListContext";
 import GenrePlaylistsProvider from "./contexts/genre-playlists/GenrePlaylistsContext";
 import PopupProvider from "./contexts/popup/PopupContext";
+import { LibTracksProvider } from "./contexts/lib-tracks/LibTracksContext";
 
 checkRequiredConfigVars();
 
@@ -38,17 +39,19 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <PopupProvider>
       <GenrePlaylistsProvider>
-        <PlayerProvider>
-          <TrackListProvider>
-            {import.meta.env.VITE_SENTRY_IS_ACTIVE === true ? (
-              <Sentry.ErrorBoundary fallback={"An error has occurred"}>
+        <LibTracksProvider>
+          <PlayerProvider>
+            <TrackListProvider>
+              {import.meta.env.VITE_SENTRY_IS_ACTIVE === true ? (
+                <Sentry.ErrorBoundary fallback={"An error has occurred"}>
+                  <App />
+                </Sentry.ErrorBoundary>
+              ) : (
                 <App />
-              </Sentry.ErrorBoundary>
-            ) : (
-              <App />
-            )}
-          </TrackListProvider>
-        </PlayerProvider>
+              )}
+            </TrackListProvider>
+          </PlayerProvider>
+        </LibTracksProvider>
       </GenrePlaylistsProvider>
     </PopupProvider>
   </React.StrictMode>
