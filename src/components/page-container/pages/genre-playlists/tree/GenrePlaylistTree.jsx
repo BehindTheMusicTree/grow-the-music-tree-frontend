@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import ReactDOMServer from "react-dom/server";
 import { FaSpinner, FaFileUpload, FaPlus, FaPlay, FaPause, FaTrashAlt } from "react-icons/fa";
-import { MdMoreVert } from "react-icons/md";
+import { MdMoreVert, MdModeEdit } from "react-icons/md";
 import { PiGraphFill } from "react-icons/pi";
 import * as d3 from "d3";
 
@@ -35,7 +35,7 @@ import GenreDeletionPopupContentObject from "../../../../../models/popup-content
 export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   const { playState, handlePlayPauseAction } = usePlayer();
   const { showPopup } = usePopup();
-  const { handleGenreAddAction, updateGenreParent } = useGenrePlaylists();
+  const { handleGenreAddAction, updateGenreParent, renameGenre } = useGenrePlaylists();
   const { playNewTrackListFromPlaylistUuid, origin: trackListOrigin } = useTrackList();
   const [
     previousRenderingVisibleActionsContainerGenrePlaylist,
@@ -141,7 +141,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     const isGenreless = !genrePlaylist.criteria;
     // Adjust container height based on whether it's genreless and how many actions are shown
     // For genreless, we only show 2 actions (play/pause and upload track)
-    // For regular genres, we show 5 actions (play/pause, upload track, add sub-genre, change parent, delete)
+    // For regular genres, we show 6 actions (play/pause, upload track, add sub-genre, change parent, rename, delete)
     const actionsContainerHeight = isGenreless
       ? ACTION_CONTAINER_DIMENSIONS.HEIGHT * 2 // Only 2 actions for genreless
       : ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT;
@@ -229,6 +229,24 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         () => "Change parent"
       );
 
+      const renameGenreActionOnclick = (event, d) => {
+        genrePlaylistGroup.dispatch("mouseleave");
+        const newName = prompt("Enter new genre name:", d.data.name);
+        if (newName && newName !== d.data.name) {
+          renameGenre(d.data.criteria.uuid, newName);
+        }
+      };
+
+      addActionContainer(
+        actionsContainerHeight,
+        actionsGroup,
+        5,
+        "rename-genre-container",
+        renameGenreActionOnclick,
+        <MdModeEdit className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
+        () => "Rename genre"
+      );
+
       const deleteGenreActionOnclick = (event, d) => {
         genrePlaylistGroup.dispatch("mouseleave");
         const popupContentObject = new GenreDeletionPopupContentObject(d.data.criteria);
@@ -238,7 +256,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       addActionContainer(
         actionsContainerHeight,
         actionsGroup,
-        5,
+        6,
         "delete-genre-container",
         deleteGenreActionOnclick,
         <FaTrashAlt className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
