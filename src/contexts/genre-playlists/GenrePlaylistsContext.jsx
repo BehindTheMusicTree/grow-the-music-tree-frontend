@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import GenreService from "../../utils/services/GenreService";
 import BadRequestError from "../../utils/errors/BadRequestError";
-import BadRequestPopupContentObject from "../../models/popup-content-object/BadRequestPopupContentObject";
+import InvalidInputContentObject from "../../models/popup-content-object/InvalidInputContentObject";
 
 export const GenrePlaylistsContext = createContext();
 
@@ -75,7 +75,7 @@ function GenrePlaylistsProvider({ children }) {
     } catch (error) {
       if (error instanceof BadRequestError) {
         // Use the error directly from API, which already contains field error details
-        const popupContentObject = new BadRequestPopupContentObject(error);
+        const popupContentObject = new InvalidInputContentObject(error);
 
         // Use callback to show popup from the component
         if (showPopupCallback) {

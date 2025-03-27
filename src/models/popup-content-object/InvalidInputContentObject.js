@@ -1,8 +1,8 @@
 import PopupContentObject from "./PopupContentObject";
 
-export default class BadRequestPopupContentObject extends PopupContentObject {
+export default class InvalidInputContentObject extends PopupContentObject {
   constructor(errorObj) {
-    super("An error occurred", "BadRequestPopupContentObject");
+    super("An error occurred", "InvalidInputContentObject");
 
     console.log("errorObj", errorObj);
 
