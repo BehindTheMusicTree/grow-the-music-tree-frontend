@@ -7,7 +7,7 @@ import { useGenrePlaylists } from "../../contexts/genre-playlists/useGenrePlayli
 export const LibTracksContext = createContext();
 
 export function LibTracksProvider({ children }) {
-  const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
+  const { setRefreshGenrePlaylistsSignal = () => {} } = useGenrePlaylists() || {};
   const [libTracks, setLibTracks] = useState();
   const [refreshlibTracksSignal, setRefreshLibTracksSignal] = useState(1);
 

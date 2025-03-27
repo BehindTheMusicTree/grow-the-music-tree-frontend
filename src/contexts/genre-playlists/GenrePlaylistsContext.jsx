@@ -2,6 +2,8 @@ import { createContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 import GenreService from "../../utils/services/GenreService";
+import BadRequestError from "../../utils/errors/BadRequestError";
+import InvalidInputContentObject from "../../models/popup-content-object/InvalidInputContentObject";
 
 export const GenrePlaylistsContext = createContext();
 
@@ -58,6 +60,33 @@ function GenrePlaylistsProvider({ children }) {
     setRefreshGenrePlaylistsSignal(1);
   };
 
+  const renameGenre = async (genreUuid, newName, showPopupCallback) => {
+    try {
+      // Pass badRequestCatched=true to handle BadRequestError here instead of global handler
+      await GenreService.putGenre(
+        genreUuid,
+        {
+          name: newName,
+        },
+        true
+      );
+      setRefreshGenrePlaylistsSignal(1);
+      return true;
+    } catch (error) {
+      if (error instanceof BadRequestError) {
+        // Use the error directly from API, which already contains field error details
+        const popupContentObject = new InvalidInputContentObject(error);
+
+        // Use callback to show popup from the component
+        if (showPopupCallback) {
+          showPopupCallback(popupContentObject);
+        }
+        return false;
+      }
+      throw error; // Rethrow other errors for global handling
+    }
+  };
+
   const deleteGenre = async (genreUuid) => {
     await GenreService.deleteGenre(genreUuid);
     setRefreshGenrePlaylistsSignal(1);
@@ -70,6 +99,7 @@ function GenrePlaylistsProvider({ children }) {
         handleGenreAddAction,
         setRefreshGenrePlaylistsSignal,
         updateGenreParent,
+        renameGenre,
         deleteGenre,
       }}
     >

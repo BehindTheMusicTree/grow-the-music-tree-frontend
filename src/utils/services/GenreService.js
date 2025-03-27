@@ -24,8 +24,8 @@ export default class GenreService {
     return await ApiService.fetchData("genres/", "POST", genreData, null);
   }
 
-  static async putGenre(genreUuid, genreData) {
-    return await ApiService.fetchData(`genres/${genreUuid}/`, "PUT", genreData, null);
+  static async putGenre(genreUuid, genreData, badRequestCatched = false) {
+    return await ApiService.fetchData(`genres/${genreUuid}/`, "PUT", genreData, null, null, badRequestCatched);
   }
 
   static async deleteGenre(genreUuid) {

@@ -1,6 +1,6 @@
 import { usePopup } from "../../contexts/popup/usePopup";
 
-import BadRequestErrorPopupChild from "./child/BadRequestPopupChild";
+import InvalidInputPopupChild from "./child/InvalidInputPopupChild";
 import LibTrackEditionPopupChild from "./child/LibTrackEditionPopupChild";
 import LibTrackUploadingPopupChild from "./child/LibTrackUploadPopupChild";
 import ApiErrorPopupChild from "./child/ApiErrorPopupChild";
@@ -12,8 +12,8 @@ export default function Popup() {
 
   let PopupChild;
   switch (popupContentObject.type) {
-    case "BadRequestPopupContentObject":
-      PopupChild = BadRequestErrorPopupChild;
+    case "InvalidInputContentObject":
+      PopupChild = InvalidInputPopupChild;
       break;
     case "LibTrackEditionPopupContentObject":
       PopupChild = LibTrackEditionPopupChild;

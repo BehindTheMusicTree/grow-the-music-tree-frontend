@@ -371,7 +371,7 @@ export default class ApiService {
             if (xhr.status === 0) {
               // Status 0 often indicates a CORS error
               const corsErrorObj = {
-                message: "Cross-Origin Request Blocked",
+                message: "A connectivity error occurred",
                 url: url,
               };
 
