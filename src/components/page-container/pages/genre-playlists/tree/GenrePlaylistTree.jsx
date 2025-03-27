@@ -229,11 +229,12 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         () => "Change parent"
       );
 
-      const renameGenreActionOnclick = (event, d) => {
+      const renameGenreActionOnclick = async (event, d) => {
         genrePlaylistGroup.dispatch("mouseleave");
         const newName = prompt("Enter new genre name:", d.data.name);
         if (newName && newName !== d.data.name) {
-          renameGenre(d.data.criteria.uuid, newName);
+          // Pass showPopup as callback for error handling
+          await renameGenre(d.data.criteria.uuid, newName, showPopup);
         }
       };
 
