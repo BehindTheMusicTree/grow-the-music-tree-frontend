@@ -47,40 +47,43 @@ export default class BadRequestPopupContentObject extends PopupContentObject {
     // Extract properties from the error data
     this.code = errorData.code || "unknown_error";
     console.log("this.code", this.code);
-    this.message = errorData.message || "Bad Request";
+    this.message = errorData.message || "Something went wrong";
     console.log("this.message", this.message);
     this.fieldErrors = errorData.fieldErrors || {};
     console.log("this.fieldErrors", this.fieldErrors);
 
-    // Convert to operationErrors format for UI display
+    // Convert to a simple error format
     this.operationErrors = [];
 
-    // Add general message error if it exists
-    if (this.message) {
-      this.operationErrors.push({
-        name: "Error",
-        errors: [this.message],
-      });
+    // Create a single error message
+    let errorMessage = "";
+
+    // First check for specific field errors
+    if (this.fieldErrors && Object.keys(this.fieldErrors).length > 0) {
+      // Get the first field error
+      const firstField = Object.keys(this.fieldErrors)[0];
+      const firstError = this.fieldErrors[firstField][0];
+
+      // Create a simplified error message based on the error type
+      if (firstField === "name" && firstError.code === "name_duplicate") {
+        errorMessage = "The name already exists. Please choose a different name.";
+      } else if (firstError.code === "required") {
+        errorMessage = `Please provide a ${firstField}.`;
+      } else if (firstError.code === "invalid_format") {
+        errorMessage = `Invalid ${firstField} format.`;
+      } else {
+        // Use the API message directly
+        errorMessage = firstError.message;
+      }
+    } else {
+      // Use general message if no field errors
+      errorMessage = this.message.includes("invalid data") ? "One or more fields contain invalid data." : this.message;
     }
 
-    // Add field errors
-    if (this.fieldErrors) {
-      Object.entries(this.fieldErrors).forEach(([fieldName, errors]) => {
-        // Format error messages in a more user-friendly way
-        const errorMessages = errors.map((error) => {
-          // Special case for duplicate name errors
-          if (fieldName === "name" && error.code === "name_duplicate") {
-            return "The name already exists. Please choose a different name.";
-          }
-          // Other error types just show the message without the code
-          return error.message;
-        });
-
-        this.operationErrors.push({
-          name: fieldName.charAt(0).toUpperCase() + fieldName.slice(1), // Capitalize field name
-          errors: errorMessages,
-        });
-      });
-    }
+    // Add just one error entry with the simplified message
+    this.operationErrors.push({
+      name: "Error",
+      errors: [errorMessage],
+    });
   }
 }
