@@ -20,6 +20,9 @@ const config = {
   apiUserPassword: getViteVar("API_UMG_USER_PASSWORD"),
   contactEmail: getViteVar("CONTACT_EMAIL"),
   sentryIsActive: getViteVar("SENTRY_IS_ACTIVE"),
+  spotifyClientId: getViteVar("SPOTIFY_CLIENT_ID"),
+  spotifyRedirectUri: getViteVar("SPOTIFY_REDIRECT_URI"),
+  spotifyScope: getViteVar("SPOTIFY_SCOPE"),
 };
 
 export default config;
@@ -33,6 +36,9 @@ export function checkRequiredConfigVars() {
     "apiUserPassword",
     "contactEmail",
     "sentryIsActive",
+    "spotifyClientId",
+    "spotifyRedirectUri",
+    "spotifyScope",
   ];
   const missingEnvVars = requiredEnvVars.filter((envVar) => !config[envVar]);
 
