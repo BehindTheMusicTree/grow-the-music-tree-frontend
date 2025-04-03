@@ -12,8 +12,9 @@ export default class SpotifyAuthService {
     // Store state in sessionStorage for verification when the user returns
     sessionStorage.setItem("spotify_auth_state", state);
 
-    // Construct the full redirect URI using the current origin
-    const redirectUri = `${window.location.origin}${config.spotifyRedirectUri}`;
+    // Use the redirect URI directly from environment variables
+    // This should exactly match what's registered in Spotify Developer Dashboard
+    const redirectUri = config.spotifyRedirectUri;
 
     const params = new URLSearchParams({
       response_type: "code",
@@ -37,7 +38,7 @@ export default class SpotifyAuthService {
     }
 
     try {
-      const response = await fetch(`${config.apiBaseUrl}spotify/auth/`, {
+      const response = await fetch(`${config.apiBaseUrl}auth/spotify/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
