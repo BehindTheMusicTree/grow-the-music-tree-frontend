@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Howler } from "howler";
 
 import { PageProvider } from "./contexts/page/PageContext";
@@ -15,6 +15,7 @@ import PageContainer from "./components/page-container/PageContainer";
 import Player from "./components/player/Player";
 import ApiErrorHandler from "./components/utils/ApiErrorHandler";
 import NotFoundPage from "./components/utils/NotFoundPage";
+import SpotifyCallback from "./components/auth/SpotifyCallback";
 
 Howler.autoUnlock = true;
 
@@ -60,6 +61,7 @@ export default function App() {
                   </div>
                 }
               />
+              <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Router>

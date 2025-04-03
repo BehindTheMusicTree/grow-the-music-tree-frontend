@@ -1,5 +1,7 @@
-import TrackService from "./TrackService";
+import ApiService from "../ApiService";
 import GenreService from "./GenreService";
 import PlaylistService from "./PlaylistService";
+import TrackService from "./TrackService";
+import SpotifyService from "./SpotifyService";
 
-export { TrackService, GenreService, PlaylistService };
+export { ApiService, GenreService, PlaylistService, TrackService, SpotifyService };
