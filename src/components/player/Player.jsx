@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolumeUp, faListUl } from "@fortawesome/free-solid-svg-icons";
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from "react-icons/fa";
 
-import { PLAY_STATES } from "../../constants";
+import { PLAY_STATES } from "../../utils/constants";
 import { usePlayer as usePlayer } from "../../contexts/player/usePlayer";
 import { useTrackList } from "../../contexts/track-list/useTrackList";
 import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
@@ -18,8 +18,14 @@ export default function Player() {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 
   const { setIsTrackListSidebarVisible } = useTrackListSidebarVisibility();
-  const { playerLibTrackObject, handlePlayPauseAction, playState, setPlayState, setResetPlayerSeekSignal } =
-    usePlayer();
+  const {
+    playerLibTrackObject,
+    handlePlayPauseAction,
+    playState,
+    setPlayState,
+    setStopProgressAnimationSignal,
+    setResetSeekSignal,
+  } = usePlayer();
 
   const { toNextTrack, toPreviousTrack } = useTrackList();
 
@@ -35,28 +41,31 @@ export default function Player() {
   };
 
   const handleTrackEnd = () => {
-    if (playerLibTrackObject.hasNext) {
+    if (playerLibTrackObject?.hasNext) {
       toNextTrack();
     } else {
       setPlayState(PLAY_STATES.STOPPED);
-      setResetPlayerSeekSignal(1);
     }
   };
 
   const handleForwardClick = () => {
+    setStopProgressAnimationSignal(1);
     toNextTrack();
   };
 
   const handleBackwardClick = () => {
-    if (!playerLibTrackObject.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
-      setResetPlayerSeekSignal(1);
+    if (!playerLibTrackObject?.hasPrevious || seek > SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP) {
+      setStopProgressAnimationSignal(1);
+      setResetSeekSignal(1);
     } else {
       toPreviousTrack();
     }
   };
 
   useEffect(() => {
-    setResetPlayerSeekSignal(1);
+    if (playerLibTrackObject) {
+      setResetSeekSignal(1);
+    }
   }, [playerLibTrackObject]);
 
   return (
@@ -64,25 +73,38 @@ export default function Player() {
       <div className="flex-1 flex items-center justify-center">
         <img className="flex-none w-16 h-16 overflow-hidden mr-5" src={albumCover} alt="Album Cover" />
         <div className="flex-1 flex flex-col items-start justify-center w-full">
-          <div>{playerLibTrackObject?.libraryTrack.title}</div>
-          <div>{playerLibTrackObject?.libraryTrack.artist?.name}</div>
+          <div>{playerLibTrackObject?.libTrack?.title}</div>
+          <div>{playerLibTrackObject?.libTrack?.artist?.name}</div>
         </div>
       </div>
       <div className="flex-2 flex flex-col justify-center items-center">
         <div className="flex flex-row items-center justify-center w-full">
-          <Button className="player-control-button" onClick={handleBackwardClick}>
+          <Button
+            className={`player-control-button ${
+              playState === PLAY_STATES.LOADING ? "player-control-button-disabled" : ""
+            }`}
+            onClick={playState === PLAY_STATES.LOADING ? null : handleBackwardClick}
+            disabled={playState === PLAY_STATES.LOADING}
+          >
             <FaStepBackward />
           </Button>
           <Button
             className={`player-control-button text-1.5xl py-4 mx-1
-            ${playState !== PLAY_STATES.PLAYING ? "pl-play-l-offset pr-play-r-offset" : "px-4"}`}
-            onClick={handlePlayPauseAction}
+            ${playState !== PLAY_STATES.PLAYING ? "pl-play-l-offset pr-play-r-offset" : "px-4"}
+            ${playState === PLAY_STATES.LOADING ? "player-control-button-disabled" : ""}`}
+            onClick={playState === PLAY_STATES.LOADING ? null : handlePlayPauseAction}
           >
             <div className="text-1.5xl">{playState === PLAY_STATES.PLAYING ? <FaPause /> : <FaPlay />}</div>
           </Button>
           <Button
-            className={playerLibTrackObject.hasNext ? "player-control-button" : "player-control-button-disabled"}
-            onClick={handleForwardClick}
+            className={
+              playState !== PLAY_STATES.LOADING
+                ? playerLibTrackObject?.hasNext
+                  ? "player-control-button"
+                  : "player-control-button-disabled"
+                : "player-control-button-disabled"
+            }
+            onClick={playState === PLAY_STATES.LOADING ? null : handleForwardClick}
           >
             <FaStepForward />
           </Button>

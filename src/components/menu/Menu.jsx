@@ -3,7 +3,7 @@ import { PiGraphLight } from "react-icons/pi";
 import { CiUser } from "react-icons/ci";
 
 import Page from "../../models/Page";
-import { PAGE_TYPES } from "../../constants";
+import { PAGE_TYPES } from "../../utils/constants";
 import { usePage } from "../../contexts/page/usePage";
 
 export default function Menu() {

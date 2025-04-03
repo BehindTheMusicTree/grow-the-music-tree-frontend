@@ -1,11 +1,11 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 
-import ApiService from "../../../utils/service/apiService";
+import { TrackService } from "../../../utils/services";
 import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePlaylists";
 import { useTrackList } from "../../../contexts/track-list/useTrackList";
 import { formatTime } from "../../../utils";
-import { FORM_RATING_NULL_VALUE } from "../../../constants";
+import { FORM_RATING_NULL_VALUE } from "../../../utils/constants";
 import Rating from "../../utils/Rating";
 
 export default function LibTrackEditionPopupChild({ popupContentObject, hide }) {
@@ -33,7 +33,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hide }) 
     if (submittedValues.rating === FORM_RATING_NULL_VALUE) {
       submittedValues.rating = null;
     }
-    const updatedLibTrack = await ApiService.putLibTrack(popupContentObject.libTrack.uuid, formValues);
+    const updatedLibTrack = await TrackService.putLibTrack(popupContentObject.libTrack.uuid, formValues);
     refreshLibTrack(updatedLibTrack);
     if (genreNameBeforeEdition !== updatedLibTrack.genre?.name) {
       setRefreshGenrePlaylistsSignal(1);
@@ -79,7 +79,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hide }) 
             <label className="genre popup-content-label">
               <span>Duration:</span>
               <div className="popup-content-input-readonly inline-block">
-                {formatTime(popupContentObject.libTrack.duration)}
+                {formatTime(popupContentObject.libTrack.file.durationInSec)}
               </div>
             </label>
           </div>
@@ -87,7 +87,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hide }) 
             <label className="popup-content-label">
               <span>Added on:</span>
               <div className="popup-content-input-readonly inline-block mr-1">
-                {new Date(popupContentObject.libTrack.addedOn).toLocaleDateString()}
+                {new Date(popupContentObject.libTrack.createdOn).toLocaleDateString()}
               </div>
               <span className="flex-grow"></span>
             </label>

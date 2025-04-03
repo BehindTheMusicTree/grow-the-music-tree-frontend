@@ -1,15 +1,17 @@
+import { v4 as uuidv4 } from "uuid";
 import PropTypes from "prop-types";
 
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { FORM_RATING_NULL_VALUE } from "../../constants";
+import { FORM_RATING_NULL_VALUE } from "../../utils/constants";
 
 export default function Rating({ rating, handleChange }) {
+  const instanceId = uuidv4();
   return (
     <div className="flex items-center">
       {[...Array(6)].map((_, i) => (
         <div key={i} className={`relative ${i === 0 ? "mr-4" : "mr-1"}`}>
           <input
-            id={`star-${i}`}
+            id={`star-${instanceId}-${i}`}
             className="w-6 h-6 opacity-0"
             type="radio"
             name="rating"
@@ -17,7 +19,7 @@ export default function Rating({ rating, handleChange }) {
             checked={rating === (i === 0 ? null : i + 5)}
             onChange={handleChange}
           />
-          <label htmlFor={`star-${i}`} className="cursor-pointer">
+          <label htmlFor={`star-${instanceId}-${i}`} className="cursor-pointer">
             {i === 0 ? (
               <div className="flex">
                 <AiOutlineStar

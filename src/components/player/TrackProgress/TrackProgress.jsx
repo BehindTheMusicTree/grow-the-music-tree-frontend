@@ -4,17 +4,26 @@ import raf from "raf";
 import ReactHowler from "react-howler";
 
 import { usePlayer } from "../../../contexts/player/usePlayer";
-import { PLAY_STATES } from "../../../constants";
+import { PLAY_STATES } from "../../../utils/constants";
 import { formatTime } from "../../../utils";
 
 export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek }) {
-  const { playerLibTrackObject, resetPlayerSeekSignal, setResetPlayerSeekSignal, playState, setPlayState } =
-    usePlayer();
+  const {
+    playerLibTrackObject,
+    stopProgressAnimationSignal,
+    setStopProgressAnimationSignal,
+    resetSeekSignal,
+    setResetSeekSignal,
+    playState,
+    setPlayState,
+  } = usePlayer();
   const [isSeeking, setIsSeeking] = useState(false);
 
   const playerRef = useRef(null);
   let rafIdRef = useRef(null);
   let previousSeekRef = useRef(null);
+
+  const PROGRESS_SEEK_MAX_WHEN_NO_PLAYER = 1;
 
   const handleLoadError = (id, errorCode) => {
     let errorMessage = "";
@@ -59,6 +68,16 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
     }
   };
 
+  const cancelRaf = () => {
+    raf.cancel(rafIdRef.current);
+  };
+
+  useEffect(() => {
+    return () => {
+      cancelRaf();
+    };
+  }, []);
+
   const renderSeekPosition = () => {
     if (playerRef.current) {
       const currentSeek = playerRef.current.seek();
@@ -76,69 +95,83 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
     }
   };
 
-  const cancelRaf = () => {
-    raf.cancel(rafIdRef.current);
-  };
-
-  useEffect(() => {
-    return () => {
-      cancelRaf();
-    };
-  }, []);
-
   useEffect(() => {
     if (playState === PLAY_STATES.PLAYING) {
       if (isSeeking) {
         cancelRaf();
-      } else if (seek >= Math.floor(playerLibTrackObject.duration)) {
+      } else if (seek >= Math.floor(playerLibTrackObject.durationInSec)) {
         handleTrackEnd();
       } else {
         playerRef.current.seek(seek);
         renderSeekPosition();
       }
     } else if (playState === PLAY_STATES.PAUSED && !isSeeking) {
-      playerRef.current.seek(seek);
+      cancelRaf();
     } else if (playState === PLAY_STATES.STOPPED && !isSeeking && seek > 0) {
       setPlayState(PLAY_STATES.PAUSED);
     }
   }, [isSeeking, playState]);
 
   useEffect(() => {
-    if (resetPlayerSeekSignal) {
-      previousSeekRef.current = null;
-      setSeek(0);
-      playerRef.current.seek(0);
-      setResetPlayerSeekSignal(0);
+    if (stopProgressAnimationSignal) {
+      cancelRaf();
+      setStopProgressAnimationSignal(0);
     }
-  }, [resetPlayerSeekSignal]);
+  }, [stopProgressAnimationSignal]);
+
+  useEffect(() => {
+    if (resetSeekSignal) {
+      previousSeekRef.current = 0;
+      setSeek(0);
+      setResetSeekSignal(0);
+    }
+  }, [resetSeekSignal]);
+
+  useEffect(() => {
+    if (seek === 0) {
+      if (playState === PLAY_STATES.LOADING) {
+        setPlayState(PLAY_STATES.PLAYING);
+      } else if (playState === PLAY_STATES.PAUSED) {
+        playerRef.current.seek(0);
+        setPlayState(PLAY_STATES.STOPPED);
+      } else if (playState === PLAY_STATES.PLAYING) {
+        playerRef.current.seek(0);
+        renderSeekPosition();
+      }
+    }
+  }, [seek]);
 
   return (
     <div className="flex flex justify-center items-center w-full">
-      <ReactHowler
-        ref={playerRef}
-        src={[playerLibTrackObject.blobUrl]}
-        html5={true}
-        playing={playState === PLAY_STATES.PLAYING}
-        format={[playerLibTrackObject.libraryTrack.file.extension.replace(".", "")]}
-        onLoadError={handleLoadError}
-        onEnd={handleTrackEnd}
-        volume={volume}
-      />
-      <div className="w-14 text-right">{formatTime(seek)}</div>
-      {playerRef.current ? (
-        <input
-          className="progress-bar ml-2.5 mr-2.5 w-full"
-          type="range"
-          min="0"
-          max={Math.floor(playerRef.current.duration())}
-          value={seek}
-          onChange={handleSeekingChange}
-          onMouseDown={handleSeekMouseDown}
-          onMouseUp={handleLeaveSeeking}
-          onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
+      {playState !== PLAY_STATES.LOADING ? (
+        <ReactHowler
+          ref={playerRef}
+          src={[playerLibTrackObject.blobUrl]}
+          html5={true}
+          playing={playState === PLAY_STATES.PLAYING}
+          format={[playerLibTrackObject.libTrack.file.extension.replace(".", "")]}
+          onLoadError={handleLoadError}
+          onEnd={handleTrackEnd}
+          volume={volume}
         />
       ) : null}
-      <div className="w-14 text-left">{formatTime(playerRef.current ? playerRef.current.duration() : 0)}</div>
+      <div className="w-14 text-right">{formatTime(seek)}</div>
+      <input
+        className="progress-bar ml-2.5 mr-2.5 w-full"
+        type="range"
+        min="0"
+        max={
+          playerRef ? Math.floor(playerLibTrackObject.libTrack.file.durationInSec) : PROGRESS_SEEK_MAX_WHEN_NO_PLAYER
+        }
+        value={playerRef ? seek : PROGRESS_SEEK_MAX_WHEN_NO_PLAYER}
+        onChange={handleSeekingChange}
+        onMouseDown={handleSeekMouseDown}
+        onMouseUp={handleLeaveSeeking}
+        onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
+      />
+      <div className="w-14 text-left">
+        {formatTime(playerRef.current ? playerLibTrackObject.libTrack.file.durationInSec : 0)}
+      </div>
     </div>
   );
 }

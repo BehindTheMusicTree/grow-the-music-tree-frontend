@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-export default function BadRequestErrorPopupChild({ popupContentObject }) {
+export default function InvalidInputPopupChild({ popupContentObject }) {
   return (
     <div>
       {popupContentObject.operationErrors.map((errorObject, index) => (
@@ -18,7 +18,7 @@ export default function BadRequestErrorPopupChild({ popupContentObject }) {
   );
 }
 
-BadRequestErrorPopupChild.propTypes = {
+InvalidInputPopupChild.propTypes = {
   popupContentObject: PropTypes.shape({
     title: PropTypes.string.isRequired,
     operationErrors: PropTypes.arrayOf(

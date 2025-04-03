@@ -1,5 +1,6 @@
 export default class PopupContentObject {
-  constructor(title) {
+  constructor(title, type) {
     this.title = title;
+    this.type = type;
   }
 }

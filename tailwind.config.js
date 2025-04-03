@@ -26,6 +26,7 @@ export default {
       },
       maxWidth: {
         xl: "44rem",
+        trackListName: "440px",
       },
       scale: {
         120: "1.2",
@@ -56,7 +57,6 @@ export default {
     },
   },
   plugins: [
-    require("tailwind-scrollbar"),
     function ({ addComponents }) {
       const newComponents = {
         ".menu-item-container": {
@@ -86,16 +86,19 @@ export default {
             "@apply appearance-none h-1.5 w-1.5 bg-blue-500 rounded-full shadow-inner shadow-progress-bar-blue": {},
           },
         },
-        ".tree-node-info-container": {
+        ".tree-info-container": {
           "@apply text-xs text-white": {},
         },
-        ".tree-node-info": {
+        ".tree-info": {
           "@apply flex justify-center items-center h-full": {},
         },
-        ".tree-node-icon-container": {
-          "@apply justify-center items-center cursor-pointer": {},
+        ".tree-action-icon-container": {
+          "@apply flex justify-center items-center h-full": {},
         },
-        ".tree-node-icon": {
+        ".tree-action-label-container": {
+          "@apply h-full w-full flex items-center justify-start text-xs text-white": {},
+        },
+        ".tree-icon": {
           "@apply fill-current text-white": {},
         },
 

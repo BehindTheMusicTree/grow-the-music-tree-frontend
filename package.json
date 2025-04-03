@@ -1,15 +1,20 @@
 {
   "name": "bodzify-ultimate-music-guide",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "cp ./env/.env.development.api-test .env.development && vite",
-    "dev:local": "cp ./env/.env.development.api-local .env.development && vite",
+    "dev:remote": "cp ./env/dev/available/.env.dev.api-remote ./env/to-load/.env.development && vite",
+    "dev:local": "cp ./env/dev/available/.env.dev.api-local ./env/to-load/.env.development && vite",
     "serve": "vite",
-    "build": "env-cmd -f ./env/.env.test vite build",
+    "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:cors": "vitest run src/utils/ApiService.test.js src/components/utils/ApiErrorHandler.test.jsx src/components/popup/child/CorsErrorPopupChild.test.jsx"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
@@ -23,25 +28,32 @@
     "d3": "^7.8.5",
     "env-cmd": "^10.1.0",
     "howler": "^2.2.4",
+    "is-fullwidth-code-point": "^3.0.0",
     "raf": "^3.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-howler": "^5.2.0",
     "react-icons": "^5.2.1",
-    "react-router-dom": "^6.22.3"
+    "react-router-dom": "^6.22.3",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
+    "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "jsdom": "^26.0.0",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
-    "vite": "^5.2.0",
-    "vite-plugin-eslint": "^1.8.1"
+    "vite": "^6.2.2",
+    "vite-plugin-eslint": "^1.8.1",
+    "vitest": "^3.0.9"
   }
 }

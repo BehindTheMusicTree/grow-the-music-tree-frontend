@@ -29,12 +29,17 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
     async function handleLibTrackToPost(file, genreUuid) {
       setFileUploadObjIsPosting(file.name, true);
       try {
-        await postLibTrack(file, genreUuid, (progress) => {
-          setFilesUploadObjs((prevFilesUploadObjs) => ({
-            ...prevFilesUploadObjs,
-            [file.name]: { ...prevFilesUploadObjs[file.name], progress },
-          }));
-        });
+        await postLibTrack(
+          file,
+          genreUuid,
+          (progress) => {
+            setFilesUploadObjs((prevFilesUploadObjs) => ({
+              ...prevFilesUploadObjs,
+              [file.name]: { ...prevFilesUploadObjs[file.name], progress },
+            }));
+          },
+          true
+        );
         setFileUploadObjIsPosting(file.name, false);
       } catch (error) {
         if (error instanceof BadRequestError) {
@@ -47,7 +52,7 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
       }
     }
 
-    async function handleLibTrackToPosts(files, genreUuid) {
+    async function handleLibTracksToPost(files, genreUuid) {
       await Promise.allSettled(files.map((file) => handleLibTrackToPost(file, genreUuid)));
     }
 
@@ -58,7 +63,7 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
           [file.name]: { size: file.size, progress: 0, isPosting: false, requestErrors: {} },
         }));
       });
-      handleLibTrackToPosts(popupContentObject.files, popupContentObject.genreUuid).then(() => {
+      handleLibTracksToPost(popupContentObject.files, popupContentObject.genreUuid).then(() => {
         setRefreshLibTracksSignal(1);
         setIsPosting(false);
       });

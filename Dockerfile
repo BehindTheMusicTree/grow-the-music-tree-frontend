@@ -1,34 +1,33 @@
-FROM node:20-alpine AS build
-
-ARG bodzifyApiUmgUsername
-ARG bodzifyApiUmgUserPassword
-ARG sentryAuthToken
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install -g npm@10.5.2
-RUN npm cache verify
-RUN npm cache clean --force
-RUN npm install is-fullwidth-code-point@3.0.0
-RUN npm install
-
-COPY . .
-
-RUN npm run build
-
+# syntax=docker/dockerfile:1
 FROM node:20-alpine
 
-# React env variables have to be prefixed with VITE_
-ENV VITE_BODZIFY_API_UMG_USERNAME=${bodzifyApiUmgUsername}
-ENV VITE_BODZIFY_API_UMG_USER_PASSWORD=${bodzifyApiUmgUserPassword}
-ENV SENTRY_AUTH_TOKEN=${sentryAuthToken}
+RUN apk add --no-cache bash
 
-WORKDIR /usr/src/app
+ARG PROJECT_DIR
+ARG APP_PORT
+ARG BUILD_COMPLETE_FILENAME
 
-COPY --from=build /usr/src/app/build ./build
+RUN for var in \
+        PROJECT_DIR \
+        APP_PORT; do \
+    if [ -z "$(eval echo \$$var)" ]; then \
+        echo "ERROR: The $var argument is not provided" >&2; \
+        exit 1; \
+    fi; \
+done
 
-RUN npm install -g npm@10.5.2
-RUN npm install -g serve
-CMD ["serve", "-s", "build", "-l", "5000"]
+ENV PROJECT_DIR=$PROJECT_DIR \
+    ENV=TEST \
+    APP_PORT=$APP_PORT \
+    SENTRY_IS_ACTIVE=true \
+    VITE_ENV_FILE_DIR=${PROJECT_DIR}env/to-load/ \
+    BUILD_COMPLETE_FILENAME=$BUILD_COMPLETE_FILENAME
+
+WORKDIR $PROJECT_DIR
+
+COPY . .
+RUN ls -la
+RUN chmod +x ./scripts/* && ./scripts/install-dependencies.sh
+RUN npm install -g npm@10.5.2 && npm install -g serve && mkdir -p $VITE_ENV_FILE_DIR
+
+ENTRYPOINT ["./scripts/entrypoint.sh"]

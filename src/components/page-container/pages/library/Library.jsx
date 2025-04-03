@@ -35,7 +35,7 @@ export default function Library() {
   };
 
   const handlePlayPauseClick = (libTrackUuid) => {
-    if (playerLibTrackObject && playerLibTrackObject.libraryTrack.uuid == libTrackUuid) {
+    if (playerLibTrackObject && playerLibTrackObject.libTrack.uuid == libTrackUuid) {
       handlePlayPauseAction();
     } else {
       playNewTrackListFromLibTrackUuid(libTrackUuid);
@@ -53,61 +53,93 @@ export default function Library() {
         webkitdirectory=""
         onChange={handleFileChange}
       />
-      <button className="action-round-button" onClick={handleFileUploadAction}>
-        <FaFileUpload size={32} />
-      </button>
-      <button className="action-round-button ml-2" onClick={handleDirectoryUploadAction}>
-        <FaFolderOpen size={32} />
-      </button>
-      <table className="table-auto w-full border-gray-500">
-        <thead>
-          <tr>
-            <th className="library-item">#</th>
-            <th className="library-item">Title</th>
-            <th className="library-item">Artist</th>
-            <th className="library-item">Album</th>
-            <th className="library-item">Genre</th>
-            <th className="library-item">Rating</th>
-            <th className="library-item">
-              <div className="flex justify-center items-center">
-                <FaRegClock />
-              </div>
-            </th>
-            <th className="library-item">Format</th>
-            <th className="library-item">Bitrate</th>
-            <th className="library-item">Plays</th>
-          </tr>
-        </thead>
-        <tbody className="space-y-10">
-          {libTracks?.map((libTrack, index) => (
-            <tr key={libTrack.uuid} className="hover:bg-gray-300 group">
-              <td className="library-item w-4 text-center pl-4 pr-1">
-                <LibTrackPositionPlayPause
-                  position={index + 1}
-                  uuid={libTrack.uuid}
-                  handlePlayPauseClick={() => handlePlayPauseClick(libTrack.uuid)}
-                />
-              </td>
-              <td className="library-item max-w-64">{libTrack.title}</td>
-              <td className="library-item">{libTrack.artist ? libTrack.artist.name : ""}</td>
-              <td className="library-item">{libTrack.album ? libTrack.album.name : ""}</td>
-              <td className="library-item">{libTrack.genre ? libTrack.genre.name : ""}</td>
-              <td className="library-item text-center">
-                <Rating
-                  rating={libTrack.rating}
-                  handleChange={() => {
-                    return;
-                  }}
-                />
-              </td>
-              <td className="library-item">{formatTime(libTrack.duration)}</td>
-              <td className="library-item text-center">{libTrack.file.extension.replace(".", "")}</td>
-              <td className="library-item text-center">{libTrack.file.bitrateInKbps} kbps</td>
-              <td className="library-item text-center">{libTrack.playCount}</td>
+      <div className="flex mb-4">
+        <button className="action-round-button" onClick={handleFileUploadAction}>
+          <FaFileUpload size={32} />
+        </button>
+        <button className="action-round-button ml-2" onClick={handleDirectoryUploadAction}>
+          <FaFolderOpen size={32} />
+        </button>
+      </div>
+      <div className="overflow-x-auto rounded-lg border border-gray-300 shadow-sm">
+        <table className="min-w-full divide-y divide-gray-300">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="library-item px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                #
+              </th>
+              <th className="library-item px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                Title
+              </th>
+              <th className="library-item px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                Artist
+              </th>
+              <th className="library-item px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                Album
+              </th>
+              <th className="library-item px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                Genre
+              </th>
+              <th className="library-item px-3 py-2 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">
+                Rating
+              </th>
+              <th className="library-item px-3 py-2 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">
+                <div className="flex justify-center items-center">
+                  <FaRegClock />
+                </div>
+              </th>
+              <th className="library-item px-3 py-2 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">
+                Format
+              </th>
+              <th className="library-item px-3 py-2 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">
+                Bitrate
+              </th>
+              <th className="library-item px-3 py-2 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">
+                Plays
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {libTracks?.map((libTrack, index) => (
+              <tr key={libTrack.uuid} className="hover:bg-gray-50 group">
+                <td className="library-item w-10 px-3 py-2 text-center">
+                  <LibTrackPositionPlayPause
+                    position={index + 1}
+                    uuid={libTrack.uuid}
+                    handlePlayPauseClick={() => handlePlayPauseClick(libTrack.uuid)}
+                  />
+                </td>
+                <td className="library-item w-full px-3 py-2 text-sm truncate">{libTrack.title}</td>
+                <td className="library-item w-32 px-3 py-2 text-sm truncate">
+                  {libTrack.artist ? libTrack.artist.name : ""}
+                </td>
+                <td className="library-item w-32 px-3 py-2 text-sm truncate">
+                  {libTrack.album ? libTrack.album.name : ""}
+                </td>
+                <td className="library-item w-32 px-3 py-2 text-sm truncate">
+                  {libTrack.genre ? libTrack.genre.name : ""}
+                </td>
+                <td className="library-item w-24 px-3 py-2 text-center">
+                  <Rating
+                    rating={libTrack.rating}
+                    handleChange={() => {
+                      return;
+                    }}
+                  />
+                </td>
+                <td className="library-item w-20 px-3 py-2 text-sm text-center">
+                  {formatTime(libTrack.file.durationInSec)}
+                </td>
+                <td className="library-item w-16 px-3 py-2 text-sm text-center">
+                  {libTrack.file.extension.replace(".", "")}
+                </td>
+                <td className="library-item w-20 px-3 py-2 text-sm text-center">{libTrack.file.bitrateInKbps} kbps</td>
+                <td className="library-item w-16 px-3 py-2 text-sm text-center">{libTrack.playCount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
