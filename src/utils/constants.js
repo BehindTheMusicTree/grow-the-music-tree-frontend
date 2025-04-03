@@ -11,8 +11,9 @@ export const TRACK_LIST_ORIGIN_TYPE = {
 };
 
 export const PAGE_TYPES = {
-  GENRE_PLAYLISTS: "GENRES",
   LIBRARY: "LIBRARY",
+  GENRE_PLAYLISTS: "GENRE_PLAYLISTS",
+  SPOTIFY_LIBRARY: "SPOTIFY_LIBRARY",
 };
 
 export const DUE_TO_PREVIOUS_ERROR_MESSAGE = "Error occurred during previous operation:";
