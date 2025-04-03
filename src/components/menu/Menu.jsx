@@ -1,13 +1,19 @@
+import { useState, useEffect, useRef } from "react";
 import { LuLibrary } from "react-icons/lu";
 import { PiGraphLight } from "react-icons/pi";
 import { CiUser } from "react-icons/ci";
+import { FaSpotify } from "react-icons/fa";
 
 import Page from "../../models/Page";
 import { PAGE_TYPES } from "../../utils/constants";
 import { usePage } from "../../contexts/page/usePage";
+import SpotifyAuthService from "../../utils/services/SpotifyAuthService";
+import ApiService from "../../utils/ApiService";
 
 export default function Menu() {
   const { page, setPage } = usePage();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef(null);
 
   const handleLibraryClick = () => {
     setPage(new Page(PAGE_TYPES.LIBRARY, null));
@@ -17,27 +23,102 @@ export default function Menu() {
     setPage(new Page(PAGE_TYPES.GENRE_PLAYLISTS, null));
   };
 
+  const handleSpotifyClick = () => {
+    const token = ApiService.getToken();
+    if (!token) {
+      SpotifyAuthService.initiateLogin();
+    } else {
+      setPage(new Page(PAGE_TYPES.SPOTIFY_LIBRARY, null));
+    }
+  };
+
+  const handleUserClick = () => {
+    setShowUserMenu(!showUserMenu);
+  };
+
+  const handleSignUpWithSpotify = () => {
+    SpotifyAuthService.initiateLogin();
+    setShowUserMenu(false);
+  };
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <div className="menu-container bg-black flex-col justify-center items-start pt-3 px-1">
-      <div className="menu-item-container" onClick={handleGenrePlaylistsClick}>
+    <div className="menu-container bg-black flex-col justify-center items-start pt-2 px-1">
+      <div className="menu-item-container group" onClick={handleGenrePlaylistsClick}>
         <div
           className={
-            page.type === PAGE_TYPES.GENRE_PLAYLISTS ? "menu-item-icon-container-active" : "menu-item-icon-container"
+            page.type === PAGE_TYPES.GENRE_PLAYLISTS
+              ? "menu-item-icon-container-active"
+              : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
           }
         >
-          <PiGraphLight />
+          <PiGraphLight className="text-lg" />
         </div>
       </div>
-      <div className="menu-item-container" onClick={handleLibraryClick}>
+      <div className="menu-item-container group" onClick={handleLibraryClick}>
         <div
-          className={page.type === PAGE_TYPES.LIBRARY ? "menu-item-icon-container-active" : "menu-item-icon-container"}
+          className={
+            page.type === PAGE_TYPES.LIBRARY
+              ? "menu-item-icon-container-active"
+              : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
+          }
         >
-          <LuLibrary />
+          <LuLibrary className="text-lg" />
         </div>
       </div>
-      <div className="menu-item-container">
-        <div className="menu-item-icon-container">
-          <CiUser className="menu-item-icon" />
+      <div className="menu-item-container relative" ref={menuRef}>
+        <div
+          className={`menu-item-icon-container transition-all duration-200 ${
+            showUserMenu ? "bg-gray-700 shadow-lg" : "hover:bg-gray-800"
+          }`}
+          onClick={handleUserClick}
+        >
+          <CiUser className="text-lg" />
+        </div>
+        <div
+          className={`
+          absolute left-full ml-2 bg-gray-800 rounded-lg shadow-xl py-2 min-w-[200px]
+          transform transition-all duration-200 origin-left
+          ${
+            showUserMenu
+              ? "opacity-100 scale-100 translate-x-0"
+              : "opacity-0 scale-95 -translate-x-2 pointer-events-none"
+          }
+        `}
+        >
+          <button
+            className="w-full px-3 py-2 text-left text-white hover:bg-[#1DB954] flex items-center
+                     transition-all duration-200 group"
+            onClick={handleSignUpWithSpotify}
+          >
+            <FaSpotify className="mr-2 text-base text-[#1DB954] group-hover:text-white transition-colors duration-200" />
+            <div>
+              <div className="text-sm font-medium">Sign in with Spotify</div>
+              <div className="text-xs text-gray-400 group-hover:text-gray-200">Connect your Spotify account</div>
+            </div>
+          </button>
+        </div>
+      </div>
+      <div className="menu-item-container group" onClick={handleSpotifyClick}>
+        <div
+          className={
+            page.type === PAGE_TYPES.SPOTIFY_LIBRARY
+              ? "menu-item-icon-container-active"
+              : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
+          }
+        >
+          <FaSpotify className="text-lg text-[#1DB954] group-hover:scale-110 transition-transform duration-200" />
         </div>
       </div>
     </div>
