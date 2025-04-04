@@ -7,6 +7,7 @@ import ApiErrorPopupChild from "./child/ApiErrorPopupChild";
 import ConnectivityErrorPopupChild from "./child/ConnectivityErrorPopupChild";
 import GenreDeletionPopupChild from "./child/GenreDeletionPopupChild";
 import SpotifyAuthPopupChild from "./child/SpotifyAuthPopupChild";
+import SpotifyAuthErrorPopupChild from "./child/SpotifyAuthErrorPopupChild";
 
 export default function Popup() {
   const { popupContentObject, hidePopup } = usePopup();
@@ -33,6 +34,9 @@ export default function Popup() {
       break;
     case "SpotifyAuthPopupContentObject":
       PopupChild = SpotifyAuthPopupChild;
+      break;
+    case "spotify-auth-error":
+      PopupChild = SpotifyAuthErrorPopupChild;
       break;
     default:
       PopupChild = null;

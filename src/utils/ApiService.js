@@ -5,12 +5,13 @@ import BadRequestError from "./errors/BadRequestError";
 import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
 import InternalServerError from "./errors/InternalServerError";
 import ConnectivityError from "./errors/ConnectivityError";
+import SpotifyService from "./services/SpotifyService";
 
 /**
  * Core API service handling authentication, HTTP requests, and error management
+ * Now uses Spotify authentication instead of UMG credentials
  */
 export default class ApiService {
-  static credentials = { username: config.apiUsername, password: config.apiUserPassword };
   static errorSubscribers = [];
 
   static onError(callback) {
@@ -192,115 +193,35 @@ export default class ApiService {
   }
 
   static getToken() {
-    return JSON.parse(localStorage.getItem("jwtToken"));
+    return SpotifyService.getSpotifyToken();
   }
 
-  static setToken(jwtToken) {
-    localStorage.setItem("jwtToken", JSON.stringify(jwtToken));
+  static hasValidToken() {
+    return SpotifyService.hasValidSpotifyToken();
   }
 
-  static async refreshToken() {
-    const refreshToken = ApiService.getToken().refresh;
-    try {
-      if (refreshToken) {
-        const url = `${config.apiBaseUrl}auth/token/refresh/`;
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ refresh: refreshToken }),
-        });
-
-        if (response.ok) {
-          const responseJson = await response.json();
-          let newToken = ApiService.getToken();
-          newToken.access = responseJson.access;
-          ApiService.setToken(newToken);
-        } else if (response.status === 401) {
-          await ApiService.login();
-        } else {
-          await this.handleNotOkResponse(url, response);
-        }
-      } else {
-        await ApiService.login();
-      }
-    } catch (error) {
-      try {
-        const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(
-          error,
-          `${config.apiBaseUrl}auth/token/refresh/`
-        );
-        throw new Error(`Failed to refresh token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
-      } catch (innerError) {
-        if (innerError instanceof ConnectivityError) {
-          this.errorSubscribers.forEach((callback) => callback(innerError));
-        } else {
-          throw innerError;
-        }
-      }
-    }
+  static throwAuthError() {
+    throw new UnauthorizedRequestError({
+      message: "Spotify authentication required",
+      status: 401,
+      details: "You must connect with Spotify to access this feature",
+    });
   }
 
   static async getHeaders() {
-    const token = ApiService.getToken();
-    let accessToken = token ? token.access : null;
     try {
-      if (accessToken) {
-        try {
-          const payload = JSON.parse(atob(accessToken.split(".")[1]));
-          const expDate = new Date(payload.exp * 1000);
-          if (expDate < new Date()) {
-            await ApiService.refreshToken();
-            accessToken = ApiService.getToken().access;
-          }
-        } catch (error) {
-          throw new Error(`Error setting access token. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`);
-        }
-        return {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        };
-      } else {
-        await ApiService.login();
-        return ApiService.getHeaders();
+      if (!this.hasValidToken()) {
+        this.throwAuthError();
       }
+
+      const spotifyToken = this.getToken();
+
+      return {
+        Authorization: `Bearer ${spotifyToken}`,
+        "Content-Type": "application/json",
+      };
     } catch (error) {
       throw new Error(`Failed to get headers. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`);
-    }
-  }
-
-  static async login() {
-    try {
-      const url = `${config.apiBaseUrl}auth/token/`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(ApiService.credentials),
-      });
-
-      if (!response.ok) {
-        await this.handleNotOkResponse(url, response);
-      } else {
-        const responseJson = await this.parseJson(response);
-        ApiService.setToken(responseJson);
-      }
-    } catch (error) {
-      try {
-        const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(
-          error,
-          `${config.apiBaseUrl}auth/token/`
-        );
-        throw new Error(`Failed to login. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
-      } catch (innerError) {
-        if (innerError instanceof ConnectivityError) {
-          this.errorSubscribers.forEach((callback) => callback(innerError));
-        } else {
-          throw innerError;
-        }
-      }
     }
   }
 
@@ -335,11 +256,14 @@ export default class ApiService {
     }
 
     try {
+      if (!this.hasValidToken()) {
+        this.throwAuthError();
+      }
+
       /* We use XMLHttpRequest because fetch doesn't provide progression for file uploads */
       const xhr = await ApiService.getXhr(url, method, data, page, onProgress);
 
       return new Promise((resolve, reject) => {
-        let mustRetryIfUnauthorized = true;
         xhr.onload = async () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             resolve(xhr.response);
@@ -348,11 +272,9 @@ export default class ApiService {
               await this.handleNotOkResponse(url, xhr, badRequestCatched);
               reject(new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${xhr.statusText}`));
             } catch (error) {
-              if (error instanceof UnauthorizedRequestError && mustRetryIfUnauthorized) {
-                mustRetryIfUnauthorized = false;
-                await ApiService.login();
-                const xhr = await ApiService.getXhr(url, method, data, page, onProgress);
-                xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
+              if (error instanceof UnauthorizedRequestError) {
+                // Token is invalid or expired - notify subscribers so popup can be shown
+                this.errorSubscribers.forEach((callback) => callback(error));
                 reject(error);
               } else if (error instanceof RequestError) {
                 if (error instanceof ConnectivityError || !(error instanceof BadRequestError) || !badRequestCatched) {
@@ -395,6 +317,12 @@ export default class ApiService {
         xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
       });
     } catch (error) {
+      // If this is an auth error, let it propagate so components can show the auth popup
+      if (error instanceof UnauthorizedRequestError) {
+        this.errorSubscribers.forEach((callback) => callback(error));
+        throw error;
+      }
+
       try {
         const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(error, url);
         throw new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
@@ -410,6 +338,10 @@ export default class ApiService {
   }
 
   static async streamAudio(trackUrl) {
+    if (!this.hasValidToken()) {
+      this.throwAuthError();
+    }
+
     const headers = await ApiService.getHeaders();
     const response = await fetch(trackUrl, { headers });
 
