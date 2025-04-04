@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import SpotifyService from "../utils/services/SpotifyService";
+import useSpotifyAuth from "../hooks/useSpotifyAuth";
 
 const SpotifyTracks = () => {
   const [tracks, setTracks] = useState([]);
@@ -8,10 +9,17 @@ const SpotifyTracks = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 50;
+  const { checkTokenAndShowPopupIfNeeded } = useSpotifyAuth();
 
   useEffect(() => {
     const fetchTracks = async () => {
       try {
+        // Check if we have a valid Spotify token, show popup if not
+        if (!checkTokenAndShowPopupIfNeeded()) {
+          setLoading(false);
+          return;
+        }
+
         const response = await SpotifyService.getLibTracks(currentPage, pageSize);
         setTracks(response.results || []);
         setTotalPages(response.total_pages || 1);
@@ -23,7 +31,7 @@ const SpotifyTracks = () => {
     };
 
     fetchTracks();
-  }, [currentPage]);
+  }, [currentPage, checkTokenAndShowPopupIfNeeded]);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);

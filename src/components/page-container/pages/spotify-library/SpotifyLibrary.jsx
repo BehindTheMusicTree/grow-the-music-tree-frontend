@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { SpotifyService } from "../../../../utils/services";
 import { FaSpotify } from "react-icons/fa";
+import useSpotifyAuth from "../../../../hooks/useSpotifyAuth";
 
 export default function SpotifyLibrary() {
   const [playlists, setPlaylists] = useState([]);
@@ -9,10 +10,17 @@ export default function SpotifyLibrary() {
   const [topTracks, setTopTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { checkTokenAndShowPopupIfNeeded } = useSpotifyAuth();
 
   useEffect(() => {
     const fetchSpotifyData = async () => {
       try {
+        // Check if we have a valid Spotify token, show popup if not
+        if (!checkTokenAndShowPopupIfNeeded()) {
+          setLoading(false);
+          return;
+        }
+
         setLoading(true);
         const [playlistsData, savedTracksData, topArtistsData, topTracksData] = await Promise.all([
           SpotifyService.getLibTracks(),

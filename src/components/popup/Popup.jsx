@@ -6,6 +6,7 @@ import LibTrackUploadingPopupChild from "./child/LibTrackUploadPopupChild";
 import ApiErrorPopupChild from "./child/ApiErrorPopupChild";
 import ConnectivityErrorPopupChild from "./child/ConnectivityErrorPopupChild";
 import GenreDeletionPopupChild from "./child/GenreDeletionPopupChild";
+import SpotifyAuthPopupChild from "./child/SpotifyAuthPopupChild";
 
 export default function Popup() {
   const { popupContentObject, hidePopup } = usePopup();
@@ -30,6 +31,9 @@ export default function Popup() {
     case "GenreDeletionPopupContentObject":
       PopupChild = GenreDeletionPopupChild;
       break;
+    case "SpotifyAuthPopupContentObject":
+      PopupChild = SpotifyAuthPopupChild;
+      break;
     default:
       PopupChild = null;
   }
@@ -45,9 +49,11 @@ export default function Popup() {
       <div className={`bg-white p-3 rounded-lg ${popupWidth} w-full relative`}>
         <div className="flex justify-between pl-2 mb-1">
           <h2>{popupContentObject.title}</h2>
-          <div className="flex flex-col items-start justify-start h-full cursor-pointer" onClick={hidePopup}>
-            &#10005;
-          </div>
+          {popupContentObject.isDismissable !== false && (
+            <div className="flex flex-col items-start justify-start h-full cursor-pointer" onClick={hidePopup}>
+              &#10005;
+            </div>
+          )}
         </div>
         {PopupChild && <PopupChild popupContentObject={popupContentObject} hide={hidePopup} />}
       </div>

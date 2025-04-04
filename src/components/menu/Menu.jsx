@@ -7,13 +7,13 @@ import { FaSpotify, FaMusic } from "react-icons/fa";
 import Page from "../../models/Page";
 import { PAGE_TYPES } from "../../utils/constants";
 import { usePage } from "../../contexts/page/usePage";
-import SpotifyAuthService from "../../utils/services/SpotifyAuthService";
-import ApiService from "../../utils/ApiService";
+import useSpotifyAuth from "../../hooks/useSpotifyAuth";
 
 export default function Menu() {
   const { page, setPage } = usePage();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef(null);
+  const { checkTokenAndShowPopupIfNeeded, login } = useSpotifyAuth();
 
   const handleLibraryClick = () => {
     setPage(new Page(PAGE_TYPES.UPLOADED_TRACKS, null));
@@ -24,10 +24,8 @@ export default function Menu() {
   };
 
   const handleSpotifyLibTracksClick = () => {
-    const token = ApiService.getToken();
-    if (!token) {
-      SpotifyAuthService.initiateLogin();
-    } else {
+    // Use the hook to check for a valid token and show popup if needed
+    if (checkTokenAndShowPopupIfNeeded()) {
       setPage(new Page(PAGE_TYPES.SPOTIFY_LIB_TRACKS, null));
     }
   };
@@ -37,7 +35,7 @@ export default function Menu() {
   };
 
   const handleSignUpWithSpotify = () => {
-    SpotifyAuthService.initiateLogin();
+    login();
     setShowUserMenu(false);
   };
 
