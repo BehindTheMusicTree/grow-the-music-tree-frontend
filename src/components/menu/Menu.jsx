@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { LuLibrary } from "react-icons/lu";
 import { PiGraphLight } from "react-icons/pi";
 import { CiUser } from "react-icons/ci";
-import { FaSpotify } from "react-icons/fa";
+import { FaSpotify, FaMusic } from "react-icons/fa";
 
 import Page from "../../models/Page";
 import { PAGE_TYPES } from "../../utils/constants";
@@ -16,19 +16,19 @@ export default function Menu() {
   const menuRef = useRef(null);
 
   const handleLibraryClick = () => {
-    setPage(new Page(PAGE_TYPES.LIBRARY, null));
+    setPage(new Page(PAGE_TYPES.UPLOADED_TRACKS, null));
   };
 
   const handleGenrePlaylistsClick = () => {
     setPage(new Page(PAGE_TYPES.GENRE_PLAYLISTS, null));
   };
 
-  const handleSpotifyClick = () => {
+  const handleSpotifyLibTracksClick = () => {
     const token = ApiService.getToken();
     if (!token) {
       SpotifyAuthService.initiateLogin();
     } else {
-      setPage(new Page(PAGE_TYPES.SPOTIFY_LIBRARY, null));
+      setPage(new Page(PAGE_TYPES.SPOTIFY_LIB_TRACKS, null));
     }
   };
 
@@ -69,7 +69,7 @@ export default function Menu() {
       <div className="menu-item-container group" onClick={handleLibraryClick}>
         <div
           className={
-            page.type === PAGE_TYPES.LIBRARY
+            page.type === PAGE_TYPES.UPLOADED_TRACKS
               ? "menu-item-icon-container-active"
               : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
           }
@@ -110,15 +110,15 @@ export default function Menu() {
           </button>
         </div>
       </div>
-      <div className="menu-item-container group" onClick={handleSpotifyClick}>
+      <div className="menu-item-container group" onClick={handleSpotifyLibTracksClick}>
         <div
           className={
-            page.type === PAGE_TYPES.SPOTIFY_LIBRARY
+            page.type === PAGE_TYPES.SPOTIFY_LIB_TRACKS
               ? "menu-item-icon-container-active"
               : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
           }
         >
-          <FaSpotify className="text-lg text-[#1DB954] group-hover:scale-110 transition-transform duration-200" />
+          <FaMusic className="text-lg text-[#1DB954] group-hover:scale-110 transition-transform duration-200" />
         </div>
       </div>
     </div>
