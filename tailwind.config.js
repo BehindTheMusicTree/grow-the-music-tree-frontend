@@ -70,7 +70,7 @@ export default {
           "@apply scale-120": {},
         },
 
-        ".library-item": {
+        ".uploaded-library-item": {
           "@apply border-b border-gray-500 py-2 text-overflow": {},
         },
         ".action-round-button": {

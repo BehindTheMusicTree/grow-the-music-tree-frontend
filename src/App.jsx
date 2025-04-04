@@ -20,7 +20,7 @@ import SpotifyCallback from "./components/auth/SpotifyCallback";
 Howler.autoUnlock = true;
 
 export default function App() {
-  const { playerLibTrackObject } = usePlayer();
+  const { playerUploadedTrackObject } = usePlayer();
   const { popupContentObject } = usePopup();
 
   const [searchSubmitted, setSearchSubmitted] = useState("");
@@ -48,7 +48,7 @@ export default function App() {
                     <div
                       className="center bg-green-500 flex-grow flex overflow-y-auto"
                       style={{
-                        maxHeight: playerLibTrackObject
+                        maxHeight: playerUploadedTrackObject
                           ? centerMaxHeight.centerWithPlayer
                           : centerMaxHeight.centerWithoutPlayer,
                       }}
@@ -56,7 +56,7 @@ export default function App() {
                       <Menu />
                       <PageContainer />
                     </div>
-                    {playerLibTrackObject && <Player />}
+                    {playerUploadedTrackObject && <Player />}
                     {popupContentObject && <Popup />}
                   </div>
                 }

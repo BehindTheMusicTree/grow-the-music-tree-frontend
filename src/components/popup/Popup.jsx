@@ -1,8 +1,8 @@
 import { usePopup } from "../../contexts/popup/usePopup";
 
 import InvalidInputPopupChild from "./child/InvalidInputPopupChild";
-import LibTrackEditionPopupChild from "./child/LibTrackEditionPopupChild";
-import LibTrackUploadingPopupChild from "./child/LibTrackUploadPopupChild";
+import UploadedTrackEditionPopupChild from "./child/UploadedTrackEditionPopupChild";
+import TrackUploadingPopupChild from "./child/TrackUploadPopupChild";
 import ApiErrorPopupChild from "./child/ApiErrorPopupChild";
 import ConnectivityErrorPopupChild from "./child/ConnectivityErrorPopupChild";
 import GenreDeletionPopupChild from "./child/GenreDeletionPopupChild";
@@ -16,11 +16,11 @@ export default function Popup() {
     case "InvalidInputContentObject":
       PopupChild = InvalidInputPopupChild;
       break;
-    case "LibTrackEditionPopupContentObject":
-      PopupChild = LibTrackEditionPopupChild;
+    case "UploadedTrackEditionPopupContentObject":
+      PopupChild = UploadedTrackEditionPopupChild;
       break;
-    case "LibTrackUploadPopupContentObject":
-      PopupChild = LibTrackUploadingPopupChild;
+    case "TrackUploadPopupContentObject":
+      PopupChild = TrackUploadingPopupChild;
       break;
     case "ApiErrorPopupContentObject":
       PopupChild = ApiErrorPopupChild;

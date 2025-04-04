@@ -3,7 +3,7 @@ import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar
 import { usePage } from "../../contexts/page/usePage";
 import TrackListSidebar from "./track-list-sidebar/TrackListSidebar";
 import GenresPlaylists from "./pages/genre-playlists/GenrePlaylists";
-import Library from "./pages/library/Library";
+import UploadedLibrary from "./pages/uploaded-library/UploadedLibrary";
 import SpotifyLibrary from "./pages/spotify-library/SpotifyLibrary";
 import SpotifyTracks from "../../pages/SpotifyTracks";
 import ErrorBoundary from "../utils/ErrorBoundary";
@@ -15,7 +15,7 @@ export default function PageContainer() {
   let pageComponent;
   switch (page.type) {
     case PAGE_TYPES.LIBRARY:
-      pageComponent = <Library />;
+      pageComponent = <UploadedLibrary />;
       break;
     case PAGE_TYPES.GENRE_PLAYLISTS:
       pageComponent = <GenresPlaylists />;

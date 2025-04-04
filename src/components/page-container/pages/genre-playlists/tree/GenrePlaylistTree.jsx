@@ -9,7 +9,7 @@ import { usePlayer } from "../../../../../contexts/player/usePlayer";
 import { useGenreGettingAssignedNewParent } from "../../../../../contexts/genre-getting-assigned-new-parent/useGenreGettingAssignedNewParent";
 
 import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "../../../../../utils/constants";
-import LibTrackUploadPopupContentObject from "../../../../../models/popup-content-object/LibTrackUploadPopupContentObject";
+import TrackUploadPopupContentObject from "../../../../../models/popup-content-object/TrackUploadPopupContentObject";
 import GenreDeletionPopupContentObject from "../../../../../models/popup-content-object/GenreDeletionPopupContentObject";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper.jsx";
@@ -40,7 +40,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
    * Handles file selection for track upload
    */
   async function handleFileChange(event) {
-    const popupContentObject = new LibTrackUploadPopupContentObject(
+    const popupContentObject = new TrackUploadPopupContentObject(
       Array.from(event.target.files),
       selectingFileGenreUuidRef.current
     );

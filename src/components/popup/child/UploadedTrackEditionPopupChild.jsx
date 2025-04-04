@@ -8,17 +8,17 @@ import { formatTime } from "../../../utils";
 import { FORM_RATING_NULL_VALUE } from "../../../utils/constants";
 import Rating from "../../utils/Rating";
 
-export default function LibTrackEditionPopupChild({ popupContentObject, hide }) {
+export default function UploadedTrackEditionPopupChild({ popupContentObject, hide }) {
   const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
-  const { refreshLibTrack } = useTrackList();
+  const { refreshUploadedTrack } = useTrackList();
   const [formValues, setFormValues] = useState({
-    title: popupContentObject.libTrack.title,
-    artistName: popupContentObject.libTrack.artist ? popupContentObject.libTrack.artist.name : "",
-    genreName: popupContentObject.libTrack.genre ? popupContentObject.libTrack.genre.name : "",
-    albumName: popupContentObject.libTrack.album ? popupContentObject.libTrack.album.name : "",
-    rating: popupContentObject.libTrack.rating,
+    title: popupContentObject.uploadedTrack.title,
+    artistName: popupContentObject.uploadedTrack.artist ? popupContentObject.uploadedTrack.artist.name : "",
+    genreName: popupContentObject.uploadedTrack.genre ? popupContentObject.uploadedTrack.genre.name : "",
+    albumName: popupContentObject.uploadedTrack.album ? popupContentObject.uploadedTrack.album.name : "",
+    rating: popupContentObject.uploadedTrack.rating,
   });
-  const genreNameBeforeEdition = popupContentObject.libTrack.genre?.name;
+  const genreNameBeforeEdition = popupContentObject.uploadedTrack.genre?.name;
 
   const handleChange = (event) => {
     setFormValues({
@@ -33,9 +33,9 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hide }) 
     if (submittedValues.rating === FORM_RATING_NULL_VALUE) {
       submittedValues.rating = null;
     }
-    const updatedLibTrack = await TrackService.putLibTrack(popupContentObject.libTrack.uuid, formValues);
-    refreshLibTrack(updatedLibTrack);
-    if (genreNameBeforeEdition !== updatedLibTrack.genre?.name) {
+    const updatedUploadedTrack = await TrackService.putUploadedTrack(popupContentObject.uploadedTrack.uuid, formValues);
+    refreshUploadedTrack(updatedUploadedTrack);
+    if (genreNameBeforeEdition !== updatedUploadedTrack.genre?.name) {
       setRefreshGenrePlaylistsSignal(1);
     }
     hide();
@@ -79,7 +79,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hide }) 
             <label className="genre popup-content-label">
               <span>Duration:</span>
               <div className="popup-content-input-readonly inline-block">
-                {formatTime(popupContentObject.libTrack.file.durationInSec)}
+                {formatTime(popupContentObject.uploadedTrack.file.durationInSec)}
               </div>
             </label>
           </div>
@@ -87,7 +87,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hide }) 
             <label className="popup-content-label">
               <span>Added on:</span>
               <div className="popup-content-input-readonly inline-block mr-1">
-                {new Date(popupContentObject.libTrack.createdOn).toLocaleDateString()}
+                {new Date(popupContentObject.uploadedTrack.createdOn).toLocaleDateString()}
               </div>
               <span className="flex-grow"></span>
             </label>
@@ -111,15 +111,15 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hide }) 
         </div>
         <div className="flex">
           <div className="popup-content-input-readonly inline-block mr-1">
-            {popupContentObject.libTrack.file.filename}
+            {popupContentObject.uploadedTrack.file.filename}
           </div>
         </div>
         <div>
           <div className="popup-content-input-readonly inline-block mr-1">
-            {popupContentObject.libTrack.file.sizeInMo} Mo
+            {popupContentObject.uploadedTrack.file.sizeInMo} Mo
           </div>
           <div className="popup-content-input-readonly inline-block">
-            {popupContentObject.libTrack.file.bitrateInKbps} kbps
+            {popupContentObject.uploadedTrack.file.bitrateInKbps} kbps
           </div>
         </div>
         <div className="flex">
@@ -134,7 +134,7 @@ export default function LibTrackEditionPopupChild({ popupContentObject, hide }) 
   );
 }
 
-LibTrackEditionPopupChild.propTypes = {
+UploadedTrackEditionPopupChild.propTypes = {
   popupContentObject: PropTypes.object.isRequired,
   hide: PropTypes.func.isRequired,
 };

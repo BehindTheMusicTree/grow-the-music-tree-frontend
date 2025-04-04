@@ -36,9 +36,9 @@ export default function TrackListSidebar() {
       </div>
       {/* 80px is player height, 100px is the banner, 56px the track list header, 3.5px the track list bottom padding */}
       <ul className={"track-list overflow-auto max-h-[calc(100vh-180px-56px-3.5px)] list-none p-0 m-0"}>
-        {trackList.map((libTrack, index) => (
-          <li key={libTrack.uuid}>
-            <TrackItem libTrack={libTrack} position={index + 1} />
+        {trackList.map((uploadedTrack, index) => (
+          <li key={uploadedTrack.uuid}>
+            <TrackItem uploadedTrack={uploadedTrack} position={index + 1} />
           </li>
         ))}
       </ul>{" "}

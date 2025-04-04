@@ -23,7 +23,7 @@ export default function SpotifyLibrary() {
 
         setLoading(true);
         const [playlistsData, savedTracksData, topArtistsData, topTracksData] = await Promise.all([
-          SpotifyService.getLibTracks(),
+          SpotifyService.getUploadedTracks(),
         ]);
 
         setPlaylists(playlistsData.items);

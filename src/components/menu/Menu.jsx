@@ -16,17 +16,17 @@ export default function Menu() {
   const { checkTokenAndShowPopupIfNeeded, login } = useSpotifyAuth();
 
   const handleLibraryClick = () => {
-    setPage(new Page(PAGE_TYPES.UPLOADED_TRACKS, null));
+    setPage(new Page(PAGE_TYPES.UPLOADED_LIBRARY, null));
   };
 
   const handleGenrePlaylistsClick = () => {
     setPage(new Page(PAGE_TYPES.GENRE_PLAYLISTS, null));
   };
 
-  const handleSpotifyLibTracksClick = () => {
+  const handleSpotifyUploadedTracksClick = () => {
     // Use the hook to check for a valid token and show popup if needed
     if (checkTokenAndShowPopupIfNeeded()) {
-      setPage(new Page(PAGE_TYPES.SPOTIFY_LIB_TRACKS, null));
+      setPage(new Page(PAGE_TYPES.SPOTIFY_LIB, null));
     }
   };
 
@@ -67,7 +67,7 @@ export default function Menu() {
       <div className="menu-item-container group" onClick={handleLibraryClick}>
         <div
           className={
-            page.type === PAGE_TYPES.UPLOADED_TRACKS
+            page.type === PAGE_TYPES.UPLOADED_LIBRARY
               ? "menu-item-icon-container-active"
               : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
           }
@@ -108,10 +108,10 @@ export default function Menu() {
           </button>
         </div>
       </div>
-      <div className="menu-item-container group" onClick={handleSpotifyLibTracksClick}>
+      <div className="menu-item-container group" onClick={handleSpotifyUploadedTracksClick}>
         <div
           className={
-            page.type === PAGE_TYPES.SPOTIFY_LIB_TRACKS
+            page.type === PAGE_TYPES.SPOTIFY_LIB
               ? "menu-item-icon-container-active"
               : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
           }

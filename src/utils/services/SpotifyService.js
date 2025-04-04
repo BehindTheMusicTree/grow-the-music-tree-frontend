@@ -46,7 +46,7 @@ export default class SpotifyService {
    * @returns {Promise<Object>} The library tracks data
    * @throws {Error} If no valid Spotify token is available
    */
-  static async getLibTracks(page = 1, pageSize = 50) {
+  static async getUploadedTracks(page = 1, pageSize = 50) {
     // This method now throws an error if there's no valid token
     // The components will catch this and show a popup
     if (!this.hasValidSpotifyToken()) {

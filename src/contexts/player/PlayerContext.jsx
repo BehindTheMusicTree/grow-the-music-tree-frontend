@@ -7,16 +7,18 @@ import { TrackService } from "../../utils/services";
 export const PlayerContext = createContext();
 
 function PlayerProvider({ children }) {
-  const [playerLibTrackObject, setPlayerLibTrackObject] = useState();
+  const [playerUploadedTrackObject, setPlayerUploadedTrackObject] = useState();
   const [stopProgressAnimationSignal, setStopProgressAnimationSignal] = useState(0);
   const [resetSeekSignal, setResetSeekSignal] = useState(0);
   const [playState, setPlayState] = useState(PLAY_STATES.STOPPED);
 
-  const setLibTrackToPlay = async (libTrack, hasNext, hasPrevious) => {
-    const playingLibTrackBlobUrl = await TrackService.loadAudioAndGetLibTrackBlobUrl(libTrack.relativeUrl);
-    setPlayerLibTrackObject({
-      libTrack: libTrack,
-      blobUrl: playingLibTrackBlobUrl,
+  const setUploadedTrackToPlay = async (uploadedTrack, hasNext, hasPrevious) => {
+    const playingUploadedTrackBlobUrl = await TrackService.loadAudioAndGetUploadedTrackBlobUrl(
+      uploadedTrack.relativeUrl
+    );
+    setPlayerUploadedTrackObject({
+      uploadedTrack: uploadedTrack,
+      blobUrl: playingUploadedTrackBlobUrl,
       hasNext: hasNext,
       hasPrevious: hasPrevious,
     });
@@ -35,8 +37,8 @@ function PlayerProvider({ children }) {
   return (
     <PlayerContext.Provider
       value={{
-        playerLibTrackObject,
-        setPlayerLibTrackObject,
+        playerUploadedTrackObject,
+        setPlayerUploadedTrackObject,
         playState,
         setPlayState,
         handlePlayPauseAction,
@@ -44,7 +46,7 @@ function PlayerProvider({ children }) {
         setResetSeekSignal,
         stopProgressAnimationSignal,
         setStopProgressAnimationSignal,
-        setLibTrackToPlay,
+        setUploadedTrackToPlay,
       }}
     >
       {children}

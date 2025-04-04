@@ -11,23 +11,23 @@ export const TrackListContext = createContext();
 function TrackListProvider({ children }) {
   const [trackList, setTrackList] = useState(null);
   const [origin, setOrigin] = useState(null);
-  const [playingLibTrackPosition, setPlayingLibTrackPosition] = useState(null);
+  const [playingUploadedTrackPosition, setPlayingUploadedTrackPosition] = useState(null);
 
-  const { playState, setPlayState, setLibTrackToPlay } = usePlayer();
+  const { playState, setPlayState, setUploadedTrackToPlay } = usePlayer();
 
-  const refreshLibTrack = async (updatedLibTrack) => {
-    const newTrackList = trackList.map((oldLibTrack) => {
-      if (oldLibTrack.uuid === updatedLibTrack.uuid) {
-        return updatedLibTrack;
+  const refreshUploadedTrack = async (updatedUploadedTrack) => {
+    const newTrackList = trackList.map((oldUploadedTrack) => {
+      if (oldUploadedTrack.uuid === updatedUploadedTrack.uuid) {
+        return updatedUploadedTrack;
       }
-      return oldLibTrack;
+      return oldUploadedTrack;
     });
     setTrackList(newTrackList);
   };
 
-  const playNewTrackListFromLibTrackUuid = async (uuid) => {
-    const newLibTrackPlayObject = await PlaylistService.postPlay(uuid);
-    setOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.LIB_TRACK, newLibTrackPlayObject.content));
+  const playNewTrackListFromUploadedTrackUuid = async (uuid) => {
+    const newUploadedTrackPlayObject = await PlaylistService.postPlay(uuid);
+    setOrigin(new TrackListOrigin(TRACK_LIST_ORIGIN_TYPE.UPLOADED_TRACK, newUploadedTrackPlayObject.content));
   };
 
   const playNewTrackListFromPlaylistUuid = async (uuid) => {
@@ -36,46 +36,46 @@ function TrackListProvider({ children }) {
   };
 
   const toPreviousTrack = () => {
-    setPlayingLibTrackPosition((prev) => prev - 1);
+    setPlayingUploadedTrackPosition((prev) => prev - 1);
   };
 
   const toNextTrack = () => {
-    setPlayingLibTrackPosition((prev) => prev + 1);
+    setPlayingUploadedTrackPosition((prev) => prev + 1);
   };
 
   const toTrackAtPosition = (position) => {
-    setPlayingLibTrackPosition(position);
+    setPlayingUploadedTrackPosition(position);
   };
 
   useEffect(() => {
     if (origin) {
-      setPlayingLibTrackPosition(1);
+      setPlayingUploadedTrackPosition(1);
       if (origin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST) {
         const trackList = origin.object.libraryTrackPlaylistRelations
           .sort((a, b) => a.position - b.position)
           .map((relation) => relation.libraryTrack);
         setTrackList(trackList);
-      } else if (origin.type === TRACK_LIST_ORIGIN_TYPE.LIB_TRACK) {
+      } else if (origin.type === TRACK_LIST_ORIGIN_TYPE.UPLOADED_TRACK) {
         setTrackList([origin.object]);
       }
     }
   }, [origin]);
 
   useEffect(() => {
-    if (trackList && trackList.length > playingLibTrackPosition - 1) {
+    if (trackList && trackList.length > playingUploadedTrackPosition - 1) {
       setPlayState(PLAY_STATES.LOADING);
     }
-  }, [origin, playingLibTrackPosition, trackList, setPlayState]);
+  }, [origin, playingUploadedTrackPosition, trackList, setPlayState]);
 
   useEffect(() => {
     if (playState === PLAY_STATES.LOADING) {
-      setLibTrackToPlay(
-        trackList[playingLibTrackPosition - 1],
-        trackList.length > playingLibTrackPosition,
-        playingLibTrackPosition > 1
+      setUploadedTrackToPlay(
+        trackList[playingUploadedTrackPosition - 1],
+        trackList.length > playingUploadedTrackPosition,
+        playingUploadedTrackPosition > 1
       );
     }
-  }, [playState, trackList, playingLibTrackPosition, setLibTrackToPlay]);
+  }, [playState, trackList, playingUploadedTrackPosition, setUploadedTrackToPlay]);
 
   return (
     <TrackListContext.Provider
@@ -83,11 +83,11 @@ function TrackListProvider({ children }) {
         trackList,
         setTrackList,
         origin,
-        playingLibTrackPosition,
-        refreshLibTrack,
-        playNewTrackListFromLibTrackUuid,
+        playingUploadedTrackPosition,
+        refreshUploadedTrack,
+        playNewTrackListFromUploadedTrackUuid,
         playNewTrackListFromPlaylistUuid,
-        playLibTrackAtPosition: setPlayingLibTrackPosition,
+        playUploadedTrackAtPosition: setPlayingUploadedTrackPosition,
         toPreviousTrack,
         toNextTrack,
         toTrackAtPosition,

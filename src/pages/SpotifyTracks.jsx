@@ -20,7 +20,7 @@ const SpotifyTracks = () => {
           return;
         }
 
-        const response = await SpotifyService.getLibTracks(currentPage, pageSize);
+        const response = await SpotifyService.getUploadedTracks(currentPage, pageSize);
         setTracks(response.results || []);
         setTotalPages(response.total_pages || 1);
         setLoading(false);

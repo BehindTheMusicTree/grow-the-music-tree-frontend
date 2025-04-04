@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { MdError, MdCheckCircle } from "react-icons/md";
 import { FaSpinner } from "react-icons/fa";
 
-import { useLibTracks } from "../../../contexts/lib-tracks/useLibTracks";
+import { useUploadedTracks } from "../../../contexts/uploaded-tracks/useUploadedTracks";
 import BadRequestError from "../../../utils/errors/BadRequestError";
 
-export default function LibTrackUploadPopupChild({ popupContentObject }) {
-  const { postLibTrack, setRefreshLibTracksSignal } = useLibTracks();
+export default function TrackUploadPopupChild({ popupContentObject }) {
+  const { postUploadedTrack, setRefreshUploadedTracksSignal } = useUploadedTracks();
   const [isPosting, setIsPosting] = useState(false);
   const [filesUploadObjs, setFilesUploadObjs] = useState({});
 
@@ -26,10 +26,10 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
   }, [popupContentObject]);
 
   useEffect(() => {
-    async function handleLibTrackToPost(file, genreUuid) {
+    async function handleUploadedTrackToPost(file, genreUuid) {
       setFileUploadObjIsPosting(file.name, true);
       try {
-        await postLibTrack(
+        await postUploadedTrack(
           file,
           genreUuid,
           (progress) => {
@@ -52,8 +52,8 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
       }
     }
 
-    async function handleLibTracksToPost(files, genreUuid) {
-      await Promise.allSettled(files.map((file) => handleLibTrackToPost(file, genreUuid)));
+    async function handleUploadedTracksToPost(files, genreUuid) {
+      await Promise.allSettled(files.map((file) => handleUploadedTrackToPost(file, genreUuid)));
     }
 
     if (isPosting) {
@@ -63,8 +63,8 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
           [file.name]: { size: file.size, progress: 0, isPosting: false, requestErrors: {} },
         }));
       });
-      handleLibTracksToPost(popupContentObject.files, popupContentObject.genreUuid).then(() => {
-        setRefreshLibTracksSignal(1);
+      handleUploadedTracksToPost(popupContentObject.files, popupContentObject.genreUuid).then(() => {
+        setRefreshUploadedTracksSignal(1);
         setIsPosting(false);
       });
     }
@@ -121,6 +121,6 @@ export default function LibTrackUploadPopupChild({ popupContentObject }) {
   );
 }
 
-LibTrackUploadPopupChild.propTypes = {
+TrackUploadPopupChild.propTypes = {
   popupContentObject: PropTypes.object.isRequired,
 };

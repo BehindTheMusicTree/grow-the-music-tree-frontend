@@ -9,7 +9,7 @@ import { formatTime } from "../../../utils";
 
 export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek }) {
   const {
-    playerLibTrackObject,
+    playerUploadedTrackObject,
     stopProgressAnimationSignal,
     setStopProgressAnimationSignal,
     resetSeekSignal,
@@ -49,7 +49,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
         errorMessage = "An unknown error occurred.";
     }
 
-    console.error(`Error loading track of url ${playerLibTrackObject.blobUrl}: ${errorCode} - ${errorMessage}`);
+    console.error(`Error loading track of url ${playerUploadedTrackObject.blobUrl}: ${errorCode} - ${errorMessage}`);
   };
 
   const handleSeekingChange = (event) => {
@@ -99,7 +99,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
     if (playState === PLAY_STATES.PLAYING) {
       if (isSeeking) {
         cancelRaf();
-      } else if (seek >= Math.floor(playerLibTrackObject.durationInSec)) {
+      } else if (seek >= Math.floor(playerUploadedTrackObject.durationInSec)) {
         handleTrackEnd();
       } else {
         playerRef.current.seek(seek);
@@ -146,10 +146,10 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
       {playState !== PLAY_STATES.LOADING ? (
         <ReactHowler
           ref={playerRef}
-          src={[playerLibTrackObject.blobUrl]}
+          src={[playerUploadedTrackObject.blobUrl]}
           html5={true}
           playing={playState === PLAY_STATES.PLAYING}
-          format={[playerLibTrackObject.libTrack.file.extension.replace(".", "")]}
+          format={[playerUploadedTrackObject.uploadedTrack.file.extension.replace(".", "")]}
           onLoadError={handleLoadError}
           onEnd={handleTrackEnd}
           volume={volume}
@@ -161,7 +161,9 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
         type="range"
         min="0"
         max={
-          playerRef ? Math.floor(playerLibTrackObject.libTrack.file.durationInSec) : PROGRESS_SEEK_MAX_WHEN_NO_PLAYER
+          playerRef
+            ? Math.floor(playerUploadedTrackObject.uploadedTrack.file.durationInSec)
+            : PROGRESS_SEEK_MAX_WHEN_NO_PLAYER
         }
         value={playerRef ? seek : PROGRESS_SEEK_MAX_WHEN_NO_PLAYER}
         onChange={handleSeekingChange}
@@ -170,7 +172,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
         onMouseLeave={handleLeaveSeeking} // because mouseup doesn't fire if mouse leaves the element
       />
       <div className="w-14 text-left">
-        {formatTime(playerRef.current ? playerLibTrackObject.libTrack.file.durationInSec : 0)}
+        {formatTime(playerRef.current ? playerUploadedTrackObject.uploadedTrack.file.durationInSec : 0)}
       </div>
     </div>
   );

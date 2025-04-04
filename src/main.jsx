@@ -10,7 +10,7 @@ import PlayerProvider from "./contexts/player/PlayerContext";
 import TrackListProvider from "./contexts/track-list/TrackListContext";
 import GenrePlaylistsProvider from "./contexts/genre-playlists/GenrePlaylistsContext";
 import PopupProvider from "./contexts/popup/PopupContext";
-import { LibTracksProvider } from "./contexts/lib-tracks/LibTracksContext";
+import { UploadedTracksProvider } from "./contexts/uploaded-tracks/UploadedTracksContext";
 
 checkRequiredConfigVars();
 
@@ -39,7 +39,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <PopupProvider>
       <GenrePlaylistsProvider>
-        <LibTracksProvider>
+        <UploadedTracksProvider>
           <PlayerProvider>
             <TrackListProvider>
               {import.meta.env.VITE_SENTRY_IS_ACTIVE === true ? (
@@ -51,7 +51,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               )}
             </TrackListProvider>
           </PlayerProvider>
-        </LibTracksProvider>
+        </UploadedTracksProvider>
       </GenrePlaylistsProvider>
     </PopupProvider>
   </React.StrictMode>
