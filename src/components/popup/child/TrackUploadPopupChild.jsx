@@ -88,6 +88,12 @@ export default function TrackUploadPopupChild({ popupContentObject }) {
                 </div>
                 <div className="w-2/5 mr-4 text-overflow">{filename}</div>
                 <div className="center flex-grow mr-2">
+                  <div className="h-4 bg-gray-200 rounded-md overflow-hidden mr-4 relative">
+                    <div className="bg-blue-500 h-full" style={{ width: `${uploadObj.progress}%` }} />
+                    <div className="absolute inset-0 flex items-center justify-center text-sm text-white">
+                      {Math.round(uploadObj.progress)}%
+                    </div>
+                  </div>
                   {uploadObj.requestErrors.length > 0 ? (
                     <div>
                       {uploadObj.requestErrors.map((fieldsErrors, errorIndex) => {
@@ -102,14 +108,7 @@ export default function TrackUploadPopupChild({ popupContentObject }) {
                         });
                       })}
                     </div>
-                  ) : (
-                    <div className="h-4 bg-gray-200 rounded-md overflow-hidden mr-4 relative">
-                      <div className="bg-blue-500 h-full" style={{ width: `${uploadObj.progress}%` }} />
-                      <div className="absolute inset-0 flex items-center justify-center text-sm text-white">
-                        {Math.round(uploadObj.progress)}%
-                      </div>
-                    </div>
-                  )}
+                  ) : null}
                 </div>
                 <div className="w-16">{(uploadObj.size / 1048576).toFixed(2)} Mo</div>
               </div>
