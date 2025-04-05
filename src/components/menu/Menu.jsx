@@ -15,7 +15,7 @@ export default function Menu() {
   const menuRef = useRef(null);
   const { checkTokenAndShowAuthIfNeeded, login } = useSpotifyAuth();
 
-  const handleLibraryClick = () => {
+  const handleUploadedLibraryClick = () => {
     setPage(new Page(PAGE_TYPES.UPLOADED_LIBRARY, null));
   };
 
@@ -64,7 +64,7 @@ export default function Menu() {
           <PiGraphLight className="text-lg" />
         </div>
       </div>
-      <div className="menu-item-container group" onClick={handleLibraryClick}>
+      <div className="menu-item-container group" onClick={handleUploadedLibraryClick}>
         <div
           className={
             page.type === PAGE_TYPES.UPLOADED_LIBRARY
