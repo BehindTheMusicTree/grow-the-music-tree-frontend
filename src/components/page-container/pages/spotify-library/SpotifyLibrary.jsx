@@ -87,7 +87,14 @@ export default function SpotifyLibrary() {
               />
               <div className="flex-grow">
                 <h3 className="text-lg font-semibold text-white mb-1">{track.name}</h3>
-                <p className="text-gray-300">{track.artists?.map((a) => a.name).join(", ") || "Unknown Artist"}</p>
+                <p className="text-gray-300">
+                  {track.artists?.map((artist, index) => (
+                    <span key={`${track.id}-artist-${index}`}>
+                      {artist.name}
+                      {index < track.artists.length - 1 ? ", " : ""}
+                    </span>
+                  )) || "Unknown Artist"}
+                </p>
               </div>
             </div>
           ))}
