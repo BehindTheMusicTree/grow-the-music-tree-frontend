@@ -8,6 +8,7 @@ import { TrackListSidebarVisibilityProvider } from "./contexts/track-list-sideba
 import { usePlayer } from "./contexts/player/usePlayer";
 import { usePopup } from "./contexts/popup/usePopup";
 import useSpotifyAuth from "./hooks/useSpotifyAuth";
+import { useNotification } from "./contexts/notification/useNotification";
 
 import Popup from "./components/popup/Popup";
 import Banner from "./components/banner/Banner";
@@ -17,27 +18,34 @@ import Player from "./components/player/Player";
 import ApiErrorHandler from "./components/utils/ApiErrorHandler";
 import NotFoundPage from "./components/utils/NotFoundPage";
 import SpotifyCallback from "./components/auth/SpotifyCallback";
-import { FaSpotify } from "react-icons/fa";
 
 Howler.autoUnlock = true;
 
-// Wrapper component that checks for Spotify authentication
+/**
+ * Wrapper component that checks for Spotify authentication
+ * Now supports non-blocking operation with notifications
+ */
 function AuthenticatedApp() {
   const { playerUploadedTrackObject } = usePlayer();
   const { popupContentObject } = usePopup();
-  const { hasValidToken, checkTokenAndShowPopupIfNeeded } = useSpotifyAuth();
+  const { hasValidToken, checkTokenAndShowAuthIfNeeded } = useSpotifyAuth();
+  const { showSpotify } = useNotification();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
   // Check authentication on component mount and whenever hasValidToken changes
   useEffect(() => {
     const checkAuth = () => {
-      const isValid = hasValidToken();
-      if (isValid !== isAuthenticated) {
-        setIsAuthenticated(isValid);
-        if (!isValid) {
-          checkTokenAndShowPopupIfNeeded();
+      if (hasValidToken()) {
+        if (!isAuthenticated) {
+          setIsAuthenticated(true);
+          // Only show success notification when transitioning from unauthenticated to authenticated
+          showSpotify("Connected to Spotify");
         }
+      } else {
+        setIsAuthenticated(false);
+        // Use non-blocking notification for authentication needs
+        checkTokenAndShowAuthIfNeeded(false); // Pass false for non-blocking mode
       }
     };
 
@@ -47,40 +55,15 @@ function AuthenticatedApp() {
     const authCheckInterval = setInterval(checkAuth, 60000); // Check every minute
 
     return () => clearInterval(authCheckInterval);
-  }, [isAuthenticated]); // Only depend on isAuthenticated state
+  }, [hasValidToken, isAuthenticated, showSpotify, checkTokenAndShowAuthIfNeeded]);
 
   const centerMaxHeight = {
     centerWithoutPlayer: "calc(100% - 100px)",
     centerWithPlayer: "calc(100% - 180px)",
   };
 
-  // If popup content exists, we're already showing a popup (possibly auth)
-  // so we'll render the app even if not authenticated
-  const shouldRenderApp = isAuthenticated || popupContentObject;
-
-  if (!shouldRenderApp) {
-    // This is a fallback in case popup system somehow fails
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <div className="text-center p-6 bg-gray-800 rounded-lg shadow-xl">
-          <div className="text-[#1DB954] mb-4">
-            <FaSpotify size={48} />
-          </div>
-          <h1 className="text-xl font-medium text-white mb-3">Spotify Authentication Required</h1>
-          <p className="text-gray-400 mb-4">You need to connect with Spotify to use this application.</p>
-          <button
-            onClick={checkTokenAndShowPopupIfNeeded}
-            className="px-6 py-3 bg-[#1DB954] text-white font-medium rounded-full hover:bg-opacity-90 
-                    transition-all duration-200 flex items-center justify-center mx-auto"
-          >
-            <FaSpotify className="mr-2" />
-            Connect with Spotify
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+  // Always render the app now - user can browse even when auth is needed
+  // Protected operations will trigger auth notifications when needed
   return (
     <div className="app flex flex-col h-screen">
       <Banner className="fixed top-0 z-50" searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
@@ -99,20 +82,24 @@ function AuthenticatedApp() {
   );
 }
 
+/**
+ * Main application component
+ * Wraps all providers and routes
+ */
 export default function App() {
   return (
-    <ApiErrorHandler>
-      <PageProvider>
-        <TrackListSidebarVisibilityProvider>
-          <Router>
+    <Router>
+      <ApiErrorHandler>
+        <PageProvider>
+          <TrackListSidebarVisibilityProvider>
             <Routes>
               <Route path="/" element={<AuthenticatedApp />} />
               <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
-          </Router>
-        </TrackListSidebarVisibilityProvider>
-      </PageProvider>
-    </ApiErrorHandler>
+          </TrackListSidebarVisibilityProvider>
+        </PageProvider>
+      </ApiErrorHandler>
+    </Router>
   );
 }

@@ -1,9 +1,41 @@
-import ApiService from "../ApiService";
+/**
+ * Service for Spotify authentication and token management
+ * Focused solely on auth, with track functionality moved to SpotifyTracksService
+ */
 
+// Log any saved tokens on service initialization to help diagnose auth issues
+(function logTokensOnStartup() {
+  console.log("=== SPOTIFY AUTH DIAGNOSTICS ===");
+  const token = localStorage.getItem("spotify_auth_token");
+  const expiry = localStorage.getItem("spotify_auth_token_expiry");
+  const refreshToken = localStorage.getItem("spotify_refresh_token");
+
+  console.log("Spotify token available:", !!token);
+
+  if (token) {
+    const expiryDate = expiry ? new Date(parseInt(expiry)) : null;
+    const now = new Date();
+    const isExpired = expiryDate && expiryDate < now;
+
+    console.log("Token expiry:", expiryDate ? expiryDate.toISOString() : "Not set");
+    console.log("Token expired:", isExpired);
+    console.log("Refresh token available:", !!refreshToken);
+
+    if (expiryDate) {
+      const timeUntilExpiry = Math.round((expiryDate.getTime() - now.getTime()) / 1000);
+      console.log("Time until expiration:", timeUntilExpiry > 0 ? timeUntilExpiry + " seconds" : "Already expired");
+    }
+  } else {
+    console.log("No Spotify token found - API calls requiring authentication will fail");
+  }
+  console.log("============================");
+})();
 export default class SpotifyService {
   // Keys for localStorage
   static SPOTIFY_TOKEN_KEY = "spotify_auth_token";
   static SPOTIFY_TOKEN_EXPIRY_KEY = "spotify_auth_token_expiry";
+  static SPOTIFY_REFRESH_KEY = "spotify_refresh_token";
+  static SPOTIFY_SYNC_TIMESTAMP_KEY = "spotify_last_sync_timestamp";
 
   /**
    * Retrieves the Spotify token from localStorage
@@ -11,6 +43,32 @@ export default class SpotifyService {
    */
   static getSpotifyToken() {
     return localStorage.getItem(this.SPOTIFY_TOKEN_KEY);
+  }
+
+  /**
+   * Saves a Spotify token to localStorage
+   * @param {string} token - The Spotify access token
+   * @param {number} expiresIn - Token lifetime in seconds
+   * @param {string} refreshToken - The refresh token (optional)
+   */
+  static saveSpotifyToken(token, expiresIn, refreshToken = null) {
+    if (!token) return;
+
+    // Save token
+    localStorage.setItem(this.SPOTIFY_TOKEN_KEY, token);
+
+    // Calculate and save expiry time
+    const expiryTime = new Date();
+    expiryTime.setSeconds(expiryTime.getSeconds() + expiresIn);
+    localStorage.setItem(this.SPOTIFY_TOKEN_EXPIRY_KEY, expiryTime.getTime().toString());
+
+    // Save refresh token if provided
+    if (refreshToken) {
+      localStorage.setItem(this.SPOTIFY_REFRESH_KEY, refreshToken);
+    }
+
+    console.log("[SpotifyService] Token saved, expires at:", expiryTime.toISOString());
+    console.log("[SpotifyService] Token lifetime:", expiresIn, "seconds");
   }
 
   /**
@@ -28,7 +86,20 @@ export default class SpotifyService {
    */
   static isSpotifyTokenExpired() {
     const expiryDate = this.getSpotifyTokenExpiry();
-    return !expiryDate || expiryDate < new Date();
+
+    // Token is expired if expiry date is missing or in the past
+    // Add 60 seconds buffer to prevent edge cases
+    if (!expiryDate) return true;
+
+    const now = new Date();
+    now.setSeconds(now.getSeconds() + 60); // Buffer
+    const isExpired = expiryDate < now;
+
+    if (isExpired) {
+      console.log("[SpotifyService] Token expired at:", expiryDate.toISOString());
+    }
+
+    return isExpired;
   }
 
   /**
@@ -36,23 +107,47 @@ export default class SpotifyService {
    * @returns {boolean} True if a valid token exists, false otherwise
    */
   static hasValidSpotifyToken() {
-    return this.getSpotifyToken() && !this.isSpotifyTokenExpired();
+    console.log("[SpotifyService] Checking token validity at:", new Date().toISOString());
+
+    const token = this.getSpotifyToken();
+    if (!token) {
+      console.log("[SpotifyService] No token found");
+      return false;
+    }
+
+    const isValid = !this.isSpotifyTokenExpired();
+    console.log("[SpotifyService] Token valid:", isValid);
+
+    return isValid;
   }
 
   /**
-   * Gets Spotify library tracks
-   * @param {number} page - The page number to fetch
-   * @param {number} pageSize - The number of items per page
-   * @returns {Promise<Object>} The library tracks data
-   * @throws {Error} If no valid Spotify token is available
+   * Updates the last sync timestamp
+   * Used to track when data was last synchronized with Spotify
    */
-  static async getUploadedTracks(page = 1, pageSize = 50) {
-    // This method now throws an error if there's no valid token
-    // The components will catch this and show a popup
-    if (!this.hasValidSpotifyToken()) {
-      throw new Error("No valid Spotify token available");
-    }
+  static updateSyncTimestamp() {
+    const now = new Date();
+    localStorage.setItem(this.SPOTIFY_SYNC_TIMESTAMP_KEY, now.getTime().toString());
+    console.log("[SpotifyService] Updated sync timestamp:", now.toISOString());
+  }
 
-    return await ApiService.fetchData(`tracks/spotify?page=${page}&page_size=${pageSize}`, "GET");
+  /**
+   * Gets the last sync timestamp
+   * @returns {Date|null} The last sync timestamp or null if never synced
+   */
+  static getLastSyncTimestamp() {
+    const timestamp = localStorage.getItem(this.SPOTIFY_SYNC_TIMESTAMP_KEY);
+    return timestamp ? new Date(parseInt(timestamp)) : null;
+  }
+
+  /**
+   * Clears all Spotify authentication data
+   * Used for logout or when auth is invalid
+   */
+  static clearSpotifyAuth() {
+    localStorage.removeItem(this.SPOTIFY_TOKEN_KEY);
+    localStorage.removeItem(this.SPOTIFY_TOKEN_EXPIRY_KEY);
+    localStorage.removeItem(this.SPOTIFY_REFRESH_KEY);
+    console.log("[SpotifyService] Spotify authentication cleared at:", new Date().toISOString());
   }
 }

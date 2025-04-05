@@ -8,7 +8,7 @@ export default class UploadedTrackService {
     let hasMore = true;
 
     while (hasMore) {
-      const data = await ApiService.fetchData("tracks/uploaded/", "GET", null, page);
+      const data = await ApiService.fetchData("library/uploaded/", "GET", null, page);
       results = results.concat(data.results);
 
       if (data.next) {
@@ -22,7 +22,7 @@ export default class UploadedTrackService {
   }
 
   static async retrieveUploadedTrack(uploadedTrackUuid) {
-    return await ApiService.fetchData(`tracks/uploaded/${uploadedTrackUuid}/`, "GET", null, null);
+    return await ApiService.fetchData(`library/uploaded/${uploadedTrackUuid}/`, "GET", null, null);
   }
 
   static async uploadTrack(file, genreUuid, onProgress, badRequestCatched = false) {
@@ -31,7 +31,7 @@ export default class UploadedTrackService {
     if (genreUuid) {
       formData.append("genre", genreUuid); // API expects "genre" instead of "genreUuid"
     }
-    return await ApiService.fetchData("tracks/uploaded/", "POST", formData, null, onProgress, badRequestCatched);
+    return await ApiService.fetchData("library/uploaded/", "POST", formData, null, onProgress, badRequestCatched);
   }
 
   static transformTrackData(data) {
@@ -46,7 +46,7 @@ export default class UploadedTrackService {
 
   static async putUploadedTrack(uploadedTrackUuid, uploadedTrackData) {
     const transformedData = this.transformTrackData(uploadedTrackData);
-    return await ApiService.fetchData(`tracks/uploaded/${uploadedTrackUuid}/`, "PUT", transformedData, null);
+    return await ApiService.fetchData(`library/uploaded/${uploadedTrackUuid}/`, "PUT", transformedData, null);
   }
 
   static async loadAudioAndGetUploadedTrackBlobUrl(uploadedTrackRelativeUrl) {

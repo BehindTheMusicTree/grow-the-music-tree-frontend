@@ -3,33 +3,73 @@ import PropTypes from "prop-types";
 
 import GenreService from "../../utils/services/GenreService";
 import BadRequestError from "../../utils/errors/BadRequestError";
+import UnauthorizedRequestError from "../../utils/errors/UnauthorizedRequestError";
 import InvalidInputContentObject from "../../models/popup-content-object/InvalidInputContentObject";
+import useSpotifyAuth from "../../hooks/useSpotifyAuth";
 
 export const GenrePlaylistsContext = createContext();
 
 function GenrePlaylistsProvider({ children }) {
   const [groupedGenrePlaylists, setGroupedGenrePlaylists] = useState();
   const [refreshGenrePlaylistsSignal, setRefreshGenrePlaylistsSignal] = useState(1);
+  const [error, setError] = useState(null);
+  const { checkTokenAndShowAuthIfNeeded } = useSpotifyAuth();
 
   const areGenrePlaylistsFetchingRef = { current: false };
 
   const handleGenreAddAction = async (event, parentUuid) => {
     event.stopPropagation();
+
+    // Check for valid Spotify token before API call
+    if (!checkTokenAndShowAuthIfNeeded(true)) {
+      return false;
+    }
+
     const name = prompt("New genre name:");
     if (!name) {
-      return;
+      return false;
     }
-    await GenreService.postGenre({
-      name: name,
-      parent: parentUuid,
-    });
-    setRefreshGenrePlaylistsSignal(1);
+
+    try {
+      await GenreService.postGenre({
+        name: name,
+        parent: parentUuid,
+      });
+      setRefreshGenrePlaylistsSignal(1);
+      return true;
+    } catch (error) {
+      // Handle authentication errors
+      if (error instanceof UnauthorizedRequestError) {
+        checkTokenAndShowAuthIfNeeded(true); // Force showing the auth popup
+        return false;
+      }
+      throw error; // Re-throw other errors
+    }
   };
 
   useEffect(() => {
     const fetchGenrePlaylists = async () => {
-      const genrePlaylists = await GenreService.getGenrePlaylists();
-      setGroupedGenrePlaylists(getGenrePlaylistsGroupedByRoot(genrePlaylists));
+      try {
+        // Check for valid Spotify token before API call
+        if (!checkTokenAndShowAuthIfNeeded(true)) {
+          setError("Authentication required");
+          return;
+        }
+
+        const genrePlaylists = await GenreService.getGenrePlaylists();
+        setGroupedGenrePlaylists(getGenrePlaylistsGroupedByRoot(genrePlaylists));
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching genre playlists:", error);
+
+        // Handle authentication errors
+        if (error instanceof UnauthorizedRequestError) {
+          setError("Authentication required");
+          checkTokenAndShowAuthIfNeeded(true); // Force showing the auth popup
+        } else {
+          setError("Failed to load genre playlists");
+        }
+      }
     };
 
     if (refreshGenrePlaylistsSignal == 1 && !areGenrePlaylistsFetchingRef.current) {
@@ -38,7 +78,7 @@ function GenrePlaylistsProvider({ children }) {
       areGenrePlaylistsFetchingRef.current = false;
       setRefreshGenrePlaylistsSignal(0);
     }
-  }, [refreshGenrePlaylistsSignal]);
+  }, [refreshGenrePlaylistsSignal, checkTokenAndShowAuthIfNeeded]);
 
   const getGenrePlaylistsGroupedByRoot = (genrePlaylists) => {
     const groupedGenrePlaylists = {};
@@ -101,6 +141,7 @@ function GenrePlaylistsProvider({ children }) {
         updateGenreParent,
         renameGenre,
         deleteGenre,
+        error, // Include error state in context value
       }}
     >
       {children}

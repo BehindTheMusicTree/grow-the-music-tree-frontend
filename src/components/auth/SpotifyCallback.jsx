@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import SpotifyAuthService from "../../utils/services/SpotifyAuthService";
-import ApiService from "../../utils/ApiService";
+import SpotifyService from "../../utils/services/SpotifyService";
 import { FaSpotify, FaRedo } from "react-icons/fa";
 
 export default function SpotifyCallback() {
@@ -12,8 +12,22 @@ export default function SpotifyCallback() {
   const [authCode, setAuthCode] = useState(null);
   const [authState, setAuthState] = useState(null);
 
+  // Use useRef instead of useState for tracking auth attempts
+  // This is more reliable in React's StrictMode which can cause components
+  // to mount twice in development
+  const authAttemptRef = useRef(false);
+
   // Function to handle the authentication process
   const processAuthentication = async (code, state) => {
+    // Prevent multiple auth attempts using ref
+    if (authAttemptRef.current) {
+      console.log("Authentication already processed for this code, skipping duplicate attempt");
+      return;
+    }
+
+    // Mark as processed immediately
+    authAttemptRef.current = true;
+
     setIsProcessing(true);
     setError(null);
     setStatusMessage("Processing authentication request...");
@@ -26,19 +40,48 @@ export default function SpotifyCallback() {
 
       console.log("Authentication data received:", Object.keys(data));
 
-      // Store the JWT token from API response
-      if (data.token) {
-        ApiService.setToken(data.token);
-        console.log("JWT token stored");
+      // Extract any token from the response data
+      const tokenValue = data.accessToken || data.token || data.access_token;
+
+      // Force a larger delay to ensure token is fully stored before checking
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Check if token was stored correctly
+      const storedToken = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_KEY);
+      console.log("Token stored correctly:", !!storedToken);
+
+      // Manual storage as a fallback
+      if (!storedToken && tokenValue) {
+        console.log("Token not found in storage, manually storing from response data");
+        const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour
+        localStorage.setItem(SpotifyService.SPOTIFY_TOKEN_KEY, tokenValue);
+        localStorage.setItem(SpotifyService.SPOTIFY_TOKEN_EXPIRY_KEY, expiryTime.toString());
+
+        // Verify again
+        const verifyStoredToken = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_KEY);
+        console.log("Manual token storage verification:", !!verifyStoredToken);
+
+        if (!verifyStoredToken) {
+          console.error("CRITICAL: Failed to store token even with manual fallback");
+        }
       }
 
-      // If we have Spotify tokens directly, they're already stored by the service
-      if (data.access_token) {
-        console.log("Spotify tokens received and stored");
-      }
+      // Log Spotify token details for diagnostics
+      console.log("Checking token status after authentication");
+      const hasValidToken = SpotifyService.hasValidSpotifyToken();
 
-      setStatusMessage("Authentication successful! Redirecting...");
-      setTimeout(() => navigate("/"), 1000);
+      if (hasValidToken) {
+        console.log("Spotify authentication successful, valid token is available");
+        setStatusMessage("Authentication successful! Redirecting...");
+        setTimeout(() => navigate("/"), 1000);
+      } else {
+        console.warn("Warning: Spotify token validation failed after authentication");
+
+        // Last resort - force page reload to refresh token state
+        console.log("Forcing page reload to refresh token state");
+        setStatusMessage("Completing authentication...");
+        setTimeout(() => (window.location.href = "/"), 1500);
+      }
     } catch (error) {
       console.error("Failed to handle Spotify callback:", error);
 
@@ -51,7 +94,14 @@ export default function SpotifyCallback() {
       } else if (error.message && error.message.includes("State verification")) {
         errorMessage = "Authentication security check failed. Please try signing in again.";
       } else if (error.message && error.message.includes("Failed to authenticate")) {
-        errorMessage = "Spotify authentication service is unavailable. Please try again later.";
+        // Check specifically for invalid_grant errors
+        if (error.message.includes("invalid_grant")) {
+          errorMessage = "This authentication code has expired or was already used. Please try signing in again.";
+          // Reset auth attempt tracking for retry
+          authAttemptRef.current = false;
+        } else {
+          errorMessage = "Spotify authentication service is unavailable. Please try again later.";
+        }
       } else if (error.message && error.message.includes("500")) {
         errorMessage = "Authentication server error. Please try again later.";
       }
@@ -94,6 +144,12 @@ export default function SpotifyCallback() {
 
     // Start the authentication process
     processAuthentication(code, state);
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      // Mark as processed in case component unmounts
+      authAttemptRef.current = true;
+    };
   }, [navigate]);
 
   // Handler for retry button

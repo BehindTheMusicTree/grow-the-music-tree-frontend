@@ -13,7 +13,7 @@ export default function Menu() {
   const { page, setPage } = usePage();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef(null);
-  const { checkTokenAndShowPopupIfNeeded, login } = useSpotifyAuth();
+  const { checkTokenAndShowAuthIfNeeded, login } = useSpotifyAuth();
 
   const handleLibraryClick = () => {
     setPage(new Page(PAGE_TYPES.UPLOADED_LIBRARY, null));
@@ -23,10 +23,10 @@ export default function Menu() {
     setPage(new Page(PAGE_TYPES.GENRE_PLAYLISTS, null));
   };
 
-  const handleSpotifyUploadedTracksClick = () => {
+  const handleSpotifyLibraryClick = () => {
     // Use the hook to check for a valid token and show popup if needed
-    if (checkTokenAndShowPopupIfNeeded()) {
-      setPage(new Page(PAGE_TYPES.SPOTIFY_LIB, null));
+    if (checkTokenAndShowAuthIfNeeded()) {
+      setPage(new Page(PAGE_TYPES.SPOTIFY_LIBRARY, null));
     }
   };
 
@@ -108,10 +108,10 @@ export default function Menu() {
           </button>
         </div>
       </div>
-      <div className="menu-item-container group" onClick={handleSpotifyUploadedTracksClick}>
+      <div className="menu-item-container group" onClick={handleSpotifyLibraryClick}>
         <div
           className={
-            page.type === PAGE_TYPES.SPOTIFY_LIB
+            page.type === PAGE_TYPES.SPOTIFY_LIBRARY
               ? "menu-item-icon-container-active"
               : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
           }

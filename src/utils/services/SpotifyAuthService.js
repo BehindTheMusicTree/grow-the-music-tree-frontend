@@ -190,23 +190,46 @@ export default class SpotifyAuthService {
       const data = await response.json();
       console.log("Response data keys:", Object.keys(data));
 
-      // Store spotify tokens in localStorage using the SpotifyService constants
-      if (data.access_token) {
-        try {
-          localStorage.setItem(SpotifyService.SPOTIFY_TOKEN_KEY, data.access_token);
-          console.log("Stored Spotify access token in localStorage");
+      // Log full response data with sensitive information partially masked
+      console.log("Full API response (sensitive data masked):", {
+        ...data,
+        // Mask sensitive data if present
+        accessToken: data.accessToken ? `${data.accessToken.substring(0, 10)}...` : undefined,
+        token: data.token ? `${data.token.substring(0, 10)}...` : undefined,
+        access_token: data.access_token ? `${data.access_token.substring(0, 10)}...` : undefined,
+        user: data.user ? { ...data.user, id: data.user.id } : undefined,
+      });
 
-          // Calculate and store expiry time if expires_in is provided
-          if (data.expires_in) {
-            const expiryTime = Date.now() + data.expires_in * 1000;
-            localStorage.setItem(SpotifyService.SPOTIFY_TOKEN_EXPIRY_KEY, expiryTime.toString());
-            console.log("Stored Spotify token expiry in localStorage");
-          }
+      // Store spotify token in localStorage using the SpotifyService constants
+      // Check for all possible token field names in the API response
+      // (we've seen it returned as 'token', 'accessToken', and potentially 'access_token')
+      const tokenValue = data.accessToken || data.token || data.access_token;
+
+      if (tokenValue) {
+        try {
+          // Store the token
+          localStorage.setItem(SpotifyService.SPOTIFY_TOKEN_KEY, tokenValue);
+          console.log("Stored Spotify token in localStorage:", tokenValue.substring(0, 10) + "...");
+
+          // Calculate and store a default expiry time (1 hour)
+          // since API doesn't provide expires_in
+          const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour in milliseconds
+          localStorage.setItem(SpotifyService.SPOTIFY_TOKEN_EXPIRY_KEY, expiryTime.toString());
+          console.log("Stored Spotify token expiry in localStorage:", new Date(expiryTime).toISOString());
+
+          // Verify token was stored
+          const storedToken = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_KEY);
+          console.log("Token storage verification:", !!storedToken);
+
+          // Force clear all localStorage and sessionStorage cache that could interfere
+          localStorage.removeItem(this.STATE_STORAGE_KEY);
+          sessionStorage.removeItem(this.STATE_STORAGE_KEY);
+          this.deleteCookie(this.STATE_COOKIE_NAME);
         } catch (e) {
           console.error("Failed to store Spotify tokens in localStorage:", e);
         }
       } else {
-        console.warn("No access_token found in response data");
+        console.warn(`No token found in API response data. Available keys: ${Object.keys(data).join(", ")}`);
       }
 
       return data;
