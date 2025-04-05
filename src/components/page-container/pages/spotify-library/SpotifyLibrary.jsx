@@ -73,18 +73,21 @@ export default function SpotifyLibrary() {
   return (
     <div className="p-6 space-y-8">
       <section>
-        <h2 className="text-2xl font-bold mb-4">Your Spotify Library</h2>
-        <div className="space-y-2">
+        <h2 className="text-3xl font-bold mb-6 text-white">Your Spotify Library</h2>
+        <div className="space-y-4">
           {spotifyTracks.map((track) => (
-            <div key={track.id} className="flex items-center bg-gray-800 p-3 rounded-lg">
+            <div
+              key={track.id}
+              className="flex items-center bg-gray-800/80 hover:bg-gray-700/80 transition-colors p-4 rounded-lg shadow-md"
+            >
               <img
                 src={track.album?.images[0]?.url || "/assets/images/album-cover-default.png"}
                 alt={track.name}
-                className="w-12 h-12 rounded mr-4"
+                className="w-16 h-16 rounded-md shadow-sm mr-6"
               />
-              <div>
-                <h3 className="font-medium">{track.name}</h3>
-                <p className="text-gray-400">{track.artists?.map((a) => a.name).join(", ") || "Unknown Artist"}</p>
+              <div className="flex-grow">
+                <h3 className="text-lg font-semibold text-white mb-1">{track.name}</h3>
+                <p className="text-gray-300">{track.artists?.map((a) => a.name).join(", ") || "Unknown Artist"}</p>
               </div>
             </div>
           ))}
