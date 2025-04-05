@@ -13,7 +13,7 @@ export default function PageContainer() {
 
   let pageComponent;
   switch (page.type) {
-    case PAGE_TYPES.LIBRARY:
+    case PAGE_TYPES.UPLOADED_LIBRARY:
       pageComponent = <UploadedLibrary />;
       break;
     case PAGE_TYPES.GENRE_PLAYLISTS:
