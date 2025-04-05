@@ -24,7 +24,7 @@ export function UploadedTracksProvider({ children }) {
     }
 
     try {
-      await TrackService.postUploadedTrack(file, genreUuid, onProgress, badRequestCatched);
+      await TrackService.uploadTrack(file, genreUuid, onProgress, badRequestCatched);
       setRefreshGenrePlaylistsSignal(1);
       return { success: true };
     } catch (error) {
