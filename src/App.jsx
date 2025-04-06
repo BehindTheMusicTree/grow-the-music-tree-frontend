@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Howler } from "howler";
 
@@ -27,15 +27,20 @@ Howler.autoUnlock = true;
 function AuthenticatedApp() {
   const { playerUploadedTrackObject } = usePlayer();
   const { popupContentObject, hidePopup } = usePopup();
-  const { hasValidToken, checkTokenAndShowAuthIfNeeded } = useSpotifyAuth();
+  const { hasValidToken, checkTokenAndShowAuthIfNeeded, showAuthPopup } = useSpotifyAuth();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [searchSubmitted, setSearchSubmitted] = useState("");
+  const previousAuthState = useRef(false);
 
   // Check authentication on component mount and whenever hasValidToken changes
   useEffect(() => {
     const checkAuth = () => {
       const tokenValid = hasValidToken();
       console.log("Token validation check result:", tokenValid);
+
+      // Track authentication state change
+      const wasAuthenticated = previousAuthState.current;
+      previousAuthState.current = tokenValid;
 
       if (tokenValid) {
         if (!isAuthenticated) {
@@ -49,8 +54,15 @@ function AuthenticatedApp() {
         }
       } else {
         setIsAuthenticated(false);
-        // Use non-blocking notification for authentication needs
-        checkTokenAndShowAuthIfNeeded(false); // Pass false for non-blocking mode
+
+        // If this is a sign-out (transition from authenticated to not authenticated)
+        if (wasAuthenticated) {
+          console.log("Sign out detected - showing auth popup");
+          showAuthPopup(); // Immediately show the auth popup
+        } else {
+          // Regular case - not signed in yet
+          checkTokenAndShowAuthIfNeeded(false); // Pass false for non-blocking mode
+        }
       }
     };
 
@@ -60,7 +72,7 @@ function AuthenticatedApp() {
     const authCheckInterval = setInterval(checkAuth, 60000); // Check every minute
 
     return () => clearInterval(authCheckInterval);
-  }, [hasValidToken, isAuthenticated, checkTokenAndShowAuthIfNeeded, popupContentObject, hidePopup]);
+  }, [hasValidToken, isAuthenticated, checkTokenAndShowAuthIfNeeded, showAuthPopup, popupContentObject, hidePopup]);
 
   const centerMaxHeight = {
     centerWithoutPlayer: "calc(100% - 100px)",
