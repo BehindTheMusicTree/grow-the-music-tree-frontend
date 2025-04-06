@@ -147,7 +147,11 @@ export default class SpotifyAuthService {
         redirect_uri: config.spotifyRedirectUri,
       };
 
-      console.log("[SpotifyAuthService] Making API request for token...");
+      console.log("[SpotifyAuthService] Making API request for token...", {
+        endpoint: `${config.apiBaseUrl}auth/spotify/`,
+        code: code.slice(0, 10) + "...", // Only log first 10 chars for security
+        redirect_uri: config.spotifyRedirectUri,
+      });
 
       // Make API request
       const response = await fetch(`${config.apiBaseUrl}auth/spotify/`, {
@@ -159,6 +163,10 @@ export default class SpotifyAuthService {
       });
 
       if (!response.ok) {
+        console.error("[SpotifyAuthService] Token exchange failed:", {
+          status: response.status,
+          statusText: response.statusText,
+        });
         throw new Error(`API request failed with status ${response.status}`);
       }
 
@@ -166,7 +174,11 @@ export default class SpotifyAuthService {
       console.log("[SpotifyAuthService] Received API response:", {
         status: response.status,
         hasAccessToken: !!data.accessToken,
+        hasRefreshToken: !!data.refreshToken,
         hasUser: !!data.user,
+        tokenType: data.accessToken ? "Bearer" : "Unknown",
+        expiresIn: "1 hour",
+        responseKeys: Object.keys(data),
       });
 
       // Extract any token from the response data
@@ -174,7 +186,14 @@ export default class SpotifyAuthService {
 
       if (tokenValue) {
         try {
-          console.log("[SpotifyAuthService] Storing token...");
+          console.log("[SpotifyAuthService] Preparing to store token data:", {
+            hasToken: true,
+            tokenLength: tokenValue.length,
+            hasRefreshToken: !!data.refreshToken,
+            hasUserProfile: !!data.user,
+            expiryTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+          });
+
           // Store the token and profile
           SpotifyService.saveSpotifyToken(
             tokenValue,
@@ -185,6 +204,19 @@ export default class SpotifyAuthService {
 
           // Verify token was stored
           const storedToken = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_KEY);
+          const storedExpiry = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_EXPIRY_KEY);
+          const storedRefresh = localStorage.getItem(SpotifyService.SPOTIFY_REFRESH_KEY);
+          const storedProfile = localStorage.getItem(SpotifyService.SPOTIFY_PROFILE_KEY);
+
+          console.log("[SpotifyAuthService] Token storage verification:", {
+            tokenStored: !!storedToken,
+            tokenLength: storedToken?.length,
+            expiryStored: !!storedExpiry,
+            expiryTime: new Date(parseInt(storedExpiry)).toISOString(),
+            refreshTokenStored: !!storedRefresh,
+            profileStored: !!storedProfile,
+          });
+
           if (!storedToken) {
             throw new Error("Failed to store token");
           }

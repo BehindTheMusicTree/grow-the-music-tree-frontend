@@ -13,22 +13,42 @@ export default function SpotifyLibrary() {
     const fetchSpotifyData = async () => {
       try {
         // Check if we have a valid Spotify token, show popup if not
-        if (!checkTokenAndShowAuthIfNeeded()) {
+        const hasValidToken = checkTokenAndShowAuthIfNeeded();
+        console.log("[SpotifyLibrary] Token check result:", hasValidToken);
+
+        if (!hasValidToken) {
+          console.log("[SpotifyLibrary] No valid token, stopping fetch");
           setLoading(false);
           return;
         }
 
         setLoading(true);
+        console.log("[SpotifyLibrary] Fetching Spotify library data...");
 
         // Use the new SpotifyTracksService
         const tracksData = await SpotifyTracksService.getLibTracks();
-        console.log("spotifyTracksData", tracksData);
+        console.log("[SpotifyLibrary] API Response:", {
+          overallTotal: tracksData.overallTotal,
+          page: tracksData.page,
+          pageSize: tracksData.pageSize,
+          hasNext: !!tracksData.next,
+          hasPrevious: !!tracksData.previous,
+          resultsCount: tracksData.results?.length,
+          sampleTrack: tracksData.results?.[0]
+            ? {
+                name: tracksData.results[0].name,
+                spotifyId: tracksData.results[0].spotifyId,
+                artists: tracksData.results[0].spotifyArtists?.map((a) => a.name),
+                album: tracksData.results[0].album?.name,
+              }
+            : null,
+        });
 
         // Extract tracks from the response
         setSpotifyTracks(tracksData.results || []);
       } catch (err) {
+        console.error("[SpotifyLibrary] API Error:", err);
         setError("Failed to load Spotify data");
-        console.error("Spotify data fetch error:", err);
       } finally {
         setLoading(false);
       }

@@ -261,7 +261,6 @@ export default class ApiService {
         Authorization: `Bearer ${spotifyToken}`,
         "Content-Type": "application/json",
       };
-      console.log("[API] Generated headers:", headers);
       return headers;
     } catch (error) {
       console.error("[API] Failed to get headers:", error);
