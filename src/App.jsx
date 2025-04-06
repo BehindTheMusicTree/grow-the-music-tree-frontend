@@ -39,11 +39,8 @@ function AuthenticatedApp() {
   // Memoize the checkAuth function to prevent it from recreating on every render
   const checkAuth = useCallback(() => {
     checkAuthCallCount.current++;
-    console.log(`[DEBUG] checkAuth called ${checkAuthCallCount.current} times`);
-    console.log("[DEBUG] Current popup type:", popupRef.current?.type);
 
     const tokenValid = hasValidToken();
-    console.log("[DEBUG] Token validation check result:", tokenValid);
 
     // Track authentication state change
     const wasAuthenticated = previousAuthState.current;
