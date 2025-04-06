@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Howler } from "howler";
 
@@ -27,52 +27,59 @@ Howler.autoUnlock = true;
 function AuthenticatedApp() {
   const { playerUploadedTrackObject } = usePlayer();
   const { popupContentObject, hidePopup } = usePopup();
-  const { hasValidToken, checkTokenAndShowAuthIfNeeded, showAuthPopup } = useSpotifyAuth();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { hasValidToken, showAuthPopup } = useSpotifyAuth();
   const [searchSubmitted, setSearchSubmitted] = useState("");
   const previousAuthState = useRef(false);
+  const popupRef = useRef(popupContentObject);
+  const checkAuthCallCount = useRef(0);
 
-  // Check authentication on component mount and whenever hasValidToken changes
-  useEffect(() => {
-    const checkAuth = () => {
-      const tokenValid = hasValidToken();
-      console.log("Token validation check result:", tokenValid);
+  // Update popup ref without an effect
+  popupRef.current = popupContentObject;
 
-      // Track authentication state change
-      const wasAuthenticated = previousAuthState.current;
-      previousAuthState.current = tokenValid;
+  // Memoize the checkAuth function to prevent it from recreating on every render
+  const checkAuth = useCallback(() => {
+    checkAuthCallCount.current++;
+    console.log(`[DEBUG] checkAuth called ${checkAuthCallCount.current} times`);
+    console.log("[DEBUG] Current popup type:", popupRef.current?.type);
 
-      if (tokenValid) {
-        if (!isAuthenticated) {
-          setIsAuthenticated(true);
-        }
+    const tokenValid = hasValidToken();
+    console.log("[DEBUG] Token validation check result:", tokenValid);
 
-        // If there's an auth popup visible, dismiss it
-        if (popupContentObject && popupContentObject.type === "SpotifyAuthPopupContentObject") {
-          console.log("Dismissing auth popup as token is now valid");
-          hidePopup();
-        }
-      } else {
-        setIsAuthenticated(false);
+    // Track authentication state change
+    const wasAuthenticated = previousAuthState.current;
+    previousAuthState.current = tokenValid;
 
-        // If this is a sign-out (transition from authenticated to not authenticated)
-        if (wasAuthenticated) {
-          console.log("Sign out detected - showing auth popup");
-          showAuthPopup(); // Immediately show the auth popup
-        } else {
-          // Regular case - not signed in yet
-          checkTokenAndShowAuthIfNeeded(false); // Pass false for non-blocking mode
-        }
+    if (tokenValid) {
+      // If there's an auth popup visible, dismiss it
+      if (popupRef.current?.type === "SpotifyAuthPopupContentObject") {
+        console.log("[DEBUG] Dismissing auth popup as token is now valid");
+        hidePopup();
       }
-    };
+    } else {
+      // If this is a sign-out (transition from authenticated to not authenticated)
+      if (wasAuthenticated) {
+        console.log("[DEBUG] Sign out detected - showing auth popup");
+        showAuthPopup(); // Immediately show the auth popup
+      }
+      // Don't call checkTokenAndShowAuthIfNeeded here as it can cause a loop
+    }
+  }, [hasValidToken, hidePopup, showAuthPopup]);
 
+  // Check authentication on component mount and set up interval
+  useEffect(() => {
+    console.log("[DEBUG] Setting up auth check effect");
+
+    // Initial check
     checkAuth();
 
     // Set up interval to periodically check token validity
     const authCheckInterval = setInterval(checkAuth, 60000); // Check every minute
 
-    return () => clearInterval(authCheckInterval);
-  }, [hasValidToken, isAuthenticated, checkTokenAndShowAuthIfNeeded, showAuthPopup, popupContentObject, hidePopup]);
+    return () => {
+      console.log("[DEBUG] Cleaning up auth check effect");
+      clearInterval(authCheckInterval);
+    };
+  }, [checkAuth]);
 
   const centerMaxHeight = {
     centerWithoutPlayer: "calc(100% - 100px)",
