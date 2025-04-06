@@ -1,61 +1,17 @@
 import { useState, useEffect } from "react";
-import { SpotifyTracksService } from "../../../../utils/services";
 import { FaSpotify } from "react-icons/fa";
-import useSpotifyAuth from "../../../../hooks/useSpotifyAuth";
+import { useSpotifyLibrary } from "../../../../contexts/spotify-library/useSpotifyLibrary";
 
 export default function SpotifyLibrary() {
-  const [spotifyTracks, setSpotifyTracks] = useState([]);
+  const { spotifyTracks, error, isAuthenticated, fetchSpotifyTracks } = useSpotifyLibrary();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { checkTokenAndShowAuthIfNeeded } = useSpotifyAuth();
 
   useEffect(() => {
-    const fetchSpotifyData = async () => {
-      try {
-        // Check if we have a valid Spotify token, show popup if not
-        const hasValidToken = checkTokenAndShowAuthIfNeeded();
-        console.log("[SpotifyLibrary] Token check result:", hasValidToken);
-
-        if (!hasValidToken) {
-          console.log("[SpotifyLibrary] No valid token, stopping fetch");
-          setLoading(false);
-          return;
-        }
-
-        setLoading(true);
-        console.log("[SpotifyLibrary] Fetching Spotify library data...");
-
-        // Use the new SpotifyTracksService
-        const tracksData = await SpotifyTracksService.getLibTracks();
-        console.log("[SpotifyLibrary] API Response:", {
-          overallTotal: tracksData.overallTotal,
-          page: tracksData.page,
-          pageSize: tracksData.pageSize,
-          hasNext: !!tracksData.next,
-          hasPrevious: !!tracksData.previous,
-          resultsCount: tracksData.results?.length,
-          sampleTrack: tracksData.results?.[0]
-            ? {
-                name: tracksData.results[0].name,
-                spotifyId: tracksData.results[0].spotifyId,
-                artists: tracksData.results[0].spotifyArtists?.map((a) => a.name),
-                album: tracksData.results[0].album?.name,
-              }
-            : null,
-        });
-
-        // Extract tracks from the response
-        setSpotifyTracks(tracksData.results || []);
-      } catch (err) {
-        console.error("[SpotifyLibrary] API Error:", err);
-        setError("Failed to load Spotify data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSpotifyData();
-  }, [checkTokenAndShowAuthIfNeeded]);
+    if (isAuthenticated) {
+      fetchSpotifyTracks();
+    }
+    setLoading(false);
+  }, [isAuthenticated, fetchSpotifyTracks]);
 
   if (loading) {
     return (
@@ -81,7 +37,7 @@ export default function SpotifyLibrary() {
           Your Spotify library appears to be empty, or there was an issue connecting to Spotify.
         </p>
         <button
-          onClick={() => checkTokenAndShowAuthIfNeeded(true)}
+          onClick={() => fetchSpotifyTracks()}
           className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded"
         >
           Reconnect with Spotify
@@ -98,23 +54,12 @@ export default function SpotifyLibrary() {
           {spotifyTracks.map((track, index) => (
             <div
               key={track.spotifyId || `track-${index}`}
-              className="flex items-center bg-gray-800/80 hover:bg-gray-700/80 transition-colors p-2 rounded-lg shadow-md"
+              className="flex items-center p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow"
             >
-              <img
-                src={track.album?.images[0]?.url || "/assets/images/album-cover-default.png"}
-                alt={track.name}
-                className="w-12 h-12 rounded-md shadow-sm mr-4"
-              />
-              <div className="flex-grow">
-                <h3 className="text-base font-semibold text-white leading-tight">{track.name}</h3>
-                <p className="text-sm text-gray-300">
-                  {track.spotifyArtists?.map((artist, index) => (
-                    <span key={`artist-${track.spotifyId || "unknown"}-${artist.spotifyId || index}`}>
-                      {artist.name}
-                      {index < track.spotifyArtists.length - 1 && ", "}
-                    </span>
-                  )) || "Unknown Artist"}
-                </p>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold">{track.name}</h3>
+                <p className="text-gray-600">{track.spotifyArtists?.map((artist) => artist.name).join(", ")}</p>
+                <p className="text-sm text-gray-500">{track.album?.name}</p>
               </div>
             </div>
           ))}
