@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { PiGraphLight } from "react-icons/pi";
-import { CiUser } from "react-icons/ci";
-import { FaSpotify, FaSignOutAlt, FaExternalLinkAlt, FaCloudUploadAlt } from "react-icons/fa";
+import { FaSpotify, FaSignOutAlt, FaExternalLinkAlt, FaCloudUploadAlt, FaUser } from "react-icons/fa";
 
 import Page from "../../models/Page";
 import { PAGE_TYPES } from "../../utils/constants";
@@ -89,7 +88,7 @@ export default function Menu() {
               : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
           }
         >
-          <PiGraphLight className="text-lg" />
+          <PiGraphLight className="text-2xl text-white" />
         </div>
       </div>
       <div className="menu-item-container group" onClick={handleUploadedLibraryClick}>
@@ -100,7 +99,7 @@ export default function Menu() {
               : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
           }
         >
-          <FaCloudUploadAlt className="text-lg" />
+          <FaCloudUploadAlt className="text-2xl text-white group-hover:scale-110 transition-transform duration-200" />
         </div>
       </div>
       <div className="menu-item-container group" onClick={handleSpotifyLibraryClick}>
@@ -111,7 +110,7 @@ export default function Menu() {
               : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
           }
         >
-          <FaSpotify className="text-lg text-white group-hover:scale-110 transition-transform duration-200" />
+          <FaSpotify className="text-2xl text-white group-hover:scale-110 transition-transform duration-200" />
         </div>
       </div>
       <div className="flex-grow"></div>
@@ -122,7 +121,7 @@ export default function Menu() {
           }`}
           onClick={handleUserClick}
         >
-          <CiUser className="text-lg" />
+          <FaUser className="text-2xl text-white" />
         </div>
         <div
           className={`
@@ -151,14 +150,14 @@ export default function Menu() {
                       />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-gray-700 mr-2 flex items-center justify-center">
-                        <CiUser className="text-gray-400" />
+                        <FaUser className="text-xl text-gray-400" />
                       </div>
                     )}
                     <div className="flex-1">
                       <div className="text-sm font-medium text-white">{profile.display_name}</div>
                       <div className="text-xs text-gray-400">Spotify Account</div>
                     </div>
-                    <FaExternalLinkAlt className="text-gray-400 text-xs" />
+                    <FaExternalLinkAlt className="text-base text-gray-400" />
                   </div>
                 </div>
               )}
@@ -167,7 +166,7 @@ export default function Menu() {
                      transition-all duration-200 group"
                 onClick={handleSignOut}
               >
-                <FaSignOutAlt className="mr-2 text-base text-red-500 group-hover:text-white transition-colors duration-200" />
+                <FaSignOutAlt className="mr-2 text-xl text-red-500 group-hover:text-white transition-colors duration-200" />
                 <div>
                   <div className="text-sm font-medium">Sign out</div>
                   <div className="text-xs text-gray-400 group-hover:text-gray-200">Disconnect from Spotify</div>
@@ -180,7 +179,7 @@ export default function Menu() {
                      transition-all duration-200 group"
               onClick={handleSignUpWithSpotify}
             >
-              <FaSpotify className="mr-2 text-base text-[#1DB954] group-hover:text-white transition-colors duration-200" />
+              <FaSpotify className="mr-2 text-xl text-[#1DB954] group-hover:text-white transition-colors duration-200" />
               <div>
                 <div className="text-sm font-medium">Sign in with Spotify</div>
                 <div className="text-xs text-gray-400 group-hover:text-gray-200">Connect your Spotify account</div>
