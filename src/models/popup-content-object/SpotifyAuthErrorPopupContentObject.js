@@ -11,7 +11,7 @@ export default class SpotifyAuthErrorPopupContentObject extends PopupContentObje
     this.title = "Spotify Authentication Required";
     this.type = "spotify-auth-error";
     this.message = errorDetails.message || "You need to connect with Spotify to use this application";
-    this.details = errorDetails.details || "Authentication is required to access this feature";
+    this.details = errorDetails.details || "Authentication is required to access this application";
     this.isDismissable = false;
     this.authService = SpotifyAuthService;
   }

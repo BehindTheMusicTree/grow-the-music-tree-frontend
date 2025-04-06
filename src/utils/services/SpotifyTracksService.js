@@ -103,4 +103,48 @@ export default class SpotifyTracksService {
       return null;
     }
   }
+
+  static async quickSync(notifyStart, notifyProgress, notifySuccess, notifyError) {
+    notifyStart && notifyStart();
+
+    try {
+      // First check if we have valid token
+      if (!SpotifyService.hasValidSpotifyToken()) {
+        notifyError && notifyError("Authentication required");
+        return;
+      }
+
+      // Simulate progress for better UX
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += 10;
+        if (progress <= 90) {
+          notifyProgress && notifyProgress(progress);
+        }
+      }, 200);
+
+      // Perform the actual sync
+      console.log("[SpotifyTracksService] Starting quick sync...");
+      const response = await ApiService.fetchData("library/spotify/sync/quick/", "POST");
+      console.log("[SpotifyTracksService] Quick sync response:", response);
+
+      // Clean up and notify success
+      clearInterval(progressInterval);
+      notifyProgress && notifyProgress(100);
+      notifySuccess && notifySuccess(response);
+
+      return response;
+    } catch (error) {
+      console.error("[SpotifyTracksService] Quick sync error:", error);
+
+      // Handle specific error cases
+      if (error.message.includes("Operation conflict")) {
+        notifyError && notifyError("A sync is already in progress. Please wait for it to complete.");
+      } else {
+        notifyError && notifyError(error.message || "Sync failed");
+      }
+
+      return null;
+    }
+  }
 }

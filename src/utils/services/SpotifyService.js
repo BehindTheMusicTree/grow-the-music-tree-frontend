@@ -36,6 +36,7 @@ export default class SpotifyService {
   static SPOTIFY_TOKEN_EXPIRY_KEY = "spotify_auth_token_expiry";
   static SPOTIFY_REFRESH_KEY = "spotify_refresh_token";
   static SPOTIFY_SYNC_TIMESTAMP_KEY = "spotify_last_sync_timestamp";
+  static SPOTIFY_PROFILE_KEY = "spotify_profile";
 
   /**
    * Retrieves the Spotify token from localStorage
@@ -50,8 +51,9 @@ export default class SpotifyService {
    * @param {string} token - The Spotify access token
    * @param {number} expiresIn - Token lifetime in seconds
    * @param {string} refreshToken - The refresh token (optional)
+   * @param {object} user - The Spotify user profile (optional)
    */
-  static saveSpotifyToken(token, expiresIn, refreshToken = null) {
+  static saveSpotifyToken(token, expiresIn, refreshToken = null, user = null) {
     if (!token) return;
 
     // Save token
@@ -65,6 +67,22 @@ export default class SpotifyService {
     // Save refresh token if provided
     if (refreshToken) {
       localStorage.setItem(this.SPOTIFY_REFRESH_KEY, refreshToken);
+    }
+
+    // Save profile if provided
+    if (user) {
+      const profile = {
+        display_name: user.displayName,
+        email: user.email,
+        external_urls: user.externalUrls,
+        followers: user.followers,
+        href: user.href,
+        id: user.spotifyId,
+        images: user.images,
+        type: user.type,
+        uri: user.uri,
+      };
+      localStorage.setItem(this.SPOTIFY_PROFILE_KEY, JSON.stringify(profile));
     }
 
     console.log("[SpotifyService] Token saved, expires at:", expiryTime.toISOString());
@@ -148,6 +166,36 @@ export default class SpotifyService {
     localStorage.removeItem(this.SPOTIFY_TOKEN_KEY);
     localStorage.removeItem(this.SPOTIFY_TOKEN_EXPIRY_KEY);
     localStorage.removeItem(this.SPOTIFY_REFRESH_KEY);
+    localStorage.removeItem(this.SPOTIFY_PROFILE_KEY);
     console.log("[SpotifyService] Spotify authentication cleared at:", new Date().toISOString());
+  }
+
+  static async getUserProfile() {
+    try {
+      const token = this.getSpotifyToken();
+      if (!token) {
+        throw new Error("No Spotify token available");
+      }
+
+      const response = await fetch("https://api.spotify.com/v1/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch Spotify profile");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching Spotify profile:", error);
+      throw error;
+    }
+  }
+
+  static getSpotifyProfile() {
+    const profileStr = localStorage.getItem(this.SPOTIFY_PROFILE_KEY);
+    return profileStr ? JSON.parse(profileStr) : null;
   }
 }

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { LuLibrary } from "react-icons/lu";
 import { PiGraphLight } from "react-icons/pi";
 import { CiUser } from "react-icons/ci";
-import { FaSpotify, FaMusic, FaSignOutAlt } from "react-icons/fa";
+import { FaSpotify, FaMusic, FaSignOutAlt, FaExternalLinkAlt } from "react-icons/fa";
 
 import Page from "../../models/Page";
 import { PAGE_TYPES } from "../../utils/constants";
@@ -15,6 +15,16 @@ export default function Menu() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef(null);
   const { checkTokenAndShowAuthIfNeeded, login, hasValidToken } = useSpotifyAuth();
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    if (hasValidToken()) {
+      const storedProfile = SpotifyService.getSpotifyProfile();
+      setProfile(storedProfile);
+    } else {
+      setProfile(null);
+    }
+  }, [hasValidToken]);
 
   const handleUploadedLibraryClick = () => {
     setPage(new Page(PAGE_TYPES.UPLOADED_LIBRARY, null));
@@ -43,6 +53,15 @@ export default function Menu() {
   const handleSignOut = () => {
     SpotifyService.clearSpotifyAuth();
     setShowUserMenu(false);
+    // Force a re-render to trigger the auth popup
+    window.location.reload();
+  };
+
+  const handleAccountClick = () => {
+    if (profile) {
+      setPage(new Page(PAGE_TYPES.ACCOUNT, null));
+      setShowUserMenu(false);
+    }
   };
 
   // Close menu when clicking outside
@@ -102,17 +121,44 @@ export default function Menu() {
         `}
         >
           {hasValidToken() ? (
-            <button
-              className="w-full px-3 py-2 text-left text-white hover:bg-red-600 flex items-center
+            <>
+              {profile && (
+                <div
+                  className="px-3 py-2 border-b border-gray-700 cursor-pointer hover:bg-gray-700 transition-colors duration-200"
+                  onClick={handleAccountClick}
+                >
+                  <div className="flex items-center">
+                    {profile.images?.[0]?.url ? (
+                      <img
+                        src={profile.images[0].url}
+                        alt={profile.display_name}
+                        className="w-8 h-8 rounded-full mr-2"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gray-700 mr-2 flex items-center justify-center">
+                        <CiUser className="text-gray-400" />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <div className="text-sm font-medium text-white">{profile.display_name}</div>
+                      <div className="text-xs text-gray-400">Spotify Account</div>
+                    </div>
+                    <FaExternalLinkAlt className="text-gray-400 text-xs" />
+                  </div>
+                </div>
+              )}
+              <button
+                className="w-full px-3 py-2 text-left text-white hover:bg-red-600 flex items-center
                      transition-all duration-200 group"
-              onClick={handleSignOut}
-            >
-              <FaSignOutAlt className="mr-2 text-base text-red-500 group-hover:text-white transition-colors duration-200" />
-              <div>
-                <div className="text-sm font-medium">Sign out</div>
-                <div className="text-xs text-gray-400 group-hover:text-gray-200">Disconnect from Spotify</div>
-              </div>
-            </button>
+                onClick={handleSignOut}
+              >
+                <FaSignOutAlt className="mr-2 text-base text-red-500 group-hover:text-white transition-colors duration-200" />
+                <div>
+                  <div className="text-sm font-medium">Sign out</div>
+                  <div className="text-xs text-gray-400 group-hover:text-gray-200">Disconnect from Spotify</div>
+                </div>
+              </button>
+            </>
           ) : (
             <button
               className="w-full px-3 py-2 text-left text-white hover:bg-[#1DB954] flex items-center

@@ -122,8 +122,19 @@ export default class ApiService {
           throw new BadRequestError(errorObj);
         } else if (status === 401) {
           throw new UnauthorizedRequestError(responseObj.errors);
+        } else if (status === 404) {
+          throw new Error(`Resource not found: ${url}`);
+        } else if (status === 409) {
+          throw new Error(responseObj.message || "Operation conflict - another operation is already in progress");
         } else if (status === 500) {
-          throw new InternalServerError(responseObj.errors);
+          // Log the full error details for debugging
+          console.error("[API] Server error details:", {
+            status,
+            url,
+            response: responseObj,
+            headers: response.headers ? Object.fromEntries(response.headers.entries()) : null,
+          });
+          throw new InternalServerError(responseObj.errors || { message: "Internal server error" });
         }
 
         errorMessage = JSON.stringify(responseObj);
@@ -132,6 +143,13 @@ export default class ApiService {
         if (error instanceof RequestError) {
           throw error;
         }
+        // Log the raw error for debugging
+        console.error("[API] Raw error details:", {
+          status,
+          url,
+          error: error.message,
+          stack: error.stack,
+        });
         throw new Error(
           `${errorMessagePrefixe} - the response message could not be analysed. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`
         );
@@ -290,59 +308,75 @@ export default class ApiService {
         this.throwAuthError();
       }
 
-      /* We use XMLHttpRequest because fetch doesn't provide progression for file uploads */
-      const xhr = await ApiService.getXhr(url, method, data, page, onProgress);
-
-      return new Promise((resolve, reject) => {
-        xhr.onload = async () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            const response = xhr.response;
-            this.logApiResponse(method, url, response);
-            resolve(response);
-          } else {
-            try {
-              await this.handleNotOkResponse(url, xhr);
-              reject(new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${xhr.statusText}`));
-            } catch (error) {
-              if (error instanceof UnauthorizedRequestError) {
-                // Token is invalid or expired - notify subscribers so popup can be shown
-                this.errorSubscribers.forEach((callback) => callback(error));
-                reject(error);
-              } else if (error instanceof RequestError) {
-                if (error instanceof ConnectivityError || !(error instanceof BadRequestError) || !badRequestCatched) {
+      // Use XMLHttpRequest for file uploads with progress, otherwise use fetch
+      if (data instanceof FormData && onProgress) {
+        const xhr = await ApiService.getXhr(url, method, data, page, onProgress);
+        return new Promise((resolve, reject) => {
+          xhr.onload = async () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              const response = xhr.response;
+              this.logApiResponse(method, url, response);
+              resolve(response);
+            } else {
+              try {
+                await this.handleNotOkResponse(url, xhr);
+                reject(
+                  new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${xhr.statusText}`)
+                );
+              } catch (error) {
+                if (error instanceof UnauthorizedRequestError) {
                   this.errorSubscribers.forEach((callback) => callback(error));
-                } else {
                   reject(error);
+                } else if (error instanceof RequestError) {
+                  if (error instanceof ConnectivityError || !(error instanceof BadRequestError) || !badRequestCatched) {
+                    this.errorSubscribers.forEach((callback) => callback(error));
+                  } else {
+                    reject(error);
+                  }
                 }
               }
             }
-          }
-        };
+          };
 
-        xhr.onerror = async () => {
-          try {
-            // XMLHttpRequest errors are often CORS-related
-            if (xhr.status === 0) {
-              // Status 0 often indicates a CORS error
-              const corsErrorObj = {
-                message: "A connectivity error occurred",
-                url: url,
-              };
-
-              const connectivityError = new ConnectivityError(corsErrorObj);
-              this.errorSubscribers.forEach((callback) => callback(connectivityError));
-              reject(connectivityError);
-            } else {
-              const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(xhr, url);
-              reject(new Error(fetchErrorMessage));
+          xhr.onerror = async () => {
+            try {
+              if (xhr.status === 0) {
+                const corsErrorObj = {
+                  message: "A connectivity error occurred",
+                  url: url,
+                };
+                const connectivityError = new ConnectivityError(corsErrorObj);
+                this.errorSubscribers.forEach((callback) => callback(connectivityError));
+                reject(connectivityError);
+              } else {
+                const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(xhr, url);
+                reject(new Error(fetchErrorMessage));
+              }
+            } catch (error) {
+              reject(error);
             }
-          } catch (error) {
-            reject(error);
-          }
-        };
+          };
 
-        xhr.send(data);
-      });
+          xhr.send(data);
+        });
+      } else {
+        // Use fetch for non-file uploads
+        const headers = await this.getHeaders();
+        const response = await fetch(url, {
+          method,
+          headers,
+          body: data ? JSON.stringify(data) : null,
+        });
+
+        if (response.ok) {
+          const responseData = await this.getResponseObjFromFetch(response);
+          this.logApiResponse(method, url, responseData);
+          return responseData;
+        } else {
+          await this.handleNotOkResponse(url, response);
+          throw new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${response.statusText}`);
+        }
+      }
     } catch (error) {
       this.logApiError(method, url, error);
       throw error;

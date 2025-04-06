@@ -1,5 +1,7 @@
 import config from "../config";
 import SpotifyService from "./SpotifyService";
+import SpotifyTracksService from "./SpotifyTracksService";
+import NotificationService from "./NotificationService";
 
 export default class SpotifyAuthService {
   static STATE_STORAGE_KEY = "spotify_auth_state";
@@ -153,9 +155,9 @@ export default class SpotifyAuthService {
       const baseUrl = config.apiBaseUrl.endsWith("/") ? config.apiBaseUrl : `${config.apiBaseUrl}/`;
 
       const url = `${baseUrl}auth/spotify/`;
-      console.log("Attempting to fetch from URL:", url);
+      const requestBody = { code };
 
-      // Detailed log of request details
+      console.log("Attempting to fetch from URL:", url);
       console.log("POST request details:", {
         url,
         headers: { "Content-Type": "application/json" },
@@ -167,7 +169,7 @@ export default class SpotifyAuthService {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify(requestBody),
       });
 
       console.log("API Response status:", response.status, response.statusText);
@@ -207,15 +209,13 @@ export default class SpotifyAuthService {
 
       if (tokenValue) {
         try {
-          // Store the token
-          localStorage.setItem(SpotifyService.SPOTIFY_TOKEN_KEY, tokenValue);
-          console.log("Stored Spotify token in localStorage:", tokenValue.substring(0, 10) + "...");
-
-          // Calculate and store a default expiry time (1 hour)
-          // since API doesn't provide expires_in
-          const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour in milliseconds
-          localStorage.setItem(SpotifyService.SPOTIFY_TOKEN_EXPIRY_KEY, expiryTime.toString());
-          console.log("Stored Spotify token expiry in localStorage:", new Date(expiryTime).toISOString());
+          // Store the token and profile
+          SpotifyService.saveSpotifyToken(
+            tokenValue,
+            60 * 60, // 1 hour in seconds
+            data.refreshToken || null,
+            data.user || null
+          );
 
           // Verify token was stored
           const storedToken = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_KEY);
@@ -225,6 +225,42 @@ export default class SpotifyAuthService {
           localStorage.removeItem(this.STATE_STORAGE_KEY);
           sessionStorage.removeItem(this.STATE_STORAGE_KEY);
           this.deleteCookie(this.STATE_COOKIE_NAME);
+
+          // Trigger quick sync
+          await SpotifyTracksService.quickSync(
+            () => {
+              // Start notification
+              NotificationService.showNotification({
+                type: "info",
+                message: "Syncing your Spotify library...",
+                duration: 0, // Don't auto-dismiss
+              });
+            },
+            (progress) => {
+              // Progress notification
+              NotificationService.showNotification({
+                type: "info",
+                message: `Syncing your Spotify library... ${progress}%`,
+                duration: 0,
+              });
+            },
+            () => {
+              // Success notification
+              NotificationService.showNotification({
+                type: "success",
+                message: "Spotify library synced successfully!",
+                duration: 5000,
+              });
+            },
+            (error) => {
+              // Error notification
+              NotificationService.showNotification({
+                type: "error",
+                message: `Failed to sync Spotify library: ${error}`,
+                duration: 5000,
+              });
+            }
+          );
         } catch (e) {
           console.error("Failed to store Spotify tokens in localStorage:", e);
         }

@@ -1,6 +1,7 @@
-import { createContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import StatusNotification from "../../components/utils/StatusNotification";
+import NotificationService from "../../utils/services/NotificationService";
 
 // Create context
 export const NotificationContext = createContext();
@@ -10,81 +11,31 @@ export const NotificationContext = createContext();
  * Allows showing loading, success, error, and other notifications
  * without blocking the UI
  */
-export const NotificationProvider = ({ children }) => {
+export function NotificationProvider({ children }) {
   const [notifications, setNotifications] = useState([]);
+  const counterRef = useRef(0);
 
-  // Generate a unique ID for notifications
-  const generateUniqueId = useCallback(() => {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  useEffect(() => {
+    const unsubscribe = NotificationService.subscribe(({ type, message, duration }) => {
+      const id = `notification-${Date.now()}-${counterRef.current++}`;
+      setNotifications((prev) => [...prev, { id, type, message }]);
+
+      if (duration > 0) {
+        setTimeout(() => {
+          setNotifications((prev) => prev.filter((n) => n.id !== id));
+        }, duration);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  // Show a notification
-  const showNotification = useCallback(
-    (message, type = "info", duration = 5000) => {
-      const id = generateUniqueId();
-
-      // Add notification to the list
-      setNotifications((prev) => [...prev, { id, message, type, duration }]);
-
-      // Return the notification ID so it can be dismissed manually if needed
-      return id;
-    },
-    [generateUniqueId]
-  );
-
-  // Show a loading notification (stays until dismissed or replaced)
-  const showLoading = useCallback(
-    (message = "Loading...") => {
-      return showNotification(message, "loading", 0);
-    },
-    [showNotification]
-  );
-
-  // Show a success notification (auto-dismisses)
-  const showSuccess = useCallback(
-    (message) => {
-      return showNotification(message, "success", 3000);
-    },
-    [showNotification]
-  );
-
-  // Show an error notification
-  const showError = useCallback(
-    (message) => {
-      return showNotification(message, "error", 5000);
-    },
-    [showNotification]
-  );
-
-  // Update an existing notification (e.g., change loading to success)
-  const updateNotification = useCallback((id, updates) => {
-    setNotifications((prev) =>
-      prev.map((notification) => (notification.id === id ? { ...notification, ...updates } : notification))
-    );
-  }, []);
-
-  // Dismiss a specific notification
-  const dismissNotification = useCallback((id) => {
-    setNotifications((prev) => prev.filter((notification) => notification.id !== id));
-  }, []);
-
-  // Dismiss all notifications
-  const dismissAll = useCallback(() => {
-    setNotifications([]);
-  }, []);
+  const showNotification = ({ type, message, duration = 5000 }) => {
+    NotificationService.showNotification({ type, message, duration });
+  };
 
   return (
-    <NotificationContext.Provider
-      value={{
-        showNotification,
-        showLoading,
-        showSuccess,
-        showError,
-        updateNotification,
-        dismissNotification,
-        dismissAll,
-      }}
-    >
+    <NotificationContext.Provider value={{ notifications, showNotification }}>
       {children}
 
       {/* Render all active notifications */}
@@ -94,14 +45,22 @@ export const NotificationProvider = ({ children }) => {
           message={message}
           type={type}
           duration={duration}
-          onDismiss={() => dismissNotification(id)}
+          onDismiss={() => showNotification({ type, message, duration: 0 })}
           visible={true}
         />
       ))}
     </NotificationContext.Provider>
   );
-};
+}
 
 NotificationProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export function useNotification() {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error("useNotification must be used within a NotificationProvider");
+  }
+  return context;
+}
