@@ -29,11 +29,6 @@ const StatusNotification = ({
     }
   }, [visible, type, duration, onDismiss]);
 
-  const handleDismiss = () => {
-    setIsVisible(false);
-    if (onDismiss) onDismiss();
-  };
-
   if (!isVisible) return null;
 
   // Get icon based on notification type
@@ -69,7 +64,7 @@ const StatusNotification = ({
   // Create portal to render at the top of the page, outside normal flow
   return createPortal(
     <div
-      className={`fixed bottom-4 right-4 z-50 p-3 rounded-lg shadow-lg border ${getBgColor()} 
+      className={`fixed top-4 right-4 z-50 p-3 rounded-lg shadow-lg border ${getBgColor()} 
                     flex items-center space-x-2 max-w-sm transition-all duration-300 transform`}
     >
       <div className="flex-shrink-0">{getIcon()}</div>
@@ -77,7 +72,13 @@ const StatusNotification = ({
 
       {/* Only show close button for non-loading notifications */}
       {type !== "loading" && (
-        <button className="flex-shrink-0 ml-2 text-gray-500 hover:text-gray-700" onClick={handleDismiss}>
+        <button
+          className="flex-shrink-0 ml-2 text-gray-500 hover:text-gray-700"
+          onClick={() => {
+            setIsVisible(false);
+            if (onDismiss) onDismiss();
+          }}
+        >
           ×
         </button>
       )}

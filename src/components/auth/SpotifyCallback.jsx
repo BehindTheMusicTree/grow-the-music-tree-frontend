@@ -21,7 +21,6 @@ export default function SpotifyCallback() {
   const processAuthentication = async (code, state) => {
     // Prevent multiple auth attempts using ref
     if (authAttemptRef.current) {
-      console.log("Authentication already processed for this code, skipping duplicate attempt");
       return;
     }
 
@@ -34,11 +33,8 @@ export default function SpotifyCallback() {
 
     try {
       setStatusMessage("Exchanging authorization code for access token...");
-      console.log("Calling SpotifyAuthService.handleCallback with code");
 
       const data = await SpotifyAuthService.handleCallback(code, state || "");
-
-      console.log("Authentication data received:", Object.keys(data));
 
       // Extract any token from the response data
       const tokenValue = data.accessToken || data.token || data.access_token;
@@ -48,65 +44,52 @@ export default function SpotifyCallback() {
 
       // Check if token was stored correctly
       const storedToken = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_KEY);
-      console.log("Token stored correctly:", !!storedToken);
 
       // Manual storage as a fallback
       if (!storedToken && tokenValue) {
-        console.log("Token not found in storage, manually storing from response data");
         const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour
         localStorage.setItem(SpotifyService.SPOTIFY_TOKEN_KEY, tokenValue);
         localStorage.setItem(SpotifyService.SPOTIFY_TOKEN_EXPIRY_KEY, expiryTime.toString());
 
         // Verify again
         const verifyStoredToken = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_KEY);
-        console.log("Manual token storage verification:", !!verifyStoredToken);
-
         if (!verifyStoredToken) {
-          console.error("CRITICAL: Failed to store token even with manual fallback");
+          throw new Error("Failed to store token");
         }
       }
 
-      // Log Spotify token details for diagnostics
-      console.log("Checking token status after authentication");
+      // Check token status
       const hasValidToken = SpotifyService.hasValidSpotifyToken();
 
       if (hasValidToken) {
-        console.log("Spotify authentication successful, valid token is available");
         setStatusMessage("Authentication successful! Redirecting...");
-        setTimeout(() => navigate("/"), 1000);
-      } else {
-        console.warn("Warning: Spotify token validation failed after authentication");
 
-        // Last resort - force page reload to refresh token state
-        console.log("Forcing page reload to refresh token state");
+        // Set flag to trigger playlists loading
+        localStorage.setItem("spotify_auth_completed", Date.now().toString());
+
+        // Increased delay to ensure all state is fully processed
+        setTimeout(() => {
+          if (navigate) {
+            navigate("/", { state: { authCompleted: true, timestamp: Date.now() } });
+          } else {
+            window.location.href = "/?auth_completed=true";
+          }
+        }, 1500);
+      } else {
         setStatusMessage("Completing authentication...");
-        setTimeout(() => (window.location.href = "/"), 1500);
+
+        // Set the flag before redirecting
+        localStorage.setItem("spotify_auth_completed", Date.now().toString());
+
+        setTimeout(() => {
+          window.location.href = "/?force_reload=true";
+        }, 1500);
       }
     } catch (error) {
-      console.error("Failed to handle Spotify callback:", error);
-
-      // Provide more specific error messages based on common failure scenarios
-      let errorMessage = "Failed to complete authentication";
-
-      if (error.message && error.message.includes("Network error")) {
-        errorMessage =
-          "Network error connecting to authentication service. Please check your internet connection and try again.";
-      } else if (error.message && error.message.includes("State verification")) {
-        errorMessage = "Authentication security check failed. Please try signing in again.";
-      } else if (error.message && error.message.includes("Failed to authenticate")) {
-        // Check specifically for invalid_grant errors
-        if (error.message.includes("invalid_grant")) {
-          errorMessage = "This authentication code has expired or was already used. Please try signing in again.";
-          // Reset auth attempt tracking for retry
-          authAttemptRef.current = false;
-        } else {
-          errorMessage = "Spotify authentication service is unavailable. Please try again later.";
-        }
-      } else if (error.message && error.message.includes("500")) {
-        errorMessage = "Authentication server error. Please try again later.";
-      }
-
-      setError(errorMessage);
+      console.error("Authentication error:", error);
+      setError(error.message);
+      setStatusMessage("Authentication failed");
+    } finally {
       setIsProcessing(false);
     }
   };

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Howler } from "howler";
 
@@ -27,51 +27,58 @@ Howler.autoUnlock = true;
 function AuthenticatedApp() {
   const { playerUploadedTrackObject } = usePlayer();
   const { popupContentObject, hidePopup } = usePopup();
-  const { hasValidToken, showAuthPopup } = useSpotifyAuth();
+  const { hasValidToken, checkTokenAndShowAuthIfNeeded, showAuthPopup } = useSpotifyAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [searchSubmitted, setSearchSubmitted] = useState("");
   const previousAuthState = useRef(false);
-  const popupRef = useRef(popupContentObject);
-  const checkAuthCallCount = useRef(0);
 
-  // Update popup ref without an effect
-  popupRef.current = popupContentObject;
-
-  // Memoize the checkAuth function to prevent it from recreating on every render
-  const checkAuth = useCallback(() => {
-    checkAuthCallCount.current++;
-
+  // Function to check authentication status
+  const checkAuth = () => {
     const tokenValid = hasValidToken();
 
-    // Track authentication state change
+    // Track authentication state change for detecting sign-out
     const wasAuthenticated = previousAuthState.current;
     previousAuthState.current = tokenValid;
 
     if (tokenValid) {
+      // Only update state if needed to avoid unnecessary renders
+      if (!isAuthenticated) {
+        setIsAuthenticated(true);
+      }
+
       // If there's an auth popup visible, dismiss it
-      if (popupRef.current?.type === "SpotifyAuthPopupContentObject") {
+      if (popupContentObject?.type === "SpotifyAuthPopupContentObject") {
         hidePopup();
       }
     } else {
+      // Update auth state to false
+      if (isAuthenticated) {
+        setIsAuthenticated(false);
+      }
+
       // If this is a sign-out (transition from authenticated to not authenticated)
       if (wasAuthenticated) {
         showAuthPopup(); // Immediately show the auth popup
+      } else {
+        // Regular case - not signed in yet
+        checkTokenAndShowAuthIfNeeded(false); // Pass false for non-blocking mode
       }
-      // Don't call checkTokenAndShowAuthIfNeeded here as it can cause a loop
     }
-  }, [hasValidToken, hidePopup, showAuthPopup]);
+  };
 
-  // Check authentication on component mount and set up interval
+  // Initial authentication check on component mount
   useEffect(() => {
-    // Initial check
     checkAuth();
+  }, []);
 
-    // Set up interval to periodically check token validity
-    const authCheckInterval = setInterval(checkAuth, 60000); // Check every minute
+  // Set up a timer effect to periodically check token validity
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      checkAuth();
+    }, 60000); // Check every minute
 
-    return () => {
-      clearInterval(authCheckInterval);
-    };
-  }, [checkAuth]);
+    return () => clearTimeout(timeoutId);
+  }, [isAuthenticated, popupContentObject, hasValidToken, checkTokenAndShowAuthIfNeeded, showAuthPopup, hidePopup]);
 
   const centerMaxHeight = {
     centerWithoutPlayer: "calc(100% - 100px)",

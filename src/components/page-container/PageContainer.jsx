@@ -5,7 +5,6 @@ import TrackListSidebar from "./track-list-sidebar/TrackListSidebar";
 import GenresPlaylists from "./pages/genre-playlists/GenrePlaylists";
 import UploadedLibrary from "./pages/uploaded-library/UploadedLibrary";
 import SpotifyLibrary from "./pages/spotify-library/SpotifyLibrary";
-import Account from "./pages/account/Account";
 import ErrorBoundary from "../utils/ErrorBoundary";
 
 export default function PageContainer() {
@@ -22,9 +21,6 @@ export default function PageContainer() {
       break;
     case PAGE_TYPES.SPOTIFY_LIBRARY:
       pageComponent = <SpotifyLibrary />;
-      break;
-    case PAGE_TYPES.ACCOUNT:
-      pageComponent = <Account />;
       break;
     default:
       pageComponent = <div>Page not found</div>;

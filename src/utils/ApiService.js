@@ -308,75 +308,59 @@ export default class ApiService {
         this.throwAuthError();
       }
 
-      // Use XMLHttpRequest for file uploads with progress, otherwise use fetch
-      if (data instanceof FormData && onProgress) {
-        const xhr = await ApiService.getXhr(url, method, data, page, onProgress);
-        return new Promise((resolve, reject) => {
-          xhr.onload = async () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              const response = xhr.response;
-              this.logApiResponse(method, url, response);
-              resolve(response);
-            } else {
-              try {
-                await this.handleNotOkResponse(url, xhr);
-                reject(
-                  new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${xhr.statusText}`)
-                );
-              } catch (error) {
-                if (error instanceof UnauthorizedRequestError) {
+      /* We use XMLHttpRequest because fetch doesn't provide progression for file uploads */
+      const xhr = await ApiService.getXhr(url, method, data, page, onProgress);
+
+      return new Promise((resolve, reject) => {
+        xhr.onload = async () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            const response = xhr.response;
+            this.logApiResponse(method, url, response);
+            resolve(response);
+          } else {
+            try {
+              await this.handleNotOkResponse(url, xhr);
+              reject(new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${xhr.statusText}`));
+            } catch (error) {
+              if (error instanceof UnauthorizedRequestError) {
+                // Token is invalid or expired - notify subscribers so popup can be shown
+                this.errorSubscribers.forEach((callback) => callback(error));
+                reject(error);
+              } else if (error instanceof RequestError) {
+                if (error instanceof ConnectivityError || !(error instanceof BadRequestError) || !badRequestCatched) {
                   this.errorSubscribers.forEach((callback) => callback(error));
+                } else {
                   reject(error);
-                } else if (error instanceof RequestError) {
-                  if (error instanceof ConnectivityError || !(error instanceof BadRequestError) || !badRequestCatched) {
-                    this.errorSubscribers.forEach((callback) => callback(error));
-                  } else {
-                    reject(error);
-                  }
                 }
               }
             }
-          };
+          }
+        };
 
-          xhr.onerror = async () => {
-            try {
-              if (xhr.status === 0) {
-                const corsErrorObj = {
-                  message: "A connectivity error occurred",
-                  url: url,
-                };
-                const connectivityError = new ConnectivityError(corsErrorObj);
-                this.errorSubscribers.forEach((callback) => callback(connectivityError));
-                reject(connectivityError);
-              } else {
-                const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(xhr, url);
-                reject(new Error(fetchErrorMessage));
-              }
-            } catch (error) {
-              reject(error);
+        xhr.onerror = async () => {
+          try {
+            // XMLHttpRequest errors are often CORS-related
+            if (xhr.status === 0) {
+              // Status 0 often indicates a CORS error
+              const corsErrorObj = {
+                message: "A connectivity error occurred",
+                url: url,
+              };
+
+              const connectivityError = new ConnectivityError(corsErrorObj);
+              this.errorSubscribers.forEach((callback) => callback(connectivityError));
+              reject(connectivityError);
+            } else {
+              const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(xhr, url);
+              reject(new Error(fetchErrorMessage));
             }
-          };
+          } catch (error) {
+            reject(error);
+          }
+        };
 
-          xhr.send(data);
-        });
-      } else {
-        // Use fetch for non-file uploads
-        const headers = await this.getHeaders();
-        const response = await fetch(url, {
-          method,
-          headers,
-          body: data ? JSON.stringify(data) : null,
-        });
-
-        if (response.ok) {
-          const responseData = await this.getResponseObjFromFetch(response);
-          this.logApiResponse(method, url, responseData);
-          return responseData;
-        } else {
-          await this.handleNotOkResponse(url, response);
-          throw new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${response.statusText}`);
-        }
-      }
+        xhr.send(data);
+      });
     } catch (error) {
       this.logApiError(method, url, error);
       throw error;
@@ -409,5 +393,155 @@ export default class ApiService {
         push();
       },
     });
+  }
+
+  static async get(url, params = {}, badRequestCatched = false) {
+    try {
+      const token = await this.getSpotifyToken();
+      const headers = this.generateHeaders(token);
+      const queryString = params ? `?${new URLSearchParams(params).toString()}` : "";
+      const fullUrl = `${this.baseUrl}${url}${queryString}`;
+
+      console.log(`[API] GET ${fullUrl}`);
+
+      const response = await fetch(fullUrl, {
+        method: "GET",
+        headers,
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new UnauthorizedRequestError("Unauthorized request");
+        }
+        if (response.status === 400 && !badRequestCatched) {
+          const errorData = await response.json();
+          throw new BadRequestError(errorData);
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(`[API] GET ${fullUrl} Response:`, data);
+      return data;
+    } catch (error) {
+      console.error(`[API] GET ${url} Error:`, error);
+      throw error;
+    }
+  }
+
+  static async post(url, data = {}, badRequestCatched = false) {
+    try {
+      const token = await this.getSpotifyToken();
+      const headers = this.generateHeaders(token);
+      const fullUrl = `${this.baseUrl}${url}`;
+
+      console.log(`[API] POST ${fullUrl}`);
+
+      const response = await fetch(fullUrl, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new UnauthorizedRequestError("Unauthorized request");
+        }
+        if (response.status === 400 && !badRequestCatched) {
+          const errorData = await response.json();
+          throw new BadRequestError(errorData);
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      console.log(`[API] POST ${fullUrl} Response:`, responseData);
+      return responseData;
+    } catch (error) {
+      console.error(`[API] POST ${url} Error:`, error);
+      throw error;
+    }
+  }
+
+  static async put(url, data = {}, badRequestCatched = false) {
+    try {
+      const token = await this.getSpotifyToken();
+      const headers = this.generateHeaders(token);
+      const fullUrl = `${this.baseUrl}${url}`;
+
+      console.log(`[API] PUT ${fullUrl}`);
+
+      const response = await fetch(fullUrl, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new UnauthorizedRequestError("Unauthorized request");
+        }
+        if (response.status === 400 && !badRequestCatched) {
+          const errorData = await response.json();
+          throw new BadRequestError(errorData);
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      console.log(`[API] PUT ${fullUrl} Response:`, responseData);
+      return responseData;
+    } catch (error) {
+      console.error(`[API] PUT ${url} Error:`, error);
+      throw error;
+    }
+  }
+
+  static async delete(url, badRequestCatched = false) {
+    try {
+      const token = await this.getSpotifyToken();
+      const headers = this.generateHeaders(token);
+      const fullUrl = `${this.baseUrl}${url}`;
+
+      console.log(`[API] DELETE ${fullUrl}`);
+
+      const response = await fetch(fullUrl, {
+        method: "DELETE",
+        headers,
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new UnauthorizedRequestError("Unauthorized request");
+        }
+        if (response.status === 400 && !badRequestCatched) {
+          const errorData = await response.json();
+          throw new BadRequestError(errorData);
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      console.log(`[API] DELETE ${fullUrl} Response:`, responseData);
+      return responseData;
+    } catch (error) {
+      console.error(`[API] DELETE ${url} Error:`, error);
+      throw error;
+    }
+  }
+
+  static async getSpotifyToken() {
+    const token = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_KEY);
+    if (!token) {
+      throw new UnauthorizedRequestError("No Spotify token found");
+    }
+    return token;
+  }
+
+  static generateHeaders(token) {
+    return {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
   }
 }
