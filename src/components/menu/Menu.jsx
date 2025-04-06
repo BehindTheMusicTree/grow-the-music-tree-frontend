@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { PiGraphLight } from "react-icons/pi";
-import { CiUser } from "react-icons/ci";
+import { FiUser } from "react-icons/fi";
 import { FaSpotify } from "react-icons/fa";
 import { BsMusicNoteList } from "react-icons/bs";
 import { FaSignOutAlt, FaExternalLinkAlt } from "react-icons/fa";
@@ -87,7 +87,7 @@ export default function Menu() {
               : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
           }
         >
-          <PiGraphLight className="text-lg" />
+          <PiGraphLight className="text-xl" />
         </div>
       </div>
       <div className="menu-item-container group" onClick={handleUploadedLibraryClick}>
@@ -98,7 +98,7 @@ export default function Menu() {
               : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
           }
         >
-          <BsMusicNoteList className="text-lg text-gray-200" />
+          <BsMusicNoteList className="text-xl text-gray-200" />
         </div>
       </div>
       <div className="menu-item-container group" onClick={handleSpotifyLibraryClick}>
@@ -109,7 +109,7 @@ export default function Menu() {
               : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
           }
         >
-          <FaSpotify className="text-lg text-[#1DB954] group-hover:scale-110 transition-transform duration-200" />
+          <FaSpotify className="text-xl text-[#1DB954] group-hover:scale-110 transition-transform duration-200" />
         </div>
       </div>
       <div className="menu-item-container relative mt-auto" ref={menuRef}>
@@ -119,7 +119,7 @@ export default function Menu() {
           }`}
           onClick={handleUserClick}
         >
-          <CiUser className="text-lg text-gray-200" />
+          <FiUser className="text-xl text-gray-200 stroke-2" />
         </div>
         <div
           className={`
@@ -148,7 +148,7 @@ export default function Menu() {
                       />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-gray-700 mr-2 flex items-center justify-center">
-                        <CiUser className="text-gray-400" />
+                        <FiUser className="text-gray-400 stroke-2" />
                       </div>
                     )}
                     <div className="flex-1">
