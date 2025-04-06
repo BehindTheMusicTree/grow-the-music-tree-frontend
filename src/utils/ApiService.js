@@ -14,6 +14,18 @@ import SpotifyService from "./services/SpotifyService";
 export default class ApiService {
   static errorSubscribers = [];
 
+  static logApiCall(method, url, data = null) {
+    console.log(`[API] ${method} ${url}`, data ? `\nRequest data: ${JSON.stringify(data, null, 2)}` : "");
+  }
+
+  static logApiResponse(method, url, response) {
+    console.log(`[API] ${method} ${url} Response:`, response);
+  }
+
+  static logApiError(method, url, error) {
+    console.error(`[API] ${method} ${url} Error:`, error);
+  }
+
   static onError(callback) {
     this.errorSubscribers.push(callback);
 
@@ -26,6 +38,7 @@ export default class ApiService {
     try {
       return await response.json();
     } catch (error) {
+      console.error("[API] Failed to parse JSON response:", error);
       throw new Error(`Failed to parse response. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}.`);
     }
   }
@@ -52,6 +65,7 @@ export default class ApiService {
 
   static async getResponseObjFromFetch(response) {
     const contentType = response.headers.get("content-type");
+    console.log("[API] Response Content-Type:", contentType);
 
     if (contentType && contentType.includes("application/json")) {
       const json = await this.parseJson(response);
@@ -69,6 +83,8 @@ export default class ApiService {
 
   static async handleNotOkResponse(url, response) {
     const status = response.status;
+    console.log(`[API] Error response from ${url} - Status: ${status}`);
+
     if (status >= 400 && status < 600) {
       let errorMessage = "";
       const errorMessagePrefixe = `url ${url} - status ${status}`;
@@ -79,6 +95,8 @@ export default class ApiService {
         } else if (response.responseType && response.responseType === "json") {
           responseObj = this.getResponseObjFromXhr(response);
         }
+
+        console.log("[API] Error response details:", responseObj);
 
         if (status === 400) {
           // Format the error data according to the API response structure
@@ -172,6 +190,7 @@ export default class ApiService {
   }
 
   static getFetchErrorMessageOtherThanBadRequest(error, url) {
+    console.error("[API] Fetch error:", error);
     if (this.isConnectivityError(error)) {
       // Create a connectivity error object with details
       const connectivityErrorObj = {
@@ -193,14 +212,19 @@ export default class ApiService {
   }
 
   static getToken() {
-    return SpotifyService.getSpotifyToken();
+    const token = SpotifyService.getSpotifyToken();
+    console.log("[API] Retrieved Spotify token:", token ? "Token exists" : "No token");
+    return token;
   }
 
   static hasValidToken() {
-    return SpotifyService.hasValidSpotifyToken();
+    const hasToken = SpotifyService.hasValidSpotifyToken();
+    console.log("[API] Token validation:", hasToken ? "Valid token" : "Invalid or missing token");
+    return hasToken;
   }
 
   static throwAuthError() {
+    console.error("[API] Authentication error: Spotify authentication required");
     throw new UnauthorizedRequestError({
       message: "Spotify authentication required",
       status: 401,
@@ -215,17 +239,20 @@ export default class ApiService {
       }
 
       const spotifyToken = this.getToken();
-
-      return {
+      const headers = {
         Authorization: `Bearer ${spotifyToken}`,
         "Content-Type": "application/json",
       };
+      console.log("[API] Generated headers:", headers);
+      return headers;
     } catch (error) {
+      console.error("[API] Failed to get headers:", error);
       throw new Error(`Failed to get headers. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`);
     }
   }
 
   static async getXhr(url, method, data, page, onProgress) {
+    console.log(`[API] Creating XHR request: ${method} ${url}`);
     const xhr = new XMLHttpRequest();
     xhr.responseType = "json";
     xhr.open(method, url, true);
@@ -242,6 +269,7 @@ export default class ApiService {
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
           const progress = Math.round((event.loaded * 100) / event.total);
+          console.log(`[API] Upload progress: ${progress}%`);
           onProgress(progress);
         }
       };
@@ -255,6 +283,8 @@ export default class ApiService {
       url += `?page=${page}`;
     }
 
+    this.logApiCall(method, url, data);
+
     try {
       if (!this.hasValidToken()) {
         this.throwAuthError();
@@ -266,10 +296,12 @@ export default class ApiService {
       return new Promise((resolve, reject) => {
         xhr.onload = async () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            resolve(xhr.response);
+            const response = xhr.response;
+            this.logApiResponse(method, url, response);
+            resolve(response);
           } else {
             try {
-              await this.handleNotOkResponse(url, xhr, badRequestCatched);
+              await this.handleNotOkResponse(url, xhr);
               reject(new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${xhr.statusText}`));
             } catch (error) {
               if (error instanceof UnauthorizedRequestError) {
@@ -302,56 +334,34 @@ export default class ApiService {
               reject(connectivityError);
             } else {
               const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(xhr, url);
-              reject(
-                new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`)
-              );
+              reject(new Error(fetchErrorMessage));
             }
           } catch (error) {
-            if (error instanceof ConnectivityError) {
-              this.errorSubscribers.forEach((callback) => callback(error));
-            }
             reject(error);
           }
         };
 
-        xhr.send(data ? (data instanceof FormData ? data : JSON.stringify(data)) : null);
+        xhr.send(data);
       });
     } catch (error) {
-      // If this is an auth error, let it propagate so components can show the auth popup
-      if (error instanceof UnauthorizedRequestError) {
-        this.errorSubscribers.forEach((callback) => callback(error));
-        throw error;
-      }
-
-      try {
-        const fetchErrorMessage = await this.getFetchErrorMessageOtherThanBadRequest(error, url);
-        throw new Error(`Failed to ${method} ${endpoint}. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${fetchErrorMessage}`);
-      } catch (innerError) {
-        if (innerError instanceof ConnectivityError) {
-          this.errorSubscribers.forEach((callback) => callback(innerError));
-          throw innerError;
-        } else {
-          throw innerError;
-        }
-      }
+      this.logApiError(method, url, error);
+      throw error;
     }
   }
 
   static async streamAudio(trackUrl) {
-    if (!this.hasValidToken()) {
-      this.throwAuthError();
-    }
-
+    console.log("[API] Streaming audio from:", trackUrl);
     const headers = await ApiService.getHeaders();
     const response = await fetch(trackUrl, { headers });
 
     if (!response.ok) {
-      await this.handleNotOkResponse(trackUrl, response);
+      console.error("[API] Audio stream error:", response.status, response.statusText);
+      throw new Error(`Failed to stream audio: ${response.status} ${response.statusText}`);
     }
 
-    const reader = response.body.getReader();
-    const stream = new ReadableStream({
+    return new ReadableStream({
       start(controller) {
+        const reader = response.body.getReader();
         function push() {
           reader.read().then(({ done, value }) => {
             if (done) {
@@ -365,9 +375,5 @@ export default class ApiService {
         push();
       },
     });
-
-    return new Response(stream, {
-      headers: { "Content-Type": "audio/*" },
-    }).blob();
   }
 }
