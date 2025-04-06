@@ -74,33 +74,34 @@ export default function SpotifyLibrary() {
     <div className="p-6 space-y-8">
       <section>
         <h2 className="text-3xl font-bold mb-6 text-gray-900">Your Spotify Library</h2>
-        <div className="space-y-2">
-          {spotifyTracks.map((track) => (
-            <div
-              key={track.id}
-              className="flex items-center bg-white hover:bg-gray-50 transition-colors rounded-lg shadow-sm py-1.5"
-            >
-              <div className="flex-shrink-0 p-1.5">
-                <img
-                  src={track.album?.images[0]?.url || "/assets/images/album-cover-default.png"}
-                  alt={track.name}
-                  className="w-8 h-8 rounded shadow-sm"
-                />
+        <ul className="space-y-2">
+          {spotifyTracks.map((track, index) => (
+            <li key={track.id ? `track-${track.id}` : `track-index-${index}`}>
+              <div className="flex items-center bg-white hover:bg-gray-50 transition-colors rounded-lg shadow-sm py-1.5">
+                <div className="flex-shrink-0 p-1.5">
+                  <img
+                    src={track.album?.images[0]?.url || "/assets/images/album-cover-default.png"}
+                    alt={track.name}
+                    className="w-8 h-8 rounded shadow-sm"
+                  />
+                </div>
+                <div className="flex-grow min-w-0 py-1 pr-4">
+                  <h3 className="text-xs font-medium text-gray-900 truncate">{track.name}</h3>
+                  <p className="text-xs text-gray-500 truncate">
+                    {track.artists
+                      ? track.artists.map((artist, idx) => (
+                          <span key={artist.id ? `artist-${artist.id}` : `track-${track.id || index}-artist-${idx}`}>
+                            {artist.name}
+                            {idx < track.artists.length - 1 ? ", " : ""}
+                          </span>
+                        ))
+                      : "Unknown Artist"}
+                  </p>
+                </div>
               </div>
-              <div className="flex-grow min-w-0 py-1 pr-4">
-                <h3 className="text-xs font-medium text-gray-900 truncate">{track.name}</h3>
-                <p className="text-xs text-gray-500 truncate">
-                  {track.artists?.map((artist, index) => (
-                    <span key={`${track.id}-artist-${index}`}>
-                      {artist.name}
-                      {index < track.artists.length - 1 ? ", " : ""}
-                    </span>
-                  )) || "Unknown Artist"}
-                </p>
-              </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </section>
     </div>
   );
