@@ -38,6 +38,9 @@ export default class SpotifyService {
   static SPOTIFY_SYNC_TIMESTAMP_KEY = "spotify_last_sync_timestamp";
   static SPOTIFY_PROFILE_KEY = "spotify_profile";
 
+  // Debug flag to control log verbosity
+  static DEBUG_TOKEN_VALIDATION = false;
+
   /**
    * Retrieves the Spotify token from localStorage
    * @returns {string|null} The Spotify token or null if not found
@@ -125,16 +128,24 @@ export default class SpotifyService {
    * @returns {boolean} True if a valid token exists, false otherwise
    */
   static hasValidSpotifyToken() {
-    console.log("[SpotifyService] Checking token validity at:", new Date().toISOString());
+    if (this.DEBUG_TOKEN_VALIDATION) {
+      console.log("[SpotifyService] Checking token validity at:", new Date().toISOString());
+    }
 
     const token = this.getSpotifyToken();
     if (!token) {
-      console.log("[SpotifyService] No token found");
+      if (this.DEBUG_TOKEN_VALIDATION) {
+        console.log("[SpotifyService] No token found");
+      }
       return false;
     }
 
     const isValid = !this.isSpotifyTokenExpired();
-    console.log("[SpotifyService] Token valid:", isValid);
+
+    // Only log on state changes or in debug mode
+    if (this.DEBUG_TOKEN_VALIDATION) {
+      console.log("[SpotifyService] Token valid:", isValid);
+    }
 
     return isValid;
   }

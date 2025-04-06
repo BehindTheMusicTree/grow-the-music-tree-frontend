@@ -49,13 +49,11 @@ function AuthenticatedApp() {
     if (tokenValid) {
       // If there's an auth popup visible, dismiss it
       if (popupRef.current?.type === "SpotifyAuthPopupContentObject") {
-        console.log("[DEBUG] Dismissing auth popup as token is now valid");
         hidePopup();
       }
     } else {
       // If this is a sign-out (transition from authenticated to not authenticated)
       if (wasAuthenticated) {
-        console.log("[DEBUG] Sign out detected - showing auth popup");
         showAuthPopup(); // Immediately show the auth popup
       }
       // Don't call checkTokenAndShowAuthIfNeeded here as it can cause a loop
@@ -64,8 +62,6 @@ function AuthenticatedApp() {
 
   // Check authentication on component mount and set up interval
   useEffect(() => {
-    console.log("[DEBUG] Setting up auth check effect");
-
     // Initial check
     checkAuth();
 
@@ -73,7 +69,6 @@ function AuthenticatedApp() {
     const authCheckInterval = setInterval(checkAuth, 60000); // Check every minute
 
     return () => {
-      console.log("[DEBUG] Cleaning up auth check effect");
       clearInterval(authCheckInterval);
     };
   }, [checkAuth]);
