@@ -231,13 +231,11 @@ export default class ApiService {
 
   static getToken() {
     const token = SpotifyService.getSpotifyToken();
-    console.log("[API] Retrieved Spotify token:", token ? "Token exists" : "No token");
     return token;
   }
 
   static hasValidToken() {
     const hasToken = SpotifyService.hasValidSpotifyToken();
-    console.log("[API] Token validation:", hasToken ? "Valid token" : "Invalid or missing token");
     return hasToken;
   }
 
@@ -269,7 +267,6 @@ export default class ApiService {
   }
 
   static async getXhr(url, method, data, page, onProgress) {
-    console.log(`[API] Creating XHR request: ${method} ${url}`);
     const xhr = new XMLHttpRequest();
     xhr.responseType = "json";
     xhr.open(method, url, true);
@@ -300,7 +297,7 @@ export default class ApiService {
       url += `?page=${page}`;
     }
 
-    this.logApiCall(method, url, data);
+    // this.logApiCall(method, url, data);
 
     try {
       if (!this.hasValidToken()) {
@@ -401,11 +398,26 @@ export default class ApiService {
       const queryString = params ? `?${new URLSearchParams(params).toString()}` : "";
       const fullUrl = `${this.baseUrl}${url}${queryString}`;
 
-      console.log(`[API] GET ${fullUrl}`);
+      console.log(`[API] GET Request:`, {
+        url: fullUrl,
+        params,
+        headers: {
+          ...headers,
+          Authorization: "Bearer [REDACTED]",
+        },
+      });
 
       const response = await fetch(fullUrl, {
         method: "GET",
         headers,
+      });
+
+      const responseData = await response.json();
+      console.log(`[API] GET Response:`, {
+        url: fullUrl,
+        status: response.status,
+        statusText: response.statusText,
+        data: responseData,
       });
 
       if (!response.ok) {
@@ -413,17 +425,18 @@ export default class ApiService {
           throw new UnauthorizedRequestError("Unauthorized request");
         }
         if (response.status === 400 && !badRequestCatched) {
-          const errorData = await response.json();
-          throw new BadRequestError(errorData);
+          throw new BadRequestError(responseData);
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log(`[API] GET ${fullUrl} Response:`, data);
-      return data;
+      return responseData;
     } catch (error) {
-      console.error(`[API] GET ${url} Error:`, error);
+      console.error(`[API] GET Error:`, {
+        url,
+        error: error.message,
+        stack: error.stack,
+      });
       throw error;
     }
   }
@@ -434,7 +447,14 @@ export default class ApiService {
       const headers = this.generateHeaders(token);
       const fullUrl = `${this.baseUrl}${url}`;
 
-      console.log(`[API] POST ${fullUrl}`);
+      console.log(`[API] POST Request:`, {
+        url: fullUrl,
+        data,
+        headers: {
+          ...headers,
+          Authorization: "Bearer [REDACTED]",
+        },
+      });
 
       const response = await fetch(fullUrl, {
         method: "POST",
@@ -442,22 +462,31 @@ export default class ApiService {
         body: JSON.stringify(data),
       });
 
+      const responseData = await response.json();
+      console.log(`[API] POST Response:`, {
+        url: fullUrl,
+        status: response.status,
+        statusText: response.statusText,
+        data: responseData,
+      });
+
       if (!response.ok) {
         if (response.status === 401) {
           throw new UnauthorizedRequestError("Unauthorized request");
         }
         if (response.status === 400 && !badRequestCatched) {
-          const errorData = await response.json();
-          throw new BadRequestError(errorData);
+          throw new BadRequestError(responseData);
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const responseData = await response.json();
-      console.log(`[API] POST ${fullUrl} Response:`, responseData);
       return responseData;
     } catch (error) {
-      console.error(`[API] POST ${url} Error:`, error);
+      console.error(`[API] POST Error:`, {
+        url,
+        error: error.message,
+        stack: error.stack,
+      });
       throw error;
     }
   }
@@ -468,7 +497,14 @@ export default class ApiService {
       const headers = this.generateHeaders(token);
       const fullUrl = `${this.baseUrl}${url}`;
 
-      console.log(`[API] PUT ${fullUrl}`);
+      console.log(`[API] PUT Request:`, {
+        url: fullUrl,
+        data,
+        headers: {
+          ...headers,
+          Authorization: "Bearer [REDACTED]",
+        },
+      });
 
       const response = await fetch(fullUrl, {
         method: "PUT",
@@ -476,22 +512,31 @@ export default class ApiService {
         body: JSON.stringify(data),
       });
 
+      const responseData = await response.json();
+      console.log(`[API] PUT Response:`, {
+        url: fullUrl,
+        status: response.status,
+        statusText: response.statusText,
+        data: responseData,
+      });
+
       if (!response.ok) {
         if (response.status === 401) {
           throw new UnauthorizedRequestError("Unauthorized request");
         }
         if (response.status === 400 && !badRequestCatched) {
-          const errorData = await response.json();
-          throw new BadRequestError(errorData);
+          throw new BadRequestError(responseData);
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const responseData = await response.json();
-      console.log(`[API] PUT ${fullUrl} Response:`, responseData);
       return responseData;
     } catch (error) {
-      console.error(`[API] PUT ${url} Error:`, error);
+      console.error(`[API] PUT Error:`, {
+        url,
+        error: error.message,
+        stack: error.stack,
+      });
       throw error;
     }
   }
@@ -502,11 +547,25 @@ export default class ApiService {
       const headers = this.generateHeaders(token);
       const fullUrl = `${this.baseUrl}${url}`;
 
-      console.log(`[API] DELETE ${fullUrl}`);
+      console.log(`[API] DELETE Request:`, {
+        url: fullUrl,
+        headers: {
+          ...headers,
+          Authorization: "Bearer [REDACTED]",
+        },
+      });
 
       const response = await fetch(fullUrl, {
         method: "DELETE",
         headers,
+      });
+
+      const responseData = await response.json();
+      console.log(`[API] DELETE Response:`, {
+        url: fullUrl,
+        status: response.status,
+        statusText: response.statusText,
+        data: responseData,
       });
 
       if (!response.ok) {
@@ -514,17 +573,18 @@ export default class ApiService {
           throw new UnauthorizedRequestError("Unauthorized request");
         }
         if (response.status === 400 && !badRequestCatched) {
-          const errorData = await response.json();
-          throw new BadRequestError(errorData);
+          throw new BadRequestError(responseData);
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const responseData = await response.json();
-      console.log(`[API] DELETE ${fullUrl} Response:`, responseData);
       return responseData;
     } catch (error) {
-      console.error(`[API] DELETE ${url} Error:`, error);
+      console.error(`[API] DELETE Error:`, {
+        url,
+        error: error.message,
+        stack: error.stack,
+      });
       throw error;
     }
   }

@@ -205,8 +205,6 @@ function GenrePlaylistsProviderInner({ children, location }) {
 
   // Improved fetch function with enhanced error handling and debug info
   const fetchGenrePlaylists = useCallback(async () => {
-    console.log("[GenrePlaylistsContext] Starting genre playlists fetch");
-
     // Check token directly to ensure we have the latest state
     const directTokenCheck = SpotifyService.hasValidSpotifyToken();
 
@@ -222,10 +220,6 @@ function GenrePlaylistsProviderInner({ children, location }) {
       areGenrePlaylistsFetchingRef.current = true;
 
       const genrePlaylists = await GenreService.getGenrePlaylists();
-      console.log("[GenrePlaylistsContext] API Response:", {
-        count: genrePlaylists?.length,
-        hasData: !!genrePlaylists,
-      });
 
       if (genrePlaylists && genrePlaylists.length > 0) {
         const grouped = getGenrePlaylistsGroupedByRoot(genrePlaylists);
@@ -235,8 +229,6 @@ function GenrePlaylistsProviderInner({ children, location }) {
         setGroupedGenrePlaylists({});
       }
     } catch (error) {
-      console.error("[GenrePlaylistsContext] API Error:", error);
-
       if (error instanceof UnauthorizedRequestError) {
         setError("Authentication required");
         checkTokenAndShowAuthIfNeeded(true);
