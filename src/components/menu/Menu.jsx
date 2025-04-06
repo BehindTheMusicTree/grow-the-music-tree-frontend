@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { LuLibrary } from "react-icons/lu";
 import { PiGraphLight } from "react-icons/pi";
 import { CiUser } from "react-icons/ci";
-import { FaSpotify, FaMusic, FaSignOutAlt, FaExternalLinkAlt } from "react-icons/fa";
+import { FaSpotify, FaSignOutAlt, FaExternalLinkAlt, FaCloudUploadAlt } from "react-icons/fa";
 
 import Page from "../../models/Page";
 import { PAGE_TYPES } from "../../utils/constants";
@@ -101,10 +100,22 @@ export default function Menu() {
               : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
           }
         >
-          <LuLibrary className="text-lg" />
+          <FaCloudUploadAlt className="text-lg" />
         </div>
       </div>
-      <div className="menu-item-container relative" ref={menuRef}>
+      <div className="menu-item-container group" onClick={handleSpotifyLibraryClick}>
+        <div
+          className={
+            page.type === PAGE_TYPES.SPOTIFY_LIBRARY
+              ? "menu-item-icon-container-active"
+              : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
+          }
+        >
+          <FaSpotify className="text-lg text-white group-hover:scale-110 transition-transform duration-200" />
+        </div>
+      </div>
+      <div className="flex-grow"></div>
+      <div className="menu-item-container relative mb-2" ref={menuRef}>
         <div
           className={`menu-item-icon-container transition-all duration-200 ${
             showUserMenu ? "bg-gray-700 shadow-lg" : "hover:bg-gray-800"
@@ -176,17 +187,6 @@ export default function Menu() {
               </div>
             </button>
           )}
-        </div>
-      </div>
-      <div className="menu-item-container group" onClick={handleSpotifyLibraryClick}>
-        <div
-          className={
-            page.type === PAGE_TYPES.SPOTIFY_LIBRARY
-              ? "menu-item-icon-container-active"
-              : "menu-item-icon-container hover:bg-gray-800 transition-colors duration-200"
-          }
-        >
-          <FaMusic className="text-lg text-[#1DB954] group-hover:scale-110 transition-transform duration-200" />
         </div>
       </div>
     </div>
