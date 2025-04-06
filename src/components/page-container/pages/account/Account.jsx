@@ -33,50 +33,51 @@ export default function Account() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-8">
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <div className="flex items-center space-x-6 mb-6">
+    <div className="max-w-2xl mx-auto py-6 px-4">
+      <h1 className="text-2xl font-bold text-gray-900 mb-6 px-2">Account Settings</h1>
+      <div className="bg-white rounded-lg shadow">
+        <div className="flex items-center space-x-4 p-4 border-b border-gray-100">
           {profile.images?.[0]?.url ? (
-            <img src={profile.images[0].url} alt={profile.display_name} className="w-24 h-24 rounded-full" />
+            <img src={profile.images[0].url} alt={profile.display_name} className="w-12 h-12 rounded-full" />
           ) : (
-            <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
-              <CiUser className="text-gray-400 text-4xl" />
+            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+              <CiUser className="text-gray-400 text-2xl" />
             </div>
           )}
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{profile.display_name}</h1>
-            <p className="text-gray-600">{profile.email}</p>
+            <h2 className="text-lg font-semibold text-gray-900">{profile.display_name}</h2>
+            <p className="text-sm text-gray-500">{profile.email}</p>
           </div>
         </div>
 
-        <div className="border-t border-gray-200 pt-6">
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-sm font-medium text-gray-500">Spotify ID</h3>
+        <div className="px-4">
+          <div className="grid grid-cols-2 divide-x divide-gray-100">
+            <div className="py-3">
+              <h3 className="text-xs font-medium text-gray-500 uppercase">Spotify ID</h3>
               <p className="mt-1 text-sm text-gray-900">{profile.id}</p>
             </div>
-            <div>
-              <h3 className="text-sm font-medium text-gray-500">Followers</h3>
+            <div className="py-3 pl-4">
+              <h3 className="text-xs font-medium text-gray-500 uppercase">Followers</h3>
               <p className="mt-1 text-sm text-gray-900">{profile.followers?.total || 0}</p>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 flex justify-between items-center">
+        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-b-lg">
           <a
             href={profile.external_urls?.spotify}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center px-4 py-2 border border-[#1DB954] text-sm font-medium rounded-md text-[#1DB954] hover:bg-[#1DB954] hover:text-white transition-colors duration-200"
+            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-[#1DB954] hover:bg-[#1DB954] hover:text-white border border-[#1DB954] transition-colors duration-200"
           >
-            <FaSpotify className="mr-2" />
-            View on Spotify
+            <FaSpotify className="mr-1.5" />
+            View Profile
           </a>
           <button
             onClick={handleSignOut}
-            className="inline-flex items-center px-4 py-2 border border-red-500 text-sm font-medium rounded-md text-red-500 hover:bg-red-500 hover:text-white transition-colors duration-200"
+            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-red-500 hover:bg-red-500 hover:text-white border border-red-500 transition-colors duration-200"
           >
-            <FaSignOutAlt className="mr-2" />
+            <FaSignOutAlt className="mr-1.5" />
             Sign Out
           </button>
         </div>
