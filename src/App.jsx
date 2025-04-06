@@ -4,6 +4,7 @@ import { Howler } from "howler";
 
 import { PageProvider } from "./contexts/page/PageContext";
 import { TrackListSidebarVisibilityProvider } from "./contexts/track-list-sidebar-visibility/TrackListSidebarVisibilityContext";
+import { GenrePlaylistsProvider } from "./contexts/genre-playlists/GenrePlaylistsContext";
 
 import { usePlayer } from "./contexts/player/usePlayer";
 import { usePopup } from "./contexts/popup/usePopup";
@@ -115,11 +116,13 @@ export default function App() {
       <ApiErrorHandler>
         <PageProvider>
           <TrackListSidebarVisibilityProvider>
-            <Routes>
-              <Route path="/" element={<AuthenticatedApp />} />
-              <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
+            <GenrePlaylistsProvider>
+              <Routes>
+                <Route path="/" element={<AuthenticatedApp />} />
+                <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </GenrePlaylistsProvider>
           </TrackListSidebarVisibilityProvider>
         </PageProvider>
       </ApiErrorHandler>

@@ -8,7 +8,6 @@ import { checkRequiredConfigVars } from "./utils/config";
 
 import PlayerProvider from "./contexts/player/PlayerContext";
 import TrackListProvider from "./contexts/track-list/TrackListContext";
-import GenrePlaylistsProvider from "./contexts/genre-playlists/GenrePlaylistsContext";
 import PopupProvider from "./contexts/popup/PopupContext";
 import { UploadedTracksProvider } from "./contexts/uploaded-tracks/UploadedTracksContext";
 import { NotificationProvider } from "./contexts/notification/NotificationContext";
@@ -40,21 +39,19 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <NotificationProvider>
       <PopupProvider>
-        <GenrePlaylistsProvider>
-          <UploadedTracksProvider>
-            <PlayerProvider>
-              <TrackListProvider>
-                {import.meta.env.VITE_SENTRY_IS_ACTIVE === true ? (
-                  <Sentry.ErrorBoundary fallback={"An error has occurred"}>
-                    <App />
-                  </Sentry.ErrorBoundary>
-                ) : (
+        <UploadedTracksProvider>
+          <PlayerProvider>
+            <TrackListProvider>
+              {import.meta.env.VITE_SENTRY_IS_ACTIVE === true ? (
+                <Sentry.ErrorBoundary fallback={"An error has occurred"}>
                   <App />
-                )}
-              </TrackListProvider>
-            </PlayerProvider>
-          </UploadedTracksProvider>
-        </GenrePlaylistsProvider>
+                </Sentry.ErrorBoundary>
+              ) : (
+                <App />
+              )}
+            </TrackListProvider>
+          </PlayerProvider>
+        </UploadedTracksProvider>
       </PopupProvider>
     </NotificationProvider>
   </React.StrictMode>

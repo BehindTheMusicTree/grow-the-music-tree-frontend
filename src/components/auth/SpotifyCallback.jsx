@@ -64,8 +64,29 @@ export default function SpotifyCallback() {
       if (hasValidToken) {
         setStatusMessage("Authentication successful! Redirecting...");
 
-        // Set flag to trigger playlists loading
+        // Wait for token to be fully processed
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        // Check for token_ready flag
+        const tokenReady = localStorage.getItem("spotify_token_ready");
+        if (!tokenReady) {
+          console.log("[SpotifyCallback] Waiting for token to be ready...");
+          // Wait up to 5 seconds for token to be ready
+          for (let i = 0; i < 10; i++) {
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            if (localStorage.getItem("spotify_token_ready")) {
+              console.log("[SpotifyCallback] Token is ready");
+              break;
+            }
+          }
+        }
+
+        // Set flag to trigger playlists loading only after token is ready
+        console.log("[SpotifyCallback] Setting auth_completed flag to trigger playlists loading");
         localStorage.setItem("spotify_auth_completed", Date.now().toString());
+
+        // Clear token ready flag
+        localStorage.removeItem("spotify_token_ready");
 
         // Increased delay to ensure all state is fully processed
         setTimeout(() => {
@@ -78,8 +99,29 @@ export default function SpotifyCallback() {
       } else {
         setStatusMessage("Completing authentication...");
 
-        // Set the flag before redirecting
+        // Wait for token to be fully processed
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        // Check for token_ready flag
+        const tokenReady = localStorage.getItem("spotify_token_ready");
+        if (!tokenReady) {
+          console.log("[SpotifyCallback] Waiting for token to be ready...");
+          // Wait up to 5 seconds for token to be ready
+          for (let i = 0; i < 10; i++) {
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            if (localStorage.getItem("spotify_token_ready")) {
+              console.log("[SpotifyCallback] Token is ready");
+              break;
+            }
+          }
+        }
+
+        // Set flag to trigger playlists loading only after token is ready
+        console.log("[SpotifyCallback] Setting auth_completed flag to trigger playlists loading");
         localStorage.setItem("spotify_auth_completed", Date.now().toString());
+
+        // Clear token ready flag
+        localStorage.removeItem("spotify_token_ready");
 
         setTimeout(() => {
           window.location.href = "/?force_reload=true";

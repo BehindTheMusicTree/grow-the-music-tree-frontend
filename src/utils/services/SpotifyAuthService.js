@@ -123,40 +123,31 @@ export default class SpotifyAuthService {
     }
 
     try {
-      // Verify state to prevent CSRF attacks - explicitly don't clean up yet
-      const storedState = this.getStoredState(false);
+      // Verify state to prevent CSRF attacks
+      const storedState = this.getStoredState(false); // Don't clean up yet
 
-      // Enhanced debugging for state verification
+      // Log state verification for debugging
       console.log("State verification details:", {
         received: state,
         stored: storedState,
         match: state === storedState,
-        receivedLength: state ? state.length : 0,
-        storedLength: storedState ? storedState.length : 0,
-        receivedType: typeof state,
-        storedType: typeof storedState,
+        receivedLength: state?.length,
+        storedLength: storedState?.length,
       });
 
-      // More lenient state check for callbacks from older auth attempts
-      if (!storedState) {
-        console.warn("No stored state found, but proceeding with auth for better UX");
-        // We proceed despite missing state as a UX improvement
-        // This is a security trade-off to prevent users from getting stuck
-      } else if (state !== storedState) {
-        console.error("State mismatch:", { state, storedState });
-        // Instead of throwing an error immediately, we'll log it but proceed
-        // This is a security trade-off to improve UX after the refactoring
-        console.warn("Proceeding despite state mismatch for better UX");
+      if (state !== storedState) {
+        // Clean up state before throwing error
+        this.cleanupStoredState();
+        throw new Error("State mismatch - possible CSRF attack");
       }
-
-      // Always clean up state here, regardless of verification result
-      this.cleanupStoredState();
 
       // Prepare request
       const requestBody = {
         code,
         redirect_uri: config.spotifyRedirectUri,
       };
+
+      console.log("[SpotifyAuthService] Making API request for token...");
 
       // Make API request
       const response = await fetch(`${config.apiBaseUrl}auth/spotify/`, {
@@ -172,12 +163,18 @@ export default class SpotifyAuthService {
       }
 
       const data = await response.json();
+      console.log("[SpotifyAuthService] Received API response:", {
+        status: response.status,
+        hasAccessToken: !!data.accessToken,
+        hasUser: !!data.user,
+      });
 
       // Extract any token from the response data
       const tokenValue = data.accessToken || data.token || data.access_token;
 
       if (tokenValue) {
         try {
+          console.log("[SpotifyAuthService] Storing token...");
           // Store the token and profile
           SpotifyService.saveSpotifyToken(
             tokenValue,
@@ -192,19 +189,24 @@ export default class SpotifyAuthService {
             throw new Error("Failed to store token");
           }
 
+          console.log("[SpotifyAuthService] Token stored successfully");
+
           // Clean up state after successful token storage
           this.cleanupStoredState();
 
+          // Set a flag indicating token is ready
+          localStorage.setItem("spotify_token_ready", "true");
+
           return data;
         } catch (error) {
-          console.error("Error during token storage:", error);
+          console.error("[SpotifyAuthService] Error during token storage:", error);
           throw error;
         }
       } else {
         throw new Error("No token found in API response");
       }
     } catch (error) {
-      console.error("Error handling Spotify callback:", error);
+      console.error("[SpotifyAuthService] Error handling Spotify callback:", error);
       throw error;
     }
   }
