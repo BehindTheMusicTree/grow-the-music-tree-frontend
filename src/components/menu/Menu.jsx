@@ -1,22 +1,23 @@
 import { useState, useEffect, useRef } from "react";
 import { PiGraphLight } from "react-icons/pi";
 import { FaSpotify, FaSignOutAlt, FaExternalLinkAlt, FaCloudUploadAlt, FaUser } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-import Page from "../../models/Page";
-import { PAGE_TYPES } from "../../utils/constants";
 import { usePage } from "../../contexts/page/usePage";
 import useSpotifyAuth from "../../hooks/useSpotifyAuth";
 import SpotifyService from "../../utils/services/SpotifyService";
 import { usePopup } from "../../contexts/popup/usePopup";
 import SpotifyAccountPopupContentObject from "../../models/popup-content-object/SpotifyAccountPopupContentObject.jsx";
+import { PAGE_TYPES } from "../../utils/constants";
 
 export default function Menu() {
-  const { page, setPage } = usePage();
+  const { page } = usePage();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef(null);
   const { checkTokenAndShowAuthIfNeeded, login, hasValidToken } = useSpotifyAuth();
   const [profile, setProfile] = useState(null);
   const { showPopup } = usePopup();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (hasValidToken()) {
@@ -28,17 +29,17 @@ export default function Menu() {
   }, [hasValidToken]);
 
   const handleUploadedLibraryClick = () => {
-    setPage(new Page(PAGE_TYPES.UPLOADED_LIBRARY, null));
+    navigate("/uploaded-library");
   };
 
   const handleGenrePlaylistsClick = () => {
-    setPage(new Page(PAGE_TYPES.GENRE_PLAYLISTS, null));
+    navigate("/genre-playlists");
   };
 
   const handleSpotifyLibraryClick = () => {
     // Use the hook to check for a valid token and show popup if needed
     if (checkTokenAndShowAuthIfNeeded()) {
-      setPage(new Page(PAGE_TYPES.SPOTIFY_LIBRARY, null));
+      navigate("/spotify-library");
     }
   };
 
