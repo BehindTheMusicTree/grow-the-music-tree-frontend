@@ -2,18 +2,19 @@ import { useState, useEffect, useRef } from "react";
 import { LuLibrary } from "react-icons/lu";
 import { PiGraphLight } from "react-icons/pi";
 import { CiUser } from "react-icons/ci";
-import { FaSpotify, FaMusic } from "react-icons/fa";
+import { FaSpotify, FaMusic, FaSignOutAlt } from "react-icons/fa";
 
 import Page from "../../models/Page";
 import { PAGE_TYPES } from "../../utils/constants";
 import { usePage } from "../../contexts/page/usePage";
 import useSpotifyAuth from "../../hooks/useSpotifyAuth";
+import SpotifyService from "../../utils/services/SpotifyService";
 
 export default function Menu() {
   const { page, setPage } = usePage();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef(null);
-  const { checkTokenAndShowAuthIfNeeded, login } = useSpotifyAuth();
+  const { checkTokenAndShowAuthIfNeeded, login, hasValidToken } = useSpotifyAuth();
 
   const handleUploadedLibraryClick = () => {
     setPage(new Page(PAGE_TYPES.UPLOADED_LIBRARY, null));
@@ -36,6 +37,11 @@ export default function Menu() {
 
   const handleSignUpWithSpotify = () => {
     login();
+    setShowUserMenu(false);
+  };
+
+  const handleSignOut = () => {
+    SpotifyService.clearSpotifyAuth();
     setShowUserMenu(false);
   };
 
@@ -95,17 +101,31 @@ export default function Menu() {
           }
         `}
         >
-          <button
-            className="w-full px-3 py-2 text-left text-white hover:bg-[#1DB954] flex items-center
+          {hasValidToken() ? (
+            <button
+              className="w-full px-3 py-2 text-left text-white hover:bg-red-600 flex items-center
                      transition-all duration-200 group"
-            onClick={handleSignUpWithSpotify}
-          >
-            <FaSpotify className="mr-2 text-base text-[#1DB954] group-hover:text-white transition-colors duration-200" />
-            <div>
-              <div className="text-sm font-medium">Sign in with Spotify</div>
-              <div className="text-xs text-gray-400 group-hover:text-gray-200">Connect your Spotify account</div>
-            </div>
-          </button>
+              onClick={handleSignOut}
+            >
+              <FaSignOutAlt className="mr-2 text-base text-red-500 group-hover:text-white transition-colors duration-200" />
+              <div>
+                <div className="text-sm font-medium">Sign out</div>
+                <div className="text-xs text-gray-400 group-hover:text-gray-200">Disconnect from Spotify</div>
+              </div>
+            </button>
+          ) : (
+            <button
+              className="w-full px-3 py-2 text-left text-white hover:bg-[#1DB954] flex items-center
+                     transition-all duration-200 group"
+              onClick={handleSignUpWithSpotify}
+            >
+              <FaSpotify className="mr-2 text-base text-[#1DB954] group-hover:text-white transition-colors duration-200" />
+              <div>
+                <div className="text-sm font-medium">Sign in with Spotify</div>
+                <div className="text-xs text-gray-400 group-hover:text-gray-200">Connect your Spotify account</div>
+              </div>
+            </button>
+          )}
         </div>
       </div>
       <div className="menu-item-container group" onClick={handleSpotifyLibraryClick}>
