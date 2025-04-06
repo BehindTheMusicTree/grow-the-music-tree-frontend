@@ -18,7 +18,7 @@ function LocationAwareProvider({ children }) {
 function SpotifyLibraryProviderInner({ children, location }) {
   const [spotifyTracks, setSpotifyTracks] = useState([]);
   const [error, setError] = useState(null);
-  const [refreshSignal, setRefreshSignal] = useState(1);
+  const [refreshSignal, setRefreshSignal] = useState(0); // Start with 0 to prevent automatic fetch on mount
   const { checkTokenAndShowAuthIfNeeded } = useSpotifyAuth();
 
   // Track Spotify auth state directly
@@ -26,9 +26,12 @@ function SpotifyLibraryProviderInner({ children, location }) {
     return SpotifyService.hasValidSpotifyToken();
   });
 
+  // Declare all refs at the top of the component
   const areTracksFetchingRef = useRef(false);
   const lastAuthCheckRef = useRef(0);
   const tokenCheckIntervalRef = useRef(null);
+  const prevAuthStateRef = useRef(isAuthenticated);
+  const refreshInProgressRef = useRef(false);
 
   // Define fetchSpotifyTracks before any effects that use it
   const fetchSpotifyTracks = useCallback(async () => {
@@ -55,36 +58,45 @@ function SpotifyLibraryProviderInner({ children, location }) {
     }
   }, [checkTokenAndShowAuthIfNeeded]);
 
-  // Single source of truth for auth state management
-  useEffect(() => {
-    // Check for auth_completed flag and auth state
-    const checkAuthFlag = () => {
-      const authCompleted = localStorage.getItem("spotify_auth_completed");
-
-      if (authCompleted) {
-        // Remove it immediately to prevent duplicate processing
-        localStorage.removeItem("spotify_auth_completed");
-
-        // Small delay to ensure token is available and stable
-        setTimeout(() => {
-          if (SpotifyService.hasValidSpotifyToken() && !areTracksFetchingRef.current) {
-            setRefreshSignal((prev) => prev + 1);
-          }
-        }, 500);
-
-        return true;
-      }
-      return false;
-    };
-
-    const updateAuthState = async () => {
-      const currentAuthState = SpotifyService.hasValidSpotifyToken();
+  // Define updateAuthState with useCallback - removing isAuthenticated dependency
+  const updateAuthState = useCallback(async () => {
+    const currentAuthState = SpotifyService.hasValidSpotifyToken();
+    if (currentAuthState !== prevAuthStateRef.current) {
+      prevAuthStateRef.current = currentAuthState;
       setIsAuthenticated(currentAuthState);
-      return currentAuthState;
-    };
+    }
+    return currentAuthState;
+  }, []);
 
-    // Handle storage changes
-    const handleStorageChange = async (e) => {
+  // Define checkAuthFlag with useCallback - with guard against concurrent updates
+  const checkAuthFlag = useCallback(() => {
+    const authCompleted = localStorage.getItem("spotify_auth_completed");
+
+    if (authCompleted) {
+      // Remove it immediately to prevent duplicate processing
+      localStorage.removeItem("spotify_auth_completed");
+
+      // Small delay to ensure token is available and stable
+      setTimeout(() => {
+        // Only trigger refresh if not already fetching and not in a refresh cycle
+        if (SpotifyService.hasValidSpotifyToken() && !areTracksFetchingRef.current && !refreshInProgressRef.current) {
+          refreshInProgressRef.current = true;
+          setRefreshSignal((prev) => prev + 1);
+          // Reset the flag after a delay to allow state to settle
+          setTimeout(() => {
+            refreshInProgressRef.current = false;
+          }, 100);
+        }
+      }, 500);
+
+      return true;
+    }
+    return false;
+  }, []);
+
+  // Define handleStorageChange with useCallback - with guard against concurrent updates
+  const handleStorageChange = useCallback(
+    async (e) => {
       if (e.key === "spotify_auth_completed") {
         // Remove it immediately to prevent duplicate processing
         localStorage.removeItem("spotify_auth_completed");
@@ -93,24 +105,34 @@ function SpotifyLibraryProviderInner({ children, location }) {
         await new Promise((resolve) => setTimeout(resolve, 500));
 
         if (SpotifyService.hasValidSpotifyToken()) {
-          if (!areTracksFetchingRef.current) {
+          // Only trigger refresh if not already fetching and not in a refresh cycle
+          if (!areTracksFetchingRef.current && !refreshInProgressRef.current) {
+            refreshInProgressRef.current = true;
             setRefreshSignal((prev) => prev + 1);
+            // Reset the flag after a delay to allow state to settle
+            setTimeout(() => {
+              refreshInProgressRef.current = false;
+            }, 100);
           }
         } else {
           // Retry after a short delay
           setTimeout(updateAuthState, 1000);
         }
       }
-    };
+    },
+    [updateAuthState]
+  );
 
-    // Setup visibility change listener
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        updateAuthState();
-        checkAuthFlag();
-      }
-    };
+  // Define handleVisibilityChange with useCallback
+  const handleVisibilityChange = useCallback(() => {
+    if (document.visibilityState === "visible") {
+      updateAuthState();
+      checkAuthFlag();
+    }
+  }, [updateAuthState, checkAuthFlag]);
 
+  // Single source of truth for auth state management
+  useEffect(() => {
     // Initialize auth and event listeners
     const initialize = async () => {
       // Check for auth completion flag
@@ -134,14 +156,15 @@ function SpotifyLibraryProviderInner({ children, location }) {
       window.removeEventListener("focus", updateAuthState);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []);
+  }, [checkAuthFlag, handleStorageChange, handleVisibilityChange, updateAuthState]);
 
-  // Add a periodic token validity check to ensure we always have the current auth state
+  // Add a periodic token validity check without the isAuthenticated dependency
   useEffect(() => {
     // Initial check
     const checkTokenValidity = () => {
       const isTokenValid = SpotifyService.hasValidSpotifyToken();
-      if (isTokenValid !== isAuthenticated) {
+      if (isTokenValid !== prevAuthStateRef.current) {
+        prevAuthStateRef.current = isTokenValid;
         setIsAuthenticated(isTokenValid);
       }
     };
@@ -155,9 +178,9 @@ function SpotifyLibraryProviderInner({ children, location }) {
         clearInterval(tokenCheckIntervalRef.current);
       }
     };
-  }, [isAuthenticated]);
+  }, []); // No dependencies prevents the infinite update loop
 
-  // Effect to handle route changes or navigation state
+  // Effect to handle route changes or navigation state - with guard against concurrent updates
   useEffect(() => {
     // Throttle frequent checks
     const now = Date.now();
@@ -168,19 +191,46 @@ function SpotifyLibraryProviderInner({ children, location }) {
 
     // Check if we have location state with authCompleted flag (from React Router)
     if (location?.state?.authCompleted) {
-      // Only process if token is valid and we're not already fetching
-      if (SpotifyService.hasValidSpotifyToken() && !areTracksFetchingRef.current) {
+      // Only process if token is valid and we're not already fetching and not in a refresh cycle
+      if (SpotifyService.hasValidSpotifyToken() && !areTracksFetchingRef.current && !refreshInProgressRef.current) {
+        refreshInProgressRef.current = true;
         setRefreshSignal((prev) => prev + 1);
+        // Reset the flag after a delay to allow state to settle
+        setTimeout(() => {
+          refreshInProgressRef.current = false;
+        }, 100);
       }
     }
   }, [location]);
 
-  // Effect to handle refresh signal
+  // Effect to handle refresh signal - with better debounce and guard against infinite loops
   useEffect(() => {
-    if (refreshSignal > 0 && !areTracksFetchingRef.current) {
-      fetchSpotifyTracks();
-    }
+    let isMounted = true;
+
+    const handleRefresh = async () => {
+      // Only fetch if the signal is positive, component is mounted, not already fetching, and not in refresh cycle
+      if (refreshSignal > 0 && isMounted && !areTracksFetchingRef.current && !refreshInProgressRef.current) {
+        await fetchSpotifyTracks();
+      }
+    };
+
+    handleRefresh();
+
+    return () => {
+      isMounted = false;
+    };
   }, [refreshSignal, fetchSpotifyTracks]);
+
+  // Create a safe version of the fetchSpotifyTracks function for the context value
+  const triggerFetch = useCallback(() => {
+    if (!areTracksFetchingRef.current && !refreshInProgressRef.current) {
+      refreshInProgressRef.current = true;
+      setRefreshSignal((prev) => prev + 1);
+      setTimeout(() => {
+        refreshInProgressRef.current = false;
+      }, 100);
+    }
+  }, []);
 
   return (
     <SpotifyLibraryContext.Provider
@@ -188,7 +238,7 @@ function SpotifyLibraryProviderInner({ children, location }) {
         spotifyTracks,
         error,
         isAuthenticated,
-        fetchSpotifyTracks: () => setRefreshSignal((prev) => prev + 1),
+        fetchSpotifyTracks: triggerFetch,
       }}
     >
       {children}

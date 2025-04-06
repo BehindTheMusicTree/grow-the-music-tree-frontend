@@ -20,7 +20,7 @@ function LocationAwareProvider({ children }) {
 // Inner provider that takes location as a prop
 function GenrePlaylistsProviderInner({ children, location }) {
   const [groupedGenrePlaylists, setGroupedGenrePlaylists] = useState();
-  const [refreshGenrePlaylistsSignal, setRefreshGenrePlaylistsSignal] = useState(1);
+  const [refreshGenrePlaylistsSignal, setRefreshGenrePlaylistsSignal] = useState(0); // Start with 0 to prevent automatic fetch on mount
   const [error, setError] = useState(null);
   const { checkTokenAndShowAuthIfNeeded } = useSpotifyAuth();
 
@@ -29,10 +29,13 @@ function GenrePlaylistsProviderInner({ children, location }) {
     return SpotifyService.hasValidSpotifyToken();
   });
 
+  // Declare all refs at the top of the component
   const areGenrePlaylistsFetchingRef = useRef(false);
   const lastAuthCheckRef = useRef(0);
   const tokenCheckIntervalRef = useRef(null);
   const lastRefreshTimeRef = useRef(0);
+  const prevAuthStateRef = useRef(isAuthenticated);
+  const refreshInProgressRef = useRef(false);
 
   // Define fetchGenrePlaylists before any effects that use it
   const fetchGenrePlaylists = useCallback(async () => {
@@ -71,38 +74,50 @@ function GenrePlaylistsProviderInner({ children, location }) {
       areGenrePlaylistsFetchingRef.current = false;
       setRefreshGenrePlaylistsSignal(0);
     }
-  }, [checkTokenAndShowAuthIfNeeded, refreshGenrePlaylistsSignal]);
+  }, [checkTokenAndShowAuthIfNeeded]); // Removed unnecessary refreshGenrePlaylistsSignal dependency
 
-  // Single source of truth for auth state management
-  useEffect(() => {
-    // Check for auth_completed flag and auth state
-    const checkAuthFlag = () => {
-      const authCompleted = localStorage.getItem("spotify_auth_completed");
-
-      if (authCompleted) {
-        // Remove it immediately to prevent duplicate processing
-        localStorage.removeItem("spotify_auth_completed");
-
-        // Small delay to ensure token is available and stable
-        setTimeout(() => {
-          if (SpotifyService.hasValidSpotifyToken() && !areGenrePlaylistsFetchingRef.current) {
-            setRefreshGenrePlaylistsSignal((prev) => prev + 1);
-          }
-        }, 500);
-
-        return true;
-      }
-      return false;
-    };
-
-    const updateAuthState = async () => {
-      const currentAuthState = SpotifyService.hasValidSpotifyToken();
+  // Define updateAuthState and checkAuthFlag with useCallback to avoid recreating them on each render
+  const updateAuthState = useCallback(async () => {
+    const currentAuthState = SpotifyService.hasValidSpotifyToken();
+    if (currentAuthState !== prevAuthStateRef.current) {
+      prevAuthStateRef.current = currentAuthState;
       setIsAuthenticated(currentAuthState);
-      return currentAuthState;
-    };
+    }
+    return currentAuthState;
+  }, []);
 
-    // Handle storage changes
-    const handleStorageChange = async (e) => {
+  const checkAuthFlag = useCallback(() => {
+    const authCompleted = localStorage.getItem("spotify_auth_completed");
+
+    if (authCompleted) {
+      // Remove it immediately to prevent duplicate processing
+      localStorage.removeItem("spotify_auth_completed");
+
+      // Small delay to ensure token is available and stable
+      setTimeout(() => {
+        // Only trigger refresh if not already fetching and not in a refresh cycle
+        if (
+          SpotifyService.hasValidSpotifyToken() &&
+          !areGenrePlaylistsFetchingRef.current &&
+          !refreshInProgressRef.current
+        ) {
+          refreshInProgressRef.current = true;
+          setRefreshGenrePlaylistsSignal((prev) => prev + 1);
+          // Reset the flag after a delay to allow state to settle
+          setTimeout(() => {
+            refreshInProgressRef.current = false;
+          }, 100);
+        }
+      }, 500);
+
+      return true;
+    }
+    return false;
+  }, []);
+
+  // Handle storage changes with guards against concurrent updates
+  const handleStorageChange = useCallback(
+    async (e) => {
       if (e.key === "spotify_auth_completed") {
         // Remove it immediately to prevent duplicate processing
         localStorage.removeItem("spotify_auth_completed");
@@ -111,24 +126,34 @@ function GenrePlaylistsProviderInner({ children, location }) {
         await new Promise((resolve) => setTimeout(resolve, 500));
 
         if (SpotifyService.hasValidSpotifyToken()) {
-          if (!areGenrePlaylistsFetchingRef.current) {
+          // Only trigger refresh if not already fetching and not in a refresh cycle
+          if (!areGenrePlaylistsFetchingRef.current && !refreshInProgressRef.current) {
+            refreshInProgressRef.current = true;
             setRefreshGenrePlaylistsSignal((prev) => prev + 1);
+            // Reset the flag after a delay to allow state to settle
+            setTimeout(() => {
+              refreshInProgressRef.current = false;
+            }, 100);
           }
         } else {
           // Retry after a short delay
           setTimeout(updateAuthState, 1000);
         }
       }
-    };
+    },
+    [updateAuthState]
+  );
 
-    // Setup visibility change listener
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        updateAuthState();
-        checkAuthFlag();
-      }
-    };
+  // Setup visibility change listener
+  const handleVisibilityChange = useCallback(() => {
+    if (document.visibilityState === "visible") {
+      updateAuthState();
+      checkAuthFlag();
+    }
+  }, [updateAuthState, checkAuthFlag]);
 
+  // Single source of truth for auth state management
+  useEffect(() => {
     // Initialize auth and event listeners
     const initialize = async () => {
       // Check for auth completion flag
@@ -152,14 +177,15 @@ function GenrePlaylistsProviderInner({ children, location }) {
       window.removeEventListener("focus", updateAuthState);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []);
+  }, [checkAuthFlag, handleStorageChange, handleVisibilityChange, updateAuthState]);
 
-  // Add a periodic token validity check to ensure we always have the current auth state
+  // Add a periodic token validity check without the isAuthenticated dependency
   useEffect(() => {
     // Initial check
     const checkTokenValidity = () => {
       const isTokenValid = SpotifyService.hasValidSpotifyToken();
-      if (isTokenValid !== isAuthenticated) {
+      if (isTokenValid !== prevAuthStateRef.current) {
+        prevAuthStateRef.current = isTokenValid;
         setIsAuthenticated(isTokenValid);
       }
     };
@@ -173,9 +199,9 @@ function GenrePlaylistsProviderInner({ children, location }) {
         clearInterval(tokenCheckIntervalRef.current);
       }
     };
-  }, [isAuthenticated]);
+  }, []); // No dependencies prevents the infinite update loop
 
-  // Effect to handle route changes or navigation state
+  // Effect to handle route changes or navigation state with guards against concurrent updates
   useEffect(() => {
     // Throttle frequent checks
     const now = Date.now();
@@ -186,25 +212,50 @@ function GenrePlaylistsProviderInner({ children, location }) {
 
     // Check if we have location state with authCompleted flag (from React Router)
     if (location?.state?.authCompleted) {
-      // Only process if token is valid and we're not already fetching
-      if (SpotifyService.hasValidSpotifyToken() && !areGenrePlaylistsFetchingRef.current) {
+      // Only process if token is valid and we're not already fetching and not in a refresh cycle
+      if (
+        SpotifyService.hasValidSpotifyToken() &&
+        !areGenrePlaylistsFetchingRef.current &&
+        !refreshInProgressRef.current
+      ) {
+        refreshInProgressRef.current = true;
         setRefreshGenrePlaylistsSignal((prev) => prev + 1);
+        // Reset the flag after a delay to allow state to settle
+        setTimeout(() => {
+          refreshInProgressRef.current = false;
+        }, 100);
       }
     }
   }, [location]);
 
-  // Effect to handle playlist refresh
+  // Effect to handle playlist refresh with better debounce and protection against loops
   useEffect(() => {
-    const now = Date.now();
-    // Debounce refresh calls - only allow one refresh per second
-    if (now - lastRefreshTimeRef.current < 1000) {
-      return;
-    }
+    let isMounted = true;
 
-    if (refreshGenrePlaylistsSignal > 0) {
-      lastRefreshTimeRef.current = now;
-      fetchGenrePlaylists();
-    }
+    const handleRefresh = async () => {
+      const now = Date.now();
+      // Debounce refresh calls - only allow one refresh per second
+      if (now - lastRefreshTimeRef.current < 1000) {
+        return;
+      }
+
+      // Only fetch if the signal is positive, component is mounted, not already fetching, and not in refresh cycle
+      if (
+        refreshGenrePlaylistsSignal > 0 &&
+        isMounted &&
+        !areGenrePlaylistsFetchingRef.current &&
+        !refreshInProgressRef.current
+      ) {
+        lastRefreshTimeRef.current = now;
+        await fetchGenrePlaylists();
+      }
+    };
+
+    handleRefresh();
+
+    return () => {
+      isMounted = false;
+    };
   }, [refreshGenrePlaylistsSignal, fetchGenrePlaylists]);
 
   const handleGenreAddAction = async (event, parentUuid) => {
@@ -289,12 +340,23 @@ function GenrePlaylistsProviderInner({ children, location }) {
     setRefreshGenrePlaylistsSignal(1);
   };
 
+  // Create a safe version of the refresh function for the context value
+  const triggerRefresh = useCallback(() => {
+    if (!areGenrePlaylistsFetchingRef.current && !refreshInProgressRef.current) {
+      refreshInProgressRef.current = true;
+      setRefreshGenrePlaylistsSignal((prev) => prev + 1);
+      setTimeout(() => {
+        refreshInProgressRef.current = false;
+      }, 100);
+    }
+  }, []);
+
   return (
     <GenrePlaylistsContext.Provider
       value={{
         groupedGenrePlaylists,
         handleGenreAddAction,
-        setRefreshGenrePlaylistsSignal,
+        setRefreshGenrePlaylistsSignal: triggerRefresh,
         updateGenreParent,
         renameGenre,
         deleteGenre,
