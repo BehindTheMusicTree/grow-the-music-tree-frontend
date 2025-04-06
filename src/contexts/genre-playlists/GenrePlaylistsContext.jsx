@@ -32,6 +32,46 @@ function GenrePlaylistsProviderInner({ children, location }) {
   const areGenrePlaylistsFetchingRef = useRef(false);
   const lastAuthCheckRef = useRef(0);
   const tokenCheckIntervalRef = useRef(null);
+  const lastRefreshTimeRef = useRef(0);
+
+  // Define fetchGenrePlaylists before any effects that use it
+  const fetchGenrePlaylists = useCallback(async () => {
+    // Check token directly to ensure we have the latest state
+    const directTokenCheck = SpotifyService.hasValidSpotifyToken();
+
+    try {
+      if (!directTokenCheck) {
+        setError("Authentication required");
+        areGenrePlaylistsFetchingRef.current = false;
+        setRefreshGenrePlaylistsSignal(0);
+        checkTokenAndShowAuthIfNeeded(true);
+        return;
+      }
+
+      areGenrePlaylistsFetchingRef.current = true;
+
+      const genrePlaylists = await GenreService.getGenrePlaylists();
+
+      if (genrePlaylists && genrePlaylists.length > 0) {
+        const grouped = getGenrePlaylistsGroupedByRoot(genrePlaylists);
+        setGroupedGenrePlaylists(grouped);
+        setError(null);
+      } else {
+        setGroupedGenrePlaylists({});
+      }
+    } catch (error) {
+      if (error instanceof UnauthorizedRequestError) {
+        setError("Authentication required");
+        checkTokenAndShowAuthIfNeeded(true);
+        setIsAuthenticated(false);
+      } else {
+        setError(`Failed to load genre playlists: ${error.message || "Unknown error"}`);
+      }
+    } finally {
+      areGenrePlaylistsFetchingRef.current = false;
+      setRefreshGenrePlaylistsSignal(0);
+    }
+  }, [checkTokenAndShowAuthIfNeeded, refreshGenrePlaylistsSignal]);
 
   // Single source of truth for auth state management
   useEffect(() => {
@@ -58,12 +98,6 @@ function GenrePlaylistsProviderInner({ children, location }) {
     const updateAuthState = async () => {
       const currentAuthState = SpotifyService.hasValidSpotifyToken();
       setIsAuthenticated(currentAuthState);
-
-      // If we just became authenticated, check for auth flag
-      if (currentAuthState && !areGenrePlaylistsFetchingRef.current) {
-        checkAuthFlag();
-      }
-
       return currentAuthState;
     };
 
@@ -156,22 +190,22 @@ function GenrePlaylistsProviderInner({ children, location }) {
       if (SpotifyService.hasValidSpotifyToken() && !areGenrePlaylistsFetchingRef.current) {
         setRefreshGenrePlaylistsSignal((prev) => prev + 1);
       }
-    } else {
-      // Otherwise check for the flag in localStorage
-      const authCompleted = localStorage.getItem("spotify_auth_completed");
-      if (authCompleted && SpotifyService.hasValidSpotifyToken() && !areGenrePlaylistsFetchingRef.current) {
-        localStorage.removeItem("spotify_auth_completed");
-        setRefreshGenrePlaylistsSignal((prev) => prev + 1);
-      }
     }
   }, [location]);
 
-  // Single effect to handle playlist refresh based on auth state
+  // Effect to handle playlist refresh
   useEffect(() => {
-    if (isAuthenticated && !areGenrePlaylistsFetchingRef.current) {
-      setRefreshGenrePlaylistsSignal((prev) => prev + 1);
+    const now = Date.now();
+    // Debounce refresh calls - only allow one refresh per second
+    if (now - lastRefreshTimeRef.current < 1000) {
+      return;
     }
-  }, [isAuthenticated]);
+
+    if (refreshGenrePlaylistsSignal > 0) {
+      lastRefreshTimeRef.current = now;
+      fetchGenrePlaylists();
+    }
+  }, [refreshGenrePlaylistsSignal, fetchGenrePlaylists]);
 
   const handleGenreAddAction = async (event, parentUuid) => {
     event.stopPropagation();
@@ -202,52 +236,6 @@ function GenrePlaylistsProviderInner({ children, location }) {
       throw error; // Re-throw other errors
     }
   };
-
-  // Improved fetch function with enhanced error handling and debug info
-  const fetchGenrePlaylists = useCallback(async () => {
-    // Check token directly to ensure we have the latest state
-    const directTokenCheck = SpotifyService.hasValidSpotifyToken();
-
-    try {
-      if (!directTokenCheck) {
-        setError("Authentication required");
-        areGenrePlaylistsFetchingRef.current = false;
-        setRefreshGenrePlaylistsSignal(0);
-        checkTokenAndShowAuthIfNeeded(true);
-        return;
-      }
-
-      areGenrePlaylistsFetchingRef.current = true;
-
-      const genrePlaylists = await GenreService.getGenrePlaylists();
-
-      if (genrePlaylists && genrePlaylists.length > 0) {
-        const grouped = getGenrePlaylistsGroupedByRoot(genrePlaylists);
-        setGroupedGenrePlaylists(grouped);
-        setError(null);
-      } else {
-        setGroupedGenrePlaylists({});
-      }
-    } catch (error) {
-      if (error instanceof UnauthorizedRequestError) {
-        setError("Authentication required");
-        checkTokenAndShowAuthIfNeeded(true);
-        setIsAuthenticated(false);
-      } else {
-        setError(`Failed to load genre playlists: ${error.message || "Unknown error"}`);
-      }
-    } finally {
-      areGenrePlaylistsFetchingRef.current = false;
-      setRefreshGenrePlaylistsSignal(0);
-    }
-  }, [checkTokenAndShowAuthIfNeeded]);
-
-  // Effect to handle playlist refresh
-  useEffect(() => {
-    if (refreshGenrePlaylistsSignal > 0) {
-      fetchGenrePlaylists();
-    }
-  }, [refreshGenrePlaylistsSignal, fetchGenrePlaylists]);
 
   const getGenrePlaylistsGroupedByRoot = (genrePlaylists) => {
     const groupedGenrePlaylists = {};
