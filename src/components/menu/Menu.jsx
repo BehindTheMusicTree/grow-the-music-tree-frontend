@@ -14,7 +14,7 @@ export default function Menu() {
   const { page } = usePage();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef(null);
-  const { checkTokenAndShowAuthIfNeeded, login, hasValidToken } = useSpotifyAuth();
+  const { login, hasValidToken } = useSpotifyAuth();
   const [profile, setProfile] = useState(null);
   const { showPopup } = usePopup();
   const navigate = useNavigate();
@@ -37,10 +37,7 @@ export default function Menu() {
   };
 
   const handleSpotifyLibraryClick = () => {
-    // Use the hook to check for a valid token and show popup if needed
-    if (checkTokenAndShowAuthIfNeeded()) {
-      navigate("/spotify-library");
-    }
+    navigate("/spotify-library");
   };
 
   const handleUserClick = () => {
