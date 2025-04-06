@@ -11,7 +11,7 @@ import SpotifyAuthPopupContentObject from "../models/popup-content-object/Spotif
  */
 export default function useSpotifyAuth() {
   const { showPopup } = usePopup();
-  const { showSpotify, showLoading } = useNotification();
+  const { showLoading } = useNotification();
 
   /**
    * Check if there's a valid Spotify token
@@ -35,8 +35,6 @@ export default function useSpotifyAuth() {
    * User can continue browsing while deciding whether to authenticate
    */
   const showAuthNotification = useCallback(() => {
-    showSpotify("Spotify authentication needed", 0);
-
     // Create clickable notification with action button
     const notificationElement = document.createElement("div");
     notificationElement.innerHTML = `
@@ -58,7 +56,7 @@ export default function useSpotifyAuth() {
     }
 
     return notificationElement;
-  }, [showSpotify, showLoading]);
+  }, [showLoading]);
 
   /**
    * Checks if a valid token exists and shows auth notification if not

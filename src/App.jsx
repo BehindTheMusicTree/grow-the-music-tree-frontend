@@ -8,7 +8,6 @@ import { TrackListSidebarVisibilityProvider } from "./contexts/track-list-sideba
 import { usePlayer } from "./contexts/player/usePlayer";
 import { usePopup } from "./contexts/popup/usePopup";
 import useSpotifyAuth from "./hooks/useSpotifyAuth";
-import { useNotification } from "./contexts/notification/useNotification";
 
 import Popup from "./components/popup/Popup";
 import Banner from "./components/banner/Banner";
@@ -27,20 +26,26 @@ Howler.autoUnlock = true;
  */
 function AuthenticatedApp() {
   const { playerUploadedTrackObject } = usePlayer();
-  const { popupContentObject } = usePopup();
+  const { popupContentObject, hidePopup } = usePopup();
   const { hasValidToken, checkTokenAndShowAuthIfNeeded } = useSpotifyAuth();
-  const { showSpotify } = useNotification();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [searchSubmitted, setSearchSubmitted] = useState("");
 
   // Check authentication on component mount and whenever hasValidToken changes
   useEffect(() => {
     const checkAuth = () => {
-      if (hasValidToken()) {
+      const tokenValid = hasValidToken();
+      console.log("Token validation check result:", tokenValid);
+
+      if (tokenValid) {
         if (!isAuthenticated) {
           setIsAuthenticated(true);
-          // Only show success notification when transitioning from unauthenticated to authenticated
-          showSpotify("Connected to Spotify");
+        }
+
+        // If there's an auth popup visible, dismiss it
+        if (popupContentObject && popupContentObject.type === "SpotifyAuthPopupContentObject") {
+          console.log("Dismissing auth popup as token is now valid");
+          hidePopup();
         }
       } else {
         setIsAuthenticated(false);
@@ -55,7 +60,7 @@ function AuthenticatedApp() {
     const authCheckInterval = setInterval(checkAuth, 60000); // Check every minute
 
     return () => clearInterval(authCheckInterval);
-  }, [hasValidToken, isAuthenticated, showSpotify, checkTokenAndShowAuthIfNeeded]);
+  }, [hasValidToken, isAuthenticated, checkTokenAndShowAuthIfNeeded, popupContentObject, hidePopup]);
 
   const centerMaxHeight = {
     centerWithoutPlayer: "calc(100% - 100px)",

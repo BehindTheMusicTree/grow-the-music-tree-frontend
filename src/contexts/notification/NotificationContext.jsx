@@ -56,14 +56,6 @@ export const NotificationProvider = ({ children }) => {
     [showNotification]
   );
 
-  // Show a Spotify-specific notification
-  const showSpotify = useCallback(
-    (message) => {
-      return showNotification(message, "spotify", 4000);
-    },
-    [showNotification]
-  );
-
   // Update an existing notification (e.g., change loading to success)
   const updateNotification = useCallback((id, updates) => {
     setNotifications((prev) =>
@@ -88,7 +80,6 @@ export const NotificationProvider = ({ children }) => {
         showLoading,
         showSuccess,
         showError,
-        showSpotify,
         updateNotification,
         dismissNotification,
         dismissAll,
