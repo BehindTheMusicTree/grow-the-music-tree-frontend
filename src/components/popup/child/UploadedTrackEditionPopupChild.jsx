@@ -1,12 +1,12 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 
-import { UploadedTrackService } from "../../../utils/services";
-import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePlaylists";
-import { useTrackList } from "../../../contexts/track-list/useTrackList";
-import { formatTime } from "../../../utils";
-import { FORM_RATING_NULL_VALUE } from "../../../utils/constants";
-import Rating from "../../utils/Rating";
+import { UploadedTrackService } from "@utils/services";
+import { useGenrePlaylists } from "@contexts/genre-playlists/useGenrePlaylists";
+import { useTrackList } from "@contexts/track-list/useTrackList";
+import { formatTime } from "@utils";
+import { FORM_RATING_NULL_VALUE } from "@utils/constants";
+import Rating from "@components/utils/Rating";
 
 export default function UploadedTrackEditionPopupChild({ popupContentObject, hide }) {
   const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
