@@ -30,7 +30,7 @@ export default class ApiAuthHelper {
     throw new UnauthorizedRequestError({
       message: "Spotify authentication required",
       status: 401,
-      details: "You must connect with Spotify to access this feature",
+      details: "You must connect with Spotify to use the application",
     });
   }
 

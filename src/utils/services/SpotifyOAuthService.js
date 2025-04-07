@@ -154,19 +154,25 @@ export default class SpotifyOAuthService {
       });
 
       if (!response.ok) {
-        // Don't try to parse non-200 responses as JSON
-        throw new Error(`Authentication failed (${response.status})`);
+        // Don't expose technical details to user
+        throw new Error(
+          "Something went wrong with the authentication. Please try again or contact our team if the issue persists."
+        );
       }
 
       let data;
       try {
         data = await response.json();
       } catch (e) {
-        throw new Error("Invalid response from server");
+        throw new Error(
+          "Something went wrong with the authentication. Please try again or contact our team if the issue persists."
+        );
       }
 
       if (!data.access_token) {
-        throw new Error("No access token received");
+        throw new Error(
+          "Something went wrong with the authentication. Please try again or contact our team if the issue persists."
+        );
       }
 
       // Clean up state after successful authentication

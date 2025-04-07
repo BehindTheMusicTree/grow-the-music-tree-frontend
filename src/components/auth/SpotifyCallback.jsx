@@ -53,8 +53,9 @@ export default function SpotifyCallback() {
     } catch (error) {
       // Show error popup
       const popupContentObject = new SpotifyAuthErrorPopupContentObject({
-        message: error.message || "Authentication failed",
-        details: "Please try connecting with Spotify again",
+        message: "Authentication Failed",
+        details:
+          "Something went wrong with the authentication. Please try again or contact our team if the issue persists.",
       });
       showPopup(popupContentObject);
 
@@ -72,8 +73,9 @@ export default function SpotifyCallback() {
 
     if (error) {
       const popupContentObject = new SpotifyAuthErrorPopupContentObject({
-        message: "Authentication was cancelled or failed",
-        details: error,
+        message: "Authentication Failed",
+        details:
+          "Something went wrong with the authentication. Please try again or contact our team if the issue persists.",
       });
       showPopup(popupContentObject);
       navigate("/");
@@ -82,8 +84,9 @@ export default function SpotifyCallback() {
 
     if (!code) {
       const popupContentObject = new SpotifyAuthErrorPopupContentObject({
-        message: "Missing authorization code from Spotify",
-        details: "Please try connecting with Spotify again",
+        message: "Authentication Failed",
+        details:
+          "Something went wrong with the authentication. Please try again or contact our team if the issue persists.",
       });
       showPopup(popupContentObject);
       navigate("/");
