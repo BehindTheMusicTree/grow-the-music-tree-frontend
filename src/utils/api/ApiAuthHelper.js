@@ -1,6 +1,6 @@
 import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "../constants";
-import SpotifyService from "../services/SpotifyService";
-import UnauthorizedRequestError from "../errors/UnauthorizedRequestError";
+import SpotifyTokenService from "../services/SpotifyTokenService";
+import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
 
 /**
  * Handles API authentication and authorization
@@ -10,7 +10,7 @@ export default class ApiAuthHelper {
    * Gets the authentication token
    */
   static getToken() {
-    const token = SpotifyService.getSpotifyToken();
+    const token = SpotifyTokenService.getSpotifyToken();
     return token;
   }
 
@@ -18,7 +18,7 @@ export default class ApiAuthHelper {
    * Checks if a valid authentication token exists
    */
   static hasValidToken() {
-    const hasToken = SpotifyService.hasValidSpotifyToken();
+    const hasToken = SpotifyTokenService.hasValidSpotifyToken();
     return hasToken;
   }
 
@@ -59,7 +59,7 @@ export default class ApiAuthHelper {
    * Gets the Spotify token from local storage
    */
   static async getSpotifyToken() {
-    const token = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_KEY);
+    const token = localStorage.getItem(SpotifyTokenService.SPOTIFY_TOKEN_KEY);
     if (!token) {
       throw new UnauthorizedRequestError("No Spotify token found");
     }

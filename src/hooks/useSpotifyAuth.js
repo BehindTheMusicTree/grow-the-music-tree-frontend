@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import { usePopup } from "../contexts/popup/usePopup";
 import { useNotification } from "../contexts/notification/useNotification";
-import SpotifyService from "../utils/services/SpotifyService";
-import SpotifyAuthService from "../utils/services/SpotifyAuthService";
+import SpotifyTokenService from "../utils/services/SpotifyTokenService";
+import SpotifyOAuthService from "../utils/services/SpotifyOAuthService";
 import SpotifyAuthPopupContentObject from "../models/popup-content-object/SpotifyAuthPopupContentObject";
 
 /**
@@ -18,7 +18,7 @@ export default function useSpotifyAuth() {
    * @returns {boolean} True if a valid token exists, false otherwise
    */
   const hasValidToken = useCallback(() => {
-    return SpotifyService.hasValidSpotifyToken();
+    return SpotifyTokenService.hasValidSpotifyToken();
   }, []);
 
   /**
@@ -51,7 +51,7 @@ export default function useSpotifyAuth() {
     if (button) {
       button.addEventListener("click", () => {
         showLoading("Connecting to Spotify...");
-        SpotifyAuthService.initiateLogin();
+        SpotifyOAuthService.initiateLogin();
       });
     }
 
@@ -84,7 +84,7 @@ export default function useSpotifyAuth() {
    */
   const login = useCallback(() => {
     showLoading("Connecting to Spotify...");
-    SpotifyAuthService.initiateLogin();
+    SpotifyOAuthService.initiateLogin();
   }, [showLoading]);
 
   return {

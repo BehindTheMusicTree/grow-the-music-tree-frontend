@@ -1,5 +1,5 @@
 import PopupContentObject from "./PopupContentObject";
-import SpotifyAuthService from "../../utils/services/SpotifyAuthService";
+import SpotifyOAuthService from "../../utils/services/SpotifyAuthService";
 
 /**
  * Popup content object for Spotify authentication errors
@@ -13,7 +13,7 @@ export default class SpotifyAuthErrorPopupContentObject extends PopupContentObje
     this.message = errorDetails.message || "You need to connect with Spotify to use this application";
     this.details = errorDetails.details || "Authentication is required to access this application";
     this.isDismissable = false;
-    this.authService = SpotifyAuthService;
+    this.authService = SpotifyOAuthService;
   }
 
   /**

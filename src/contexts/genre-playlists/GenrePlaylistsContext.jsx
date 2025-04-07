@@ -7,7 +7,7 @@ import BadRequestError from "../../utils/errors/BadRequestError";
 import UnauthorizedRequestError from "../../utils/errors/UnauthorizedRequestError";
 import InvalidInputContentObject from "../../models/popup-content-object/InvalidInputContentObject";
 import useSpotifyAuth from "../../hooks/useSpotifyAuth";
-import SpotifyService from "../../utils/services/SpotifyService";
+import SpotifyTokenService from "../../utils/services/SpotifyService";
 
 export const GenrePlaylistsContext = createContext();
 
@@ -26,7 +26,7 @@ function GenrePlaylistsProviderInner({ children, location }) {
 
   // Track Spotify auth state directly
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return SpotifyService.hasValidSpotifyToken();
+    return SpotifyTokenService.hasValidSpotifyToken();
   });
 
   // Declare all refs at the top of the component
@@ -40,7 +40,7 @@ function GenrePlaylistsProviderInner({ children, location }) {
   // Define fetchGenrePlaylists before any effects that use it
   const fetchGenrePlaylists = useCallback(async () => {
     // Check token directly to ensure we have the latest state
-    const directTokenCheck = SpotifyService.hasValidSpotifyToken();
+    const directTokenCheck = SpotifyTokenService.hasValidSpotifyToken();
 
     try {
       if (!directTokenCheck) {
@@ -78,7 +78,7 @@ function GenrePlaylistsProviderInner({ children, location }) {
 
   // Define updateAuthState and checkAuthFlag with useCallback to avoid recreating them on each render
   const updateAuthState = useCallback(async () => {
-    const currentAuthState = SpotifyService.hasValidSpotifyToken();
+    const currentAuthState = SpotifyTokenService.hasValidSpotifyToken();
     if (currentAuthState !== prevAuthStateRef.current) {
       prevAuthStateRef.current = currentAuthState;
       setIsAuthenticated(currentAuthState);
@@ -97,7 +97,7 @@ function GenrePlaylistsProviderInner({ children, location }) {
       setTimeout(() => {
         // Only trigger refresh if not already fetching and not in a refresh cycle
         if (
-          SpotifyService.hasValidSpotifyToken() &&
+          SpotifyTokenService.hasValidSpotifyToken() &&
           !areGenrePlaylistsFetchingRef.current &&
           !refreshInProgressRef.current
         ) {
@@ -125,7 +125,7 @@ function GenrePlaylistsProviderInner({ children, location }) {
         // Wait a bit to ensure token is available
         await new Promise((resolve) => setTimeout(resolve, 500));
 
-        if (SpotifyService.hasValidSpotifyToken()) {
+        if (SpotifyTokenService.hasValidSpotifyToken()) {
           // Only trigger refresh if not already fetching and not in a refresh cycle
           if (!areGenrePlaylistsFetchingRef.current && !refreshInProgressRef.current) {
             refreshInProgressRef.current = true;
@@ -183,7 +183,7 @@ function GenrePlaylistsProviderInner({ children, location }) {
   useEffect(() => {
     // Initial check
     const checkTokenValidity = () => {
-      const isTokenValid = SpotifyService.hasValidSpotifyToken();
+      const isTokenValid = SpotifyTokenService.hasValidSpotifyToken();
       if (isTokenValid !== prevAuthStateRef.current) {
         prevAuthStateRef.current = isTokenValid;
         setIsAuthenticated(isTokenValid);
@@ -214,7 +214,7 @@ function GenrePlaylistsProviderInner({ children, location }) {
     if (location?.state?.authCompleted) {
       // Only process if token is valid and we're not already fetching and not in a refresh cycle
       if (
-        SpotifyService.hasValidSpotifyToken() &&
+        SpotifyTokenService.hasValidSpotifyToken() &&
         !areGenrePlaylistsFetchingRef.current &&
         !refreshInProgressRef.current
       ) {

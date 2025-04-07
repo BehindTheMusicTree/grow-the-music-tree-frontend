@@ -1,5 +1,5 @@
 import ApiService from "../ApiService";
-import SpotifyService from "./SpotifyService";
+import SpotifyTokenService from "./SpotifyService";
 
 /**
  * Service for fetching and managing Spotify tracks
@@ -34,7 +34,7 @@ export default class SpotifyTracksService {
    */
   static async getLibTracks(page = 1, pageSize = 50, showErrors = true) {
     // Check token but don't throw - background operations will handle auth gracefully
-    if (!SpotifyService.hasValidSpotifyToken()) {
+    if (!SpotifyTokenService.hasValidSpotifyToken()) {
       console.warn("No valid Spotify token available - API calls will be queued");
       // Signal auth required but return empty data to prevent UI crashes
       return { results: [], count: 0, authentication_required: true };
@@ -75,7 +75,7 @@ export default class SpotifyTracksService {
 
     try {
       // First check if we have valid token
-      if (!SpotifyService.hasValidSpotifyToken()) {
+      if (!SpotifyTokenService.hasValidSpotifyToken()) {
         notifyError && notifyError("Authentication required");
         return;
       }
@@ -109,7 +109,7 @@ export default class SpotifyTracksService {
 
     try {
       // First check if we have valid token
-      if (!SpotifyService.hasValidSpotifyToken()) {
+      if (!SpotifyTokenService.hasValidSpotifyToken()) {
         notifyError && notifyError("Authentication required");
         return;
       }
@@ -124,9 +124,7 @@ export default class SpotifyTracksService {
       }, 200);
 
       // Perform the actual sync
-      console.log("[SpotifyTracksService] Starting quick sync...");
       const response = await ApiService.fetchData("library/spotify/sync/quick/", "POST");
-      console.log("[SpotifyTracksService] Quick sync response:", response);
 
       // Clean up and notify success
       clearInterval(progressInterval);

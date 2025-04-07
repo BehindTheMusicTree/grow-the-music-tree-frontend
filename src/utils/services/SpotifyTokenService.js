@@ -3,7 +3,7 @@
  * Focused solely on auth, with track functionality moved to SpotifyTracksService
  */
 
-export default class SpotifyService {
+export default class SpotifyTokenService {
   // Keys for localStorage
   static SPOTIFY_TOKEN_KEY = "spotify_auth_token";
   static SPOTIFY_TOKEN_EXPIRY_KEY = "spotify_auth_token_expiry";

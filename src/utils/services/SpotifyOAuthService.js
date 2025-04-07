@@ -1,7 +1,7 @@
 import config from "../config";
-import SpotifyService from "./SpotifyService";
+import SpotifyTokenService from "./SpotifyTokenService";
 
-export default class SpotifyAuthService {
+export default class SpotifyOAuthService {
   static STATE_STORAGE_KEY = "spotify_auth_state";
   static STATE_COOKIE_NAME = "spotify_auth_state"; // Fallback to cookie
 
@@ -195,7 +195,7 @@ export default class SpotifyAuthService {
           });
 
           // Store the token and profile
-          SpotifyService.saveSpotifyToken(
+          SpotifyTokenService.saveSpotifyToken(
             tokenValue,
             60 * 60, // 1 hour in seconds
             data.refreshToken || null,
@@ -203,10 +203,10 @@ export default class SpotifyAuthService {
           );
 
           // Verify token was stored
-          const storedToken = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_KEY);
-          const storedExpiry = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_EXPIRY_KEY);
-          const storedRefresh = localStorage.getItem(SpotifyService.SPOTIFY_REFRESH_KEY);
-          const storedProfile = localStorage.getItem(SpotifyService.SPOTIFY_PROFILE_KEY);
+          const storedToken = localStorage.getItem(SpotifyTokenService.SPOTIFY_TOKEN_KEY);
+          const storedExpiry = localStorage.getItem(SpotifyTokenService.SPOTIFY_TOKEN_EXPIRY_KEY);
+          const storedRefresh = localStorage.getItem(SpotifyTokenService.SPOTIFY_REFRESH_KEY);
+          const storedProfile = localStorage.getItem(SpotifyTokenService.SPOTIFY_PROFILE_KEY);
 
           console.log("[SpotifyAuthService] Token storage verification:", {
             tokenStored: !!storedToken,

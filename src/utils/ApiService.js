@@ -1,11 +1,11 @@
 import config from "./config";
 import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "./constants";
-import RequestError from "./errors/RequestError";
-import BadRequestError from "./errors/BadRequestError";
-import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
-import InternalServerError from "./errors/InternalServerError";
-import ConnectivityError from "./errors/ConnectivityError";
-import SpotifyService from "./services/SpotifyService";
+import RequestError from "./api/errors/RequestError";
+import BadRequestError from "./api/errors/BadRequestError";
+import UnauthorizedRequestError from "./api/errors/UnauthorizedRequestError";
+import InternalServerError from "./api/errors/InternalServerError";
+import ConnectivityError from "./api/errors/ConnectivityError";
+import SpotifyTokenService from "./services/SpotifyTokenService";
 
 /**
  * Core API service handling authentication, HTTP requests, and error management
@@ -230,12 +230,12 @@ export default class ApiService {
   }
 
   static getToken() {
-    const token = SpotifyService.getSpotifyToken();
+    const token = SpotifyTokenService.getSpotifyToken();
     return token;
   }
 
   static hasValidToken() {
-    const hasToken = SpotifyService.hasValidSpotifyToken();
+    const hasToken = SpotifyTokenService.hasValidSpotifyToken();
     return hasToken;
   }
 
@@ -590,7 +590,7 @@ export default class ApiService {
   }
 
   static async getSpotifyToken() {
-    const token = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_KEY);
+    const token = localStorage.getItem(SpotifyTokenService.SPOTIFY_TOKEN_KEY);
     if (!token) {
       throw new UnauthorizedRequestError("No Spotify token found");
     }

@@ -1,10 +1,10 @@
 import config from "../config";
 import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "../constants";
-import RequestError from "../errors/RequestError";
-import BadRequestError from "../errors/BadRequestError";
-import UnauthorizedRequestError from "../errors/UnauthorizedRequestError";
-import InternalServerError from "../errors/InternalServerError";
-import ConnectivityError from "../errors/ConnectivityError";
+import RequestError from "./errors/RequestError";
+import BadRequestError from "./errors/BadRequestError";
+import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
+import InternalServerError from "./errors/InternalServerError";
+import ConnectivityError from "./errors/ConnectivityError";
 
 /**
  * Handles API error detection, parsing, and management

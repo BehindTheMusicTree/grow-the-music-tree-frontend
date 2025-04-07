@@ -1,136 +1,64 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import SpotifyAuthService from "../../utils/services/SpotifyAuthService";
-import SpotifyService from "../../utils/services/SpotifyService";
+import SpotifyOAuthService from "../../utils/services/SpotifyAuthService";
+import SpotifyTokenService from "../../utils/services/SpotifyService";
 import { FaSpotify, FaRedo } from "react-icons/fa";
 
 export default function SpotifyCallback() {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
-  const [statusMessage, setStatusMessage] = useState("Please wait while we process your login");
   const [isProcessing, setIsProcessing] = useState(true);
   const [authCode, setAuthCode] = useState(null);
   const [authState, setAuthState] = useState(null);
 
   // Use useRef instead of useState for tracking auth attempts
-  // This is more reliable in React's StrictMode which can cause components
-  // to mount twice in development
   const authAttemptRef = useRef(false);
 
   // Function to handle the authentication process
   const processAuthentication = async (code, state) => {
-    // Prevent multiple auth attempts using ref
     if (authAttemptRef.current) {
       return;
     }
-
-    // Mark as processed immediately
     authAttemptRef.current = true;
 
     setIsProcessing(true);
     setError(null);
-    setStatusMessage("Processing authentication request...");
 
     try {
-      setStatusMessage("Exchanging authorization code for access token...");
-
-      const data = await SpotifyAuthService.handleCallback(code, state || "");
+      const data = await SpotifyOAuthService.handleCallback(code, state || "");
 
       // Extract any token from the response data
       const tokenValue = data.accessToken || data.token || data.access_token;
 
-      // Force a larger delay to ensure token is fully stored before checking
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       // Check if token was stored correctly
-      const storedToken = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_KEY);
+      const storedToken = localStorage.getItem(SpotifyTokenService.SPOTIFY_TOKEN_KEY);
 
       // Manual storage as a fallback
       if (!storedToken && tokenValue) {
         const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour
-        localStorage.setItem(SpotifyService.SPOTIFY_TOKEN_KEY, tokenValue);
-        localStorage.setItem(SpotifyService.SPOTIFY_TOKEN_EXPIRY_KEY, expiryTime.toString());
-
-        // Verify again
-        const verifyStoredToken = localStorage.getItem(SpotifyService.SPOTIFY_TOKEN_KEY);
-        if (!verifyStoredToken) {
-          throw new Error("Failed to store token");
-        }
+        localStorage.setItem(SpotifyTokenService.SPOTIFY_TOKEN_KEY, tokenValue);
+        localStorage.setItem(SpotifyTokenService.SPOTIFY_TOKEN_EXPIRY_KEY, expiryTime.toString());
       }
 
       // Check token status
-      const hasValidToken = SpotifyService.hasValidSpotifyToken();
+      const hasValidToken = SpotifyTokenService.hasValidSpotifyToken();
 
       if (hasValidToken) {
-        setStatusMessage("Authentication successful! Redirecting...");
-
-        // Wait for token to be fully processed
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Check for token_ready flag
-        const tokenReady = localStorage.getItem("spotify_token_ready");
-        if (!tokenReady) {
-          console.log("[SpotifyCallback] Waiting for token to be ready...");
-          // Wait up to 5 seconds for token to be ready
-          for (let i = 0; i < 10; i++) {
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            if (localStorage.getItem("spotify_token_ready")) {
-              console.log("[SpotifyCallback] Token is ready");
-              break;
-            }
-          }
-        }
-
-        // Set flag to trigger playlists loading only after token is ready
-        console.log("[SpotifyCallback] Setting auth_completed flag to trigger playlists loading");
+        // Set flag to trigger playlists loading
         localStorage.setItem("spotify_auth_completed", Date.now().toString());
 
-        // Clear token ready flag
-        localStorage.removeItem("spotify_token_ready");
-
-        // Increased delay to ensure all state is fully processed
-        setTimeout(() => {
-          if (navigate) {
-            navigate("/", { state: { authCompleted: true, timestamp: Date.now() } });
-          } else {
-            window.location.href = "/?auth_completed=true";
-          }
-        }, 1500);
+        // Navigate to home page
+        if (navigate) {
+          navigate("/", { state: { authCompleted: true } });
+        } else {
+          window.location.href = "/";
+        }
       } else {
-        setStatusMessage("Completing authentication...");
-
-        // Wait for token to be fully processed
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Check for token_ready flag
-        const tokenReady = localStorage.getItem("spotify_token_ready");
-        if (!tokenReady) {
-          console.log("[SpotifyCallback] Waiting for token to be ready...");
-          // Wait up to 5 seconds for token to be ready
-          for (let i = 0; i < 10; i++) {
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            if (localStorage.getItem("spotify_token_ready")) {
-              console.log("[SpotifyCallback] Token is ready");
-              break;
-            }
-          }
-        }
-
-        // Set flag to trigger playlists loading only after token is ready
-        console.log("[SpotifyCallback] Setting auth_completed flag to trigger playlists loading");
-        localStorage.setItem("spotify_auth_completed", Date.now().toString());
-
-        // Clear token ready flag
-        localStorage.removeItem("spotify_token_ready");
-
-        setTimeout(() => {
-          window.location.href = "/?force_reload=true";
-        }, 1500);
+        window.location.href = "/";
       }
     } catch (error) {
       console.error("Authentication error:", error);
       setError(error.message);
-      setStatusMessage("Authentication failed");
     } finally {
       setIsProcessing(false);
     }
@@ -157,22 +85,11 @@ export default function SpotifyCallback() {
       return;
     }
 
-    // State can be missing in some scenarios, but we'll proceed with a warning
-    if (!state) {
-      console.warn("Missing state parameter - proceeding anyway");
-      setStatusMessage("Proceeding with authentication (missing state)");
-    }
-
-    // Store these for potential retries
     setAuthCode(code);
     setAuthState(state);
-
-    // Start the authentication process
     processAuthentication(code, state);
 
-    // Cleanup function to prevent memory leaks
     return () => {
-      // Mark as processed in case component unmounts
       authAttemptRef.current = true;
     };
   }, [navigate]);
@@ -182,8 +99,7 @@ export default function SpotifyCallback() {
     if (authCode) {
       processAuthentication(authCode, authState);
     } else {
-      // If we somehow lost the code, go back to login
-      SpotifyAuthService.initiateLogin();
+      SpotifyOAuthService.initiateLogin();
     }
   };
 
@@ -225,13 +141,7 @@ export default function SpotifyCallback() {
           <FaSpotify size={40} />
         </div>
         <h1 className="text-xl font-medium text-white mb-2">Spotify Authentication</h1>
-        <p className="text-sm text-gray-400 mb-2">{statusMessage}</p>
-
-        {isProcessing && (
-          <div className="mt-4 w-full bg-gray-700 rounded-full h-2.5">
-            <div className="bg-[#1DB954] h-2.5 rounded-full animate-pulse w-full"></div>
-          </div>
-        )}
+        <p className="text-sm text-gray-400 mb-2">Please wait while we connect to Spotify...</p>
       </div>
     </div>
   );

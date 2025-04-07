@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { usePage } from "../../contexts/page/usePage";
 import useSpotifyAuth from "../../hooks/useSpotifyAuth";
-import SpotifyService from "../../utils/services/SpotifyService";
+import SpotifyTokenService from "../../utils/services/SpotifyTokenService.js";
 import { usePopup } from "../../contexts/popup/usePopup";
 import SpotifyAccountPopupContentObject from "../../models/popup-content-object/SpotifyAccountPopupContentObject.jsx";
 import { PAGE_TYPES } from "../../utils/constants";
@@ -21,7 +21,7 @@ export default function Menu() {
 
   useEffect(() => {
     if (hasValidToken()) {
-      const storedProfile = SpotifyService.getSpotifyProfile();
+      const storedProfile = SpotifyTokenService.getSpotifyProfile();
       setProfile(storedProfile);
     } else {
       setProfile(null);
@@ -50,7 +50,7 @@ export default function Menu() {
   };
 
   const handleSignOut = () => {
-    SpotifyService.clearSpotifyAuth();
+    SpotifyTokenService.clearSpotifyAuth();
     setShowUserMenu(false);
     // Force a re-render to trigger the auth popup
     window.location.reload();
