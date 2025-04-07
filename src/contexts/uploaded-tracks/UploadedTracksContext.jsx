@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
-import { TrackService } from "../../utils/services";
+import { UploadedTrackService } from "../../utils/services";
 import { useGenrePlaylists } from "../genre-playlists/useGenrePlaylists";
 import useSpotifyAuth from "../../hooks/useSpotifyAuth";
 import UnauthorizedRequestError from "../../utils/errors/UnauthorizedRequestError";
@@ -24,7 +24,7 @@ export function UploadedTracksProvider({ children }) {
     }
 
     try {
-      await TrackService.uploadTrack(file, genreUuid, onProgress, badRequestCatched);
+      await UploadedTrackService.uploadTrack(file, genreUuid, onProgress, badRequestCatched);
       setRefreshGenrePlaylistsSignal(1);
       return { success: true };
     } catch (error) {
@@ -45,7 +45,7 @@ export function UploadedTracksProvider({ children }) {
         return;
       }
 
-      const uploadedTracks = await TrackService.getUploadedTracks();
+      const uploadedTracks = await UploadedTrackService.getUploadedTracks();
       setUploadedTracks(uploadedTracks);
       setError(null);
     } catch (error) {

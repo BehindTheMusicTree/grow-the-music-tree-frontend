@@ -1,13 +1,11 @@
 import ApiService from "@utils/ApiService";
 import SpotifyTokenService from "@utils/services/SpotifyTokenService";
-import RequestError from "@utils/errors/RequestError";
-import UnauthorizedRequestError from "@utils/errors/UnauthorizedRequestError";
 
 /**
  * Service for fetching and managing Spotify tracks
  * Separates track functionality from authentication
  */
-export default class spotifyLibTracksService {
+export default class SpotifyTracksService {
   static SPOTIFY_SYNC_TIMESTAMP_KEY = "spotify_last_sync_timestamp";
 
   /**
@@ -37,7 +35,6 @@ export default class spotifyLibTracksService {
   static async getLibTracks(page = 1, pageSize = 50, showErrors = true) {
     // Check token but don't throw - background operations will handle auth gracefully
     if (!SpotifyTokenService.hasValidSpotifyToken()) {
-      console.warn("No valid Spotify token available - API calls will be queued");
       // Signal auth required but return empty data to prevent UI crashes
       return { results: [], count: 0, authentication_required: true };
     }
@@ -50,8 +47,6 @@ export default class spotifyLibTracksService {
 
       return data;
     } catch (error) {
-      console.error("Error fetching Spotify tracks:", error);
-
       if (showErrors) {
         // Signal auth required if appropriate
         if (error.statusCode === 401) {
@@ -72,50 +67,98 @@ export default class spotifyLibTracksService {
    * @param {Function} notifyError - Callback when sync fails
    */
   static async syncInBackground(notifyStart, notifySuccess, notifyError) {
-    notifyStart && notifyStart();
+    if (notifyStart) notifyStart();
 
     try {
       // First check if we have valid token
       if (!SpotifyTokenService.hasValidSpotifyToken()) {
-        notifyError && notifyError("Authentication required");
+        if (notifyError) notifyError("Authentication required");
         return;
       }
 
       // Perform the actual sync
       const data = await this.getLibTracks(1, 50, false);
-      notifySuccess && notifySuccess(data);
+      if (notifySuccess) notifySuccess(data);
 
       return data;
     } catch (error) {
-      notifyError && notifyError(error.message || "Sync failed");
+      if (notifyError) notifyError(error.message || "Sync failed");
       return null;
     }
   }
 
   static async quickSync(notifyStart, notifySuccess, notifyError) {
-    notifyStart && notifyStart();
+    if (notifyStart) notifyStart();
 
     try {
       // First check if we have valid token
       if (!SpotifyTokenService.hasValidSpotifyToken()) {
-        notifyError && notifyError("Authentication required");
+        if (notifyError) notifyError("Authentication required");
         return;
       }
 
       // Perform the actual sync
       const response = await ApiService.fetchData("library/spotify/sync/quick/", "POST");
-      notifySuccess && notifySuccess(response);
+      if (notifySuccess) notifySuccess(response);
 
       return response;
     } catch (error) {
       // Handle specific error cases
       if (error.message.includes("Operation conflict")) {
-        notifyError && notifyError("A sync is already in progress. Please wait for it to complete.");
+        if (notifyError) notifyError("A sync is already in progress. Please wait for it to complete.");
       } else {
-        notifyError && notifyError(error.message || "Sync failed");
+        if (notifyError) notifyError(error.message || "Sync failed");
       }
 
       return null;
+    }
+  }
+
+  static async getTrackDetails(trackId) {
+    try {
+      const response = await ApiService.get(`/spotify/tracks/${trackId}`);
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 401) {
+        throw new Error("Authentication required");
+      }
+      throw error;
+    }
+  }
+
+  static async getTrackFeatures(trackId) {
+    try {
+      const response = await ApiService.get(`/spotify/tracks/${trackId}/features`);
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 401) {
+        throw new Error("Authentication required");
+      }
+      throw error;
+    }
+  }
+
+  static async getTrackAnalysis(trackId) {
+    try {
+      const response = await ApiService.get(`/spotify/tracks/${trackId}/analysis`);
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 401) {
+        throw new Error("Authentication required");
+      }
+      throw error;
+    }
+  }
+
+  static async getTrackRecommendations(trackId) {
+    try {
+      const response = await ApiService.get(`/spotify/tracks/${trackId}/recommendations`);
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 401) {
+        throw new Error("Authentication required");
+      }
+      throw error;
     }
   }
 }

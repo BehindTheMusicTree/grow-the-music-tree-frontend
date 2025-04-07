@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 
-import { TrackService } from "../../../utils/services";
+import { UploadedTrackService } from "../../../utils/services";
 import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePlaylists";
 import { useTrackList } from "../../../contexts/track-list/useTrackList";
 import { formatTime } from "../../../utils";
@@ -33,7 +33,10 @@ export default function UploadedTrackEditionPopupChild({ popupContentObject, hid
     if (submittedValues.rating === FORM_RATING_NULL_VALUE) {
       submittedValues.rating = null;
     }
-    const updatedUploadedTrack = await TrackService.putUploadedTrack(popupContentObject.uploadedTrack.uuid, formValues);
+    const updatedUploadedTrack = await UploadedTrackService.putUploadedTrack(
+      popupContentObject.uploadedTrack.uuid,
+      formValues
+    );
     refreshUploadedTrack(updatedUploadedTrack);
     if (genreNameBeforeEdition !== updatedUploadedTrack.genre?.name) {
       setRefreshGenrePlaylistsSignal(1);

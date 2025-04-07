@@ -2,7 +2,7 @@ import { createContext, useState } from "react";
 import PropTypes from "prop-types";
 
 import { PLAY_STATES } from "../../utils/constants";
-import { TrackService } from "../../utils/services";
+import { UploadedTrackService } from "../../utils/services";
 import useSpotifyAuth from "../../hooks/useSpotifyAuth";
 import UnauthorizedRequestError from "../../utils/errors/UnauthorizedRequestError";
 
@@ -24,7 +24,7 @@ function PlayerProvider({ children }) {
         return false;
       }
 
-      const playingUploadedTrackBlobUrl = await TrackService.loadAudioAndGetUploadedTrackBlobUrl(
+      const playingUploadedTrackBlobUrl = await UploadedTrackService.loadAudioAndGetUploadedTrackBlobUrl(
         uploadedTrack.relativeUrl
       );
 

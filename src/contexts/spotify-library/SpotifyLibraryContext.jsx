@@ -180,7 +180,7 @@ SpotifyLibraryProviderInner.propTypes = {
   }).isRequired,
 };
 
-export const SpotifyLibraryProvider = LocationAwareProvider;
+export { LocationAwareProvider as SpotifyLibraryProvider };
 
 export function useSpotifyLibrary() {
   const context = useContext(SpotifyLibraryContext);
