@@ -20,22 +20,27 @@ export default function SpotifyCallback() {
 
     try {
       const data = await SpotifyOAuthService.handleCallback(code, state || "");
+      console.log("Auth response data:", data);
 
-      // Extract any token from the response data
-      const tokenValue = data.accessToken || data.token || data.access_token;
+      // Extract token from the response data
+      const tokenValue = data.accessToken;
+      console.log("Token value:", tokenValue ? "Present" : "Missing");
 
-      // Check if token was stored correctly
-      const storedToken = localStorage.getItem(SpotifyTokenService.SPOTIFY_TOKEN_KEY);
-
-      // Manual storage as a fallback
-      if (!storedToken && tokenValue) {
-        const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour
-        localStorage.setItem(SpotifyTokenService.SPOTIFY_TOKEN_KEY, tokenValue);
-        localStorage.setItem(SpotifyTokenService.SPOTIFY_TOKEN_EXPIRY_KEY, expiryTime.toString());
+      if (!tokenValue) {
+        throw new Error("No access token in response");
       }
+
+      // Store the token using SpotifyTokenService
+      SpotifyTokenService.saveSpotifyToken(
+        tokenValue,
+        3600, // 1 hour in seconds
+        null, // No refresh token in this flow
+        data.user // Store user profile
+      );
 
       // Check token status
       const hasValidToken = SpotifyTokenService.hasValidSpotifyToken();
+      console.log("Has valid token:", hasValidToken);
 
       if (hasValidToken) {
         // Set flag to trigger playlists loading
@@ -48,9 +53,11 @@ export default function SpotifyCallback() {
           window.location.href = "/";
         }
       } else {
-        window.location.href = "/";
+        throw new Error("Token validation failed after storage");
       }
     } catch (error) {
+      console.error("Authentication error:", error);
+
       // Show error popup
       const popupContentObject = new SpotifyAuthErrorPopupContentObject({
         message: "Authentication Failed",
