@@ -1,17 +1,14 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { usePopup } from "@contexts/popup/usePopup";
 import SpotifyOAuthService from "@utils/services/SpotifyOAuthService";
 import SpotifyTokenService from "@utils/services/SpotifyTokenService";
-import { FaSpotify, FaRedo } from "react-icons/fa";
+import SpotifyAuthErrorPopupContentObject from "@models/popup-content-object/SpotifyAuthErrorPopupContentObject";
+import { FaSpotify } from "react-icons/fa";
 
 export default function SpotifyCallback() {
   const navigate = useNavigate();
-  const [error, setError] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(true);
-  const [authCode, setAuthCode] = useState(null);
-  const [authState, setAuthState] = useState(null);
-
-  // Use useRef instead of useState for tracking auth attempts
+  const { showPopup } = usePopup();
   const authAttemptRef = useRef(false);
 
   // Function to handle the authentication process
@@ -20,9 +17,6 @@ export default function SpotifyCallback() {
       return;
     }
     authAttemptRef.current = true;
-
-    setIsProcessing(true);
-    setError(null);
 
     try {
       const data = await SpotifyOAuthService.handleCallback(code, state || "");
@@ -57,10 +51,15 @@ export default function SpotifyCallback() {
         window.location.href = "/";
       }
     } catch (error) {
-      console.error("Authentication error:", error);
-      setError(error.message);
-    } finally {
-      setIsProcessing(false);
+      // Show error popup
+      const popupContentObject = new SpotifyAuthErrorPopupContentObject({
+        message: error.message || "Authentication failed",
+        details: "Please try connecting with Spotify again",
+      });
+      showPopup(popupContentObject);
+
+      // Navigate back to home after showing error
+      navigate("/");
     }
   };
 
@@ -72,72 +71,36 @@ export default function SpotifyCallback() {
     const error = urlParams.get("error");
 
     if (error) {
-      console.error("Spotify authentication error from URL:", error);
-      setError("Authentication was cancelled or failed");
-      setIsProcessing(false);
+      const popupContentObject = new SpotifyAuthErrorPopupContentObject({
+        message: "Authentication was cancelled or failed",
+        details: error,
+      });
+      showPopup(popupContentObject);
+      navigate("/");
       return;
     }
 
     if (!code) {
-      console.error("Missing authorization code");
-      setError("Missing authorization code from Spotify");
-      setIsProcessing(false);
+      const popupContentObject = new SpotifyAuthErrorPopupContentObject({
+        message: "Missing authorization code from Spotify",
+        details: "Please try connecting with Spotify again",
+      });
+      showPopup(popupContentObject);
+      navigate("/");
       return;
     }
 
-    setAuthCode(code);
-    setAuthState(state);
     processAuthentication(code, state);
 
     return () => {
       authAttemptRef.current = true;
     };
-  }, [navigate]);
-
-  // Handler for retry button
-  const handleRetry = () => {
-    if (authCode) {
-      processAuthentication(authCode, authState);
-    } else {
-      SpotifyOAuthService.initiateLogin();
-    }
-  };
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <div className="text-center p-6 bg-gray-800 rounded-lg shadow-xl max-w-md">
-          <div className="text-[#1DB954] mb-4">
-            <FaSpotify size={40} />
-          </div>
-          <h2 className="text-xl font-semibold text-white mb-3">Authentication Error</h2>
-          <div className="text-red-500 mb-6 text-sm">{error}</div>
-
-          <div className="flex flex-col space-y-3">
-            <button
-              onClick={handleRetry}
-              className="px-4 py-2 bg-[#1DB954] text-white font-medium rounded-full hover:bg-opacity-90 transition-all duration-200 flex items-center justify-center"
-            >
-              <FaRedo className="mr-2" />
-              Retry Authentication
-            </button>
-
-            <button
-              onClick={() => navigate("/")}
-              className="px-4 py-2 bg-gray-700 text-white font-medium rounded-full hover:bg-opacity-90 transition-all duration-200"
-            >
-              Return to Home Page
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  }, [navigate, showPopup]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900">
       <div className="text-center p-6 bg-gray-800 rounded-lg shadow-xl">
-        <div className={`text-[#1DB954] mb-4 ${isProcessing ? "animate-spin" : ""}`}>
+        <div className="text-[#1DB954] mb-4 animate-spin">
           <FaSpotify size={40} />
         </div>
         <h1 className="text-xl font-medium text-white mb-2">Spotify Authentication</h1>

@@ -141,104 +141,40 @@ export default class SpotifyOAuthService {
         throw new Error("State mismatch - possible CSRF attack");
       }
 
-      // Prepare request
-      const requestBody = {
-        code,
-        redirect_uri: config.spotifyRedirectUri,
-      };
-
-      console.log("[SpotifyAuthService] Making API request for token...", {
-        endpoint: `${config.apiBaseUrl}auth/spotify/`,
-        code: code.slice(0, 10) + "...", // Only log first 10 chars for security
-        redirect_uri: config.spotifyRedirectUri,
-      });
-
-      // Make API request
-      const response = await fetch(`${config.apiBaseUrl}auth/spotify/`, {
+      // Make request to our backend
+      const response = await fetch(`${config.apiBaseUrl}auth/spotify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({
+          code,
+          redirect_uri: config.spotifyRedirectUri,
+        }),
       });
 
       if (!response.ok) {
-        console.error("[SpotifyAuthService] Token exchange failed:", {
-          status: response.status,
-          statusText: response.statusText,
-        });
-        throw new Error(`API request failed with status ${response.status}`);
+        // Don't try to parse non-200 responses as JSON
+        throw new Error(`Authentication failed (${response.status})`);
       }
 
-      const data = await response.json();
-      console.log("[SpotifyAuthService] Received API response:", {
-        status: response.status,
-        hasAccessToken: !!data.accessToken,
-        hasRefreshToken: !!data.refreshToken,
-        hasUser: !!data.user,
-        tokenType: data.accessToken ? "Bearer" : "Unknown",
-        expiresIn: "1 hour",
-        responseKeys: Object.keys(data),
-      });
-
-      // Extract any token from the response data
-      const tokenValue = data.accessToken || data.token || data.access_token;
-
-      if (tokenValue) {
-        try {
-          console.log("[SpotifyAuthService] Preparing to store token data:", {
-            hasToken: true,
-            tokenLength: tokenValue.length,
-            hasRefreshToken: !!data.refreshToken,
-            hasUserProfile: !!data.user,
-            expiryTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-          });
-
-          // Store the token and profile
-          SpotifyTokenService.saveSpotifyToken(
-            tokenValue,
-            60 * 60, // 1 hour in seconds
-            data.refreshToken || null,
-            data.user || null
-          );
-
-          // Verify token was stored
-          const storedToken = localStorage.getItem(SpotifyTokenService.SPOTIFY_TOKEN_KEY);
-          const storedExpiry = localStorage.getItem(SpotifyTokenService.SPOTIFY_TOKEN_EXPIRY_KEY);
-          const storedRefresh = localStorage.getItem(SpotifyTokenService.SPOTIFY_REFRESH_KEY);
-          const storedProfile = localStorage.getItem(SpotifyTokenService.SPOTIFY_PROFILE_KEY);
-
-          console.log("[SpotifyAuthService] Token storage verification:", {
-            tokenStored: !!storedToken,
-            tokenLength: storedToken?.length,
-            expiryStored: !!storedExpiry,
-            expiryTime: new Date(parseInt(storedExpiry)).toISOString(),
-            refreshTokenStored: !!storedRefresh,
-            profileStored: !!storedProfile,
-          });
-
-          if (!storedToken) {
-            throw new Error("Failed to store token");
-          }
-
-          console.log("[SpotifyAuthService] Token stored successfully");
-
-          // Clean up state after successful token storage
-          this.cleanupStoredState();
-
-          // Set a flag indicating token is ready
-          localStorage.setItem("spotify_token_ready", "true");
-
-          return data;
-        } catch (error) {
-          console.error("[SpotifyAuthService] Error during token storage:", error);
-          throw error;
-        }
-      } else {
-        throw new Error("No token found in API response");
+      let data;
+      try {
+        data = await response.json();
+      } catch (e) {
+        throw new Error("Invalid response from server");
       }
+
+      if (!data.access_token) {
+        throw new Error("No access token received");
+      }
+
+      // Clean up state after successful authentication
+      this.cleanupStoredState();
+
+      return data;
     } catch (error) {
-      console.error("[SpotifyAuthService] Error handling Spotify callback:", error);
+      console.error("Error in handleCallback:", error);
       throw error;
     }
   }
