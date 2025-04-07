@@ -142,7 +142,7 @@ export default class SpotifyOAuthService {
       }
 
       // Make request to our backend
-      const response = await fetch(`${config.apiBaseUrl}auth/spotify`, {
+      const response = await fetch(`${config.apiBaseUrl}auth/spotify/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
