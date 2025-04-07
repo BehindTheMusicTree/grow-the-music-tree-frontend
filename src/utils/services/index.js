@@ -1,4 +1,4 @@
-import ApiService from "@utils/ApiService";
+import ApiService from "../api/ApiService";
 import GenreService from "./GenreService";
 import NotificationService from "./NotificationService";
 import PlaylistService from "./PlaylistService";

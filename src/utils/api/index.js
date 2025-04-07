@@ -1,11 +1,6 @@
-import ApiErrorHandler from './ApiErrorHandler';
-import ApiAuthHelper from './ApiAuthHelper';
-import ApiLogging from './ApiLogging';
-import ApiHttpClient from './ApiHttpClient';
+import ApiErrorHandler from "./ApiErrorHandler";
+import ApiAuthHelper from "./ApiAuthHelper";
+import ApiHttpClient from "./ApiHttpClient";
+import ApiService from "./ApiService";
 
-export {
-  ApiErrorHandler,
-  ApiAuthHelper,
-  ApiLogging,
-  ApiHttpClient
-};
+export { ApiErrorHandler, ApiAuthHelper, ApiHttpClient, ApiService };
