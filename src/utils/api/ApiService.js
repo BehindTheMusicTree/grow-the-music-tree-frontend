@@ -1,16 +1,16 @@
-import config from "../config";
-import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "../constants";
-import RequestError from "./errors/RequestError";
-import BadRequestError from "./errors/BadRequestError";
-import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
-import InternalServerError from "./errors/InternalServerError";
-import ConnectivityError from "./errors/ConnectivityError";
-import SpotifyTokenService from "../services/SpotifyTokenService";
-import ApiLogger from "./ApiLogger";
+import config from "./config";
+import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "./constants";
+import RequestError from "./api/errors/RequestError";
+import BadRequestError from "./api/errors/BadRequestError";
+import UnauthorizedRequestError from "./api/errors/UnauthorizedRequestError";
+import InternalServerError from "./api/errors/InternalServerError";
+import ConnectivityError from "./api/errors/ConnectivityError";
+import ApiLogger from "./api/ApiLogger";
+import ApiErrorHandler from "./ApiErrorHandler";
+import ApiAuthHelper from "./ApiAuthHelper";
 
 /**
- * Core API service handling authentication, HTTP requests, and error management
- * Now uses Spotify authentication instead of UMG credentials
+ * Core API service handling HTTP requests and response management
  */
 export default class ApiService {
   static errorSubscribers = [];
@@ -29,224 +29,49 @@ export default class ApiService {
 
   static onError(callback) {
     this.errorSubscribers.push(callback);
-
     return () => {
       this.errorSubscribers = this.errorSubscribers.filter((subscriber) => subscriber !== callback);
     };
   }
 
   static async parseJson(response) {
-    try {
-      return await response.json();
-    } catch (error) {
-      console.error("[API] Failed to parse JSON response:", error);
-      throw new Error(`Failed to parse response. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}.`);
-    }
+    return ApiErrorHandler.parseJson(response);
   }
 
   static getResponseObjFromXhr(xhr) {
-    return xhr.response;
+    return ApiErrorHandler.getResponseObjFromXhr(xhr);
   }
 
   static extractErrorFromHtml(html) {
-    // Extract title content which usually contains the error type
-    const titleMatch = html.match(/<title>(.*?)<\/title>/);
-    if (titleMatch) {
-      return titleMatch[1].trim();
-    }
-
-    // Extract error message from explanation div if it exists
-    const explanationMatch = html.match(/<div id="explanation">(.*?)<\/div>/s);
-    if (explanationMatch) {
-      return explanationMatch[1].replace(/<[^>]*>/g, "").trim();
-    }
-
-    return "Unknown error occurred";
+    return ApiErrorHandler.extractErrorFromHtml(html);
   }
 
   static async getResponseObjFromFetch(response) {
-    const contentType = response.headers.get("content-type");
-    console.log("[API] Response Content-Type:", contentType);
-
-    if (contentType && contentType.includes("application/json")) {
-      const json = await this.parseJson(response);
-      return json;
-    } else {
-      const text = await response.text();
-      // If the response is HTML, try to extract error message
-      if (contentType && contentType.includes("text/html")) {
-        const errors = { errors: this.extractErrorFromHtml(text) };
-        return errors;
-      }
-      return text;
-    }
+    return ApiErrorHandler.getResponseObjFromFetch(response);
   }
 
   static async handleNotOkResponse(url, response) {
-    const status = response.status;
-    console.log(`[API] Error response from ${url} - Status: ${status}`);
-
-    if (status >= 400 && status < 600) {
-      let errorMessage = "";
-      const errorMessagePrefixe = `url ${url} - status ${status}`;
-      try {
-        let responseObj;
-        if (response.json) {
-          responseObj = await this.getResponseObjFromFetch(response);
-        } else if (response.responseType && response.responseType === "json") {
-          responseObj = this.getResponseObjFromXhr(response);
-        }
-
-        console.log("[API] Error response details:", responseObj);
-
-        if (status === 400) {
-          // Format the error data according to the API response structure
-          const errorObj = {
-            code: responseObj.details?.code || "unknown_error",
-            message: responseObj.details?.message || "Bad Request",
-          };
-
-          // If fieldErrors exist, create a map with fieldname -> message, code
-          if (responseObj.details?.fieldErrors) {
-            const fieldErrorsMap = {};
-
-            Object.entries(responseObj.details.fieldErrors).forEach(([fieldName, errors]) => {
-              fieldErrorsMap[fieldName] = errors.map((error) => ({
-                message: error.message,
-                code: error.code,
-              }));
-            });
-
-            errorObj.fieldErrors = fieldErrorsMap;
-          }
-
-          throw new BadRequestError(errorObj);
-        } else if (status === 401) {
-          throw new UnauthorizedRequestError(responseObj.errors);
-        } else if (status === 404) {
-          throw new Error(`Resource not found: ${url}`);
-        } else if (status === 409) {
-          throw new Error(responseObj.message || "Operation conflict - another operation is already in progress");
-        } else if (status === 500) {
-          // Log the full error details for debugging
-          console.error("[API] Server error details:", {
-            status,
-            url,
-            response: responseObj,
-            headers: response.headers ? Object.fromEntries(response.headers.entries()) : null,
-          });
-          throw new InternalServerError(responseObj.errors || { message: "Internal server error" });
-        }
-
-        errorMessage = JSON.stringify(responseObj);
-        throw new Error(`${errorMessagePrefixe} ${errorMessage ? ` - ${errorMessage}` : ""}`);
-      } catch (error) {
-        if (error instanceof RequestError) {
-          throw error;
-        }
-        // Log the raw error for debugging
-        console.error("[API] Raw error details:", {
-          status,
-          url,
-          error: error.message,
-          stack: error.stack,
-        });
-        throw new Error(
-          `${errorMessagePrefixe} - the response message could not be analysed. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`
-        );
-      }
-    }
-    return "";
+    return ApiErrorHandler.handleNotOkResponse(url, response);
   }
 
   static isConnectivityError(error) {
-    // Check if the error message contains connectivity-related terms
-    const errorMessage = error.message ? error.message.toLowerCase() : "";
-    const connectivityTerms = [
-      // CORS terms (English)
-      "cors",
-      "cross-origin",
-      "access-control-allow-origin",
-      "same origin policy",
-      // CORS terms (French)
-      "requête multiorigine",
-      "politique same origin",
-      "cross-origin request",
-      "blocage d'une requête",
-      // Common network error terms
-      "failed to fetch",
-      "network error",
-      "status: (null)",
-      "status: null",
-      "status: 0",
-      // API unreachability terms
-      "networkerror when attempting to fetch resource",
-      "could not connect to the server",
-      "connection refused",
-      "no such host",
-      "dns lookup failed",
-      "connection timed out",
-      "unable to connect",
-      "unable to reach",
-      "unreachable",
-      "refused",
-      "timeout",
-    ];
-
-    const hasConnectivityErrorMessage = connectivityTerms.some((term) => errorMessage.includes(term));
-
-    // Connectivity errors often appear as TypeErrors with network error messages
-    const isLikelyConnectivityError =
-      error instanceof TypeError ||
-      (error instanceof Error && errorMessage.includes("status: (null)")) ||
-      (error instanceof Error && errorMessage.includes("status: null")) ||
-      (error instanceof Error && errorMessage.includes("status: 0")) ||
-      // Check for network errors that might indicate API unreachability
-      (error instanceof Error && error.name === "TypeError" && error.message.includes("Failed to fetch")) ||
-      (error instanceof Error && error.name === "NetworkError");
-
-    return hasConnectivityErrorMessage || isLikelyConnectivityError;
+    return ApiErrorHandler.isConnectivityError(error);
   }
 
   static getFetchErrorMessageOtherThanBadRequest(error, url) {
-    console.error("[API] Fetch error:", error);
-    if (this.isConnectivityError(error)) {
-      // Create a connectivity error object with details
-      const connectivityErrorObj = {
-        message: "API Connection Error",
-        url: url || "Unknown URL",
-        details: {
-          type: "connection_error",
-          message: error.message,
-          expectedUrl: config.apiBaseUrl,
-        },
-      };
-
-      throw new ConnectivityError(connectivityErrorObj);
-    } else if (error instanceof TypeError) {
-      return `${error.message} probably because of a network error.`;
-    } else {
-      return error.message;
-    }
+    return ApiErrorHandler.getFetchErrorMessageOtherThanBadRequest(error, url);
   }
 
   static getToken() {
-    const token = SpotifyTokenService.getSpotifyToken();
-    return token;
+    return ApiAuthHelper.getSpotifyToken();
   }
 
   static hasValidToken() {
-    const hasToken = SpotifyTokenService.hasValidSpotifyToken();
-    return hasToken;
+    return ApiAuthHelper.hasValidToken();
   }
 
   static throwAuthError() {
-    console.error("[API] Authentication error: Spotify authentication required");
-    throw new UnauthorizedRequestError({
-      message: "Spotify authentication required",
-      status: 401,
-      details: "You must connect with Spotify to use this feature",
-    });
+    return ApiAuthHelper.throwAuthError();
   }
 
   static async getHeaders() {
@@ -256,11 +81,7 @@ export default class ApiService {
       }
 
       const spotifyToken = this.getToken();
-      const headers = {
-        Authorization: `Bearer ${spotifyToken}`,
-        "Content-Type": "application/json",
-      };
-      return headers;
+      return ApiAuthHelper.generateHeaders(spotifyToken);
     } catch (error) {
       console.error("[API] Failed to get headers:", error);
       throw new Error(`Failed to get headers. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`);
@@ -394,8 +215,7 @@ export default class ApiService {
 
   static async get(url, params = {}, badRequestCatched = false) {
     try {
-      const token = await this.getSpotifyToken();
-      const headers = this.generateHeaders(token);
+      const headers = await ApiAuthHelper.getHeaders();
       const queryString = params ? `?${new URLSearchParams(params).toString()}` : "";
       const fullUrl = `${this.baseUrl}${url}${queryString}`;
 
@@ -428,8 +248,7 @@ export default class ApiService {
 
   static async post(url, data = {}, badRequestCatched = false) {
     try {
-      const token = await this.getSpotifyToken();
-      const headers = this.generateHeaders(token);
+      const headers = await ApiAuthHelper.getHeaders();
       const fullUrl = `${this.baseUrl}${url}`;
 
       ApiLogger.logRequest("POST", fullUrl, null, headers, data);
@@ -462,8 +281,7 @@ export default class ApiService {
 
   static async put(url, data = {}, badRequestCatched = false) {
     try {
-      const token = await this.getSpotifyToken();
-      const headers = this.generateHeaders(token);
+      const headers = await ApiAuthHelper.getHeaders();
       const fullUrl = `${this.baseUrl}${url}`;
 
       ApiLogger.logRequest("PUT", fullUrl, null, headers, data);
@@ -496,8 +314,7 @@ export default class ApiService {
 
   static async delete(url, badRequestCatched = false) {
     try {
-      const token = await this.getSpotifyToken();
-      const headers = this.generateHeaders(token);
+      const headers = await ApiAuthHelper.getHeaders();
       const fullUrl = `${this.baseUrl}${url}`;
 
       ApiLogger.logRequest("DELETE", fullUrl, null, headers);
@@ -525,20 +342,5 @@ export default class ApiService {
       ApiLogger.logError("DELETE", url, error);
       throw error;
     }
-  }
-
-  static async getSpotifyToken() {
-    const token = localStorage.getItem(SpotifyTokenService.SPOTIFY_TOKEN_KEY);
-    if (!token) {
-      throw new UnauthorizedRequestError("No Spotify token found");
-    }
-    return token;
-  }
-
-  static generateHeaders(token) {
-    return {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    };
   }
 }

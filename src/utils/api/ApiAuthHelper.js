@@ -1,25 +1,39 @@
 import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "../constants";
-import SpotifyTokenService from "../services/SpotifyTokenService";
+import SpotifyTokenService from "./services/SpotifyTokenService";
 import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
 
 /**
- * Handles API authentication and authorization
+ * Helper class for API authentication management
+ * Handles token retrieval, validation, and header generation
  */
 export default class ApiAuthHelper {
   /**
-   * Gets the authentication token
+   * Gets the Spotify token from storage
+   * @throws UnauthorizedRequestError if no token is found
    */
-  static getToken() {
+  static getSpotifyToken() {
     const token = SpotifyTokenService.getSpotifyToken();
+    if (!token) {
+      throw new UnauthorizedRequestError("No Spotify token found");
+    }
     return token;
   }
 
   /**
-   * Checks if a valid authentication token exists
+   * Checks if a valid Spotify token exists
    */
   static hasValidToken() {
-    const hasToken = SpotifyTokenService.hasValidSpotifyToken();
-    return hasToken;
+    return SpotifyTokenService.hasValidSpotifyToken();
+  }
+
+  /**
+   * Generates headers with authentication token
+   */
+  static generateHeaders(token) {
+    return {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
   }
 
   /**
@@ -30,7 +44,7 @@ export default class ApiAuthHelper {
     throw new UnauthorizedRequestError({
       message: "Spotify authentication required",
       status: 401,
-      details: "You must connect with Spotify to use the application",
+      details: "You must connect with Spotify to use this feature",
     });
   }
 
@@ -43,7 +57,7 @@ export default class ApiAuthHelper {
         this.throwAuthError();
       }
 
-      const spotifyToken = this.getToken();
+      const spotifyToken = this.getSpotifyToken();
       const headers = {
         Authorization: `Bearer ${spotifyToken}`,
         "Content-Type": "application/json",
@@ -53,26 +67,5 @@ export default class ApiAuthHelper {
       console.error("[API] Failed to get headers:", error);
       throw new Error(`Failed to get headers. ${DUE_TO_PREVIOUS_ERROR_MESSAGE} ${error.message}`);
     }
-  }
-
-  /**
-   * Gets the Spotify token from local storage
-   */
-  static async getSpotifyToken() {
-    const token = localStorage.getItem(SpotifyTokenService.SPOTIFY_TOKEN_KEY);
-    if (!token) {
-      throw new UnauthorizedRequestError("No Spotify token found");
-    }
-    return token;
-  }
-
-  /**
-   * Generates authorization headers
-   */
-  static generateHeaders(token) {
-    return {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    };
   }
 }

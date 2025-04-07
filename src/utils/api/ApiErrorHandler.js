@@ -7,7 +7,8 @@ import InternalServerError from "./errors/InternalServerError";
 import ConnectivityError from "./errors/ConnectivityError";
 
 /**
- * Handles API error detection, parsing, and management
+ * Centralized error handling for API requests
+ * This class is the single source of truth for all API error handling logic
  */
 export default class ApiErrorHandler {
   /**
