@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 export const PopupContext = createContext();
 
-function PopupProvider({ children }) {
+export function PopupProvider({ children }) {
   const [popupContentObject, setPopupContentObject] = useState();
 
   const showPopup = (popupContentObject) => {
