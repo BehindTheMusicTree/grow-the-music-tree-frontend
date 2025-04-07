@@ -24,13 +24,14 @@ export function AuthProvider({ children }) {
       clearInterval(checkIntervalRef.current);
     }
 
-    // Get token expiration time
-    const tokenData = SpotifyTokenService.getSpotifyTokenData();
-    if (!tokenData) return;
+    // Get token and expiry
+    const token = SpotifyTokenService.getSpotifyToken();
+    const expiryDate = SpotifyTokenService.getSpotifyTokenExpiry();
+
+    if (!token || !expiryDate) return;
 
     const now = Date.now();
-    const expiresIn = tokenData.expires_in * 1000; // Convert to milliseconds
-    const timeUntilExpiry = tokenData.created_at + expiresIn - now;
+    const timeUntilExpiry = expiryDate.getTime() - now;
 
     // If token is expired or will expire soon, check more frequently
     if (timeUntilExpiry <= 0) {
