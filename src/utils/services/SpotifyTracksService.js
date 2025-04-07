@@ -66,11 +66,10 @@ export default class SpotifyTracksService {
    * Initiates a background sync with Spotify
    * Non-blocking operation with status notifications
    * @param {Function} notifyStart - Callback when sync starts
-   * @param {Function} notifyProgress - Callback for progress updates
    * @param {Function} notifySuccess - Callback when sync succeeds
    * @param {Function} notifyError - Callback when sync fails
    */
-  static async syncInBackground(notifyStart, notifyProgress, notifySuccess, notifyError) {
+  static async syncInBackground(notifyStart, notifySuccess, notifyError) {
     notifyStart && notifyStart();
 
     try {
@@ -80,21 +79,8 @@ export default class SpotifyTracksService {
         return;
       }
 
-      // Simulate progress for better UX
-      let progress = 0;
-      const progressInterval = setInterval(() => {
-        progress += 10;
-        if (progress <= 90) {
-          notifyProgress && notifyProgress(progress);
-        }
-      }, 200);
-
       // Perform the actual sync
       const data = await this.getLibTracks(1, 50, false);
-
-      // Clean up and notify success
-      clearInterval(progressInterval);
-      notifyProgress && notifyProgress(100);
       notifySuccess && notifySuccess(data);
 
       return data;
@@ -104,7 +90,7 @@ export default class SpotifyTracksService {
     }
   }
 
-  static async quickSync(notifyStart, notifyProgress, notifySuccess, notifyError) {
+  static async quickSync(notifyStart, notifySuccess, notifyError) {
     notifyStart && notifyStart();
 
     try {
@@ -114,27 +100,12 @@ export default class SpotifyTracksService {
         return;
       }
 
-      // Simulate progress for better UX
-      let progress = 0;
-      const progressInterval = setInterval(() => {
-        progress += 10;
-        if (progress <= 90) {
-          notifyProgress && notifyProgress(progress);
-        }
-      }, 200);
-
       // Perform the actual sync
       const response = await ApiService.fetchData("library/spotify/sync/quick/", "POST");
-
-      // Clean up and notify success
-      clearInterval(progressInterval);
-      notifyProgress && notifyProgress(100);
       notifySuccess && notifySuccess(response);
 
       return response;
     } catch (error) {
-      console.error("[SpotifyTracksService] Quick sync error:", error);
-
       // Handle specific error cases
       if (error.message.includes("Operation conflict")) {
         notifyError && notifyError("A sync is already in progress. Please wait for it to complete.");
