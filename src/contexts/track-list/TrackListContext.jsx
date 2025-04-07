@@ -8,7 +8,7 @@ import TrackListOrigin from "../../models/TrackListOrigin";
 
 export const TrackListContext = createContext();
 
-function TrackListProvider({ children }) {
+export function TrackListProvider({ children }) {
   const [trackList, setTrackList] = useState(null);
   const [origin, setOrigin] = useState(null);
   const [playingUploadedTrackPosition, setPlayingUploadedTrackPosition] = useState(null);
