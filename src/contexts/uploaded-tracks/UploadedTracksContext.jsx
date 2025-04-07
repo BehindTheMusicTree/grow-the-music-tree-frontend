@@ -10,15 +10,18 @@ export const UploadedTracksContext = createContext();
 
 export function UploadedTracksProvider({ children }) {
   const { setRefreshGenrePlaylistsSignal = () => {} } = useGenrePlaylists() || {};
-  const [uploadedTracks, setUploadedTracks] = useState();
+  const [uploadedTracks, setUploadedTracks] = useState([]);
   const [refreshuploadedTracksSignal, setRefreshUploadedTracksSignal] = useState(1);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const pageSize = 50;
   const { checkTokenAndShowAuthIfNeeded } = useSpotifyAuth();
 
   const areUploadedTrackFetchingRef = { current: false };
 
   async function postUploadedTrack(file, genreUuid, onProgress, badRequestCatched) {
-    // Check for valid Spotify token before API call
     if (!checkTokenAndShowAuthIfNeeded(true)) {
       return { success: false, authRequired: true };
     }
@@ -28,44 +31,62 @@ export function UploadedTracksProvider({ children }) {
       setRefreshGenrePlaylistsSignal(1);
       return { success: true };
     } catch (error) {
-      // Handle authentication errors
       if (error instanceof UnauthorizedRequestError) {
-        checkTokenAndShowAuthIfNeeded(true); // Force showing the auth popup
+        checkTokenAndShowAuthIfNeeded(true);
         return { success: false, authRequired: true };
       }
-      throw error; // Re-throw other errors
+      throw error;
     }
   }
 
-  async function fetchUploadedTracks() {
+  async function fetchUploadedTracks(page = 1, showErrors = true) {
     try {
-      // Check for valid Spotify token before API call
-      if (!checkTokenAndShowAuthIfNeeded(true)) {
+      setLoading(true);
+      const result = await UploadedTrackService.getUploadedTracks(page, pageSize, showErrors);
+
+      if (result.authRequired) {
         setError("Authentication required");
+        checkTokenAndShowAuthIfNeeded(true);
         return;
       }
 
-      const uploadedTracks = await UploadedTrackService.getUploadedTracks();
-      setUploadedTracks(uploadedTracks);
-      setError(null);
+      if (result.success) {
+        if (page === 1) {
+          setUploadedTracks(result.tracks);
+        } else {
+          setUploadedTracks((prev) => [...prev, ...result.tracks]);
+        }
+        setHasMore(result.tracks.length === pageSize);
+        setError(null);
+      } else {
+        setError(result.error || "Failed to load tracks");
+      }
     } catch (error) {
       console.error("Error fetching uploaded tracks:", error);
-
-      // Handle authentication errors
       if (error instanceof UnauthorizedRequestError) {
         setError("Authentication required");
-        checkTokenAndShowAuthIfNeeded(true); // Force showing the auth popup
+        checkTokenAndShowAuthIfNeeded(true);
       } else {
         setError("Failed to load tracks");
       }
+    } finally {
+      setLoading(false);
     }
   }
 
+  const loadMore = () => {
+    if (!loading && hasMore) {
+      setCurrentPage((prev) => prev + 1);
+      fetchUploadedTracks(currentPage + 1);
+    }
+  };
+
   useEffect(() => {
     const fetchUploadedTracksAsync = async () => {
-      if (refreshuploadedTracksSignal == 1 && !areUploadedTrackFetchingRef.current) {
+      if (refreshuploadedTracksSignal === 1 && !areUploadedTrackFetchingRef.current) {
         areUploadedTrackFetchingRef.current = true;
-        await fetchUploadedTracks();
+        setCurrentPage(1);
+        await fetchUploadedTracks(1);
         areUploadedTrackFetchingRef.current = false;
         setRefreshUploadedTracksSignal(0);
       }
@@ -80,7 +101,10 @@ export function UploadedTracksProvider({ children }) {
         uploadedTracks,
         postUploadedTrack,
         setRefreshUploadedTracksSignal,
-        error, // Include error state in context value
+        error,
+        loading,
+        hasMore,
+        loadMore,
       }}
     >
       {children}
