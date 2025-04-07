@@ -1,5 +1,5 @@
 import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "../constants";
-import SpotifyTokenService from "./services/SpotifyTokenService";
+import SpotifyTokenService from "../services/SpotifyTokenService";
 import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
 
 /**
