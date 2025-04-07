@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { usePopup } from "@contexts/popup/usePopup";
-import ApiService from "@utils/ApiService";
+import ApiService from "@utils/api/ApiService";
 import RequestError from "@utils/errors/RequestError";
 import ConnectivityError from "@utils/errors/ConnectivityError";
 import UnauthorizedRequestError from "@utils/errors/UnauthorizedRequestError";

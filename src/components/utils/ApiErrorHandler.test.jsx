@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
 import ApiErrorHandler from "./ApiErrorHandler";
-import ApiService from "../../utils/ApiService";
+import ApiService from "../../utils/api/ApiService";
 import { usePopup } from "../../contexts/popup/usePopup";
 import ConnectivityError from "../../utils/errors/ConnectivityError";
 import ConnectivityErrorPopupContentObject from "../../models/popup-content-object/ConnectivityErrorPopupContentObject";
