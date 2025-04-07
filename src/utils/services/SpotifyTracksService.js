@@ -1,4 +1,4 @@
-import ApiService from "@utils/ApiService";
+import ApiService from "../api/ApiService";
 import SpotifyTokenService from "@utils/services/SpotifyTokenService";
 
 /**

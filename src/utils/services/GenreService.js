@@ -1,6 +1,4 @@
-import ApiService from "@utils/ApiService";
-import BadRequestError from "@utils/errors/BadRequestError";
-import UnauthorizedRequestError from "@utils/errors/UnauthorizedRequestError";
+import ApiService from "../api/ApiService";
 
 export default class GenreService {
   static async getGenres() {

@@ -1,24 +1,38 @@
 import config from "../config";
-import ApiService from "../ApiService";
+import ApiService from "../api/ApiService";
 
 export default class UploadedTrackService {
   static async getUploadedTracks() {
-    let results = [];
-    let page = 1;
-    let hasMore = true;
+    try {
+      let results = [];
+      let page = 1;
+      let hasMore = true;
 
-    while (hasMore) {
-      const data = await ApiService.fetchData("library/uploaded/", "GET", null, page);
-      results = results.concat(data.results);
+      while (hasMore) {
+        try {
+          const data = await ApiService.fetchData("library/uploaded/", "GET", null, page);
+          results = results.concat(data.results);
 
-      if (data.next) {
-        page++;
-      } else {
-        hasMore = false;
+          if (data.next) {
+            page++;
+          } else {
+            hasMore = false;
+          }
+        } catch (error) {
+          // If we get a 404, assume no tracks exist yet
+          if (error.message?.includes("Resource not found")) {
+            hasMore = false;
+          } else {
+            throw error;
+          }
+        }
       }
-    }
 
-    return results;
+      return results;
+    } catch (error) {
+      console.error("Error fetching uploaded tracks:", error);
+      return [];
+    }
   }
 
   static async retrieveUploadedTrack(uploadedTrackUuid) {

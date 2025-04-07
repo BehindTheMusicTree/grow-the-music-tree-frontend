@@ -1,5 +1,6 @@
 import config from "../config";
-import SpotifyTokenService from "./SpotifyTokenService";
+import ApiLogger from "../api/ApiLogger";
+import ApiService from "../api/ApiService";
 
 export default class SpotifyOAuthService {
   static STATE_STORAGE_KEY = "spotify_auth_state";
@@ -141,46 +142,39 @@ export default class SpotifyOAuthService {
         throw new Error("State mismatch - possible CSRF attack");
       }
 
-      // Make request to our backend
-      const response = await fetch(`${config.apiBaseUrl}auth/spotify/`, {
+      const url = `${config.apiBaseUrl}auth/spotify/`;
+      const data = {
+        code,
+        redirect_uri: config.spotifyRedirectUri,
+      };
+
+      // Make direct fetch call since we don't want to use token-based auth for this endpoint
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          code,
-          redirect_uri: config.spotifyRedirectUri,
-        }),
+        body: JSON.stringify(data),
       });
 
+      const responseData = await response.json();
+      ApiLogger.logResponse("POST", url, response.status, response.statusText, responseData);
+
       if (!response.ok) {
-        // Don't expose technical details to user
-        throw new Error(
-          "Something went wrong with the authentication. Please try again or contact our team if the issue persists."
-        );
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      let data;
-      try {
-        data = await response.json();
-      } catch (e) {
-        throw new Error(
-          "Something went wrong with the authentication. Please try again or contact our team if the issue persists."
-        );
-      }
-
-      if (!data.access_token) {
-        throw new Error(
-          "Something went wrong with the authentication. Please try again or contact our team if the issue persists."
-        );
+      if (!responseData.accessToken) {
+        throw new Error("No access token in response");
       }
 
       // Clean up state after successful authentication
       this.cleanupStoredState();
 
-      return data;
+      return responseData;
     } catch (error) {
-      console.error("Error in handleCallback:", error);
+      // Clean up state on error
+      this.cleanupStoredState();
       throw error;
     }
   }

@@ -1,7 +1,7 @@
 import config from "../config";
 import ApiAuthHelper from "./ApiAuthHelper";
 import ApiErrorHandler from "./ApiErrorHandler";
-import ApiLogging from "./ApiLogging";
+import ApiLogger from "./ApiLogger";
 
 /**
  * Handles API HTTP requests
@@ -67,8 +67,6 @@ export default class ApiHttpClient {
       url += `?page=${page}`;
     }
 
-    // ApiLogging.logApiCall(method, url, data);
-
     try {
       if (!ApiAuthHelper.hasValidToken()) {
         ApiAuthHelper.throwAuthError();
@@ -81,7 +79,7 @@ export default class ApiHttpClient {
         xhr.onload = async () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             const response = xhr.response;
-            ApiLogging.logApiResponse(method, url, response);
+            ApiLogger.logApiResponse(method, url, response);
             resolve(response);
           } else {
             try {
@@ -128,7 +126,7 @@ export default class ApiHttpClient {
         xhr.send(data);
       });
     } catch (error) {
-      ApiLogging.logApiError(method, url, error);
+      ApiLogger.logApiError(method, url, error);
       throw error;
     }
   }
@@ -174,7 +172,7 @@ export default class ApiHttpClient {
       const queryString = params ? `?${new URLSearchParams(params).toString()}` : "";
       const fullUrl = `${this.baseUrl}${url}${queryString}`;
 
-      ApiLogging.logRequest("GET", fullUrl, params, headers);
+      ApiLogger.logRequest("GET", fullUrl, params, headers);
 
       const response = await fetch(fullUrl, {
         method: "GET",
@@ -182,7 +180,7 @@ export default class ApiHttpClient {
       });
 
       const responseData = await response.json();
-      ApiLogging.logResponse("GET", fullUrl, response.status, response.statusText, responseData);
+      ApiLogger.logResponse("GET", fullUrl, response.status, response.statusText, responseData);
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -196,7 +194,7 @@ export default class ApiHttpClient {
 
       return responseData;
     } catch (error) {
-      ApiLogging.logError("GET", url, error);
+      ApiLogger.logError("GET", url, error);
       throw error;
     }
   }
@@ -210,7 +208,7 @@ export default class ApiHttpClient {
       const headers = ApiAuthHelper.generateHeaders(token);
       const fullUrl = `${this.baseUrl}${url}`;
 
-      ApiLogging.logRequest("POST", fullUrl, null, headers, data);
+      ApiLogger.logRequest("POST", fullUrl, null, headers, data);
 
       const response = await fetch(fullUrl, {
         method: "POST",
@@ -219,7 +217,7 @@ export default class ApiHttpClient {
       });
 
       const responseData = await response.json();
-      ApiLogging.logResponse("POST", fullUrl, response.status, response.statusText, responseData);
+      ApiLogger.logResponse("POST", fullUrl, response.status, response.statusText, responseData);
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -233,7 +231,7 @@ export default class ApiHttpClient {
 
       return responseData;
     } catch (error) {
-      ApiLogging.logError("POST", url, error);
+      ApiLogger.logError("POST", url, error);
       throw error;
     }
   }
@@ -247,7 +245,7 @@ export default class ApiHttpClient {
       const headers = ApiAuthHelper.generateHeaders(token);
       const fullUrl = `${this.baseUrl}${url}`;
 
-      ApiLogging.logRequest("PUT", fullUrl, null, headers, data);
+      ApiLogger.logRequest("PUT", fullUrl, null, headers, data);
 
       const response = await fetch(fullUrl, {
         method: "PUT",
@@ -256,7 +254,7 @@ export default class ApiHttpClient {
       });
 
       const responseData = await response.json();
-      ApiLogging.logResponse("PUT", fullUrl, response.status, response.statusText, responseData);
+      ApiLogger.logResponse("PUT", fullUrl, response.status, response.statusText, responseData);
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -270,7 +268,7 @@ export default class ApiHttpClient {
 
       return responseData;
     } catch (error) {
-      ApiLogging.logError("PUT", url, error);
+      ApiLogger.logError("PUT", url, error);
       throw error;
     }
   }
@@ -284,7 +282,7 @@ export default class ApiHttpClient {
       const headers = ApiAuthHelper.generateHeaders(token);
       const fullUrl = `${this.baseUrl}${url}`;
 
-      ApiLogging.logRequest("DELETE", fullUrl, null, headers);
+      ApiLogger.logRequest("DELETE", fullUrl, null, headers);
 
       const response = await fetch(fullUrl, {
         method: "DELETE",
@@ -292,7 +290,7 @@ export default class ApiHttpClient {
       });
 
       const responseData = await response.json();
-      ApiLogging.logResponse("DELETE", fullUrl, response.status, response.statusText, responseData);
+      ApiLogger.logResponse("DELETE", fullUrl, response.status, response.statusText, responseData);
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -306,7 +304,7 @@ export default class ApiHttpClient {
 
       return responseData;
     } catch (error) {
-      ApiLogging.logError("DELETE", url, error);
+      ApiLogger.logError("DELETE", url, error);
       throw error;
     }
   }
