@@ -1,11 +1,11 @@
-import config from "./config";
-import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "./constants";
-import RequestError from "./api/errors/RequestError";
-import BadRequestError from "./api/errors/BadRequestError";
-import UnauthorizedRequestError from "./api/errors/UnauthorizedRequestError";
-import InternalServerError from "./api/errors/InternalServerError";
-import ConnectivityError from "./api/errors/ConnectivityError";
-import ApiLogger from "./api/ApiLogger";
+import config from "../config";
+import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "../constants";
+import RequestError from "./errors/RequestError";
+import BadRequestError from "./errors/BadRequestError";
+import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
+import InternalServerError from "./errors/InternalServerError";
+import ConnectivityError from "./errors/ConnectivityError";
+import ApiLogger from "./ApiLogger";
 import ApiErrorHandler from "./ApiErrorHandler";
 import ApiAuthHelper from "./ApiAuthHelper";
 
