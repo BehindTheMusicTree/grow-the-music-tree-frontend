@@ -3,8 +3,8 @@ import { useTrackListSidebarVisibility } from "@contexts/track-list-sidebar-visi
 import { usePage } from "@contexts/page/usePage";
 import TrackListSidebar from "@components/page-container/track-list-sidebar/TrackListSidebar";
 import GenresPlaylists from "@components/page-container/pages/genre-playlists/GenrePlaylists";
-import UploadedLibrary from "@components/page-container/pages/uploaded-library/UploadedLibrary";
-import SpotifyLibrary from "@components/page-container/pages/spotify-library/SpotifyLibrary";
+import UploadedLibrary from "@components/page-container/pages/UploadedLibrary";
+import SpotifyLibrary from "@components/page-container/pages/SpotifyLibrary";
 import ErrorBoundary from "@components/utils/ErrorBoundary";
 
 export default function PageContainer() {
