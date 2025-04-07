@@ -1,5 +1,5 @@
 import PopupContentObject from "./PopupContentObject";
-import SpotifyOAuthService from "../../utils/services/SpotifyAuthService";
+import SpotifyOAuthService from "@utils/services/SpotifyOAuthService";
 
 /**
  * Popup content object for Spotify authentication errors

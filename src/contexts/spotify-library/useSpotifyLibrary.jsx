@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { SpotifyLibraryContext } from "./SpotifyLibraryContext";
 
-export function useSpotifyLibrary() {
+export function useSpotifyLibTracks() {
   return useContext(SpotifyLibraryContext);
 }

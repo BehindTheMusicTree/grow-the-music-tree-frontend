@@ -1,3 +1,6 @@
-export { default as RequestError } from "./RequestError";
-export { default as ConnectivityError } from "./ConnectivityError";
-export { default as UnauthorizedRequestError } from "./UnauthorizedRequestError";
+import RequestError from "./RequestError";
+import ConnectivityError from "./ConnectivityError";
+import UnauthorizedRequestError from "./UnauthorizedRequestError";
+import BadRequestError from "./BadRequestError";
+
+export { RequestError, ConnectivityError, UnauthorizedRequestError, BadRequestError };

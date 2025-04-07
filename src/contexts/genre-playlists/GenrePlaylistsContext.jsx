@@ -1,13 +1,18 @@
 import { createContext, useState, useEffect, useCallback, useRef } from "react";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
+import { usePopup } from "@contexts/popup/usePopup";
+import { useNotification } from "@contexts/notification/useNotification";
 
-import GenreService from "../../utils/services/GenreService";
-import BadRequestError from "../../utils/errors/BadRequestError";
-import UnauthorizedRequestError from "../../utils/errors/UnauthorizedRequestError";
-import InvalidInputContentObject from "../../models/popup-content-object/InvalidInputContentObject";
-import useSpotifyAuth from "../../hooks/useSpotifyAuth";
-import SpotifyTokenService from "../../utils/services/SpotifyService";
+import GenreService from "@utils/services/GenreService";
+import BadRequestError from "@utils/errors/BadRequestError";
+import UnauthorizedRequestError from "@utils/errors/UnauthorizedRequestError";
+import InvalidInputContentObject from "@models/popup-content-object/InvalidInputContentObject";
+import useSpotifyAuth from "@hooks/useSpotifyAuth";
+import SpotifyTokenService from "@utils/services/SpotifyTokenService";
+import ApiErrorPopupContentObject from "@models/popup-content-object/ApiErrorPopupContentObject";
+import ConnectivityErrorPopupContentObject from "@models/popup-content-object/ConnectivityErrorPopupContentObject";
+import SpotifyAuthErrorPopupContentObject from "@models/popup-content-object/SpotifyAuthErrorPopupContentObject";
 
 export const GenrePlaylistsContext = createContext();
 

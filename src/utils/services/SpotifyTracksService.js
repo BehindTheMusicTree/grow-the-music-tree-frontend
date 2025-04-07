@@ -1,11 +1,13 @@
-import ApiService from "../ApiService";
-import SpotifyTokenService from "./SpotifyService";
+import ApiService from "@utils/ApiService";
+import SpotifyTokenService from "@utils/services/SpotifyTokenService";
+import RequestError from "@utils/errors/RequestError";
+import UnauthorizedRequestError from "@utils/errors/UnauthorizedRequestError";
 
 /**
  * Service for fetching and managing Spotify tracks
  * Separates track functionality from authentication
  */
-export default class SpotifyTracksService {
+export default class spotifyLibTracksService {
   static SPOTIFY_SYNC_TIMESTAMP_KEY = "spotify_last_sync_timestamp";
 
   /**

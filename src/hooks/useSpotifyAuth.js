@@ -1,9 +1,10 @@
-import { useCallback } from "react";
-import { usePopup } from "../contexts/popup/usePopup";
+import { useState, useEffect, useCallback } from "react";
+import { usePopup } from "@contexts/popup/usePopup";
 import { useNotification } from "../contexts/notification/useNotification";
-import SpotifyTokenService from "../utils/services/SpotifyTokenService";
-import SpotifyOAuthService from "../utils/services/SpotifyOAuthService";
-import SpotifyAuthPopupContentObject from "../models/popup-content-object/SpotifyAuthPopupContentObject";
+import SpotifyTokenService from "@utils/services/SpotifyTokenService";
+import SpotifyOAuthService from "@utils/services/SpotifyOAuthService";
+import SpotifyAuthPopupContentObject from "@models/popup-content-object/SpotifyAuthPopupContentObject";
+import SpotifyAuthErrorPopupContentObject from "@models/popup-content-object/SpotifyAuthErrorPopupContentObject";
 
 /**
  * Hook for handling Spotify authentication

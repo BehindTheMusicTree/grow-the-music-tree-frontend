@@ -1,12 +1,12 @@
 import { useEffect } from "react";
-import { usePopup } from "../../contexts/popup/usePopup";
-import ApiService from "../../../utils/ApiService";
-import RequestError from "../../../utils/errors/RequestError";
-import ConnectivityError from "../../../utils/errors/ConnectivityError";
-import UnauthorizedRequestError from "../../../utils/errors/UnauthorizedRequestError";
-import ApiErrorPopupContentObject from "../../../models/popup-content-object/ApiErrorPopupContentObject";
-import ConnectivityErrorPopupContentObject from "../../../models/popup-content-object/ConnectivityErrorPopupContentObject";
-import SpotifyAuthErrorPopupContentObject from "../../../models/popup-content-object/SpotifyAuthErrorPopupContentObject";
+import { usePopup } from "@contexts/popup/usePopup";
+import ApiService from "@utils/ApiService";
+import RequestError from "@utils/errors/RequestError";
+import ConnectivityError from "@utils/errors/ConnectivityError";
+import UnauthorizedRequestError from "@utils/errors/UnauthorizedRequestError";
+import ApiErrorPopupContentObject from "@models/popup-content-object/ApiErrorPopupContentObject";
+import ConnectivityErrorPopupContentObject from "@models/popup-content-object/ConnectivityErrorPopupContentObject";
+import SpotifyAuthErrorPopupContentObject from "@models/popup-content-object/SpotifyAuthErrorPopupContentObject";
 
 const ApiErrorHandler = ({ children }) => {
   const { showPopup } = usePopup();

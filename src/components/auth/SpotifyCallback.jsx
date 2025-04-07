@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import SpotifyOAuthService from "../../utils/services/SpotifyAuthService";
-import SpotifyTokenService from "../../utils/services/SpotifyService";
+import SpotifyOAuthService from "@utils/services/SpotifyOAuthService";
+import SpotifyTokenService from "@utils/services/SpotifyTokenService";
 import { FaSpotify, FaRedo } from "react-icons/fa";
 
 export default function SpotifyCallback() {

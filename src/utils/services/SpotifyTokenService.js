@@ -1,6 +1,6 @@
 /**
  * Service for Spotify authentication and token management
- * Focused solely on auth, with track functionality moved to SpotifyTracksService
+ * Focused solely on auth, with track functionality moved to spotifyLibTracksService
  */
 
 export default class SpotifyTokenService {

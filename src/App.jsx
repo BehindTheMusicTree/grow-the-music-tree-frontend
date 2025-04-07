@@ -6,6 +6,7 @@ import { PageProvider } from "./contexts/page/PageContext";
 import { TrackListSidebarVisibilityProvider } from "./contexts/track-list-sidebar-visibility/TrackListSidebarVisibilityContext";
 import { GenrePlaylistsProvider } from "./contexts/genre-playlists/GenrePlaylistsContext";
 import { SpotifyLibraryProvider } from "./contexts/spotify-library/SpotifyLibraryContext";
+import { AuthProvider } from "@contexts/auth/AuthContext";
 
 import { usePlayer } from "./contexts/player/usePlayer";
 import { usePopup } from "./contexts/popup/usePopup";
@@ -114,24 +115,26 @@ function AuthenticatedApp() {
 export default function App() {
   return (
     <Router>
-      <ApiErrorHandler>
-        <PageProvider>
-          <TrackListSidebarVisibilityProvider>
-            <GenrePlaylistsProvider>
-              <SpotifyLibraryProvider>
-                <Routes>
-                  <Route path="/" element={<AuthenticatedApp />} />
-                  <Route path="/genre-playlists" element={<AuthenticatedApp />} />
-                  <Route path="/uploaded-library" element={<AuthenticatedApp />} />
-                  <Route path="/spotify-library" element={<AuthenticatedApp />} />
-                  <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
-                  <Route path="*" element={<NotFoundPage />} />
-                </Routes>
-              </SpotifyLibraryProvider>
-            </GenrePlaylistsProvider>
-          </TrackListSidebarVisibilityProvider>
-        </PageProvider>
-      </ApiErrorHandler>
+      <AuthProvider>
+        <ApiErrorHandler>
+          <PageProvider>
+            <TrackListSidebarVisibilityProvider>
+              <GenrePlaylistsProvider>
+                <SpotifyLibraryProvider>
+                  <Routes>
+                    <Route path="/" element={<AuthenticatedApp />} />
+                    <Route path="/genre-playlists" element={<AuthenticatedApp />} />
+                    <Route path="/uploaded-library" element={<AuthenticatedApp />} />
+                    <Route path="/spotify-library" element={<AuthenticatedApp />} />
+                    <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
+                    <Route path="*" element={<NotFoundPage />} />
+                  </Routes>
+                </SpotifyLibraryProvider>
+              </GenrePlaylistsProvider>
+            </TrackListSidebarVisibilityProvider>
+          </PageProvider>
+        </ApiErrorHandler>
+      </AuthProvider>
     </Router>
   );
 }
