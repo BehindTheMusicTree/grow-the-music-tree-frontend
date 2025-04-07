@@ -43,7 +43,7 @@ export default function UploadedLibrary() {
   };
 
   return (
-    <div className="library">
+    <div className="uploaded-library">
       <input type="file" ref={fileInputRef} style={{ display: "none" }} multiple onChange={handleFileChange} />
       <input
         type="file"
