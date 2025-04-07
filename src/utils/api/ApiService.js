@@ -1,11 +1,12 @@
-import config from "./config";
-import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "./constants";
-import RequestError from "./api/errors/RequestError";
-import BadRequestError from "./api/errors/BadRequestError";
-import UnauthorizedRequestError from "./api/errors/UnauthorizedRequestError";
-import InternalServerError from "./api/errors/InternalServerError";
-import ConnectivityError from "./api/errors/ConnectivityError";
-import SpotifyTokenService from "./services/SpotifyTokenService";
+import config from "../config";
+import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "../constants";
+import RequestError from "./errors/RequestError";
+import BadRequestError from "./errors/BadRequestError";
+import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
+import InternalServerError from "./errors/InternalServerError";
+import ConnectivityError from "./errors/ConnectivityError";
+import SpotifyTokenService from "../services/SpotifyTokenService";
+import ApiLogger from "./ApiLogger";
 
 /**
  * Core API service handling authentication, HTTP requests, and error management
@@ -398,14 +399,7 @@ export default class ApiService {
       const queryString = params ? `?${new URLSearchParams(params).toString()}` : "";
       const fullUrl = `${this.baseUrl}${url}${queryString}`;
 
-      console.log(`[API] GET Request:`, {
-        url: fullUrl,
-        params,
-        headers: {
-          ...headers,
-          Authorization: "Bearer [REDACTED]",
-        },
-      });
+      ApiLogger.logRequest("GET", fullUrl, params, headers);
 
       const response = await fetch(fullUrl, {
         method: "GET",
@@ -413,12 +407,7 @@ export default class ApiService {
       });
 
       const responseData = await response.json();
-      console.log(`[API] GET Response:`, {
-        url: fullUrl,
-        status: response.status,
-        statusText: response.statusText,
-        data: responseData,
-      });
+      ApiLogger.logResponse("GET", fullUrl, response.status, response.statusText, responseData);
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -432,11 +421,7 @@ export default class ApiService {
 
       return responseData;
     } catch (error) {
-      console.error(`[API] GET Error:`, {
-        url,
-        error: error.message,
-        stack: error.stack,
-      });
+      ApiLogger.logError("GET", url, error);
       throw error;
     }
   }
@@ -447,14 +432,7 @@ export default class ApiService {
       const headers = this.generateHeaders(token);
       const fullUrl = `${this.baseUrl}${url}`;
 
-      console.log(`[API] POST Request:`, {
-        url: fullUrl,
-        data,
-        headers: {
-          ...headers,
-          Authorization: "Bearer [REDACTED]",
-        },
-      });
+      ApiLogger.logRequest("POST", fullUrl, null, headers, data);
 
       const response = await fetch(fullUrl, {
         method: "POST",
@@ -463,12 +441,7 @@ export default class ApiService {
       });
 
       const responseData = await response.json();
-      console.log(`[API] POST Response:`, {
-        url: fullUrl,
-        status: response.status,
-        statusText: response.statusText,
-        data: responseData,
-      });
+      ApiLogger.logResponse("POST", fullUrl, response.status, response.statusText, responseData);
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -482,11 +455,7 @@ export default class ApiService {
 
       return responseData;
     } catch (error) {
-      console.error(`[API] POST Error:`, {
-        url,
-        error: error.message,
-        stack: error.stack,
-      });
+      ApiLogger.logError("POST", url, error);
       throw error;
     }
   }
@@ -497,14 +466,7 @@ export default class ApiService {
       const headers = this.generateHeaders(token);
       const fullUrl = `${this.baseUrl}${url}`;
 
-      console.log(`[API] PUT Request:`, {
-        url: fullUrl,
-        data,
-        headers: {
-          ...headers,
-          Authorization: "Bearer [REDACTED]",
-        },
-      });
+      ApiLogger.logRequest("PUT", fullUrl, null, headers, data);
 
       const response = await fetch(fullUrl, {
         method: "PUT",
@@ -513,12 +475,7 @@ export default class ApiService {
       });
 
       const responseData = await response.json();
-      console.log(`[API] PUT Response:`, {
-        url: fullUrl,
-        status: response.status,
-        statusText: response.statusText,
-        data: responseData,
-      });
+      ApiLogger.logResponse("PUT", fullUrl, response.status, response.statusText, responseData);
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -532,11 +489,7 @@ export default class ApiService {
 
       return responseData;
     } catch (error) {
-      console.error(`[API] PUT Error:`, {
-        url,
-        error: error.message,
-        stack: error.stack,
-      });
+      ApiLogger.logError("PUT", url, error);
       throw error;
     }
   }
@@ -547,13 +500,7 @@ export default class ApiService {
       const headers = this.generateHeaders(token);
       const fullUrl = `${this.baseUrl}${url}`;
 
-      console.log(`[API] DELETE Request:`, {
-        url: fullUrl,
-        headers: {
-          ...headers,
-          Authorization: "Bearer [REDACTED]",
-        },
-      });
+      ApiLogger.logRequest("DELETE", fullUrl, null, headers);
 
       const response = await fetch(fullUrl, {
         method: "DELETE",
@@ -561,12 +508,7 @@ export default class ApiService {
       });
 
       const responseData = await response.json();
-      console.log(`[API] DELETE Response:`, {
-        url: fullUrl,
-        status: response.status,
-        statusText: response.statusText,
-        data: responseData,
-      });
+      ApiLogger.logResponse("DELETE", fullUrl, response.status, response.statusText, responseData);
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -580,11 +522,7 @@ export default class ApiService {
 
       return responseData;
     } catch (error) {
-      console.error(`[API] DELETE Error:`, {
-        url,
-        error: error.message,
-        stack: error.stack,
-      });
+      ApiLogger.logError("DELETE", url, error);
       throw error;
     }
   }

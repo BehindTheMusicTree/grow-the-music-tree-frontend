@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import ApiService from "./ApiService";
-import ConnectivityError from "./errors/ConnectivityError";
-import ConnectivityErrorPopupContentObject from "../models/popup-content-object/ConnectivityErrorPopupContentObject";
-import config from "./config";
+import ConnectivityError from "../errors/ConnectivityError";
+import ConnectivityErrorPopupContentObject from "../../models/popup-content-object/ConnectivityErrorPopupContentObject";
+import config from "../config";
 
 describe("ApiService connectivity error handling", () => {
   let errorSubscriberMock;
