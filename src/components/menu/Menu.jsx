@@ -3,12 +3,12 @@ import { PiGraphLight } from "react-icons/pi";
 import { FaSpotify, FaSignOutAlt, FaExternalLinkAlt, FaCloudUploadAlt, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-import { usePage } from "../../contexts/page/usePage";
-import useSpotifyAuth from "../../hooks/useSpotifyAuth";
-import SpotifyTokenService from "../../utils/services/SpotifyTokenService.js";
-import { usePopup } from "../../contexts/popup/usePopup";
-import SpotifyAccountPopupContentObject from "../../models/popup-content-object/SpotifyAccountPopupContentObject.jsx";
-import { PAGE_TYPES } from "../../utils/constants";
+import { usePage } from "@contexts/page/usePage";
+import useSpotifyAuth from "@hooks/useSpotifyAuth";
+import SpotifyTokenService from "@utils/services/SpotifyTokenService";
+import { usePopup } from "@contexts/popup/usePopup";
+import SpotifyAccountPopupContentObject from "@models/popup-content-object/SpotifyAccountPopupContentObject";
+import { PAGE_TYPES } from "@utils/constants";
 
 export default function Menu() {
   const { page } = usePage();

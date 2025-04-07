@@ -1,11 +1,11 @@
-import { PAGE_TYPES } from "../../utils/constants";
-import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
-import { usePage } from "../../contexts/page/usePage";
-import TrackListSidebar from "./track-list-sidebar/TrackListSidebar";
-import GenresPlaylists from "./pages/genre-playlists/GenrePlaylists";
-import UploadedLibrary from "./pages/uploaded-library/UploadedLibrary";
-import SpotifyLibrary from "./pages/spotify-library/SpotifyLibrary";
-import ErrorBoundary from "../utils/ErrorBoundary";
+import { PAGE_TYPES } from "@utils/constants";
+import { useTrackListSidebarVisibility } from "@contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
+import { usePage } from "@contexts/page/usePage";
+import TrackListSidebar from "@components/page-container/track-list-sidebar/TrackListSidebar";
+import GenresPlaylists from "@components/page-container/pages/genre-playlists/GenrePlaylists";
+import UploadedLibrary from "@components/page-container/pages/uploaded-library/UploadedLibrary";
+import SpotifyLibrary from "@components/page-container/pages/spotify-library/SpotifyLibrary";
+import ErrorBoundary from "@components/utils/ErrorBoundary";
 
 export default function PageContainer() {
   const { page } = usePage();

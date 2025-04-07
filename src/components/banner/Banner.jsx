@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 
 import SearchForm from "./SearchForm";
-import logo from "../../assets/images/logos/umg-logo-maze-100.svg";
+import logo from "@assets/images/logos/umg-logo-maze-100.svg";
 
 export default function Banner({ setSearchSubmitted }) {
   return (
