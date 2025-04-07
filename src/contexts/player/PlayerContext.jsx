@@ -8,7 +8,7 @@ import UnauthorizedRequestError from "../../utils/errors/UnauthorizedRequestErro
 
 export const PlayerContext = createContext();
 
-function PlayerProvider({ children }) {
+export function PlayerProvider({ children }) {
   const [playerUploadedTrackObject, setPlayerUploadedTrackObject] = useState();
   const [stopProgressAnimationSignal, setStopProgressAnimationSignal] = useState(0);
   const [resetSeekSignal, setResetSeekSignal] = useState(0);
