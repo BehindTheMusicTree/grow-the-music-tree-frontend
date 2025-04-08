@@ -1,18 +1,20 @@
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import SpotifyTokenService from "@utils/services/SpotifyTokenService";
+import ApiTokenService from "@utils/services/ApiTokenService";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return SpotifyTokenService.hasValidSpotifyToken();
+    console.log("[AuthContext isAuthenticated] Checking token status");
+    return ApiTokenService.hasValidApiToken();
   });
   const checkIntervalRef = useRef(null);
   const lastCheckTimeRef = useRef(Date.now());
 
   const checkAuth = () => {
-    const isValid = SpotifyTokenService.hasValidSpotifyToken();
+    console.log("[AuthContext checkAuth] Checking token status");
+    const isValid = ApiTokenService.hasValidApiToken();
     setIsAuthenticated(isValid);
     lastCheckTimeRef.current = Date.now();
     return isValid;
@@ -25,8 +27,8 @@ export function AuthProvider({ children }) {
     }
 
     // Get token and expiry
-    const token = SpotifyTokenService.getSpotifyToken();
-    const expiryDate = SpotifyTokenService.getSpotifyTokenExpiry();
+    const token = ApiTokenService.getApiToken();
+    const expiryDate = ApiTokenService.getApiTokenExpiry();
 
     if (!token || !expiryDate) return;
 
@@ -68,13 +70,29 @@ export function AuthProvider({ children }) {
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
+    // Listen for storage events
+    const handleStorageChange = (e) => {
+      if (e.key === "spotify_auth_completed") {
+        checkAuth();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
     return () => {
       if (checkIntervalRef.current) {
         clearInterval(checkIntervalRef.current);
       }
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
+
+  const getToken = () => {
+    const token = ApiTokenService.getApiToken();
+    const expiryDate = ApiTokenService.getApiTokenExpiry();
+    return { token, expiryDate };
+  };
 
   return <AuthContext.Provider value={{ isAuthenticated, checkAuth }}>{children}</AuthContext.Provider>;
 }

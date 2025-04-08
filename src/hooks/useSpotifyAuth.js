@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { usePopup } from "@contexts/popup/usePopup";
 import { useNotification } from "@contexts/notification/useNotification";
-import SpotifyTokenService from "@utils/services/SpotifyTokenService";
+import ApiTokenService from "@utils/services/ApiTokenService";
 import SpotifyOAuthService from "@utils/services/SpotifyOAuthService";
 import SpotifyAuthPopupContentObject from "@models/popup-content-object/SpotifyAuthPopupContentObject";
 import SpotifyAuthErrorPopupContentObject from "@models/popup-content-object/SpotifyAuthErrorPopupContentObject";
@@ -19,7 +19,8 @@ export default function useSpotifyAuth() {
    * @returns {boolean} True if a valid token exists, false otherwise
    */
   const hasValidToken = useCallback(() => {
-    return SpotifyTokenService.hasValidSpotifyToken();
+    console.log("[useSpotifyAuth] Checking for valid token");
+    return ApiTokenService.hasValidApiToken();
   }, []);
 
   /**
@@ -67,6 +68,7 @@ export default function useSpotifyAuth() {
    */
   const checkTokenAndShowAuthIfNeeded = useCallback(
     (blocking = false) => {
+      console.log("[useSpotifyAuth checkTokenAndShowAuthIfNeeded] Checking token status");
       if (!hasValidToken()) {
         if (blocking) {
           showAuthPopup();

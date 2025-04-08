@@ -33,21 +33,30 @@ export default class GenreService {
   }
 
   static async getGenrePlaylists() {
+    console.log("[GenreService] Starting getGenrePlaylists request");
     let results = [];
     let page = 1;
     let hasMore = true;
 
-    while (hasMore) {
-      const data = await ApiService.fetchData("genre-playlists/", "GET", null, page);
-      results = results.concat(data.results);
+    try {
+      while (hasMore) {
+        console.log("[GenreService] Fetching page", page);
+        const data = await ApiService.fetchData("genre-playlists/", "GET", null, page);
+        console.log("[GenreService] Received data for page", page, data);
+        results = results.concat(data.results);
 
-      if (data.next) {
-        page++;
-      } else {
-        hasMore = false;
+        if (data.next) {
+          page++;
+        } else {
+          hasMore = false;
+        }
       }
-    }
 
-    return results;
+      console.log("[GenreService] Completed fetching all pages, total results:", results.length);
+      return results;
+    } catch (error) {
+      console.error("[GenreService] Error in getGenrePlaylists:", error);
+      throw error;
+    }
   }
 }

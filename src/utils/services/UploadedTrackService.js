@@ -1,6 +1,6 @@
 import config from "../config";
 import ApiService from "../api/ApiService";
-import SpotifyTokenService from "./SpotifyTokenService";
+import ApiTokenService from "./ApiTokenService";
 
 export default class UploadedTrackService {
   /**
@@ -12,7 +12,8 @@ export default class UploadedTrackService {
    */
   static async getUploadedTracks(page = 1, pageSize = 50, showErrors = true) {
     // Check token but don't throw - background operations will handle auth gracefully
-    if (!SpotifyTokenService.hasValidSpotifyToken()) {
+    console.log("[UploadedTrackService getUploadedTracks] Checking token status");
+    if (!ApiTokenService.hasValidApiToken()) {
       // Signal auth required but return empty data to prevent UI crashes
       return { results: [], count: 0, authentication_required: true };
     }
@@ -42,6 +43,9 @@ export default class UploadedTrackService {
   }
 
   static async uploadTrack(file, genreUuid, onProgress, badRequestCatched = false) {
+    if (!ApiTokenService.hasValidApiToken()) {
+      throw new Error("No valid API token available");
+    }
     const formData = new FormData();
     formData.append("file", file);
     if (genreUuid) {

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { usePage } from "@contexts/page/usePage";
 import useSpotifyAuth from "@hooks/useSpotifyAuth";
-import SpotifyTokenService from "@utils/services/SpotifyTokenService";
+import ApiTokenService from "@utils/services/ApiTokenService";
 import { usePopup } from "@contexts/popup/usePopup";
 import SpotifyAccountPopupContentObject from "@models/popup-content-object/SpotifyAccountPopupContentObject";
 import { PAGE_TYPES } from "@utils/constants";
@@ -20,8 +20,9 @@ export default function Menu() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("[Menu] Checking token status");
     if (hasValidToken()) {
-      const storedProfile = SpotifyTokenService.getSpotifyProfile();
+      const storedProfile = ApiTokenService.getApiProfile();
       setProfile(storedProfile);
     } else {
       setProfile(null);
@@ -50,7 +51,7 @@ export default function Menu() {
   };
 
   const handleSignOut = () => {
-    SpotifyTokenService.clearSpotifyAuth();
+    ApiTokenService.clearApiAuth();
     setShowUserMenu(false);
     // Force a re-render to trigger the auth popup
     window.location.reload();

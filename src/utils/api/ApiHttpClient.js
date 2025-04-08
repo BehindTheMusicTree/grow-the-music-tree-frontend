@@ -68,6 +68,7 @@ export default class ApiHttpClient {
     }
 
     try {
+      console.log("[ApiHttpClient fetchData] Checking token status");
       if (!ApiAuthHelper.hasValidToken()) {
         ApiAuthHelper.throwAuthError();
       }
@@ -167,7 +168,7 @@ export default class ApiHttpClient {
    */
   static async get(url, params = {}, badRequestCatched = false) {
     try {
-      const token = await ApiAuthHelper.getSpotifyToken();
+      const token = await ApiAuthHelper.getApiToken();
       const headers = ApiAuthHelper.generateHeaders(token);
       const queryString = params ? `?${new URLSearchParams(params).toString()}` : "";
       const fullUrl = `${this.baseUrl}${url}${queryString}`;
@@ -204,7 +205,7 @@ export default class ApiHttpClient {
    */
   static async post(url, data = {}, badRequestCatched = false) {
     try {
-      const token = await ApiAuthHelper.getSpotifyToken();
+      const token = await ApiAuthHelper.getApiToken();
       const headers = ApiAuthHelper.generateHeaders(token);
       const fullUrl = `${this.baseUrl}${url}`;
 
@@ -241,7 +242,7 @@ export default class ApiHttpClient {
    */
   static async put(url, data = {}, badRequestCatched = false) {
     try {
-      const token = await ApiAuthHelper.getSpotifyToken();
+      const token = await ApiAuthHelper.getApiToken();
       const headers = ApiAuthHelper.generateHeaders(token);
       const fullUrl = `${this.baseUrl}${url}`;
 
@@ -278,7 +279,7 @@ export default class ApiHttpClient {
    */
   static async delete(url, badRequestCatched = false) {
     try {
-      const token = await ApiAuthHelper.getSpotifyToken();
+      const token = await ApiAuthHelper.getApiToken();
       const headers = ApiAuthHelper.generateHeaders(token);
       const fullUrl = `${this.baseUrl}${url}`;
 

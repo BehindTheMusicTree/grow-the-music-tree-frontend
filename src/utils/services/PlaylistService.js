@@ -1,4 +1,4 @@
-import ApiService from "./ApiService";
+import ApiService from "../api/ApiService";
 
 class PlaylistService {
   static async listPlaylists() {

@@ -1,11 +1,11 @@
 import ApiService from "../api/ApiService";
-import SpotifyTokenService from "@utils/services/SpotifyTokenService";
+import ApiTokenService from "@utils/services/ApiTokenService";
 
 /**
  * Service for fetching and managing Spotify tracks
  * Separates track functionality from authentication
  */
-export default class SpotifyTracksService {
+export default class SpotifyLibTracksService {
   static SPOTIFY_SYNC_TIMESTAMP_KEY = "spotify_last_sync_timestamp";
 
   /**
@@ -32,9 +32,10 @@ export default class SpotifyTracksService {
    * @param {boolean} showErrors - Whether to show errors to the user
    * @returns {Promise<Object>} The library tracks data
    */
-  static async getLibTracks(page = 1, pageSize = 50, showErrors = true) {
+  static async listSpotifyLibTracks(page = 1, pageSize = 50, showErrors = true) {
     // Check token but don't throw - background operations will handle auth gracefully
-    if (!SpotifyTokenService.hasValidSpotifyToken()) {
+    console.log("[SpotifyLibTracksService getLibTracks] Checking token status");
+    if (!ApiTokenService.hasValidSpotifyToken()) {
       // Signal auth required but return empty data to prevent UI crashes
       return { results: [], count: 0, authentication_required: true };
     }
@@ -71,13 +72,14 @@ export default class SpotifyTracksService {
 
     try {
       // First check if we have valid token
-      if (!SpotifyTokenService.hasValidSpotifyToken()) {
+      console.log("[SpotifyLibTracksService syncInBackground] Checking token status");
+      if (!ApiTokenService.hasValidSpotifyToken()) {
         if (notifyError) notifyError("Authentication required");
         return;
       }
 
       // Perform the actual sync
-      const data = await this.getLibTracks(1, 50, false);
+      const data = await this.listSpotifyLibTracks(1, 50, false);
       if (notifySuccess) notifySuccess(data);
 
       return data;
@@ -92,7 +94,8 @@ export default class SpotifyTracksService {
 
     try {
       // First check if we have valid token
-      if (!SpotifyTokenService.hasValidSpotifyToken()) {
+      console.log("[SpotifyLibTracksService quickSync] Checking token status");
+      if (!ApiTokenService.hasValidSpotifyToken()) {
         if (notifyError) notifyError("Authentication required");
         return;
       }

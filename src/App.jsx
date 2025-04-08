@@ -42,6 +42,7 @@ function AuthenticatedApp() {
 
   // Function to check authentication status
   const checkAuth = () => {
+    console.log("[AuthenticatedApp checkAuth] Checking token status");
     const tokenValid = hasValidToken();
 
     // Track authentication state change for detecting sign-out
@@ -121,9 +122,9 @@ export default function App() {
   return (
     <Router>
       <AuthProvider>
-        <ApiErrorHandler>
-          <NotificationProvider>
-            <PopupProvider>
+        <NotificationProvider>
+          <PopupProvider>
+            <ApiErrorHandler>
               <PlayerProvider>
                 <TrackListProvider>
                   <UploadedTracksProvider>
@@ -146,9 +147,9 @@ export default function App() {
                   </UploadedTracksProvider>
                 </TrackListProvider>
               </PlayerProvider>
-            </PopupProvider>
-          </NotificationProvider>
-        </ApiErrorHandler>
+            </ApiErrorHandler>
+          </PopupProvider>
+        </NotificationProvider>
       </AuthProvider>
     </Router>
   );

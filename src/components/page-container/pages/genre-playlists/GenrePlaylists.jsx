@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "./tree/tree-constants";
 import { useGenrePlaylists } from "../../../../contexts/genre-playlists/useGenrePlaylists";
 import { GenreGettingAssignedNewParentProvider } from "../../../../contexts/genre-getting-assigned-new-parent/GenreGettingAssignedNewParentContext";
@@ -5,7 +6,11 @@ import { GenreGettingAssignedNewParentProvider } from "../../../../contexts/genr
 import GenrePlaylistsTree from "./tree/GenrePlaylistTree";
 
 export default function GenrePlaylists() {
-  const { groupedGenrePlaylists, handleGenreAddAction } = useGenrePlaylists();
+  const { groupedGenrePlaylists, handleGenreAddAction, setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
+
+  useEffect(() => {
+    setRefreshGenrePlaylistsSignal(1);
+  }, [setRefreshGenrePlaylistsSignal]);
 
   return (
     <GenreGettingAssignedNewParentProvider>

@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "@contexts/popup/usePopup";
 import SpotifyOAuthService from "@utils/services/SpotifyOAuthService";
-import SpotifyTokenService from "@utils/services/SpotifyTokenService";
+import ApiTokenService from "@utils/services/ApiTokenService";
 import SpotifyAuthErrorPopupContentObject from "@models/popup-content-object/SpotifyAuthErrorPopupContentObject";
 import { FaSpotify } from "react-icons/fa";
 
@@ -30,8 +30,8 @@ export default function SpotifyCallback() {
         throw new Error("No access token in response");
       }
 
-      // Store the token using SpotifyTokenService
-      SpotifyTokenService.saveSpotifyToken(
+      // Store the token using ApiTokenService
+      ApiTokenService.saveApiToken(
         tokenValue,
         3600, // 1 hour in seconds
         null, // No refresh token in this flow
@@ -39,7 +39,8 @@ export default function SpotifyCallback() {
       );
 
       // Check token status
-      const hasValidToken = SpotifyTokenService.hasValidSpotifyToken();
+      console.log("[SpotifyCallback] Checking token status");
+      const hasValidToken = ApiTokenService.hasValidApiToken();
       console.log("Has valid token:", hasValidToken);
 
       if (hasValidToken) {

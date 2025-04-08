@@ -3,9 +3,9 @@ import GenreService from "./GenreService";
 import NotificationService from "./NotificationService";
 import PlaylistService from "./PlaylistService";
 import UploadedTrackService from "./UploadedTrackService";
-import SpotifyTokenService from "./SpotifyTokenService";
-import SpotifyTracksService from "./SpotifyTracksService";
+import ApiTokenService from "./ApiTokenService";
 import SpotifyOAuthService from "./SpotifyOAuthService";
+import SpotifyLibTracksService from "./SpotifyLibTracksService";
 
 export {
   ApiService,
@@ -13,7 +13,7 @@ export {
   NotificationService,
   PlaylistService,
   UploadedTrackService,
-  SpotifyTokenService,
-  SpotifyTracksService,
+  ApiTokenService,
   SpotifyOAuthService,
+  SpotifyLibTracksService as SpotifyLibTracksService,
 };
