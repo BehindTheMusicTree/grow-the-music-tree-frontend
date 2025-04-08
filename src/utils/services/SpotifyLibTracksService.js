@@ -1,5 +1,4 @@
 import ApiService from "../api/ApiService";
-import ApiTokenService from "@utils/services/ApiTokenService";
 
 /**
  * Service for fetching and managing Spotify tracks
@@ -33,26 +32,32 @@ export default class SpotifyLibTracksService {
    * @returns {Promise<Object>} The library tracks data
    */
   static async listSpotifyLibTracks(page = 1, pageSize = 50, showErrors = true) {
-    // Check token but don't throw - background operations will handle auth gracefully
-    console.log("[SpotifyLibTracksService getLibTracks] Checking token status");
-    if (!ApiTokenService.hasValidSpotifyToken()) {
-      // Signal auth required but return empty data to prevent UI crashes
-      return { results: [], count: 0, authentication_required: true };
-    }
-
     try {
-      const data = await ApiService.fetchData(`library/spotify?page=${page}&pageSize=${pageSize}`, "GET");
+      // Let ApiService handle auth, but with a custom catch for graceful background operations
+      const data = await ApiService.fetchData(
+        `library/spotify?page=${page}&pageSize=${pageSize}`,
+        "GET",
+        null,
+        null,
+        null,
+        false,
+        true
+      );
 
       // Update sync timestamp on successful data retrieval
       this.updateSyncTimestamp();
 
       return data;
     } catch (error) {
-      if (showErrors) {
-        // Signal auth required if appropriate
-        if (error.statusCode === 401) {
-          return { results: [], count: 0, authentication_required: true };
-        }
+      // Special handling for background operations - don't show errors if not needed
+      if (error.name === "UnauthorizedRequestError" || error.statusCode === 401) {
+        return { results: [], count: 0, authentication_required: true };
+      }
+
+      // Only show other errors if explicitly requested
+      if (!showErrors) {
+        console.log("[SpotifyLibTracksService] Suppressing error:", error.message);
+        return { results: [], count: 0, error: error.message };
       }
 
       // Rethrow for components that want to handle errors directly
@@ -71,17 +76,9 @@ export default class SpotifyLibTracksService {
     if (notifyStart) notifyStart();
 
     try {
-      // First check if we have valid token
-      console.log("[SpotifyLibTracksService syncInBackground] Checking token status");
-      if (!ApiTokenService.hasValidSpotifyToken()) {
-        if (notifyError) notifyError("Authentication required");
-        return;
-      }
-
-      // Perform the actual sync
       const data = await this.listSpotifyLibTracks(1, 50, false);
-      if (notifySuccess) notifySuccess(data);
 
+      if (notifySuccess) notifySuccess(data);
       return data;
     } catch (error) {
       if (notifyError) notifyError(error.message || "Sync failed");
@@ -93,23 +90,20 @@ export default class SpotifyLibTracksService {
     if (notifyStart) notifyStart();
 
     try {
-      // First check if we have valid token
-      console.log("[SpotifyLibTracksService quickSync] Checking token status");
-      if (!ApiTokenService.hasValidSpotifyToken()) {
-        if (notifyError) notifyError("Authentication required");
-        return;
-      }
+      // Let ApiService handle auth checks
+      const response = await ApiService.fetchData("library/spotify/sync/quick/", "POST", null, null, null, false, true);
 
-      // Perform the actual sync
-      const response = await ApiService.fetchData("library/spotify/sync/quick/", "POST");
       if (notifySuccess) notifySuccess(response);
-
       return response;
     } catch (error) {
-      // Handle specific error cases
-      if (error.message.includes("Operation conflict")) {
+      // Keep special handling for Operation conflict errors
+      if (error.message && error.message.includes("Operation conflict")) {
         if (notifyError) notifyError("A sync is already in progress. Please wait for it to complete.");
+      } else if (error.name === "UnauthorizedRequestError") {
+        // Auth errors
+        if (notifyError) notifyError("Authentication required");
       } else {
+        // Other errors
         if (notifyError) notifyError(error.message || "Sync failed");
       }
 
