@@ -95,6 +95,24 @@ export default class ApiService {
     return hasToken;
   }
 
+  /**
+   * Centralized method to check authentication
+   * @throws {UnauthorizedRequestError} If not authenticated
+   */
+  static ensureAuthenticated() {
+    console.log("[ApiService ensureAuthenticated] Checking token status");
+    if (!this.hasValidToken()) {
+      console.log("[ApiService ensureAuthenticated] No valid token, throwing auth error");
+      throw new UnauthorizedRequestError({
+        message: "Authentication required",
+        details: {
+          type: "spotify_auth_required",
+          message: "Please authenticate with Spotify to continue",
+        },
+      });
+    }
+  }
+
   static throwAuthError() {
     return ApiAuthHelper.throwAuthError();
   }
@@ -139,8 +157,16 @@ export default class ApiService {
     return xhr;
   }
 
-  static async fetchData(endpoint, method, data = null, page = null, onProgress = null, badRequestCatched = false) {
-    console.log("[ApiService] Starting fetchData:", { endpoint, method, page });
+  static async fetchData(
+    endpoint,
+    method,
+    data = null,
+    page = null,
+    onProgress = null,
+    badRequestCatched = false,
+    requiresAuth = true
+  ) {
+    console.log("[ApiService] Starting fetchData:", { endpoint, method, page, requiresAuth });
     let url = `${config.apiBaseUrl}${endpoint}`;
     if (page) {
       url += `?page=${page}`;
@@ -148,10 +174,10 @@ export default class ApiService {
     console.log("[ApiService] Constructed URL:", url);
 
     try {
-      console.log("[ApiService] Checking token validity");
-      if (!this.hasValidToken()) {
-        console.log("[ApiService] No valid token, throwing auth error");
-        this.throwAuthError();
+      // Check auth if required
+      if (requiresAuth) {
+        console.log("[ApiService] Auth required, checking token validity");
+        this.ensureAuthenticated();
       }
 
       console.log("[ApiService] Getting XHR with headers");
@@ -223,6 +249,49 @@ export default class ApiService {
     }
   }
 
+  /**
+   * Centralized method to handle API connectivity errors
+   * @param {Error} error - The error that occurred
+   * @param {string} endpoint - The API endpoint that failed
+   * @param {string} method - The HTTP method that was used
+   * @param {string} fullUrl - The full URL that was requested
+   * @returns {ConnectivityError} - The connectivity error to throw
+   */
+  static handleApiConnectivityError(error, endpoint, method, fullUrl) {
+    // Check if it's a network error
+    if (error.message.includes("Failed to fetch") || error.name === "TypeError") {
+      const connectivityError = new ConnectivityError({
+        message: "Could not connect to the server",
+        url: fullUrl,
+        details: {
+          type: "connection_error",
+          message: "The server appears to be down or unreachable",
+        },
+      });
+
+      // Record error and notify subscribers if needed
+      this.handleError(error, endpoint, method);
+
+      return connectivityError;
+    }
+
+    // For server errors (404, 500+)
+    if (error.status === 404 || error.status >= 500) {
+      const requestError = new RequestError("ServerError", error.status, null, {
+        message: `Server error: ${error.status} ${error.statusText || ""}`,
+        url: fullUrl,
+      });
+
+      // Record error and notify subscribers if needed
+      this.handleError(requestError, endpoint, method);
+
+      return requestError;
+    }
+
+    // For other errors, just pass them through
+    return error;
+  }
+
   static async streamAudio(trackUrl) {
     console.log("[API] Streaming audio from:", trackUrl);
     const headers = await ApiService.getHeaders();
@@ -251,12 +320,18 @@ export default class ApiService {
     });
   }
 
-  static async get(url, params = {}, badRequestCatched = false) {
+  static async get(url, params = {}, badRequestCatched = false, requiresAuth = true) {
     console.log("[ApiService] ====== Starting GET request ======");
     console.log("[ApiService] URL:", url);
-    console.log("[ApiService] Params:", params);
+    console.log("[ApiService] Params:", params, "Requires Auth:", requiresAuth);
 
     try {
+      // Check auth if required
+      if (requiresAuth) {
+        console.log("[ApiService] Auth required, checking token validity");
+        this.ensureAuthenticated();
+      }
+
       console.log("[ApiService] Getting auth headers...");
       const headers = await ApiAuthHelper.getHeaders();
       console.log("[ApiService] Headers received:", { hasAuth: !!headers.Authorization });
@@ -302,29 +377,9 @@ export default class ApiService {
         // Extract endpoint from URL
         const endpoint = url.split("?")[0];
 
-        // Handle connection refused and other network errors
-        if (fetchError.message.includes("Failed to fetch") || fetchError.name === "TypeError") {
-          const connectivityError = new ConnectivityError({
-            message: "Could not connect to the server",
-            url: fullUrl,
-            details: {
-              type: "connection_error",
-              message: "The server appears to be down or unreachable",
-            },
-          });
-
-          // Check server status before notifying
-          const serverHandled = this.handleError(fetchError, endpoint, "GET");
-          if (!serverHandled) {
-            this.errorSubscribers.forEach((callback) => callback(connectivityError));
-          }
-
-          throw connectivityError;
-        }
-
-        // For other errors, also check server status
-        this.handleError(fetchError, endpoint);
-        throw fetchError;
+        // Use centralized error handling
+        const errorToThrow = this.handleApiConnectivityError(fetchError, endpoint, "GET", fullUrl);
+        throw errorToThrow;
       }
     } catch (error) {
       console.error("[ApiService] General error in GET request:", error);
@@ -333,8 +388,14 @@ export default class ApiService {
     }
   }
 
-  static async post(url, data = {}, badRequestCatched = false) {
+  static async post(url, data = {}, badRequestCatched = false, requiresAuth = true) {
     try {
+      // Check auth if required
+      if (requiresAuth) {
+        console.log("[ApiService] POST Auth required, checking token validity");
+        this.ensureAuthenticated();
+      }
+
       const headers = await ApiAuthHelper.getHeaders();
       const fullUrl = `${config.apiBaseUrl}${url}`;
 
@@ -377,22 +438,12 @@ export default class ApiService {
 
         return responseData;
       } catch (fetchError) {
-        // Handle connection refused and other network errors
-        if (fetchError.message.includes("Failed to fetch") || fetchError.name === "TypeError") {
-          const connectivityError = new ConnectivityError({
-            message: "Could not connect to the server",
-            url: fullUrl,
-            details: {
-              type: "connection_error",
-              message: "The server appears to be down or unreachable",
-            },
-          });
+        // Extract endpoint from URL
+        const endpoint = url.split("?")[0];
 
-          // Handle error and show popup (if not in cooldown)
-          this.handleError(connectivityError, url.split("?")[0], "POST");
-          throw connectivityError;
-        }
-        throw fetchError;
+        // Use centralized error handling
+        const errorToThrow = this.handleApiConnectivityError(fetchError, endpoint, "POST", fullUrl);
+        throw errorToThrow;
       }
     } catch (error) {
       ApiLogger.logError("POST", url, error);
@@ -400,8 +451,14 @@ export default class ApiService {
     }
   }
 
-  static async put(url, data = {}, badRequestCatched = false) {
+  static async put(url, data = {}, badRequestCatched = false, requiresAuth = true) {
     try {
+      // Check auth if required
+      if (requiresAuth) {
+        console.log("[ApiService] PUT Auth required, checking token validity");
+        this.ensureAuthenticated();
+      }
+
       const headers = await ApiAuthHelper.getHeaders();
       const fullUrl = `${config.apiBaseUrl}${url}`;
 
@@ -444,22 +501,12 @@ export default class ApiService {
 
         return responseData;
       } catch (fetchError) {
-        // Handle connection refused and other network errors
-        if (fetchError.message.includes("Failed to fetch") || fetchError.name === "TypeError") {
-          const connectivityError = new ConnectivityError({
-            message: "Could not connect to the server",
-            url: fullUrl,
-            details: {
-              type: "connection_error",
-              message: "The server appears to be down or unreachable",
-            },
-          });
+        // Extract endpoint from URL
+        const endpoint = url.split("?")[0];
 
-          // Handle error and show popup (if not in cooldown)
-          this.handleError(connectivityError, url.split("?")[0], "PUT");
-          throw connectivityError;
-        }
-        throw fetchError;
+        // Use centralized error handling
+        const errorToThrow = this.handleApiConnectivityError(fetchError, endpoint, "PUT", fullUrl);
+        throw errorToThrow;
       }
     } catch (error) {
       ApiLogger.logError("PUT", url, error);
@@ -467,8 +514,14 @@ export default class ApiService {
     }
   }
 
-  static async delete(url, badRequestCatched = false) {
+  static async delete(url, badRequestCatched = false, requiresAuth = true) {
     try {
+      // Check auth if required
+      if (requiresAuth) {
+        console.log("[ApiService] DELETE Auth required, checking token validity");
+        this.ensureAuthenticated();
+      }
+
       const headers = await ApiAuthHelper.getHeaders();
       const fullUrl = `${config.apiBaseUrl}${url}`;
 
@@ -510,22 +563,12 @@ export default class ApiService {
 
         return responseData;
       } catch (fetchError) {
-        // Handle connection refused and other network errors
-        if (fetchError.message.includes("Failed to fetch") || fetchError.name === "TypeError") {
-          const connectivityError = new ConnectivityError({
-            message: "Could not connect to the server",
-            url: fullUrl,
-            details: {
-              type: "connection_error",
-              message: "The server appears to be down or unreachable",
-            },
-          });
+        // Extract endpoint from URL
+        const endpoint = url.split("?")[0];
 
-          // Handle error and show popup (if not in cooldown)
-          this.handleError(connectivityError, url.split("?")[0], "DELETE");
-          throw connectivityError;
-        }
-        throw fetchError;
+        // Use centralized error handling
+        const errorToThrow = this.handleApiConnectivityError(fetchError, endpoint, "DELETE", fullUrl);
+        throw errorToThrow;
       }
     } catch (error) {
       ApiLogger.logError("DELETE", url, error);

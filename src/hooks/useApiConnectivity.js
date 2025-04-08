@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { usePopup } from "../contexts/popup/usePopup";
 import ConnectivityErrorPopupContentObject from "../models/popup-content-object/ConnectivityErrorPopupContentObject";
 import useAuthChangeHandler from "./useAuthChangeHandler";
+import useAuthState from "./useAuthState";
 
 /**
  * Custom hook for handling API connectivity issues
@@ -30,6 +31,9 @@ export default function useApiConnectivity({
   const { showPopup } = usePopup();
   const lastConnectivityErrorRef = useRef(0);
   const connectivityErrorCooldown = 30000; // 30 seconds cooldown for connectivity errors
+
+  // Get authentication state directly
+  const isAuthenticated = useAuthState();
 
   // Setup auth change handling
   const { handleStorageChange, handleVisibilityChange, registerListeners, checkAuthAndRefresh } = useAuthChangeHandler({
@@ -108,5 +112,6 @@ export default function useApiConnectivity({
     handleStorageChange,
     handleVisibilityChange,
     checkAuthAndRefresh,
+    isAuthenticated,
   };
 }
