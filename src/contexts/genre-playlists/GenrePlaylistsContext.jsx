@@ -31,19 +31,18 @@ function GenrePlaylistsProviderInner({ children, location }) {
   const isAuthenticated = useAuthState();
 
   // Declare all refs at the top of the component
-  const areGenrePlaylistsFetchingRef = useRef(false);
+  const isOperationInProgressRef = useRef(false);
   const lastAuthCheckRef = useRef(0);
   const lastRefreshTimeRef = useRef(0);
   const prevAuthStateRef = useRef(isAuthenticated);
-  const refreshInProgressRef = useRef(false);
 
   // Create safe version of refresh function
   const triggerRefresh = useCallback(() => {
-    if (!areGenrePlaylistsFetchingRef.current && !refreshInProgressRef.current) {
-      refreshInProgressRef.current = true;
+    if (!isOperationInProgressRef.current) {
+      isOperationInProgressRef.current = true;
       setRefreshGenrePlaylistsSignalRaw((prev) => prev + 1);
       setTimeout(() => {
-        refreshInProgressRef.current = false;
+        isOperationInProgressRef.current = false;
       }, 100);
     }
   }, []);
@@ -51,8 +50,7 @@ function GenrePlaylistsProviderInner({ children, location }) {
   // Setup API connectivity handling
   const { handleApiError } = useApiConnectivity({
     refreshCallback: triggerRefresh,
-    fetchingRef: areGenrePlaylistsFetchingRef,
-    refreshInProgressRef,
+    fetchingRef: isOperationInProgressRef,
   });
 
   // Define fetchGenrePlaylists before any effects that use it
@@ -67,14 +65,14 @@ function GenrePlaylistsProviderInner({ children, location }) {
       if (!directTokenCheck) {
         console.log("[GenrePlaylistsContext] No valid token, showing auth popup");
         setError("Authentication required");
-        areGenrePlaylistsFetchingRef.current = false;
+        isOperationInProgressRef.current = false;
         setRefreshGenrePlaylistsSignalRaw(0);
         checkTokenAndShowAuthIfNeeded(true);
         return;
       }
 
       console.log("[GenrePlaylistsContext] Setting fetching flag");
-      areGenrePlaylistsFetchingRef.current = true;
+      isOperationInProgressRef.current = true;
 
       console.log("[GenrePlaylistsContext] Calling GenreService.getGenrePlaylists");
       const genrePlaylists = await GenreService.getGenrePlaylists();
@@ -104,7 +102,7 @@ function GenrePlaylistsProviderInner({ children, location }) {
       }
     } finally {
       console.log("[GenrePlaylistsContext] Resetting fetching flag");
-      areGenrePlaylistsFetchingRef.current = false;
+      isOperationInProgressRef.current = false;
       setRefreshGenrePlaylistsSignalRaw(0);
     }
   }, [checkTokenAndShowAuthIfNeeded, handleApiError]);
@@ -112,20 +110,8 @@ function GenrePlaylistsProviderInner({ children, location }) {
   // Setup authentication handling and event listeners
   const { registerListeners, checkAuthAndRefresh } = useAuthChangeHandler({
     refreshCallback: triggerRefresh,
-    isFetchingRef: areGenrePlaylistsFetchingRef,
-    refreshInProgressRef: refreshInProgressRef,
+    isFetchingRef: isOperationInProgressRef,
   });
-
-  // Setup event listeners and perform initial auth check
-  useEffect(() => {
-    // Register auth event listeners for storage and visibility changes
-    const unregisterListeners = registerListeners();
-
-    // Initial auth check and data refresh if needed
-    checkAuthAndRefresh();
-
-    return unregisterListeners;
-  }, [registerListeners, checkAuthAndRefresh]);
 
   // React to changes in authentication state from the AuthContext
   useEffect(() => {
@@ -133,7 +119,7 @@ function GenrePlaylistsProviderInner({ children, location }) {
     prevAuthStateRef.current = isAuthenticated;
 
     // If user becomes authenticated, trigger a data refresh
-    if (isAuthenticated && !areGenrePlaylistsFetchingRef.current && !refreshInProgressRef.current) {
+    if (isAuthenticated && !isOperationInProgressRef.current) {
       triggerRefresh();
     }
   }, [isAuthenticated, triggerRefresh]);
@@ -149,18 +135,14 @@ function GenrePlaylistsProviderInner({ children, location }) {
 
     // Check if we have location state with authCompleted flag (from React Router)
     if (location?.state?.authCompleted) {
-      // Only process if token is valid and we're not already fetching and not in a refresh cycle
+      // Only process if token is valid and we're not already fetching
       console.log("[GenrePlaylistsContext useEffect] Checking token status");
-      if (
-        ApiTokenService.hasValidApiToken() &&
-        !areGenrePlaylistsFetchingRef.current &&
-        !refreshInProgressRef.current
-      ) {
-        refreshInProgressRef.current = true;
+      if (ApiTokenService.hasValidApiToken() && !isOperationInProgressRef.current) {
+        isOperationInProgressRef.current = true;
         setRefreshGenrePlaylistsSignalRaw((prev) => prev + 1);
         // Reset the flag after a delay to allow state to settle
         setTimeout(() => {
-          refreshInProgressRef.current = false;
+          isOperationInProgressRef.current = false;
         }, 100);
       }
     }
@@ -177,13 +159,8 @@ function GenrePlaylistsProviderInner({ children, location }) {
         return;
       }
 
-      // Only fetch if the signal is positive, component is mounted, not already fetching, and not in refresh cycle
-      if (
-        refreshGenrePlaylistsSignal > 0 &&
-        isMounted &&
-        !areGenrePlaylistsFetchingRef.current &&
-        !refreshInProgressRef.current
-      ) {
+      // Only fetch if the signal is positive, component is mounted, and not already fetching
+      if (refreshGenrePlaylistsSignal > 0 && isMounted && !isOperationInProgressRef.current) {
         lastRefreshTimeRef.current = now;
         await fetchGenrePlaylists();
       }
