@@ -88,12 +88,6 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  const getToken = () => {
-    const token = ApiTokenService.getApiToken();
-    const expiryDate = ApiTokenService.getApiTokenExpiry();
-    return { token, expiryDate };
-  };
-
   return <AuthContext.Provider value={{ isAuthenticated, checkAuth }}>{children}</AuthContext.Provider>;
 }
 
