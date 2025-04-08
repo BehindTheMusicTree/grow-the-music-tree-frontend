@@ -1,6 +1,5 @@
 import config from "../config";
 import ApiService from "../api/ApiService";
-import ApiTokenService from "./ApiTokenService";
 
 export default class UploadedTrackService {
   /**
@@ -8,18 +7,21 @@ export default class UploadedTrackService {
    * @param {number} page - The page number to fetch
    * @param {number} pageSize - The number of items per page
    * @param {boolean} showErrors - Whether to show errors to the user
+   * @param {boolean} requiresAuth - Whether authentication is required
    * @returns {Promise<Object>} The uploaded tracks data
    */
-  static async getUploadedTracks(page = 1, pageSize = 50, showErrors = true) {
-    // Check token but don't throw - background operations will handle auth gracefully
-    console.log("[UploadedTrackService getUploadedTracks] Checking token status");
-    if (!ApiTokenService.hasValidApiToken()) {
-      // Signal auth required but return empty data to prevent UI crashes
-      return { results: [], count: 0, authentication_required: true };
-    }
-
+  static async getUploadedTracks(page = 1, pageSize = 50, showErrors = true, requiresAuth = false) {
+    // Don't require auth by default - this allows background operations to handle auth failures gracefully
     try {
-      const data = await ApiService.fetchData(`library/uploaded/?page=${page}&pageSize=${pageSize}`, "GET");
+      const data = await ApiService.fetchData(
+        `library/uploaded/?page=${page}&pageSize=${pageSize}`,
+        "GET",
+        null,
+        null,
+        null,
+        false,
+        requiresAuth
+      );
       return data;
     } catch (error) {
       if (showErrors) {
@@ -39,19 +41,18 @@ export default class UploadedTrackService {
   }
 
   static async retrieveUploadedTrack(uploadedTrackUuid) {
-    return await ApiService.fetchData(`library/uploaded/${uploadedTrackUuid}/`, "GET", null, null);
+    // ApiService handles authentication
+    return await ApiService.fetchData(`library/uploaded/${uploadedTrackUuid}/`, "GET", null, null, null, false, true);
   }
 
   static async uploadTrack(file, genreUuid, onProgress, badRequestCatched = false) {
-    if (!ApiTokenService.hasValidApiToken()) {
-      throw new Error("No valid API token available");
-    }
+    // ApiService handles authentication
     const formData = new FormData();
     formData.append("file", file);
     if (genreUuid) {
       formData.append("genre", genreUuid); // API expects "genre" instead of "genreUuid"
     }
-    return await ApiService.fetchData("library/uploaded/", "POST", formData, null, onProgress, badRequestCatched);
+    return await ApiService.fetchData("library/uploaded/", "POST", formData, null, onProgress, badRequestCatched, true);
   }
 
   static transformTrackData(data) {
@@ -66,7 +67,16 @@ export default class UploadedTrackService {
 
   static async putUploadedTrack(uploadedTrackUuid, uploadedTrackData) {
     const transformedData = this.transformTrackData(uploadedTrackData);
-    return await ApiService.fetchData(`library/uploaded/${uploadedTrackUuid}/`, "PUT", transformedData, null);
+    // ApiService handles authentication
+    return await ApiService.fetchData(
+      `library/uploaded/${uploadedTrackUuid}/`,
+      "PUT",
+      transformedData,
+      null,
+      null,
+      false,
+      true
+    );
   }
 
   static async loadAudioAndGetUploadedTrackBlobUrl(uploadedTrackRelativeUrl) {
@@ -74,8 +84,8 @@ export default class UploadedTrackService {
       console.error("Cannot load audio: uploadedTrackRelativeUrl is undefined");
       throw new Error("Track URL is undefined");
     }
-    const headers = { Authorization: `Bearer ${ApiService.getToken().access}` };
-    const blob = await ApiService.streamAudio(`${config.apiBaseUrl}${uploadedTrackRelativeUrl}download/`, headers);
+    // ApiService will handle authentication internally
+    const blob = await ApiService.streamAudio(`${config.apiBaseUrl}${uploadedTrackRelativeUrl}download/`);
     return URL.createObjectURL(blob);
   }
 }

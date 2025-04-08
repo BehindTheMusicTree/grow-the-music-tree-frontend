@@ -118,50 +118,26 @@ export default class SpotifyLibTracksService {
   }
 
   static async getTrackDetails(trackId) {
-    try {
-      const response = await ApiService.get(`/spotify/tracks/${trackId}`);
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        throw new Error("Authentication required");
-      }
-      throw error;
-    }
+    // Use ApiService's centralized authentication check
+    const response = await ApiService.get(`/spotify/tracks/${trackId}`, {}, false, true);
+    return response.data;
   }
 
   static async getTrackFeatures(trackId) {
-    try {
-      const response = await ApiService.get(`/spotify/tracks/${trackId}/features`);
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        throw new Error("Authentication required");
-      }
-      throw error;
-    }
+    // Use ApiService's centralized authentication check
+    const response = await ApiService.get(`/spotify/tracks/${trackId}/features`, {}, false, true);
+    return response.data;
   }
 
   static async getTrackAnalysis(trackId) {
-    try {
-      const response = await ApiService.get(`/spotify/tracks/${trackId}/analysis`);
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        throw new Error("Authentication required");
-      }
-      throw error;
-    }
+    // Use ApiService's centralized authentication check
+    const response = await ApiService.get(`/spotify/tracks/${trackId}/analysis`, {}, false, true);
+    return response.data;
   }
 
   static async getTrackRecommendations(trackId) {
-    try {
-      const response = await ApiService.get(`/spotify/tracks/${trackId}/recommendations`);
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        throw new Error("Authentication required");
-      }
-      throw error;
-    }
+    // Use ApiService's centralized authentication check
+    const response = await ApiService.get(`/spotify/tracks/${trackId}/recommendations`, {}, false, true);
+    return response.data;
   }
 }
