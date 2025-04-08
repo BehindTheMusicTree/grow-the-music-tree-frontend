@@ -9,7 +9,6 @@ export function AuthProvider({ children }) {
     console.log("[AuthContext isAuthenticated] Checking token status");
     return ApiTokenService.hasValidApiToken();
   });
-  const checkIntervalRef = useRef(null);
   const lastCheckTimeRef = useRef(Date.now());
 
   const checkAuth = () => {
@@ -20,36 +19,9 @@ export function AuthProvider({ children }) {
     return isValid;
   };
 
-  const startPeriodicCheck = () => {
-    // Clear any existing interval
-    if (checkIntervalRef.current) {
-      clearInterval(checkIntervalRef.current);
-    }
-
-    // Get token and expiry
-    const token = ApiTokenService.getApiToken();
-    const expiryDate = ApiTokenService.getApiTokenExpiry();
-
-    if (!token || !expiryDate) return;
-
-    const now = Date.now();
-    const timeUntilExpiry = expiryDate.getTime() - now;
-
-    // If token is expired or will expire soon, check more frequently
-    if (timeUntilExpiry <= 0) {
-      checkIntervalRef.current = setInterval(checkAuth, 30000); // Every 30 seconds
-    } else if (timeUntilExpiry <= 300000) {
-      // Less than 5 minutes until expiry
-      checkIntervalRef.current = setInterval(checkAuth, 60000); // Every minute
-    } else {
-      checkIntervalRef.current = setInterval(checkAuth, 300000); // Every 5 minutes
-    }
-  };
-
   useEffect(() => {
     // Initial check
     checkAuth();
-    startPeriodicCheck();
 
     // Handle visibility changes
     const handleVisibilityChange = () => {
@@ -57,13 +29,6 @@ export function AuthProvider({ children }) {
         // If it's been more than 5 minutes since last check, check now
         if (Date.now() - lastCheckTimeRef.current > 300000) {
           checkAuth();
-        }
-        startPeriodicCheck();
-      } else {
-        // Clear interval when tab is not visible
-        if (checkIntervalRef.current) {
-          clearInterval(checkIntervalRef.current);
-          checkIntervalRef.current = null;
         }
       }
     };
@@ -80,9 +45,6 @@ export function AuthProvider({ children }) {
     window.addEventListener("storage", handleStorageChange);
 
     return () => {
-      if (checkIntervalRef.current) {
-        clearInterval(checkIntervalRef.current);
-      }
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("storage", handleStorageChange);
     };
