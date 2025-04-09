@@ -1,4 +1,4 @@
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "@contexts/AuthContext";
 
 /**
  * Custom hook that safely retrieves authentication state
