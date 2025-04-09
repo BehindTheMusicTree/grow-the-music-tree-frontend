@@ -1,125 +1,83 @@
-import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
-
-import { MdError, MdCheckCircle } from "react-icons/md";
+import { useState, useEffect } from "react";
+import { useUploadedTracks } from "@contexts/UploadedTrackContext";
 import { FaSpinner } from "react-icons/fa";
-
-import { useUploadedTracks } from "../../../contexts/uploaded-tracks/useUploadedTracks";
-import BadRequestError from "../../../utils/errors/BadRequestError";
+import PropTypes from "prop-types";
+import { MdError, MdCheckCircle } from "react-icons/md";
+import BadRequestError from "@utils/errors/BadRequestError";
 
 export default function TrackUploadPopupChild({ popupContentObject }) {
   const { postUploadedTrack, setRefreshUploadedTracksSignal } = useUploadedTracks();
   const [isPosting, setIsPosting] = useState(false);
-  const [filesUploadObjs, setFilesUploadObjs] = useState({});
-
-  const setFileUploadObjIsPosting = (filename, isPosting) => {
-    setFilesUploadObjs((prevFileUploadObj) => ({
-      ...prevFileUploadObj,
-      [filename]: { ...prevFileUploadObj[filename], isPosting: isPosting },
-    }));
-  };
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    if (popupContentObject && !isPosting) {
+    if (isPosting) {
+      const uploadTrack = async () => {
+        try {
+          await postUploadedTrack(popupContentObject.files[0], popupContentObject.genreUuid);
+          setSuccess(true);
+          setRefreshUploadedTracksSignal((prev) => !prev);
+        } catch (error) {
+          if (error instanceof BadRequestError) {
+            setError(error.message);
+          } else {
+            setError("An error occurred while uploading the track");
+          }
+        } finally {
+          setIsPosting(false);
+        }
+      };
+
+      uploadTrack();
+    }
+  }, [
+    isPosting,
+    popupContentObject.files,
+    popupContentObject.genreUuid,
+    postUploadedTrack,
+    setRefreshUploadedTracksSignal,
+  ]);
+
+  useEffect(() => {
+    if (popupContentObject.files && popupContentObject.files.length > 0) {
       setIsPosting(true);
     }
-  }, [popupContentObject]);
+  }, [popupContentObject.files]);
 
-  useEffect(() => {
-    async function handleUploadedTrackToPost(file, genreUuid) {
-      setFileUploadObjIsPosting(file.name, true);
-      try {
-        await postUploadedTrack(
-          file,
-          genreUuid,
-          (progress) => {
-            setFilesUploadObjs((prevFilesUploadObjs) => ({
-              ...prevFilesUploadObjs,
-              [file.name]: { ...prevFilesUploadObjs[file.name], progress },
-            }));
-          },
-          true
-        );
-        setFileUploadObjIsPosting(file.name, false);
-      } catch (error) {
-        if (error instanceof BadRequestError) {
-          setFilesUploadObjs((prevFileUploadObj) => ({
-            ...prevFileUploadObj,
-            [file.name]: { ...prevFileUploadObj[file.name], requestErrors: error.requestErrors },
-          }));
-        }
-        setFileUploadObjIsPosting(file.name, false);
-      }
-    }
-
-    async function handleUploadedTracksToPost(files, genreUuid) {
-      await Promise.allSettled(files.map((file) => handleUploadedTrackToPost(file, genreUuid)));
-    }
-
-    if (isPosting) {
-      popupContentObject.files.forEach((file) => {
-        setFilesUploadObjs((prevUploadObj) => ({
-          ...prevUploadObj,
-          [file.name]: { size: file.size, progress: 0, isPosting: false, requestErrors: {} },
-        }));
-      });
-      handleUploadedTracksToPost(popupContentObject.files, popupContentObject.genreUuid).then(() => {
-        setRefreshUploadedTracksSignal(1);
-        setIsPosting(false);
-      });
-    }
-  }, [isPosting]);
-
-  return (
-    <div>
-      <div>
-        <div>
-          {Object.entries(filesUploadObjs).map(([filename, uploadObj]) => {
-            return (
-              <div key={filename} className="h-8 flex items-center">
-                <div className="icon-container mr-2">
-                  {uploadObj.isPosting ? (
-                    <FaSpinner size={18} className="animate-spin fill-current text-gray-400" />
-                  ) : uploadObj.requestErrors.length > 0 ? (
-                    <MdError size={20} color="red" className="mr-1" />
-                  ) : (
-                    <MdCheckCircle size={20} color="green" className="mr-1" />
-                  )}
-                </div>
-                <div className="w-2/5 mr-4 text-overflow">{filename}</div>
-                <div className="center flex-grow mr-2">
-                  <div className="h-4 bg-gray-200 rounded-md overflow-hidden mr-4 relative">
-                    <div className="bg-blue-500 h-full" style={{ width: `${uploadObj.progress}%` }} />
-                    <div className="absolute inset-0 flex items-center justify-center text-sm text-white">
-                      {Math.round(uploadObj.progress)}%
-                    </div>
-                  </div>
-                  {uploadObj.requestErrors.length > 0 ? (
-                    <div>
-                      {uploadObj.requestErrors.map((fieldsErrors, errorIndex) => {
-                        return Object.entries(fieldsErrors).map(([fieldName, fieldErrors], index) => {
-                          return fieldErrors.map((fieldError, subIndex) => {
-                            return (
-                              <div key={`${fieldName}-${errorIndex}-${index}-${subIndex}`} className="text-left">
-                                {fieldError}
-                              </div>
-                            );
-                          });
-                        });
-                      })}
-                    </div>
-                  ) : null}
-                </div>
-                <div className="w-16">{(uploadObj.size / 1048576).toFixed(2)} Mo</div>
-              </div>
-            );
-          })}
-        </div>
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center p-4">
+        <MdError className="text-red-500 text-4xl mb-2" />
+        <p className="text-red-500 text-center">{error}</p>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (success) {
+    return (
+      <div className="flex flex-col items-center justify-center p-4">
+        <MdCheckCircle className="text-green-500 text-4xl mb-2" />
+        <p className="text-green-500 text-center">Track uploaded successfully!</p>
+      </div>
+    );
+  }
+
+  if (isPosting) {
+    return (
+      <div className="flex flex-col items-center justify-center p-4">
+        <FaSpinner className="text-[#1DB954] text-4xl mb-2 animate-spin" />
+        <p className="text-[#1DB954] text-center">Uploading track...</p>
+      </div>
+    );
+  }
+
+  return null;
 }
 
 TrackUploadPopupChild.propTypes = {
-  popupContentObject: PropTypes.object.isRequired,
+  popupContentObject: PropTypes.shape({
+    files: PropTypes.arrayOf(PropTypes.instanceOf(File)).isRequired,
+    genreUuid: PropTypes.string.isRequired,
+  }).isRequired,
 };

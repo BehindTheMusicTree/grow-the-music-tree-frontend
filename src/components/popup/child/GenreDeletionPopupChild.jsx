@@ -1,14 +1,21 @@
 import PropTypes from "prop-types";
-import { useGenrePlaylists } from "../../../contexts/genre-playlists/useGenrePlaylists";
-import Button from "../../utils/Button";
+import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
+import { usePopup } from "@contexts/PopupContext";
+import Button from "@components/utils/Button";
+import ApiErrorPopupContentObject from "@models/popup-content-object/ApiErrorPopupContentObject";
 
 export default function GenreDeletionPopupChild({ hide, popupContentObject }) {
   const { deleteGenre } = useGenrePlaylists();
+  const { showPopup } = usePopup();
   const { genre } = popupContentObject;
 
   const handleDeleteGenre = async () => {
-    await deleteGenre(genre.uuid);
-    hide();
+    const result = await deleteGenre(genre.uuid);
+    if (result.success) {
+      hide();
+    } else {
+      showPopup(new ApiErrorPopupContentObject(result.error));
+    }
   };
 
   return (

@@ -125,7 +125,7 @@ export function addActionsGroup(d3, genrePlaylist, genrePlaylistGroup, callbacks
     handlePlayPauseIconAction,
     fileInputRef,
     selectingFileGenreUuidRef,
-    handleGenreAddAction,
+    addGenre,
     setGenreGettingAssignedNewParent,
     renameGenre,
     showPopup,
@@ -196,9 +196,15 @@ export function addActionsGroup(d3, genrePlaylist, genrePlaylistGroup, callbacks
     .attr("fill", "RGBA(0, 0, 0, 0)");
 
   if (!isGenreless) {
-    const addChildActionOnclick = (event, d) => {
+    const addChildActionOnclick = async (event, d) => {
       genrePlaylistGroup.dispatch("mouseleave");
-      handleGenreAddAction(event, d.data.criteria.uuid);
+      const name = prompt("New genre name:");
+      if (name) {
+        const result = await addGenre(name, d.data.criteria.uuid);
+        if (!result.success) {
+          showPopup("Error", result.error.message);
+        }
+      }
     };
 
     addActionContainer(

@@ -3,30 +3,20 @@ import { PiGraphLight } from "react-icons/pi";
 import { FaSpotify, FaSignOutAlt, FaExternalLinkAlt, FaCloudUploadAlt, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-import { usePage } from "../../contexts/page/usePage";
-import useSpotifyAuth from "../../hooks/useSpotifyAuth";
-import SpotifyService from "../../utils/services/SpotifyService";
-import { usePopup } from "../../contexts/popup/usePopup";
-import SpotifyAccountPopupContentObject from "../../models/popup-content-object/SpotifyAccountPopupContentObject.jsx";
-import { PAGE_TYPES } from "../../utils/constants";
+import ApiTokenService from "@utils/services/ApiTokenService";
+import { PAGE_TYPES } from "@utils/constants";
+import { usePage } from "@contexts/PageContext";
+import { useAuthState } from "@contexts/AuthContext";
+import useSpotifyLogin from "@hooks/useSpotifyLogin";
 
 export default function Menu() {
+  const isAuthenticated = useAuthState();
   const { page } = usePage();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef(null);
-  const { login, hasValidToken } = useSpotifyAuth();
-  const [profile, setProfile] = useState(null);
-  const { showPopup } = usePopup();
+  const { login } = useSpotifyLogin();
+  const [profile] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (hasValidToken()) {
-      const storedProfile = SpotifyService.getSpotifyProfile();
-      setProfile(storedProfile);
-    } else {
-      setProfile(null);
-    }
-  }, [hasValidToken]);
 
   const handleUploadedLibraryClick = () => {
     navigate("/uploaded-library");
@@ -50,18 +40,16 @@ export default function Menu() {
   };
 
   const handleSignOut = () => {
-    SpotifyService.clearSpotifyAuth();
+    ApiTokenService.clearApiAuth();
     setShowUserMenu(false);
     // Force a re-render to trigger the auth popup
     window.location.reload();
   };
 
   const handleAccountClick = () => {
-    if (profile) {
-      const popup = new SpotifyAccountPopupContentObject(profile);
-      showPopup(popup);
-      setShowUserMenu(false);
-    }
+    // Navigate to dedicated account page without showing popup
+    setShowUserMenu(false);
+    navigate("/account");
   };
 
   // Close menu when clicking outside
@@ -132,7 +120,7 @@ export default function Menu() {
           }
         `}
         >
-          {hasValidToken() ? (
+          {isAuthenticated ? (
             <>
               {profile && (
                 <div

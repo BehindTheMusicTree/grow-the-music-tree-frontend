@@ -1,11 +1,12 @@
-import { PAGE_TYPES } from "../../utils/constants";
-import { useTrackListSidebarVisibility } from "../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
-import { usePage } from "../../contexts/page/usePage";
-import TrackListSidebar from "./track-list-sidebar/TrackListSidebar";
-import GenresPlaylists from "./pages/genre-playlists/GenrePlaylists";
-import UploadedLibrary from "./pages/uploaded-library/UploadedLibrary";
-import SpotifyLibrary from "./pages/spotify-library/SpotifyLibrary";
-import ErrorBoundary from "../utils/ErrorBoundary";
+import { PAGE_TYPES } from "@utils/constants";
+import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
+import { usePage } from "@contexts/PageContext";
+import TrackListSidebar from "@components/page-container/track-list-sidebar/TrackListSidebar";
+import GenresPlaylists from "@components/page-container/pages/genre-playlists/GenrePlaylists";
+import UploadedLibrary from "@components/page-container/pages/UploadedLibrary.jsx";
+import SpotifyLibrary from "@components/page-container/pages/SpotifyLibrary";
+import AccountPage from "@components/page-container/pages/AccountPage";
+import ErrorBoundary from "@components/utils/ErrorBoundary";
 
 export default function PageContainer() {
   const { page } = usePage();
@@ -21,6 +22,9 @@ export default function PageContainer() {
       break;
     case PAGE_TYPES.SPOTIFY_LIBRARY:
       pageComponent = <SpotifyLibrary />;
+      break;
+    case PAGE_TYPES.ACCOUNT:
+      pageComponent = <AccountPage />;
       break;
     default:
       pageComponent = <div>Page not found</div>;

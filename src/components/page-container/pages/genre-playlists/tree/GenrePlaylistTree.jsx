@@ -2,18 +2,20 @@ import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import * as d3 from "d3";
 
-import { usePopup } from "../../../../../contexts/popup/usePopup";
-import { useTrackList } from "../../../../../contexts/track-list/useTrackList";
-import { useGenrePlaylists } from "../../../../../contexts/genre-playlists/useGenrePlaylists";
-import { usePlayer } from "../../../../../contexts/player/usePlayer";
-import { useGenreGettingAssignedNewParent } from "../../../../../contexts/genre-getting-assigned-new-parent/useGenreGettingAssignedNewParent";
+import { usePopup } from "@contexts/PopupContext";
+import { useTrackList } from "@contexts/TrackListContext";
+import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
+import { usePlayer } from "@contexts/PlayerContext";
+import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssignedNewParentContext";
 
-import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "../../../../../utils/constants";
-import TrackUploadPopupContentObject from "../../../../../models/popup-content-object/TrackUploadPopupContentObject";
-import GenreDeletionPopupContentObject from "../../../../../models/popup-content-object/GenreDeletionPopupContentObject";
+import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "@utils/constants";
+import TrackUploadPopupContentObject from "@models/popup-content-object/TrackUploadPopupContentObject";
+import GenreDeletionPopupContentObject from "@models/popup-content-object/GenreDeletionPopupContentObject";
+import InvalidInputContentObject from "@models/popup-content-object/InvalidInputContentObject";
+import ApiErrorPopupContentObject from "@models/popup-content-object/ApiErrorPopupContentObject";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper.jsx";
-import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer";
+import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer.js";
 
 /**
  * Component that renders a D3 tree visualization of genre playlists
@@ -88,6 +90,20 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     // Transform coordinates for SVG
     const transformedTreeData = setupTreeLayout(d3, treeData, highestVerticalCoordinate);
 
+    const updateGenreParent = async (genreUuid, parentUuid) => {
+      const result = await updateGenreParent(genreUuid, parentUuid);
+      if (!result.success) {
+        showPopup(new ApiErrorPopupContentObject(result.error));
+      }
+    };
+
+    const renameGenre = async (genreUuid, newName) => {
+      const result = await renameGenre(genreUuid, newName);
+      if (!result.success) {
+        showPopup(new ApiErrorPopupContentObject(result.error));
+      }
+    };
+
     // Render the tree
     const svg = renderTree(d3, svgRef, transformedTreeData, width, height, {
       previousRenderingVisibleActionsContainerGenrePlaylist,
@@ -122,6 +138,12 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     previousRenderingVisibleActionsContainerGenrePlaylist,
     svgWidth,
     svgHeight,
+    handleGenreAddAction,
+    handlePlayPauseIconAction,
+    setGenreGettingAssignedNewParent,
+    updateGenreParent,
+    renameGenre,
+    showPopup,
   ]);
 
   return (

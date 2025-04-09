@@ -1,13 +1,16 @@
-import ApiService from "../ApiService";
+import ApiService from "../api/ApiService";
 
 export default class GenreService {
+  // Authentication is now handled by ApiService
+
   static async getGenres() {
+    // ApiService handles authentication and connectivity errors
     let results = [];
     let page = 1;
     let hasMore = true;
 
     while (hasMore) {
-      const data = await ApiService.fetchData("genres/", "GET", null, page);
+      const data = await ApiService.fetchData("genres/", "GET", null, page, null, false, true);
       results = results.concat(data.results);
 
       if (data.next) {
@@ -21,24 +24,31 @@ export default class GenreService {
   }
 
   static async postGenre(genreData) {
-    return await ApiService.fetchData("genres/", "POST", genreData, null);
+    // ApiService handles authentication and connectivity errors
+    return await ApiService.fetchData("genres/", "POST", genreData, null, null, false, true);
   }
 
   static async putGenre(genreUuid, genreData, badRequestCatched = false) {
-    return await ApiService.fetchData(`genres/${genreUuid}/`, "PUT", genreData, null, null, badRequestCatched);
+    // Pass badRequestCatched parameter directly to ApiService
+    // ApiService will handle authentication, connectivity, and badRequest errors
+    return await ApiService.fetchData(`genres/${genreUuid}/`, "PUT", genreData, null, null, badRequestCatched, true);
   }
 
   static async deleteGenre(genreUuid) {
-    return await ApiService.fetchData(`genres/${genreUuid}/`, "DELETE", null, null);
+    // ApiService handles authentication and connectivity errors
+    return await ApiService.fetchData(`genres/${genreUuid}/`, "DELETE", null, null, null, false, true);
   }
 
   static async getGenrePlaylists() {
+    // ApiService handles authentication and connectivity errors
     let results = [];
     let page = 1;
     let hasMore = true;
 
     while (hasMore) {
-      const data = await ApiService.fetchData("genre-playlists/", "GET", null, page);
+      console.log("[GenreService] Fetching page", page);
+      const data = await ApiService.fetchData("genre-playlists/", "GET", null, page, null, false, true);
+      console.log("[GenreService] Received data for page", page, data);
       results = results.concat(data.results);
 
       if (data.next) {
@@ -48,6 +58,7 @@ export default class GenreService {
       }
     }
 
+    console.log("[GenreService] Completed fetching all pages, total results:", results.length);
     return results;
   }
 }

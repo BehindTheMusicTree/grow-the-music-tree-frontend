@@ -2,10 +2,25 @@ import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import eslintPlugin from "vite-plugin-eslint";
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   envDir: "./env/to-load/",
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+      "@components": path.resolve(__dirname, "./src/components"),
+      "@utils": path.resolve(__dirname, "./src/utils"),
+      "@contexts": path.resolve(__dirname, "./src/contexts"),
+      "@hooks": path.resolve(__dirname, "./src/hooks"),
+      "@models": path.resolve(__dirname, "./src/models"),
+      "@assets": path.resolve(__dirname, "./src/assets"),
+      "@pages": path.resolve(__dirname, "./src/pages"),
+      "@routes": path.resolve(__dirname, "./src/routes"),
+      "@layouts": path.resolve(__dirname, "./src/layouts"),
+    },
+  },
   plugins: [
     react({
       babel: {
@@ -67,12 +82,6 @@ export default defineConfig({
     target: "esnext",
     supported: {
       "dynamic-import": true,
-    },
-  },
-  resolve: {
-    alias: {
-      "hoist-non-react-statics": "hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js",
-      // Removed direct ESM aliases for Sentry packages to fix source map issues
     },
   },
   css: {

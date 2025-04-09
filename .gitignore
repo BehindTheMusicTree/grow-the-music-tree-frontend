@@ -32,5 +32,4 @@ build/
 
 .env.sentry-build-plugin
 
-.DS_Store
 public/env-config.js

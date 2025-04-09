@@ -7,7 +7,7 @@ export default class ConnectivityErrorPopupContentObject extends PopupContentObj
     const connectivityIssueType = ConnectivityErrorPopupContentObject.detectConnectivityIssueType(errorObj);
 
     // Set title based on the detected issue type
-    const title = "API Connectivity Error";
+    const title = connectivityIssueType.title || "API Connectivity Error";
 
     super(title, "ConnectivityErrorPopupContentObject");
 
@@ -50,89 +50,75 @@ export default class ConnectivityErrorPopupContentObject extends PopupContentObj
     });
   }
 
-  // Static helper method to detect the specific type of connectivity issue
   static detectConnectivityIssueType(errorObj) {
-    // Check error message for common connectivity issue indicators
-    const errorMessage = (errorObj.details?.message || errorObj.message || "").toLowerCase();
-
-    // Check for server unreachability first
-    const unreachabilityIndicators = [
-      "failed to fetch",
-      "network error",
-      "connection refused",
-      "server unreachable",
-      "cannot connect to server",
-      "unable to connect",
-      "network request failed",
-      "status: (null)",
-      "status: null",
-      "status: 0",
-      "unable to reach",
-      "timeout",
-      "no such host",
-      "dns lookup failed",
-    ];
-
-    if (unreachabilityIndicators.some((indicator) => errorMessage.includes(indicator))) {
-      return {
-        type: "server_unreachable",
-        code: "server_unreachable",
-        defaultMessage: "Connection Failed",
-        detailsMessage:
-          "The application cannot establish a connection to the service. This typically happens when the service is unavailable, there are network issues, or your internet connection is interrupted.",
+    const issueTypes = {
+      server_not_found: {
+        type: "server_not_found",
+        code: "SERVER_NOT_FOUND",
+        title: "Server Not Available",
+        defaultMessage: "The server is not responding or the endpoint doesn't exist",
+        detailsMessage: "We couldn't reach the server or the requested endpoint.",
         troubleshootingSteps: [
-          "1. Check if the API server is running",
-          "2. Verify your internet connection",
-          "3. Check if the service is experiencing an outage",
-          "4. Wait a few minutes and try again",
-          "5. Contact support if the problem persists",
+          "Please try refreshing the page",
+          "Check if the server is running",
+          "Verify your internet connection",
+          "If the issue persists, the server might be down for maintenance",
         ],
-      };
-    }
-
-    // Check for CORS issues
-    const corsIndicators = [
-      "cors",
-      "cross-origin",
-      "access-control-allow-origin",
-      "same origin policy",
-      "requête multiorigine",
-      "politique same origin",
-      "cross-origin request",
-      "blocage d'une requête",
-    ];
-
-    if (corsIndicators.some((indicator) => errorMessage.includes(indicator))) {
-      return {
+      },
+      connection_error: {
+        type: "connection_error",
+        code: "CONNECTION_ERROR",
+        title: "Connection Error",
+        defaultMessage: "Could not connect to the server",
+        detailsMessage: "There was a problem connecting to the server.",
+        troubleshootingSteps: [
+          "Check your internet connection",
+          "Try refreshing the page",
+          "If using a VPN, try disabling it",
+          "Clear your browser cache and try again",
+        ],
+      },
+      cors_error: {
         type: "cors_error",
-        code: "cors_error",
-        defaultMessage: "Connection Access Restricted",
-        detailsMessage:
-          "The browser prevented the connection due to security restrictions. This is one type of connectivity issue that happens when a web page from one domain tries to access resources from another domain, but the server doesn't allow it (also known as a CORS issue).",
+        code: "CORS_ERROR",
+        title: "Cross-Origin Error",
+        defaultMessage: "Cross-Origin Request Blocked",
+        detailsMessage: "The browser blocked the request due to security restrictions.",
         troubleshootingSteps: [
-          "1. Check if the API server is running",
-          "2. Verify the API URL is correct in your environment configuration",
-          "3. Ensure the API server has CORS properly configured",
-          "4. Try refreshing the page",
-          "5. Check your network connection",
+          "Try refreshing the page",
+          "Clear your browser cache",
+          "If the issue persists, contact support",
         ],
-      };
+      },
+      default: {
+        type: "unknown",
+        code: "UNKNOWN_ERROR",
+        title: "Connection Error",
+        defaultMessage: "An unexpected error occurred while connecting to the server",
+        detailsMessage: "We encountered an unexpected error while trying to connect to the server.",
+        troubleshootingSteps: [
+          "Try refreshing the page",
+          "Check your internet connection",
+          "If the issue persists, contact support",
+        ],
+      },
+    };
+
+    // Check for specific error types
+    if (errorObj.details?.type === "server_not_found") {
+      return issueTypes.server_not_found;
     }
 
-    // Default to generic connectivity issue
-    return {
-      type: "connectivity_error",
-      code: "connectivity_error",
-      defaultMessage: "Network Connection Problem",
-      detailsMessage:
-        "The application is having trouble communicating with the service. This could be due to various reasons including network instability, service availability issues, or connection configuration problems.",
-      troubleshootingSteps: [
-        "1. Check if the API server is running",
-        "2. Verify your internet connection",
-        "3. Verify the API URL is correct in your environment configuration",
-        "4. Try refreshing the page",
-        "5. Contact support if the problem persists",
-      ],
-    };
+    if (errorObj.details?.type === "connection_error") {
+      return issueTypes.connection_error;
+    }
+
+    // Check for CORS errors
+    if (errorObj.message?.toLowerCase().includes("cors") || errorObj.message?.toLowerCase().includes("cross-origin")) {
+      return issueTypes.cors_error;
+    }
+
+    // Default case
+    return issueTypes.default;
   }
 }
