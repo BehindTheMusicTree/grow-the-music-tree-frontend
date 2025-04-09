@@ -1,8 +1,8 @@
 import TrackItem from "./TrackItem";
-import { capitalizeFirstLetter } from "../../../utils";
-import { useTrackList } from "../../../contexts/track-list/useTrackList";
-import { useTrackListSidebarVisibility } from "../../../contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
-import { TRACK_LIST_ORIGIN_TYPE } from "../../../utils/constants";
+import { capitalizeFirstLetter } from "@utils/capitalizeFirstLetter";
+import { useTrackList } from "@contexts/TrackListContext";
+import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
+import { TRACK_LIST_ORIGIN_TYPE } from "@utils/constants";
 
 export default function TrackListSidebar() {
   const { trackList, origin } = useTrackList();
