@@ -1,8 +1,7 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import SpotifyLibTracksService from "@utils/services/SpotifyLibTracksService";
 import ApiTokenService from "@utils/services/ApiTokenService";
-import useApiConnectivity from "@hooks/useApiConnectivity";
 import useSpotifyAuthActions from "@hooks/useSpotifyAuthActions";
 import useAuthState from "@hooks/useAuthState";
 
@@ -15,61 +14,45 @@ export function SpotifyLibraryProvider({ children }) {
   const checkTokenAndShowAuthIfNeeded = useSpotifyAuthActions();
   const isAuthenticated = useAuthState();
 
-  // Setup API connectivity handling
-  const { handleApiError } = useApiConnectivity({
-    fetchingRef: isOperationInProgressRef,
-    refreshInProgressRef: isOperationInProgressRef,
-  });
+  const fetchTracks = useCallback(async () => {
+    if (isOperationInProgressRef.current) {
+      return;
+    }
 
-  // Effect to fetch tracks when auth state changes
-  useEffect(() => {
-    let isMounted = true;
+    isOperationInProgressRef.current = true;
+    setError(null);
 
-    const fetchTracks = async () => {
-      if (!isMounted || isOperationInProgressRef.current) {
+    try {
+      const directTokenCheck = ApiTokenService.hasValidApiToken();
+
+      if (!directTokenCheck) {
+        setError("Authentication required");
+        isOperationInProgressRef.current = false;
+        checkTokenAndShowAuthIfNeeded(true);
         return;
       }
 
-      isOperationInProgressRef.current = true;
+      const tracksData = await SpotifyLibTracksService.getLibTracks();
+      setspotifyLibTracks(tracksData.results || []);
       setError(null);
+    } catch (error) {
+      console.error("Error fetching tracks:", error);
+      setError("Failed to load Spotify library tracks");
 
-      try {
-        const directTokenCheck = ApiTokenService.hasValidApiToken();
-
-        if (!directTokenCheck) {
-          setError("Authentication required");
-          isOperationInProgressRef.current = false;
-          checkTokenAndShowAuthIfNeeded(true);
-          return;
-        }
-
-        const tracksData = await SpotifyLibTracksService.getLibTracks();
-        setspotifyLibTracks(tracksData.results || []);
-        setError(null);
-      } catch (error) {
-        console.error("Error fetching tracks:", error);
-        const isConnectivityError = handleApiError(error, "/api/spotify/tracks");
-
-        if (!isConnectivityError) {
-          setError("Failed to load Spotify library tracks");
-        }
-
-        if (error.status === 401 || error.status === 403) {
-          checkTokenAndShowAuthIfNeeded(true);
-        }
-      } finally {
-        isOperationInProgressRef.current = false;
+      if (error.status === 401 || error.status === 403) {
+        checkTokenAndShowAuthIfNeeded(true);
       }
-    };
+    } finally {
+      isOperationInProgressRef.current = false;
+    }
+  }, [checkTokenAndShowAuthIfNeeded]);
 
+  // Effect to fetch tracks when auth state changes
+  useEffect(() => {
     if (isAuthenticated) {
       fetchTracks();
     }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [isAuthenticated, checkTokenAndShowAuthIfNeeded, handleApiError]);
+  }, [isAuthenticated, fetchTracks]);
 
   return (
     <SpotifyLibraryContext.Provider
