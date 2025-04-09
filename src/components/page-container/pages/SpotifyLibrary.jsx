@@ -1,28 +1,9 @@
-import { useState, useEffect } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { MdError } from "react-icons/md";
-import useSpotifyAuth from "@hooks/useSpotifyAuth";
 import { useSpotifyLibrary } from "@contexts//SpotifyLibraryContext";
 
 export default function SpotifyLibrary() {
-  const { spotifyLibTracks, error, setRefreshSignal } = useSpotifyLibrary();
-  const { checkTokenAndShowAuthIfNeeded } = useSpotifyAuth();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const initialize = async () => {
-      try {
-        await checkTokenAndShowAuthIfNeeded();
-        setRefreshSignal(1);
-      } catch (error) {
-        console.error("Error initializing Spotify library:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initialize();
-  }, [checkTokenAndShowAuthIfNeeded, setRefreshSignal]);
+  const { spotifyLibTracks, error, loading } = useSpotifyLibrary();
 
   if (loading) {
     return (
