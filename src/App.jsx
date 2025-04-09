@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 
 import { AuthProvider } from "@contexts/AuthContext";
-import { NotificationProvider } from "@contexts/notification/NotificationContext";
+import { NotificationProvider } from "@contexts/NotificationContext";
 import { PopupProvider } from "@contexts/popup/PopupContext";
 import { PlayerProvider } from "@contexts/player/PlayerContext";
 import { TrackListProvider } from "@contexts/track-list/TrackListContext";
