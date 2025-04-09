@@ -24,6 +24,11 @@ export default class SpotifyLibTracksService {
     return timestamp ? new Date(parseInt(timestamp)) : null;
   }
 
+  static async retrieveSpotifyLibTrack(trackId) {
+    const response = await ApiService.get(`/spotify/tracks/${trackId}`, {}, false, true);
+    return response.data;
+  }
+
   /**
    * Gets Spotify library tracks with background operation support
    * @param {number} page - The page number to fetch
@@ -85,10 +90,5 @@ export default class SpotifyLibTracksService {
         if (notifyError) notifyError(error.message || "Sync failed");
       }
     }
-  }
-
-  static async getTrackDetails(trackId) {
-    const response = await ApiService.get(`/spotify/tracks/${trackId}`, {}, false, true);
-    return response.data;
   }
 }
