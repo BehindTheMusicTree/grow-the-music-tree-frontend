@@ -14,6 +14,7 @@ export const PAGE_TYPES = {
   GENRE_PLAYLISTS: "GENRE_PLAYLISTS",
   UPLOADED_LIBRARY: "UPLOADED_LIBRARY",
   SPOTIFY_LIBRARY: "SPOTIFY_LIBRARY",
+  ACCOUNT: "ACCOUNT",
 };
 
 export const DUE_TO_PREVIOUS_ERROR_MESSAGE = "Error occurred during previous operation:";
