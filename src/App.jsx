@@ -1,98 +1,43 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useState } from "react";
+import { BrowserRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-import {
-  AuthProvider,
-  NotificationProvider,
-  PopupProvider,
-  PlayerProvider,
-  TrackListProvider,
-  UploadedTrackProvider,
-  PageProvider,
-  TrackListSidebarVisibilityProvider,
-  GenrePlaylistProvider,
-  SpotifyLibraryProvider,
-  usePlayer,
-  usePopup,
-} from "@contexts";
+import { AuthProvider } from "@contexts/AuthContext";
+import { PopupProvider } from "@contexts/PopupContext";
+import { UploadedTrackProvider } from "@contexts/UploadedTrackContext";
+import { GenrePlaylistProvider } from "@contexts/GenrePlaylistContext";
+import { ApiAuthenticatedProvider } from "@contexts/ApiAuthenticatedContext";
 
-import Banner from "@components/banner/Banner";
-import Menu from "@components/menu/Menu";
-import PageContainer from "@components/page-container/PageContainer";
-import Player from "@components/player/Player";
-import Popup from "@components/popup/Popup";
-import NotFoundPage from "@components/utils/NotFoundPage";
-import SpotifyCallback from "@components/auth/SpotifyCallback";
-import ApiErrorHandler from "@components/utils/ApiErrorHandler";
-import { Howler } from "howler";
+import AppRoutes from "./AppRoutes";
 
-Howler.autoUnlock = true;
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      cacheTime: 1000 * 60 * 30, // 30 minutes
+    },
+  },
+});
 
-/**
- * Main layout component that provides the application structure
- * Includes banner, menu, page container, player and popup components
- */
-function AppLayout() {
-  const { playerUploadedTrackObject } = usePlayer();
-  const { popupContentObject } = usePopup();
-  const [searchSubmitted, setSearchSubmitted] = useState("");
-
-  const centerMaxHeight = {
-    centerWithoutPlayer: "calc(100% - 100px)",
-    centerWithPlayer: "calc(100% - 180px)",
-  };
-
+function App() {
   return (
-    <div className="app flex flex-col h-screen">
-      <Banner className="fixed top-0 z-50" searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
-      <div
-        className="center bg-green-500 flex-grow flex overflow-y-auto"
-        style={{
-          maxHeight: playerUploadedTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
-        }}
-      >
-        <Menu />
-        <PageContainer />
-      </div>
-      {playerUploadedTrackObject && <Player />}
-      {popupContentObject && <Popup />}
-    </div>
-  );
-}
-
-export default function App() {
-  return (
-    <Router>
-      <AuthProvider>
-        <NotificationProvider>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
           <PopupProvider>
-            <ApiErrorHandler>
-              <PlayerProvider>
-                <TrackListProvider>
-                  <PageProvider>
-                    <TrackListSidebarVisibilityProvider>
-                      <GenrePlaylistProvider>
-                        <UploadedTrackProvider>
-                          <SpotifyLibraryProvider>
-                            <Routes>
-                              <Route path="/" element={<AppLayout />} />
-                              <Route path="/genre-playlists" element={<AppLayout />} />
-                              <Route path="/uploaded-library" element={<AppLayout />} />
-                              <Route path="/spotify-library" element={<AppLayout />} />
-                              <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
-                              <Route path="*" element={<NotFoundPage />} />
-                            </Routes>
-                          </SpotifyLibraryProvider>
-                        </UploadedTrackProvider>
-                      </GenrePlaylistProvider>
-                    </TrackListSidebarVisibilityProvider>
-                  </PageProvider>
-                </TrackListProvider>
-              </PlayerProvider>
-            </ApiErrorHandler>
+            <ApiAuthenticatedProvider contextName="app">
+              <UploadedTrackProvider>
+                <GenrePlaylistProvider>
+                  <AppRoutes />
+                </GenrePlaylistProvider>
+              </UploadedTrackProvider>
+            </ApiAuthenticatedProvider>
           </PopupProvider>
-        </NotificationProvider>
-      </AuthProvider>
-    </Router>
+        </AuthProvider>
+      </BrowserRouter>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }
+
+export default App;
