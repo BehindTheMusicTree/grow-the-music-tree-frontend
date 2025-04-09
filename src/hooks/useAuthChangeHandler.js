@@ -99,7 +99,6 @@ export default function useAuthChangeHandler({
     if (document.visibilityState === "visible") {
       // Update auth state if provided
       if (updateAuthStateCallback) {
-        console.log("[useAuthChangeHandler] Checking token status");
         const isTokenValid = ApiTokenService.hasValidApiToken();
         updateAuthStateCallback(isTokenValid);
         prevAuthStateRef.current = isTokenValid;
