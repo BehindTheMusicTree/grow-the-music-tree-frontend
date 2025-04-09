@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useGenrePlaylists } from "@contexts/genre-playlists/useGenrePlaylists";
+import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
 import { usePopup } from "@contexts/PopupContext";
 import Button from "@components/utils/Button";
 import ApiErrorPopupContentObject from "@models/popup-content-object/ApiErrorPopupContentObject";

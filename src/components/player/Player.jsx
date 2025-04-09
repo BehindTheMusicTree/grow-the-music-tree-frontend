@@ -6,7 +6,7 @@ import { FaPlay, FaPause, FaStepForward, FaStepBackward } from "react-icons/fa";
 
 import { PLAY_STATES } from "@utils/constants";
 import { usePlayer } from "@contexts/PlayerContext";
-import { useTrackList } from "@contexts/track-list/useTrackList";
+import { useTrackList } from "@contexts/TrackListContext";
 import { useTrackListSidebarVisibility } from "@contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
 
 import albumCover from "@assets/images/album-cover-default.png";
