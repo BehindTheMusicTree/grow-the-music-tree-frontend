@@ -3,31 +3,23 @@ import { PiGraphLight } from "react-icons/pi";
 import { FaSpotify, FaSignOutAlt, FaExternalLinkAlt, FaCloudUploadAlt, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-import { usePage } from "@contexts/PageContext";
-import useSpotifyAuth from "@hooks/useSpotifyAuth";
 import ApiTokenService from "@utils/services/ApiTokenService";
-import { usePopup } from "@contexts/PopupContext";
-import SpotifyAccountPopupContentObject from "@models/popup-content-object/SpotifyAccountPopupContentObject";
 import { PAGE_TYPES } from "@utils/constants";
+import { usePage } from "@contexts/PageContext";
+import { usePopup } from "@contexts/PopupContext";
+import { useAuthState } from "@contexts/AuthContext";
+import useSpotifyLogin from "@hooks/useSpotifyLogin";
+import SpotifyAccountPopupContentObject from "@models/popup-content-object/SpotifyAccountPopupContentObject";
 
 export default function Menu() {
+  const isAuthenticated = useAuthState();
   const { page } = usePage();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef(null);
-  const { login, hasValidToken } = useSpotifyAuth();
-  const [profile, setProfile] = useState(null);
+  const { login } = useSpotifyLogin();
+  const [profile] = useState(null);
   const { showPopup } = usePopup();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    console.log("[Menu] Checking token status");
-    if (hasValidToken()) {
-      const storedProfile = ApiTokenService.getApiProfile();
-      setProfile(storedProfile);
-    } else {
-      setProfile(null);
-    }
-  }, [hasValidToken]);
 
   const handleUploadedLibraryClick = () => {
     navigate("/uploaded-library");
@@ -133,7 +125,7 @@ export default function Menu() {
           }
         `}
         >
-          {hasValidToken() ? (
+          {isAuthenticated ? (
             <>
               {profile && (
                 <div
