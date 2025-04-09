@@ -8,7 +8,7 @@ import UploadedTrackPositionPlayPause from "@components/utils/UploadedTrackPosit
 import { usePlayer } from "@contexts/PlayerContext";
 import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
-import { useUploadedTracks } from "@contexts/uploaded-tracks/useUploadedTracks";
+import { useUploadedTracks } from "@contexts/UploadedTrackContext";
 import TrackUploadPopupContentObject from "@models/popup-content-object/TrackUploadPopupContentObject";
 
 export default function UploadedLibrary() {
