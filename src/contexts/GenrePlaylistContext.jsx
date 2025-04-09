@@ -9,12 +9,12 @@ export const GenrePlaylistContext = createContext();
 export function useGenrePlaylists() {
   const context = useContext(GenrePlaylistContext);
   if (!context) {
-    throw new Error("useGenrePlaylists must be used within a GenrePlaylistsProvider");
+    throw new Error("useGenrePlaylists must be used within a GenrePlaylistProvider");
   }
   return context;
 }
 
-export function GenrePlaylistsProvider({ children }) {
+export function GenrePlaylistProvider({ children }) {
   const LOADING_KEY = "genrePlaylists";
   const { triggerRefresh, setLoading, getLoading } = useAuthenticatedDataRefreshSignal();
 
@@ -22,9 +22,11 @@ export function GenrePlaylistsProvider({ children }) {
   const [error, setError] = useState(null);
 
   const fetchGenrePlaylists = useCallback(async () => {
-    setLoading(LOADING_KEY, true);
-    setError(null);
+    if (getLoading(LOADING_KEY)) return;
+
     try {
+      setLoading(LOADING_KEY, true);
+      setError(null);
       const playlists = await GenreService.getGenrePlaylists();
       setGenrePlaylists(playlists);
     } catch (error) {
@@ -32,22 +34,70 @@ export function GenrePlaylistsProvider({ children }) {
     } finally {
       setLoading(LOADING_KEY, false);
     }
-  }, [setLoading]);
+  }, [getLoading, setLoading]);
 
   useEffect(() => {
     fetchGenrePlaylists();
-  }, [fetchGenrePlaylists, triggerRefresh]);
+  }, [fetchGenrePlaylists]);
 
-  const loading = getLoading(LOADING_KEY);
-  const setRefreshSignal = () => triggerRefresh(LOADING_KEY);
+  const addGenre = async (genreData) => {
+    try {
+      setError(null);
+      const newGenre = await GenreService.postGenre(genreData);
+      setGenrePlaylists((prev) => [...prev, newGenre]);
+      triggerRefresh(LOADING_KEY);
+      return newGenre;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    }
+  };
+
+  const updateGenre = async (genreUuid, genreData) => {
+    try {
+      setError(null);
+      const updatedGenre = await GenreService.putGenre(genreUuid, genreData);
+      setGenrePlaylists((prev) => prev.map((genre) => (genre.uuid === genreUuid ? updatedGenre : genre)));
+      triggerRefresh(LOADING_KEY);
+      return updatedGenre;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    }
+  };
+
+  const deleteGenre = async (genreUuid) => {
+    try {
+      setError(null);
+      await GenreService.deleteGenre(genreUuid);
+      setGenrePlaylists((prev) => prev.filter((genre) => genre.uuid !== genreUuid));
+      triggerRefresh(LOADING_KEY);
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    }
+  };
+
+  const getGenre = (genreUuid) => {
+    return genrePlaylists.find((genre) => genre.uuid === genreUuid);
+  };
+
+  const getGenrePlaylists = () => {
+    return genrePlaylists;
+  };
 
   return (
     <GenrePlaylistContext.Provider
       value={{
         genrePlaylists,
         error,
-        loading,
-        setRefreshSignal,
+        loading: getLoading(LOADING_KEY),
+        addGenre,
+        updateGenre,
+        deleteGenre,
+        getGenre,
+        getGenrePlaylists,
+        refreshGenrePlaylists: () => triggerRefresh(LOADING_KEY),
       }}
     >
       {children}
@@ -55,6 +105,6 @@ export function GenrePlaylistsProvider({ children }) {
   );
 }
 
-GenrePlaylistsProvider.propTypes = {
+GenrePlaylistProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };

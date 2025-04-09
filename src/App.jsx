@@ -9,7 +9,7 @@ import { TrackListProvider } from "@contexts/TrackListContext";
 import { UploadedTracksProvider } from "@contexts/UploadedTrackContext";
 import { PageProvider } from "@contexts/PageContext";
 import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVisibilityContext";
-import { GenrePlaylistsProvider } from "@contexts/GenrePlaylistContext";
+import { GenrePlaylistProvider } from "@contexts/GenrePlaylistContext";
 import { SpotifyLibraryProvider } from "@contexts/SpotifyLibraryContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { usePopup } from "@contexts/PopupContext";
@@ -69,7 +69,7 @@ export default function App() {
                   <UploadedTracksProvider>
                     <PageProvider>
                       <TrackListSidebarVisibilityProvider>
-                        <GenrePlaylistsProvider>
+                        <GenrePlaylistProvider>
                           <SpotifyLibraryProvider>
                             <Routes>
                               <Route path="/" element={<AppLayout />} />
@@ -80,7 +80,7 @@ export default function App() {
                               <Route path="*" element={<NotFoundPage />} />
                             </Routes>
                           </SpotifyLibraryProvider>
-                        </GenrePlaylistsProvider>
+                        </GenrePlaylistProvider>
                       </TrackListSidebarVisibilityProvider>
                     </PageProvider>
                   </UploadedTracksProvider>
