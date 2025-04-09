@@ -19,7 +19,6 @@ export default function useSpotifyAuth() {
    * @returns {boolean} True if a valid token exists, false otherwise
    */
   const hasValidToken = useCallback(() => {
-    console.log("[useSpotifyAuth] Checking for valid token");
     return ApiTokenService.hasValidApiToken();
   }, []);
 
