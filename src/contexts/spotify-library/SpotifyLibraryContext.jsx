@@ -1,27 +1,21 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useLocation } from "react-router-dom";
 import SpotifyLibTracksService from "@utils/services/SpotifyLibTracksService";
 import ApiTokenService from "@utils/services/ApiTokenService";
 import useApiConnectivity from "@hooks/useApiConnectivity";
 import useAuthChangeHandler from "@hooks/useAuthChangeHandler";
 import useSpotifyAuthActions from "@hooks/useSpotifyAuthActions";
 import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
+import useAuthState from "@hooks/useAuthState";
 
 export const SpotifyLibraryContext = createContext();
 
-// Wrapper component that provides location context
-function LocationAwareProvider({ children }) {
-  const location = useLocation();
-  return <SpotifyLibraryProviderInner location={location}>{children}</SpotifyLibraryProviderInner>;
-}
-
-// Inner provider that takes location as a prop
-function SpotifyLibraryProviderInner({ children, location }) {
+export function SpotifyLibraryProvider({ children }) {
   const [spotifyLibTracks, setspotifyLibTracks] = useState([]);
   const [error, setError] = useState(null);
 
   const { refreshSignal, setRefreshSignal, isOperationInProgressRef } = useAuthenticatedDataRefreshSignal();
+  const isAuthenticated = useAuthState();
   const checkTokenAndShowAuthIfNeeded = useSpotifyAuthActions();
 
   // Setup API connectivity handling
@@ -45,14 +39,12 @@ function SpotifyLibraryProviderInner({ children, location }) {
     return unregisterListeners;
   }, [registerListeners, checkAuthAndRefresh]);
 
-  // Effect to handle route changes or navigation state
+  // Initial data fetch
   useEffect(() => {
-    if (location?.state?.authCompleted) {
-      if (ApiTokenService.hasValidApiToken() && !isOperationInProgressRef.current) {
-        setRefreshSignal();
-      }
+    if (isAuthenticated) {
+      setRefreshSignal();
     }
-  }, [location, setRefreshSignal]);
+  }, [isAuthenticated, setRefreshSignal]);
 
   // Effect to fetch tracks when refreshSignal changes
   useEffect(() => {
@@ -115,27 +107,9 @@ function SpotifyLibraryProviderInner({ children, location }) {
   );
 }
 
-// Main provider component that handles both Router and non-Router contexts
-function SpotifyLibraryProvider({ children }) {
-  try {
-    // Try to render with location context
-    return <LocationAwareProvider>{children}</LocationAwareProvider>;
-  } catch (_) {
-    // If we're outside Router context, render without location
-    return <SpotifyLibraryProviderInner location={null}>{children}</SpotifyLibraryProviderInner>;
-  }
-}
-
-LocationAwareProvider.propTypes = {
+SpotifyLibraryProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
-
-SpotifyLibraryProviderInner.propTypes = {
-  children: PropTypes.node.isRequired,
-  location: PropTypes.object,
-};
-
-export { SpotifyLibraryProvider };
 
 export function useSpotifyLibrary() {
   const context = useContext(SpotifyLibraryContext);
