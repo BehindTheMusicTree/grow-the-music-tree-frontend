@@ -1,13 +1,13 @@
 import { createContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
-import { GenreService } from "../../utils/services";
-import { useAuthenticatedDataRefreshSignal } from "../../hooks/useAuthenticatedDataRefreshSignal";
-import useApiConnectivity from "../../hooks/useApiConnectivity";
-import useAuthChangeHandler from "../../hooks/useAuthChangeHandler";
-import useAuthState from "../../hooks/useAuthState";
-import useSpotifyAuthActions from "../../hooks/useSpotifyAuthActions";
-import ApiTokenService from "../../utils/services/ApiTokenService";
+import { GenreService } from "@utils/services";
+import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
+import useApiConnectivity from "@hooks/useApiConnectivity";
+import useAuthChangeHandler from "@hooks/useAuthChangeHandler";
+import useAuthState from "@hooks/useAuthState";
+import useSpotifyAuthActions from "@hooks/useSpotifyAuthActions";
+import ApiTokenService from "@utils/services/ApiTokenService";
 import BadRequestError from "@utils/errors/BadRequestError";
 
 export const GenrePlaylistsContext = createContext();
