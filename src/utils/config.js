@@ -1,6 +1,17 @@
-const getViteVar = (key) => {
+const getEnvVar = (key) => {
+  // Check Next.js environment variables first
+  const nextKey = `NEXT_PUBLIC_${key}`;
+  if (typeof process !== "undefined" && process.env && process.env[nextKey]) {
+    return process.env[nextKey];
+  }
+
+  // Fall back to Vite environment variables
   const viteKey = `VITE_${key}`;
-  return import.meta.env[viteKey] || null;
+  if (typeof import.meta !== "undefined" && import.meta.env && import.meta.env[viteKey]) {
+    return import.meta.env[viteKey];
+  }
+
+  return null;
 };
 
 // Extract API version from the API base URL
@@ -10,17 +21,17 @@ const extractApiVersion = (baseUrl) => {
   return versionMatch ? versionMatch[1] : null;
 };
 
-const apiBaseUrl = getViteVar("API_BASE_URL");
+const apiBaseUrl = getEnvVar("API_BASE_URL");
 
 const config = {
-  env: getViteVar("ENV"),
+  env: getEnvVar("ENV") || "development",
   apiVersion: extractApiVersion(apiBaseUrl),
   apiBaseUrl,
-  contactEmail: getViteVar("CONTACT_EMAIL"),
-  sentryIsActive: getViteVar("SENTRY_IS_ACTIVE"),
-  spotifyClientId: getViteVar("SPOTIFY_CLIENT_ID"),
-  spotifyRedirectUri: getViteVar("SPOTIFY_REDIRECT_URI"),
-  spotifyScope: getViteVar("SPOTIFY_SCOPE"),
+  contactEmail: getEnvVar("CONTACT_EMAIL"),
+  sentryIsActive: getEnvVar("SENTRY_IS_ACTIVE"),
+  spotifyClientId: getEnvVar("SPOTIFY_CLIENT_ID"),
+  spotifyRedirectUri: getEnvVar("SPOTIFY_REDIRECT_URI"),
+  spotifyScope: getEnvVar("SPOTIFY_SCOPE"),
 };
 
 export default config;

@@ -1,6 +1,9 @@
 import config from "@utils/config";
 import { DUE_TO_PREVIOUS_ERROR_MESSAGE } from "../constants";
 import RequestError from "./errors/RequestError";
+
+// Helper to check if code is running on the client side
+const isClient = typeof window !== "undefined";
 import BadRequestError from "./errors/BadRequestError";
 import UnauthorizedRequestError from "./errors/UnauthorizedRequestError";
 import ConnectivityError from "./errors/ConnectivityError";
@@ -133,6 +136,12 @@ export default class ApiService {
   }
 
   static async getXhr(url, method, data, page, onProgress) {
+    // Check if running on server side
+    if (!isClient) {
+      console.warn("[API] Attempted to create XMLHttpRequest on server side");
+      return null;
+    }
+
     const xhr = new XMLHttpRequest();
     xhr.responseType = "json";
     xhr.open(method, url, true);
@@ -180,8 +189,48 @@ export default class ApiService {
         this.ensureAuthenticated();
       }
 
+      // Use fetch API directly when on server side
+      if (!isClient) {
+        console.log("[ApiService] Running on server side, using fetch API");
+        const headers = await ApiAuthHelper.getHeaders();
+
+        try {
+          const response = await fetch(url, {
+            method,
+            headers,
+            body: data ? JSON.stringify(data) : undefined,
+          });
+
+          const responseData = await response.json();
+
+          if (!response.ok) {
+            console.log("[ApiService] Server-side fetch error:", response.status);
+            if (response.status === 401) {
+              throw new UnauthorizedRequestError("Unauthorized request");
+            }
+            if (response.status === 400 && !badRequestCatched) {
+              throw new BadRequestError(responseData);
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          return responseData;
+        } catch (fetchError) {
+          console.error("[ApiService] Server-side fetch error:", fetchError);
+          const endpoint = url.split("?")[0];
+          const errorToThrow = this.handleApiConnectivityError(fetchError, endpoint, method, url);
+          throw errorToThrow;
+        }
+      }
+
+      // Client-side: Use XHR for progress tracking and better browser compatibility
       console.log("[ApiService] Getting XHR with headers");
       const xhr = await ApiService.getXhr(url, method, data, page, onProgress);
+
+      if (!xhr) {
+        throw new Error("Failed to create XHR request - this may happen in server environments");
+      }
+
       console.log("[ApiService] XHR configured");
 
       return new Promise((resolve, reject) => {
@@ -324,6 +373,13 @@ export default class ApiService {
 
   static async streamAudio(trackUrl) {
     console.log("[API] Streaming audio from:", trackUrl);
+
+    // Cannot stream audio on server side
+    if (!isClient) {
+      console.warn("[API] Attempted to stream audio on server side");
+      return null;
+    }
+
     const headers = await ApiService.getHeaders();
     const response = await fetch(trackUrl, { headers });
 
