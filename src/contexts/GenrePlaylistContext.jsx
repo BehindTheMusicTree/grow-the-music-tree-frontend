@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { GenrePlaylistService } from "@utils/services";
-import { useAuthState } from "@contexts/AuthStateContext";
+import { useAuth } from "@contexts/AuthContext";
 
 export const GenrePlaylistContext = createContext();
 
@@ -16,7 +16,7 @@ export function useGenrePlaylists() {
 }
 
 export function GenrePlaylistProvider({ children }) {
-  const { isAuthenticated } = useAuthState();
+  const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
 
   const {
