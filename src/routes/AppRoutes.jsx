@@ -3,7 +3,7 @@ import NotFoundPage from "@components/utils/NotFoundPage";
 import SpotifyCallback from "@components/auth/SpotifyCallback";
 import { AppLayout } from "@layouts/AppLayout";
 
-export default function AppRoutes() {
+export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<AppLayout />} />
