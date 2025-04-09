@@ -6,10 +6,8 @@ import { useNavigate } from "react-router-dom";
 import ApiTokenService from "@utils/services/ApiTokenService";
 import { PAGE_TYPES } from "@utils/constants";
 import { usePage } from "@contexts/PageContext";
-import { usePopup } from "@contexts/PopupContext";
 import { useAuthState } from "@contexts/AuthContext";
 import useSpotifyLogin from "@hooks/useSpotifyLogin";
-import SpotifyAccountPopupContentObject from "@models/popup-content-object/SpotifyAccountPopupContentObject";
 
 export default function Menu() {
   const isAuthenticated = useAuthState();
@@ -18,7 +16,6 @@ export default function Menu() {
   const menuRef = useRef(null);
   const { login } = useSpotifyLogin();
   const [profile] = useState(null);
-  const { showPopup } = usePopup();
   const navigate = useNavigate();
 
   const handleUploadedLibraryClick = () => {
@@ -50,17 +47,9 @@ export default function Menu() {
   };
 
   const handleAccountClick = () => {
-    if (profile) {
-      // Show popup and navigate to account page
-      const popup = new SpotifyAccountPopupContentObject(profile);
-      showPopup(popup);
-      setShowUserMenu(false);
-      navigate("/account");
-    } else {
-      // Just navigate to account page if no profile
-      setShowUserMenu(false);
-      navigate("/account");
-    }
+    // Navigate to dedicated account page without showing popup
+    setShowUserMenu(false);
+    navigate("/account");
   };
 
   // Close menu when clicking outside
