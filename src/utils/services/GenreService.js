@@ -1,5 +1,4 @@
 import ApiService from "../api/ApiService";
-import config from "@utils/config";
 
 export default class GenreService {
   // Authentication is now handled by ApiService

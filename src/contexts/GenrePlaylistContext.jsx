@@ -2,7 +2,7 @@ import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { GenrePlaylistService } from "@utils/services";
+import { GenreService } from "@utils/services";
 import { useAuth } from "@contexts/AuthContext";
 
 export const GenrePlaylistContext = createContext();
@@ -25,26 +25,26 @@ export function GenrePlaylistProvider({ children }) {
     error,
   } = useQuery({
     queryKey: ["genrePlaylists"],
-    queryFn: () => GenrePlaylistService.getGenrePlaylists(),
+    queryFn: () => GenreService.getGenrePlaylists(),
     enabled: isAuthenticated,
   });
 
   const addGenreMutation = useMutation({
-    mutationFn: (genreData) => GenrePlaylistService.postGenre(genreData),
+    mutationFn: (genreData) => GenreService.postGenre(genreData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["genrePlaylists"] });
     },
   });
 
   const updateGenreMutation = useMutation({
-    mutationFn: ({ genreUuid, genreData }) => GenrePlaylistService.putGenre(genreUuid, genreData),
+    mutationFn: ({ genreUuid, genreData }) => GenreService.putGenre(genreUuid, genreData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["genrePlaylists"] });
     },
   });
 
   const deleteGenreMutation = useMutation({
-    mutationFn: (genreUuid) => GenrePlaylistService.deleteGenre(genreUuid),
+    mutationFn: (genreUuid) => GenreService.deleteGenre(genreUuid),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["genrePlaylists"] });
     },
