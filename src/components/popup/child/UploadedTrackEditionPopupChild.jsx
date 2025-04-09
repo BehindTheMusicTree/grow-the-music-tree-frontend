@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { UploadedTrackService } from "@utils/services";
 import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
-import { useTrackList } from "@contexts/track-list/useTrackList";
+import { useTrackList } from "@contexts/useTrackList";
 import { formatTime } from "@utils/formatting";
 import { FORM_RATING_NULL_VALUE } from "@utils/constants";
 import Rating from "@components/utils/Rating";
