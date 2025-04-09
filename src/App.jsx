@@ -6,7 +6,7 @@ import { NotificationProvider } from "@contexts/NotificationContext";
 import { PopupProvider } from "@contexts/PopupContext";
 import { PlayerProvider } from "@contexts/PlayerContext";
 import { TrackListProvider } from "@contexts/TrackListContext";
-import { UploadedTracksProvider } from "@contexts/UploadedTracksContext";
+import { UploadedTracksProvider } from "@contexts/UploadedTrackContext";
 import { PageProvider } from "@contexts/PageContext";
 import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVisibilityContext";
 import { GenrePlaylistsProvider } from "@contexts/GenrePlaylistContext";

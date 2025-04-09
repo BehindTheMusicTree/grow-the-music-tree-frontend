@@ -8,10 +8,10 @@ import useApiConnectivity from "@hooks/useApiConnectivity";
 import useAuthState from "@hooks/useAuthState";
 import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
 
-export const UploadedTracksContext = createContext();
+export const UploadedTrackContext = createContext();
 
 export function useUploadedTracks() {
-  const context = useContext(UploadedTracksContext);
+  const context = useContext(UploadedTrackContext);
   if (!context) {
     throw new Error("useUploadedTracks must be used within an UploadedTracksProvider");
   }
@@ -77,7 +77,7 @@ export function UploadedTracksProvider({ children }) {
   }
 
   return (
-    <UploadedTracksContext.Provider
+    <UploadedTrackContext.Provider
       value={{
         uploadedTracks,
         error,
@@ -90,7 +90,7 @@ export function UploadedTracksProvider({ children }) {
       }}
     >
       {children}
-    </UploadedTracksContext.Provider>
+    </UploadedTrackContext.Provider>
   );
 }
 
