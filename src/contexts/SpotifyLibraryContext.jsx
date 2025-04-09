@@ -1,12 +1,8 @@
-import { createContext, useState, useEffect, useContext, useCallback } from "react";
+import { createContext, useState, useContext, useCallback, useEffect } from "react";
 import PropTypes from "prop-types";
 
-import { SpotifyLibraryService } from "../utils/services";
-import useApiConnectivity from "../hooks/useApiConnectivity";
-import useAuthState from "../hooks/useAuthState";
-import { useAuthenticatedDataRefreshSignal } from "../hooks/useAuthenticatedDataRefreshSignal";
-import { handleApiError } from "../utils/apiErrorHandler";
-import { checkTokenAndShowAuthIfNeeded } from "../utils/authUtils";
+import { SpotifyLibTrackService } from "@utils/services";
+import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
 
 export const SpotifyLibraryContext = createContext();
 
@@ -19,54 +15,71 @@ export function useSpotifyLibrary() {
 }
 
 export function SpotifyLibraryProvider({ children }) {
-  const { isAuthenticated } = useAuthState();
-  const { checkApiConnectivity } = useApiConnectivity();
-  const { triggerRefresh } = useAuthenticatedDataRefreshSignal();
+  const LOADING_KEY = "spotifyLibrary";
+  const { triggerRefresh, setLoading, getLoading } = useAuthenticatedDataRefreshSignal();
 
-  const [spotifyLibrary, setSpotifyLibrary] = useState([]);
+  const [tracks, setTracks] = useState([]);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  const fetchSpotifyLibrary = useCallback(async () => {
-    if (!isAuthenticated) return;
-
+  const fetchTracks = useCallback(async () => {
+    setLoading(LOADING_KEY, true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-      await checkApiConnectivity();
-      await checkTokenAndShowAuthIfNeeded();
-
-      const response = await fetch("/api/spotify-library", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("spotify_access_token")}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setSpotifyLibrary(data);
+      const data = await SpotifyLibTrackService.getTracks();
+      setTracks(data);
     } catch (error) {
       setError(error.message);
-      handleApiError(error);
     } finally {
-      setLoading(false);
+      setLoading(LOADING_KEY, false);
     }
-  }, [isAuthenticated, checkApiConnectivity]);
+  }, [setLoading]);
+
+  const updateTrack = useCallback(
+    async (trackId, updates) => {
+      setLoading(LOADING_KEY, true);
+      setError(null);
+      try {
+        await SpotifyLibTrackService.updateTrack(trackId, updates);
+        triggerRefresh(LOADING_KEY);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(LOADING_KEY, false);
+      }
+    },
+    [setLoading, triggerRefresh]
+  );
+
+  const deleteTrack = useCallback(
+    async (trackId) => {
+      setLoading(LOADING_KEY, true);
+      setError(null);
+      try {
+        await SpotifyLibTrackService.deleteTrack(trackId);
+        triggerRefresh(LOADING_KEY);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(LOADING_KEY, false);
+      }
+    },
+    [setLoading, triggerRefresh]
+  );
 
   useEffect(() => {
-    fetchSpotifyLibrary();
-  }, [fetchSpotifyLibrary, triggerRefresh]);
+    fetchTracks();
+  }, [fetchTracks]);
+
+  const loading = getLoading(LOADING_KEY);
 
   return (
     <SpotifyLibraryContext.Provider
       value={{
-        spotifyLibrary,
+        tracks,
         error,
         loading,
-        setRefreshSignal: triggerRefresh,
+        updateTrack,
+        deleteTrack,
       }}
     >
       {children}
