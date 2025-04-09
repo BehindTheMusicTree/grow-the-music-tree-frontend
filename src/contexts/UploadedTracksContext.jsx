@@ -1,14 +1,12 @@
 import { createContext, useState, useEffect, useContext, useCallback } from "react";
 import PropTypes from "prop-types";
 
-import { UploadedTrackService } from "../utils/services";
-import { useGenrePlaylists } from "./GenrePlaylistsContext";
-import UnauthorizedRequestError from "../utils/errors/UnauthorizedRequestError";
-import useApiConnectivity from "../hooks/useApiConnectivity";
-import useAuthState from "../hooks/useAuthState";
-import { useAuthenticatedDataRefreshSignal } from "../hooks/useAuthenticatedDataRefreshSignal";
-import { handleApiError } from "../utils/apiErrorHandler";
-import { checkTokenAndShowAuthIfNeeded } from "../utils/authUtils";
+import { UploadedTrackService } from "@utils/services";
+import UnauthorizedRequestError from "@utils/errors/UnauthorizedRequestError";
+import { useGenrePlaylists } from "@context/GenrePlaylistsContext";
+import useApiConnectivity from "@hooks/useApiConnectivity";
+import useAuthState from "@hooks/useAuthState";
+import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
 
 export const UploadedTracksContext = createContext();
 
@@ -24,20 +22,20 @@ export function UploadedTracksProvider({ children }) {
   const { setRefreshGenrePlaylistsSignal = () => {} } = useGenrePlaylists() || {};
   const { isAuthenticated } = useAuthState();
   const { checkApiConnectivity } = useApiConnectivity();
-  const { triggerRefresh } = useAuthenticatedDataRefreshSignal();
+  const { triggerRefresh, refreshSignal, setLoading, getLoading } = useAuthenticatedDataRefreshSignal();
 
   const [uploadedTracks, setUploadedTracks] = useState([]);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const pageSize = 50;
 
   const fetchUploadedTracks = useCallback(async () => {
     if (!isAuthenticated) return;
+    if (getLoading("uploadedTracks")) return;
 
     try {
-      setLoading(true);
+      setLoading("uploadedTracks", true);
       setError(null);
       await checkApiConnectivity();
       await checkTokenAndShowAuthIfNeeded();
@@ -58,13 +56,13 @@ export function UploadedTracksProvider({ children }) {
       setError(error.message);
       handleApiError(error);
     } finally {
-      setLoading(false);
+      setLoading("uploadedTracks", false);
     }
-  }, [isAuthenticated, checkApiConnectivity]);
+  }, [isAuthenticated, checkApiConnectivity, getLoading, setLoading]);
 
   useEffect(() => {
     fetchUploadedTracks();
-  }, [fetchUploadedTracks, triggerRefresh]);
+  }, [fetchUploadedTracks, refreshSignal]);
 
   async function postUploadedTrack(file, genreUuid, onProgress, badRequestCatched) {
     if (!checkTokenAndShowAuthIfNeeded(true)) {
@@ -74,6 +72,7 @@ export function UploadedTracksProvider({ children }) {
     try {
       await UploadedTrackService.uploadTrack(file, genreUuid, onProgress, badRequestCatched);
       setRefreshGenrePlaylistsSignal(1);
+      triggerRefresh("uploadedTracks");
       return { success: true };
     } catch (error) {
       if (error instanceof UnauthorizedRequestError) {
@@ -94,12 +93,12 @@ export function UploadedTracksProvider({ children }) {
       value={{
         uploadedTracks,
         error,
-        loading,
+        loading: getLoading("uploadedTracks"),
         currentPage,
         setCurrentPage,
         hasMore,
         postUploadedTrack,
-        setRefreshSignal: triggerRefresh,
+        refreshUploadedTracks: () => triggerRefresh("uploadedTracks"),
       }}
     >
       {children}
