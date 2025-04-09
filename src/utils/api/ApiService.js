@@ -257,6 +257,36 @@ export default class ApiService {
    * @param {string} fullUrl - The full URL that was requested
    * @returns {ConnectivityError} - The connectivity error to throw
    */
+  /**
+   * Centralized method to handle authentication errors specifically
+   * Provides customizable handling for background operations that need graceful errors
+   *
+   * @param {Error} error - The caught error to check
+   * @param {boolean} returnEmptyResults - If true, returns empty results object instead of throwing
+   * @returns {Object|null} Returns empty results object for background operations if specified
+   * @throws {Error} Rethrows the error if it's not an auth error or returnEmptyResults is false
+   */
+  static handleAuthError(error, returnEmptyResults = false) {
+    // Check if it's an authentication error
+    if (
+      error.name === "UnauthorizedRequestError" ||
+      error.statusCode === 401 ||
+      (error.response && error.response.status === 401)
+    ) {
+      // For background operations that need graceful handling
+      if (returnEmptyResults) {
+        console.log("[ApiService] Auth error handled gracefully for background operation");
+        return { results: [], count: 0, authentication_required: true };
+      }
+
+      // Otherwise rethrow the auth error
+      throw error;
+    }
+
+    // Not an auth error, just rethrow it
+    throw error;
+  }
+
   static handleApiConnectivityError(error, endpoint, method, fullUrl) {
     // Check if it's a network error
     if (error.message.includes("Failed to fetch") || error.name === "TypeError") {
