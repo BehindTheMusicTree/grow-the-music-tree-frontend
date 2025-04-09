@@ -1,87 +1,71 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useState, useEffect, useCallback, useRef } from "react";
 import PropTypes from "prop-types";
 
-import { GenreService } from "@utils/services";
-import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
-import useApiConnectivity from "@hooks/useApiConnectivity";
-import useAuthChangeHandler from "@hooks/useAuthChangeHandler";
-import useAuthState from "@hooks/useAuthState";
-import useSpotifyAuthActions from "@hooks/useSpotifyAuthActions";
-import ApiTokenService from "@utils/services/ApiTokenService";
+import GenreService from "@utils/services/GenreService";
 import BadRequestError from "@utils/errors/BadRequestError";
+import useAuthState from "@hooks/useAuthState";
 
 export const GenrePlaylistsContext = createContext();
 
-export function GenrePlaylistsProvider({ children }) {
-  const [genrePlaylists, setGenrePlaylists] = useState([]);
+function GenrePlaylistsProvider({ children }) {
+  const [groupedGenrePlaylists, setGroupedGenrePlaylists] = useState();
+  const [refreshGenrePlaylistsSignal, setRefreshGenrePlaylistsSignalRaw] = useState(0);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  const { refreshSignal, setRefreshSignal, isOperationInProgressRef } = useAuthenticatedDataRefreshSignal();
-  const isAuthenticated = useAuthState();
-  const checkTokenAndShowAuthIfNeeded = useSpotifyAuthActions();
+  const { isAuthenticated } = useAuthState();
 
-  // Setup API connectivity handling
-  const { handleApiError } = useApiConnectivity({
-    refreshCallback: setRefreshSignal,
-    fetchingRef: isOperationInProgressRef,
-    refreshInProgressRef: isOperationInProgressRef,
-  });
+  const isOperationInProgressRef = useRef(false);
+  const previousAuthStateRef = useRef(false);
 
-  // Setup authentication handling and event listeners
-  const { registerListeners, checkAuthAndRefresh } = useAuthChangeHandler({
-    refreshCallback: setRefreshSignal,
-    isFetchingRef: isOperationInProgressRef,
-    refreshInProgressRef: isOperationInProgressRef,
-  });
-
-  // Setup auth event listeners and perform initial auth check
-  useEffect(() => {
-    const unregisterListeners = registerListeners();
-    checkAuthAndRefresh();
-    return unregisterListeners;
-  }, [registerListeners, checkAuthAndRefresh]);
+  // Create safe version of refresh function
+  const triggerRefresh = useCallback(() => {
+    if (!isOperationInProgressRef.current) {
+      isOperationInProgressRef.current = true;
+      setRefreshGenrePlaylistsSignalRaw((prev) => prev + 1);
+      setTimeout(() => {
+        isOperationInProgressRef.current = false;
+      }, 100);
+    }
+  }, []);
 
   // Initial data fetch
   useEffect(() => {
     if (isAuthenticated) {
-      setRefreshSignal();
+      triggerRefresh();
     }
-  }, [isAuthenticated, setRefreshSignal]);
+  }, [isAuthenticated, triggerRefresh]);
+
+  const fetchGenrePlaylists = useCallback(async () => {
+    isOperationInProgressRef.current = true;
+    setError(null);
+
+    try {
+      const genrePlaylists = await GenreService.getGenrePlaylists();
+
+      if (genrePlaylists && genrePlaylists.length > 0) {
+        const grouped = getGenrePlaylistsGroupedByRoot(genrePlaylists);
+        setGroupedGenrePlaylists(grouped);
+      } else {
+        setGroupedGenrePlaylists({});
+      }
+    } catch (error) {
+      setError(error);
+      setGroupedGenrePlaylists({});
+    } finally {
+      isOperationInProgressRef.current = false;
+      setRefreshGenrePlaylistsSignalRaw(0);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchGenrePlaylists = async () => {
-      if (refreshSignal > 0 && !isOperationInProgressRef.current) {
-        isOperationInProgressRef.current = true;
-        setLoading(true);
-        setError(null);
-
-        try {
-          const directTokenCheck = ApiTokenService.hasValidApiToken();
-          if (!directTokenCheck) {
-            setError("Authentication required");
-            checkTokenAndShowAuthIfNeeded(true);
-            return;
-          }
-
-          const playlists = await GenreService.getGenrePlaylists();
-          setGenrePlaylists(playlists);
-          setError(null);
-        } catch (error) {
-          console.error("Error fetching genre playlists:", error);
-          const isConnectivityError = handleApiError(error, "/api/genres/playlists");
-          if (!isConnectivityError) {
-            setError("Failed to load genre playlists");
-          }
-        } finally {
-          setLoading(false);
-          isOperationInProgressRef.current = false;
-        }
-      }
-    };
-
-    fetchGenrePlaylists();
-  }, [refreshSignal, checkTokenAndShowAuthIfNeeded, handleApiError]);
+    if (
+      !isOperationInProgressRef.current &&
+      isAuthenticated &&
+      (!previousAuthStateRef.current || refreshGenrePlaylistsSignal)
+    ) {
+      fetchGenrePlaylists();
+    }
+  }, [isAuthenticated, fetchGenrePlaylists, refreshGenrePlaylistsSignal]);
 
   const addGenre = async (name, parentUuid) => {
     try {
@@ -89,7 +73,7 @@ export function GenrePlaylistsProvider({ children }) {
         name,
         parent: parentUuid,
       });
-      setRefreshSignal();
+      triggerRefresh();
       return { success: true };
     } catch (error) {
       return { success: false, error };
@@ -114,7 +98,7 @@ export function GenrePlaylistsProvider({ children }) {
       await GenreService.putGenre(genreUuid, {
         parent: parentUuid,
       });
-      setRefreshSignal();
+      triggerRefresh();
       return { success: true };
     } catch (error) {
       return { success: false, error };
@@ -130,7 +114,7 @@ export function GenrePlaylistsProvider({ children }) {
         },
         true
       );
-      setRefreshSignal();
+      triggerRefresh();
       return { success: true };
     } catch (error) {
       if (error instanceof BadRequestError) {
@@ -148,7 +132,7 @@ export function GenrePlaylistsProvider({ children }) {
   const deleteGenre = async (genreUuid) => {
     try {
       await GenreService.deleteGenre(genreUuid);
-      setRefreshSignal();
+      triggerRefresh();
       return { success: true };
     } catch (error) {
       return { success: false, error };
@@ -158,14 +142,13 @@ export function GenrePlaylistsProvider({ children }) {
   return (
     <GenrePlaylistsContext.Provider
       value={{
-        genrePlaylists,
+        groupedGenrePlaylists,
         addGenre,
-        setRefreshGenrePlaylistsSignal: setRefreshSignal,
+        setRefreshGenrePlaylistsSignal: triggerRefresh,
         updateGenreParent,
         renameGenre,
         deleteGenre,
         error,
-        loading,
       }}
     >
       {children}
@@ -176,3 +159,6 @@ export function GenrePlaylistsProvider({ children }) {
 GenrePlaylistsProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export { GenrePlaylistsProvider };
+export default GenrePlaylistsProvider;

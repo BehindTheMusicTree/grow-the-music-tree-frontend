@@ -3,9 +3,7 @@ import PropTypes from "prop-types";
 import SpotifyLibTracksService from "@utils/services/SpotifyLibTracksService";
 import ApiTokenService from "@utils/services/ApiTokenService";
 import useApiConnectivity from "@hooks/useApiConnectivity";
-import useAuthChangeHandler from "@hooks/useAuthChangeHandler";
 import useSpotifyAuthActions from "@hooks/useSpotifyAuthActions";
-import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
 import useAuthState from "@hooks/useAuthState";
 
 export const SpotifyLibraryContext = createContext();
@@ -13,45 +11,22 @@ export const SpotifyLibraryContext = createContext();
 export function SpotifyLibraryProvider({ children }) {
   const [spotifyLibTracks, setspotifyLibTracks] = useState([]);
   const [error, setError] = useState(null);
-
-  const { refreshSignal, setRefreshSignal, isOperationInProgressRef } = useAuthenticatedDataRefreshSignal();
-  const isAuthenticated = useAuthState();
+  const isOperationInProgressRef = { current: false };
   const checkTokenAndShowAuthIfNeeded = useSpotifyAuthActions();
+  const isAuthenticated = useAuthState();
 
   // Setup API connectivity handling
   const { handleApiError } = useApiConnectivity({
-    refreshCallback: setRefreshSignal,
     fetchingRef: isOperationInProgressRef,
     refreshInProgressRef: isOperationInProgressRef,
   });
 
-  // Setup authentication handling and event listeners
-  const { registerListeners, checkAuthAndRefresh } = useAuthChangeHandler({
-    refreshCallback: setRefreshSignal,
-    isFetchingRef: isOperationInProgressRef,
-    refreshInProgressRef: isOperationInProgressRef,
-  });
-
-  // Setup auth event listeners and perform initial auth check
-  useEffect(() => {
-    const unregisterListeners = registerListeners();
-    checkAuthAndRefresh();
-    return unregisterListeners;
-  }, [registerListeners, checkAuthAndRefresh]);
-
-  // Initial data fetch
-  useEffect(() => {
-    if (isAuthenticated) {
-      setRefreshSignal();
-    }
-  }, [isAuthenticated, setRefreshSignal]);
-
-  // Effect to fetch tracks when refreshSignal changes
+  // Effect to fetch tracks when auth state changes
   useEffect(() => {
     let isMounted = true;
 
     const fetchTracks = async () => {
-      if (refreshSignal <= 0 || !isMounted || isOperationInProgressRef.current) {
+      if (!isMounted || isOperationInProgressRef.current) {
         return;
       }
 
@@ -87,19 +62,25 @@ export function SpotifyLibraryProvider({ children }) {
       }
     };
 
-    fetchTracks();
+    if (isAuthenticated) {
+      fetchTracks();
+    }
 
     return () => {
       isMounted = false;
     };
-  }, [refreshSignal, checkTokenAndShowAuthIfNeeded, handleApiError]);
+  }, [isAuthenticated, checkTokenAndShowAuthIfNeeded, handleApiError]);
 
   return (
     <SpotifyLibraryContext.Provider
       value={{
         spotifyLibTracks,
         error,
-        setRefreshSignal,
+        refreshTracks: () => {
+          if (isAuthenticated) {
+            fetchTracks();
+          }
+        },
       }}
     >
       {children}

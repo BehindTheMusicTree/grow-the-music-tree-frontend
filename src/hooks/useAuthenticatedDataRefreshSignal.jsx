@@ -1,8 +1,19 @@
 import { useState, useCallback } from "react";
+import useApiConnectivity from "./useApiConnectivity";
+import useSpotifyAuthActions from "./useSpotifyAuthActions";
 
 export function useAuthenticatedDataRefreshSignal() {
   const [refreshSignal, setRefreshSignalRaw] = useState(0);
   const isOperationInProgressRef = { current: false };
+
+  const checkTokenAndShowAuthIfNeeded = useSpotifyAuthActions();
+
+  // Setup API connectivity handling
+  const { handleApiError } = useApiConnectivity({
+    refreshCallback: triggerRefresh,
+    fetchingRef: isOperationInProgressRef,
+    refreshInProgressRef: isOperationInProgressRef,
+  });
 
   const triggerRefresh = useCallback(() => {
     if (!isOperationInProgressRef.current) {
@@ -18,5 +29,7 @@ export function useAuthenticatedDataRefreshSignal() {
     refreshSignal,
     setRefreshSignal: triggerRefresh,
     isOperationInProgressRef,
+    handleApiError,
+    checkTokenAndShowAuthIfNeeded,
   };
 }

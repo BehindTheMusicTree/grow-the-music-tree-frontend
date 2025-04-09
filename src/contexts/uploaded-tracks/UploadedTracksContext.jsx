@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
 
 import { UploadedTrackService } from "../../utils/services";
@@ -27,8 +27,7 @@ export function UploadedTracksProvider({ children }) {
   const checkTokenAndShowAuthIfNeeded = useSpotifyAuthActions();
 
   // Setup API connectivity handling
-  const { handleApiError } = useApiConnectivity({
-    refreshCallback: setRefreshSignal,
+  const { handleApiError, refreshCallback } = useApiConnectivity({
     fetchingRef: isOperationInProgressRef,
     refreshInProgressRef: isOperationInProgressRef,
   });
@@ -54,6 +53,58 @@ export function UploadedTracksProvider({ children }) {
     }
   }, [isAuthenticated, setRefreshSignal]);
 
+  // Effect to fetch tracks when refreshCallback is triggered
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchTracks = async () => {
+      if (!isMounted || isOperationInProgressRef.current) {
+        return;
+      }
+
+      isOperationInProgressRef.current = true;
+      setError(null);
+      setLoading(true);
+
+      try {
+        const directTokenCheck = ApiTokenService.hasValidApiToken();
+
+        if (!directTokenCheck) {
+          setError("Authentication required");
+          isOperationInProgressRef.current = false;
+          setLoading(false);
+          checkTokenAndShowAuthIfNeeded(true);
+          return;
+        }
+
+        const tracksData = await UploadedTrackService.getUploadedTracks(currentPage, pageSize);
+        setUploadedTracks(tracksData.results || []);
+        setHasMore(tracksData.has_more || false);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching tracks:", error);
+        const isConnectivityError = handleApiError(error, "/api/library/uploaded");
+
+        if (!isConnectivityError) {
+          setError("Failed to load uploaded tracks");
+        }
+
+        if (error.status === 401 || error.status === 403) {
+          checkTokenAndShowAuthIfNeeded(true);
+        }
+      } finally {
+        isOperationInProgressRef.current = false;
+        setLoading(false);
+      }
+    };
+
+    fetchTracks();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [refreshCallback, currentPage, checkTokenAndShowAuthIfNeeded, handleApiError]);
+
   async function postUploadedTrack(file, genreUuid, onProgress, badRequestCatched) {
     if (!checkTokenAndShowAuthIfNeeded(true)) {
       return { success: false, authRequired: true };
@@ -77,84 +128,17 @@ export function UploadedTracksProvider({ children }) {
     }
   }
 
-  async function fetchUploadedTracks(page = 1, showErrors = true) {
-    try {
-      const directTokenCheck = ApiTokenService.hasValidApiToken();
-
-      if (!directTokenCheck) {
-        setError("Authentication required");
-        isOperationInProgressRef.current = false;
-        checkTokenAndShowAuthIfNeeded(true);
-        return;
-      }
-
-      setLoading(true);
-      const result = await UploadedTrackService.getUploadedTracks(page, pageSize, showErrors);
-
-      if (result.authRequired) {
-        setError("Authentication required");
-        checkTokenAndShowAuthIfNeeded(true);
-        return;
-      }
-
-      if (result.success) {
-        if (page === 1) {
-          setUploadedTracks(result.tracks);
-        } else {
-          setUploadedTracks((prev) => [...prev, ...result.tracks]);
-        }
-        setHasMore(result.tracks.length === pageSize);
-        setError(null);
-      } else {
-        if (!result.connectivityError) {
-          setError(result.error || "Failed to load tracks");
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching uploaded tracks:", error);
-      const isConnectivityError = handleApiError(error, "/api/library/uploaded");
-
-      if (error instanceof UnauthorizedRequestError) {
-        setError("Authentication required");
-        checkTokenAndShowAuthIfNeeded(true);
-      } else if (!isConnectivityError) {
-        setError("Failed to load tracks");
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const loadMore = () => {
-    if (!loading && hasMore) {
-      setCurrentPage((prev) => prev + 1);
-      fetchUploadedTracks(currentPage + 1);
-    }
-  };
-
-  useEffect(() => {
-    const fetchUploadedTracksAsync = async () => {
-      if (refreshSignal > 0 && !isOperationInProgressRef.current) {
-        isOperationInProgressRef.current = true;
-        setCurrentPage(1);
-        await fetchUploadedTracks(1);
-        isOperationInProgressRef.current = false;
-      }
-    };
-
-    fetchUploadedTracksAsync();
-  }, [refreshSignal]);
-
   return (
     <UploadedTracksContext.Provider
       value={{
         uploadedTracks,
-        postUploadedTrack,
-        setRefreshUploadedTracksSignal: setRefreshSignal,
         error,
         loading,
+        currentPage,
+        setCurrentPage,
         hasMore,
-        loadMore,
+        postUploadedTrack,
+        setRefreshSignal: refreshCallback,
       }}
     >
       {children}
@@ -165,3 +149,11 @@ export function UploadedTracksProvider({ children }) {
 UploadedTracksProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export function useUploadedTracks() {
+  const context = useContext(UploadedTracksContext);
+  if (!context) {
+    throw new Error("useUploadedTracks must be used within an UploadedTracksProvider");
+  }
+  return context;
+}
