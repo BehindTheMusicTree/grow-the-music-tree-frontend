@@ -1,7 +1,7 @@
 import { createContext, useState, useContext, useCallback, useEffect } from "react";
 import PropTypes from "prop-types";
 
-import { SpotifyLibTrackService } from "@utils/services";
+import { SpotifyLibTracksService } from "@utils/services";
 import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
 
 export const SpotifyLibraryContext = createContext();
@@ -25,7 +25,7 @@ export function SpotifyLibraryProvider({ children }) {
     setLoading(LOADING_KEY, true);
     setError(null);
     try {
-      const data = await SpotifyLibTrackService.getTracks();
+      const data = await SpotifyLibTracksService.getTracks();
       setTracks(data);
     } catch (error) {
       setError(error.message);
@@ -39,7 +39,7 @@ export function SpotifyLibraryProvider({ children }) {
       setLoading(LOADING_KEY, true);
       setError(null);
       try {
-        await SpotifyLibTrackService.updateTrack(trackId, updates);
+        await SpotifyLibTracksService.updateTrack(trackId, updates);
         triggerRefresh(LOADING_KEY);
       } catch (error) {
         setError(error.message);
@@ -55,7 +55,7 @@ export function SpotifyLibraryProvider({ children }) {
       setLoading(LOADING_KEY, true);
       setError(null);
       try {
-        await SpotifyLibTrackService.deleteTrack(trackId);
+        await SpotifyLibTracksService.deleteTrack(trackId);
         triggerRefresh(LOADING_KEY);
       } catch (error) {
         setError(error.message);
