@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
+
 import { AuthProvider } from "@contexts/AuthContext";
 import { PopupProvider } from "@contexts/PopupContext";
 import { UploadedTrackProvider } from "@contexts/UploadedTrackContext";
 import { GenrePlaylistProvider } from "@contexts/GenrePlaylistContext";
-import { ApiAuthenticatedProvider } from "@contexts/ApiAuthenticatedContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -22,9 +22,7 @@ export function AppLayout({ children }) {
       <AuthProvider>
         <PopupProvider>
           <UploadedTrackProvider>
-            <GenrePlaylistProvider>
-              <ApiAuthenticatedProvider>{children}</ApiAuthenticatedProvider>
-            </GenrePlaylistProvider>
+            <GenrePlaylistProvider>{children}</GenrePlaylistProvider>
           </UploadedTrackProvider>
         </PopupProvider>
       </AuthProvider>

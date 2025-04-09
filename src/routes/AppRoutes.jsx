@@ -1,31 +1,17 @@
 import { Routes, Route } from "react-router-dom";
-import { Home } from "@pages/Home";
-import { Upload } from "@pages/Upload";
-import { GenrePlaylists } from "@pages/GenrePlaylists";
-import { NotFound } from "@pages/NotFound";
-import { ProtectedRoute } from "@components/auth/ProtectedRoute";
+import NotFoundPage from "@components/utils/NotFoundPage";
+import SpotifyCallback from "@components/auth/SpotifyCallback";
+import { AppLayout } from "@layouts/AppLayout";
 
-export function AppRoutes() {
+export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route
-        path="/upload"
-        element={
-          <ProtectedRoute>
-            <Upload />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/genre-playlists"
-        element={
-          <ProtectedRoute>
-            <GenrePlaylists />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="*" element={<NotFound />} />
+      <Route path="/" element={<AppLayout />} />
+      <Route path="/genre-playlists" element={<AppLayout />} />
+      <Route path="/uploaded-library" element={<AppLayout />} />
+      <Route path="/spotify-library" element={<AppLayout />} />
+      <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
