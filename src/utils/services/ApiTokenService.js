@@ -85,7 +85,6 @@ export default class ApiTokenService {
   static hasValidApiToken() {
     const token = this.getApiToken();
     const isValid = !!token;
-    console.log("[ApiTokenService hasValidApiToken] Token validity check:", { isValid, exists: !!token });
     return isValid;
   }
 
