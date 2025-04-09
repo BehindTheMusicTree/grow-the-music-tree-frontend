@@ -31,38 +31,20 @@ export default class SpotifyLibTracksService {
    * @param {boolean} showErrors - Whether to show errors to the user
    * @returns {Promise<Object>} The library tracks data
    */
-  static async listSpotifyLibTracks(page = 1, pageSize = 50, showErrors = true) {
-    try {
-      // Let ApiService handle auth, but with a custom catch for graceful background operations
-      const data = await ApiService.fetchData(
-        `library/spotify?page=${page}&pageSize=${pageSize}`,
-        "GET",
-        null,
-        null,
-        null,
-        false,
-        true
-      );
+  static async listSpotifyLibTracks(page = 1, pageSize = 50) {
+    const data = await ApiService.fetchData(
+      `library/spotify?page=${page}&pageSize=${pageSize}`,
+      "GET",
+      null,
+      null,
+      null,
+      false,
+      true
+    );
 
-      // Update sync timestamp on successful data retrieval
-      this.updateSyncTimestamp();
+    this.updateSyncTimestamp();
 
-      return data;
-    } catch (error) {
-      // Special handling for background operations - don't show errors if not needed
-      if (error.name === "UnauthorizedRequestError" || error.statusCode === 401) {
-        return { results: [], count: 0, authentication_required: true };
-      }
-
-      // Only show other errors if explicitly requested
-      if (!showErrors) {
-        console.log("[SpotifyLibTracksService] Suppressing error:", error.message);
-        return { results: [], count: 0, error: error.message };
-      }
-
-      // Rethrow for components that want to handle errors directly
-      throw error;
-    }
+    return data;
   }
 
   /**
@@ -90,48 +72,23 @@ export default class SpotifyLibTracksService {
     if (notifyStart) notifyStart();
 
     try {
-      // Let ApiService handle auth checks
       const response = await ApiService.fetchData("library/spotify/sync/quick/", "POST", null, null, null, false, true);
 
       if (notifySuccess) notifySuccess(response);
       return response;
     } catch (error) {
-      // Keep special handling for Operation conflict errors
+      // Special handling for Operation conflict errors
       if (error.message && error.message.includes("Operation conflict")) {
         if (notifyError) notifyError("A sync is already in progress. Please wait for it to complete.");
-      } else if (error.name === "UnauthorizedRequestError") {
-        // Auth errors
-        if (notifyError) notifyError("Authentication required");
       } else {
         // Other errors
         if (notifyError) notifyError(error.message || "Sync failed");
       }
-
-      return null;
     }
   }
 
   static async getTrackDetails(trackId) {
-    // Use ApiService's centralized authentication check
     const response = await ApiService.get(`/spotify/tracks/${trackId}`, {}, false, true);
-    return response.data;
-  }
-
-  static async getTrackFeatures(trackId) {
-    // Use ApiService's centralized authentication check
-    const response = await ApiService.get(`/spotify/tracks/${trackId}/features`, {}, false, true);
-    return response.data;
-  }
-
-  static async getTrackAnalysis(trackId) {
-    // Use ApiService's centralized authentication check
-    const response = await ApiService.get(`/spotify/tracks/${trackId}/analysis`, {}, false, true);
-    return response.data;
-  }
-
-  static async getTrackRecommendations(trackId) {
-    // Use ApiService's centralized authentication check
-    const response = await ApiService.get(`/spotify/tracks/${trackId}/recommendations`, {}, false, true);
     return response.data;
   }
 }
