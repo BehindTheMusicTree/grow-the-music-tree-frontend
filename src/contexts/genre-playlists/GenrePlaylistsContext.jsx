@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect, useCallback, useRef } from "react";
 import PropTypes from "prop-types";
-import { useLocation } from "react-router-dom";
 
 import GenreService from "@utils/services/GenreService";
 import BadRequestError from "@utils/errors/BadRequestError";
@@ -8,14 +7,7 @@ import useAuthState from "@hooks/useAuthState";
 
 export const GenrePlaylistsContext = createContext();
 
-// Wrapper component that provides location context
-function LocationAwareProvider({ children }) {
-  const location = useLocation();
-  return <GenrePlaylistsProviderInner location={location}>{children}</GenrePlaylistsProviderInner>;
-}
-
-// Inner provider that takes location as a prop
-function GenrePlaylistsProviderInner({ children }) {
+function GenrePlaylistsProvider({ children }) {
   const [groupedGenrePlaylists, setGroupedGenrePlaylists] = useState();
   const [refreshGenrePlaylistsSignal, setRefreshGenrePlaylistsSignalRaw] = useState(0);
   const [error, setError] = useState(null);
@@ -170,26 +162,6 @@ function GenrePlaylistsProviderInner({ children }) {
     </GenrePlaylistsContext.Provider>
   );
 }
-
-// Main provider component that handles both Router and non-Router contexts
-function GenrePlaylistsProvider({ children }) {
-  try {
-    // Try to render with location context
-    return <LocationAwareProvider>{children}</LocationAwareProvider>;
-  } catch (_) {
-    // If we're outside Router context, render without location
-    return <GenrePlaylistsProviderInner location={null}>{children}</GenrePlaylistsProviderInner>;
-  }
-}
-
-GenrePlaylistsProviderInner.propTypes = {
-  children: PropTypes.node.isRequired,
-  location: PropTypes.object,
-};
-
-LocationAwareProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-};
 
 GenrePlaylistsProvider.propTypes = {
   children: PropTypes.node.isRequired,
