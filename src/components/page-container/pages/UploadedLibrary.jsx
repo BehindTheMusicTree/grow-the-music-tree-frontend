@@ -6,7 +6,7 @@ import { FaRegClock } from "react-icons/fa";
 import Rating from "@components/utils/Rating";
 import UploadedTrackPositionPlayPause from "@components/utils/UploadedTrackPositionPlayPause";
 import { usePlayer } from "@contexts/PlayerContext";
-import { usePopup } from "@contexts/popup/usePopup";
+import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/track-list/useTrackList";
 import { useUploadedTracks } from "@contexts/uploaded-tracks/useUploadedTracks";
 import TrackUploadPopupContentObject from "@models/popup-content-object/TrackUploadPopupContentObject";

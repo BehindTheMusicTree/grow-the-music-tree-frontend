@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import * as d3 from "d3";
 
-import { usePopup } from "../../../../../contexts/popup/usePopup";
+import { usePopup } from "../../../../../contexts/PopupContext";
 import { useTrackList } from "../../../../../contexts/track-list/useTrackList";
 import { useGenrePlaylists } from "../../../../../contexts/genre-playlists/useGenrePlaylists";
 import { usePlayer } from "../../../../../contexts/usePlayer";

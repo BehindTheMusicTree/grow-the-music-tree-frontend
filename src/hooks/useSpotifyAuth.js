@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { usePopup } from "@contexts/popup/usePopup";
+import { usePopup } from "@contexts/PopupContext";
 import { useNotification } from "@contexts/notification/useNotification";
 import ApiTokenService from "@utils/services/ApiTokenService";
 import SpotifyOAuthService from "@utils/services/SpotifyOAuthService";

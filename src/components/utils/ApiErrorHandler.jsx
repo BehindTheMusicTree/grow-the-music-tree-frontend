@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { usePopup } from "@contexts/popup/usePopup";
+import { usePopup } from "@contexts/PopupContext";
 import ApiService from "@utils/api/ApiService";
 import RequestError from "@utils/errors/RequestError";
 import ConnectivityError from "@utils/errors/ConnectivityError";

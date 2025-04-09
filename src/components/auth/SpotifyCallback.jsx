@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { usePopup } from "@contexts/popup/usePopup";
+import { usePopup } from "@contexts/PopupContext";
 import SpotifyOAuthService from "@utils/services/SpotifyOAuthService";
 import ApiTokenService from "@utils/services/ApiTokenService";
 import SpotifyAuthErrorPopupContentObject from "@models/popup-content-object/SpotifyAuthErrorPopupContentObject";

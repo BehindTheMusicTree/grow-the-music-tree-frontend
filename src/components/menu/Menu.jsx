@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { usePage } from "@contexts/page/usePage";
 import useSpotifyAuth from "@hooks/useSpotifyAuth";
 import ApiTokenService from "@utils/services/ApiTokenService";
-import { usePopup } from "@contexts/popup/usePopup";
+import { usePopup } from "@contexts/PopupContext";
 import SpotifyAccountPopupContentObject from "@models/popup-content-object/SpotifyAccountPopupContentObject";
 import { PAGE_TYPES } from "@utils/constants";
 
