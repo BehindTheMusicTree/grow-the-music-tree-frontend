@@ -80,15 +80,6 @@ function AuthenticatedApp() {
     checkAuth();
   }, []);
 
-  // Set up a timer effect to periodically check token validity
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      checkAuth();
-    }, 60000); // Check every minute
-
-    return () => clearTimeout(timeoutId);
-  }, [isAuthenticated, popupContentObject, hasValidToken, checkTokenAndShowAuthIfNeeded, showAuthPopup, hidePopup]);
-
   const centerMaxHeight = {
     centerWithoutPlayer: "calc(100% - 100px)",
     centerWithPlayer: "calc(100% - 180px)",
