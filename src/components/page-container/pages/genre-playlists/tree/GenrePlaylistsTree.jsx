@@ -5,7 +5,7 @@ import * as d3 from "d3";
 import { usePopup } from "../../../../../contexts/PopupContext";
 import { useTrackList } from "../../../../../contexts/track-list/useTrackList";
 import { useGenrePlaylists } from "../../../../../contexts/genre-playlists/useGenrePlaylists";
-import { usePlayer } from "../../../@contexts/PlayerContext";
+import { usePlayer } from "../../@contexts/PlayerContext";
 import { useGenreGettingAssignedNewParent } from "../../../../../contexts/genre-getting-assigned-new-parent/useGenreGettingAssignedNewParent";
 
 import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "../../../../../utils/constants";
