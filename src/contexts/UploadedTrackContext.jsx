@@ -2,10 +2,7 @@ import { createContext, useState, useEffect, useContext, useCallback } from "rea
 import PropTypes from "prop-types";
 
 import { UploadedTrackService } from "@utils/services";
-import UnauthorizedRequestError from "@utils/errors/UnauthorizedRequestError";
 import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
-import useApiConnectivity from "@hooks/useApiConnectivity";
-import useAuthState from "@hooks/useAuthState";
 import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
 
 export const UploadedTrackContext = createContext();
@@ -20,8 +17,6 @@ export function useUploadedTracks() {
 
 export function UploadedTrackProvider({ children }) {
   const { setRefreshGenrePlaylistsSignal = () => {} } = useGenrePlaylists() || {};
-  const { isAuthenticated } = useAuthState();
-  const { checkApiConnectivity } = useApiConnectivity();
   const { triggerRefresh, refreshSignal, setLoading, getLoading } = useAuthenticatedDataRefreshSignal();
 
   const [uploadedTracks, setUploadedTracks] = useState([]);
