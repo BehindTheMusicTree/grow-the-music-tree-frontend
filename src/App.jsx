@@ -1,18 +1,21 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 
-import { AuthProvider } from "@contexts/AuthContext";
-import { NotificationProvider } from "@contexts/NotificationContext";
-import { PopupProvider } from "@contexts/PopupContext";
-import { PlayerProvider } from "@contexts/PlayerContext";
-import { TrackListProvider } from "@contexts/TrackListContext";
-import { UploadedTrackProvider } from "@contexts/UploadedTrackContext";
-import { PageProvider } from "@contexts/PageContext";
-import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVisibilityContext";
-import { GenrePlaylistProvider } from "@contexts/GenrePlaylistContext";
-import { SpotifyLibraryProvider } from "@contexts/SpotifyLibraryContext";
-import { usePlayer } from "@contexts/PlayerContext";
-import { usePopup } from "@contexts/PopupContext";
+import {
+  AuthProvider,
+  NotificationProvider,
+  PopupProvider,
+  PlayerProvider,
+  TrackListProvider,
+  UploadedTrackProvider,
+  PageProvider,
+  TrackListSidebarVisibilityProvider,
+  GenrePlaylistProvider,
+  SpotifyLibraryProvider,
+  usePlayer,
+  usePopup,
+} from "@contexts";
+
 import Banner from "@components/banner/Banner";
 import Menu from "@components/menu/Menu";
 import PageContainer from "@components/page-container/PageContainer";
