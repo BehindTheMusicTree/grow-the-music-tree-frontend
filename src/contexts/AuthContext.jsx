@@ -4,6 +4,14 @@ import ApiTokenService from "@utils/services/ApiTokenService";
 
 export const AuthContext = createContext();
 
+export function useAuthState() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuthState must be used within an AuthProvider");
+  }
+  return context;
+}
+
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return ApiTokenService.hasValidApiToken();
