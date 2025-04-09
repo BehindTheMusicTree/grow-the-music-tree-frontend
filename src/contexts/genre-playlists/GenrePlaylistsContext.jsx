@@ -5,8 +5,7 @@ import { useLocation } from "react-router-dom";
 import GenreService from "@utils/services/GenreService";
 import BadRequestError from "@utils/errors/BadRequestError";
 import InvalidInputContentObject from "@models/popup-content-object/InvalidInputContentObject";
-import useApiConnectivity from "@hooks/useApiConnectivity";
-import useAuthErrorHandler from "@hooks/useAuthErrorHandler";
+import useAuthState from "@hooks/useAuthState";
 
 export const GenrePlaylistsContext = createContext();
 
@@ -17,18 +16,15 @@ function LocationAwareProvider({ children }) {
 }
 
 // Inner provider that takes location as a prop
-function GenrePlaylistsProviderInner({ children, location }) {
+function GenrePlaylistsProviderInner({ children }) {
   const [groupedGenrePlaylists, setGroupedGenrePlaylists] = useState();
   const [refreshGenrePlaylistsSignal, setRefreshGenrePlaylistsSignalRaw] = useState(0); // Start with 0 to prevent automatic fetch on mount
   const [error, setError] = useState(null);
 
-  // Centralized auth error handling - provides both auth checking and error handling
-  const { handleAuthError, checkTokenAndShowAuthIfNeeded } = useAuthErrorHandler(setError);
+  const { isAuthenticated } = useAuthState();
 
-  // Declare all refs at the top of the component
   const isOperationInProgressRef = useRef(false);
-  const lastAuthCheckRef = useRef(0);
-  const lastRefreshTimeRef = useRef(0);
+  const previousAuthStateRef = useRef(false);
 
   // Create safe version of refresh function
   const triggerRefresh = useCallback(() => {
@@ -41,126 +37,46 @@ function GenrePlaylistsProviderInner({ children, location }) {
     }
   }, []);
 
-  // Setup API connectivity handling with enhanced auth functionality
-  const { isAuthenticated } = useApiConnectivity({
-    refreshCallback: triggerRefresh,
-    fetchingRef: isOperationInProgressRef,
-  });
-
-  // Track previous auth state
-  const prevAuthStateRef = useRef(isAuthenticated);
-
-  // Define fetchGenrePlaylists before any effects that use it
   const fetchGenrePlaylists = useCallback(async () => {
-    console.log("[GenrePlaylistsContext] Starting fetchGenrePlaylists");
+    isOperationInProgressRef.current = true;
 
-    try {
-      isOperationInProgressRef.current = true;
+    const genrePlaylists = await GenreService.getGenrePlaylists();
 
-      const genrePlaylists = await GenreService.getGenrePlaylists();
-
-      if (genrePlaylists && genrePlaylists.length > 0) {
-        const grouped = getGenrePlaylistsGroupedByRoot(genrePlaylists);
-        setGroupedGenrePlaylists(grouped);
-        setError(null);
-      } else {
-        setGroupedGenrePlaylists({});
-      }
-    } catch (error) {
-      console.error("[GenrePlaylistsContext] Error fetching playlists:", error);
-
-      // Use centralized error handling
-      handleAuthError(error, "Failed to load genre playlists");
-    } finally {
-      console.log("[GenrePlaylistsContext] Resetting fetching flag");
-      isOperationInProgressRef.current = false;
-      setRefreshGenrePlaylistsSignalRaw(0);
+    if (genrePlaylists && genrePlaylists.length > 0) {
+      const grouped = getGenrePlaylistsGroupedByRoot(genrePlaylists);
+      setGroupedGenrePlaylists(grouped);
+      setError(null);
+    } else {
+      setGroupedGenrePlaylists({});
     }
-  }, [checkTokenAndShowAuthIfNeeded]);
+    isOperationInProgressRef.current = false;
+    setRefreshGenrePlaylistsSignalRaw(0);
+  }, []);
 
-  // React to changes in authentication state from the AuthContext
   useEffect(() => {
-    // Update the reference to track changes
-    prevAuthStateRef.current = isAuthenticated;
-
-    // If user becomes authenticated, trigger a data refresh
-    if (isAuthenticated && !isOperationInProgressRef.current) {
-      triggerRefresh();
+    if (
+      !isOperationInProgressRef.current &&
+      isAuthenticated &&
+      (!previousAuthStateRef.current || refreshGenrePlaylistsSignal)
+    ) {
+      fetchGenrePlaylists();
     }
-  }, [isAuthenticated, triggerRefresh]);
-
-  // Effect to handle route changes or navigation state with guards against concurrent updates
-  useEffect(() => {
-    // Throttle frequent checks
-    const now = Date.now();
-    if (now - lastAuthCheckRef.current < 1000) {
-      return;
-    }
-    lastAuthCheckRef.current = now;
-
-    // Check if we have location state with authCompleted flag (from React Router)
-    if (location?.state?.authCompleted && !isOperationInProgressRef.current) {
-      // If authentication was just completed, trigger a refresh
-      isOperationInProgressRef.current = true;
-      setRefreshGenrePlaylistsSignalRaw((prev) => prev + 1);
-      // Reset the flag after a delay to allow state to settle
-      setTimeout(() => {
-        isOperationInProgressRef.current = false;
-      }, 100);
-    }
-  }, [location]);
-
-  // Effect to handle playlist refresh with better debounce and protection against loops
-  useEffect(() => {
-    let isMounted = true;
-
-    const handleRefresh = async () => {
-      const now = Date.now();
-      // Debounce refresh calls - only allow one refresh per second
-      if (now - lastRefreshTimeRef.current < 1000) {
-        return;
-      }
-
-      // Only fetch if the signal is positive, component is mounted, and not already fetching
-      if (refreshGenrePlaylistsSignal > 0 && isMounted && !isOperationInProgressRef.current) {
-        lastRefreshTimeRef.current = now;
-        await fetchGenrePlaylists();
-      }
-    };
-
-    handleRefresh();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [refreshGenrePlaylistsSignal, fetchGenrePlaylists]);
+  }, [isAuthenticated, fetchGenrePlaylists, refreshGenrePlaylistsSignal]);
 
   const handleGenreAddAction = async (event, parentUuid) => {
     event.stopPropagation();
-
-    // Check for valid Spotify token before API call
-    if (!checkTokenAndShowAuthIfNeeded(true)) {
-      return false;
-    }
 
     const name = prompt("New genre name:");
     if (!name) {
       return false;
     }
 
-    try {
-      // GenreService handles connectivity errors and auth checks
-      await GenreService.postGenre({
-        name: name,
-        parent: parentUuid,
-      });
-      triggerRefresh();
-      return true;
-    } catch (error) {
-      // Use centralized error handling
-      handleAuthError(error, "Failed to add genre");
-      return false;
-    }
+    await GenreService.postGenre({
+      name: name,
+      parent: parentUuid,
+    });
+    triggerRefresh();
+    return true;
   };
 
   const getGenrePlaylistsGroupedByRoot = (genrePlaylists) => {
@@ -177,17 +93,10 @@ function GenrePlaylistsProviderInner({ children, location }) {
   };
 
   const updateGenreParent = async (genreUuid, parentUuid) => {
-    try {
-      // GenreService handles connectivity errors
-      await GenreService.putGenre(genreUuid, {
-        parent: parentUuid,
-      });
-      triggerRefresh();
-    } catch (error) {
-      // Use centralized error handling
-      handleAuthError(error, "Failed to update genre");
-      throw error;
-    }
+    await GenreService.putGenre(genreUuid, {
+      parent: parentUuid,
+    });
+    triggerRefresh();
   };
 
   const renameGenre = async (genreUuid, newName, showPopupCallback) => {
@@ -213,23 +122,13 @@ function GenrePlaylistsProviderInner({ children, location }) {
         }
         return false;
       }
-
-      // Use centralized error handling for auth and other errors
-      handleAuthError(error, "Failed to rename genre");
       return false;
     }
   };
 
   const deleteGenre = async (genreUuid) => {
-    try {
-      // GenreService handles connectivity errors
-      await GenreService.deleteGenre(genreUuid);
-      triggerRefresh();
-    } catch (error) {
-      // Use centralized error handling
-      handleAuthError(error, "Failed to delete genre");
-      throw error;
-    }
+    await GenreService.deleteGenre(genreUuid);
+    triggerRefresh();
   };
 
   return (
