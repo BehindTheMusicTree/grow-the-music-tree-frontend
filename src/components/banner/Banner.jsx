@@ -6,7 +6,7 @@ import logo from "@assets/images/logos/umg-logo-maze-100.svg";
 export default function Banner({ setSearchSubmitted }) {
   return (
     <div className="py-2 px-3 bg-black text-gray-100">
-      <div className="max-w-7xl mx-auto relative">
+      <div className="w-full mx-auto relative">
         <div className="flex items-center">
           <div className="mr-3">
             <img src={logo} alt="logo" className="w-12 h-12" />
