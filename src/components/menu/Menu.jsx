@@ -51,9 +51,15 @@ export default function Menu() {
 
   const handleAccountClick = () => {
     if (profile) {
+      // Show popup and navigate to account page
       const popup = new SpotifyAccountPopupContentObject(profile);
       showPopup(popup);
       setShowUserMenu(false);
+      navigate("/account");
+    } else {
+      // Just navigate to account page if no profile
+      setShowUserMenu(false);
+      navigate("/account");
     }
   };
 
