@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import { UploadedTrackService } from "@utils/services";
 import UnauthorizedRequestError from "@utils/errors/UnauthorizedRequestError";
-import { useGenrePlaylists } from "@context/GenrePlaylistsContext";
+import { useGenrePlaylists } from "@context/GenrePlaylistContext";
 import useApiConnectivity from "@hooks/useApiConnectivity";
 import useAuthState from "@hooks/useAuthState";
 import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
@@ -27,8 +27,7 @@ export function UploadedTracksProvider({ children }) {
   const [uploadedTracks, setUploadedTracks] = useState([]);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const pageSize = 50;
+  const [hasMore] = useState(true);
 
   const fetchUploadedTracks = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -38,7 +37,6 @@ export function UploadedTracksProvider({ children }) {
       setLoading("uploadedTracks", true);
       setError(null);
       await checkApiConnectivity();
-      await checkTokenAndShowAuthIfNeeded();
 
       const response = await fetch("/api/uploaded-tracks", {
         headers: {
@@ -54,7 +52,6 @@ export function UploadedTracksProvider({ children }) {
       setUploadedTracks(data);
     } catch (error) {
       setError(error.message);
-      handleApiError(error);
     } finally {
       setLoading("uploadedTracks", false);
     }
@@ -65,10 +62,6 @@ export function UploadedTracksProvider({ children }) {
   }, [fetchUploadedTracks, refreshSignal]);
 
   async function postUploadedTrack(file, genreUuid, onProgress, badRequestCatched) {
-    if (!checkTokenAndShowAuthIfNeeded(true)) {
-      return { success: false, authRequired: true };
-    }
-
     try {
       await UploadedTrackService.uploadTrack(file, genreUuid, onProgress, badRequestCatched);
       setRefreshGenrePlaylistsSignal(1);
@@ -76,12 +69,7 @@ export function UploadedTracksProvider({ children }) {
       return { success: true };
     } catch (error) {
       if (error instanceof UnauthorizedRequestError) {
-        checkTokenAndShowAuthIfNeeded(true);
         return { success: false, authRequired: true };
-      }
-
-      if (handleApiError(error, "/api/library/uploaded")) {
-        return { success: false, connectivityError: true };
       }
 
       throw error;

@@ -9,7 +9,7 @@ import { TrackListProvider } from "@contexts/TrackListContext";
 import { UploadedTracksProvider } from "@contexts/UploadedTracksContext";
 import { PageProvider } from "@contexts/PageContext";
 import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVisibilityContext";
-import { GenrePlaylistsProvider } from "@contexts/GenrePlaylistsContext";
+import { GenrePlaylistsProvider } from "@contexts/GenrePlaylistContext";
 import { SpotifyLibraryProvider } from "@contexts/SpotifyLibraryContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { usePopup } from "@contexts/PopupContext";

@@ -4,10 +4,10 @@ import PropTypes from "prop-types";
 import { GenrePlaylistService } from "@utils/services";
 import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
 
-export const GenrePlaylistsContext = createContext();
+export const GenrePlaylistContext = createContext();
 
 export function useGenrePlaylists() {
-  const context = useContext(GenrePlaylistsContext);
+  const context = useContext(GenrePlaylistContext);
   if (!context) {
     throw new Error("useGenrePlaylists must be used within a GenrePlaylistsProvider");
   }
@@ -42,7 +42,7 @@ export function GenrePlaylistsProvider({ children }) {
   const setRefreshSignal = () => triggerRefresh(LOADING_KEY);
 
   return (
-    <GenrePlaylistsContext.Provider
+    <GenrePlaylistContext.Provider
       value={{
         genrePlaylists,
         error,
@@ -51,7 +51,7 @@ export function GenrePlaylistsProvider({ children }) {
       }}
     >
       {children}
-    </GenrePlaylistsContext.Provider>
+    </GenrePlaylistContext.Provider>
   );
 }
 
