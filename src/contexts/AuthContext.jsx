@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  return <AuthContext.Provider value={{ isAuthenticated, checkAuth }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ isAuthenticated }}>{children}</AuthContext.Provider>;
 }
 
 AuthProvider.propTypes = {
