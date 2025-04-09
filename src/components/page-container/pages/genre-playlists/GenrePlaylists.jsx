@@ -1,4 +1,4 @@
-import { GenreGettingAssignedNewParentProvider } from "@contexts/genre-getting-assigned-new-parent/GenreGettingAssignedNewParentContext";
+import { GenreGettingAssignedNewParentProvider } from "@contexts/GenreGettingAssignedNewParentContext";
 import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "./tree/tree-constants";
 import GenrePlaylistsTree from "./tree/GenrePlaylistTree";
 import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
