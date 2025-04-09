@@ -19,7 +19,6 @@ export default class ApiTokenService {
    * @returns {string|null} The API token or null if not found
    */
   static getApiToken() {
-    console.log("[ApiTokenService] Getting token from storage");
     const token = localStorage.getItem(this.API_TOKEN_KEY);
     console.log("[ApiTokenService] Token retrieved:", { exists: !!token, length: token?.length });
     return token;
