@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Howler } from "howler";
 
@@ -6,7 +6,7 @@ import { PageProvider } from "./contexts/page/PageContext";
 import { TrackListSidebarVisibilityProvider } from "./contexts/track-list-sidebar-visibility/TrackListSidebarVisibilityContext";
 import { GenrePlaylistsProvider } from "./contexts/genre-playlists/GenrePlaylistsContext";
 import { SpotifyLibraryProvider } from "./contexts/spotify-library/SpotifyLibraryContext";
-import { AuthProvider } from "@contexts/auth/AuthContext";
+import { AuthProvider } from "@contexts/AuthContext";
 import { NotificationProvider } from "./contexts/notification/NotificationContext";
 import { PopupProvider } from "./contexts/popup/PopupContext";
 import { PlayerProvider } from "./contexts/player/PlayerContext";
@@ -15,7 +15,6 @@ import { UploadedTracksProvider } from "./contexts/uploaded-tracks/UploadedTrack
 
 import { usePlayer } from "./contexts/player/usePlayer";
 import { usePopup } from "./contexts/popup/usePopup";
-import useSpotifyAuth from "./hooks/useSpotifyAuth";
 
 import Popup from "./components/popup/Popup";
 import Banner from "./components/banner/Banner";
@@ -29,59 +28,19 @@ import SpotifyCallback from "./components/auth/SpotifyCallback";
 Howler.autoUnlock = true;
 
 /**
- * Wrapper component that checks for Spotify authentication
- * Now supports non-blocking operation with notifications
+ * Main layout component that provides the application structure
+ * Includes banner, menu, page container, player and popup components
  */
-function AuthenticatedApp() {
+function AppLayout() {
   const { playerUploadedTrackObject } = usePlayer();
-  const { popupContentObject, hidePopup } = usePopup();
-  const { hasValidToken, checkTokenAndShowAuthIfNeeded, showAuthPopup } = useSpotifyAuth();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { popupContentObject } = usePopup();
   const [searchSubmitted, setSearchSubmitted] = useState("");
-  const previousAuthState = useRef(false);
-
-  // Function to check authentication status
-  const checkAuth = () => {
-    console.log("[AuthenticatedApp checkAuth] Checking token status");
-    const tokenValid = hasValidToken();
-
-    // Track authentication state change for detecting sign-out
-    const wasAuthenticated = previousAuthState.current;
-    previousAuthState.current = tokenValid;
-
-    if (tokenValid) {
-      // Only update state if needed to avoid unnecessary renders
-      if (!isAuthenticated) {
-        setIsAuthenticated(true);
-      }
-
-      // If there's an auth popup visible, dismiss it
-      if (popupContentObject?.type === "SpotifyAuthPopupContentObject") {
-        hidePopup();
-      }
-    } else {
-      // Update auth state to false
-      if (isAuthenticated) {
-        setIsAuthenticated(false);
-      }
-
-      // If this is a sign-out (transition from authenticated to not authenticated)
-      if (wasAuthenticated) {
-        showAuthPopup(); // Immediately show the auth popup
-      } else {
-        // Regular case - not signed in yet
-        checkTokenAndShowAuthIfNeeded(false); // Pass false for non-blocking mode
-      }
-    }
-  };
 
   const centerMaxHeight = {
     centerWithoutPlayer: "calc(100% - 100px)",
     centerWithPlayer: "calc(100% - 180px)",
   };
 
-  // Always render the app now - user can browse even when auth is needed
-  // Protected operations will trigger auth notifications when needed
   return (
     <div className="app flex flex-col h-screen">
       <Banner className="fixed top-0 z-50" searchSubmitted={searchSubmitted} setSearchSubmitted={setSearchSubmitted} />
@@ -100,10 +59,6 @@ function AuthenticatedApp() {
   );
 }
 
-/**
- * Main application component
- * Wraps all providers and routes
- */
 export default function App() {
   return (
     <Router>
@@ -119,10 +74,10 @@ export default function App() {
                         <GenrePlaylistsProvider>
                           <SpotifyLibraryProvider>
                             <Routes>
-                              <Route path="/" element={<AuthenticatedApp />} />
-                              <Route path="/genre-playlists" element={<AuthenticatedApp />} />
-                              <Route path="/uploaded-library" element={<AuthenticatedApp />} />
-                              <Route path="/spotify-library" element={<AuthenticatedApp />} />
+                              <Route path="/" element={<AppLayout />} />
+                              <Route path="/genre-playlists" element={<AppLayout />} />
+                              <Route path="/uploaded-library" element={<AppLayout />} />
+                              <Route path="/spotify-library" element={<AppLayout />} />
                               <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
                               <Route path="*" element={<NotFoundPage />} />
                             </Routes>
