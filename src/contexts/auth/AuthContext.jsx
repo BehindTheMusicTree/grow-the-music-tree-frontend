@@ -6,13 +6,11 @@ export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    console.log("[AuthContext isAuthenticated] Checking token status");
     return ApiTokenService.hasValidApiToken();
   });
   const lastCheckTimeRef = useRef(Date.now());
 
   const checkAuth = () => {
-    console.log("[AuthContext checkAuth] Checking token status");
     const isValid = ApiTokenService.hasValidApiToken();
     setIsAuthenticated(isValid);
     lastCheckTimeRef.current = Date.now();
