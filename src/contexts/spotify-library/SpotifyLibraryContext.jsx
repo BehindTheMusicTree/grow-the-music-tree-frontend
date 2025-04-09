@@ -5,7 +5,6 @@ import SpotifyLibTracksService from "@utils/services/SpotifyLibTracksService";
 import ApiTokenService from "@utils/services/ApiTokenService";
 import useApiConnectivity from "@hooks/useApiConnectivity";
 import useAuthChangeHandler from "@hooks/useAuthChangeHandler";
-import useAuthState from "@hooks/useAuthState";
 import useSpotifyAuthActions from "@hooks/useSpotifyAuthActions";
 
 export const SpotifyLibraryContext = createContext();
@@ -24,12 +23,10 @@ function SpotifyLibraryProviderInner({ children, location }) {
 
   // Use focused hooks for auth state and actions
   const checkTokenAndShowAuthIfNeeded = useSpotifyAuthActions();
-  const isAuthenticated = useAuthState();
 
   // Declare all refs at the top of the component
   const areTracksFetchingRef = useRef(false);
   const lastAuthCheckRef = useRef(0);
-  const prevAuthStateRef = useRef(isAuthenticated);
   const refreshInProgressRef = useRef(false);
 
   // Create a safe refresh function
@@ -71,10 +68,9 @@ function SpotifyLibraryProviderInner({ children, location }) {
   // React to changes in authentication state
   useEffect(() => {
     // Update the reference to track changes
-    prevAuthStateRef.current = isAuthenticated;
 
     // If user becomes authenticated, trigger data refresh
-    if (isAuthenticated && !areTracksFetchingRef.current && !refreshInProgressRef.current) {
+    if (!areTracksFetchingRef.current && !refreshInProgressRef.current) {
       triggerRefresh();
     }
   }, [isAuthenticated, triggerRefresh]);
