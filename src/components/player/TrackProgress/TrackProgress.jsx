@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import raf from "raf";
 import ReactHowler from "react-howler";
 
-import { usePlayer } from "@contexts/player/usePlayer";
+import { usePlayer } from "@contexts/usePlayer";
 import { PLAY_STATES } from "@utils/constants";
 import { formatTime } from "@utils";
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { MdError } from "react-icons/md";
 import useSpotifyAuth from "@hooks/useSpotifyAuth";
-import { useSpotifyLibrary } from "@contexts/spotify-library/SpotifyLibraryContext";
+import { useSpotifyLibrary } from "@contexts//SpotifyLibraryContext";
 
 export default function SpotifyLibrary() {
   const { spotifyLibTracks, error, setRefreshSignal } = useSpotifyLibrary();
