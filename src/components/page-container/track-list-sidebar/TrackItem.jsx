@@ -4,7 +4,7 @@ import { MdMoreVert } from "react-icons/md";
 import { formatTime } from "../../../utils";
 import UploadedTrackEditionPopupContentObject from "../../../models/popup-content-object/UploadedTrackEditionPopupContentObject";
 import { usePopup } from "../../../contexts/PopupContext";
-import { usePlayer } from "../../../contexts/usePlayer";
+import { usePlayer } from "../@contexts/PlayerContext";
 import { useTrackList } from "../../../contexts/track-list/useTrackList";
 import UploadedTrackPositionPlayPause from "../../utils/UploadedTrackPositionPlayPause";
 

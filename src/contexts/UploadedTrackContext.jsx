@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import { UploadedTrackService } from "@utils/services";
 import UnauthorizedRequestError from "@utils/errors/UnauthorizedRequestError";
-import { useGenrePlaylists } from "@contexts/GenrePlaylistsContext";
+import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
 import useApiConnectivity from "@hooks/useApiConnectivity";
 import useAuthState from "@hooks/useAuthState";
 import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
