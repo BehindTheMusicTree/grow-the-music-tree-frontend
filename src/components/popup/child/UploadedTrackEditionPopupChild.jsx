@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 
 import { UploadedTrackService } from "@utils/services";
-import { useGenrePlaylists } from "@contexts/GenrePlaylistsContext";
+import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
 import { useTrackList } from "@contexts/track-list/useTrackList";
 import { formatTime } from "@utils/formatting";
 import { FORM_RATING_NULL_VALUE } from "@utils/constants";
