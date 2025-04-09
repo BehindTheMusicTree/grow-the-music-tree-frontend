@@ -69,10 +69,10 @@ export default function App() {
             <ApiErrorHandler>
               <PlayerProvider>
                 <TrackListProvider>
-                  <UploadedTrackProvider>
-                    <PageProvider>
-                      <TrackListSidebarVisibilityProvider>
-                        <GenrePlaylistProvider>
+                  <PageProvider>
+                    <TrackListSidebarVisibilityProvider>
+                      <GenrePlaylistProvider>
+                        <UploadedTrackProvider>
                           <SpotifyLibraryProvider>
                             <Routes>
                               <Route path="/" element={<AppLayout />} />
@@ -83,10 +83,10 @@ export default function App() {
                               <Route path="*" element={<NotFoundPage />} />
                             </Routes>
                           </SpotifyLibraryProvider>
-                        </GenrePlaylistProvider>
-                      </TrackListSidebarVisibilityProvider>
-                    </PageProvider>
-                  </UploadedTrackProvider>
+                        </UploadedTrackProvider>
+                      </GenrePlaylistProvider>
+                    </TrackListSidebarVisibilityProvider>
+                  </PageProvider>
                 </TrackListProvider>
               </PlayerProvider>
             </ApiErrorHandler>
