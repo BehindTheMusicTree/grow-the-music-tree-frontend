@@ -4,7 +4,6 @@ import { useLocation } from "react-router-dom";
 
 import GenreService from "@utils/services/GenreService";
 import BadRequestError from "@utils/errors/BadRequestError";
-import InvalidInputContentObject from "@models/popup-content-object/InvalidInputContentObject";
 import useAuthState from "@hooks/useAuthState";
 
 export const GenrePlaylistsContext = createContext();
@@ -39,18 +38,24 @@ function GenrePlaylistsProviderInner({ children }) {
 
   const fetchGenrePlaylists = useCallback(async () => {
     isOperationInProgressRef.current = true;
+    setError(null);
 
-    const genrePlaylists = await GenreService.getGenrePlaylists();
+    try {
+      const genrePlaylists = await GenreService.getGenrePlaylists();
 
-    if (genrePlaylists && genrePlaylists.length > 0) {
-      const grouped = getGenrePlaylistsGroupedByRoot(genrePlaylists);
-      setGroupedGenrePlaylists(grouped);
-      setError(null);
-    } else {
+      if (genrePlaylists && genrePlaylists.length > 0) {
+        const grouped = getGenrePlaylistsGroupedByRoot(genrePlaylists);
+        setGroupedGenrePlaylists(grouped);
+      } else {
+        setGroupedGenrePlaylists({});
+      }
+    } catch (error) {
+      setError(error);
       setGroupedGenrePlaylists({});
+    } finally {
+      isOperationInProgressRef.current = false;
+      setRefreshGenrePlaylistsSignalRaw(0);
     }
-    isOperationInProgressRef.current = false;
-    setRefreshGenrePlaylistsSignalRaw(0);
   }, []);
 
   useEffect(() => {
@@ -68,15 +73,19 @@ function GenrePlaylistsProviderInner({ children }) {
 
     const name = prompt("New genre name:");
     if (!name) {
-      return false;
+      return { success: false, error: new Error("No name provided") };
     }
 
-    await GenreService.postGenre({
-      name: name,
-      parent: parentUuid,
-    });
-    triggerRefresh();
-    return true;
+    try {
+      await GenreService.postGenre({
+        name: name,
+        parent: parentUuid,
+      });
+      triggerRefresh();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error };
+    }
   };
 
   const getGenrePlaylistsGroupedByRoot = (genrePlaylists) => {
@@ -93,15 +102,19 @@ function GenrePlaylistsProviderInner({ children }) {
   };
 
   const updateGenreParent = async (genreUuid, parentUuid) => {
-    await GenreService.putGenre(genreUuid, {
-      parent: parentUuid,
-    });
-    triggerRefresh();
+    try {
+      await GenreService.putGenre(genreUuid, {
+        parent: parentUuid,
+      });
+      triggerRefresh();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error };
+    }
   };
 
-  const renameGenre = async (genreUuid, newName, showPopupCallback) => {
+  const renameGenre = async (genreUuid, newName) => {
     try {
-      // Pass badRequestCatched=true to handle BadRequestError here instead of global handler
       await GenreService.putGenre(
         genreUuid,
         {
@@ -110,25 +123,28 @@ function GenrePlaylistsProviderInner({ children }) {
         true
       );
       triggerRefresh();
-      return true;
+      return { success: true };
     } catch (error) {
       if (error instanceof BadRequestError) {
-        // Use the error directly from API, which already contains field error details
-        const popupContentObject = new InvalidInputContentObject(error);
-
-        // Use callback to show popup from the component
-        if (showPopupCallback) {
-          showPopupCallback(popupContentObject);
-        }
-        return false;
+        return {
+          success: false,
+          error,
+          isBadRequest: true,
+          errorDetails: error.details,
+        };
       }
-      return false;
+      return { success: false, error };
     }
   };
 
   const deleteGenre = async (genreUuid) => {
-    await GenreService.deleteGenre(genreUuid);
-    triggerRefresh();
+    try {
+      await GenreService.deleteGenre(genreUuid);
+      triggerRefresh();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error };
+    }
   };
 
   return (
