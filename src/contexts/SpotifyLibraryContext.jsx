@@ -1,8 +1,9 @@
-import { createContext, useState, useContext, useCallback, useEffect } from "react";
+import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { SpotifyLibTracksService } from "@utils/services";
-import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
+import { useAuth } from "@contexts/AuthContext";
 
 export const SpotifyLibraryContext = createContext();
 
@@ -15,71 +16,50 @@ export function useSpotifyLibrary() {
 }
 
 export function SpotifyLibraryProvider({ children }) {
-  const LOADING_KEY = "spotifyLibrary";
-  const { triggerRefresh, setLoading, getLoading } = useAuthenticatedDataRefreshSignal();
+  const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
-  const [tracks, setTracks] = useState([]);
-  const [error, setError] = useState(null);
+  const {
+    data: tracks = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["spotifyLibTracks"],
+    queryFn: () => SpotifyLibTracksService.listSpotifyLibTracks(),
+    enabled: isAuthenticated,
+  });
 
-  const fetchTracks = useCallback(async () => {
-    setLoading(LOADING_KEY, true);
-    setError(null);
-    try {
-      const data = await SpotifyLibTracksService.getTracks();
-      setTracks(data);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(LOADING_KEY, false);
-    }
-  }, [setLoading]);
-
-  const updateTrack = useCallback(
-    async (trackId, updates) => {
-      setLoading(LOADING_KEY, true);
-      setError(null);
-      try {
-        await SpotifyLibTracksService.updateTrack(trackId, updates);
-        triggerRefresh(LOADING_KEY);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(LOADING_KEY, false);
-      }
+  const updateTrackMutation = useMutation({
+    mutationFn: ({ trackId, updates }) => SpotifyLibTracksService.updateTrack(trackId, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["spotifyLibTracks"] });
     },
-    [setLoading, triggerRefresh]
-  );
+  });
 
-  const deleteTrack = useCallback(
-    async (trackId) => {
-      setLoading(LOADING_KEY, true);
-      setError(null);
-      try {
-        await SpotifyLibTracksService.deleteTrack(trackId);
-        triggerRefresh(LOADING_KEY);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(LOADING_KEY, false);
-      }
+  const deleteTrackMutation = useMutation({
+    mutationFn: (trackId) => SpotifyLibTracksService.deleteTrack(trackId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["spotifyLibTracks"] });
     },
-    [setLoading, triggerRefresh]
-  );
+  });
 
-  useEffect(() => {
-    fetchTracks();
-  }, [fetchTracks]);
+  const updateTrack = async (trackId, updates) => {
+    return updateTrackMutation.mutateAsync({ trackId, updates });
+  };
 
-  const loading = getLoading(LOADING_KEY);
+  const deleteTrack = async (trackId) => {
+    return deleteTrackMutation.mutateAsync(trackId);
+  };
 
   return (
     <SpotifyLibraryContext.Provider
       value={{
         tracks,
         error,
-        loading,
+        isLoading,
         updateTrack,
         deleteTrack,
+        refreshTracks: () => queryClient.invalidateQueries({ queryKey: ["spotifyLibTracks"] }),
       }}
     >
       {children}

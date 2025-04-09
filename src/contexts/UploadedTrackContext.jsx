@@ -1,9 +1,9 @@
-import { createContext, useState, useEffect, useContext, useCallback } from "react";
+import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { UploadedTrackService } from "@utils/services";
-import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
-import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
+import { useAuth } from "@contexts/AuthContext";
 
 export const UploadedTrackContext = createContext();
 
@@ -16,72 +16,51 @@ export function useUploadedTracks() {
 }
 
 export function UploadedTrackProvider({ children }) {
-  const { setRefreshGenrePlaylistsSignal = () => {} } = useGenrePlaylists() || {};
-  const { triggerRefresh, refreshSignal, setLoading, getLoading } = useAuthenticatedDataRefreshSignal();
+  const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
-  const [uploadedTracks, setUploadedTracks] = useState([]);
-  const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore] = useState(true);
+  const {
+    data: uploadedTracks = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["uploadedTracks"],
+    queryFn: () => UploadedTrackService.getUploadedTracks(),
+    enabled: isAuthenticated,
+  });
 
-  const fetchUploadedTracks = useCallback(async () => {
-    if (!isAuthenticated) return;
-    if (getLoading("uploadedTracks")) return;
+  const uploadTrackMutation = useMutation({
+    mutationFn: ({ file, genreUuid, onProgress }) => UploadedTrackService.uploadTrack(file, genreUuid, onProgress),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
+    },
+  });
 
-    try {
-      setLoading("uploadedTracks", true);
-      setError(null);
-      await checkApiConnectivity();
+  const updateTrackMutation = useMutation({
+    mutationFn: ({ uploadedTrackUuid, uploadedTrackData }) =>
+      UploadedTrackService.putUploadedTrack(uploadedTrackUuid, uploadedTrackData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
+    },
+  });
 
-      const response = await fetch("/api/uploaded-tracks", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("spotify_access_token")}`,
-        },
-      });
+  const postUploadedTrack = async (file, genreUuid, onProgress) => {
+    return uploadTrackMutation.mutateAsync({ file, genreUuid, onProgress });
+  };
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setUploadedTracks(data);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading("uploadedTracks", false);
-    }
-  }, [isAuthenticated, checkApiConnectivity, getLoading, setLoading]);
-
-  useEffect(() => {
-    fetchUploadedTracks();
-  }, [fetchUploadedTracks, refreshSignal]);
-
-  async function postUploadedTrack(file, genreUuid, onProgress, badRequestCatched) {
-    try {
-      await UploadedTrackService.uploadTrack(file, genreUuid, onProgress, badRequestCatched);
-      setRefreshGenrePlaylistsSignal(1);
-      triggerRefresh("uploadedTracks");
-      return { success: true };
-    } catch (error) {
-      if (error instanceof UnauthorizedRequestError) {
-        return { success: false, authRequired: true };
-      }
-
-      throw error;
-    }
-  }
+  const updateUploadedTrack = async (uploadedTrackUuid, uploadedTrackData) => {
+    return updateTrackMutation.mutateAsync({ uploadedTrackUuid, uploadedTrackData });
+  };
 
   return (
     <UploadedTrackContext.Provider
       value={{
         uploadedTracks,
         error,
-        loading: getLoading("uploadedTracks"),
-        currentPage,
-        setCurrentPage,
-        hasMore,
+        isLoading,
         postUploadedTrack,
-        refreshUploadedTracks: () => triggerRefresh("uploadedTracks"),
+        updateUploadedTrack,
+        refreshUploadedTracks: () => queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] }),
       }}
     >
       {children}
