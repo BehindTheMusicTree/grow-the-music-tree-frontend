@@ -1,6 +1,6 @@
 import { PAGE_TYPES } from "@utils/constants";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
-import { usePage } from "@contexts/page/usePage";
+import { usePage } from "@contexts/PageContext";
 import TrackListSidebar from "@components/page-container/track-list-sidebar/TrackListSidebar";
 import GenresPlaylists from "@components/page-container/pages/genre-playlists/GenrePlaylists";
 import UploadedLibrary from "@components/page-container/pages/UploadedLibrary.jsx";
