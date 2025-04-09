@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useContext, useCallback } from "react";
 import PropTypes from "prop-types";
 
-import { GenrePlaylistService } from "@utils/services";
+import { GenreService } from "@utils/services";
 import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
 
 export const GenrePlaylistContext = createContext();
@@ -25,7 +25,7 @@ export function GenrePlaylistsProvider({ children }) {
     setLoading(LOADING_KEY, true);
     setError(null);
     try {
-      const playlists = await GenrePlaylistService.getGenrePlaylists();
+      const playlists = await GenreService.getGenrePlaylists();
       setGenrePlaylists(playlists);
     } catch (error) {
       setError(error.message);
