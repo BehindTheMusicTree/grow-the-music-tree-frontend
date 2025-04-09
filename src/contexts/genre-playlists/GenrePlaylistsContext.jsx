@@ -17,7 +17,7 @@ function LocationAwareProvider({ children }) {
 // Inner provider that takes location as a prop
 function GenrePlaylistsProviderInner({ children }) {
   const [groupedGenrePlaylists, setGroupedGenrePlaylists] = useState();
-  const [refreshGenrePlaylistsSignal, setRefreshGenrePlaylistsSignalRaw] = useState(0); // Start with 0 to prevent automatic fetch on mount
+  const [refreshGenrePlaylistsSignal, setRefreshGenrePlaylistsSignalRaw] = useState(0);
   const [error, setError] = useState(null);
 
   const { isAuthenticated } = useAuthState();
@@ -35,6 +35,13 @@ function GenrePlaylistsProviderInner({ children }) {
       }, 100);
     }
   }, []);
+
+  // Initial data fetch
+  useEffect(() => {
+    if (isAuthenticated) {
+      triggerRefresh();
+    }
+  }, [isAuthenticated, triggerRefresh]);
 
   const fetchGenrePlaylists = useCallback(async () => {
     isOperationInProgressRef.current = true;
