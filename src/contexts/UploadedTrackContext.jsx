@@ -13,12 +13,12 @@ export const UploadedTrackContext = createContext();
 export function useUploadedTracks() {
   const context = useContext(UploadedTrackContext);
   if (!context) {
-    throw new Error("useUploadedTracks must be used within an UploadedTracksProvider");
+    throw new Error("useUploadedTracks must be used within an UploadedTrackProvider");
   }
   return context;
 }
 
-export function UploadedTracksProvider({ children }) {
+export function UploadedTrackProvider({ children }) {
   const { setRefreshGenrePlaylistsSignal = () => {} } = useGenrePlaylists() || {};
   const { isAuthenticated } = useAuthState();
   const { checkApiConnectivity } = useApiConnectivity();
@@ -94,6 +94,6 @@ export function UploadedTracksProvider({ children }) {
   );
 }
 
-UploadedTracksProvider.propTypes = {
+UploadedTrackProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };

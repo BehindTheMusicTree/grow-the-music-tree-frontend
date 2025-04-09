@@ -6,7 +6,7 @@ import { NotificationProvider } from "@contexts/NotificationContext";
 import { PopupProvider } from "@contexts/PopupContext";
 import { PlayerProvider } from "@contexts/PlayerContext";
 import { TrackListProvider } from "@contexts/TrackListContext";
-import { UploadedTracksProvider } from "@contexts/UploadedTrackContext";
+import { UploadedTrackProvider } from "@contexts/UploadedTrackContext";
 import { PageProvider } from "@contexts/PageContext";
 import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVisibilityContext";
 import { GenrePlaylistProvider } from "@contexts/GenrePlaylistContext";
@@ -66,7 +66,7 @@ export default function App() {
             <ApiErrorHandler>
               <PlayerProvider>
                 <TrackListProvider>
-                  <UploadedTracksProvider>
+                  <UploadedTrackProvider>
                     <PageProvider>
                       <TrackListSidebarVisibilityProvider>
                         <GenrePlaylistProvider>
@@ -83,7 +83,7 @@ export default function App() {
                         </GenrePlaylistProvider>
                       </TrackListSidebarVisibilityProvider>
                     </PageProvider>
-                  </UploadedTracksProvider>
+                  </UploadedTrackProvider>
                 </TrackListProvider>
               </PlayerProvider>
             </ApiErrorHandler>
