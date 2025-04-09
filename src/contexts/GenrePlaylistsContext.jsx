@@ -1,12 +1,8 @@
 import { createContext, useState, useEffect, useContext, useCallback } from "react";
 import PropTypes from "prop-types";
 
-import { GenrePlaylistService } from "../utils/services";
-import useApiConnectivity from "../hooks/useApiConnectivity";
-import useAuthState from "../hooks/useAuthState";
-import { useAuthenticatedDataRefreshSignal } from "../hooks/useAuthenticatedDataRefreshSignal";
-import { handleApiError } from "../utils/apiErrorHandler";
-import { checkTokenAndShowAuthIfNeeded } from "../utils/authUtils";
+import { GenrePlaylistService } from "@utils/services";
+import { useAuthenticatedDataRefreshSignal } from "@hooks/useAuthenticatedDataRefreshSignal";
 
 export const GenrePlaylistsContext = createContext();
 
@@ -19,46 +15,31 @@ export function useGenrePlaylists() {
 }
 
 export function GenrePlaylistsProvider({ children }) {
-  const { isAuthenticated } = useAuthState();
-  const { checkApiConnectivity } = useApiConnectivity();
-  const { triggerRefresh } = useAuthenticatedDataRefreshSignal();
+  const LOADING_KEY = "genrePlaylists";
+  const { triggerRefresh, setLoading, getLoading } = useAuthenticatedDataRefreshSignal();
 
   const [genrePlaylists, setGenrePlaylists] = useState([]);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
 
   const fetchGenrePlaylists = useCallback(async () => {
-    if (!isAuthenticated) return;
-
+    setLoading(LOADING_KEY, true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-      await checkApiConnectivity();
-      await checkTokenAndShowAuthIfNeeded();
-
-      const response = await fetch("/api/genre-playlists", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("spotify_access_token")}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setGenrePlaylists(data);
+      const playlists = await GenrePlaylistService.getGenrePlaylists();
+      setGenrePlaylists(playlists);
     } catch (error) {
       setError(error.message);
-      handleApiError(error);
     } finally {
-      setLoading(false);
+      setLoading(LOADING_KEY, false);
     }
-  }, [isAuthenticated, checkApiConnectivity]);
+  }, [setLoading]);
 
   useEffect(() => {
     fetchGenrePlaylists();
   }, [fetchGenrePlaylists, triggerRefresh]);
+
+  const loading = getLoading(LOADING_KEY);
+  const setRefreshSignal = () => triggerRefresh(LOADING_KEY);
 
   return (
     <GenrePlaylistsContext.Provider
@@ -66,7 +47,7 @@ export function GenrePlaylistsProvider({ children }) {
         genrePlaylists,
         error,
         loading,
-        setRefreshSignal: triggerRefresh,
+        setRefreshSignal,
       }}
     >
       {children}
