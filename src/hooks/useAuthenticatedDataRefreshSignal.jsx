@@ -1,35 +1,43 @@
-import { useState, useCallback } from "react";
-import useApiConnectivity from "./useApiConnectivity";
-import useSpotifyAuthActions from "./useSpotifyAuthActions";
+import { useCallback, useRef, useEffect } from "react";
+import useAuthState from "./useAuthState";
 
 export function useAuthenticatedDataRefreshSignal() {
-  const [refreshSignal, setRefreshSignalRaw] = useState(0);
-  const isOperationInProgressRef = { current: false };
+  const { isAuthenticated } = useAuthState();
+  const refreshSignalRef = useRef(0);
+  const loadingStatesRef = useRef(new Map());
 
-  const checkTokenAndShowAuthIfNeeded = useSpotifyAuthActions();
+  const triggerRefresh = useCallback(
+    (loadingKey) => {
+      if (!isAuthenticated || loadingStatesRef.current.get(loadingKey)) return;
+      refreshSignalRef.current += 1;
+      loadingStatesRef.current.set(loadingKey, true);
+    },
+    [isAuthenticated]
+  );
 
-  // Setup API connectivity handling
-  const { handleApiError } = useApiConnectivity({
-    refreshCallback: triggerRefresh,
-    fetchingRef: isOperationInProgressRef,
-    refreshInProgressRef: isOperationInProgressRef,
-  });
-
-  const triggerRefresh = useCallback(() => {
-    if (!isOperationInProgressRef.current) {
-      isOperationInProgressRef.current = true;
-      setRefreshSignalRaw((prev) => prev + 1);
-      setTimeout(() => {
-        isOperationInProgressRef.current = false;
-      }, 100);
-    }
+  const setLoading = useCallback((loadingKey, value) => {
+    loadingStatesRef.current.set(loadingKey, value);
   }, []);
 
+  const getLoading = useCallback((loadingKey) => {
+    return loadingStatesRef.current.get(loadingKey) || false;
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Trigger refresh for all loading states
+      loadingStatesRef.current.forEach((_, key) => {
+        if (!loadingStatesRef.current.get(key)) {
+          triggerRefresh(key);
+        }
+      });
+    }
+  }, [isAuthenticated, triggerRefresh]);
+
   return {
-    refreshSignal,
-    setRefreshSignal: triggerRefresh,
-    isOperationInProgressRef,
-    handleApiError,
-    checkTokenAndShowAuthIfNeeded,
+    triggerRefresh,
+    refreshSignal: refreshSignalRef.current,
+    setLoading,
+    getLoading,
   };
 }
