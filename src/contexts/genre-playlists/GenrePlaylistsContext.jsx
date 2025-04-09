@@ -67,17 +67,10 @@ function GenrePlaylistsProvider({ children }) {
     }
   }, [isAuthenticated, fetchGenrePlaylists, refreshGenrePlaylistsSignal]);
 
-  const handleGenreAddAction = async (event, parentUuid) => {
-    event.stopPropagation();
-
-    const name = prompt("New genre name:");
-    if (!name) {
-      return { success: false, error: new Error("No name provided") };
-    }
-
+  const addGenre = async (name, parentUuid) => {
     try {
       await GenreService.postGenre({
-        name: name,
+        name,
         parent: parentUuid,
       });
       triggerRefresh();
@@ -150,7 +143,7 @@ function GenrePlaylistsProvider({ children }) {
     <GenrePlaylistsContext.Provider
       value={{
         groupedGenrePlaylists,
-        handleGenreAddAction,
+        addGenre,
         setRefreshGenrePlaylistsSignal: triggerRefresh,
         updateGenreParent,
         renameGenre,
