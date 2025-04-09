@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePopup } from "@contexts/popup/usePopup";
 import ApiService from "@utils/api/ApiService";
 import RequestError from "@utils/errors/RequestError";
@@ -10,6 +10,7 @@ import SpotifyAuthErrorPopupContentObject from "@models/popup-content-object/Spo
 
 const ApiErrorHandler = ({ children }) => {
   const { showPopup } = usePopup();
+  const hasShownConnectivityErrorRef = useRef(false);
 
   useEffect(() => {
     const unsubscribe = ApiService.onError((error) => {
@@ -17,8 +18,11 @@ const ApiErrorHandler = ({ children }) => {
       let popupContentObject;
 
       if (error instanceof ConnectivityError) {
-        // Create specific connectivity error popup content
-        popupContentObject = new ConnectivityErrorPopupContentObject(error);
+        // Show connectivity error only once
+        if (!hasShownConnectivityErrorRef.current) {
+          hasShownConnectivityErrorRef.current = true;
+          popupContentObject = new ConnectivityErrorPopupContentObject(error);
+        }
       } else if (error instanceof UnauthorizedRequestError) {
         // Spotify authentication error - show non-dismissable popup
         popupContentObject = new SpotifyAuthErrorPopupContentObject(error);
