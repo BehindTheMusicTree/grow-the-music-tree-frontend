@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { FaFileUpload, FaFolderOpen } from "react-icons/fa";
 
-import { formatTime } from "@utils";
+import { formatTime } from "@utils/formatting";
 import { FaRegClock } from "react-icons/fa";
 import Rating from "@components/utils/Rating";
 import UploadedTrackPositionPlayPause from "@components/utils/UploadedTrackPositionPlayPause";

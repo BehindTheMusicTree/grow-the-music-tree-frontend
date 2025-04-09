@@ -1,5 +1,5 @@
 import TrackItem from "./TrackItem";
-import { capitalizeFirstLetter } from "@utils/capitalizeFirstLetter";
+import { capitalizeFirstLetter } from "@utils/formatting";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 import { TRACK_LIST_ORIGIN_TYPE } from "@utils/constants";

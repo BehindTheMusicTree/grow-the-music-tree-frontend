@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { MdMoreVert } from "react-icons/md";
 
-import { formatTime } from "@utils/formatTime";
+import { formatTime } from "@utils/formatting";
 import UploadedTrackEditionPopupContentObject from "@models/popup-content-object/UploadedTrackEditionPopupContentObject";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
