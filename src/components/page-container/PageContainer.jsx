@@ -1,5 +1,5 @@
 import { PAGE_TYPES } from "@utils/constants";
-import { useTrackListSidebarVisibility } from "@contexts/track-list-sidebar-visibility/useTrackListSidebarVisibility";
+import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 import { usePage } from "@contexts/page/usePage";
 import TrackListSidebar from "@components/page-container/track-list-sidebar/TrackListSidebar";
 import GenresPlaylists from "@components/page-container/pages/genre-playlists/GenrePlaylists";
