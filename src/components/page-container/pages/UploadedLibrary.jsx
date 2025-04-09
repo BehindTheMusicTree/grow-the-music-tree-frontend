@@ -5,7 +5,7 @@ import { formatTime } from "@utils";
 import { FaRegClock } from "react-icons/fa";
 import Rating from "@components/utils/Rating";
 import UploadedTrackPositionPlayPause from "@components/utils/UploadedTrackPositionPlayPause";
-import { usePlayer } from "@contexts/usePlayer";
+import { usePlayer } from "@contexts/PlayerContext";
 import { usePopup } from "@contexts/popup/usePopup";
 import { useTrackList } from "@contexts/track-list/useTrackList";
 import { useUploadedTracks } from "@contexts/uploaded-tracks/useUploadedTracks";
