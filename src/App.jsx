@@ -1,29 +1,27 @@
-import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Howler } from "howler";
+import { useState } from "react";
 
-import { PageProvider } from "./contexts/page/PageContext";
-import { TrackListSidebarVisibilityProvider } from "./contexts/track-list-sidebar-visibility/TrackListSidebarVisibilityContext";
-import { GenrePlaylistsProvider } from "./contexts/genre-playlists/GenrePlaylistsContext";
-import { SpotifyLibraryProvider } from "./contexts/spotify-library/SpotifyLibraryContext";
 import { AuthProvider } from "@contexts/AuthContext";
-import { NotificationProvider } from "./contexts/notification/NotificationContext";
-import { PopupProvider } from "./contexts/popup/PopupContext";
-import { PlayerProvider } from "./contexts/player/PlayerContext";
-import { TrackListProvider } from "./contexts/track-list/TrackListContext";
-import { UploadedTracksProvider } from "./contexts/uploaded-tracks/UploadedTracksContext";
-
-import { usePlayer } from "./contexts/player/usePlayer";
-import { usePopup } from "./contexts/popup/usePopup";
-
-import Popup from "./components/popup/Popup";
-import Banner from "./components/banner/Banner";
-import Menu from "./components/menu/Menu";
-import PageContainer from "./components/page-container/PageContainer";
-import Player from "./components/player/Player";
-import ApiErrorHandler from "./components/utils/ApiErrorHandler";
-import NotFoundPage from "./components/utils/NotFoundPage";
-import SpotifyCallback from "./components/auth/SpotifyCallback";
+import { NotificationProvider } from "@contexts/notification/NotificationContext";
+import { PopupProvider } from "@contexts/popup/PopupContext";
+import { PlayerProvider } from "@contexts/player/PlayerContext";
+import { TrackListProvider } from "@contexts/track-list/TrackListContext";
+import { UploadedTracksProvider } from "@contexts/uploaded-tracks/UploadedTracksContext";
+import { PageProvider } from "@contexts/page/PageContext";
+import { TrackListSidebarVisibilityProvider } from "@contexts/track-list-sidebar-visibility/TrackListSidebarVisibilityContext";
+import { GenrePlaylistsProvider } from "@contexts/genre-playlists/GenrePlaylistsContext";
+import { SpotifyLibraryProvider } from "@contexts/spotify-library/SpotifyLibraryContext";
+import { usePlayer } from "@contexts/player/usePlayer";
+import { usePopup } from "@contexts/popup/usePopup";
+import Banner from "@components/banner/Banner";
+import Menu from "@components/menu/Menu";
+import PageContainer from "@components/page-container/PageContainer";
+import Player from "@components/player/Player";
+import Popup from "@components/popup/Popup";
+import NotFoundPage from "@components/utils/NotFoundPage";
+import SpotifyCallback from "@components/auth/SpotifyCallback";
+import ApiErrorHandler from "@components/utils/ApiErrorHandler";
+import { Howler } from "howler";
 
 Howler.autoUnlock = true;
 
