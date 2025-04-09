@@ -75,11 +75,6 @@ function AuthenticatedApp() {
     }
   };
 
-  // Initial authentication check on component mount
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
   const centerMaxHeight = {
     centerWithoutPlayer: "calc(100% - 100px)",
     centerWithPlayer: "calc(100% - 180px)",
