@@ -1,11 +1,12 @@
+"use client";
+
 import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { UploadedTrackService } from "@utils/services";
 import { useAuth } from "@contexts/AuthContext";
 
-export const UploadedTrackContext = createContext();
+const UploadedTrackContext = createContext();
 
 export function useUploadedTracks() {
   const context = useContext(UploadedTrackContext);
@@ -18,6 +19,7 @@ export function useUploadedTracks() {
 export function UploadedTrackProvider({ children }) {
   const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const {
     data: uploadedTracks = [],
@@ -25,31 +27,87 @@ export function UploadedTrackProvider({ children }) {
     error,
   } = useQuery({
     queryKey: ["uploadedTracks"],
-    queryFn: () => UploadedTrackService.getUploadedTracks(),
+    queryFn: async () => {
+      const response = await fetch(`${baseUrl}uploaded-tracks`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch uploaded tracks");
+      }
+      return response.json();
+    },
     enabled: isAuthenticated,
   });
 
-  const uploadTrackMutation = useMutation({
-    mutationFn: ({ file, genreUuid, onProgress }) => UploadedTrackService.uploadTrack(file, genreUuid, onProgress),
+  const addTrackMutation = useMutation({
+    mutationFn: async (trackData) => {
+      const response = await fetch(`${baseUrl}uploaded-tracks`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(trackData),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to add track");
+      }
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
     },
   });
 
   const updateTrackMutation = useMutation({
-    mutationFn: ({ uploadedTrackUuid, uploadedTrackData }) =>
-      UploadedTrackService.putUploadedTrack(uploadedTrackUuid, uploadedTrackData),
+    mutationFn: async ({ uploadedTrackUuid, uploadedTrackData }) => {
+      const response = await fetch(`${baseUrl}uploaded-tracks/${uploadedTrackUuid}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(uploadedTrackData),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update track");
+      }
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
     },
   });
 
-  const postUploadedTrack = async (file, genreUuid, onProgress) => {
-    return uploadTrackMutation.mutateAsync({ file, genreUuid, onProgress });
+  const deleteTrackMutation = useMutation({
+    mutationFn: async (uploadedTrackUuid) => {
+      const response = await fetch(`${baseUrl}uploaded-tracks/${uploadedTrackUuid}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete track");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
+    },
+  });
+
+  const addTrack = async (trackData) => {
+    return addTrackMutation.mutateAsync(trackData);
   };
 
-  const updateUploadedTrack = async (uploadedTrackUuid, uploadedTrackData) => {
+  const updateTrack = async (uploadedTrackUuid, uploadedTrackData) => {
     return updateTrackMutation.mutateAsync({ uploadedTrackUuid, uploadedTrackData });
+  };
+
+  const deleteTrack = async (uploadedTrackUuid) => {
+    return deleteTrackMutation.mutateAsync(uploadedTrackUuid);
+  };
+
+  const getTrack = (uploadedTrackUuid) => {
+    return uploadedTracks.find((track) => track.uuid === uploadedTrackUuid);
+  };
+
+  const getTracks = () => {
+    return uploadedTracks;
   };
 
   return (
@@ -58,9 +116,12 @@ export function UploadedTrackProvider({ children }) {
         uploadedTracks,
         error,
         isLoading,
-        postUploadedTrack,
-        updateUploadedTrack,
-        refreshUploadedTracks: () => queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] }),
+        addTrack,
+        updateTrack,
+        deleteTrack,
+        getTrack,
+        getTracks,
+        refreshTracks: () => queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] }),
       }}
     >
       {children}
