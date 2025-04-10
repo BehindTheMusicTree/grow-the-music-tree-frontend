@@ -5,10 +5,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { PopupProvider } from "@/contexts/PopupContext";
 import { UploadedTrackProvider } from "@/contexts/UploadedTrackContext";
 import { GenrePlaylistProvider } from "@/contexts/GenrePlaylistContext";
-import { PageProvider } from "@/contexts/PageContext";
 import { PlayerProvider } from "@/contexts/PlayerContext";
 import { TrackListSidebarVisibilityProvider } from "@/contexts/TrackListSidebarVisibilityContext";
-import { SpotifyLibraryProvider } from "@/contexts/SpotifyLibraryContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 
 const queryClient = new QueryClient();
@@ -19,15 +17,11 @@ export default function Providers({ children }) {
       <PopupProvider>
         <UploadedTrackProvider>
           <GenrePlaylistProvider>
-            <PageProvider>
-              <PlayerProvider>
-                <TrackListSidebarVisibilityProvider>
-                  <SpotifyLibraryProvider>
-                    <NotificationProvider>{children}</NotificationProvider>
-                  </SpotifyLibraryProvider>
-                </TrackListSidebarVisibilityProvider>
-              </PlayerProvider>
-            </PageProvider>
+            <PlayerProvider>
+              <TrackListSidebarVisibilityProvider>
+                <NotificationProvider>{children}</NotificationProvider>
+              </TrackListSidebarVisibilityProvider>
+            </PlayerProvider>
           </GenrePlaylistProvider>
         </UploadedTrackProvider>
       </PopupProvider>
