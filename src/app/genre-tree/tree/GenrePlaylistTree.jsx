@@ -8,7 +8,7 @@ import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
 import { usePlayer } from "@contexts/PlayerContext.jsx";
 import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssignedNewParentContext.jsx";
 
-import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "@/app/lib/utils/constants.js";
+import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "@lib/utils/constants.js";
 import TrackUploadPopupContentObject from "@models/popup-content-object/TrackUploadPopupContentObject";
 import GenreDeletionPopupContentObject from "@models/popup-content-object/GenreDeletionPopupContentObject";
 import InvalidInputContentObject from "@models/popup-content-object/InvalidInputContentObject";

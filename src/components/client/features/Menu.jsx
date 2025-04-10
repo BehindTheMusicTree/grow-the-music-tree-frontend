@@ -3,7 +3,7 @@ import { PiGraphLight } from "react-icons/pi";
 import { FaSpotify, FaSignOutAlt, FaExternalLinkAlt, FaCloudUploadAlt, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-import { PAGE_TYPES } from "@/app/lib/utils/constants";
+import { PAGE_TYPES } from "@lib/utils/constants";
 import { usePage } from "@contexts/PageContext";
 import { useAuthState } from "@contexts/AuthContext";
 import useSpotifyLogin from "@hooks/useSpotifyLogin";

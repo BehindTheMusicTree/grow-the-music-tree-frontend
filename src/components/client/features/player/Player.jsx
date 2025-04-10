@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolumeUp, faListUl } from "@fortawesome/free-solid-svg-icons";
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from "react-icons/fa";
 
-import { PLAY_STATES } from "@/app/lib/utils/constants";
+import { PLAY_STATES } from "@lib/utils/constants";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
