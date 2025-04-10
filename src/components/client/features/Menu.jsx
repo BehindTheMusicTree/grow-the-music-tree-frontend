@@ -4,8 +4,8 @@ import { FaSpotify, FaSignOutAlt, FaExternalLinkAlt, FaCloudUploadAlt, FaUser } 
 import { useNavigate } from "react-router-dom";
 
 import { PAGE_TYPES } from "@lib/utils/constants";
-import { usePage } from "@contexts/PageContext";
-import { useAuthState } from "@contexts/AuthContext";
+import { usePage } from "@/contexts/PageContext";
+import { useAuthState } from "@/contexts/AuthContext";
 import useSpotifyLogin from "@hooks/useSpotifyLogin";
 
 export default function Menu() {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useUploadedTracks } from "@contexts/UploadedTrackContext";
+import { useUploadedTracks } from "@/contexts/UploadedTrackContext";
 import { FaSpinner } from "react-icons/fa";
 import PropTypes from "prop-types";
 import { MdError, MdCheckCircle } from "react-icons/md";

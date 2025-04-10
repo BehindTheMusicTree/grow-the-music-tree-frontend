@@ -2,11 +2,11 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { PopupProvider } from "@contexts/PopupContext";
-import { UploadedTrackProvider } from "@contexts/UploadedTrackContext";
-import { GenrePlaylistProvider } from "@contexts/GenrePlaylistContext";
-import { PlayerProvider } from "@contexts/PlayerContext";
-import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVisibilityContext";
+import { PopupProvider } from "@/contexts/PopupContext";
+import { UploadedTrackProvider } from "@/contexts/UploadedTrackContext";
+import { GenrePlaylistProvider } from "@/contexts/GenrePlaylistContext";
+import { PlayerProvider } from "@/contexts/PlayerContext";
+import { TrackListSidebarVisibilityProvider } from "@/contexts/TrackListSidebarVisibilityContext";
 
 const queryClient = new QueryClient();
 
