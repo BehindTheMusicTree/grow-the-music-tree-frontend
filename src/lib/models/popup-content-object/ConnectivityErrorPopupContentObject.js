@@ -1,5 +1,5 @@
 import PopupContentObject from "./PopupContentObject";
-import config from "../../utils/config";
+import config from "@/lib/config";
 
 export default class ConnectivityErrorPopupContentObject extends PopupContentObject {
   constructor(errorObj) {
