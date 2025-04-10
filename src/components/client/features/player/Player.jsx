@@ -5,12 +5,12 @@ import { faVolumeUp, faListUl } from "@fortawesome/free-solid-svg-icons";
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from "react-icons/fa";
 
 import { PLAY_STATES } from "@/app/lib/utils/constants";
-import { usePlayer } from "@/app/contexts/PlayerContext";
-import { useTrackList } from "@/app/contexts/TrackListContext";
-import { useTrackListSidebarVisibility } from "@/app/contexts/TrackListSidebarVisibilityContext";
+import { usePlayer } from "@contexts/PlayerContext";
+import { useTrackList } from "@contexts/TrackListContext";
+import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 
 import albumCover from "@assets/images/album-cover-default.png";
-import Button from "@/app/components/client/Button";
+import Button from "@components/client/ui/Button";
 
 import TrackProgress from "./TrackProgress/TrackProgress";
 

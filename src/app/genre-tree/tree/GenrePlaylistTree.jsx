@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import * as d3 from "d3";
 
-import { usePopup } from "@/app/contexts/PopupContext.jsx";
-import { useTrackList } from "@/app/contexts/TrackListContext.jsx";
+import { usePopup } from "@contexts/PopupContext.jsx";
+import { useTrackList } from "@contexts/TrackListContext.jsx";
 import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
-import { usePlayer } from "@/app/contexts/PlayerContext.jsx";
-import { useGenreGettingAssignedNewParent } from "@/app/contexts/GenreGettingAssignedNewParentContext.jsx";
+import { usePlayer } from "@contexts/PlayerContext.jsx";
+import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssignedNewParentContext.jsx";
 
 import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "@/app/lib/utils/constants.js";
 import TrackUploadPopupContentObject from "@models/popup-content-object/TrackUploadPopupContentObject";

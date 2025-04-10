@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { uploadTrack } from "../../actions/tracks";
+import { uploadTrack } from "../../app/actions/tracks";
 
 export default function TrackUploader() {
   const [file, setFile] = useState(null);

@@ -1,15 +1,15 @@
 import { initSentry } from "@/lib/sentry";
 import { checkRequiredConfigVars } from "@/lib/config";
 
-import Banner from "@/app/components/client/banner/Banner";
-import Menu from "@/app/components/client/Menu";
-import Player from "@/app/components/client/player/Player";
-import Popup from "@/app/components/client/popup/Popup";
+import Banner from "@components/client/features/banner/Banner";
+import Menu from "@components/client/features/Menu";
+import Player from "@components/client/features/player/Player";
+import Popup from "@components/client/ui/popup/Popup";
 import Providers from "@/app/providers";
-import { usePopup } from "@/app/contexts/PopupContext";
-import { usePlayer } from "@/app/contexts/PlayerContext";
+import { usePopup } from "@contexts/PopupContext";
+import { usePlayer } from "@contexts/PlayerContext";
 import TrackListSidebar from "@components/track-list-sidebar/TrackListSidebar";
-import { useTrackListSidebarVisibility } from "@/app/contexts/TrackListSidebarVisibilityContext";
+import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 
 initSentry();
 checkRequiredConfigVars();

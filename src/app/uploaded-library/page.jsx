@@ -4,11 +4,11 @@ import { FaFileUpload, FaFolderOpen } from "react-icons/fa";
 import { formatTime } from "@/app/lib/utils/formatting";
 import { FaRegClock } from "react-icons/fa";
 import Rating from "@components/utils/Rating";
-import UploadedTrackPositionPlayPause from "@/app/components/client/UploadedTrackPositionPlayPause";
-import { usePlayer } from "@/app/contexts/PlayerContext";
-import { usePopup } from "@/app/contexts/PopupContext";
-import { useTrackList } from "@/app/contexts/TrackListContext";
-import { useUploadedTracks } from "@/app/contexts/UploadedTrackContext";
+import UploadedTrackPositionPlayPause from "@components/client/UploadedTrackPositionPlayPause";
+import { usePlayer } from "@contexts/PlayerContext";
+import { usePopup } from "@contexts/PopupContext";
+import { useTrackList } from "@contexts/TrackListContext";
+import { useUploadedTracks } from "@contexts/UploadedTrackContext";
 import TrackUploadPopupContentObject from "@models/popup-content-object/TrackUploadPopupContentObject";
 
 export default function UploadedLibrary() {
