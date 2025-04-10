@@ -5,7 +5,7 @@
       "@components/*": ["src/components/*"],
       "@contexts/*": ["src/contexts/*"],
       "@layouts/*": ["src/layouts/*"],
-      "@utils/*": ["src/utils/*"],
+      "@utils/*": ["src/app/lib/utils/*"],
       "@models/*": ["src/models/*"],
       "@hooks/*": ["src/hooks/*"],
       "@assets/*": ["src/assets/*"],

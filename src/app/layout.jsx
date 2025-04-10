@@ -6,10 +6,10 @@ import Menu from "@/app/components/client/Menu";
 import Player from "@/app/components/client/player/Player";
 import Popup from "@/app/components/client/popup/Popup";
 import Providers from "@/app/providers";
-import { usePopup } from "@contexts/PopupContext";
-import { usePlayer } from "@contexts/PlayerContext";
+import { usePopup } from "@/app/contexts/PopupContext";
+import { usePlayer } from "@/app/contexts/PlayerContext";
 import TrackListSidebar from "@components/track-list-sidebar/TrackListSidebar";
-import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
+import { useTrackListSidebarVisibility } from "@/app/contexts/TrackListSidebarVisibilityContext";
 
 initSentry();
 checkRequiredConfigVars();

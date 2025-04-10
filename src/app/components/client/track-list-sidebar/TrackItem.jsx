@@ -1,11 +1,11 @@
 import PropTypes from "prop-types";
 import { MdMoreVert } from "react-icons/md";
 
-import { formatTime } from "@utils/formatting";
+import { formatTime } from "@/app/lib/utils/formatting";
 import UploadedTrackEditionPopupContentObject from "@models/popup-content-object/UploadedTrackEditionPopupContentObject";
-import { usePopup } from "@contexts/PopupContext";
-import { usePlayer } from "@contexts/PlayerContext";
-import { useTrackList } from "@contexts/TrackListContext";
+import { usePopup } from "@/app/contexts/PopupContext";
+import { usePlayer } from "@/app/contexts/PlayerContext";
+import { useTrackList } from "@/app/contexts/TrackListContext";
 import UploadedTrackPositionPlayPause from "@/app/components/client/UploadedTrackPositionPlayPause";
 
 export default function TrackItem({ uploadedTrack, position }) {

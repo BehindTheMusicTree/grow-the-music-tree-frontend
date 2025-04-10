@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
-import { usePopup } from "@contexts/PopupContext";
+import { usePopup } from "@/app/contexts/PopupContext";
 import Button from "@/app/components/client/Button";
 import ApiErrorPopupContentObject from "@models/popup-content-object/ApiErrorPopupContentObject";
 

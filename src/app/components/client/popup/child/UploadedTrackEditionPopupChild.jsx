@@ -3,9 +3,9 @@ import { useState } from "react";
 
 import { UploadedTrackService } from "@utils/services";
 import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
-import { useTrackList } from "@contexts/TrackListContext";
-import { formatTime } from "@utils/formatting";
-import { FORM_RATING_NULL_VALUE } from "@utils/constants";
+import { useTrackList } from "@/app/contexts/TrackListContext";
+import { formatTime } from "@/app/lib/utils/formatting";
+import { FORM_RATING_NULL_VALUE } from "@/app/lib/utils/constants";
 import Rating from "@components/utils/Rating";
 
 export default function UploadedTrackEditionPopupChild({ popupContentObject, hide }) {

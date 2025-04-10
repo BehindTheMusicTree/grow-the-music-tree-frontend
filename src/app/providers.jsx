@@ -2,12 +2,11 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { PopupProvider } from "@/contexts/PopupContext";
-import { UploadedTrackProvider } from "@/contexts/UploadedTrackContext";
+import { PopupProvider } from "@/app/contexts/PopupContext";
+import { UploadedTrackProvider } from "@/app/contexts/UploadedTrackContext";
 import { GenrePlaylistProvider } from "@/contexts/GenrePlaylistContext";
-import { PlayerProvider } from "@/contexts/PlayerContext";
-import { TrackListSidebarVisibilityProvider } from "@/contexts/TrackListSidebarVisibilityContext";
-import { NotificationProvider } from "@/contexts/NotificationContext";
+import { PlayerProvider } from "@/app/contexts/PlayerContext";
+import { TrackListSidebarVisibilityProvider } from "@/app/contexts/TrackListSidebarVisibilityContext";
 
 const queryClient = new QueryClient();
 
@@ -18,9 +17,7 @@ export default function Providers({ children }) {
         <UploadedTrackProvider>
           <GenrePlaylistProvider>
             <PlayerProvider>
-              <TrackListSidebarVisibilityProvider>
-                <NotificationProvider>{children}</NotificationProvider>
-              </TrackListSidebarVisibilityProvider>
+              <TrackListSidebarVisibilityProvider>{children}</TrackListSidebarVisibilityProvider>
             </PlayerProvider>
           </GenrePlaylistProvider>
         </UploadedTrackProvider>
