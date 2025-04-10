@@ -10,13 +10,4 @@ export const TRACK_LIST_ORIGIN_TYPE = {
   UPLOADED_TRACK: "UPLOADED_TRACK",
 };
 
-export const PAGE_TYPES = {
-  GENRE_PLAYLISTS: "GENRE_PLAYLISTS",
-  UPLOADED_LIBRARY: "UPLOADED_LIBRARY",
-  SPOTIFY_LIBRARY: "SPOTIFY_LIBRARY",
-  ACCOUNT: "ACCOUNT",
-};
-
-export const DUE_TO_PREVIOUS_ERROR_MESSAGE = "Error occurred during previous operation:";
-
 export const FORM_RATING_NULL_VALUE = -1;
