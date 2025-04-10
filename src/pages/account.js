@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNextPage } from "@contexts/NextPageContext";
 import { PAGE_TYPES } from "@utils/constants";
-import AccountPage from "@components/page-container/pages/AccountPage";
+import AccountPage from "@/app/account/page";
 import Page from "@models/Page";
 
 export default function Account() {

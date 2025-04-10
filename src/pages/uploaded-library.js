@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNextPage } from "@contexts/NextPageContext";
 import { PAGE_TYPES } from "@utils/constants";
-import UploadedLibrary from "@components/page-container/pages/UploadedLibrary";
+import UploadedLibrary from "@/app/uploaded-library/page";
 import Page from "@models/Page";
 
 export default function UploadedLibraryPage() {

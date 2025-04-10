@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNextPage } from "@contexts/NextPageContext";
 import { PAGE_TYPES } from "@utils/constants";
-import SpotifyLibrary from "@components/page-container/pages/SpotifyLibrary";
+import SpotifyLibrary from "@/app/spotify-library/page";
 import Page from "@models/Page";
 
 export default function SpotifyLibraryPage() {
