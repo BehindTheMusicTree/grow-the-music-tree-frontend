@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { initSentry } from "@/lib/sentry";
+import { checkRequiredConfigVars } from "@/lib/config";
 
 import Banner from "@/app/components/client/banner/Banner";
 import Menu from "@/app/components/client/Menu";
@@ -9,6 +10,9 @@ import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import TrackListSidebar from "@components/track-list-sidebar/TrackListSidebar";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
+
+initSentry();
+checkRequiredConfigVars();
 
 export default function RootLayout({ children }) {
   const { playerUploadedTrackObject } = usePlayer();
