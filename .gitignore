@@ -35,8 +35,4 @@ build/
 public/env-config.js
 
 # Next.js build artifacts
-.next/trace
-.next/index.pack
-.next/cache
-.next/standalone
-.next/types
+.next/
