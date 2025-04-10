@@ -8,12 +8,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage",
-    "test:cors": "vitest run src/utils/ApiService.test.js src/components/utils/ApiErrorHandler.test.jsx src/components/popup/child/CorsErrorPopupChild.test.jsx"
+    "lint": "next lint"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
@@ -22,7 +17,6 @@
     "@next/eslint-plugin-next": "^15.2.5",
     "@sentry/react": "^7.111.0",
     "@sentry/tracing": "^7.111.0",
-    "@sentry/vite-plugin": "^2.16.1",
     "@tailwindcss/forms": "^0.5.7",
     "@tanstack/react-query": "^5.72.2",
     "classnames": "^2.5.1",
@@ -47,7 +41,6 @@
     "@types/react-dom": "^18.2.22",
     "@typescript-eslint/eslint-plugin": "^8.29.0",
     "@typescript-eslint/parser": "^8.29.0",
-    "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
     "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
@@ -56,9 +49,6 @@
     "eslint-plugin-react-refresh": "^0.4.6",
     "jsdom": "^26.0.0",
     "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.3",
-    "vite": "^6.2.2",
-    "vite-plugin-eslint": "^1.8.1",
-    "vitest": "^3.0.9"
+    "tailwindcss": "^3.4.3"
   }
 }
