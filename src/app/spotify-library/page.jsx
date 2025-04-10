@@ -1,3 +1,5 @@
+"use client";
+
 import { FaSpinner } from "react-icons/fa";
 import { MdError } from "react-icons/md";
 import { useSpotifyLibrary } from "@/contexts//SpotifyLibraryContext";

@@ -1,3 +1,5 @@
+"use client";
+
 import TrackItem from "./TrackItem";
 import { capitalizeFirstLetter } from "@lib/utils/formatting";
 import { useTrackList } from "@/contexts/TrackListContext";

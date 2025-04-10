@@ -1,5 +1,6 @@
+"use client";
+
 import PopupContentObject from "./PopupContentObject";
-import SpotifyOAuthService from "../../utils/services/SpotifyOAuthService";
 
 export default class SpotifyAuthPopupContentObject extends PopupContentObject {
   constructor() {
@@ -7,7 +8,7 @@ export default class SpotifyAuthPopupContentObject extends PopupContentObject {
     this.message = "You need to connect your Spotify account to access the application.";
     this.isDismissable = false;
     this.onAuthenticate = () => {
-      SpotifyOAuthService.initiateLogin();
+      console.log("onAuthenticate");
     };
   }
 }

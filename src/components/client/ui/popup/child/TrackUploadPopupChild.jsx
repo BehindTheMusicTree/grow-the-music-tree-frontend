@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import { useUploadedTracks } from "@/contexts/UploadedTrackContext";
 import { FaSpinner } from "react-icons/fa";

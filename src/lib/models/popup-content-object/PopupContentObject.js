@@ -1,3 +1,5 @@
+"use client";
+
 export default class PopupContentObject {
   constructor(title, type) {
     this.title = title;

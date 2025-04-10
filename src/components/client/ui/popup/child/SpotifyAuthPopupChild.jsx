@@ -1,3 +1,5 @@
+"use client";
+
 import { FaSpotify } from "react-icons/fa";
 import PropTypes from "prop-types";
 

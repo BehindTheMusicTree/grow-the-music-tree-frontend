@@ -1,6 +1,8 @@
+"use client";
+
 import { useState, useEffect, useRef } from "react";
 import { PiGraphLight } from "react-icons/pi";
-import { FaSpotify, FaSignOutAlt, FaExternalLinkAlt, FaCloudUploadAlt, FaUser } from "react-icons/fa";
+import { FaSpotify, FaExternalLinkAlt, FaCloudUploadAlt, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 import { PAGE_TYPES } from "@lib/utils/constants";

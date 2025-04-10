@@ -1,3 +1,5 @@
+"use client";
+
 import { usePopup } from "@/contexts/PopupContext";
 
 import InvalidInputPopupChild from "./child/InvalidInputPopupChild";

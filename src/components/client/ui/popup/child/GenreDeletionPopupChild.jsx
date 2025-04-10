@@ -1,3 +1,5 @@
+"use client";
+
 import PropTypes from "prop-types";
 import { useGenrePlaylists } from "@/contexts/GenrePlaylistContext";
 import { usePopup } from "@/contexts/PopupContext";

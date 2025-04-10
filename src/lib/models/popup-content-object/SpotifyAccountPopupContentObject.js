@@ -1,3 +1,5 @@
+"use client";
+
 import PopupContentObject from "./PopupContentObject";
 
 export default class SpotifyAccountPopupContentObject extends PopupContentObject {

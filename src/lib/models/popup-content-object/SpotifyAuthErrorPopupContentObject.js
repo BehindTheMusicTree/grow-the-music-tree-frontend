@@ -1,3 +1,5 @@
+"use client";
+
 import PopupContentObject from "./PopupContentObject";
 import SpotifyOAuthService from "@utils/services/SpotifyOAuthService";
 

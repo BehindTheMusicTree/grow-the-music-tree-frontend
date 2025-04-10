@@ -1,3 +1,5 @@
+"use client";
+
 import PopupContentObject from "./PopupContentObject";
 import config from "@/lib/config";
 
