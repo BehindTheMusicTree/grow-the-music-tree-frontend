@@ -1,4 +1,3 @@
-export { AuthProvider, useAuth } from "./AuthContext";
 export { NotificationProvider, useNotification } from "./NotificationContext";
 export { PopupProvider, usePopup } from "./PopupContext";
 export { PlayerProvider, usePlayer } from "./PlayerContext";

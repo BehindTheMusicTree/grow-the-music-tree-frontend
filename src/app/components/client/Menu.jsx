@@ -3,7 +3,6 @@ import { PiGraphLight } from "react-icons/pi";
 import { FaSpotify, FaSignOutAlt, FaExternalLinkAlt, FaCloudUploadAlt, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-import ApiTokenService from "@utils/services/ApiTokenService";
 import { PAGE_TYPES } from "@utils/constants";
 import { usePage } from "@contexts/PageContext";
 import { useAuthState } from "@contexts/AuthContext";
@@ -37,13 +36,6 @@ export default function Menu() {
   const handleSignUpWithSpotify = () => {
     login();
     setShowUserMenu(false);
-  };
-
-  const handleSignOut = () => {
-    ApiTokenService.clearApiAuth();
-    setShowUserMenu(false);
-    // Force a re-render to trigger the auth popup
-    window.location.reload();
   };
 
   const handleAccountClick = () => {
@@ -147,17 +139,6 @@ export default function Menu() {
                   </div>
                 </div>
               )}
-              <button
-                className="w-full px-3 py-2 text-left text-white hover:bg-red-600 flex items-center
-                     transition-all duration-200 group"
-                onClick={handleSignOut}
-              >
-                <FaSignOutAlt className="mr-2 text-xl text-red-500 group-hover:text-white transition-colors duration-200" />
-                <div>
-                  <div className="text-sm font-medium">Sign out</div>
-                  <div className="text-xs text-gray-400 group-hover:text-gray-200">Disconnect from Spotify</div>
-                </div>
-              </button>
             </>
           ) : (
             <button
