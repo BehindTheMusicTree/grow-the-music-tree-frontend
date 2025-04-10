@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import Banner from "@/app/components/client/banner/Banner";
 import Menu from "@/app/components/client/Menu";
-import Player from "@components/player/Player";
-import Popup from "@components/popup/Popup";
+import Player from "@/app/components/client/player/Player";
+import Popup from "@/app/components/client/popup/Popup";
 import Providers from "@/app/providers";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";

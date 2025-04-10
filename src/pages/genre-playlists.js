@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNextPage } from "@contexts/NextPageContext";
 import { PAGE_TYPES } from "@utils/constants";
-import GenresPlaylists from "@components/page-container/pages/genre-playlists/GenrePlaylists";
+import GenresPlaylists from "@/app/genre-tree/GenrePlaylists";
 import Page from "@models/Page";
 
 export default function GenrePlaylistsPage() {

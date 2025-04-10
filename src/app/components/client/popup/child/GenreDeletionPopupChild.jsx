@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
 import { usePopup } from "@contexts/PopupContext";
-import Button from "@components/utils/Button";
+import Button from "@/app/components/client/Button";
 import ApiErrorPopupContentObject from "@models/popup-content-object/ApiErrorPopupContentObject";
 
 export default function GenreDeletionPopupChild({ hide, popupContentObject }) {

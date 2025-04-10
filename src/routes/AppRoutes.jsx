@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import NotFoundPage from "@components/utils/NotFoundPage";
+import NotFoundPage from "@/app/not-found-jsx";
 import SpotifyCallback from "@/app/spotify-callback/page";
 
 export function AppRoutes() {

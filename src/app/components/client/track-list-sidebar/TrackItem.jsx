@@ -6,7 +6,7 @@ import UploadedTrackEditionPopupContentObject from "@models/popup-content-object
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackList } from "@contexts/TrackListContext";
-import UploadedTrackPositionPlayPause from "@components/utils/UploadedTrackPositionPlayPause";
+import UploadedTrackPositionPlayPause from "@/app/components/client/UploadedTrackPositionPlayPause";
 
 export default function TrackItem({ uploadedTrack, position }) {
   const { showPopup } = usePopup();

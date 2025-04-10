@@ -1,4 +1,4 @@
-import NotFoundPage from "@components/utils/NotFoundPage";
+import NotFoundPage from "@/app/not-found-jsx";
 
 export default function Custom404() {
   return (

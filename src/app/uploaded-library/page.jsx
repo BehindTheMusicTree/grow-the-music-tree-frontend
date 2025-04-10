@@ -4,7 +4,7 @@ import { FaFileUpload, FaFolderOpen } from "react-icons/fa";
 import { formatTime } from "@utils/formatting";
 import { FaRegClock } from "react-icons/fa";
 import Rating from "@components/utils/Rating";
-import UploadedTrackPositionPlayPause from "@components/utils/UploadedTrackPositionPlayPause";
+import UploadedTrackPositionPlayPause from "@/app/components/client/UploadedTrackPositionPlayPause";
 import { usePlayer } from "@contexts/PlayerContext";
 import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";

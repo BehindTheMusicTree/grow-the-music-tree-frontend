@@ -10,7 +10,7 @@ import { useTrackList } from "@contexts/TrackListContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 
 import albumCover from "@assets/images/album-cover-default.png";
-import Button from "@components/utils/Button";
+import Button from "@/app/components/client/Button";
 
 import TrackProgress from "./TrackProgress/TrackProgress";
 
