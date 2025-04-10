@@ -1,18 +1,19 @@
 import { useState } from "react";
 
-import Banner from "@components/banner/Banner";
-import Menu from "@components/menu/Menu";
-import PageContainer from "@components/page-container/PageContainer";
+import Banner from "@/app/components/client/banner/Banner";
+import Menu from "@/app/components/client/Menu";
 import Player from "@components/player/Player";
 import Popup from "@components/popup/Popup";
 import Providers from "@/app/providers";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
+import TrackListSidebar from "@components/track-list-sidebar/TrackListSidebar";
+import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 
-export default function RootLayout() {
+export default function RootLayout({ children }) {
   const { playerUploadedTrackObject } = usePlayer();
   const { popupContentObject } = usePopup();
-
+  const isTrackListSidebarVisible = useTrackListSidebarVisibility();
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {
     centerWithPlayer: "calc(100vh - 180px)", // Assuming banner is 100px and player is 80px
@@ -35,7 +36,15 @@ export default function RootLayout() {
               }}
             >
               <Menu />
-              <PageContainer />
+              {
+                /* 180px being the sum of the banner and player heights, 100px being the height of the banner alone */
+                <div className={"page-container w-full flex-grow p-5 overflow-auto flex flex-col bg-gray-200 m-0"}>
+                  <main>{children}</main>
+
+                  {/* bottom-20 corresponding to 80px which is the player's height */}
+                  {isTrackListSidebarVisible ? <TrackListSidebar /> : null}
+                </div>
+              }
             </div>
             {playerUploadedTrackObject && <Player />}
             {popupContentObject && <Popup />}

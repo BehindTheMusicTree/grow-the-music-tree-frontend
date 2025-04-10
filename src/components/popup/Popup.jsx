@@ -1,4 +1,4 @@
-import { usePopup } from "../../contexts/PopupContext";
+import { usePopup } from "@contexts/PopupContext";
 
 import InvalidInputPopupChild from "./child/InvalidInputPopupChild";
 import UploadedTrackEditionPopupChild from "./child/UploadedTrackEditionPopupChild";

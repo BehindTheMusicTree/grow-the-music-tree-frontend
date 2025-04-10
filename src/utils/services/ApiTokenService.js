@@ -15,10 +15,19 @@ export default class ApiTokenService {
   static _lastTokenCheck = { time: 0, result: false };
 
   /**
+   * Checks if the code is running in a browser environment
+   * @returns {boolean} True if running in browser, false otherwise
+   */
+  static isBrowser() {
+    return typeof window !== "undefined";
+  }
+
+  /**
    * Retrieves the API token from localStorage
    * @returns {string|null} The API token or null if not found
    */
   static getApiToken() {
+    if (!this.isBrowser()) return null;
     const token = localStorage.getItem(this.API_TOKEN_KEY);
     console.log("[ApiTokenService] Token retrieved:", { exists: !!token, length: token?.length });
     return token;
@@ -32,7 +41,7 @@ export default class ApiTokenService {
    * @param {object} profile - The user profile (optional)
    */
   static saveApiToken(token, expiresIn, refreshToken = null, profile = null) {
-    if (!token) return;
+    if (!this.isBrowser() || !token) return;
 
     // Save token
     localStorage.setItem(this.API_TOKEN_KEY, token);
@@ -54,62 +63,72 @@ export default class ApiTokenService {
   }
 
   /**
-   * Retrieves the API token expiry date from localStorage
-   * @returns {Date|null} The API token expiry date or null if not found
+   * Retrieves the API token expiry time from localStorage
+   * @returns {number|null} The expiry time in milliseconds or null if not found
    */
   static getApiTokenExpiry() {
+    if (!this.isBrowser()) return null;
     const expiry = localStorage.getItem(this.API_TOKEN_EXPIRY_KEY);
-    return expiry ? new Date(parseInt(expiry)) : null;
+    return expiry ? parseInt(expiry) : null;
   }
 
   /**
    * Checks if the API token is expired
-   * @returns {boolean} True if token is expired or missing, false otherwise
+   * @returns {boolean} True if expired or not found, false otherwise
    */
   static isApiTokenExpired() {
-    const expiryDate = this.getApiTokenExpiry();
+    if (!this.isBrowser()) return true;
+    const expiry = this.getApiTokenExpiry();
+    if (!expiry) return true;
 
-    // Token is expired if expiry date is missing or in the past
-    // Add 60 seconds buffer to prevent edge cases
-    if (!expiryDate) return true;
-
-    const now = new Date();
-    now.setSeconds(now.getSeconds() + 60); // Buffer
-    return expiryDate < now;
+    const now = new Date().getTime();
+    return now >= expiry;
   }
 
   /**
    * Checks if there is a valid API token
-   * @returns {boolean} True if a valid token exists, false otherwise
+   * @returns {boolean} True if valid token exists, false otherwise
    */
   static hasValidApiToken() {
+    if (!this.isBrowser()) return false;
+
+    // Check cache first
+    const now = Date.now();
+    if (now - this._lastTokenCheck.time < 1000) {
+      return this._lastTokenCheck.result;
+    }
+
     const token = this.getApiToken();
-    const isValid = !!token;
+    const isValid = !!token && !this.isApiTokenExpired();
+
+    // Update cache
+    this._lastTokenCheck = { time: now, result: isValid };
     return isValid;
   }
 
   /**
-   * Updates the last sync timestamp
-   * Used to track when data was last synchronized
+   * Updates the last sync timestamp in localStorage
    */
   static updateSyncTimestamp() {
-    const now = new Date();
-    localStorage.setItem(this.API_SYNC_TIMESTAMP_KEY, now.getTime().toString());
+    if (!this.isBrowser()) return;
+    localStorage.setItem(this.API_SYNC_TIMESTAMP_KEY, Date.now().toString());
   }
 
   /**
-   * Gets the last sync timestamp
-   * @returns {Date|null} The last sync timestamp or null if not found
+   * Retrieves the last sync timestamp from localStorage
+   * @returns {number|null} The timestamp in milliseconds or null if not found
    */
   static getLastSyncTimestamp() {
+    if (!this.isBrowser()) return null;
     const timestamp = localStorage.getItem(this.API_SYNC_TIMESTAMP_KEY);
-    return timestamp ? new Date(parseInt(timestamp)) : null;
+    return timestamp ? parseInt(timestamp) : null;
   }
 
   /**
-   * Clears all API auth data from localStorage
+   * Clears all API authentication data from localStorage
    */
   static clearApiAuth() {
+    if (!this.isBrowser()) return;
     localStorage.removeItem(this.API_TOKEN_KEY);
     localStorage.removeItem(this.API_TOKEN_EXPIRY_KEY);
     localStorage.removeItem(this.API_REFRESH_KEY);
@@ -118,22 +137,27 @@ export default class ApiTokenService {
   }
 
   /**
-   * Gets the stored user profile
+   * Retrieves the API profile from localStorage
    * @returns {object|null} The user profile or null if not found
    */
   static getApiProfile() {
+    if (!this.isBrowser()) return null;
     const profile = localStorage.getItem(this.API_PROFILE_KEY);
     return profile ? JSON.parse(profile) : null;
   }
 
   /**
-   * Ensures a valid API token exists
-   * @throws {Error} If no valid token is available
+   * Ensures the API token is valid, refreshing if necessary
+   * @returns {Promise<boolean>} True if token is valid, false otherwise
    */
-  static ensureValidToken() {
-    const token = this.getApiToken();
-    if (!token || this.isApiTokenExpired()) {
-      throw new Error("No API token available");
-    }
+  static async ensureValidToken() {
+    if (!this.isBrowser()) return false;
+    if (this.hasValidApiToken()) return true;
+
+    const refreshToken = localStorage.getItem(this.API_REFRESH_KEY);
+    if (!refreshToken) return false;
+
+    // TODO: Implement token refresh logic
+    return false;
   }
 }

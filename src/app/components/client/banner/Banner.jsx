@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import SearchForm from "./SearchForm";
 import logo from "@assets/images/logos/umg-logo-maze-100.svg";
 
-export default function Banner({ setSearchSubmitted }) {
+export default function Banner() {
   return (
     <div className="py-2 px-3 bg-black text-gray-100">
       <div className="w-full mx-auto relative">
@@ -17,7 +17,7 @@ export default function Banner({ setSearchSubmitted }) {
           </div>
         </div>
         <div className="search w-64 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <SearchForm setSearchSubmitted={setSearchSubmitted} />
+          <SearchForm />
         </div>
       </div>
     </div>

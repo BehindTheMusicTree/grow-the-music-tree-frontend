@@ -1,4 +1,4 @@
-import SpotifyCallback from "@components/auth/SpotifyCallback";
+import SpotifyCallback from "@/app/spotify-callback/page";
 
 export default function SpotifyCallbackPage() {
   return (

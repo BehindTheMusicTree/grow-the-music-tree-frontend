@@ -2,17 +2,8 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import { FaSearch } from "react-icons/fa";
 
-const logApiCall = (action, data) => {
-  console.log(`API ${action}:`, {
-    timestamp: new Date().toISOString(),
-    action,
-    data,
-  });
-};
-
-export default function SearchForm({ setSearchSubmitted }) {
+export default function SearchForm() {
   const [isFirstFocus, setIsFirstFocus] = useState(true);
-  const [searchUnsubmitted, setSearchUnsubmitted] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,26 +12,12 @@ export default function SearchForm({ setSearchSubmitted }) {
       alert("Please enter a search term");
       return;
     }
-
-    try {
-      logApiCall("SEARCH_START", { query: searchUnsubmitted });
-      await setSearchSubmitted(searchUnsubmitted);
-      logApiCall("SEARCH_SUCCESS", { query: searchUnsubmitted });
-    } catch (error) {
-      logApiCall("SEARCH_ERROR", { query: searchUnsubmitted, error: error.message });
-      console.error("Search failed:", error);
-    }
   };
 
   const handleFocus = () => {
     if (isFirstFocus) {
-      setSearchUnsubmitted("");
       setIsFirstFocus(false);
     }
-  };
-
-  const handleChange = (e) => {
-    setSearchUnsubmitted(e.target.value);
   };
 
   return (
@@ -51,8 +28,6 @@ export default function SearchForm({ setSearchSubmitted }) {
         type="text"
         name="search"
         placeholder="Search library or dig..."
-        onChange={handleChange}
-        value={searchUnsubmitted}
         onFocus={handleFocus}
       />
     </form>

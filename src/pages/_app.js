@@ -12,8 +12,8 @@ import { NotificationProvider } from "@contexts/NotificationContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-import Banner from "@components/banner/Banner";
-import Menu from "@components/menu/Menu";
+import Banner from "@/app/components/client/banner/Banner";
+import Menu from "@/app/components/client/Menu";
 import Player from "@components/player/Player";
 import Popup from "@components/popup/Popup";
 
