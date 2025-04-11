@@ -1,10 +1,9 @@
 "use client";
 
 import { createContext, useContext } from "react";
+import { useSession } from "next-auth/react";
 import PropTypes from "prop-types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-import { useAuth } from "@contexts/AuthContext";
 
 const UploadedTrackContext = createContext();
 
@@ -17,10 +16,9 @@ export function useUploadedTracks() {
 }
 
 export function UploadedTrackProvider({ children }) {
-  const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
+  const { status } = useSession();
   const {
     data: uploadedTracks = [],
     isLoading,
@@ -34,7 +32,7 @@ export function UploadedTrackProvider({ children }) {
       }
       return response.json();
     },
-    enabled: isAuthenticated,
+    enabled: status === "authenticated",
   });
 
   const addTrackMutation = useMutation({
@@ -54,6 +52,7 @@ export function UploadedTrackProvider({ children }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
     },
+    enabled: status === "authenticated",
   });
 
   const updateTrackMutation = useMutation({
@@ -73,6 +72,7 @@ export function UploadedTrackProvider({ children }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
     },
+    enabled: status === "authenticated",
   });
 
   const deleteTrackMutation = useMutation({
@@ -88,6 +88,7 @@ export function UploadedTrackProvider({ children }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
     },
+    enabled: status === "authenticated",
   });
 
   const addTrack = async (trackData) => {
