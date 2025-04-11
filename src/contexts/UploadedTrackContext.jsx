@@ -103,11 +103,11 @@ export function UploadedTrackProvider({ children }) {
     return deleteTrackMutation.mutateAsync(uploadedTrackUuid);
   };
 
-  const getTrack = (uploadedTrackUuid) => {
+  const retrieveTrack = (uploadedTrackUuid) => {
     return uploadedTracks.find((track) => track.uuid === uploadedTrackUuid);
   };
 
-  const getTracks = () => {
+  const listTracks = () => {
     return uploadedTracks;
   };
 
@@ -120,8 +120,8 @@ export function UploadedTrackProvider({ children }) {
         addTrack,
         updateTrack,
         deleteTrack,
-        getTrack,
-        getTracks,
+        retrieveTrack,
+        listTracks,
         refreshTracks: () => queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] }),
       }}
     >
