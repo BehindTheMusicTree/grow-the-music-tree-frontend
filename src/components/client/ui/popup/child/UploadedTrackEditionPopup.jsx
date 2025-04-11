@@ -1,10 +1,10 @@
 "use client";
 
-import { BasePopup } from "./BasePopup";
-import { formatTime } from "@lib/utils/formatting";
-import Rating from "@components/utils/Rating";
 import PropTypes from "prop-types";
+import { formatTime } from "@utils/formatting";
+import Rating from "@components/client/features/Rating";
 import Button from "@components/client/ui/Button";
+import { BasePopup } from "./BasePopup";
 
 export function UploadedTrackEditionPopup({ onClose, track, formValues, onFormChange, onSubmit, className = "" }) {
   return (
