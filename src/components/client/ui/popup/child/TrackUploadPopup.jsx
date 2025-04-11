@@ -11,7 +11,7 @@ export default function TrackUploadPopup({ content, onClose }) {
   const isPostingRef = useRef(false);
 
   useEffect(() => {
-    async function postLibTracks(files, genreUuid) {
+    async function uploadTracks(files, genreUuid) {
       try {
         const formData = new FormData();
         files.forEach((file) => formData.append("files", file));
@@ -37,7 +37,7 @@ export default function TrackUploadPopup({ content, onClose }) {
 
     if (content && !isPostingRef.current) {
       isPostingRef.current = true;
-      postLibTracks(content.files, content.genreUuid);
+      uploadTracks(content.files, content.genreUuid);
     }
   }, [content, setRefreshGenrePlaylistsSignal, onClose]);
 
