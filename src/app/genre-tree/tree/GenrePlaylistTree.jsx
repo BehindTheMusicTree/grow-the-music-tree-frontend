@@ -40,11 +40,10 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
    * Handles file selection for track upload
    */
   async function handleFileChange(event) {
-    const popupContentObject = new TrackUploadPopupContentObject(
-      Array.from(event.target.files),
-      selectingFileGenreUuidRef.current
-    );
-    showPopup(popupContentObject);
+    showPopup("trackUpload", {
+      files: event.target.files,
+      genreUuid: selectingFileGenreUuidRef.current,
+    });
     event.target.value = null;
   }
 
@@ -89,16 +88,15 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     const transformedTreeData = setupTreeLayout(d3, treeData, highestVerticalCoordinate);
 
     const updateGenreParent = async (genreUuid, parentUuid) => {
-      const result = await updateGenreParent(genreUuid, parentUuid);
-      if (!result.success) {
-        showPopup(new ApiErrorPopupContentObject(result.error));
-      }
+      await updateGenreParent(genreUuid, parentUuid);
     };
 
-    const renameGenre = async (genreUuid, newName) => {
+    const handleRenameGenre = async (genreUuid, newName) => {
       const result = await renameGenre(genreUuid, newName);
       if (!result.success) {
-        showPopup(new ApiErrorPopupContentObject(result.error));
+        if (result.code === 2001) {
+          showPopup("invalidInput", result);
+        }
       }
     };
 
@@ -115,9 +113,10 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       handleGenreAddAction,
       setGenreGettingAssignedNewParent,
       updateGenreParent,
-      renameGenre,
+      handleRenameGenre,
       showPopup,
       setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
+      renameGenre,
     });
 
     // Cleanup on unmount
@@ -139,8 +138,8 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     handlePlayPauseIconAction,
     setGenreGettingAssignedNewParent,
     updateGenreParent,
-    renameGenre,
     showPopup,
+    renameGenre,
   ]);
 
   return (
