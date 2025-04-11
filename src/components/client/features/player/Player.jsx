@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolumeUp, faListUl } from "@fortawesome/free-solid-svg-icons";
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from "react-icons/fa";
 
-import { PLAY_STATES } from "@lib/utils/constants";
+import { PLAY_STATES } from "@utils/constants";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
@@ -73,7 +73,13 @@ export default function Player() {
   return (
     <div className="w-full h-player fixed bottom-0 flex justify-between p-2 bg-black text-white text-sm">
       <div className="flex-1 flex items-center justify-center">
-        <img className="flex-none w-16 h-16 overflow-hidden mr-5" src={albumCover} alt="Album Cover" />
+        <Image
+          className="flex-none w-16 h-16 overflow-hidden mr-5"
+          src={albumCover}
+          alt="Album Cover"
+          width={64}
+          height={64}
+        />
         <div className="flex-1 flex flex-col items-start justify-center w-full">
           <div>{playerUploadedTrackObject?.uploadedTrack?.title}</div>
           <div>{playerUploadedTrackObject?.uploadedTrack?.artist?.name}</div>
