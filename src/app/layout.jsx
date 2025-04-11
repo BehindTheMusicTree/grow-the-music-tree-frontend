@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { initSentry } from "@/lib/sentry";
 import { checkRequiredConfigVars } from "@/lib/config";
-import { setupConnectivityInterceptor } from "@utils/connectivityInterceptor";
+import { setupConnectivityInterceptor } from "@utils/connectivity/connectivityInterceptor";
 import { useConnectivityErrorHandler } from "@/hooks/useConnectivityErrorHandler";
 
 import Banner from "@/components/client/features/banner/Banner";
