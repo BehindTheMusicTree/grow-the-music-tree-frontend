@@ -7,27 +7,27 @@ import { UploadedTrackProvider } from "@contexts/UploadedTrackContext";
 import { GenrePlaylistProvider } from "@contexts/GenrePlaylistContext";
 import { PlayerProvider } from "@contexts/PlayerContext";
 import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVisibilityContext";
-import { AuthProvider } from "@contexts/AuthContext";
 import { TrackListProvider } from "@contexts/TrackListContext";
+import { SpotifyLibraryProvider } from "@contexts/SpotifyLibraryContext";
 
 const queryClient = new QueryClient();
 
 export default function Providers({ children }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <PopupProvider>
-          <UploadedTrackProvider>
-            <GenrePlaylistProvider>
-              <PlayerProvider>
-                <TrackListProvider>
+      <PopupProvider>
+        <UploadedTrackProvider>
+          <GenrePlaylistProvider>
+            <PlayerProvider>
+              <TrackListProvider>
+                <SpotifyLibraryProvider>
                   <TrackListSidebarVisibilityProvider>{children}</TrackListSidebarVisibilityProvider>
-                </TrackListProvider>
-              </PlayerProvider>
-            </GenrePlaylistProvider>
-          </UploadedTrackProvider>
-        </PopupProvider>
-      </AuthProvider>
+                </SpotifyLibraryProvider>
+              </TrackListProvider>
+            </PlayerProvider>
+          </GenrePlaylistProvider>
+        </UploadedTrackProvider>
+      </PopupProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

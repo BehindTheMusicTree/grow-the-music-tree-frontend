@@ -1,16 +1,17 @@
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@lib/auth";
 
 export async function GET(request, { params }) {
-  const token = cookies().get("auth_token")?.value;
-  const { uuid } = params;
-
-  if (!token) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { uuid } = params;
+
   const response = await fetch(`${process.env.API_BASE_URL}library/uploaded/${uuid}/`, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${session.accessToken}`,
     },
   });
 
@@ -22,13 +23,12 @@ export async function GET(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
-  const token = cookies().get("auth_token")?.value;
-  const { uuid } = params;
-
-  if (!token) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { uuid } = params;
   const data = await request.json();
 
   // Transform data as in the original service
@@ -43,7 +43,7 @@ export async function PUT(request, { params }) {
   const response = await fetch(`${process.env.API_BASE_URL}library/uploaded/${uuid}/`, {
     method: "PUT",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${session.accessToken}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(transformedData),

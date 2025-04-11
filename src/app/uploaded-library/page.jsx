@@ -11,7 +11,6 @@ import { usePlayer } from "@contexts/PlayerContext";
 import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useUploadedTracks } from "@contexts/UploadedTrackContext";
-import TrackUploadPopupContentObject from "@models/popup-content-object/TrackUploadPopupContentObject";
 
 export default function UploadedLibrary() {
   const { uploadedTracks } = useUploadedTracks();
@@ -31,8 +30,10 @@ export default function UploadedLibrary() {
   };
 
   const handleFileChange = (event) => {
-    const popupContentObject = new TrackUploadPopupContentObject(Array.from(event.target.files), null);
-    showPopup(popupContentObject);
+    showPopup("trackUpload", {
+      files: Array.from(event.target.files),
+      directory: null,
+    });
     event.target.value = null;
   };
 

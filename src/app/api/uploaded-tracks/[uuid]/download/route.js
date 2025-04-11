@@ -1,16 +1,17 @@
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@lib/auth";
 
 export async function GET(request, { params }) {
-  const token = cookies().get("auth_token")?.value;
-  const { uuid } = params;
-
-  if (!token) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { uuid } = params;
+
   const response = await fetch(`${process.env.API_BASE_URL}library/uploaded/${uuid}/download/`, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${session.accessToken}`,
     },
   });
 
