@@ -3,9 +3,7 @@
 import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-import { useAuth } from "./AuthContext";
-
+import { useSession } from "next-auth/react";
 const GenrePlaylistContext = createContext();
 
 export function useGenrePlaylists() {
@@ -17,10 +15,9 @@ export function useGenrePlaylists() {
 }
 
 export function GenrePlaylistProvider({ children }) {
-  const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
+  const { status } = useSession();
   const {
     data: genrePlaylists = [],
     isLoading,
@@ -34,7 +31,7 @@ export function GenrePlaylistProvider({ children }) {
       }
       return response.json();
     },
-    enabled: isAuthenticated,
+    enabled: status === "authenticated",
   });
 
   const addGenreMutation = useMutation({
@@ -54,6 +51,7 @@ export function GenrePlaylistProvider({ children }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["genrePlaylists"] });
     },
+    enabled: status === "authenticated",
   });
 
   const updateGenreMutation = useMutation({
@@ -73,6 +71,7 @@ export function GenrePlaylistProvider({ children }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["genrePlaylists"] });
     },
+    enabled: status === "authenticated",
   });
 
   const deleteGenreMutation = useMutation({
@@ -88,6 +87,7 @@ export function GenrePlaylistProvider({ children }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["genrePlaylists"] });
     },
+    enabled: status === "authenticated",
   });
 
   const addGenre = async (genreData) => {
@@ -102,11 +102,11 @@ export function GenrePlaylistProvider({ children }) {
     return deleteGenreMutation.mutateAsync(genreUuid);
   };
 
-  const getGenre = (genreUuid) => {
+  const retrieveGenre = (genreUuid) => {
     return genrePlaylists.find((genre) => genre.uuid === genreUuid);
   };
 
-  const getGenrePlaylists = () => {
+  const listGenrePlaylists = () => {
     return genrePlaylists;
   };
 
@@ -119,8 +119,8 @@ export function GenrePlaylistProvider({ children }) {
         addGenre,
         updateGenre,
         deleteGenre,
-        getGenre,
-        getGenrePlaylists,
+        retrieveGenre,
+        listGenrePlaylists,
         refreshGenrePlaylists: () => queryClient.invalidateQueries({ queryKey: ["genrePlaylists"] }),
       }}
     >
