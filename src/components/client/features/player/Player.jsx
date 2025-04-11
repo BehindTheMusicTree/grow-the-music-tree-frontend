@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolumeUp, faListUl } from "@fortawesome/free-solid-svg-icons";
@@ -15,7 +16,6 @@ import albumCover from "@assets/images/album-cover-default.png";
 import Button from "@components/client/ui/Button";
 
 import TrackProgress from "./TrackProgress/TrackProgress";
-
 export default function Player() {
   const SEEK_THRESHOLD_AFTER_WHICH_TO_SKIP = 2;
 

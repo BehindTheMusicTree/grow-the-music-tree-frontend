@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
+import Image from "next/image";
 export default function AccountPage() {
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +48,7 @@ export default function AccountPage() {
           <div className="bg-green-600 p-6 text-white">
             <div className="flex items-center">
               {profile.images?.[0]?.url ? (
-                <img
+                <Image
                   src={profile.images[0].url}
                   alt={profile.display_name}
                   className="w-20 h-20 rounded-full border-2 border-white mr-4"

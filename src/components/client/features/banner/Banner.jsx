@@ -4,14 +4,14 @@ import PropTypes from "prop-types";
 
 import SearchForm from "./SearchForm";
 import logo from "@assets/images/logos/umg-logo-maze-100.svg";
-
+import Image from "next/image";
 export default function Banner() {
   return (
     <div className="py-2 px-3 bg-black text-gray-100">
       <div className="w-full mx-auto relative">
         <div className="flex items-center">
           <div className="mr-3">
-            <img src={logo} alt="logo" className="w-12 h-12" />
+            <Image src={logo} alt="logo" width={48} height={48} />
           </div>
           <div>
             <h1 className="text-2xl font-bold">Ultimate Music Guide</h1>
