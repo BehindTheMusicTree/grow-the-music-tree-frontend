@@ -1,10 +1,41 @@
+// Check required environment variables first
+const requiredPublicEnvVars = [
+  "API_BASE_URL",
+  "CONTACT_EMAIL",
+  "SENTRY_IS_ACTIVE",
+  "SPOTIFY_CLIENT_ID",
+  "SPOTIFY_REDIRECT_URI",
+  "SPOTIFY_SCOPE",
+];
+const requiredPrivateEnvVars = ["ENV"];
+
+const missingPublicVars = requiredPublicEnvVars.filter((envVar) => !process?.env?.[`NEXT_PUBLIC_${envVar}`]);
+const missingPrivateVars = requiredPrivateEnvVars.filter((envVar) => !process?.env?.[envVar]);
+
+if (missingPublicVars.length > 0 || missingPrivateVars.length > 0) {
+  throw new Error(
+    `Missing required environment variables: ${[
+      ...missingPublicVars.map((v) => `NEXT_PUBLIC_${v}`),
+      ...missingPrivateVars,
+    ].join(", ")}`
+  );
+}
+
 const getPublicEnvVar = (key) => {
   const nextKey = `NEXT_PUBLIC_${key}`;
-  return process?.env?.[nextKey] ?? null;
+  const value = process?.env?.[nextKey];
+  if (!value) {
+    throw new Error(`Missing required environment variable: NEXT_PUBLIC_${key}`);
+  }
+  return value;
 };
 
 const getPrivateEnvVar = (key) => {
-  return process?.env?.[key] ?? null;
+  const value = process?.env?.[key];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${key}`);
+  }
+  return value;
 };
 
 const extractApiVersionFromBaseUrl = (baseUrl) => {
@@ -38,24 +69,3 @@ const config = {
 };
 
 export default config;
-
-export function checkRequiredConfigVars() {
-  const requiredPublicEnvVars = [
-    "API_BASE_URL",
-    "CONTACT_EMAIL",
-    "SENTRY_IS_ACTIVE",
-    "SPOTIFY_CLIENT_ID",
-    "SPOTIFY_REDIRECT_URI",
-    "SPOTIFY_SCOPE",
-  ];
-  const requiredPrivateEnvVars = ["ENV"];
-
-  const missingPublicVars = requiredPublicEnvVars.filter((envVar) => !getPublicEnvVar(envVar));
-  const missingPrivateVars = requiredPrivateEnvVars.filter((envVar) => !getPrivateEnvVar(envVar));
-
-  if (missingPublicVars.length > 0 || missingPrivateVars.length > 0) {
-    throw new Error(
-      `Missing required environment variables: ${[...missingPublicVars, ...missingPrivateVars].join(", ")}`
-    );
-  }
-}
