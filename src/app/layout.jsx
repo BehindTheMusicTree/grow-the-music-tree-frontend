@@ -1,11 +1,16 @@
+"use client";
+
+import { useEffect } from "react";
 import { initSentry } from "@/lib/sentry";
 import { checkRequiredConfigVars } from "@/lib/config";
+import { useConnectivityErrorHandler } from "../hooks/useConnectivityErrorHandler";
+import { setupConnectivityInterceptor } from "../utils/connectivityInterceptor";
 
 import Banner from "@/components/client/features/banner/Banner";
 import Menu from "@/components/client/features/Menu";
 import Player from "@/components/client/features/player/Player";
 import TrackListSidebar from "@/components/client/features/track-list-sidebar/TrackListSidebar";
-import Popup from "@/components/client/ui/popup/Popup";
+import Popup from "@components/client/ui/popup/child/BasePopup";
 import Providers from "@/app/providers";
 import { usePopup } from "@/contexts/PopupContext";
 import { usePlayer } from "@/contexts/PlayerContext";
@@ -18,6 +23,12 @@ export default function RootLayout({ children }) {
   const { playerUploadedTrackObject } = usePlayer();
   const { popupContentObject } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
+  const { handleConnectivityError, ErrorPopup } = useConnectivityErrorHandler();
+
+  useEffect(() => {
+    setupConnectivityInterceptor(handleConnectivityError);
+  }, [handleConnectivityError]);
+
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {
     centerWithPlayer: "calc(100vh - 180px)", // Assuming banner is 100px and player is 80px
@@ -54,6 +65,7 @@ export default function RootLayout({ children }) {
             {popupContentObject && <Popup />}
           </div>
         </Providers>
+        <ErrorPopup />
       </body>
     </html>
   );

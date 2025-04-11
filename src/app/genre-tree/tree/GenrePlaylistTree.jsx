@@ -10,11 +10,7 @@ import { useGenrePlaylists } from "@/contexts/GenrePlaylistContext";
 import { usePlayer } from "@/contexts/PlayerContext.jsx";
 import { useGenreGettingAssignedNewParent } from "@/contexts/GenreGettingAssignedNewParentContext.jsx";
 
-import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "@lib/utils/constants.js";
-import TrackUploadPopupContentObject from "@models/popup-content-object/TrackUploadPopupContentObject";
-import GenreDeletionPopupContentObject from "@models/popup-content-object/GenreDeletionPopupContentObject";
-import InvalidInputContentObject from "@models/popup-content-object/InvalidInputContentObject";
-import ApiErrorPopupContentObject from "@models/popup-content-object/ApiErrorPopupContentObject";
+import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "@lib/utils/constants.js";opupContentObject";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper.jsx";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer.js";
@@ -121,7 +117,6 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       updateGenreParent,
       renameGenre,
       showPopup,
-      GenreDeletionPopupContentObject,
       setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
     });
 

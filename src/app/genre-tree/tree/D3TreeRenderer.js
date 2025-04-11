@@ -69,7 +69,6 @@ export function renderTree(d3, svgRef, treeData, svgWidth, svgHeight, callbacks)
     updateGenreParent,
     renameGenre,
     showPopup,
-    GenreDeletionPopupContentObject,
     setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
   } = callbacks;
 
@@ -126,7 +125,6 @@ export function renderTree(d3, svgRef, treeData, svgWidth, svgHeight, callbacks)
         setGenreGettingAssignedNewParent,
         renameGenre,
         showPopup,
-        GenreDeletionPopupContentObject,
         trackListOrigin,
         playState,
       });
@@ -180,7 +178,6 @@ export function renderTree(d3, svgRef, treeData, svgWidth, svgHeight, callbacks)
       setGenreGettingAssignedNewParent,
       renameGenre,
       showPopup,
-      GenreDeletionPopupContentObject,
       trackListOrigin,
       playState,
     });
