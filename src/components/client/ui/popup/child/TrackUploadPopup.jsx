@@ -3,11 +3,9 @@
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { MdError } from "react-icons/md";
-import { useSession } from "next-auth/react";
 import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
 
 export default function TrackUploadPopup({ content, onClose }) {
-  const { data: session, status } = useSession();
   const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
   const [requestErrors, setRequestErrors] = useState();
   const isPostingRef = useRef(false);
@@ -21,9 +19,6 @@ export default function TrackUploadPopup({ content, onClose }) {
 
         const response = await fetch("/api/uploaded-tracks", {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${session.accessToken}`,
-          },
           body: formData,
         });
 
@@ -40,11 +35,11 @@ export default function TrackUploadPopup({ content, onClose }) {
       isPostingRef.current = false;
     }
 
-    if (content && !isPostingRef.current && status === "authenticated") {
+    if (content && !isPostingRef.current) {
       isPostingRef.current = true;
       postLibTracks(content.files, content.genreUuid);
     }
-  }, [content, session?.accessToken, status, setRefreshGenrePlaylistsSignal, onClose]);
+  }, [content, setRefreshGenrePlaylistsSignal, onClose]);
 
   return (
     <div>
