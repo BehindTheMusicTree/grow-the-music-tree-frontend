@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
 
 export default function TrackUploadPopup({ content, onClose }) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
   const [requestErrors, setRequestErrors] = useState();
   const isPostingRef = useRef(false);
@@ -40,11 +40,11 @@ export default function TrackUploadPopup({ content, onClose }) {
       isPostingRef.current = false;
     }
 
-    if (content && !isPostingRef.current) {
+    if (content && !isPostingRef.current && status === "authenticated") {
       isPostingRef.current = true;
       postLibTracks(content.files, content.genreUuid);
     }
-  }, [content, session?.accessToken]);
+  }, [content, session?.accessToken, status, setRefreshGenrePlaylistsSignal, onClose]);
 
   return (
     <div>
