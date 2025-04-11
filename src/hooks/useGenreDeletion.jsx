@@ -1,28 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
-import { GenreDeletionPopup } from "../components/client/ui/popup/child/GenreDeletionPopup";
+import { useCallback } from "react";
+import { usePopup } from "@/contexts/PopupContext";
 
 export function useGenreDeletion(onDelete) {
-  const [genreToDelete, setGenreToDelete] = useState(null);
+  const { showPopup } = usePopup();
 
-  const showDeletePopup = (genre) => {
-    setGenreToDelete(genre);
-  };
-
-  const handleDelete = (genre) => {
-    onDelete(genre);
-    setGenreToDelete(null);
-  };
-
-  const DeletePopup = () => {
-    if (!genreToDelete) return null;
-
-    return <GenreDeletionPopup genre={genreToDelete} onClose={() => setGenreToDelete(null)} onConfirm={handleDelete} />;
-  };
+  const showDeletePopup = useCallback(
+    (genre) => {
+      showPopup("genreDeletion", {
+        genre,
+        onConfirm: (genre) => {
+          onDelete(genre);
+        },
+      });
+    },
+    [showPopup, onDelete]
+  );
 
   return {
     showDeletePopup,
-    DeletePopup,
   };
 }
