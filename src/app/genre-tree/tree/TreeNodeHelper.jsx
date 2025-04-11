@@ -2,7 +2,8 @@ import ReactDOMServer from "react-dom/server";
 import { MdMoreVert, MdModeEdit } from "react-icons/md";
 import { FaPlus, FaTrashAlt, FaPlay, FaPause, FaSpinner, FaFileUpload } from "react-icons/fa";
 import { PiGraphFill } from "react-icons/pi";
-import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "../../../../../utils/constants";
+
+import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "@utils/constants";
 import {
   RECTANGLE_COLOR,
   RECT_BASE_DIMENSIONS,
