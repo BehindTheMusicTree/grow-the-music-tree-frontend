@@ -2,9 +2,9 @@
 
 import { BasePopup } from "./BasePopup";
 import { formatTime } from "@lib/utils/formatting";
-import Rating from "@/components/utils/Rating";
+import Rating from "@components/utils/Rating";
 import PropTypes from "prop-types";
-import Button from "@/components/client/ui/Button";
+import Button from "@components/client/ui/Button";
 
 export function UploadedTrackEditionPopup({ onClose, track, formValues, onFormChange, onSubmit, className = "" }) {
   return (

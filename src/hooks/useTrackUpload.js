@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUploadedTracks } from "@/contexts/UploadedTrackContext";
-import { TrackUploadPopup } from "@/components/ui/popup/TrackUploadPopup";
+import { useUploadedTracks } from "@contexts/UploadedTrackContext";
+import { TrackUploadPopup } from "@components/ui/popup/TrackUploadPopup";
 import BadRequestError from "@utils/errors/BadRequestError";
 
 export function useTrackUpload() {

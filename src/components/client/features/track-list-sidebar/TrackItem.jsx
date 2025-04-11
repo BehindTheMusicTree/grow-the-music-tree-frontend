@@ -4,11 +4,10 @@ import PropTypes from "prop-types";
 import { MdMoreVert } from "react-icons/md";
 
 import { formatTime } from "@lib/utils/formatting";
-import UploadedTrackEditionPopupContentObject from "@models/popup-content-object/UploadedTrackEditionPopupContentObject";
-import { usePopup } from "@/contexts/PopupContext";
-import { usePlayer } from "@/contexts/PlayerContext";
-import { useTrackList } from "@/contexts/TrackListContext";
-import UploadedTrackPositionPlayPause from "@/components/client/UploadedTrackPositionPlayPause";
+import { usePopup } from "@contexts/PopupContext";
+import { usePlayer } from "@contexts/PlayerContext";
+import { useTrackList } from "@contexts/TrackListContext";
+import UploadedTrackPositionPlayPause from "@components/client/features/UploadedTrackPositionPlayPause";
 
 export default function TrackItem({ uploadedTrack, position }) {
   const { showPopup } = usePopup();
@@ -17,8 +16,7 @@ export default function TrackItem({ uploadedTrack, position }) {
 
   const handleEditClick = (event) => {
     event.stopPropagation();
-    const popupContentObject = new UploadedTrackEditionPopupContentObject(uploadedTrack);
-    showPopup(popupContentObject);
+    showPopup("trackEdition", uploadedTrack);
   };
 
   const handlePlayPauseClick = (event) => {

@@ -3,7 +3,7 @@
 import { BasePopup } from "./BasePopup";
 import { FaSpotify } from "react-icons/fa";
 import PropTypes from "prop-types";
-import Button from "@/components/client/ui/Button";
+import Button from "@components/client/ui/Button";
 
 export function SpotifyAuthErrorPopup({ onClose, message, details, onConnect, className = "" }) {
   return (

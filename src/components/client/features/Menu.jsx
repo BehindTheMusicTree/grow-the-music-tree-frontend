@@ -3,7 +3,7 @@
 import { PiGraphLight } from "react-icons/pi";
 import { FaSpotify, FaCloudUploadAlt, FaUser } from "react-icons/fa";
 
-import { MenuGroup } from "@/components/client/ui/menu/MenuGroup";
+import { MenuGroup } from "@components/client/ui/menu/MenuGroup";
 
 const menuGroups = {
   library: [

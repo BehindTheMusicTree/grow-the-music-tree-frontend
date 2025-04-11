@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import PropTypes from "prop-types";
-import Button from "@/components/client/ui/Button";
+import Button from "@components/client/ui/Button";
 
 export function PopupTitle({ title, onClose, isDismissable }) {
   return (

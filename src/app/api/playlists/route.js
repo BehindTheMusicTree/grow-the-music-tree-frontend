@@ -1,4 +1,4 @@
-import { getPlaylists } from "@/lib/services/spotify";
+import { getPlaylists } from "@lib/services/spotify";
 
 export async function GET() {
   const playlists = await getPlaylists();

@@ -4,7 +4,7 @@ import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@contexts/AuthContext";
 
 const UploadedTrackContext = createContext();
 

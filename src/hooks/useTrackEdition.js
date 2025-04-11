@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { UploadedTrackService } from "@utils/services";
-import { useGenrePlaylists } from "@/contexts/GenrePlaylistContext";
-import { useTrackList } from "@/contexts/TrackListContext";
-import { UploadedTrackEditionPopup } from "@/components/ui/popup/UploadedTrackEditionPopup";
+import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
+import { useTrackList } from "@contexts/TrackListContext";
+import { UploadedTrackEditionPopup } from "@components/ui/popup/UploadedTrackEditionPopup";
 import { FORM_RATING_NULL_VALUE } from "@lib/utils/constants";
 
 export function useTrackEdition() {

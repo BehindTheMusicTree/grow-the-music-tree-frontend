@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuthState } from "@/contexts/AuthContext";
+import { useAuthState } from "@contexts/AuthContext";
 import SpotifyOAuthService from "@utils/services/SpotifyOAuthService";
 
 export default function AccountPage() {
