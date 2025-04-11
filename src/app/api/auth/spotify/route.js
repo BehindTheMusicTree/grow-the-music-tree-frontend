@@ -26,7 +26,8 @@ export async function POST(request) {
 
     if (!response.ok) {
       const error = await response.json();
-      return NextResponse.json({ error: "Failed to exchange code for tokens" }, { status: response.status });
+      console.error("Error in Spotify auth callback:", error);
+      return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 
     const data = await response.json();
