@@ -3,9 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev:remote": "cp ./env/dev/available/.env.dev.api-remote ./env/to-load/.env.development && PORT=${PORT:-5000} next dev",
-    "dev:local": "cp ./env/dev/available/.env.dev.api-local ./env/to-load/.env.development && PORT=${PORT:-5000} next dev",
-    "dev": "PORT=${PORT:-5000} next dev",
+    "dev:remote": "cp ./env/dev/available/.env.dev.api-remote ./env/to-load/.env.development && next dev",
+    "dev:local": "cp ./env/dev/available/.env.dev.api-local ./env/to-load/.env.development && next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "PORT=${PORT:-5000} next start",
     "lint": "next lint"
