@@ -5,7 +5,7 @@ import { FaSpotify } from "react-icons/fa";
 import PropTypes from "prop-types";
 import Button from "@components/client/ui/Button";
 
-export function SpotifyAuthPopup({ onClose, message, onAuthenticate, className = "" }) {
+export default function SpotifyAuthPopup({ onClose, message, onAuthenticate, className = "" }) {
   return (
     <BasePopup title="Spotify Authentication" onClose={onClose} className={`max-w-md ${className}`}>
       <div className="flex flex-col items-center space-y-6">

@@ -4,7 +4,7 @@ import { BasePopup } from "./BasePopup";
 import { AlertCircle } from "lucide-react";
 import PropTypes from "prop-types";
 
-export function AppErrorPopup({ title, operationErrors, className = "" }) {
+export default function AppErrorPopup({ title, operationErrors, className = "" }) {
   return (
     <BasePopup title={title} isDismissable={false} className={`max-w-lg ${className}`}>
       <div className="space-y-4">

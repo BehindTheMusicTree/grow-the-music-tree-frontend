@@ -5,7 +5,7 @@ import { FaSpinner } from "react-icons/fa";
 import { MdError, MdCheckCircle } from "react-icons/md";
 import PropTypes from "prop-types";
 
-export function TrackUploadPopup({ onClose, files, genreUuid, isPosting, error, success, className = "" }) {
+export default function TrackUploadPopup({ onClose, files, genreUuid, isPosting, error, success, className = "" }) {
   return (
     <BasePopup title="Upload Track" onClose={onClose} className={`max-w-md ${className}`}>
       <div className="flex flex-col items-center justify-center p-4">

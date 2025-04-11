@@ -5,7 +5,7 @@ import { FaSpotify } from "react-icons/fa";
 import PropTypes from "prop-types";
 import Button from "@components/client/ui/Button";
 
-export function SpotifyAuthErrorPopup({ onClose, message, details, onConnect, className = "" }) {
+export default function SpotifyAuthErrorPopup({ onClose, message, details, onConnect, className = "" }) {
   return (
     <BasePopup title="Spotify Authentication Error" onClose={onClose} className={`max-w-md ${className}`}>
       <div className="flex flex-col items-center space-y-6">

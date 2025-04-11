@@ -4,7 +4,7 @@ import { BasePopup } from "./BasePopup";
 import { AlertCircle } from "lucide-react";
 import PropTypes from "prop-types";
 
-export function InvalidInputPopup({ onClose, title, operationErrors, className = "" }) {
+export default function InvalidInputPopup({ onClose, title, operationErrors, className = "" }) {
   return (
     <BasePopup title={title} onClose={onClose} className={`max-w-md ${className}`}>
       <div className="space-y-4">

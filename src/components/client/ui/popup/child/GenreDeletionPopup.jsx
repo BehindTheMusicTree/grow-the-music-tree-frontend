@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import BasePopup from "./BasePopup";
 
-export function GenreDeletionPopup({ genre, onClose, onConfirm }) {
+export default function GenreDeletionPopup({ genre, onClose, onConfirm }) {
   const handleConfirm = () => {
     onConfirm(genre);
     onClose();

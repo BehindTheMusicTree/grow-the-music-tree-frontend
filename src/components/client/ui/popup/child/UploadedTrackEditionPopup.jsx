@@ -6,7 +6,14 @@ import Rating from "@components/client/features/Rating";
 import Button from "@components/client/ui/Button";
 import { BasePopup } from "./BasePopup";
 
-export function UploadedTrackEditionPopup({ onClose, track, formValues, onFormChange, onSubmit, className = "" }) {
+export default function UploadedTrackEditionPopup({
+  onClose,
+  track,
+  formValues,
+  onFormChange,
+  onSubmit,
+  className = "",
+}) {
   return (
     <BasePopup title="Edit Track" onClose={onClose} className={`max-w-2xl ${className}`}>
       <form onSubmit={onSubmit} className="space-y-6">

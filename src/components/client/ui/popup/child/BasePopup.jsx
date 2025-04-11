@@ -4,7 +4,7 @@
 import { createPortal } from "react-dom";
 import { PopupTitle } from "../PopupTitle";
 
-export function BasePopup({
+export default function BasePopup({
   title,
   children,
   onClose,

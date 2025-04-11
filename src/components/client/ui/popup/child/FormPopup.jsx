@@ -3,7 +3,7 @@
 import { BasePopup } from "./BasePopup";
 import { Button } from "@components/ui/button";
 
-export function FormPopup({
+export default function FormPopup({
   title,
   children,
   onSubmit,
