@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { initSentry } from "@lib/sentry";
 
 import Providers from "@app/providers";
-import { checkRequiredConfigVars } from "@lib/config";
 import { setupFetchInterceptor } from "@lib/fetch/fetchInterceptor";
 import { useFetchErrorHandler } from "@hooks/useFetchErrorHandler";
 import { usePopup } from "@contexts/PopupContext";
@@ -17,7 +16,6 @@ import TrackListSidebar from "@components/client/features/track-list-sidebar/Tra
 import Popup from "@components/client/ui/popup/child/BasePopup";
 
 initSentry();
-checkRequiredConfigVars();
 
 function AppContent({ children }) {
   const { playerUploadedTrackObject } = usePlayer();
