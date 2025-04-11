@@ -1,3 +1,3 @@
-const style = getComputedStyle(document.documentElement);
-export const PRIMARY_COLOR = style.getPropertyValue("--primary").trim();
-export const SECONDARY_COLOR = style.getPropertyValue("--secondary").trim();
+export const STYLE = getComputedStyle(document.documentElement);
+export const PRIMARY_COLOR = STYLE.getPropertyValue("--primary").trim();
+export const SECONDARY_COLOR = STYLE.getPropertyValue("--secondary").trim();
