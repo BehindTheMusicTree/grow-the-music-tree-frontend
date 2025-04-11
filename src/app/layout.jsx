@@ -19,7 +19,7 @@ import Popup from "@components/client/ui/popup/child/BasePopup";
 initSentry();
 checkRequiredConfigVars();
 
-export default function RootLayout({ children }) {
+function AppContent({ children }) {
   const { playerUploadedTrackObject } = usePlayer();
   const { popupContentObject } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
@@ -36,36 +36,40 @@ export default function RootLayout({ children }) {
   };
 
   return (
+    <div className="app flex flex-col h-screen">
+      <Banner className="fixed top-0 z-50" />
+
+      <div
+        className="center bg-green-500 flex-grow flex overflow-y-auto"
+        style={{
+          maxHeight: playerUploadedTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
+        }}
+      >
+        <Menu />
+        {
+          /* 180px being the sum of the banner and player heights, 100px being the height of the banner alone */
+          <div className={"page-container w-full flex-grow p-5 overflow-auto flex flex-col bg-gray-200 m-0"}>
+            <main>{children}</main>
+
+            {/* bottom-20 corresponding to 80px which is the player's height */}
+            {isTrackListSidebarVisible ? <TrackListSidebar /> : null}
+          </div>
+        }
+      </div>
+      {playerUploadedTrackObject && <Player />}
+      {popupContentObject && <Popup />}
+      <ErrorPopup />
+    </div>
+  );
+}
+
+export default function RootLayout({ children }) {
+  return (
     <html lang="en">
       <body>
         <Providers>
-          <div className="app flex flex-col h-screen">
-            <Banner className="fixed top-0 z-50" />
-
-            <div
-              className="center bg-green-500 flex-grow flex overflow-y-auto"
-              style={{
-                maxHeight: playerUploadedTrackObject
-                  ? centerMaxHeight.centerWithPlayer
-                  : centerMaxHeight.centerWithoutPlayer,
-              }}
-            >
-              <Menu />
-              {
-                /* 180px being the sum of the banner and player heights, 100px being the height of the banner alone */
-                <div className={"page-container w-full flex-grow p-5 overflow-auto flex flex-col bg-gray-200 m-0"}>
-                  <main>{children}</main>
-
-                  {/* bottom-20 corresponding to 80px which is the player's height */}
-                  {isTrackListSidebarVisible ? <TrackListSidebar /> : null}
-                </div>
-              }
-            </div>
-            {playerUploadedTrackObject && <Player />}
-            {popupContentObject && <Popup />}
-          </div>
+          <AppContent>{children}</AppContent>
         </Providers>
-        <ErrorPopup />
       </body>
     </html>
   );
