@@ -1,60 +1,32 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuthState } from "@contexts/AuthContext";
-import SpotifyOAuthService from "@utils/services/SpotifyOAuthService";
 
 export default function AccountPage() {
-  const isAuthenticated = useAuthState();
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      const fetchProfile = async () => {
-        setIsLoading(true);
-        try {
-          // This is a placeholder - implement actual profile fetching using SpotifyOAuthService
-          // const profileData = await SpotifyOAuthService.getProfile();
-          // For now, simulating profile data
-          const profileData = {
-            display_name: "Spotify User",
-            email: "user@example.com",
-            images: [{ url: "" }],
-            country: "US",
-            product: "premium",
-            followers: { total: 0 },
-            external_urls: { spotify: "https://open.spotify.com/user/example" },
-          };
-          setProfile(profileData);
-        } catch (err) {
-          setError(err.message || "Failed to fetch profile");
-        } finally {
-          setIsLoading(false);
-        }
+    const fetchProfile = async () => {
+      setIsLoading(true);
+      // This is a placeholder - implement actual profile fetching using SpotifyOAuthService
+      // const profileData = await SpotifyOAuthService.getProfile();
+      // For now, simulating profile data
+      const profileData = {
+        display_name: "Spotify User",
+        email: "user@example.com",
+        images: [{ url: "" }],
+        country: "US",
+        product: "premium",
+        followers: { total: 0 },
+        external_urls: { spotify: "https://open.spotify.com/user/example" },
       };
+      setProfile(profileData);
+      setIsLoading(false);
+    };
 
-      fetchProfile();
-    }
-  }, [isAuthenticated]);
-
-  if (!isAuthenticated) {
-    return (
-      <div className="account-page p-8">
-        <h1 className="text-2xl font-bold mb-6">Account</h1>
-        <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-          <p className="text-lg mb-4">You need to connect your Spotify account to view your profile.</p>
-          <button
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-            onClick={() => SpotifyOAuthService.login()}
-          >
-            Connect Spotify
-          </button>
-        </div>
-      </div>
-    );
-  }
+    fetchProfile();
+  });
 
   if (isLoading) {
     return (
@@ -62,23 +34,6 @@ export default function AccountPage() {
         <h1 className="text-2xl font-bold mb-6">Account</h1>
         <div className="flex justify-center items-center h-64">
           <p>Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="account-page p-8">
-        <h1 className="text-2xl font-bold mb-6">Account</h1>
-        <div className="bg-red-100 p-6 rounded-lg shadow-md text-red-700">
-          <p>Error loading profile: {error}</p>
-          <button
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-            onClick={() => window.location.reload()}
-          >
-            Try Again
-          </button>
         </div>
       </div>
     );
