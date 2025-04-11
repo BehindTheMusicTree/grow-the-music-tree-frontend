@@ -12,7 +12,7 @@ export function GenreDeletionPopup({ genre, onClose, onConfirm }) {
     <BasePopup title="Delete Genre" onClose={onClose}>
       <div className="space-y-4">
         <p className="text-gray-700">
-          Are you sure you want to delete the genre "{genre.name}"? This action cannot be undone.
+          Are you sure you want to delete the genre &quot;{genre.name}&quot;? This action cannot be undone.
         </p>
         <div className="flex justify-end space-x-3">
           <button className="px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200" onClick={onClose}>
