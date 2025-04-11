@@ -1,3 +1,15 @@
-export const STYLE = getComputedStyle(document.documentElement);
-export const PRIMARY_COLOR = STYLE.getPropertyValue("--primary").trim();
-export const SECONDARY_COLOR = STYLE.getPropertyValue("--secondary").trim();
+const getThemeColors = () => {
+  if (typeof window === "undefined") {
+    return {
+      primary: "#0d3b66",
+      secondary: "#85c1e9",
+    };
+  }
+  const style = getComputedStyle(document.documentElement);
+  return {
+    primary: style.getPropertyValue("--primary").trim(),
+    secondary: style.getPropertyValue("--secondary").trim(),
+  };
+};
+
+export const { primary: PRIMARY_COLOR, secondary: SECONDARY_COLOR } = getThemeColors();
