@@ -1,8 +1,8 @@
 "use client";
 
-import { BasePopup } from "./BasePopup";
 import { FaSpinner } from "react-icons/fa";
 import { MdError, MdCheckCircle } from "react-icons/md";
+import BasePopup from "./BasePopup";
 import PropTypes from "prop-types";
 
 export default function TrackUploadPopup({ onClose, files, genreUuid, isPosting, error, success, className = "" }) {

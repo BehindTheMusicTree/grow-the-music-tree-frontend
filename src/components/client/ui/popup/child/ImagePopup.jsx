@@ -1,6 +1,6 @@
 "use client";
 
-import { BasePopup } from "./BasePopup";
+import BasePopup from "./BasePopup";
 import Image from "next/image";
 
 export default function ImagePopup({ title, imageUrl, onClose, alt = "Popup image" }) {

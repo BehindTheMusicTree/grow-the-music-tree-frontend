@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { AppErrorPopup } from "@components/client/ui/popup/child/AppErrorPopup";
+import AppErrorPopup from "@components/client/ui/popup/child/AppErrorPopup";
 
 export function useFetchErrorHandler() {
   const [error, setError] = useState(null);

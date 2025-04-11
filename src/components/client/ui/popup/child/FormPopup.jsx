@@ -1,6 +1,6 @@
 "use client";
 
-import { BasePopup } from "./BasePopup";
+import BasePopup from "./BasePopup";
 import { Button } from "@components/ui/button";
 
 export default function FormPopup({

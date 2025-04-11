@@ -1,6 +1,6 @@
 "use client";
 
-import { BasePopup } from "./BasePopup";
+import BasePopup from "./BasePopup";
 import { AlertCircle } from "lucide-react";
 import PropTypes from "prop-types";
 
