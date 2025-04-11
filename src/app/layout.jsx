@@ -2,19 +2,19 @@
 
 import { useEffect } from "react";
 import { initSentry } from "@lib/sentry";
+
 import { checkRequiredConfigVars } from "@lib/config";
 import { setupFetchInterceptor } from "@lib/fetch/fetchInterceptor";
 import { useFetchErrorHandler } from "@hooks/useFetchErrorHandler";
-
+import Providers from "@app/providers";
+import { usePopup } from "@contexts/PopupContext";
+import { usePlayer } from "@contexts/PlayerContext";
+import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 import Banner from "@components/client/features/banner/Banner";
 import Menu from "@components/client/features/Menu";
 import Player from "@components/client/features/player/Player";
 import TrackListSidebar from "@components/client/features/track-list-sidebar/TrackListSidebar";
 import Popup from "@components/client/ui/popup/child/BasePopup";
-import Providers from "@app/providers";
-import { usePopup } from "@contexts/PopupContext";
-import { usePlayer } from "@contexts/PlayerContext";
-import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 
 initSentry();
 checkRequiredConfigVars();
