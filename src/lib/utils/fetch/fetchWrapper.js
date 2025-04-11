@@ -1,4 +1,4 @@
-export async function apiWrapper(apiCall, onError) {
+export async function fetchWrapper(apiCall, onError) {
   try {
     const response = await apiCall();
     if (!response.ok) {

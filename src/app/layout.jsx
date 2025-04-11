@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import { initSentry } from "@/lib/sentry";
 import { checkRequiredConfigVars } from "@/lib/config";
-import { setupConnectivityInterceptor } from "@utils/connectivity/connectivityInterceptor";
-import { useConnectivityErrorHandler } from "@/hooks/useConnectivityErrorHandler";
+import { setupfetchInterceptor } from "@/utils/fetch/fetchInterceptor";
+import { useFetchErrorHandler } from "@/hooks/useFetchErrorHandler";
 
 import Banner from "@/components/client/features/banner/Banner";
 import Menu from "@/components/client/features/Menu";
@@ -23,11 +23,11 @@ export default function RootLayout({ children }) {
   const { playerUploadedTrackObject } = usePlayer();
   const { popupContentObject } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-  const { handleConnectivityError, ErrorPopup } = useConnectivityErrorHandler();
+  const { handleFetchError, ErrorPopup } = useFetchErrorHandler();
 
   useEffect(() => {
-    setupConnectivityInterceptor(handleConnectivityError);
-  }, [handleConnectivityError]);
+    setupfetchInterceptor(handleFetchError);
+  }, [handleFetchError]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {

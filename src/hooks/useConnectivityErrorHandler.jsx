@@ -1,10 +1,10 @@
 import { useState, useCallback } from "react";
 import { AppErrorPopup } from "../components/client/ui/popup/child/AppErrorPopup";
 
-export function useConnectivityErrorHandler() {
+export function useFetchErrorHandler() {
   const [error, setError] = useState(null);
 
-  const handleConnectivityError = useCallback((error) => {
+  const handleFetchError = useCallback((error) => {
     const status = error?.response?.status;
     const isExternalService = error?.config?.url?.includes("spotify") || error?.config?.url?.includes("oauth");
 
@@ -27,7 +27,7 @@ export function useConnectivityErrorHandler() {
   };
 
   return {
-    handleConnectivityError,
+    handleFetchError,
     ErrorPopup,
   };
 }
