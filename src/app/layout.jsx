@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { initSentry } from "@/lib/sentry";
 import { checkRequiredConfigVars } from "@/lib/config";
-import { setupfetchInterceptor } from "@/utils/fetch/fetchInterceptor";
+import { setupFetchInterceptor } from "@/lib/utils/connectivity/fetchInterceptor";
 import { useFetchErrorHandler } from "@/hooks/useFetchErrorHandler";
 
 import Banner from "@/components/client/features/banner/Banner";
@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
   const { handleFetchError, ErrorPopup } = useFetchErrorHandler();
 
   useEffect(() => {
-    setupfetchInterceptor(handleFetchError);
+    setupFetchInterceptor(handleFetchError);
   }, [handleFetchError]);
 
   // Calculate dynamic heights based on player visibility
