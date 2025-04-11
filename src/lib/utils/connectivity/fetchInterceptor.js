@@ -1,9 +1,8 @@
 const originalFetch = window.fetch;
 
-export const setupConnectivityInterceptor = (handleError) => {
+export const setupFetchInterceptor = (handleError) => {
   window.fetch = async (...args) => {
-    const [url, options] = args;
-    const isExternalService = typeof url === "string" && (url.includes("spotify") || url.includes("oauth"));
+    const [url] = args;
 
     try {
       const response = await originalFetch(...args);
