@@ -1,44 +1,46 @@
-const getEnvVar = (key) => {
-  // Check Next.js environment variables first
+const ensurePublicEnvVarIsSet = (key) => {
   const nextKey = `NEXT_PUBLIC_${key}`;
-  if (typeof process !== "undefined" && process.env && process.env[nextKey]) {
-    return process.env[nextKey];
-  }
-
-  // Fall back to Vite environment variables
-  const viteKey = `VITE_${key}`;
-  if (typeof import.meta !== "undefined" && import.meta.env && import.meta.env[viteKey]) {
-    return import.meta.env[viteKey];
-  }
-
-  return null;
+  return process?.env?.[nextKey] ?? null;
 };
 
-// Extract API version from the API base URL
-const extractApiVersion = (baseUrl) => {
+const ensurePrivateEnvVarIsSet = (key) => {
+  return process?.env?.[key] ?? null;
+};
+
+const extractApiVersionFromBaseUrl = (baseUrl) => {
   if (!baseUrl) return null;
   const versionMatch = baseUrl.match(/\/api\/(v[0-9]+\.[0-9]+\.[0-9]+)\//);
   return versionMatch ? versionMatch[1] : null;
 };
 
-const apiBaseUrl = getEnvVar("API_BASE_URL");
+const apiBaseUrl = ensurePublicEnvVarIsSet("API_BASE_URL");
 
-const config = {
-  env: getEnvVar("ENV") || "development",
-  apiVersion: extractApiVersion(apiBaseUrl),
+// Server-side only config
+export const serverConfig = {
+  env: ensurePrivateEnvVarIsSet("ENV"),
+};
+
+// Public config (client-side accessible)
+export const publicConfig = {
+  apiVersion: extractApiVersionFromBaseUrl(apiBaseUrl),
   apiBaseUrl,
-  contactEmail: getEnvVar("CONTACT_EMAIL"),
-  sentryIsActive: getEnvVar("SENTRY_IS_ACTIVE"),
-  spotifyClientId: getEnvVar("SPOTIFY_CLIENT_ID"),
-  spotifyRedirectUri: getEnvVar("SPOTIFY_REDIRECT_URI"),
-  spotifyScope: getEnvVar("SPOTIFY_SCOPE"),
+  contactEmail: ensurePublicEnvVarIsSet("CONTACT_EMAIL"),
+  sentryIsActive: ensurePublicEnvVarIsSet("SENTRY_IS_ACTIVE"),
+  spotifyClientId: ensurePublicEnvVarIsSet("SPOTIFY_CLIENT_ID"),
+  spotifyRedirectUri: ensurePublicEnvVarIsSet("SPOTIFY_REDIRECT_URI"),
+  spotifyScope: ensurePublicEnvVarIsSet("SPOTIFY_SCOPE"),
+};
+
+// Combined config for internal use
+const config = {
+  ...serverConfig,
+  ...publicConfig,
 };
 
 export default config;
 
 export function checkRequiredConfigVars() {
-  const requiredEnvVars = [
-    "env",
+  const requiredPublicEnvVars = [
     "apiVersion",
     "apiBaseUrl",
     "contactEmail",
@@ -47,9 +49,14 @@ export function checkRequiredConfigVars() {
     "spotifyRedirectUri",
     "spotifyScope",
   ];
-  const missingEnvVars = requiredEnvVars.filter((envVar) => !config[envVar]);
+  const requiredPrivateEnvVars = ["env"];
 
-  if (missingEnvVars.length > 0) {
-    throw new Error(`Missing required environment variables: ${missingEnvVars.join(", ")}`);
+  const missingPublicVars = requiredPublicEnvVars.filter((envVar) => !publicConfig[envVar]);
+  const missingPrivateVars = requiredPrivateEnvVars.filter((envVar) => !serverConfig[envVar]);
+
+  if (missingPublicVars.length > 0 || missingPrivateVars.length > 0) {
+    throw new Error(
+      `Missing required environment variables: ${[...missingPublicVars, ...missingPrivateVars].join(", ")}`
+    );
   }
 }
