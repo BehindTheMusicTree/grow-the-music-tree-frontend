@@ -1,9 +1,9 @@
-const ensurePublicEnvVarIsSet = (key) => {
+const getPublicEnvVar = (key) => {
   const nextKey = `NEXT_PUBLIC_${key}`;
   return process?.env?.[nextKey] ?? null;
 };
 
-const ensurePrivateEnvVarIsSet = (key) => {
+const getPrivateEnvVar = (key) => {
   return process?.env?.[key] ?? null;
 };
 
@@ -13,22 +13,22 @@ const extractApiVersionFromBaseUrl = (baseUrl) => {
   return versionMatch ? versionMatch[1] : null;
 };
 
-const apiBaseUrl = ensurePublicEnvVarIsSet("API_BASE_URL");
+const apiBaseUrl = getPublicEnvVar("API_BASE_URL");
 
 // Server-side only config
 export const serverConfig = {
-  env: ensurePrivateEnvVarIsSet("ENV"),
+  env: getPrivateEnvVar("ENV"),
 };
 
 // Public config (client-side accessible)
 export const publicConfig = {
-  apiVersion: extractApiVersionFromBaseUrl(apiBaseUrl),
   apiBaseUrl,
-  contactEmail: ensurePublicEnvVarIsSet("CONTACT_EMAIL"),
-  sentryIsActive: ensurePublicEnvVarIsSet("SENTRY_IS_ACTIVE"),
-  spotifyClientId: ensurePublicEnvVarIsSet("SPOTIFY_CLIENT_ID"),
-  spotifyRedirectUri: ensurePublicEnvVarIsSet("SPOTIFY_REDIRECT_URI"),
-  spotifyScope: ensurePublicEnvVarIsSet("SPOTIFY_SCOPE"),
+  apiVersion: extractApiVersionFromBaseUrl(apiBaseUrl),
+  contactEmail: getPublicEnvVar("CONTACT_EMAIL"),
+  sentryIsActive: getPublicEnvVar("SENTRY_IS_ACTIVE"),
+  spotifyClientId: getPublicEnvVar("SPOTIFY_CLIENT_ID"),
+  spotifyRedirectUri: getPublicEnvVar("SPOTIFY_REDIRECT_URI"),
+  spotifyScope: getPublicEnvVar("SPOTIFY_SCOPE"),
 };
 
 // Combined config for internal use
@@ -41,18 +41,17 @@ export default config;
 
 export function checkRequiredConfigVars() {
   const requiredPublicEnvVars = [
-    "apiVersion",
-    "apiBaseUrl",
-    "contactEmail",
-    "sentryIsActive",
-    "spotifyClientId",
-    "spotifyRedirectUri",
-    "spotifyScope",
+    "API_BASE_URL",
+    "CONTACT_EMAIL",
+    "SENTRY_IS_ACTIVE",
+    "SPOTIFY_CLIENT_ID",
+    "SPOTIFY_REDIRECT_URI",
+    "SPOTIFY_SCOPE",
   ];
-  const requiredPrivateEnvVars = ["env"];
+  const requiredPrivateEnvVars = ["ENV"];
 
-  const missingPublicVars = requiredPublicEnvVars.filter((envVar) => !publicConfig[envVar]);
-  const missingPrivateVars = requiredPrivateEnvVars.filter((envVar) => !serverConfig[envVar]);
+  const missingPublicVars = requiredPublicEnvVars.filter((envVar) => !getPublicEnvVar(envVar));
+  const missingPrivateVars = requiredPrivateEnvVars.filter((envVar) => !getPrivateEnvVar(envVar));
 
   if (missingPublicVars.length > 0 || missingPrivateVars.length > 0) {
     throw new Error(
