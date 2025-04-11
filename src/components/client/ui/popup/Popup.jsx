@@ -3,12 +3,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import BasePopup from "./child/BasePopup";
-import { GenreDeletionPopup } from "./child/GenreDeletionPopup";
-import { TrackUploadPopup } from "./child/TrackUploadPopup";
-import { InvalidInputPopup } from "./child/InvalidInputPopup";
-import { SpotifyAuthPopup } from "./child/SpotifyAuthPopup";
-import { SpotifyAuthErrorPopup } from "./child/SpotifyAuthErrorPopup";
-import { UploadedTrackEditionPopup } from "./child/UploadedTrackEditionPopup";
+import GenreDeletionPopup from "./child/GenreDeletionPopup";
+import TrackUploadPopup from "./child/TrackUploadPopup";
+import InvalidInputPopup from "./child/InvalidInputPopup";
+import SpotifyAuthPopup from "./child/SpotifyAuthPopup";
+import SpotifyAuthErrorPopup from "./child/SpotifyAuthErrorPopup";
+import UploadedTrackEditionPopup from "./child/UploadedTrackEditionPopup";
 
 function Popup({ type, content, onClose }) {
   switch (type) {
