@@ -8,6 +8,7 @@ import { GenrePlaylistProvider } from "@contexts/GenrePlaylistContext";
 import { PlayerProvider } from "@contexts/PlayerContext";
 import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVisibilityContext";
 import { AuthProvider } from "@contexts/AuthContext";
+import { TrackListProvider } from "@contexts/TrackListContext";
 
 const queryClient = new QueryClient();
 
@@ -19,7 +20,9 @@ export default function Providers({ children }) {
           <UploadedTrackProvider>
             <GenrePlaylistProvider>
               <PlayerProvider>
-                <TrackListSidebarVisibilityProvider>{children}</TrackListSidebarVisibilityProvider>
+                <TrackListProvider>
+                  <TrackListSidebarVisibilityProvider>{children}</TrackListSidebarVisibilityProvider>
+                </TrackListProvider>
               </PlayerProvider>
             </GenrePlaylistProvider>
           </UploadedTrackProvider>
