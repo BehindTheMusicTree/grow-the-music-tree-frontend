@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Copy remote environment configuration
-cp ./env/dev/available/.env.dev.api-remote ./env/to-load/.env.development
+cp ./env/dev/available/.env.dev.api-remote ./.env.development
 
 # Load port configuration
 source ./env/dev/available/.env.port

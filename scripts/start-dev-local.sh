@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Copy local environment configuration
-cp ./env/dev/available/.env.dev.api-local ./env/to-load/.env.development
+cp ./env/dev/available/.env.dev.api-local ./.env.development
 
 # Load port configuration
 source ./env/dev/available/.env.port
