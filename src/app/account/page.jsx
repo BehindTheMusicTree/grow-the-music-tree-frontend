@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+
 export default function AccountPage() {
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
