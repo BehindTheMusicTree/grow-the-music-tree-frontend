@@ -3,10 +3,10 @@
 import { useEffect } from "react";
 import { initSentry } from "@lib/sentry";
 
+import Providers from "@app/providers";
 import { checkRequiredConfigVars } from "@lib/config";
 import { setupFetchInterceptor } from "@lib/fetch/fetchInterceptor";
 import { useFetchErrorHandler } from "@hooks/useFetchErrorHandler";
-import Providers from "@app/providers";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
