@@ -1,38 +1,50 @@
 "use client";
 
-import BasePopup from "./BasePopup";
-import { AlertCircle } from "lucide-react";
 import PropTypes from "prop-types";
+import { MdError } from "react-icons/md";
 
-export default function InvalidInputPopup({ onClose, title, operationErrors, className = "" }) {
+export default function InvalidInputPopup({ content, onClose }) {
+  const { details } = content;
+
   return (
-    <BasePopup title={title} onClose={onClose} className={`max-w-md ${className}`}>
-      <div className="space-y-4">
-        {operationErrors.map((errorObject, index) => (
-          <div key={index} className="flex items-start gap-2">
-            <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
-            <ul className="list-none space-y-1">
-              {errorObject.errors.map((error, index) => (
-                <li key={index} className="text-red-600">
-                  {error}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+    <div>
+      <div className="flex items-center">
+        <MdError size={20} color="red" />
+        <h3 className="ml-1">{details.message}</h3>
       </div>
-    </BasePopup>
+      {details.fieldErrors && (
+        <div className="mt-4">
+          {Object.entries(details.fieldErrors).map(([fieldName, errors]) => (
+            <div key={fieldName} className="mb-2">
+              <h4 className="font-semibold">{fieldName}</h4>
+              <ul className="ml-4">
+                {errors.map((error, index) => (
+                  <li key={index} className="text-red-500">
+                    - {error.message}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
 InvalidInputPopup.propTypes = {
+  content: PropTypes.shape({
+    details: PropTypes.shape({
+      message: PropTypes.string.isRequired,
+      fieldErrors: PropTypes.objectOf(
+        PropTypes.arrayOf(
+          PropTypes.shape({
+            message: PropTypes.string.isRequired,
+            code: PropTypes.string.isRequired,
+          })
+        )
+      ),
+    }).isRequired,
+  }).isRequired,
   onClose: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  operationErrors: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      errors: PropTypes.arrayOf(PropTypes.string).isRequired,
-    })
-  ).isRequired,
-  className: PropTypes.string,
 };
