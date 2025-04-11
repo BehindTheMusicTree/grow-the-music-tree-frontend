@@ -5,11 +5,11 @@
       "@components/*": ["src/components/*"],
       "@contexts/*": ["src/contexts/*"],
       "@layouts/*": ["src/layouts/*"],
-      "@utils/*": ["src/lib/utils/*"],
       "@models/*": ["src/models/*"],
       "@hooks/*": ["src/hooks/*"],
       "@assets/*": ["src/assets/*"],
       "@lib/*": ["src/lib/*"],
+      "@utils/*": ["src/lib/utils/*"],
       "@/*": ["src/*"]
     }
   }
