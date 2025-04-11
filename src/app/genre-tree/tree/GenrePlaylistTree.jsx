@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import * as d3 from "d3";
 
@@ -10,7 +10,7 @@ import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
 import { usePlayer } from "@contexts/PlayerContext.jsx";
 import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssignedNewParentContext.jsx";
 
-import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "@lib/utils/constants.js";opupContentObject";
+import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "@utils/constants.js";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper.jsx";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer.js";
@@ -48,27 +48,27 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     event.target.value = null;
   }
 
-  /**
-   * Handles play/pause action for a genre playlist
-   */
-  const handlePlayPauseIconAction = (genrePlaylist) => {
-    if (
-      !trackListOrigin ||
-      playState === PLAY_STATES.STOPPED ||
-      trackListOrigin.type !== TRACK_LIST_ORIGIN_TYPE.PLAYLIST ||
-      trackListOrigin.object.uuid !== genrePlaylist.uuid
-    ) {
-      if (genrePlaylist.libraryTracksCount > 0) {
-        playNewTrackListFromPlaylistUuid(genrePlaylist.uuid);
+  const handlePlayPauseIconAction = useCallback(
+    (genrePlaylist) => {
+      if (
+        !trackListOrigin ||
+        playState === PLAY_STATES.STOPPED ||
+        trackListOrigin.type !== TRACK_LIST_ORIGIN_TYPE.PLAYLIST ||
+        trackListOrigin.object.uuid !== genrePlaylist.uuid
+      ) {
+        if (genrePlaylist.libraryTracksCount > 0) {
+          playNewTrackListFromPlaylistUuid(genrePlaylist.uuid);
+        }
+      } else if (
+        trackListOrigin &&
+        trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
+        trackListOrigin.object.uuid === genrePlaylist.uuid
+      ) {
+        handlePlayPauseAction();
       }
-    } else if (
-      trackListOrigin &&
-      trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
-      trackListOrigin.object.uuid === genrePlaylist.uuid
-    ) {
-      handlePlayPauseAction();
-    }
-  };
+    },
+    [trackListOrigin, playState, playNewTrackListFromPlaylistUuid, handlePlayPauseAction]
+  );
 
   useEffect(() => {
     // Clear any previous SVG content
