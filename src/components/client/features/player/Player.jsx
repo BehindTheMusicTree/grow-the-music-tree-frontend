@@ -68,7 +68,7 @@ export default function Player() {
     if (playerUploadedTrackObject) {
       setResetSeekSignal(1);
     }
-  }, [playerUploadedTrackObject]);
+  }, [playerUploadedTrackObject, setResetSeekSignal]);
 
   return (
     <div className="w-full h-player fixed bottom-0 flex justify-between p-2 bg-black text-white text-sm">
