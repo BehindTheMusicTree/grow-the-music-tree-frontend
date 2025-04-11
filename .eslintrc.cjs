@@ -5,12 +5,7 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  extends: [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "next/core-web-vitals",
-  ],
+  extends: ["next/core-web-vitals", "eslint:recommended", "plugin:@typescript-eslint/recommended"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaFeatures: {
@@ -19,23 +14,10 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["react", "@typescript-eslint", "next"],
+  plugins: ["@typescript-eslint"],
   settings: {
     react: {
       version: "detect",
-    },
-    "import/resolver": {
-      alias: {
-        map: [
-          ["@", "./src"],
-          ["@components", "./src/components"],
-          ["@contexts", "./src/contexts"],
-          ["@hooks", "./src/hooks"],
-          ["@models", "./src/models"],
-          ["@utils", "./src/utils"],
-        ],
-        extensions: [".js", ".jsx", ".ts", ".tsx"],
-      },
     },
   },
   rules: {
