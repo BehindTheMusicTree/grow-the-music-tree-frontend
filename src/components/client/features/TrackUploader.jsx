@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { uploadTrack } from "../../app/actions/tracks";
 
 export default function TrackUploader() {
   const [file, setFile] = useState(null);
@@ -22,9 +21,10 @@ export default function TrackUploader() {
       if (genreUuid) {
         formData.append("genre", genreUuid);
       }
-
-      const result = await uploadTrack(formData);
-      // Handle success (e.g., show success message, clear form)
+      await fetch("/api/uploaded-tracks", {
+        method: "POST",
+        body: formData,
+      });
       setFile(null);
       setGenreUuid("");
     } catch (err) {
