@@ -34,7 +34,7 @@ const menuGroups = {
   ],
 };
 
-export function Menu() {
+export default function Menu() {
   return (
     <nav className="bg-black flex flex-col justify-start items-start p-2 h-full">
       <MenuGroup items={menuGroups.library} />
