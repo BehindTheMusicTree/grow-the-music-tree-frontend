@@ -55,7 +55,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         trackListOrigin.type !== TRACK_LIST_ORIGIN_TYPE.PLAYLIST ||
         trackListOrigin.object.uuid !== genrePlaylist.uuid
       ) {
-        if (genrePlaylist.libraryTracksCount > 0) {
+        if (genrePlaylist.libTracksCount > 0) {
           playNewTrackListFromPlaylistUuid(genrePlaylist.uuid);
         }
       } else if (

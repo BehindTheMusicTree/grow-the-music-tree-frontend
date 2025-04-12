@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getSpotifyLibTracks } from "@/app/actions/spotify-lib-tracks";
+import { getSpotifyLibTracks } from "@actions/spotify-lib-tracks";
 
 const SpotifyLibTracksContext = createContext();
 
@@ -24,7 +24,7 @@ export const SpotifyLibTracksProvider = ({ children }) => {
   }, []);
 
   const {
-    data: libraryTracks,
+    data: libTracks,
     isLoading,
     error,
   } = useQuery({
@@ -33,7 +33,7 @@ export const SpotifyLibTracksProvider = ({ children }) => {
   });
 
   const value = {
-    libraryTracks,
+    libTracks,
     isLoading,
     error,
   };

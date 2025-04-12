@@ -294,7 +294,7 @@ export function addActionsGroup(d3, genrePlaylist, genrePlaylistGroup, callbacks
     "playpause-container",
     playPauseActionOnclick,
     <FaSpinner size={SPINNER_ICON_SIZE} className="animate-spin fill-current text-white" />,
-    (d) => d.data.libraryTracksCount + " track" + (d.data.libraryTracksCount > 1 ? "s" : ""),
+    (d) => d.data.libTracksCount + " track" + (d.data.libTracksCount > 1 ? "s" : ""),
     spinnerVisibilityFunction
   );
 
@@ -320,13 +320,13 @@ export function addActionsGroup(d3, genrePlaylist, genrePlaylistGroup, callbacks
       const playElement = (
         <div
           className={`playpause-container tree-action-icon-container ${
-            d.data.libraryTracksCount === 0 ? "text-gray-500" : ""
+            d.data.libTracksCount === 0 ? "text-gray-500" : ""
           }`}
         >
           <FaPlay
             size={PLAY_PAUSE_ICON_DIMENSIONS.HEIGHT}
             className="play-icon"
-            color={`${d.data.libraryTracksCount === 0 ? "grey" : "white"}`}
+            color={`${d.data.libTracksCount === 0 ? "grey" : "white"}`}
           />
         </div>
       );
@@ -352,7 +352,7 @@ export function addActionsGroup(d3, genrePlaylist, genrePlaylistGroup, callbacks
       return ReactDOMServer.renderToString(element);
     })
     .style("cursor", function (d) {
-      if (d.data.libraryTracksCount > 0) {
+      if (d.data.libTracksCount > 0) {
         return "pointer";
       }
       return "default";
