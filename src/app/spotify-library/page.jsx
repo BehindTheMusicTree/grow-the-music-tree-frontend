@@ -2,10 +2,10 @@
 
 import { FaSpinner } from "react-icons/fa";
 import { MdError } from "react-icons/md";
-import { useSpotifyLibrary } from "@contexts/SpotifyLibraryContext";
+import { useSpotifyLibTracks } from "@contexts/SpotifyLibTracksContext";
 
 export default function SpotifyLibrary() {
-  const { spotifyLibTracks, error, loading } = useSpotifyLibrary();
+  const { spotifyLibTracks, error, loading } = useSpotifyLibTracks();
 
   if (loading) {
     return (
