@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { getSpotifyLibraryTracks } from "@/app/actions/spotify-library";
 
 const SpotifyLibraryContext = createContext();
 
@@ -15,11 +16,11 @@ export const useSpotifyLibrary = () => {
 
 export const SpotifyLibraryProvider = ({ children }) => {
   const fetchLibraryTracks = useCallback(async () => {
-    const response = await fetch("/api/spotify-lib-tracks");
-    if (!response.ok) {
+    try {
+      return await getSpotifyLibraryTracks();
+    } catch (error) {
       throw new Error("Failed to fetch library tracks");
     }
-    return response.json();
   }, []);
 
   const {
