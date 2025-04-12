@@ -9,7 +9,7 @@ import { GenrePlaylistProvider } from "@contexts/GenrePlaylistContext";
 import { PlayerProvider } from "@contexts/PlayerContext";
 import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVisibilityContext";
 import { TrackListProvider } from "@contexts/TrackListContext";
-import { SpotifyLibraryProvider } from "@contexts/SpotifyLibraryContext";
+import { SpotifyLibTracksProvider } from "@contexts/SpotifyLibTracksContext";
 
 const queryClient = new QueryClient();
 
@@ -22,9 +22,9 @@ export default function Providers({ children }) {
             <GenrePlaylistProvider>
               <PlayerProvider>
                 <TrackListProvider>
-                  <SpotifyLibraryProvider>
+                  <SpotifyLibTracksProvider>
                     <TrackListSidebarVisibilityProvider>{children}</TrackListSidebarVisibilityProvider>
-                  </SpotifyLibraryProvider>
+                  </SpotifyLibTracksProvider>
                 </TrackListProvider>
               </PlayerProvider>
             </GenrePlaylistProvider>
