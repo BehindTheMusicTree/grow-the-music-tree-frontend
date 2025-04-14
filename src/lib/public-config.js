@@ -1,47 +1,44 @@
-// Check required public environment variables
-const requiredPublicEnvVars = [
-  "API_BASE_URL",
-  "CONTACT_EMAIL",
-  "SENTRY_IS_ACTIVE",
-  "SPOTIFY_CLIENT_ID",
-  "SPOTIFY_REDIRECT_URI",
-  "SPOTIFY_SCOPE",
-  "BASE_URL_WITHOUT_PORT",
+// Public configuration
+// This file contains only public, client-safe configuration values
+// Can be used by both client and server components
+
+// List of required public environment variables
+const requiredPublicVars = [
+  "NEXT_PUBLIC_API_BASE_URL",
+  "NEXT_PUBLIC_SPOTIFY_CLIENT_ID",
+  "NEXT_PUBLIC_SPOTIFY_SCOPE",
+  "NEXT_PUBLIC_SPOTIFY_REDIRECT_URI",
 ];
 
-const missingPublicVars = requiredPublicEnvVars.filter((envVar) => !process?.env?.[`NEXT_PUBLIC_${envVar}`]);
-
-if (missingPublicVars.length > 0) {
-  throw new Error(
-    `Missing required public environment variables: ${missingPublicVars.map((v) => `NEXT_PUBLIC_${v}`).join(", ")}`
-  );
+// Check for missing required variables
+const missingVars = requiredPublicVars.filter((varName) => !process.env[varName]);
+if (missingVars.length > 0) {
+  throw new Error(`Missing required public environment variables: ${missingVars.join(", ")}`);
 }
 
-const getPublicEnvVar = (key) => {
-  const nextKey = `NEXT_PUBLIC_${key}`;
-  const value = process?.env?.[nextKey];
+// Helper to get public environment variables
+function getPublicEnvVar(varName) {
+  const value = process.env[varName];
   if (!value) {
-    throw new Error(`Missing required environment variable: NEXT_PUBLIC_${key}`);
+    throw new Error(`Missing required public environment variable: ${varName}`);
   }
   return value;
-};
+}
 
-const extractApiVersionFromBaseUrl = (baseUrl) => {
-  if (!baseUrl) return null;
-  const versionMatch = baseUrl.match(/\/api\/(v[0-9]+\.[0-9]+\.[0-9]+)\//);
-  return versionMatch ? versionMatch[1] : null;
-};
+// Extract API version from base URL
+function getApiVersion(baseUrl) {
+  const match = baseUrl.match(/\/v\d+\//);
+  return match ? match[0].slice(1, -1) : "v1";
+}
 
-const apiBaseUrl = getPublicEnvVar("API_BASE_URL");
-
-// Public config (client-side accessible)
+// Public configuration object
 export const publicConfig = {
-  apiBaseUrl,
-  apiVersion: extractApiVersionFromBaseUrl(apiBaseUrl),
-  spotifyClientId: getPublicEnvVar("SPOTIFY_CLIENT_ID"),
-  spotifyRedirectUri: getPublicEnvVar("SPOTIFY_REDIRECT_URI"),
-  spotifyScope: getPublicEnvVar("SPOTIFY_SCOPE"),
-  baseUrl: getPublicEnvVar("BASE_URL_WITHOUT_PORT"),
-  contactEmail: getPublicEnvVar("CONTACT_EMAIL"),
-  sentryIsActive: getPublicEnvVar("SENTRY_IS_ACTIVE") === "true",
+  // API configuration
+  apiBaseUrl: getPublicEnvVar("NEXT_PUBLIC_API_BASE_URL"),
+  apiVersion: getApiVersion(getPublicEnvVar("NEXT_PUBLIC_API_BASE_URL")),
+
+  // Spotify configuration
+  spotifyClientId: getPublicEnvVar("NEXT_PUBLIC_SPOTIFY_CLIENT_ID"),
+  spotifyScope: getPublicEnvVar("NEXT_PUBLIC_SPOTIFY_SCOPE"),
+  spotifyRedirectUri: getPublicEnvVar("NEXT_PUBLIC_SPOTIFY_REDIRECT_URI"),
 };
