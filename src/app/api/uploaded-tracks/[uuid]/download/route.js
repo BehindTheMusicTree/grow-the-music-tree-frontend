@@ -1,13 +1,12 @@
 import { withAuthProtection } from "@lib/server/auth-api";
-import { authOptions } from "@lib/auth";
 
 /**
  * Handler for downloading track files
- * This is an API route that serves binary file data 
+ * This is an API route that serves binary file data
  */
 async function downloadTrackImpl(session, authFetch, { params }) {
   const { uuid } = params;
-  
+
   // Use authFetch but get the raw response without throwing errors
   // This is a special case since we're handling binary data
   const response = await authFetch(
@@ -31,4 +30,4 @@ async function downloadTrackImpl(session, authFetch, { params }) {
 }
 
 // Export with auth protection - API route specific pattern
-export const GET = withAuthProtection(downloadTrackImpl, authOptions);
+export const GET = withAuthProtection(downloadTrackImpl);

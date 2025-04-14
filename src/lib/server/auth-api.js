@@ -1,5 +1,6 @@
 // NO "use client" - this is server-only code
 import { getServerSession } from "next-auth";
+import { authOptions } from "@lib/auth";
 
 /**
  * Creates an authenticated fetch function with auth headers pre-applied
@@ -40,11 +41,11 @@ export function createAuthFetch(session) {
 /**
  * Server-side wrapper that standardizes auth and provides authFetch
  */
-export function withAuthProtection(serverAction, authOptionsArg) {
+export function withAuthProtection(serverAction) {
   return async (...args) => {
     try {
       // Check authentication
-      const session = await getServerSession(authOptionsArg);
+      const session = await getServerSession(authOptions);
       if (!session) {
         const error = new Error("Unauthorized");
         error.name = "AuthenticationError";

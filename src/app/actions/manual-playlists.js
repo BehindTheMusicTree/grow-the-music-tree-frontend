@@ -2,7 +2,7 @@
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@lib/auth";
-import { withAuthHandling } from "@lib/auth-error-handler";
+import { withAuthProtection } from "@lib/server/auth-api";
 
 async function listManualPlaylistsImpl(page = 1, pageSize = 50) {
   const session = await getServerSession(authOptions);
@@ -45,5 +45,5 @@ async function createManualPlaylistImpl(playlistData) {
   return response.json();
 }
 
-export const listManualPlaylists = withAuthHandling(listManualPlaylistsImpl);
-export const createManualPlaylist = withAuthHandling(createManualPlaylistImpl);
+export const listManualPlaylists = withAuthProtection(listManualPlaylistsImpl);
+export const createManualPlaylist = withAuthProtection(createManualPlaylistImpl);

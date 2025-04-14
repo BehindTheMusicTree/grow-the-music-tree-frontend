@@ -1,7 +1,6 @@
 "use server";
 
 import { withAuthProtection } from "@lib/server/auth-api";
-import { authOptions } from "@lib/auth";
 
 // Implementation with authFetch
 async function listSpotifyLibTracksImpl(session, authFetch, page = 1, pageSize = 50) {
@@ -10,5 +9,4 @@ async function listSpotifyLibTracksImpl(session, authFetch, page = 1, pageSize =
   return response.json();
 }
 
-// Export the protected version
-export const listSpotifyLibTracks = withAuthProtection(listSpotifyLibTracksImpl, authOptions);
+export const listSpotifyLibTracks = withAuthProtection(listSpotifyLibTracksImpl);
