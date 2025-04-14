@@ -15,9 +15,7 @@ export const useSpotifyLibTracks = () => {
 };
 
 export const SpotifyLibTracksProvider = ({ children }) => {
-  // Maximally simplified implementation - auth errors handled by GlobalAuthErrorHandler
   const fetchLibTracks = useCallback(async () => {
-    // Direct call - errors will bubble up to GlobalAuthErrorHandler
     return listSpotifyLibTracks();
   }, []);
 
