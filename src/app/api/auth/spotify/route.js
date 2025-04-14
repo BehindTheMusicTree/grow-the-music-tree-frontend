@@ -15,7 +15,6 @@ export async function POST(request) {
       return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
     }
 
-    // Exchange code for tokens directly with Spotify
     const response = await fetch("https://accounts.spotify.com/api/token", {
       method: "POST",
       headers: {
