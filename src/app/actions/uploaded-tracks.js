@@ -2,12 +2,29 @@
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@lib/auth";
+import { withAuthHandling } from "@lib/auth-error-handler";
 
-export async function uploadTrack(formData) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    throw new Error("Unauthorized");
+async function listUploadedTracksImpl(session, page = 1, pageSize = 50) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}library/uploaded/?page=${page}&pageSize=${pageSize}`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch tracks");
   }
+
+  return response.json();
+}
+
+export const getTracks = withAuthHandling(listUploadedTracksImpl);
+
+async function uploadTrackImpl(formData) {
+  const session = await getServerSession(authOptions);
 
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}library/uploaded/`, {
     method: "POST",
@@ -19,11 +36,8 @@ export async function uploadTrack(formData) {
   return response.json();
 }
 
-export async function updateUploadedTrack(uploadedTrackUuid, uploadedTrackData) {
+async function updateUploadedTrackImpl(uploadedTrackUuid, uploadedTrackData) {
   const session = await getServerSession(authOptions);
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
 
   const transformedData = {
     ...uploadedTrackData,
@@ -43,3 +57,7 @@ export async function updateUploadedTrack(uploadedTrackUuid, uploadedTrackData) 
   });
   return response.json();
 }
+
+export const listUploadedTracks = withAuthHandling(listUploadedTracksImpl);
+export const uploadTrack = withAuthHandling(uploadTrackImpl);
+export const updateUploadedTrack = withAuthHandling(updateUploadedTrackImpl);

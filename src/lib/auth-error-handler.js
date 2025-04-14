@@ -3,6 +3,8 @@
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@lib/auth";
 
 // Custom error class for auth errors
 export class AuthenticationError extends Error {
@@ -24,16 +26,12 @@ export function GlobalAuthErrorHandler() {
     // Global error handler for unhandled promise rejections
     const handleUnhandledRejection = (event) => {
       const error = event.reason;
-      
+
       // Check if it's an auth error from server action or API
-      if (
-        error?.name === "AuthenticationError" || 
-        error?.message === "Unauthorized" ||
-        error?.status === 401
-      ) {
+      if (error?.name === "AuthenticationError" || error?.message === "Unauthorized" || error?.status === 401) {
         // Show auth popup
         showAuthPopup();
-        
+
         // Prevent default handling
         event.preventDefault();
       }
@@ -43,22 +41,14 @@ export function GlobalAuthErrorHandler() {
     queryClient.setDefaultOptions({
       queries: {
         onError: (error) => {
-          if (
-            error?.name === "AuthenticationError" || 
-            error?.message === "Unauthorized" ||
-            error?.status === 401
-          ) {
+          if (error?.name === "AuthenticationError" || error?.message === "Unauthorized" || error?.status === 401) {
             showAuthPopup();
           }
         },
       },
       mutations: {
         onError: (error) => {
-          if (
-            error?.name === "AuthenticationError" || 
-            error?.message === "Unauthorized" ||
-            error?.status === 401
-          ) {
+          if (error?.name === "AuthenticationError" || error?.message === "Unauthorized" || error?.status === 401) {
             showAuthPopup();
           }
         },
@@ -78,14 +68,19 @@ export function GlobalAuthErrorHandler() {
 }
 
 /**
- * Wrapper for server actions to standardize error handling
+ * Wrapper for server actions to standardize error handling and authentication
  * @param {Function} serverAction - The server action to wrap
- * @returns {Function} - Wrapped function with standardized error handling
+ * @returns {Function} - Wrapped function with standardized error handling and authentication
  */
 export function withAuthHandling(serverAction) {
   return async (...args) => {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      throw new AuthenticationError();
+    }
+
     try {
-      return await serverAction(...args);
+      return await serverAction(session, ...args);
     } catch (error) {
       // Standardize auth errors
       if (error.message === "Unauthorized") {

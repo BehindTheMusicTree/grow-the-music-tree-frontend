@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getSpotifyLibTracks } from "@actions/spotify-lib-tracks";
+import { listSpotifyLibTracks } from "@actions/spotify-lib-tracks";
 
 const SpotifyLibTracksContext = createContext();
 
@@ -18,7 +18,7 @@ export const SpotifyLibTracksProvider = ({ children }) => {
   // Maximally simplified implementation - auth errors handled by GlobalAuthErrorHandler
   const fetchLibTracks = useCallback(async () => {
     // Direct call - errors will bubble up to GlobalAuthErrorHandler
-    return getSpotifyLibTracks();
+    return listSpotifyLibTracks();
   }, []);
 
   const {
