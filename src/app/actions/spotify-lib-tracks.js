@@ -2,8 +2,10 @@
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@lib/auth";
+import { withAuthHandling } from "@lib/auth-error-handler";
 
-export async function getSpotifyLibTracks(page = 1, pageSize = 50) {
+// Original server action implementation
+async function getSpotifyLibTracksImpl(page = 1, pageSize = 50) {
   const session = await getServerSession(authOptions);
   if (!session) {
     throw new Error("Unauthorized");
@@ -22,3 +24,6 @@ export async function getSpotifyLibTracks(page = 1, pageSize = 50) {
 
   return response.json();
 }
+
+// Export the wrapped version with standardized auth error handling
+export const getSpotifyLibTracks = withAuthHandling(getSpotifyLibTracksImpl);
