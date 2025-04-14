@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { initSentry } from "@lib/sentry";
 
 import Providers from "@app/providers";
-import { setupFetchInterceptor } from "@lib/fetch/fetchInterceptor";
+import { setupFetchInterceptor } from "@lib/client/fetchInterceptor";
 import { useFetchErrorHandler } from "@hooks/useFetchErrorHandler";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";

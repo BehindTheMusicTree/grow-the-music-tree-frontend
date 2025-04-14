@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useCallback, useEffect } from "react";
 import { usePopup } from "./PopupContext";
-import { setupFetchInterceptor } from "@lib/fetch/fetchInterceptor";
+import { setupFetchInterceptor } from "@lib/client/fetchInterceptor";
 import { useQueryClient } from "@tanstack/react-query";
 
 const ErrorContext = createContext(null);
