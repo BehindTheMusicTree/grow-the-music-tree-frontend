@@ -10,7 +10,8 @@ import { PlayerProvider } from "@contexts/PlayerContext";
 import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVisibilityContext";
 import { TrackListProvider } from "@contexts/TrackListContext";
 import { SpotifyLibTracksProvider } from "@contexts/SpotifyLibTracksContext";
-import { GlobalAuthErrorHandler } from "@lib/client/auth-error-handler";
+import { ErrorProvider } from "@contexts/ErrorContext";
+import { setupFetchInterceptor } from "@lib/fetch/fetchInterceptor";
 
 const queryClient = new QueryClient();
 
@@ -19,19 +20,19 @@ export default function Providers({ children }) {
     <SessionProvider>
       <QueryClientProvider client={queryClient}>
         <PopupProvider>
-          {/* Global error handler for auth errors - centralized approach */}
-          <GlobalAuthErrorHandler />
-          <UploadedTrackProvider>
-            <GenrePlaylistProvider>
-              <PlayerProvider>
-                <TrackListProvider>
-                  <SpotifyLibTracksProvider>
-                    <TrackListSidebarVisibilityProvider>{children}</TrackListSidebarVisibilityProvider>
-                  </SpotifyLibTracksProvider>
-                </TrackListProvider>
-              </PlayerProvider>
-            </GenrePlaylistProvider>
-          </UploadedTrackProvider>
+          <ErrorProvider>
+            <UploadedTrackProvider>
+              <GenrePlaylistProvider>
+                <PlayerProvider>
+                  <TrackListProvider>
+                    <SpotifyLibTracksProvider>
+                      <TrackListSidebarVisibilityProvider>{children}</TrackListSidebarVisibilityProvider>
+                    </SpotifyLibTracksProvider>
+                  </TrackListProvider>
+                </PlayerProvider>
+              </GenrePlaylistProvider>
+            </UploadedTrackProvider>
+          </ErrorProvider>
         </PopupProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
