@@ -1,14 +1,9 @@
 "use server";
 
-import { getServerSession } from "next-auth";
-import { authOptions } from "@lib/auth";
 import { withAuthProtection } from "@lib/server/auth-api";
-import { getPublicEnvVar } from "@lib/config";
 
 async function listManualPlaylistsImpl(authFetch, page = 1, pageSize = 50) {
-  const response = await authFetch(
-    `${getPublicEnvVar("API_BASE_URL")}manual-playlists/?page=${page}&pageSize=${pageSize}`
-  );
+  const response = await authFetch(`manual-playlists/?page=${page}&pageSize=${pageSize}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch genre playlists");
@@ -17,18 +12,10 @@ async function listManualPlaylistsImpl(authFetch, page = 1, pageSize = 50) {
   return response.json();
 }
 
-async function createManualPlaylistImpl(playlistData) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
-
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}manual-playlists/`, {
+async function createManualPlaylistImpl(session, authFetch, playlistData) {
+  const response = await authFetch("manual-playlists/", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${session.accessToken}`,
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(playlistData),
   });
 

@@ -4,16 +4,13 @@ import { withAuthProtection } from "@lib/server/auth-api";
 
 // List tracks with authFetch
 async function listUploadedTracksImpl(session, authFetch, page = 1, pageSize = 50) {
-  const response = await authFetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}library/uploaded/?page=${page}&pageSize=${pageSize}`
-  );
-
+  const response = await authFetch(`library/uploaded/?page=${page}&pageSize=${pageSize}`);
   return response.json();
 }
 
 // Upload track with authFetch
 async function uploadTrackImpl(session, authFetch, formData) {
-  const response = await authFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}library/uploaded/`, {
+  const response = await authFetch("library/uploaded/", {
     method: "POST",
     body: formData,
   });
@@ -31,7 +28,7 @@ async function updateUploadedTrackImpl(session, authFetch, uploadedTrackUuid, up
     genreName: undefined,
   };
 
-  const response = await authFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}library/uploaded/${uploadedTrackUuid}/`, {
+  const response = await authFetch(`library/uploaded/${uploadedTrackUuid}/`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(transformedData),

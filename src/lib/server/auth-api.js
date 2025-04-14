@@ -1,6 +1,31 @@
 // NO "use client" - this is server-only code
 import { getServerSession } from "next-auth";
+import { serverConfig } from "@lib/server-config";
+import { publicConfig } from "@lib/public-config";
 import { authOptions } from "@lib/auth";
+
+/**
+ * Standard response object for authentication errors
+ * @typedef {Object} AuthResponse
+ * @property {boolean} success - Whether the operation was successful
+ * @property {Object} data - The operation result data (if successful)
+ * @property {Object} error - Error information (if not successful)
+ */
+
+/**
+ * Creates a standard auth error response object
+ * This avoids throwing errors which cause 500 status codes
+ */
+export function createAuthErrorResponse() {
+  return {
+    success: false,
+    error: {
+      type: "auth",
+      code: "unauthorized",
+      message: "Authentication required",
+    },
+  };
+}
 
 /**
  * Creates an authenticated fetch function with auth headers pre-applied
@@ -9,7 +34,7 @@ import { authOptions } from "@lib/auth";
  * @returns {Function} - Enhanced fetch function with auth headers
  */
 export function createAuthFetch(session) {
-  return async (url, options = {}) => {
+  return async (endpoint, options = {}) => {
     // Extract special options
     const { resolveOnError, ...fetchOptions } = options;
 
@@ -20,7 +45,7 @@ export function createAuthFetch(session) {
     };
 
     // Make the request with auth headers
-    const response = await fetch(url, {
+    const response = await fetch(`${publicConfig.apiBaseUrl}${endpoint}`, {
       ...fetchOptions,
       headers,
     });
@@ -44,8 +69,11 @@ export function createAuthFetch(session) {
 export function withAuthProtection(serverAction) {
   return async (...args) => {
     try {
-      // Check authentication
-      const session = await getServerSession(authOptions);
+      // Check authentication using combined auth options
+      const session = await getServerSession({
+        ...authOptions,
+        ...serverConfig.authOptions,
+      });
       if (!session) {
         const error = new Error("Unauthorized");
         error.name = "AuthenticationError";

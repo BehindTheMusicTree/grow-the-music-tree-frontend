@@ -10,7 +10,7 @@ async function downloadTrackImpl(session, authFetch, { params }) {
   // Use authFetch but get the raw response without throwing errors
   // This is a special case since we're handling binary data
   const response = await authFetch(
-    `${process.env.API_BASE_URL}library/uploaded/${uuid}/download/`,
+    `library/uploaded/${uuid}/download/`,
     { resolveOnError: true } // Special option to prevent auto-error throwing for binary handling
   );
 
