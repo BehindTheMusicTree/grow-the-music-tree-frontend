@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
-import { serverConfig, publicConfig } from "@lib/config";
+import { publicConfig } from "@lib/public-config";
+import { serverConfig } from "@lib/sever/server-config";
 
 export const authOptions = {
   providers: [
