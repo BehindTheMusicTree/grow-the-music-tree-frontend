@@ -1,29 +1,31 @@
 "use server";
 
-import { getServerSession } from "next-auth";
+import { withAuthProtection } from "@lib/server/auth-api";
 import { authOptions } from "@lib/auth";
-import { withAuthHandling } from "@lib/auth-error-handler";
 
-async function listGenrePlaylistsImpl(page = 1, pageSize = 50) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
-
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}genre-playlists/?page=${page}&pageSize=${pageSize}`,
-    {
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    }
+// Clean implementation using authFetch
+async function listGenrePlaylistsImpl(session, authFetch, page = 1, pageSize = 50) {
+  const response = await authFetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}genre-playlists/?page=${page}&pageSize=${pageSize}`
   );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch genre playlists");
-  }
-
+  
   return response.json();
 }
 
-export const listGenrePlaylists = withAuthHandling(listGenrePlaylistsImpl);
+// Create playlist implementation
+async function createGenrePlaylistImpl(session, authFetch, genreData) {
+  const response = await authFetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}genre-playlists/`, 
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(genreData),
+    }
+  );
+  
+  return response.json();
+}
+
+// Export protected versions
+export const listGenrePlaylists = withAuthProtection(listGenrePlaylistsImpl, authOptions);
+export const createGenrePlaylist = withAuthProtection(createGenrePlaylistImpl, authOptions);

@@ -1,19 +1,19 @@
 "use server";
 
-import { withAuthHandling } from "@lib/auth-error-handler";
+import { withAuthProtection } from "@lib/server/auth-api";
+import { authOptions } from "@lib/auth";
 
-async function listSpotifyLibTracksImpl(session, page = 1, pageSize = 50) {
-  const response = await fetch(`${process.env.API_BASE_URL}library/spotify/?page=${page}&pageSize=${pageSize}`, {
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch Spotify library tracks");
-  }
-
+// Implementation with authFetch
+async function getSpotifyLibTracksImpl(session, authFetch, page = 1, pageSize = 50) {
+  const response = await authFetch(
+    `${process.env.API_BASE_URL}library/uploaded/?page=${page}&pageSize=${pageSize}`
+  );
+  
   return response.json();
 }
 
-export const listSpotifyLibTracks = withAuthHandling(listSpotifyLibTracksImpl);
+// Export the protected version
+export const getSpotifyLibTracks = withAuthProtection(
+  getSpotifyLibTracksImpl, 
+  authOptions
+);

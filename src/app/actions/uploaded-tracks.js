@@ -1,44 +1,32 @@
 "use server";
 
-import { getServerSession } from "next-auth";
+import { withAuthProtection } from "@lib/server/auth-api";
 import { authOptions } from "@lib/auth";
-import { withAuthHandling } from "@lib/auth-error-handler";
 
-async function listUploadedTracksImpl(session, page = 1, pageSize = 50) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}library/uploaded/?page=${page}&pageSize=${pageSize}`,
+// List tracks with authFetch
+async function listUploadedTracksImpl(session, authFetch, page = 1, pageSize = 50) {
+  const response = await authFetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}library/uploaded/?page=${page}&pageSize=${pageSize}`
+  );
+  
+  return response.json();
+}
+
+// Upload track with authFetch
+async function uploadTrackImpl(session, authFetch, formData) {
+  const response = await authFetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}library/uploaded/`, 
     {
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
+      method: "POST",
+      body: formData,
     }
   );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch tracks");
-  }
-
+  
   return response.json();
 }
 
-export const getTracks = withAuthHandling(listUploadedTracksImpl);
-
-async function uploadTrackImpl(formData) {
-  const session = await getServerSession(authOptions);
-
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}library/uploaded/`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    body: formData,
-  });
-  return response.json();
-}
-
-async function updateUploadedTrackImpl(uploadedTrackUuid, uploadedTrackData) {
-  const session = await getServerSession(authOptions);
-
+// Update track with authFetch
+async function updateUploadedTrackImpl(session, authFetch, uploadedTrackUuid, uploadedTrackData) {
   const transformedData = {
     ...uploadedTrackData,
     artistsNames: uploadedTrackData.artistName ? [uploadedTrackData.artistName] : uploadedTrackData.artistsNames,
@@ -47,17 +35,20 @@ async function updateUploadedTrackImpl(uploadedTrackUuid, uploadedTrackData) {
     genreName: undefined,
   };
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}library/uploaded/${uploadedTrackUuid}/`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    body: JSON.stringify(transformedData),
-  });
+  const response = await authFetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}library/uploaded/${uploadedTrackUuid}/`, 
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(transformedData),
+    }
+  );
+  
   return response.json();
 }
 
-export const listUploadedTracks = withAuthHandling(listUploadedTracksImpl);
-export const uploadTrack = withAuthHandling(uploadTrackImpl);
-export const updateUploadedTrack = withAuthHandling(updateUploadedTrackImpl);
+// Export all protected versions
+export const getTracks = withAuthProtection(listUploadedTracksImpl, authOptions);
+export const listUploadedTracks = withAuthProtection(listUploadedTracksImpl, authOptions);
+export const uploadTrack = withAuthProtection(uploadTrackImpl, authOptions);
+export const updateUploadedTrack = withAuthProtection(updateUploadedTrackImpl, authOptions);
