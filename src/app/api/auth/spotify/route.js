@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { serverConfig, publicConfig } from "@lib/config";
+import { serverConfig } from "@lib/server/server-config";
+import { publicConfig } from "@lib/public-config";
 
 export async function POST(request) {
   try {
