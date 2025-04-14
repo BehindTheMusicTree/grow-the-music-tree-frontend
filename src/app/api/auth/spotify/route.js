@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPublicEnvVar, getPrivateEnvVar } from "@lib/config";
+import { serverConfig, publicConfig } from "@lib/config";
 
 export async function POST(request) {
   try {
@@ -14,7 +14,7 @@ export async function POST(request) {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         Authorization: `Basic ${Buffer.from(
-          `${getPublicEnvVar("SPOTIFY_CLIENT_ID")}:${getPrivateEnvVar("SPOTIFY_CLIENT_SECRET")}`
+          `${publicConfig.spotifyClientId}:${serverConfig.spotifyClientSecret}`
         ).toString("base64")}`,
       },
       body: new URLSearchParams({

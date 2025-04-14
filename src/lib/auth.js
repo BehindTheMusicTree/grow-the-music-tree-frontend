@@ -1,15 +1,16 @@
 import NextAuth from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
+import { serverConfig, publicConfig } from "@lib/config";
 
 export const authOptions = {
   providers: [
     SpotifyProvider({
-      clientId: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+      clientId: publicConfig.spotifyClientId,
+      clientSecret: serverConfig.spotifyClientSecret,
       authorization: {
         params: {
-          scope: process.env.NEXT_PUBLIC_SPOTIFY_SCOPE,
-          redirect_uri: process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI,
+          scope: publicConfig.spotifyScope,
+          redirect_uri: publicConfig.spotifyRedirectUri,
         },
       },
     }),
@@ -24,7 +25,7 @@ export const authOptions = {
           },
           body: JSON.stringify({
             code: account.code,
-            redirect_uri: process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI,
+            redirect_uri: publicConfig.spotifyRedirectUri,
           }),
         });
 
@@ -57,7 +58,8 @@ export const authOptions = {
     signIn: "/auth/signin",
     error: "/auth/error",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  // Use server config for secret and url
+  ...serverConfig.authOptions,
 };
 
 export default NextAuth(authOptions);
