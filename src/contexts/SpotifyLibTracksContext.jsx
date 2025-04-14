@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useCallback } from "react";
+import { createContext, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { listSpotifyLibTracks } from "@actions/spotify-lib-tracks";
+import { useError } from "@contexts/ErrorContext";
 
 const SpotifyLibTracksContext = createContext();
 
@@ -15,9 +16,7 @@ export const useSpotifyLibTracks = () => {
 };
 
 export const SpotifyLibTracksProvider = ({ children }) => {
-  const fetchLibTracks = useCallback(async () => {
-    return listSpotifyLibTracks();
-  }, []);
+  const { handleError } = useError();
 
   const {
     data: libTracks,
@@ -25,7 +24,8 @@ export const SpotifyLibTracksProvider = ({ children }) => {
     error,
   } = useQuery({
     queryKey: ["spotifyLibTracks"],
-    queryFn: fetchLibTracks,
+    queryFn: listSpotifyLibTracks,
+    onError: handleError,
   });
 
   const value = {
