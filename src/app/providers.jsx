@@ -11,7 +11,6 @@ import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVi
 import { TrackListProvider } from "@contexts/TrackListContext";
 import { SpotifyLibTracksProvider } from "@contexts/SpotifyLibTracksContext";
 import { ErrorProvider } from "@contexts/ErrorContext";
-import { setupFetchInterceptor } from "@lib/fetch/fetchInterceptor";
 
 const queryClient = new QueryClient();
 
