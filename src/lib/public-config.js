@@ -1,4 +1,4 @@
-// Check required environment variables first
+// Check required public environment variables
 const requiredPublicEnvVars = [
   "API_BASE_URL",
   "CONTACT_EMAIL",
@@ -6,18 +6,14 @@ const requiredPublicEnvVars = [
   "SPOTIFY_CLIENT_ID",
   "SPOTIFY_REDIRECT_URI",
   "SPOTIFY_SCOPE",
+  "BASE_URL_WITHOUT_PORT",
 ];
-const requiredPrivateEnvVars = ["ENV"];
 
 const missingPublicVars = requiredPublicEnvVars.filter((envVar) => !process?.env?.[`NEXT_PUBLIC_${envVar}`]);
-const missingPrivateVars = requiredPrivateEnvVars.filter((envVar) => !process?.env?.[envVar]);
 
-if (missingPublicVars.length > 0 || missingPrivateVars.length > 0) {
+if (missingPublicVars.length > 0) {
   throw new Error(
-    `Missing required environment variables: ${[
-      ...missingPublicVars.map((v) => `NEXT_PUBLIC_${v}`),
-      ...missingPrivateVars,
-    ].join(", ")}`
+    `Missing required public environment variables: ${missingPublicVars.map((v) => `NEXT_PUBLIC_${v}`).join(", ")}`
   );
 }
 
@@ -30,14 +26,6 @@ const getPublicEnvVar = (key) => {
   return value;
 };
 
-const getPrivateEnvVar = (key) => {
-  const value = process?.env?.[key];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${key}`);
-  }
-  return value;
-};
-
 const extractApiVersionFromBaseUrl = (baseUrl) => {
   if (!baseUrl) return null;
   const versionMatch = baseUrl.match(/\/api\/(v[0-9]+\.[0-9]+\.[0-9]+)\//);
@@ -46,26 +34,14 @@ const extractApiVersionFromBaseUrl = (baseUrl) => {
 
 const apiBaseUrl = getPublicEnvVar("API_BASE_URL");
 
-// Server-side only config
-export const serverConfig = {
-  env: getPrivateEnvVar("ENV"),
-};
-
 // Public config (client-side accessible)
 export const publicConfig = {
   apiBaseUrl,
   apiVersion: extractApiVersionFromBaseUrl(apiBaseUrl),
-  contactEmail: getPublicEnvVar("CONTACT_EMAIL"),
-  sentryIsActive: getPublicEnvVar("SENTRY_IS_ACTIVE"),
   spotifyClientId: getPublicEnvVar("SPOTIFY_CLIENT_ID"),
   spotifyRedirectUri: getPublicEnvVar("SPOTIFY_REDIRECT_URI"),
   spotifyScope: getPublicEnvVar("SPOTIFY_SCOPE"),
+  baseUrl: getPublicEnvVar("BASE_URL_WITHOUT_PORT"),
+  contactEmail: getPublicEnvVar("CONTACT_EMAIL"),
+  sentryIsActive: getPublicEnvVar("SENTRY_IS_ACTIVE") === "true",
 };
-
-// Combined config for internal use
-const config = {
-  ...serverConfig,
-  ...publicConfig,
-};
-
-export default config;
