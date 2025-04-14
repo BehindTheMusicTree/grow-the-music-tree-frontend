@@ -1,13 +1,7 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@lib/auth";
+import { getPublicEnvVar, getPrivateEnvVar } from "@lib/config";
 
 export async function POST(request) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     const { code, redirect_uri } = await request.json();
 
@@ -20,7 +14,7 @@ export async function POST(request) {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         Authorization: `Basic ${Buffer.from(
-          `${process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
+          `${getPublicEnvVar("SPOTIFY_CLIENT_ID")}:${getPrivateEnvVar("SPOTIFY_CLIENT_SECRET")}`
         ).toString("base64")}`,
       },
       body: new URLSearchParams({
