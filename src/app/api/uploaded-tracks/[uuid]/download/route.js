@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { withAuthProtection } from "@lib/server/auth-api";
 
 /**
@@ -16,17 +17,23 @@ async function downloadTrackImpl(session, authFetch, { params }) {
 
   // Handle error manually for binary responses
   if (!response.ok) {
-    throw new Error("Failed to download track");
+    const error = await response.json();
+    return NextResponse.json({ error: error.message }, { status: response.status });
   }
 
-  // Get binary data and set appropriate headers for download
-  const blob = await response.blob();
-  const headers = new Headers();
-  headers.set("Content-Type", "audio/mpeg");
-  headers.set("Content-Disposition", `attachment; filename="track-${uuid}.mp3"`);
+  // Get the content type from the response or determine from filename
+  const contentType = response.headers.get("content-type") || "audio/mpeg";
+  const contentDisposition = response.headers.get("content-disposition");
+  const filename = contentDisposition ? contentDisposition.split("filename=")[1].replace(/"/g, "") : `track-${uuid}`;
 
-  // Return proper Response object for the API route
-  return new Response(blob, { headers });
+  // Create response with the correct content type
+  const headers = new Headers();
+  headers.set("Content-Type", contentType);
+  headers.set("Content-Disposition", `attachment; filename="${filename}"`);
+
+  return new NextResponse(response.body, {
+    headers,
+  });
 }
 
 // Export with auth protection - API route specific pattern
