@@ -9,9 +9,12 @@ import InvalidInputPopup from "./child/InvalidInputPopup";
 import SpotifyAuthPopup from "./child/SpotifyAuthPopup";
 import SpotifyAuthErrorPopup from "./child/SpotifyAuthErrorPopup";
 import UploadedTrackEditionPopup from "./child/UploadedTrackEditionPopup";
+import NonAuthErrorPopup from "./child/NonAuthErrorPopup";
 
 function Popup({ type, content, onClose }) {
   switch (type) {
+    case "nonAuthError":
+      return <NonAuthErrorPopup {...content} onClose={onClose} />;
     case "genreDeletion":
       return <GenreDeletionPopup {...content} onClose={onClose} />;
     case "trackUpload":
