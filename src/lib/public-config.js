@@ -3,12 +3,6 @@
 // Can be used by both client and server components
 // Validation happens at app startup in middleware.js
 
-// Extract API version from base URL (helper function)
-function getApiVersion(baseUrl) {
-  const match = baseUrl.match(/\/v\d+\//);
-  return match ? match[0].slice(1, -1) : "v1";
-}
-
 // Create clean configuration object with values only
 export const publicConfig = Object.freeze({
   // API configuration
@@ -16,7 +10,10 @@ export const publicConfig = Object.freeze({
     return process.env.NEXT_PUBLIC_API_BASE_URL;
   },
   get apiVersion() {
-    return getApiVersion(this.apiBaseUrl);
+    const baseUrl = this.apiBaseUrl;
+    if (!baseUrl) return "v1";
+    const match = baseUrl.match(/\/v\d+\//);
+    return match ? match[0].slice(1, -1) : "v1";
   },
 
   // Spotify configuration

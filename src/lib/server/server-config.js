@@ -5,14 +5,20 @@
 import { publicConfig } from "@lib/public-config";
 
 // Create clean configuration object with values only
-export const serverConfig = Object.freeze({
+export const serverConfig = {
   // Environment
   env: process.env.ENV,
   port: process.env.PORT,
 
-  // Auth configuration
-  authOptions: {
-    secret: process.env.NEXTAUTH_SECRET,
-    url: `${publicConfig.apiBaseUrl.split("/api")[0]}:${process.env.PORT}`,
+  // Spotify
+  spotifyClientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+
+  // Auth
+  authSecret: process.env.NEXTAUTH_SECRET,
+  get authUrl() {
+    const baseUrl = publicConfig.apiBaseUrl;
+    if (!baseUrl) return `http://localhost:${this.port}`;
+    const base = baseUrl.split("/api")[0];
+    return `${base}:${this.port}`;
   },
-});
+};
