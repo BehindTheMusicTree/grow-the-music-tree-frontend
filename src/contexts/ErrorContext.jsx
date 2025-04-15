@@ -32,14 +32,14 @@ export function ErrorProvider({ children }) {
 
       // Handle fetch errors
       if (error?.response) {
-        showPopup("error", {
+        showPopup("nonAuthError", {
           message: `Request failed with status ${error.response.status}`,
         });
         return;
       }
 
       // Handle generic errors
-      showPopup("error", {
+      showPopup("nonAuthError", {
         message: error?.message || "An unexpected error occurred",
       });
     },
