@@ -4,12 +4,14 @@ import { createContext, useContext, useCallback, useEffect } from "react";
 import { usePopup } from "./PopupContext";
 import { setupFetchInterceptor } from "@lib/client/fetchInterceptor";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 
 const ErrorContext = createContext(null);
 
 export function ErrorProvider({ children }) {
   const { showPopup } = usePopup();
   const queryClient = useQueryClient();
+  const { showAuthPopup } = useSpotifyAuth();
 
   const handleError = useCallback(
     (error) => {
@@ -24,12 +26,7 @@ export function ErrorProvider({ children }) {
         (typeof error === "string" && error.includes("Unauthorized"))
       ) {
         console.log("Auth error detected, showing popup");
-        showPopup("spotifyAuth", {
-          message: "Connect your Spotify account to access all features",
-          onAuthenticate: () => {
-            // This will be handled by the popup component
-          },
-        });
+        showAuthPopup();
         return;
       }
 
@@ -46,7 +43,7 @@ export function ErrorProvider({ children }) {
         message: error?.message || "An unexpected error occurred",
       });
     },
-    [showPopup]
+    [showPopup, showAuthPopup]
   );
 
   // Add automatic error catching capabilities
