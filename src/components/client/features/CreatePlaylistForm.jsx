@@ -27,11 +27,11 @@ export default function CreatePlaylistForm() {
     try {
       // Call the server action with authentication check
       const result = await createGenrePlaylist(formData);
-      
+      console.log(result);
+
       // Handle success
       setFormData({ name: "", description: "" });
       alert("Playlist created successfully!");
-      
     } catch (error) {
       // Check specifically for authentication errors from the server action
       if (error.message === "Unauthorized") {
@@ -49,13 +49,9 @@ export default function CreatePlaylistForm() {
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-6">Create New Playlist</h2>
-      
-      {submitError && (
-        <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
-          {submitError}
-        </div>
-      )}
-      
+
+      {submitError && <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{submitError}</div>}
+
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -71,7 +67,7 @@ export default function CreatePlaylistForm() {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        
+
         <div className="mb-6">
           <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
             Description
@@ -85,12 +81,8 @@ export default function CreatePlaylistForm() {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full"
-        >
+
+        <Button type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? "Creating..." : "Create Playlist"}
         </Button>
       </form>
