@@ -7,7 +7,8 @@ export const authOptions = {
   providers: [
     SpotifyProvider({
       clientId: publicConfig.spotifyClientId,
-      clientSecret: serverConfig.spotifyClientSecret,
+      // No client secret - we'll handle token exchange in our API
+      clientSecret: "placeholder-not-used", // Required by Provider but won't be used
       authorization: {
         params: {
           scope: publicConfig.spotifyScope,
@@ -59,8 +60,9 @@ export const authOptions = {
     signIn: "/auth/signin",
     error: "/auth/error",
   },
-  // Use server config for secret and url
-  ...serverConfig.authOptions,
+  // Use server config for session secret and url but not client secret
+  secret: serverConfig.authSecret,
+  url: serverConfig.authUrl,
 };
 
 export default NextAuth(authOptions);
