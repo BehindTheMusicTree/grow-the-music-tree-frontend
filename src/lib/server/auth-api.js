@@ -64,7 +64,8 @@ export function createAuthFetch(session) {
 }
 
 /**
- * Server-side wrapper that standardizes auth and provides authFetch
+ * Server-side wrapper that handles auth and provides standard response format
+ * Returns response objects instead of throwing errors for auth issues
  */
 export function withAuthProtection(serverAction) {
   return async (...args) => {
@@ -74,26 +75,33 @@ export function withAuthProtection(serverAction) {
         ...authOptions,
         ...serverConfig.authOptions,
       });
+
       if (!session) {
-        const error = new Error("Unauthorized");
-        error.name = "AuthenticationError";
-        error.status = 401;
-        throw error;
+        // Return auth error response instead of throwing
+        console.log("Not authenticated, returning auth error response");
+        return createAuthErrorResponse();
       }
 
       // Create authenticated fetch helper
       const authFetch = createAuthFetch(session);
 
       // Call the original action with session, authFetch and args
-      return await serverAction(session, authFetch, ...args);
+      const result = await serverAction(session, authFetch, ...args);
+
+      // Wrap successful result
+      return {
+        success: true,
+        data: result,
+      };
     } catch (error) {
-      // Standardize auth errors
+      // Handle auth errors from external APIs
       if (error?.message === "Unauthorized" || error?.status === 401) {
-        const authError = new Error("Unauthorized");
-        authError.name = "AuthenticationError";
-        authError.status = 401;
-        throw authError;
+        console.log("Caught auth error from external API");
+        return createAuthErrorResponse();
       }
+
+      // Pass through other errors
+      console.error("Server action error:", error);
       throw error;
     }
   };
