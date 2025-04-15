@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { serverConfig } from "@lib/server/server-config";
 import { publicConfig } from "@lib/public-config";
 
 export async function POST(request) {
@@ -10,16 +9,12 @@ export async function POST(request) {
       return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
     }
 
-    const response = await fetch("https://accounts.spotify.com/api/token", {
+    const response = await fetch(`${publicConfig.apiBaseUrl}/auth/spotify`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Basic ${Buffer.from(
-          `${publicConfig.spotifyClientId}:${serverConfig.spotifyClientSecret}`
-        ).toString("base64")}`,
+        "Content-Type": "application/json",
       },
-      body: new URLSearchParams({
-        grant_type: "authorization_code",
+      body: JSON.stringify({
         code,
         redirect_uri,
       }),
@@ -35,7 +30,7 @@ export async function POST(request) {
     return NextResponse.json({
       access_token: data.access_token,
       refresh_token: data.refresh_token,
-      expires_at: Math.floor(Date.now() / 1000) + data.expires_in,
+      expires_at: data.expires_at,
     });
   } catch (error) {
     console.error("Error in Spotify auth callback:", error);
