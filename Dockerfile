@@ -20,7 +20,6 @@ ENV PROJECT_DIR=$PROJECT_DIR \
     ENV=TEST \
     APP_PORT=$APP_PORT \
     SENTRY_IS_ACTIVE=true \
-    VITE_ENV_FILE_DIR=${PROJECT_DIR}env/to-load/ \
     BUILD_COMPLETE_FILENAME=$BUILD_COMPLETE_FILENAME
 
 WORKDIR $PROJECT_DIR
@@ -28,6 +27,6 @@ WORKDIR $PROJECT_DIR
 COPY . .
 RUN ls -la
 RUN chmod +x ./scripts/* && ./scripts/install-dependencies.sh
-RUN npm install -g npm@10.5.2 && npm install -g serve && mkdir -p $VITE_ENV_FILE_DIR
+RUN npm install -g npm@10.5.2 && npm install -g serve
 
 ENTRYPOINT ["./scripts/entrypoint.sh"]
