@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Button from "@components/client/ui/Button";
-import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { createGenrePlaylist } from "@actions/genres-playlists";
 
 export default function CreatePlaylistForm() {
@@ -12,7 +11,6 @@ export default function CreatePlaylistForm() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
-  const { showAuthPopup } = useSpotifyAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,7 +23,6 @@ export default function CreatePlaylistForm() {
     setSubmitError(null);
 
     try {
-      // Call the server action with authentication check
       const result = await createGenrePlaylist(formData);
       console.log(result);
 
@@ -33,14 +30,7 @@ export default function CreatePlaylistForm() {
       setFormData({ name: "", description: "" });
       alert("Playlist created successfully!");
     } catch (error) {
-      // Check specifically for authentication errors from the server action
-      if (error.message === "Unauthorized") {
-        // Show the Spotify authentication popup
-        showAuthPopup();
-      } else {
-        // Handle other errors
-        setSubmitError(error.message || "Failed to create playlist");
-      }
+      setSubmitError(error.message || "Failed to create playlist");
     } finally {
       setIsSubmitting(false);
     }
