@@ -1,38 +1,47 @@
 // Server-side configuration
 // This file contains private, server-only configuration values
 
-// List of required private environment variables
-const requiredPrivateVars = ["ENV", "PORT", "SPOTIFY_CLIENT_SECRET", "NEXTAUTH_SECRET"];
+import { publicConfig } from "../public-config";
+
+// Direct access to environment variables
+// Store them in variables to ensure they're loaded and verified once
+const ENV = process.env.ENV;
+const PORT = process.env.PORT;
+const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
+const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET;
+
+// List of required private environment variables with their values
+const requiredPrivateVars = [
+  { name: "ENV", value: ENV },
+  { name: "PORT", value: PORT },
+  { name: "SPOTIFY_CLIENT_SECRET", value: SPOTIFY_CLIENT_SECRET },
+  { name: "NEXTAUTH_SECRET", value: NEXTAUTH_SECRET },
+];
 
 // Check for missing required variables
-const missingVars = requiredPrivateVars.filter((varName) => !process.env[varName]);
+const missingVars = requiredPrivateVars
+  .filter(({ value }) => !value)
+  .map(({ name }) => name);
+
 if (missingVars.length > 0) {
   throw new Error(`Missing required private environment variables: ${missingVars.join(", ")}`);
 }
 
-// Helper to get private environment variables
-function getPrivateEnvVar(varName) {
-  const value = process.env[varName];
-  if (!value) {
-    throw new Error(`Missing required private environment variable: ${varName}`);
-  }
-  return value;
-}
-
-import { publicConfig } from "../public-config";
-
 // Server configuration object
 export const serverConfig = {
   // Environment
-  env: getPrivateEnvVar("ENV"),
-  port: getPrivateEnvVar("PORT"),
+  env: ENV,
+  port: PORT,
 
   // Spotify configuration
-  spotifyClientSecret: getPrivateEnvVar("SPOTIFY_CLIENT_SECRET"),
+  spotifyClientSecret: SPOTIFY_CLIENT_SECRET,
 
   // Auth configuration
   authOptions: {
-    secret: getPrivateEnvVar("NEXTAUTH_SECRET"),
-    url: `${publicConfig.baseUrl}:${getPrivateEnvVar("PORT")}`,
+    secret: NEXTAUTH_SECRET,
+    url: `${publicConfig.apiBaseUrl.split("/api")[0]}:${PORT}`,
   },
 };
+
+// Make the config object immutable to prevent accidental modifications
+Object.freeze(serverConfig);
