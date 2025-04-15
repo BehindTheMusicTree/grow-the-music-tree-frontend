@@ -13,19 +13,32 @@ import Banner from "@components/client/features/banner/Banner";
 import Menu from "@components/client/features/Menu";
 import Player from "@components/client/features/player/Player";
 import TrackListSidebar from "@components/client/features/track-list-sidebar/TrackListSidebar";
-import Popup from "@components/client/ui/popup/child/BasePopup";
+import Popup from "@components/client/ui/popup/Popup";
 
 initSentry();
 
 function AppContent({ children }) {
   const { playerUploadedTrackObject } = usePlayer();
-  const { popupContentObject } = usePopup();
+  const { popupContentObject, showPopup, hidePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-  const { handleFetchError, ErrorPopup } = useFetchErrorHandler();
+  const { handleFetchError, error, clearError } = useFetchErrorHandler();
 
   useEffect(() => {
     setupFetchInterceptor(handleFetchError);
   }, [handleFetchError]);
+
+  useEffect(() => {
+    if (error) {
+      showPopup("error", {
+        title: error.title,
+        message: error.message,
+        onClose: () => {
+          clearError();
+          hidePopup();
+        },
+      });
+    }
+  }, [error, showPopup, hidePopup, clearError]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {
@@ -55,8 +68,9 @@ function AppContent({ children }) {
         }
       </div>
       {playerUploadedTrackObject && <Player />}
-      {popupContentObject && <Popup />}
-      <ErrorPopup />
+      {popupContentObject && (
+        <Popup type={popupContentObject.type} content={popupContentObject.content} onClose={hidePopup} />
+      )}
     </div>
   );
 }

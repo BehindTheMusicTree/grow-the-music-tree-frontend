@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import AppErrorPopup from "@components/client/ui/popup/child/AppErrorPopup";
 
 export function useFetchErrorHandler() {
   const [error, setError] = useState(null);
@@ -20,14 +19,9 @@ export function useFetchErrorHandler() {
     }
   }, []);
 
-  const ErrorPopup = () => {
-    if (!error) return null;
-
-    return <AppErrorPopup title={error.title} message={error.message} isDismissable={false} />;
-  };
-
   return {
     handleFetchError,
-    ErrorPopup,
+    error,
+    clearError: () => setError(null),
   };
 }
