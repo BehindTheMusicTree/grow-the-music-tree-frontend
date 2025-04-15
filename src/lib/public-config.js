@@ -12,11 +12,21 @@ function getApiVersion(baseUrl) {
 // Create clean configuration object with values only
 export const publicConfig = Object.freeze({
   // API configuration
-  apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
-  apiVersion: getApiVersion(process.env.NEXT_PUBLIC_API_BASE_URL),
+  get apiBaseUrl() {
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  },
+  get apiVersion() {
+    return getApiVersion(this.apiBaseUrl);
+  },
 
   // Spotify configuration
-  spotifyClientId: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
-  spotifyScope: process.env.NEXT_PUBLIC_SPOTIFY_SCOPE,
-  spotifyRedirectUri: process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI,
+  get spotifyClientId() {
+    return process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
+  },
+  get spotifyScope() {
+    return process.env.NEXT_PUBLIC_SPOTIFY_SCOPE;
+  },
+  get spotifyRedirectUri() {
+    return process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI;
+  },
 });
