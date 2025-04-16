@@ -62,7 +62,7 @@ jobs:
         run: |
           ssh ${{ env.SSH_DESTINATION }} "
             rm -f ${{ env.ENV_FILE }} &&
-            echo 'NODE_ENV=TEST' >> $ENV_FILE &&
+            echo 'NODE_ENV=test' >> $ENV_FILE &&
             echo 'CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
             echo 'API_BASE_URL=https://${{ vars.DOMAIN_NAME }}/api/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
             echo 'API_UMG_USERNAME=${{ secrets.API_UMG_USERNAME }}' >> ${{ env.ENV_FILE }} &&
