@@ -11,10 +11,24 @@ import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVi
 import { TrackListProvider } from "@contexts/TrackListContext";
 import { SpotifyLibTracksProvider } from "@contexts/SpotifyLibTracksContext";
 import { ConnectivityErrorProvider } from "@contexts/ConnectivityErrorContext";
+import { useEffect } from "react";
+import { validateClientEnv } from "@lib/env-validator";
 
 const queryClient = new QueryClient();
 
 export default function Providers({ children }) {
+  // Validate client environment variables on component mount
+  useEffect(() => {
+    try {
+      validateClientEnv();
+      console.log("✅ Client environment variables validated successfully");
+    } catch (error) {
+      console.error("❌ Client environment validation failed:", error.message);
+      // We don't throw here to prevent the app from crashing,
+      // but the error will be visible in the console
+      // The ConnectivityErrorProvider can be used to display a user-friendly error
+    }
+  }, []);
   return (
     <SessionProvider>
       <QueryClientProvider client={queryClient}>
