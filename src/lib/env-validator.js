@@ -1,6 +1,8 @@
 // Environment validation for runtime checks
 // Validates in all environments to catch configuration issues early
 
+import { isBrowser } from "@utils/browser";
+
 // List of required environment variables
 const requiredVars = {
   public: [
@@ -93,14 +95,14 @@ export function validateClientEnv() {
   // Skip if already validated (since env vars won't change during runtime)
   if (clientValidationPerformed) return true;
 
+  // Skip validation if not in browser
+  if (!isBrowser()) {
+    console.log("Skipping client environment validation (not in browser)");
+    return true;
+  }
+
   // Extensive debug logging to diagnose environment variable issues
   console.log("=== CLIENT ENVIRONMENT VALIDATION START ===");
-
-  // Check if we're running in browser
-  console.log(`Running in browser: ${typeof window !== "undefined"}`);
-
-  // Check if process.env exists and what type it is
-  console.log(`process.env type: ${typeof process.env}`);
 
   // Log all available process.env keys with NEXT_PUBLIC prefix
   console.log("All available NEXT_PUBLIC_ environment variables:");
@@ -117,14 +119,6 @@ export function validateClientEnv() {
       console.log(`  Value sample: ${value.substring(0, 10)}...`);
     }
   });
-
-  // Delay validation slightly to ensure variables have time to load (1ms is enough for a render cycle)
-  setTimeout(() => {
-    console.log("Post-timeout validation check:");
-    requiredVars.public.forEach((name) => {
-      console.log(`${name}: ${process.env[name] ? "defined (after timeout)" : "still undefined"}`);
-    });
-  }, 1);
 
   // Check if variables exist in process.env (standard Next.js approach)
   const missingPublicVars = requiredVars.public.filter((name) => !process.env[name]);
@@ -144,9 +138,6 @@ export function validateClientEnv() {
     // For now, let's return true instead of throwing, to prevent app crashes during debugging
     console.log("=== CLIENT ENVIRONMENT VALIDATION END ===");
     return true;
-
-    // Throw an error that can be caught by error boundaries
-    // throw new Error(errorMessage);
   }
 
   // Mark as validated to avoid redundant checks
