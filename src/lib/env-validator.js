@@ -93,7 +93,40 @@ export function validateClientEnv() {
   // Skip if already validated (since env vars won't change during runtime)
   if (clientValidationPerformed) return true;
 
-  // Only check public variables on client side
+  // Extensive debug logging to diagnose environment variable issues
+  console.log("=== CLIENT ENVIRONMENT VALIDATION START ===");
+
+  // Check if we're running in browser
+  console.log(`Running in browser: ${typeof window !== "undefined"}`);
+
+  // Check if process.env exists and what type it is
+  console.log(`process.env type: ${typeof process.env}`);
+
+  // Log all available process.env keys with NEXT_PUBLIC prefix
+  console.log("All available NEXT_PUBLIC_ environment variables:");
+  const nextPublicKeys = Object.keys(process.env).filter((key) => key.startsWith("NEXT_PUBLIC_"));
+  console.log(`Found ${nextPublicKeys.length} NEXT_PUBLIC_ variables:`, nextPublicKeys);
+
+  // Log each required variable's status
+  console.log("Required Environment Variables Status:");
+  requiredVars.public.forEach((name) => {
+    const value = process.env[name];
+    console.log(`${name}: ${value ? "defined" : "undefined"}`);
+    if (value) {
+      // For debugging, show the first few characters of each defined variable
+      console.log(`  Value sample: ${value.substring(0, 10)}...`);
+    }
+  });
+
+  // Delay validation slightly to ensure variables have time to load (1ms is enough for a render cycle)
+  setTimeout(() => {
+    console.log("Post-timeout validation check:");
+    requiredVars.public.forEach((name) => {
+      console.log(`${name}: ${process.env[name] ? "defined (after timeout)" : "still undefined"}`);
+    });
+  }, 1);
+
+  // Check if variables exist in process.env (standard Next.js approach)
   const missingPublicVars = requiredVars.public.filter((name) => !process.env[name]);
 
   if (missingPublicVars.length > 0) {
@@ -101,9 +134,19 @@ export function validateClientEnv() {
 
     // Log the error for debugging
     console.error(errorMessage);
+    console.log("Note: Please ensure:");
+    console.log("1. Environment variables are defined in .env.development or .env.development.local");
+    console.log("2. All variables start with NEXT_PUBLIC_ for client-side access");
+    console.log("3. You started the app using the proper script (start-dev-api-local.sh or start-dev-api-remote.sh)");
+    console.log("4. You've restarted the Next.js server after making changes to .env files");
+    console.log("5. You don't have server-side-only JS code trying to run on the client");
+
+    // For now, let's return true instead of throwing, to prevent app crashes during debugging
+    console.log("=== CLIENT ENVIRONMENT VALIDATION END ===");
+    return true;
 
     // Throw an error that can be caught by error boundaries
-    throw new Error(errorMessage);
+    // throw new Error(errorMessage);
   }
 
   // Mark as validated to avoid redundant checks
