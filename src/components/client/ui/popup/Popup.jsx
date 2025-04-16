@@ -13,18 +13,18 @@ import NonAuthErrorPopup from "./child/NonAuthErrorPopup";
 
 function Popup({ type, content, onClose }) {
   switch (type) {
-    case "nonAuthError":
+    case "networkError":
       return <NonAuthErrorPopup {...content} onClose={onClose} />;
+    case "authError":
+      return <SpotifyAuthErrorPopup {...content} onClose={onClose} />;
+    case "spotifyAuth":
+      return <SpotifyAuthPopup {...content} onClose={onClose} />;
     case "genreDeletion":
       return <GenreDeletionPopup {...content} onClose={onClose} />;
     case "trackUpload":
       return <TrackUploadPopup {...content} onClose={onClose} />;
     case "invalidInput":
       return <InvalidInputPopup {...content} onClose={onClose} />;
-    case "spotifyAuth":
-      return <SpotifyAuthPopup {...content} onClose={onClose} />;
-    case "spotifyAuthError":
-      return <SpotifyAuthErrorPopup {...content} onClose={onClose} />;
     case "trackEdition":
       return <UploadedTrackEditionPopup {...content} onClose={onClose} />;
     default:
