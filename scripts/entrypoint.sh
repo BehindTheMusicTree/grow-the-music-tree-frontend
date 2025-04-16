@@ -39,21 +39,21 @@ main() {
     # SENTRY_AUTH_TOKEN is not needed in the Vite env file.
     # Sentry simply reads it from the environment.
 
-    VITE_ENV_FILE="${VITE_ENV_FILE_DIR}.env"
-    log_with_script_suffixe "Generating the Vite env file $VITE_ENV_FILE ..."
-    cat << EOF > $VITE_ENV_FILE
-VITE_ENV=$ENV
-VITE_CONTACT_EMAIL=$CONTACT_EMAIL
-VITE_API_BASE_URL=$API_BASE_URL
-VITE_API_UMG_USERNAME=$API_UMG_USERNAME
-VITE_API_UMG_USER_PASSWORD='$API_UMG_USER_PASSWORD'
-VITE_SENTRY_IS_ACTIVE=$SENTRY_IS_ACTIVE
+    NEXT_ENV_FILE="${NEXT_ENV_FILE_DIR}.env"
+    log_with_script_suffixe "Generating Next.js env file $NEXT_ENV_FILE ..."
+    cat << EOF > $NEXT_ENV_FILE
+NODE_ENV=$ENV
+NEXT_PUBLIC_CONTACT_EMAIL=$CONTACT_EMAIL
+NEXT_PUBLIC_API_BASE_URL=$API_BASE_URL
+NEXT_PUBLIC_API_UMG_USERNAME=$API_UMG_USERNAME
+NEXT_PUBLIC_API_UMG_USER_PASSWORD='$API_UMG_USER_PASSWORD'
+NEXT_PUBLIC_SENTRY_IS_ACTIVE=$SENTRY_IS_ACTIVE
 EOF
     if [ $? -ne 0 ]; then
         log_with_script_suffixe "ERROR: Failed to generate the Vite env file." >&2
         exit 1
     fi
-    log_with_script_suffixe "Vite env file generated successfully."
+    log_with_script_suffixe "Next.js env file generated successfully."
 
     log_with_script_suffixe "Building the application..."
     npm run build
