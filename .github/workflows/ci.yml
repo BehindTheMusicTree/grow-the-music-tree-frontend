@@ -55,7 +55,6 @@ jobs:
           mkdir -p ~/.ssh &&
           ssh-keyscan -H ${{ vars.DOMAIN_NAME }} >> ~/.ssh/known_hosts
 
-      # React env variables have to be prefixed with VITE_ in order to be accessible in the app
       - name: SSH Set UMG environment variables on server
         env:
           ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKERIZED_APP_ENV_FILENAME }}
@@ -63,11 +62,9 @@ jobs:
           ssh ${{ env.SSH_DESTINATION }} "
             rm -f ${{ env.ENV_FILE }} &&
             echo 'NODE_ENV=test' >> $ENV_FILE &&
-            echo 'CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
-            echo 'API_BASE_URL=https://${{ vars.DOMAIN_NAME }}/api/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
-            echo 'API_UMG_USERNAME=${{ secrets.API_UMG_USERNAME }}' >> ${{ env.ENV_FILE }} &&
-            echo 'API_UMG_USER_PASSWORD=${{ secrets.API_UMG_USER_PASSWORD }}' >> ${{ env.ENV_FILE }} &&
-            echo 'SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}' >> ${{ env.ENV_FILE }}
+            echo 'NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_API_BASE_URL=https://${{ vars.DOMAIN_NAME }}/api/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ vars.SENTRY_IS_ACTIVE }}' >> ${{ env.ENV_FILE }}
           "
 
   set-partial-docker-compose-on-server:
