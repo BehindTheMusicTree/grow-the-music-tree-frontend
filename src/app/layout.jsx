@@ -25,7 +25,7 @@ function AppContent({ children }) {
 
   useEffect(() => {
     if (connectivityError.type !== ErrorType.NONE) {
-      showPopup(connectivityError.type, {
+      showPopup(connectivityError.type === ErrorType.AUTH ? "authError" : "networkError", {
         title: connectivityError.type === ErrorType.AUTH ? "Authentication Required" : "Network Error",
         message: connectivityError.message,
         onClose: () => {
