@@ -3,8 +3,8 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev:remote": "bash scripts/start-dev-remote.sh",
-    "dev:local": "bash scripts/start-dev-local.sh",
+    "dev:remote": "bash scripts/start-dev-api-remote.sh",
+    "dev:local": "bash scripts/start-dev-api-local.sh",
     "dev": "bash scripts/start-dev.sh",
     "build": "next build",
     "start": "next start",
