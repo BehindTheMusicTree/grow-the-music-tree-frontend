@@ -4,8 +4,7 @@ import { useEffect } from "react";
 import { initSentry } from "@lib/sentry";
 
 import Providers from "@app/providers";
-import { setupFetchInterceptor } from "@lib/client/fetchInterceptor";
-import { useConnectivityError } from "@contexts/ErrorContext";
+import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
@@ -22,13 +21,6 @@ function AppContent({ children }) {
   const { showPopup, hidePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
   const { connectivityError, clearConnectivityError, ConnectivityErrorType } = useConnectivityError();
-
-  useEffect(() => {
-    setupFetchInterceptor((error) => {
-      // Error handling is now managed by ConnectivityErrorContext
-      console.error("Fetch error:", error);
-    });
-  }, []);
 
   useEffect(() => {
     if (connectivityError.type !== ConnectivityErrorType.NONE) {
