@@ -53,15 +53,13 @@ function AppContent({ children }) {
         }}
       >
         <Menu />
-        {
-          /* 180px being the sum of the banner and player heights, 100px being the height of the banner alone */
-          <div className={"page-container w-full flex-grow p-5 overflow-auto flex flex-col bg-gray-200 m-0"}>
-            <main>{children}</main>
+        {/* 180px being the sum of the banner and player heights, 100px being the height of the banner alone */}
+        <div className={"page-container w-full flex-grow p-5 overflow-auto flex flex-col bg-gray-200 m-0"}>
+          <main>{children}</main>
 
-            {/* bottom-20 corresponding to 80px which is the player's height */}
-            {isTrackListSidebarVisible ? <TrackListSidebar /> : null}
-          </div>
-        }
+          {/* bottom-20 corresponding to 80px which is the player's height */}
+          {isTrackListSidebarVisible ? <TrackListSidebar /> : null}
+        </div>
       </div>
       {playerUploadedTrackObject && <Player />}
       <Popup />
