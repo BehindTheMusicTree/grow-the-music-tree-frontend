@@ -22,16 +22,20 @@ The application has been migrated from a Vite-based React application to Next.js
 
 ## Environment Setup
 
-Create a `.env.local` file in the root of the project with the following variables:
+Create a `.env.development.api-{local|remote}` file in the root of the project with the following variables:
 
 ```
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
-NEXT_PUBLIC_ENV=development
-NEXT_PUBLIC_CONTACT_EMAIL=your-contact-email@example.com
+NODE_ENV=development
+
+NEXT_PUBLIC_BASE_URL_WITHOUT_PORT={base-url-without-port}
+NEXT_PUBLIC_API_BASE_URL={api-base-url}
+NEXT_PUBLIC_CONTACT_EMAIL=garcia.andreas.1991@gmail.com
 NEXT_PUBLIC_SENTRY_IS_ACTIVE=false
-NEXT_PUBLIC_SPOTIFY_CLIENT_ID=your-spotify-client-id
-NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=http://localhost:3000/auth/spotify/callback
-NEXT_PUBLIC_SPOTIFY_SCOPE=user-read-private,user-read-email,user-library-read
+
+NEXT_PUBLIC_SPOTIFY_CLIENT_ID={spotify-client-id}
+NEXT_PUBLIC_SPOTIFY_REDIRECT_URI={spotify-redirect-uri}
+NEXT_PUBLIC_SPOTIFY_SCOPE=user-read-email playlist-read-private playlist-read-collaborative user-library-read user-top-read
+
 ```
 
 Adjust the values as needed for your environment.
