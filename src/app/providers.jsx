@@ -10,7 +10,7 @@ import { PlayerProvider } from "@contexts/PlayerContext";
 import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVisibilityContext";
 import { TrackListProvider } from "@contexts/TrackListContext";
 import { SpotifyLibTracksProvider } from "@contexts/SpotifyLibTracksContext";
-import { ErrorProvider } from "@contexts/ConnectivityErrorContext";
+import { ConnectivityErrorProvider } from "@contexts/ConnectivityErrorContext";
 
 const queryClient = new QueryClient();
 
@@ -19,7 +19,7 @@ export default function Providers({ children }) {
     <SessionProvider>
       <QueryClientProvider client={queryClient}>
         <PopupProvider>
-          <ErrorProvider>
+          <ConnectivityErrorProvider>
             <UploadedTrackProvider>
               <GenrePlaylistProvider>
                 <PlayerProvider>
@@ -31,7 +31,7 @@ export default function Providers({ children }) {
                 </PlayerProvider>
               </GenrePlaylistProvider>
             </UploadedTrackProvider>
-          </ErrorProvider>
+          </ConnectivityErrorProvider>
         </PopupProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

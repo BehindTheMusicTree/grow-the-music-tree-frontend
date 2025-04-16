@@ -3,7 +3,7 @@
 import { createContext, useContext, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { listSpotifyLibTracks } from "@actions/spotify-lib-tracks";
-import { useError } from "@contexts/ConnectivityErrorContext";
+import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 
 const SpotifyLibTracksContext = createContext();
 
@@ -16,7 +16,7 @@ export const useSpotifyLibTracks = () => {
 };
 
 export const SpotifyLibTracksProvider = ({ children }) => {
-  const { handleError } = useError();
+  const { handleConnectivityError } = useConnectivityError();
 
   // Wrapper for server action that handles the new response format
   const fetchLibTracks = useCallback(async () => {
@@ -25,18 +25,18 @@ export const SpotifyLibTracksProvider = ({ children }) => {
   }, []);
 
   const {
-    data: libTracks,
-    isLoading,
+    data: spotifyLibTracks,
+    isLoading: loading,
     error,
   } = useQuery({
     queryKey: ["spotifyLibTracks"],
     queryFn: fetchLibTracks,
-    onError: handleError,
+    onError: handleConnectivityError,
   });
 
   const value = {
-    libTracks,
-    isLoading,
+    spotifyLibTracks,
+    loading,
     error,
   };
 
