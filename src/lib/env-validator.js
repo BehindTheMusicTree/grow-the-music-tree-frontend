@@ -10,7 +10,7 @@ export function validateEnv() {
       "NEXT_PUBLIC_SPOTIFY_SCOPE",
       "NEXT_PUBLIC_SPOTIFY_REDIRECT_URI",
     ],
-    private: ["ENV", "PORT", "SPOTIFY_CLIENT_SECRET", "NEXTAUTH_SECRET"],
+    private: ["NODE_ENV", "PORT", "NEXTAUTH_SECRET"],
   };
 
   // Check for missing variables

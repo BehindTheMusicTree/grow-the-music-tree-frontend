@@ -7,7 +7,7 @@ import { publicConfig } from "@lib/public-config";
 // Create clean configuration object with values only
 export const serverConfig = {
   // Environment
-  env: process.env.ENV,
+  env: process.env.NODE_ENV,
   port: process.env.PORT,
 
   // Spotify
