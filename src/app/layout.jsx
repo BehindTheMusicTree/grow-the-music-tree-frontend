@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { initSentry } from "@lib/sentry";
+import "./globals.css";
 
 import Providers from "@app/providers";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
