@@ -20,12 +20,12 @@ function AppContent({ children }) {
   const { playerUploadedTrackObject } = usePlayer();
   const { showPopup, hidePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-  const { connectivityError, clearConnectivityError, ConnectivityErrorType } = useConnectivityError();
+  const { connectivityError, clearConnectivityError, ErrorType } = useConnectivityError();
 
   useEffect(() => {
-    if (connectivityError.type !== ConnectivityErrorType.NONE) {
+    if (connectivityError.type !== ErrorType.NONE) {
       showPopup(connectivityError.type, {
-        title: connectivityError.type === ConnectivityErrorType.AUTH ? "Authentication Required" : "Connection Error",
+        title: connectivityError.type === ErrorType.AUTH ? "Authentication Required" : "Network Error",
         message: connectivityError.message,
         onClose: () => {
           clearConnectivityError();
@@ -33,7 +33,7 @@ function AppContent({ children }) {
         },
       });
     }
-  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, ConnectivityErrorType]);
+  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, ErrorType]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {

@@ -6,15 +6,15 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const ConnectivityErrorContext = createContext(null);
 
-const ConnectivityErrorType = {
+const ErrorType = {
   NONE: "none",
   AUTH: "auth",
-  CONNECTIVITY: "connectivity",
+  NETWORK: "network",
 };
 
 export function ConnectivityErrorProvider({ children }) {
   const queryClient = useQueryClient();
-  const [connectivityError, setConnectivityError] = useState({ type: ConnectivityErrorType.NONE, message: null });
+  const [connectivityError, setConnectivityError] = useState({ type: ErrorType.NONE, message: null });
 
   const handleConnectivityError = useCallback((error) => {
     console.log("ConnectivityErrorProvider handling error:", error);
@@ -28,14 +28,14 @@ export function ConnectivityErrorProvider({ children }) {
       (typeof error === "string" && error.includes("Unauthorized"))
     ) {
       console.log("Auth error detected");
-      setConnectivityError({ type: ConnectivityErrorType.AUTH, message: "Please log in to continue" });
+      setConnectivityError({ type: ErrorType.AUTH, message: "Please log in to continue" });
       return;
     }
 
     // Handle fetch errors
     if (error?.response) {
       setConnectivityError({
-        type: ConnectivityErrorType.CONNECTIVITY,
+        type: ErrorType.NETWORK,
         message: `Request failed with status ${error.response.status}`,
       });
       return;
@@ -43,7 +43,7 @@ export function ConnectivityErrorProvider({ children }) {
 
     // Handle generic errors
     setConnectivityError({
-      type: ConnectivityErrorType.CONNECTIVITY,
+      type: ErrorType.NETWORK,
       message: error?.message || "An unexpected error occurred",
     });
   }, []);
@@ -97,7 +97,7 @@ export function ConnectivityErrorProvider({ children }) {
   }, [handleConnectivityError, queryClient]);
 
   const clearConnectivityError = useCallback(() => {
-    setConnectivityError({ type: ConnectivityErrorType.NONE, message: null });
+    setConnectivityError({ type: ErrorType.NONE, message: null });
   }, []);
 
   return (
@@ -105,7 +105,7 @@ export function ConnectivityErrorProvider({ children }) {
       value={{
         connectivityError,
         clearConnectivityError,
-        ConnectivityErrorType,
+        ErrorType,
       }}
     >
       {children}
