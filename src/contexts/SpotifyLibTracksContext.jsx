@@ -3,7 +3,7 @@
 import { createContext, useContext, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { listSpotifyLibTracks } from "@actions/spotify-lib-tracks";
-import { useError } from "@contexts/ErrorContext";
+import { useError } from "@contexts/ConnectivityErrorContext";
 
 const SpotifyLibTracksContext = createContext();
 

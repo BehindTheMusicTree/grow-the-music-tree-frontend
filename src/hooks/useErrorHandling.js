@@ -1,6 +1,6 @@
 "use client";
 
-import { useError } from "@contexts/ErrorContext";
+import { useError } from "@contexts/ConnectivityErrorContext";
 
 export function useErrorHandling() {
   const { handleError } = useError();

@@ -10,7 +10,7 @@ import { PlayerProvider } from "@contexts/PlayerContext";
 import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVisibilityContext";
 import { TrackListProvider } from "@contexts/TrackListContext";
 import { SpotifyLibTracksProvider } from "@contexts/SpotifyLibTracksContext";
-import { ErrorProvider } from "@contexts/ErrorContext";
+import { ErrorProvider } from "@contexts/ConnectivityErrorContext";
 
 const queryClient = new QueryClient();
 
