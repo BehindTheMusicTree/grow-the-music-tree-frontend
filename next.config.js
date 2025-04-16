@@ -6,13 +6,16 @@ const nextConfig = {
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
+      "@app": "/src/app",
+      "@actions": "/src/app/actions",
       "@components": "/src/components",
       "@contexts": "/src/contexts",
       "@layouts": "/src/layouts",
-      "@utils": "/src/utils",
       "@models": "/src/models",
       "@hooks": "/src/hooks",
       "@assets": "/src/assets",
+      "@lib": "/src/lib",
+      "@utils": "/src/lib/utils",
     };
     return config;
   },
