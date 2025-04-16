@@ -27,7 +27,7 @@ export default function AccountPage() {
     };
 
     fetchProfile();
-  });
+  }, []); // Add empty dependency array to run only once on mount
 
   if (isLoading) {
     return (
