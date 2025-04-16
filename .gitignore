@@ -32,8 +32,6 @@ build/
 
 .env.sentry-build-plugin
 
-public/env-config.js
-
 # Next.js build artifacts
 .next/
 .env.development
