@@ -1,75 +1,77 @@
 "use client";
 
-import { createContext, useContext, useCallback, useEffect } from "react";
-import { usePopup } from "./PopupContext";
+import { createContext, useContext, useCallback, useEffect, useState } from "react";
 import { setupFetchInterceptor } from "@lib/client/fetchInterceptor";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 
-const ErrorContext = createContext(null);
+const ConnectivityErrorContext = createContext(null);
 
-export function ErrorProvider({ children }) {
-  const { showPopup } = usePopup();
+const ConnectivityErrorType = {
+  NONE: "none",
+  AUTH: "auth",
+  CONNECTIVITY: "connectivity",
+};
+
+export function ConnectivityErrorProvider({ children }) {
   const queryClient = useQueryClient();
-  const { showAuthPopup } = useSpotifyAuth();
+  const [connectivityError, setConnectivityError] = useState({ type: ConnectivityErrorType.NONE, message: null });
 
-  const handleError = useCallback(
-    (error) => {
-      console.log("ErrorProvider handling error:", error);
+  const handleConnectivityError = useCallback((error) => {
+    console.log("ConnectivityErrorProvider handling error:", error);
 
-      // Handle authentication errors
-      if (
-        error?.name === "AuthenticationError" ||
-        error?.message === "Unauthorized" ||
-        error?.status === 401 ||
-        error?.cause?.name === "AuthenticationError" ||
-        (typeof error === "string" && error.includes("Unauthorized"))
-      ) {
-        console.log("Auth error detected, showing popup");
-        showAuthPopup();
-        return;
-      }
+    // Handle authentication errors
+    if (
+      error?.name === "AuthenticationError" ||
+      error?.message === "Unauthorized" ||
+      error?.status === 401 ||
+      error?.cause?.name === "AuthenticationError" ||
+      (typeof error === "string" && error.includes("Unauthorized"))
+    ) {
+      console.log("Auth error detected");
+      setConnectivityError({ type: ConnectivityErrorType.AUTH, message: "Please log in to continue" });
+      return;
+    }
 
-      // Handle fetch errors
-      if (error?.response) {
-        showPopup("nonAuthError", {
-          message: `Request failed with status ${error.response.status}`,
-        });
-        return;
-      }
-
-      // Handle generic errors
-      showPopup("nonAuthError", {
-        message: error?.message || "An unexpected error occurred",
+    // Handle fetch errors
+    if (error?.response) {
+      setConnectivityError({
+        type: ConnectivityErrorType.CONNECTIVITY,
+        message: `Request failed with status ${error.response.status}`,
       });
-    },
-    [showPopup, showAuthPopup]
-  );
+      return;
+    }
+
+    // Handle generic errors
+    setConnectivityError({
+      type: ConnectivityErrorType.CONNECTIVITY,
+      message: error?.message || "An unexpected error occurred",
+    });
+  }, []);
 
   // Add automatic error catching capabilities
   useEffect(() => {
     // Setup fetch interceptor
     const cleanupInterceptor = setupFetchInterceptor((error) => {
-      handleError(error);
+      handleConnectivityError(error);
     });
 
     // Handle unhandled rejections (catches server action errors)
     const handleUnhandledRejection = (event) => {
-      console.log("Unhandled rejection caught by ErrorProvider:", event.reason);
-      handleError(event.reason);
+      console.log("Unhandled rejection caught by ConnectivityErrorProvider:", event.reason);
+      handleConnectivityError(event.reason);
     };
 
     // Handle window errors
     const handleWindowError = (event) => {
       if (event.error) {
-        handleError(event.error);
+        handleConnectivityError(event.error);
       }
     };
 
     // Set up React Query defaults
     queryClient.setDefaultOptions({
       queries: {
-        onError: handleError,
+        onError: handleConnectivityError,
         retry: (failureCount, error) => {
           if (error?.name === "AuthenticationError" || error?.message === "Unauthorized" || error?.status === 401) {
             return false; // Don't retry auth errors
@@ -78,7 +80,7 @@ export function ErrorProvider({ children }) {
         },
       },
       mutations: {
-        onError: handleError,
+        onError: handleConnectivityError,
       },
     });
 
@@ -92,15 +94,29 @@ export function ErrorProvider({ children }) {
       window.removeEventListener("error", handleWindowError);
       if (cleanupInterceptor) cleanupInterceptor();
     };
-  }, [handleError, queryClient]);
+  }, [handleConnectivityError, queryClient]);
 
-  return <ErrorContext.Provider value={{ handleError }}>{children}</ErrorContext.Provider>;
+  const clearConnectivityError = useCallback(() => {
+    setConnectivityError({ type: ConnectivityErrorType.NONE, message: null });
+  }, []);
+
+  return (
+    <ConnectivityErrorContext.Provider
+      value={{
+        connectivityError,
+        clearConnectivityError,
+        ConnectivityErrorType,
+      }}
+    >
+      {children}
+    </ConnectivityErrorContext.Provider>
+  );
 }
 
-export function useError() {
-  const context = useContext(ErrorContext);
+export function useConnectivityError() {
+  const context = useContext(ConnectivityErrorContext);
   if (!context) {
-    throw new Error("useError must be used within an ErrorProvider");
+    throw new Error("useConnectivityError must be used within a ConnectivityErrorProvider");
   }
   return context;
 }

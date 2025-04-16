@@ -5,7 +5,7 @@ import { initSentry } from "@lib/sentry";
 
 import Providers from "@app/providers";
 import { setupFetchInterceptor } from "@lib/client/fetchInterceptor";
-import { useFetchErrorHandler } from "@hooks/useFetchErrorHandler";
+import { useConnectivityError } from "@contexts/ErrorContext";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
@@ -19,26 +19,29 @@ initSentry();
 
 function AppContent({ children }) {
   const { playerUploadedTrackObject } = usePlayer();
-  const { popupContentObject, showPopup, hidePopup } = usePopup();
+  const { showPopup, hidePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-  const { handleFetchError, error, clearError } = useFetchErrorHandler();
+  const { connectivityError, clearConnectivityError, ConnectivityErrorType } = useConnectivityError();
 
   useEffect(() => {
-    setupFetchInterceptor(handleFetchError);
-  }, [handleFetchError]);
+    setupFetchInterceptor((error) => {
+      // Error handling is now managed by ConnectivityErrorContext
+      console.error("Fetch error:", error);
+    });
+  }, []);
 
   useEffect(() => {
-    if (error) {
-      showPopup("error", {
-        title: error.title,
-        message: error.message,
+    if (connectivityError.type !== ConnectivityErrorType.NONE) {
+      showPopup(connectivityError.type, {
+        title: connectivityError.type === ConnectivityErrorType.AUTH ? "Authentication Required" : "Connection Error",
+        message: connectivityError.message,
         onClose: () => {
-          clearError();
+          clearConnectivityError();
           hidePopup();
         },
       });
     }
-  }, [error, showPopup, hidePopup, clearError]);
+  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, ConnectivityErrorType]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {
@@ -68,9 +71,7 @@ function AppContent({ children }) {
         }
       </div>
       {playerUploadedTrackObject && <Player />}
-      {popupContentObject && (
-        <Popup type={popupContentObject.type} content={popupContentObject.content} onClose={hidePopup} />
-      )}
+      <Popup />
     </div>
   );
 }
