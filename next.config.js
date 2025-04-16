@@ -2,8 +2,12 @@
 
 const nextConfig = {
   reactStrictMode: true,
-  // Configure webpack to handle the special imports
-  webpack: (config) => {
+  // Configure webpack to handle the special imports and disable minimization
+  webpack: (config, { isServer }) => {
+    // Disable minimization for both client and server bundles
+    config.optimization.minimize = false;
+
+    // Configure aliases
     config.resolve.alias = {
       ...config.resolve.alias,
       "@app": "/src/app",
