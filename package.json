@@ -5,7 +5,6 @@
   "scripts": {
     "dev:remote": "bash scripts/start-dev-api-remote.sh",
     "dev:local": "bash scripts/start-dev-api-local.sh",
-    "dev": "bash scripts/start-dev.sh",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
