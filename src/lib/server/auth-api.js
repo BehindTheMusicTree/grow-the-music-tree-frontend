@@ -42,8 +42,16 @@ export function createAuthFetch(session) {
       ...fetchOptions.headers,
     };
 
+    // Ensure the base URL is available
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (!baseUrl) {
+      const error = new Error("API base URL is not configured");
+      error.name = "ConfigurationError";
+      throw error;
+    }
+
     // Make the request with auth headers
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${endpoint}`, {
+    const response = await fetch(`${baseUrl}${endpoint}`, {
       ...fetchOptions,
       headers,
     });
@@ -68,11 +76,8 @@ export function createAuthFetch(session) {
 export function withAuthProtection(serverAction) {
   return async (...args) => {
     try {
-      // Check authentication using combined auth options
-      const session = await getServerSession({
-        ...authOptions,
-        ...serverConfig.authOptions,
-      });
+      // Check authentication using authOptions
+      const session = await getServerSession(authOptions);
 
       if (!session) {
         // Return auth error response instead of throwing
