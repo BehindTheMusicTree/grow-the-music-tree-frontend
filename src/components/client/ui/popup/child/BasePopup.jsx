@@ -2,7 +2,6 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import { useIsMounted } from "@utils/browser";
 import { PopupTitle } from "../PopupTitle";
 
 export default function BasePopup({
@@ -14,7 +13,12 @@ export default function BasePopup({
   type = "default", // default | fullscreen | bottom-sheet | alert
 }) {
   // Use the mounting hook to ensure we only access document after client-side hydration
-  const isMounted = useIsMounted();
+
+  const { isMounted, setIsMounted } = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const getPopupClasses = () => {
     const baseClasses = "bg-white rounded-lg p-4";
