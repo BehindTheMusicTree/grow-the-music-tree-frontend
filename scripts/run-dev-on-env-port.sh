@@ -9,4 +9,4 @@ fi
 echo "Sourced port configuration from .env.port: $PORT"
 
 # Run the development server
-npm run dev --port $PORT
+npm run dev -- --port $PORT
