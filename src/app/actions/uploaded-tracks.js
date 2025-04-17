@@ -1,6 +1,6 @@
 "use server";
 
-import { withAuthProtection } from "@lib/server/auth-api";
+import { withAuthProtection } from "@lib/auth/auth-api";
 
 // List tracks with authFetch
 async function listUploadedTracksImpl(authFetch, page = 1, pageSize = 50) {

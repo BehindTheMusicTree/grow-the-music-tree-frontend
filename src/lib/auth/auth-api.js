@@ -1,6 +1,6 @@
 // NO "use client" - this is server-only code
 import { getServerSession } from "next-auth";
-import { authOptions } from "@lib/server/auth-spotify";
+import { authOptions } from "@lib/auth/auth-spotify";
 
 /**
  * Standard response object for authentication errors
@@ -77,6 +77,8 @@ export function createAuthFetch(session) {
  */
 export function withAuthProtection(serverAction) {
   return async (...args) => {
+    console.log("withAuthProtection");
+    console.log(args);
     try {
       // Check authentication using authOptions
       const session = await getServerSession(authOptions);
@@ -90,8 +92,8 @@ export function withAuthProtection(serverAction) {
       // Create authenticated fetch helper
       const authFetch = createAuthFetch(session);
 
-      // Call the original action with session, authFetch and args
-      const result = await serverAction(session, authFetch, ...args);
+      // Call the original action with authFetch and args
+      const result = await serverAction(authFetch, ...args);
 
       // Wrap successful result
       return {

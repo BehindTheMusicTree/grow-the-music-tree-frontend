@@ -1,6 +1,6 @@
 "use server";
 
-import { withAuthProtection } from "@lib/server/auth-api";
+import { withAuthProtection } from "@lib/auth/auth-api";
 
 async function listManualPlaylistsImpl(authFetch, page = 1, pageSize = 50) {
   const response = await authFetch(`manual-playlists/?page=${page}&pageSize=${pageSize}`);
