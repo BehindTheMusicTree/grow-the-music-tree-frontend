@@ -3,13 +3,13 @@
 import { withAuthProtection } from "@lib/server/auth-api";
 
 // List tracks with authFetch
-async function listUploadedTracksImpl(session, authFetch, page = 1, pageSize = 50) {
+async function listUploadedTracksImpl(authFetch, page = 1, pageSize = 50) {
   const response = await authFetch(`library/uploaded/?page=${page}&pageSize=${pageSize}`);
   return response.json();
 }
 
 // Upload track with authFetch
-async function uploadTrackImpl(session, authFetch, formData) {
+async function uploadTrackImpl(authFetch, formData) {
   const response = await authFetch("library/uploaded/", {
     method: "POST",
     body: formData,
@@ -19,7 +19,7 @@ async function uploadTrackImpl(session, authFetch, formData) {
 }
 
 // Update track with authFetch
-async function updateUploadedTrackImpl(session, authFetch, uploadedTrackUuid, uploadedTrackData) {
+async function updateUploadedTrackImpl(authFetch, uploadedTrackUuid, uploadedTrackData) {
   const transformedData = {
     ...uploadedTrackData,
     artistsNames: uploadedTrackData.artistName ? [uploadedTrackData.artistName] : uploadedTrackData.artistsNames,

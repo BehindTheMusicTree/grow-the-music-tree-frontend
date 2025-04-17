@@ -12,7 +12,7 @@ async function listManualPlaylistsImpl(authFetch, page = 1, pageSize = 50) {
   return response.json();
 }
 
-async function createManualPlaylistImpl(session, authFetch, playlistData) {
+async function createManualPlaylistImpl(authFetch, playlistData) {
   const response = await authFetch("manual-playlists/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -5,7 +5,7 @@ import { withAuthProtection } from "@lib/server/auth-api";
  * Handler for downloading track files
  * This is an API route that serves binary file data
  */
-async function downloadTrackImpl(session, authFetch, { params }) {
+async function downloadTrackImpl(authFetch, { params }) {
   const { uuid } = params;
 
   // Use authFetch but get the raw response without throwing errors
