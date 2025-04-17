@@ -1,17 +1,16 @@
 "use client";
 
-import { isBrowser } from "@utils/browser";
 import { validateClientEnv } from "@lib/env-validator";
 
 // Store the original fetch only in browser environments
-const originalFetch = isBrowser() ? window.fetch : null;
+const originalFetch = typeof window !== "undefined" ? window.fetch : null;
 
 /**
  * Sets up a global fetch interceptor that handles errors consistently
  */
 export const setupFetchInterceptor = (handleError) => {
   // Skip setup in SSR environments
-  if (!isBrowser()) return;
+  if (typeof window === "undefined") return;
 
   // Validate client environment variables on initialization
   try {
@@ -89,7 +88,7 @@ export const setupFetchInterceptor = (handleError) => {
 
   // Return a cleanup function
   return () => {
-    if (isBrowser()) {
+    if (typeof window !== "undefined") {
       window.fetch = originalFetch;
     }
   };

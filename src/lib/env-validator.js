@@ -1,8 +1,6 @@
 // Environment validation for runtime checks
 // Validates in all environments to catch configuration issues early
 
-import { isBrowser } from "@utils/browser";
-
 // List of required environment variables
 const requiredVars = {
   public: [
@@ -96,7 +94,7 @@ export function validateClientEnv() {
   if (clientValidationPerformed) return true;
 
   // Skip validation if not in browser
-  if (!isBrowser()) {
+  if (typeof window === "undefined") {
     console.log("Skipping client environment validation (not in browser)");
     return true;
   }
