@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import Popup from "@components/client/ui/popup/Popup";
 
@@ -7,13 +7,13 @@ const PopupContext = createContext();
 export function PopupProvider({ children }) {
   const [activePopup, setActivePopup] = useState(null);
 
-  const showPopup = (type, content) => {
+  const showPopup = useCallback((type, content) => {
     setActivePopup({ type, content });
-  };
+  }, []);
 
-  const hidePopup = () => {
+  const hidePopup = useCallback(() => {
     setActivePopup(null);
-  };
+  }, []);
 
   return (
     <PopupContext.Provider value={{ showPopup, hidePopup }}>
