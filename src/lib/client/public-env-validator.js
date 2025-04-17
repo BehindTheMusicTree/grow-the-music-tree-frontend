@@ -18,8 +18,8 @@ export function validateClientEnv() {
 
     var hasMissingEnvVars = false;
     for (const [key, value] of Object.entries(clientEnvVars)) {
-      if (value === undefined) {
-        console.error(`Environment variable ${key} is undefined`);
+      if (value === undefined || value === "") {
+        console.error(`Environment variable ${key} is ${value === "" ? "empty" : "undefined"}`);
         hasMissingEnvVars = true;
       }
     }
