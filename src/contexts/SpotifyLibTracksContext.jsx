@@ -19,9 +19,15 @@ export const SpotifyLibTracksProvider = ({ children }) => {
   const { handleConnectivityError } = useConnectivityError();
 
   // Wrapper for server action that handles the new response format
-  const fetchLibTracks = useCallback(async () => {
-    const response = await listSpotifyLibTracks();
-    return response.data;
+  // with added resilience for undefined responses
+  const fetchSpotifyLibTracks = useCallback(async () => {
+    try {
+      const spotifyLibTracks = await listSpotifyLibTracks();
+      return spotifyLibTracks;
+    } catch (error) {
+      console.error("Error fetching Spotify tracks:", error);
+      throw error;
+    }
   }, []);
 
   const {
@@ -30,7 +36,7 @@ export const SpotifyLibTracksProvider = ({ children }) => {
     error,
   } = useQuery({
     queryKey: ["spotifyLibTracks"],
-    queryFn: fetchLibTracks,
+    queryFn: fetchSpotifyLibTracks,
     onError: handleConnectivityError,
   });
 
