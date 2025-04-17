@@ -17,8 +17,33 @@ import { validateClientEnv } from "@lib/env-validator";
 const queryClient = new QueryClient();
 
 export default function Providers({ children }) {
-  // Validate client environment variables on component mount
+  // Inject environment variables from server to client and validate them
   useEffect(() => {
+    // Create fallback mechanism for client-side environment variables
+    if (typeof window !== "undefined") {
+      // Define the variables we need to make available to the client
+      const clientEnvVars = {
+        NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
+        NEXT_PUBLIC_SPOTIFY_CLIENT_ID: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
+        NEXT_PUBLIC_SPOTIFY_SCOPE: process.env.NEXT_PUBLIC_SPOTIFY_SCOPE,
+        NEXT_PUBLIC_SPOTIFY_REDIRECT_URI: process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI,
+      };
+
+      // Create a global __NEXT_ENV object to store environment variables
+      window.__NEXT_ENV = window.__NEXT_ENV || {};
+
+      // Inject each environment variable if it's not already defined
+      Object.entries(clientEnvVars).forEach(([key, value]) => {
+        if (value) {
+          // Set on window.__NEXT_ENV for our custom validator
+          window.__NEXT_ENV[key] = value;
+
+          // Also set directly on window for easier access
+          window[key] = value;
+        }
+      });
+    }
+
     try {
       validateClientEnv();
       console.log("✅ Client environment variables validated successfully");
