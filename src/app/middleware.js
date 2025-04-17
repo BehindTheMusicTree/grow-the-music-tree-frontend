@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { validateServerEnv } from "@lib/env-validator";
+import { validateServerEnv } from "@lib/public-env-validator";
 
 // Validate environment variables once at initialization
 // This will throw early if any required variables are missing

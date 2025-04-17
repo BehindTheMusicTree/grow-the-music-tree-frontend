@@ -1,7 +1,5 @@
 "use client";
 
-import { validateClientEnv } from "@lib/env-validator";
-
 // Store the original fetch only in browser environments
 const originalFetch = typeof window !== "undefined" ? window.fetch : null;
 
@@ -11,16 +9,6 @@ const originalFetch = typeof window !== "undefined" ? window.fetch : null;
 export const setupFetchInterceptor = (handleError) => {
   // Skip setup in SSR environments
   if (typeof window === "undefined") return;
-
-  // Validate client environment variables on initialization
-  try {
-    validateClientEnv();
-  } catch (error) {
-    error.name = "EnvironmentError";
-    handleError(error);
-    // We don't throw here to allow the app to continue, but the error will be logged
-    console.error("Client environment validation failed:", error.message);
-  }
 
   window.fetch = async (...args) => {
     const [url, requestInit = {}] = args;
