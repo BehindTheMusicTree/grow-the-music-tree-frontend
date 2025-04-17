@@ -55,12 +55,10 @@ export const authOptions = {
     },
   },
   pages: {
-    signIn: "/auth/signin",
-    error: "/auth/error",
+    signIn: "/api/auth/spotify",
   },
-  // Use server config for session secret and url but not client secret
-  secret: serverConfig.authSecret,
-  url: serverConfig.authUrl,
+  secret: process.env.NEXTAUTH_SECRET,
+  url: process.env.NEXT_PUBLIC_BASE_URL_WITHOUT_PORT,
 };
 
 export default NextAuth(authOptions);
