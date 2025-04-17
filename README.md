@@ -1,4 +1,4 @@
-# Ultimate Music Guide - Next.js Frontend
+# Music Tree - Next.js Frontend
 
 This project has been migrated from React + Vite to Next.js to provide server-side rendering capabilities, improved SEO, and better integration with the Django REST API backend.
 

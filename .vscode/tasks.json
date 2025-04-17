@@ -123,6 +123,16 @@
         "panel": "shared"
       },
       "problemMatcher": []
+    },
+    {
+      "label": "ensure-debug-dirs",
+      "type": "shell",
+      "command": "mkdir -p .vscode/firefox-debug-profile",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": []
     }
   ]
 }

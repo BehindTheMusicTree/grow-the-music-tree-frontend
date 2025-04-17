@@ -14,7 +14,7 @@ export default function Banner() {
             <Image src={logo} alt="logo" width={48} height={48} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Ultimate Music Guide</h1>
+            <h1 className="text-2xl font-bold">Music Tree</h1>
             <h3 className="text-sm">by Bodzify</h3>
           </div>
         </div>

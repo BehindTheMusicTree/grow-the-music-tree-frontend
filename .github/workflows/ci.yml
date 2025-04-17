@@ -1,4 +1,4 @@
-name: Ultimate Music Guide CI
+name: Music Tree CI
 
 on:
   push:
@@ -32,10 +32,10 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.UMG_IMAGE_REPO }}:${{ vars.APP_VERSION }}
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.MUSIC_TREE_IMAGE_REPO }}:${{ vars.APP_VERSION }}
           build-args: |
             PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
-            APP_PORT=${{ vars.UMG_PORT }}
+            APP_PORT=${{ vars.MUSIC_TREE_PORT }}
             BUILD_COMPLETE_FILENAME=${{ env.BUILD_COMPLETE_FILENAME }}
 
   set-env-variables-on-server:
@@ -55,7 +55,7 @@ jobs:
           mkdir -p ~/.ssh &&
           ssh-keyscan -H ${{ vars.DOMAIN_NAME }} >> ~/.ssh/known_hosts
 
-      - name: SSH Set UMG environment variables on server
+      - name: SSH Set MUSIC_TREE environment variables on server
         env:
           ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKERIZED_APP_ENV_FILENAME }}
         run: |
@@ -90,13 +90,13 @@ jobs:
       - name: Generate partial docker compose file
         env:
           DOCKER_COMPOSE_PARTIAL_FILENAME: ${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }}
-          SERVICE_NAME: ${{ vars.UMG_SERVICE_NAME }}
+          SERVICE_NAME: ${{ vars.MUSIC_TREE_SERVICE_NAME }}
           PROJECT_DIR: ${{ env.CONTAINER_ROOT_DIR }}
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
-          IMAGE_REPO: ${{ vars.UMG_IMAGE_REPO }}
+          IMAGE_REPO: ${{ vars.MUSIC_TREE_IMAGE_REPO }}
           APP_VERSION: ${{ vars.APP_VERSION }}
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
-          APP_PORT: ${{ vars.UMG_PORT }}
+          APP_PORT: ${{ vars.MUSIC_TREE_PORT }}
           ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}
           BUILD_COMPLETE_FILENAME: ${{ env.BUILD_COMPLETE_FILENAME }}
         run: bash scripts/generate-partial-docker-compose.sh
