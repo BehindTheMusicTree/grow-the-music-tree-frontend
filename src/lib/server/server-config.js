@@ -16,7 +16,7 @@ export const serverConfig = {
   // Auth
   authSecret: process.env.NEXTAUTH_SECRET,
   get authUrl() {
-    const baseUrl = publicConfig.apiBaseUrl;
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
     if (!baseUrl) return `http://localhost:${this.port}`;
     const base = baseUrl.split("/api")[0];
     return `${base}:${this.port}`;

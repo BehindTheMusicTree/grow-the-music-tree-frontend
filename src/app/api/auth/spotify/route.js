@@ -9,7 +9,7 @@ export async function POST(request) {
       return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
     }
 
-    const response = await fetch(`${publicConfig.apiBaseUrl}/auth/spotify`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/spotify`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

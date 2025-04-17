@@ -45,7 +45,7 @@ export function createAuthFetch(session) {
     };
 
     // Make the request with auth headers
-    const response = await fetch(`${publicConfig.apiBaseUrl}${endpoint}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${endpoint}`, {
       ...fetchOptions,
       headers,
     });
