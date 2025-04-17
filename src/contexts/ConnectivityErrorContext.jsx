@@ -32,7 +32,6 @@ export function ConnectivityErrorProvider({ children }) {
       return;
     }
 
-    // Handle fetch errors
     if (error?.response) {
       setConnectivityError({
         type: ConnectivityErrorType.NETWORK,
@@ -50,7 +49,6 @@ export function ConnectivityErrorProvider({ children }) {
 
   // Add automatic error catching capabilities
   useEffect(() => {
-    // Setup fetch interceptor
     const cleanupInterceptor = setupFetchInterceptor((error) => {
       handleConnectivityError(error);
     });
