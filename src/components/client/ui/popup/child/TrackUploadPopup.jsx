@@ -6,40 +6,28 @@ import { MdError } from "react-icons/md";
 import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
 
 export default function TrackUploadPopup({ content, onClose }) {
-  const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
-  const [requestErrors, setRequestErrors] = useState();
+  const { setRefreshGenrePlaylistsSignal, uploadTracks } = useGenrePlaylists();
   const isPostingRef = useRef(false);
 
   useEffect(() => {
-    async function uploadTracks(files, genreUuid) {
-      try {
-        const formData = new FormData();
-        files.forEach((file) => formData.append("files", file));
-        formData.append("genre_uuid", genreUuid);
-
-        const response = await fetch("/api/uploaded-tracks", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || "Upload failed");
+    async function handleUpload() {
+      if (content && !isPostingRef.current) {
+        isPostingRef.current = true;
+        try {
+          const response = await uploadTracks(content.files, content.genreUuid);
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || "Upload failed");
+          }
+          setRefreshGenrePlaylistsSignal(1);
+          onClose();
+        } finally {
+          isPostingRef.current = false;
         }
-
-        setRefreshGenrePlaylistsSignal(1);
-        onClose();
-      } catch (error) {
-        setRequestErrors(error.message);
       }
-      isPostingRef.current = false;
     }
-
-    if (content && !isPostingRef.current) {
-      isPostingRef.current = true;
-      uploadTracks(content.files, content.genreUuid);
-    }
-  }, [content, setRefreshGenrePlaylistsSignal, onClose]);
+    handleUpload();
+  }, [content, setRefreshGenrePlaylistsSignal, onClose, uploadTracks]);
 
   return (
     <div>
