@@ -3,11 +3,12 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev:remote": "bash scripts/start-dev-api-remote.sh",
-    "dev:local": "bash scripts/start-dev-api-local.sh",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "verify-env:local": "cp ./env/dev/available/.env.development.api-local ./.env.development.local && node scripts/verify-env.js",
+    "verify-env:remote": "cp ./env/dev/available/.env.development.api-remote ./.env.development.local && node scripts/verify-env.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
