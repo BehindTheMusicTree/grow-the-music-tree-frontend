@@ -30,7 +30,4 @@ if (allPresent) {
   console.log("\n✅ SUCCESS: All required environment variables are present!");
 } else {
   console.log("\n❌ ERROR: Some environment variables are missing!");
-  console.log("Make sure to:");
-  console.log("1. Start the app using npm run dev:local or npm run dev:remote");
-  console.log("2. If debugging in VS Code, use the 'Start Dev Server' launch configuration");
 }
