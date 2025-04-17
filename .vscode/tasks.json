@@ -60,14 +60,6 @@
       "problemMatcher": []
     },
     {
-      "label": "setup-and-verify-remote",
-      "dependsOn": ["setup-env-dev-remote", "verify-env-dev-remote"],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      }
-    },
-    {
       "label": "start-dev-server",
       "type": "npm",
       "script": "dev",
