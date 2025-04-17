@@ -1,7 +1,9 @@
 // components/ui/popup/BasePopup.jsx
 "use client";
 
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+
 import { PopupTitle } from "../PopupTitle";
 
 export default function BasePopup({
@@ -12,9 +14,7 @@ export default function BasePopup({
   className = "",
   type = "default", // default | fullscreen | bottom-sheet | alert
 }) {
-  // Use the mounting hook to ensure we only access document after client-side hydration
-
-  const { isMounted, setIsMounted } = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
