@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "verify-env:local": "cp ./env/dev/available/.env.development.api-local ./.env.development.local && node scripts/verify-env.js",
-    "verify-env:remote": "cp ./env/dev/available/.env.development.api-remote ./.env.development.local && node scripts/verify-env.js"
+    "verify-env": "node scripts/verify-env.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
