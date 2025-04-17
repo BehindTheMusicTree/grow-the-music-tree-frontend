@@ -1,7 +1,5 @@
 // NO "use client" - this is server-only code
 import { getServerSession } from "next-auth";
-import { serverConfig } from "@lib/server/server-config";
-import { publicConfig } from "@lib/public-config";
 import { authOptions } from "@lib/server/auth-spotify";
 
 /**
