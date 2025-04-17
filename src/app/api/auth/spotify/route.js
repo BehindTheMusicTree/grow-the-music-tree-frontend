@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { publicConfig } from "@lib/public-config";
 
 export async function POST(request) {
   try {
