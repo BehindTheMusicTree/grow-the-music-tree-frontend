@@ -48,6 +48,8 @@ export function createAuthFetch(session) {
       const error = new Error("API base URL is not configured");
       error.name = "ConfigurationError";
       throw error;
+    } else {
+      console.log("API base URL:", baseUrl);
     }
 
     // Make the request with auth headers
