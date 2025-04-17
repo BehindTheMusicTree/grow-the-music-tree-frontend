@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { setupFetchInterceptor } from "@lib/client/fetchInterceptor";
+import { setupFetchInterceptor } from "@lib/fetchInterceptor";
 
 const ConnectivityErrorContext = createContext(null);
 

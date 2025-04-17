@@ -9,11 +9,11 @@ import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
-import Banner from "@components/client/features/banner/Banner";
-import Menu from "@components/client/features/Menu";
-import Player from "@components/client/features/player/Player";
-import TrackListSidebar from "@components/client/features/track-list-sidebar/TrackListSidebar";
-import Popup from "@components/client/ui/popup/Popup";
+import Banner from "@components/features/banner/Banner";
+import Menu from "@components/features/Menu";
+import Player from "@components/features/player/Player";
+import TrackListSidebar from "@components/features/track-list-sidebar/TrackListSidebar";
+import Popup from "@components/ui/popup/Popup";
 
 initSentry();
 

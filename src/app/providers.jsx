@@ -12,7 +12,7 @@ import { TrackListProvider } from "@contexts/TrackListContext";
 import { SpotifyLibTracksProvider } from "@contexts/SpotifyLibTracksContext";
 import { ConnectivityErrorProvider } from "@contexts/ConnectivityErrorContext";
 import { useEffect } from "react";
-import { validateClientEnv } from "@lib/client/public-env-validator";
+import { validateClientEnv } from "@lib/public-env-validator";
 
 const queryClient = new QueryClient();
 

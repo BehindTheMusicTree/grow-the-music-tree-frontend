@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Button from "@components/client/ui/Button";
+import Button from "@components/ui/Button";
 import { createGenrePlaylist } from "@app/actions/genre-playlists";
 
 export default function CreatePlaylistForm() {
