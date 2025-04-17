@@ -18,8 +18,6 @@ dist-ssr
 *.local
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
 .idea
 .DS_Store
 *.suo
@@ -35,3 +33,5 @@ build/
 # Next.js build artifacts
 .next/
 .env.development
+
+.vscode/chrome-debug-profile/*

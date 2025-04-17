@@ -1,0 +1,14 @@
+{
+  "explorer.compactFolders": false,
+  "css.validate": true,
+  "css.lint.unknownAtRules": "ignore",
+  "workbench.colorCustomizations": {
+    "editorCursor.foreground": "#2E4D8B",
+    "terminalCursor.foreground": "#2E4D8B",
+    "titleBar.activeBackground": "#2E4D8B",
+    "titleBar.activeForeground": "#ffffff",
+    "activityBar.background": "#1D3557",
+    "statusBar.background": "#1D3557",
+    "statusBar.foreground": "#ffffff"
+  }
+}
