@@ -104,15 +104,29 @@ export function validateClientEnv() {
   // Extensive debug logging to diagnose environment variable issues
   console.log("=== CLIENT ENVIRONMENT VALIDATION START ===");
 
-  // Log all available process.env keys with NEXT_PUBLIC prefix
-  console.log("All available NEXT_PUBLIC_ environment variables:");
-  const nextPublicKeys = Object.keys(process.env).filter((key) => key.startsWith("NEXT_PUBLIC_"));
+  // Create a map of environment variables from window.__NEXT_DATA__.props.pageProps
+  // This is more reliable for client-side access than process.env
+  let clientEnvVars = {};
+
+  // Access Next.js injected data if available
+  if (typeof window !== "undefined" && window.__NEXT_DATA__?.props?.pageProps?.__NEXT_ENV) {
+    clientEnvVars = window.__NEXT_DATA__.props.pageProps.__NEXT_ENV || {};
+    console.log("Found environment variables in __NEXT_DATA__");
+  } else {
+    // Fallback to process.env
+    clientEnvVars = { ...process.env };
+    console.log("Using process.env as fallback");
+  }
+
+  // Log all available NEXT_PUBLIC_ environment variables
+  const nextPublicKeys = Object.keys(clientEnvVars).filter((key) => key.startsWith("NEXT_PUBLIC_"));
   console.log(`Found ${nextPublicKeys.length} NEXT_PUBLIC_ variables:`, nextPublicKeys);
 
   // Log each required variable's status
   console.log("Required Environment Variables Status:");
   requiredVars.public.forEach((name) => {
-    const value = process.env[name];
+    // Check both sources of environment variables
+    const value = clientEnvVars[name] || process.env[name] || window[name];
     console.log(`${name}: ${value ? "defined" : "undefined"}`);
     if (value) {
       // For debugging, show the first few characters of each defined variable
@@ -120,8 +134,10 @@ export function validateClientEnv() {
     }
   });
 
-  // Check if variables exist in process.env (standard Next.js approach)
-  const missingPublicVars = requiredVars.public.filter((name) => !process.env[name]);
+  // Check if variables exist (using multiple potential sources)
+  const missingPublicVars = requiredVars.public.filter((name) => {
+    return !(clientEnvVars[name] || process.env[name] || window[name]);
+  });
 
   if (missingPublicVars.length > 0) {
     const errorMessage = `Client environment validation failed! Missing: ${missingPublicVars.join(", ")}`;
@@ -131,9 +147,8 @@ export function validateClientEnv() {
     console.log("Note: Please ensure:");
     console.log("1. Environment variables are defined in .env.development or .env.development.local");
     console.log("2. All variables start with NEXT_PUBLIC_ for client-side access");
-    console.log("3. You started the app using the proper script (start-dev-api-local.sh or start-dev-api-remote.sh)");
+    console.log("3. You started the app using the proper script (npm run dev after setting up environment)");
     console.log("4. You've restarted the Next.js server after making changes to .env files");
-    console.log("5. You don't have server-side-only JS code trying to run on the client");
 
     // For now, let's return true instead of throwing, to prevent app crashes during debugging
     console.log("=== CLIENT ENVIRONMENT VALIDATION END ===");
