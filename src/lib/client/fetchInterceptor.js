@@ -13,24 +13,6 @@ export const setupFetchInterceptor = (handleError) => {
   window.fetch = async (...args) => {
     const [url, requestInit = {}] = args;
 
-    // Validate URL
-    if (!url) {
-      const error = new Error("No URL provided to fetch");
-      error.name = "FetchConfigError";
-      handleError(error);
-      throw error;
-    }
-
-    // Check for malformed URLs that might include undefined values
-    if (url.includes("undefined/") || url === "undefined") {
-      const error = new Error(
-        `Malformed URL detected: "${url}". This might be caused by undefined environment variables.`
-      );
-      error.name = "EnvironmentError";
-      handleError(error);
-      throw error;
-    }
-
     // Clone the request init to preserve the original request details
     const requestDetails = {
       url,
