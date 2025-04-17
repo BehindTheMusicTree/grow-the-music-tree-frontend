@@ -14,7 +14,6 @@
       "autoAttachChildProcesses": false,
       "restart": true,
       "env": {
-        "NODE_OPTIONS": "--require ${workspaceFolder}/node_modules/next/dist/compiled/next-server/lib/utils.js",
         "VSCODE_INSPECTOR_OPTIONS": "{\"autoAttachMode\":\"smart\"}"
       },
       "serverReadyAction": {
@@ -36,7 +35,6 @@
       "autoAttachChildProcesses": false,
       "restart": true,
       "env": {
-        "NODE_OPTIONS": "--require ${workspaceFolder}/node_modules/next/dist/compiled/next-server/lib/utils.js",
         "VSCODE_INSPECTOR_OPTIONS": "{\"autoAttachMode\":\"smart\"}"
       },
       "serverReadyAction": {
