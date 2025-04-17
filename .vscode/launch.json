@@ -19,7 +19,8 @@
       "serverReadyAction": {
         "pattern": "started server on .+, url: (https?://.+)",
         "uriFormat": "%s",
-        "action": "debugWithChrome"
+        "action": "startDebugging",
+        "name": "Debug in Firefox"
       }
     },
     {
@@ -40,7 +41,8 @@
       "serverReadyAction": {
         "pattern": "started server on .+, url: (https?://.+)",
         "uriFormat": "%s",
-        "action": "debugWithChrome"
+        "action": "startDebugging",
+        "name": "Debug in Firefox"
       }
     },
     {
