@@ -1,10 +1,14 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { useSession } from "next-auth/react";
 import PropTypes from "prop-types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getTracks, uploadTrack, updateTrack } from "@actions/uploaded-tracks";
+
+import {
+  listUploadedTracks as listUploadedTracksApi,
+  uploadTrack as uploadTrackApi,
+  updateUploadedTrack as updateUploadedTrackApi,
+} from "@app/actions/uploaded-tracks";
 
 const UploadedTrackContext = createContext();
 
@@ -18,64 +22,42 @@ export function useUploadedTracks() {
 
 export function UploadedTrackProvider({ children }) {
   const queryClient = useQueryClient();
-  const { status } = useSession();
 
   const {
     data: uploadedTracks = [],
-    isLoading,
+    loading,
     error,
   } = useQuery({
     queryKey: ["uploadedTracks"],
-    queryFn: getTracks,
-    enabled: status === "authenticated",
+    queryFn: listUploadedTracksApi,
   });
 
-  const addTrackMutation = useMutation({
+  const uploadTrack = useMutation({
     mutationFn: async (formData) => {
-      return uploadTrack(formData);
+      return uploadTrackApi(formData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
     },
-    enabled: status === "authenticated",
   });
 
-  const updateTrackMutation = useMutation({
+  const updateUploadedTrack = useMutation({
     mutationFn: async ({ uploadedTrackUuid, uploadedTrackData }) => {
-      return updateTrack(uploadedTrackUuid, uploadedTrackData);
+      return updateUploadedTrackApi(uploadedTrackUuid, uploadedTrackData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
     },
-    enabled: status === "authenticated",
   });
-
-  const addTrack = async (formData) => {
-    return addTrackMutation.mutateAsync(formData);
-  };
-
-  const updateTrack = async (uploadedTrackUuid, uploadedTrackData) => {
-    return updateTrackMutation.mutateAsync({ uploadedTrackUuid, uploadedTrackData });
-  };
-
-  const retrieveTrack = (uploadedTrackUuid) => {
-    return uploadedTracks.find((track) => track.uuid === uploadedTrackUuid);
-  };
-
-  const listTracks = () => {
-    return uploadedTracks;
-  };
 
   return (
     <UploadedTrackContext.Provider
       value={{
         uploadedTracks,
         error,
-        isLoading,
-        addTrack,
-        updateTrack,
-        retrieveTrack,
-        listTracks,
+        loading,
+        uploadTrack,
+        updateUploadedTrack,
         refreshTracks: () => queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] }),
       }}
     >
