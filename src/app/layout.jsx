@@ -25,9 +25,21 @@ function AppContent({ children }) {
 
   useEffect(() => {
     if (connectivityError.type !== ErrorType.NONE) {
-      showPopup(connectivityError.type === ErrorType.AUTH ? "authError" : "networkError", {
-        title: connectivityError.type === ErrorType.AUTH ? "Authentication Required" : "Network Error",
+      let popupType = "networkError";
+      let title = "Network Error";
+
+      if (connectivityError.type === ErrorType.AUTH) {
+        popupType = "authError";
+        title = "Authentication Required";
+      } else if (connectivityError.type === ErrorType.BAD_REQUEST || connectivityError.type === ErrorType.INTERNAL) {
+        popupType = "error";
+        title = connectivityError.type === ErrorType.BAD_REQUEST ? "Invalid Request" : "Internal Error";
+      }
+
+      showPopup(popupType, {
+        title,
         message: connectivityError.message,
+        debugCode: connectivityError.code,
         onClose: () => {
           clearConnectivityError();
           hidePopup();
@@ -52,16 +64,12 @@ function AppContent({ children }) {
           maxHeight: playerUploadedTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
         }}
       >
-        <Menu />
-        {/* 180px being the sum of the banner and player heights, 100px being the height of the banner alone */}
-        <div className={"page-container w-full flex-grow p-5 overflow-auto flex flex-col bg-gray-200 m-0"}>
-          <main>{children}</main>
-
-          {/* bottom-20 corresponding to 80px which is the player's height */}
-          {isTrackListSidebarVisible ? <TrackListSidebar /> : null}
-        </div>
+        <Menu className="fixed left-0 z-40" />
+        <main className="flex-grow ml-16">{children}</main>
+        {isTrackListSidebarVisible && <TrackListSidebar className="fixed right-0 z-40" />}
       </div>
-      {playerUploadedTrackObject && <Player />}
+
+      {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />}
       <Popup />
     </div>
   );
