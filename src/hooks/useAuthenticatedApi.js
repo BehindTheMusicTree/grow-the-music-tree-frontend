@@ -56,6 +56,7 @@ export function useAuthenticatedApi(serviceFn) {
   const { setConnectivityError } = useConnectivityError();
 
   return async (...args) => {
+    console.log("useAuthenticatedApi", serviceFn, args);
     try {
       const { getSession } = await import("next-auth/react");
       const session = await getSession();
