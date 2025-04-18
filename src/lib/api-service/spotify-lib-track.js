@@ -22,7 +22,7 @@ async function listSpotifyLibTracksImpl(authFetch, page = 1, pageSize = 50) {
 }
 
 // Export the wrapped API function
-export const fetchSpotifyLibTracks = withAuthProtection(listSpotifyLibTracksImpl);
+export const listSpotifyLibTracks = withAuthProtection(listSpotifyLibTracksImpl);
 
 /**
  * Additional Spotify API functions can be added here
