@@ -15,12 +15,7 @@ export function PopupProvider({ children }) {
     setActivePopup(null);
   }, []);
 
-  return (
-    <PopupContext.Provider value={{ showPopup, hidePopup, activePopup }}>
-      {children}
-      {activePopup && <Popup type={activePopup.type} content={activePopup.content} onClose={hidePopup} />}
-    </PopupContext.Provider>
-  );
+  return <PopupContext.Provider value={{ showPopup, hidePopup, activePopup }}>{children}</PopupContext.Provider>;
 }
 
 PopupProvider.propTypes = {

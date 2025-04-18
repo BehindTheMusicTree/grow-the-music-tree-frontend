@@ -52,7 +52,7 @@ function AppContent({ children }) {
         },
       });
     }
-  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, ConnectivityErrorType]);
+  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, ConnectivityErrorType, activePopup]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {
@@ -76,7 +76,7 @@ function AppContent({ children }) {
       </div>
 
       {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />}
-      <Popup />
+      {activePopup && <Popup type={activePopup.type} content={activePopup.content} onClose={hidePopup} />}
     </div>
   );
 }

@@ -78,8 +78,6 @@ export function createAuthFetch(session) {
  */
 export function withAuthProtection(clientAction) {
   return async (...args) => {
-    console.log("withAuthProtection");
-
     try {
       // For client-side, we need to import getSession dynamically to avoid
       // server-side import issues
@@ -87,8 +85,6 @@ export function withAuthProtection(clientAction) {
       const session = await getSession();
 
       if (!session) {
-        // Return auth error response instead of throwing
-        console.log("Not authenticated, returning auth error response");
         return createAuthErrorResponse();
       }
 
