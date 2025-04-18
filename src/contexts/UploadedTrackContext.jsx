@@ -3,7 +3,7 @@
 import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getTracks, uploadTrack, updateTrack } from "@lib/api-service/uploaded-track";
+import { listUploadedTracks, updateUploadedTrack as updateUploadedTrackApi } from "@lib/api-service/uploaded-track";
 
 const UploadedTrackContext = createContext();
 
@@ -24,12 +24,12 @@ export const UploadedTrackProvider = ({ children }) => {
     error,
   } = useQuery({
     queryKey: ["uploadedTracks"],
-    queryFn: getTracks,
+    queryFn: listUploadedTracks,
   });
 
-  const updateTrack = useMutation({
+  const updateUploadedTrack = useMutation({
     mutationFn: async ({ uploadedTrackUuid, uploadedTrackData }) => {
-      return updateTrack(uploadedTrackUuid, uploadedTrackData);
+      return updateUploadedTrackApi(uploadedTrackUuid, uploadedTrackData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
@@ -38,9 +38,9 @@ export const UploadedTrackProvider = ({ children }) => {
 
   const value = {
     uploadedTracks,
+    updateUploadedTrack,
     error,
     loading,
-    updateTrack,
     refreshTracks: () => queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] }),
   };
 
