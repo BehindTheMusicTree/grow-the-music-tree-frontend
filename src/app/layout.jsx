@@ -19,12 +19,12 @@ initSentry();
 
 function AppContent({ children }) {
   const { playerUploadedTrackObject } = usePlayer();
-  const { showPopup, hidePopup } = usePopup();
+  const { showPopup, hidePopup, activePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
   const { connectivityError, clearConnectivityError, ConnectivityErrorType } = useConnectivityError();
 
   useEffect(() => {
-    if (connectivityError?.type !== ConnectivityErrorType.NONE) {
+    if (connectivityError?.type !== ConnectivityErrorType.NONE || activePopup !== null) {
       let popupType = "networkError";
       let title = "Network Error";
 
