@@ -34,7 +34,7 @@ NEXT_PUBLIC_SENTRY_IS_ACTIVE=false
 
 NEXT_PUBLIC_SPOTIFY_CLIENT_ID={spotify-client-id}
 NEXT_PUBLIC_SPOTIFY_REDIRECT_URI={spotify-redirect-uri}
-NEXT_PUBLIC_SPOTIFY_SCOPE=user-read-email playlist-read-private playlist-read-collaborative user-library-read user-top-read
+NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-collaborative user-library-read user-top-read
 
 ```
 

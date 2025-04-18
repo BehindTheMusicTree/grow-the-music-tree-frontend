@@ -11,7 +11,7 @@ console.log("Checking required NEXT_PUBLIC_ variables:");
 const requiredVars = [
   "NEXT_PUBLIC_API_BASE_URL",
   "NEXT_PUBLIC_SPOTIFY_CLIENT_ID",
-  "NEXT_PUBLIC_SPOTIFY_SCOPE",
+  "NEXT_PUBLIC_SPOTIFY_SCOPES",
   "NEXT_PUBLIC_SPOTIFY_REDIRECT_URI",
 ];
 
