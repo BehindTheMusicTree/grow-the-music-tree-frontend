@@ -37,8 +37,6 @@ async function updateUploadedTrackImpl(authFetch, uploadedTrackUuid, uploadedTra
   return response.json();
 }
 
-// Export all protected versions
-export const getTracks = withAuthProtection(listUploadedTracksImpl);
 export const listUploadedTracks = withAuthProtection(listUploadedTracksImpl);
 export const uploadTrack = withAuthProtection(uploadTrackImpl);
 export const updateUploadedTrack = withAuthProtection(updateUploadedTrackImpl);
