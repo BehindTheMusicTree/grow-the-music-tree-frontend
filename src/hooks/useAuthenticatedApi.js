@@ -1,8 +1,9 @@
 "use client";
 
+import { useCallback } from "react";
 import { useSession } from "@contexts/SessionContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
-import { ErrorCode } from "@lib/error-codes";
+import { ErrorCode } from "@contexts/error-codes";
 
 /**
  * Creates an authenticated fetch function with auth headers pre-applied

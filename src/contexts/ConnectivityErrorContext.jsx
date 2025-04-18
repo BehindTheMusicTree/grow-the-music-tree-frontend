@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useCallback, useEffect, useState } from "react";
 import { setupFetchInterceptor } from "@lib/fetchInterceptor";
-import { ErrorCode } from "@lib/error-codes";
+import { ErrorCode } from "./error-codes";
 
 const ConnectivityErrorContext = createContext(null);
 
@@ -113,7 +113,13 @@ export function ConnectivityErrorProvider({ children }) {
 
   return (
     <ConnectivityErrorContext.Provider
-      value={{ connectivityError, handleConnectivityError, setConnectivityError, ConnectivityErrorType }}
+      value={{
+        connectivityError,
+        handleConnectivityError,
+        setConnectivityError,
+        ConnectivityErrorType,
+        ErrorCode,
+      }}
     >
       {children}
     </ConnectivityErrorContext.Provider>
