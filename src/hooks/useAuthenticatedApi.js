@@ -53,7 +53,7 @@ function createAuthFetch(session) {
  * @returns {Function} - Wrapped function that handles auth and errors
  */
 export function useAuthenticatedApi(serviceFn) {
-  const { setConnectivityError } = useConnectivityError();
+  const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
 
   return async (...args) => {
     console.log("useAuthenticatedApi", serviceFn, args);
@@ -63,7 +63,7 @@ export function useAuthenticatedApi(serviceFn) {
 
       if (!session) {
         setConnectivityError({
-          type: "AUTH",
+          type: ConnectivityErrorType.AUTH,
           message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED),
           code: ErrorCode.AUTH_REQUIRED,
         });
@@ -76,7 +76,7 @@ export function useAuthenticatedApi(serviceFn) {
     } catch (error) {
       if (error?.message === "Unauthorized" || error?.status === 401) {
         setConnectivityError({
-          type: "AUTH",
+          type: ConnectivityErrorType.AUTH,
           message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED),
           code: ErrorCode.AUTH_REQUIRED,
         });
@@ -85,11 +85,11 @@ export function useAuthenticatedApi(serviceFn) {
 
       if (error?.name === "TypeError" && error?.message === "Failed to fetch") {
         setConnectivityError({
-          type: "NETWORK",
-          message: ErrorCode.getMessage(ErrorCode.NETWORK_ERROR),
-          code: ErrorCode.NETWORK_ERROR,
+          type: ConnectivityErrorType.INTERNAL,
+          message: ErrorCode.getMessage(ErrorCode.INTERNAL),
+          code: ErrorCode.INTERNAL,
         });
-        return { success: false, error: { message: ErrorCode.getMessage(ErrorCode.NETWORK_ERROR) } };
+        return { success: false, error: { message: ErrorCode.getMessage(ErrorCode.INTERNAL) } };
       }
 
       console.error("API error:", error);
