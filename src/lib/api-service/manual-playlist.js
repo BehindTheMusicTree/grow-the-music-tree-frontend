@@ -1,19 +1,15 @@
-import { useAuthenticatedFetch } from "@hooks/useAuthenticatedFetch";
+"use client";
 
-// Pure API service implementations
-async function listManualPlaylistsImpl(authFetch, page = 1, pageSize = 50) {
-  const response = await authFetch(`manual-playlists/?page=${page}&pageSize=${pageSize}`);
+export async function listManualPlaylists(page = 1, pageSize = 50) {
+  const response = await fetch(`manual-playlists/?page=${page}&pageSize=${pageSize}`);
   return response.json();
 }
 
-async function createManualPlaylistImpl(authFetch, playlistData) {
-  const response = await authFetch("manual-playlists/", {
+export async function createManualPlaylist(manualPlaylistData) {
+  const response = await fetch("manual-playlists/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(playlistData),
+    body: JSON.stringify(manualPlaylistData),
   });
   return response.json();
 }
-
-// Export the pure implementations
-export { listManualPlaylistsImpl, createManualPlaylistImpl };
