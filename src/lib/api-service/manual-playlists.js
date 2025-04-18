@@ -1,5 +1,3 @@
-"use server";
-
 import { withAuthProtection } from "@lib/auth/auth-api";
 
 async function listManualPlaylistsImpl(authFetch, page = 1, pageSize = 50) {

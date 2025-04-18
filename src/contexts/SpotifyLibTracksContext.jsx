@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { listSpotifyLibTracks as listSpotifyLibTracksApi } from "@lib/api/spotify-service";
+import { listSpotifyLibTracks as listSpotifyLibTracksApi } from "@lib/api-service/spotify-lib-tracks-service";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 
 const SpotifyLibTracksContext = createContext();

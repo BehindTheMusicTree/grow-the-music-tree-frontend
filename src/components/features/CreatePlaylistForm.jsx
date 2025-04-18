@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Button from "@components/ui/Button";
-import { createGenrePlaylist } from "@app/actions/genre-playlists";
+import { createGenrePlaylist } from "@lib/api-service/genre-playlists";
 
 export default function CreatePlaylistForm() {
   const [formData, setFormData] = useState({

@@ -1,5 +1,3 @@
-"use server";
-
 import { withAuthProtection } from "@lib/auth/auth-api";
 
 // List tracks with authFetch
