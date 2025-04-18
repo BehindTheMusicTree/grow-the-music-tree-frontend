@@ -39,6 +39,10 @@ export const setupFetchInterceptor = (handleError) => {
         // Special handling for authentication errors
         if (response.status === 401) {
           error.name = "AuthenticationError";
+          // Check for session expiration header
+          if (response.headers.get("x-auth-error") === "session-expired") {
+            error.name = "SessionExpiredError";
+          }
         }
 
         throw error;

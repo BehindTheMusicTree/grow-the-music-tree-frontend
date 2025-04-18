@@ -11,6 +11,7 @@ const ConnectivityErrorType = {
   NETWORK: "network",
   INTERNAL: "internal",
   BAD_REQUEST: "badRequest",
+  SESSION_EXPIRED: "sessionExpired",
 };
 
 export function ConnectivityErrorProvider({ children }) {
@@ -23,19 +24,31 @@ export function ConnectivityErrorProvider({ children }) {
   const handleConnectivityError = useCallback((error) => {
     console.log("ConnectivityErrorProvider handling error:", error);
 
+    // Handle session expiration and auth errors
     if (
       error?.name === "AuthenticationError" ||
       error?.message === "Unauthorized" ||
       error?.status === 401 ||
       error?.cause?.name === "AuthenticationError" ||
-      (typeof error === "string" && error.includes("Unauthorized"))
+      (typeof error === "string" && error.includes("Unauthorized")) ||
+      error?.response?.status === 401
     ) {
       console.log("Auth error detected");
-      setConnectivityError({
-        type: ConnectivityErrorType.AUTH,
-        message: "Please log in to continue",
-        code: null,
-      });
+
+      // Check if it's a session expiration case
+      if (error?.response?.headers?.get("x-auth-error") === "session-expired") {
+        setConnectivityError({
+          type: ConnectivityErrorType.SESSION_EXPIRED,
+          message: "Your session has expired. Please log in again.",
+          code: "SE001",
+        });
+      } else {
+        setConnectivityError({
+          type: ConnectivityErrorType.AUTH,
+          message: "Please log in to continue",
+          code: "AU001",
+        });
+      }
       return;
     }
 

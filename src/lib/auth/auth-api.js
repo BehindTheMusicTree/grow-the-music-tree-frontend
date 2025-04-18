@@ -1,5 +1,7 @@
 "use client";
 
+import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
+
 /**
  * Standard response object for authentication errors
  * @typedef {Object} AuthResponse
@@ -7,21 +9,6 @@
  * @property {Object} data - The operation result data (if successful)
  * @property {Object} error - Error information (if not successful)
  */
-
-/**
- * Creates a standard auth error response object
- * This avoids throwing errors which cause 500 status codes
- */
-export function createAuthErrorResponse() {
-  return {
-    success: false,
-    error: {
-      type: "auth",
-      code: "unauthorized",
-      message: "Authentication required",
-    },
-  };
-}
 
 /**
  * Creates an authenticated fetch function with auth headers pre-applied
@@ -79,13 +66,22 @@ export function createAuthFetch(session) {
 export function withAuthProtection(clientAction) {
   return async (...args) => {
     try {
+      console.log("withAuthProtection");
       // For client-side, we need to import getSession dynamically to avoid
       // server-side import issues
       const { getSession } = await import("next-auth/react");
       const session = await getSession();
+      console.log("session", session);
 
       if (!session) {
-        return createAuthErrorResponse();
+        console.log("No session, setting auth error");
+        const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
+        setConnectivityError({
+          type: ConnectivityErrorType.AUTH,
+          message: "Please log in to continue",
+          code: "AU001",
+        });
+        return { success: false, error: { message: "Authentication required" } };
       }
 
       // Create authenticated fetch helper
@@ -103,7 +99,13 @@ export function withAuthProtection(clientAction) {
       // Handle auth errors from external APIs
       if (error?.message === "Unauthorized" || error?.status === 401) {
         console.log("Caught auth error from external API");
-        return createAuthErrorResponse();
+        const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
+        setConnectivityError({
+          type: ConnectivityErrorType.AUTH,
+          message: "Please log in to continue",
+          code: "AU001",
+        });
+        return { success: false, error: { message: "Authentication required" } };
       }
 
       // Pass through other errors
