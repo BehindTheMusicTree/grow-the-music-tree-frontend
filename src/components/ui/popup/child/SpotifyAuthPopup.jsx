@@ -12,7 +12,8 @@ export default function SpotifyAuthPopup({ onAuthenticate, className = "" }) {
       aria-modal="true"
       aria-labelledby="popup-title"
     >
-      <div className={`w-full max-w-md rounded-lg overflow-hidden shadow-xl ${className}`}>
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
+      <div className={`w-full max-w-md rounded-lg overflow-hidden shadow-xl relative ${className}`}>
         {/* Black header with white text */}
         <div className="bg-black p-4 text-white">
           <h3 id="popup-title" className="text-white font-semibold">
