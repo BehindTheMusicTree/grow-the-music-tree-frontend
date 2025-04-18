@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { withAuthProtection } from "@hooks/useAuthenticatedFetch";
+import { useAuthenticatedFetch } from "@hooks/useAuthenticatedFetch";
 
 /**
  * Handler for downloading track files
@@ -37,4 +37,4 @@ async function downloadTrackImpl(authFetch, { params }) {
 }
 
 // Export with auth protection - API route specific pattern
-export const GET = withAuthProtection(downloadTrackImpl);
+export const GET = useAuthenticatedFetch(downloadTrackImpl);

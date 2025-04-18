@@ -1,4 +1,4 @@
-import { withAuthProtection } from "@hooks/useAuthenticatedFetch";
+import { useAuthenticatedFetch } from "@hooks/useAuthenticatedFetch";
 
 // List tracks with authFetch
 async function listUploadedTracksImpl(authFetch, page = 1, pageSize = 50) {
@@ -35,6 +35,6 @@ async function updateUploadedTrackImpl(authFetch, uploadedTrackUuid, uploadedTra
   return response.json();
 }
 
-export const listUploadedTracks = withAuthProtection(listUploadedTracksImpl);
-export const uploadTrack = withAuthProtection(uploadTrackImpl);
-export const updateUploadedTrack = withAuthProtection(updateUploadedTrackImpl);
+export const listUploadedTracks = useAuthenticatedFetch(listUploadedTracksImpl);
+export const uploadTrack = useAuthenticatedFetch(uploadTrackImpl);
+export const updateUploadedTrack = useAuthenticatedFetch(updateUploadedTrackImpl);

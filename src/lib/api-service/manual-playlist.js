@@ -1,4 +1,4 @@
-import { withAuthProtection } from "@hooks/useAuthenticatedFetch";
+import { useAuthenticatedFetch } from "@hooks/useAuthenticatedFetch";
 
 async function listManualPlaylistsImpl(authFetch, page = 1, pageSize = 50) {
   const response = await authFetch(`manual-playlists/?page=${page}&pageSize=${pageSize}`);
@@ -24,5 +24,5 @@ async function createManualPlaylistImpl(authFetch, playlistData) {
   return response.json();
 }
 
-export const listManualPlaylists = withAuthProtection(listManualPlaylistsImpl);
-export const createManualPlaylist = withAuthProtection(createManualPlaylistImpl);
+export const listManualPlaylists = useAuthenticatedFetch(listManualPlaylistsImpl);
+export const createManualPlaylist = useAuthenticatedFetch(createManualPlaylistImpl);

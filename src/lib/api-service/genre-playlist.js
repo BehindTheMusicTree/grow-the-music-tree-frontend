@@ -1,4 +1,4 @@
-import { withAuthProtection } from "@hooks/useAuthenticatedFetch";
+import { useAuthenticatedFetch } from "@hooks/useAuthenticatedFetch";
 
 async function listGenrePlaylistsImpl(authFetch, page = 1, pageSize = 50) {
   const response = await authFetch(`genre-playlists/?page=${page}&pageSize=${pageSize}`);
@@ -17,5 +17,5 @@ async function createGenrePlaylistImpl(authFetch, genreData) {
 }
 
 // Export protected versions
-export const listGenrePlaylists = withAuthProtection(listGenrePlaylistsImpl);
-export const createGenrePlaylist = withAuthProtection(createGenrePlaylistImpl);
+export const listGenrePlaylists = useAuthenticatedFetch(listGenrePlaylistsImpl);
+export const createGenrePlaylist = useAuthenticatedFetch(createGenrePlaylistImpl);
