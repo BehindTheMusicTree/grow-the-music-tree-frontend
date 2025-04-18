@@ -1,6 +1,6 @@
 "use client";
 
-import { withClientAuthProtection } from "@lib/auth/auth-api";
+import { withAuthProtection } from "@lib/auth/auth-api";
 
 /**
  * Client-side Spotify API service
@@ -22,9 +22,9 @@ async function listSpotifyLibTracksImpl(authFetch, page = 1, pageSize = 50) {
 }
 
 // Export the wrapped API function
-export const fetchSpotifyLibTracks = withClientAuthProtection(listSpotifyLibTracksImpl);
+export const fetchSpotifyLibTracks = withAuthProtection(listSpotifyLibTracksImpl);
 
 /**
  * Additional Spotify API functions can be added here
- * Each should be implemented and then wrapped with withClientAuthProtection
+ * Each should be implemented and then wrapped with withAuthProtection
  */
