@@ -21,20 +21,23 @@ function AppContent({ children }) {
   const { playerUploadedTrackObject } = usePlayer();
   const { showPopup, hidePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-  const { connectivityError, clearConnectivityError, ErrorType } = useConnectivityError();
+  const { connectivityError, clearConnectivityError, ConnectivityErrorType } = useConnectivityError();
 
   useEffect(() => {
-    if (connectivityError.type !== ErrorType.NONE) {
+    if (connectivityError?.type !== ConnectivityErrorType.NONE) {
       let popupType = "networkError";
       let title = "Network Error";
 
-      if (connectivityError.type === ErrorType.AUTH) {
+      if (connectivityError.type === ConnectivityErrorType.AUTH) {
         popupType = "authError";
         title = "Authentication Required";
-      } else if (connectivityError.type === ErrorType.BAD_REQUEST || connectivityError.type === ErrorType.INTERNAL) {
+      } else if (
+        connectivityError.type === ConnectivityErrorType.BAD_REQUEST ||
+        connectivityError.type === ConnectivityErrorType.INTERNAL
+      ) {
         popupType = "internalError";
         title = "Internal Error";
-      } else if (connectivityError.type === ErrorType.NETWORK) {
+      } else if (connectivityError.type === ConnectivityErrorType.NETWORK) {
         popupType = "networkError";
         title = "Network Error";
       }
@@ -49,7 +52,7 @@ function AppContent({ children }) {
         },
       });
     }
-  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, ErrorType]);
+  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, ConnectivityErrorType]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {

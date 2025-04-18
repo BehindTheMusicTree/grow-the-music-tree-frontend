@@ -96,7 +96,7 @@ export function ConnectivityErrorProvider({ children }) {
   }, [handleConnectivityError]);
 
   return (
-    <ConnectivityErrorContext.Provider value={{ connectivityError, handleConnectivityError }}>
+    <ConnectivityErrorContext.Provider value={{ connectivityError, handleConnectivityError, ConnectivityErrorType }}>
       {children}
     </ConnectivityErrorContext.Provider>
   );
