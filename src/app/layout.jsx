@@ -35,7 +35,6 @@ function AppContent({ children }) {
 
       if (connectivityError.type === ConnectivityErrorType.AUTH) {
         popupType = "authError";
-        title = "Authentication Required";
       } else if (
         connectivityError.type === ConnectivityErrorType.BAD_REQUEST ||
         connectivityError.type === ConnectivityErrorType.INTERNAL
