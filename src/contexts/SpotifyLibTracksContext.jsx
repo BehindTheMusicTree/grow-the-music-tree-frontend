@@ -3,6 +3,7 @@
 import { createContext, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { listSpotifyLibTracks } from "@lib/api-service/spotify-lib-track";
+import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
 
 const SpotifyLibTracksContext = createContext();
 
@@ -21,7 +22,7 @@ export const SpotifyLibTracksProvider = ({ children }) => {
     error,
   } = useQuery({
     queryKey: ["spotifyLibTracks"],
-    queryFn: listSpotifyLibTracks,
+    queryFn: useAuthenticatedApi(listSpotifyLibTracks),
   });
 
   const value = {

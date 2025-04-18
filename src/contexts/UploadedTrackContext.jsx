@@ -4,7 +4,7 @@ import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { listUploadedTracks, updateUploadedTrack as updateUploadedTrackApi } from "@lib/api-service/uploaded-track";
-
+import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
 const UploadedTrackContext = createContext();
 
 export const useUploadedTracks = () => {
@@ -24,13 +24,11 @@ export const UploadedTrackProvider = ({ children }) => {
     error,
   } = useQuery({
     queryKey: ["uploadedTracks"],
-    queryFn: listUploadedTracks,
+    queryFn: useAuthenticatedApi(listUploadedTracks),
   });
 
   const updateUploadedTrack = useMutation({
-    mutationFn: async ({ uploadedTrackUuid, uploadedTrackData }) => {
-      return updateUploadedTrackApi(uploadedTrackUuid, uploadedTrackData);
-    },
+    mutationFn: useAuthenticatedApi(updateUploadedTrackApi),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
     },
