@@ -33,8 +33,8 @@ function AppContent({ children }) {
       let popupType = "networkError";
       let title = "Network Error";
 
-      if (connectivityError.type === ConnectivityErrorType.AUTH) {
-        popupType = "authError";
+      if (connectivityError.type === ConnectivityErrorType.AUTH_REQUIRED) {
+        popupType = "authRequired";
       } else if (
         connectivityError.type === ConnectivityErrorType.BAD_REQUEST ||
         connectivityError.type === ConnectivityErrorType.INTERNAL
