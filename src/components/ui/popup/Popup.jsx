@@ -14,7 +14,7 @@ import InternalErrorPopup from "./child/InternalErrorPopup";
 function Popup({ type, content, onClose }) {
   switch (type) {
     case "networkError":
-    case "error": // Handle both network and general errors
+    case "internalError": // Handle both network and general errors
       return <InternalErrorPopup {...content} onClose={onClose} />;
     case "authError":
       return <SpotifyAuthErrorPopup {...content} onClose={onClose} />;
