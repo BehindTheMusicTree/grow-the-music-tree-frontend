@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { listSpotifyLibTracks } from "@actions/spotify-lib-tracks";
+import { listSpotifyLibTracks as listSpotifyLibTracksApi } from "@lib/api/spotify-service";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 
 const SpotifyLibTracksContext = createContext();
@@ -18,12 +18,11 @@ export const useSpotifyLibTracks = () => {
 export const SpotifyLibTracksProvider = ({ children }) => {
   const { handleConnectivityError } = useConnectivityError();
 
-  // Wrapper for server action that handles the new response format
-  // with added resilience for undefined responses
-  const fetchSpotifyLibTracks = useCallback(async () => {
+  // Wrapper for API call that handles error handling
+  const listSpotifyLibTracks = useCallback(async () => {
     try {
-      const spotifyLibTracks = await listSpotifyLibTracks();
-      return spotifyLibTracks;
+      const response = await listSpotifyLibTracksApi();
+      return response;
     } catch (error) {
       console.error("Error fetching Spotify tracks:", error);
       throw error;
@@ -32,11 +31,11 @@ export const SpotifyLibTracksProvider = ({ children }) => {
 
   const {
     data: spotifyLibTracks,
-    isLoading: loading,
+    loading: loading,
     error,
   } = useQuery({
     queryKey: ["spotifyLibTracks"],
-    queryFn: fetchSpotifyLibTracks,
+    queryFn: listSpotifyLibTracks,
     onError: handleConnectivityError,
   });
 
