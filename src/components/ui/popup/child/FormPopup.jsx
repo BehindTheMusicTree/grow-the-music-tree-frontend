@@ -10,7 +10,7 @@ export default function FormPopup({
   onCancel,
   submitText = "Submit",
   cancelText = "Cancel",
-  isLoading = false,
+  loading = false,
 }) {
   return (
     <BasePopup title={title} onClose={onCancel}>
@@ -20,8 +20,8 @@ export default function FormPopup({
           <Button type="button" variant="outline" onClick={onCancel}>
             {cancelText}
           </Button>
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Loading..." : submitText}
+          <Button type="submit" disabled={loading}>
+            {loading ? "Loading..." : submitText}
           </Button>
         </div>
       </form>
