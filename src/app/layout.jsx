@@ -32,8 +32,11 @@ function AppContent({ children }) {
         popupType = "authError";
         title = "Authentication Required";
       } else if (connectivityError.type === ErrorType.BAD_REQUEST || connectivityError.type === ErrorType.INTERNAL) {
-        popupType = "error";
-        title = connectivityError.type === ErrorType.BAD_REQUEST ? "Invalid Request" : "Internal Error";
+        popupType = "internalError";
+        title = "Internal Error";
+      } else if (connectivityError.type === ErrorType.NETWORK) {
+        popupType = "networkError";
+        title = "Network Error";
       }
 
       showPopup(popupType, {
