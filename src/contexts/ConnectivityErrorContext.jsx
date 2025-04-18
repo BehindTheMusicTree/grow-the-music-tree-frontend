@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useContext, useCallback, useEffect, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { setupFetchInterceptor } from "@lib/fetchInterceptor";
 
 const ConnectivityErrorContext = createContext(null);
@@ -11,16 +10,19 @@ const ConnectivityErrorType = {
   AUTH: "auth",
   NETWORK: "network",
   INTERNAL: "internal",
+  BAD_REQUEST: "badRequest",
 };
 
 export function ConnectivityErrorProvider({ children }) {
-  const queryClient = useQueryClient();
-  const [connectivityError, setConnectivityError] = useState({ type: ConnectivityErrorType.NONE, message: null });
+  const [connectivityError, setConnectivityError] = useState({
+    type: ConnectivityErrorType.NONE,
+    message: null,
+    code: null,
+  });
 
   const handleConnectivityError = useCallback((error) => {
     console.log("ConnectivityErrorProvider handling error:", error);
 
-    // Handle authentication errors
     if (
       error?.name === "AuthenticationError" ||
       error?.message === "Unauthorized" ||
@@ -29,13 +31,31 @@ export function ConnectivityErrorProvider({ children }) {
       (typeof error === "string" && error.includes("Unauthorized"))
     ) {
       console.log("Auth error detected");
-      setConnectivityError({ type: ConnectivityErrorType.AUTH, message: "Please log in to continue" });
+      setConnectivityError({
+        type: ConnectivityErrorType.AUTH,
+        message: "Please log in to continue",
+        code: null,
+      });
       return;
     }
 
-    if (error?.name === "InternalServerError" || error?.status === 500) {
+    if (error?.status === 400 || error?.name === "BadRequestError") {
+      console.log("Bad request error detected");
+      setConnectivityError({
+        type: ConnectivityErrorType.BAD_REQUEST,
+        message: "Invalid request",
+        code: error?.code || "BR001",
+      });
+      return;
+    }
+
+    if (error?.name === "InternalServerError" || error?.status === 500 || error?.name === "InternalError") {
       console.log("Internal error detected");
-      setConnectivityError({ type: ConnectivityErrorType.INTERNAL, message: "An internal error occured" });
+      setConnectivityError({
+        type: ConnectivityErrorType.INTERNAL,
+        message: "An internal error occurred",
+        code: error?.code || "IE001",
+      });
       return;
     }
 
@@ -43,14 +63,15 @@ export function ConnectivityErrorProvider({ children }) {
       setConnectivityError({
         type: ConnectivityErrorType.NETWORK,
         message: `Request failed with status ${error.response.status}`,
+        code: null,
       });
       return;
     }
 
-    // Handle generic errors
     setConnectivityError({
       type: ConnectivityErrorType.NETWORK,
       message: error?.message || "An unexpected error occurred",
+      code: null,
     });
   }, []);
 
@@ -66,53 +87,16 @@ export function ConnectivityErrorProvider({ children }) {
       handleConnectivityError(event.reason);
     };
 
-    // Handle window errors
-    const handleWindowError = (event) => {
-      if (event.error) {
-        handleConnectivityError(event.error);
-      }
-    };
-
-    // Set up React Query defaults
-    queryClient.setDefaultOptions({
-      queries: {
-        onError: handleConnectivityError,
-        retry: (failureCount, error) => {
-          if (error?.name === "AuthenticationError" || error?.message === "Unauthorized" || error?.status === 401) {
-            return false; // Don't retry auth errors
-          }
-          return failureCount < 3; // Default retry logic
-        },
-      },
-      mutations: {
-        onError: handleConnectivityError,
-      },
-    });
-
-    // Set up global listeners
     window.addEventListener("unhandledrejection", handleUnhandledRejection);
-    window.addEventListener("error", handleWindowError);
 
     return () => {
-      // Clean up all listeners and interceptors
+      cleanupInterceptor();
       window.removeEventListener("unhandledrejection", handleUnhandledRejection);
-      window.removeEventListener("error", handleWindowError);
-      if (cleanupInterceptor) cleanupInterceptor();
     };
-  }, [handleConnectivityError, queryClient]);
-
-  const clearConnectivityError = useCallback(() => {
-    setConnectivityError({ type: ConnectivityErrorType.NONE, message: null });
-  }, []);
+  }, [handleConnectivityError]);
 
   return (
-    <ConnectivityErrorContext.Provider
-      value={{
-        connectivityError,
-        clearConnectivityError,
-        ErrorType: ConnectivityErrorType,
-      }}
-    >
+    <ConnectivityErrorContext.Provider value={{ connectivityError, handleConnectivityError }}>
       {children}
     </ConnectivityErrorContext.Provider>
   );
