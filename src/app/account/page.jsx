@@ -5,11 +5,11 @@ import Image from "next/image";
 
 export default function AccountPage() {
   const [profile, setProfile] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      setIsLoading(true);
+      setLoading(true);
       // This is a placeholder - implement actual profile fetching using SpotifyOAuthService
       // const profileData = await SpotifyOAuthService.getProfile();
       // For now, simulating profile data
@@ -23,13 +23,13 @@ export default function AccountPage() {
         external_urls: { spotify: "https://open.spotify.com/user/example" },
       };
       setProfile(profileData);
-      setIsLoading(false);
+      setLoading(false);
     };
 
     fetchProfile();
   }, []); // Add empty dependency array to run only once on mount
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="account-page p-8">
         <h1 className="text-2xl font-bold mb-6">Account</h1>
