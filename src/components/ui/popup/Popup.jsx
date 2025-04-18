@@ -15,10 +15,12 @@ import NetworkErrorPopup from "./child/NetworkErrorPopup";
 function Popup({ type, content, onClose }) {
   switch (type) {
     case "internalError":
-      return <InternalErrorPopup {...content} onClose={onClose} />;
+      return <InternalErrorPopup {...content} />;
     case "networkError":
-      return <NetworkErrorPopup {...content} onClose={onClose} />;
-    case "authError":
+      return <NetworkErrorPopup {...content} />;
+    case "authRequired":
+      return <SpotifyAuthPopup {...content} />;
+    case "spotifyAuthError":
       return <SpotifyAuthErrorPopup {...content} />;
     case "spotifyAuth":
       return <SpotifyAuthPopup {...content} />;
