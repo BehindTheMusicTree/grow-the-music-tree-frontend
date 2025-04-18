@@ -1,10 +1,12 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useCallback } from "react";
 import PropTypes from "prop-types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import { listGenrePlaylists } from "@actions/genre-playlists";
+import { listGenrePlaylists as listGenrePlaylistsApi } from "@lib/api/genre-playlist-service";
+import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
+
 const GenrePlaylistContext = createContext();
 
 export function useGenrePlaylists() {
@@ -18,19 +20,26 @@ export function useGenrePlaylists() {
 export function GenrePlaylistProvider({ children }) {
   const queryClient = useQueryClient();
   const { status } = useSession();
+  const { handleConnectivityError } = useConnectivityError();
+
+  const listGenrePlaylists = useCallback(async () => {
+    try {
+      const response = await listGenrePlaylistsApi();
+      return response;
+    } catch (error) {
+      console.error("Error fetching genre playlists:", error);
+      throw error;
+    }
+  }, []);
+
   const {
     data: genrePlaylists = [],
-    isLoading,
+    loading,
     error,
   } = useQuery({
     queryKey: ["genrePlaylists"],
-    queryFn: async () => {
-      const response = await listGenrePlaylists();
-      if (!response.ok) {
-        throw new Error("Failed to fetch genre playlists");
-      }
-      return response.json();
-    },
+    queryFn: listGenrePlaylists,
+    onError: handleConnectivityError,
     enabled: status === "authenticated",
   });
 
@@ -39,7 +48,7 @@ export function GenrePlaylistProvider({ children }) {
       value={{
         genrePlaylists,
         error,
-        isLoading,
+        loading,
         refreshGenrePlaylists: () => queryClient.invalidateQueries({ queryKey: ["genrePlaylists"] }),
       }}
     >

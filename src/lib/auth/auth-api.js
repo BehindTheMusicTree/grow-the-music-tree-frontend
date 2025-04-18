@@ -1,4 +1,5 @@
-// NO "use client" - this is server-only code
+"use client";
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@lib/auth/auth-spotify";
 
@@ -109,6 +110,54 @@ export function withAuthProtection(serverAction) {
 
       // Pass through other errors
       console.error("Server action error:", error);
+      throw error;
+    }
+  };
+}
+
+/**
+ * Client-side wrapper that handles auth and provides standard response format
+ * Similar to withAuthProtection but uses client-side session handling
+ *
+ * @param {Function} clientAction - The client action to wrap with authentication
+ * @returns {Function} - Wrapped function that handles auth and error standardization
+ */
+export function withAuthProtection(clientAction) {
+  return async (...args) => {
+    console.log("withAuthProtection");
+
+    try {
+      // For client-side, we need to import getSession dynamically to avoid
+      // server-side import issues
+      const { getSession } = await import("next-auth/react");
+      const session = await getSession();
+
+      if (!session) {
+        // Return auth error response instead of throwing
+        console.log("Not authenticated, returning auth error response");
+        return createAuthErrorResponse();
+      }
+
+      // Create authenticated fetch helper
+      const authFetch = createAuthFetch(session);
+
+      // Call the original action with authFetch and args
+      const result = await clientAction(authFetch, ...args);
+
+      // Wrap successful result
+      return {
+        success: true,
+        data: result,
+      };
+    } catch (error) {
+      // Handle auth errors from external APIs
+      if (error?.message === "Unauthorized" || error?.status === 401) {
+        console.log("Caught auth error from external API");
+        return createAuthErrorResponse();
+      }
+
+      // Pass through other errors
+      console.error("Client action error:", error);
       throw error;
     }
   };
