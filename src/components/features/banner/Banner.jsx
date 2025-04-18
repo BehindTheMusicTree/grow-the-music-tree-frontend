@@ -3,7 +3,7 @@
 import PropTypes from "prop-types";
 
 import SearchForm from "./SearchForm";
-import logo from "@assets/images/logos/umg-logo-maze-100.svg";
+import logo from "@assets/images/logos/tree.png";
 import Image from "next/image";
 export default function Banner() {
   return (
