@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "@contexts/SessionContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { ErrorCode } from "@lib/error-codes";
 
@@ -54,14 +55,11 @@ function createAuthFetch(session) {
  */
 export function useAuthenticatedApi(serviceFn) {
   const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
+  const { data: session } = useSession();
 
   return async (...args) => {
-    console.log("useAuthenticatedApi", serviceFn, args);
     try {
-      const { getSession } = await import("next-auth/react");
-      const session = await getSession();
-
-      if (!session) {
+      if (!session?.accessToken) {
         setConnectivityError({
           type: ConnectivityErrorType.AUTH_REQUIRED,
           message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED),

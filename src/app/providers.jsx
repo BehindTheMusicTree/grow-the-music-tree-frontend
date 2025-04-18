@@ -2,7 +2,6 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { SessionProvider } from "next-auth/react";
 import { PopupProvider } from "@contexts/PopupContext";
 import { UploadedTrackProvider } from "@contexts/UploadedTrackContext";
 import { GenrePlaylistProvider } from "@contexts/GenrePlaylistContext";
@@ -11,6 +10,8 @@ import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVi
 import { TrackListProvider } from "@contexts/TrackListContext";
 import { SpotifyLibTracksProvider } from "@contexts/SpotifyLibTracksContext";
 import { ConnectivityErrorProvider } from "@contexts/ConnectivityErrorContext";
+import { SpotifyAuthProvider } from "@contexts/SpotifyAuthContext";
+import { SessionProvider } from "@contexts/SessionContext";
 import { useEffect } from "react";
 import { validateClientEnv } from "@lib/public-env-validator";
 
@@ -22,25 +23,27 @@ export default function Providers({ children }) {
   }, []);
 
   return (
-    <SessionProvider>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <SessionProvider>
         <PopupProvider>
           <ConnectivityErrorProvider>
             <UploadedTrackProvider>
               <GenrePlaylistProvider>
                 <PlayerProvider>
                   <TrackListProvider>
-                    <SpotifyLibTracksProvider>
-                      <TrackListSidebarVisibilityProvider>{children}</TrackListSidebarVisibilityProvider>
-                    </SpotifyLibTracksProvider>
+                    <SpotifyAuthProvider>
+                      <SpotifyLibTracksProvider>
+                        <TrackListSidebarVisibilityProvider>{children}</TrackListSidebarVisibilityProvider>
+                      </SpotifyLibTracksProvider>
+                    </SpotifyAuthProvider>
                   </TrackListProvider>
                 </PlayerProvider>
               </GenrePlaylistProvider>
             </UploadedTrackProvider>
           </ConnectivityErrorProvider>
         </PopupProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </SessionProvider>
+      </SessionProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }
