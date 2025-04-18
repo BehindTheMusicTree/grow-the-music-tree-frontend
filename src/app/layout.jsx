@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { initSentry } from "@lib/sentry";
 import "./globals.css";
 
@@ -22,9 +22,14 @@ function AppContent({ children }) {
   const { showPopup, hidePopup, activePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
   const { connectivityError, clearConnectivityError, ConnectivityErrorType } = useConnectivityError();
+  const hasPopupRef = useRef(false);
 
   useEffect(() => {
-    if (connectivityError?.type !== ConnectivityErrorType.NONE || activePopup !== null) {
+    hasPopupRef.current = activePopup !== null;
+  }, [activePopup]);
+
+  useEffect(() => {
+    if (connectivityError?.type !== ConnectivityErrorType.NONE && !hasPopupRef.current) {
       let popupType = "networkError";
       let title = "Network Error";
 
@@ -52,7 +57,7 @@ function AppContent({ children }) {
         },
       });
     }
-  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, ConnectivityErrorType, activePopup]);
+  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, ConnectivityErrorType]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {
