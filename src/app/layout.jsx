@@ -69,7 +69,7 @@ function AppContent({ children }) {
       <Banner className="fixed top-0 z-50" />
 
       <div
-        className="center bg-green-500 flex-grow flex overflow-y-auto"
+        className="center bg-gray-100 flex-grow flex overflow-y-auto"
         style={{
           maxHeight: playerUploadedTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
         }}
