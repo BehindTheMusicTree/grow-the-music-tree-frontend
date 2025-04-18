@@ -57,16 +57,20 @@ export function createAuthFetch(session) {
 }
 
 /**
- * Client-side wrapper that handles auth and provides standard response format
- * Similar to withAuthProtection but uses client-side session handling
+ * Client-side hook that provides an auth-protected function wrapper
+ * Only use this inside React components
  *
  * @param {Function} clientAction - The client action to wrap with authentication
  * @returns {Function} - Wrapped function that handles auth and error standardization
  */
-export function withAuthProtection(clientAction) {
+export function useAuthProtection(clientAction) {
+  // Get connectivity error handlers from context
+  const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
+
+  // Return the wrapped function
   return async (...args) => {
     try {
-      console.log("withAuthProtection");
+      console.log("useAuthProtection (hook version)");
       // For client-side, we need to import getSession dynamically to avoid
       // server-side import issues
       const { getSession } = await import("next-auth/react");
@@ -75,7 +79,6 @@ export function withAuthProtection(clientAction) {
 
       if (!session) {
         console.log("No session, setting auth error");
-        const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
         setConnectivityError({
           type: ConnectivityErrorType.AUTH,
           message: "Please log in to continue",
@@ -99,7 +102,6 @@ export function withAuthProtection(clientAction) {
       // Handle auth errors from external APIs
       if (error?.message === "Unauthorized" || error?.status === 401) {
         console.log("Caught auth error from external API");
-        const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
         setConnectivityError({
           type: ConnectivityErrorType.AUTH,
           message: "Please log in to continue",
