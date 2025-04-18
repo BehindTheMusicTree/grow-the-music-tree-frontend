@@ -6,7 +6,7 @@ import { listUploadedTracks } from "@actions/uploaded-tracks";
 
 export default function TracksList({ initialData }) {
   const router = useRouter();
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, loading, isError, error } = useQuery({
     queryKey: ["tracks", 1, 50],
     queryFn: () => listUploadedTracks(1, 50),
     initialData,
@@ -22,7 +22,7 @@ export default function TracksList({ initialData }) {
     return <div>Error loading tracks</div>;
   }
 
-  if (isLoading && !data) return <div>Loading...</div>;
+  if (loading && !data) return <div>Loading...</div>;
 
   return (
     <div>
