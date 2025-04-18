@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useCallback, useEffect, useState } from "react";
 import { setupFetchInterceptor } from "@lib/fetchInterceptor";
+import { ErrorCode } from "@lib/error-codes";
 
 const ConnectivityErrorContext = createContext(null);
 
@@ -39,52 +40,54 @@ export function ConnectivityErrorProvider({ children }) {
       if (error?.response?.headers?.get("x-auth-error") === "session-expired") {
         setConnectivityError({
           type: ConnectivityErrorType.SESSION_EXPIRED,
-          message: "Your session has expired. Please log in again.",
-          code: "SE001",
+          message: ErrorCode.getMessage(ErrorCode.SESSION_EXPIRED),
+          code: ErrorCode.SESSION_EXPIRED,
         });
       } else {
         setConnectivityError({
           type: ConnectivityErrorType.AUTH,
-          message: "Please log in to continue",
-          code: "AU001",
+          message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED),
+          code: ErrorCode.AUTH_REQUIRED,
         });
       }
       return;
     }
 
-    if (error?.status === 400 || error?.name === "BadRequestError") {
-      console.log("Bad request error detected");
-      setConnectivityError({
-        type: ConnectivityErrorType.BAD_REQUEST,
-        message: "Invalid request",
-        code: error?.code || "BR001",
-      });
-      return;
-    }
-
-    if (error?.name === "InternalServerError" || error?.status === 500 || error?.name === "InternalError") {
-      console.log("Internal error detected");
-      setConnectivityError({
-        type: ConnectivityErrorType.INTERNAL,
-        message: "An internal error occurred",
-        code: error?.code || "IE001",
-      });
-      return;
-    }
-
-    if (error?.response) {
+    // Handle network errors
+    if (error?.name === "TypeError" && error?.message === "Failed to fetch") {
       setConnectivityError({
         type: ConnectivityErrorType.NETWORK,
-        message: `Request failed with status ${error.response.status}`,
-        code: null,
+        message: ErrorCode.getMessage(ErrorCode.NETWORK_ERROR),
+        code: ErrorCode.NETWORK_ERROR,
       });
       return;
     }
 
+    // Handle bad requests
+    if (error?.status === 400) {
+      setConnectivityError({
+        type: ConnectivityErrorType.BAD_REQUEST,
+        message: ErrorCode.getMessage(ErrorCode.BAD_REQUEST),
+        code: ErrorCode.BAD_REQUEST,
+      });
+      return;
+    }
+
+    // Handle internal server errors
+    if (error?.status >= 500) {
+      setConnectivityError({
+        type: ConnectivityErrorType.INTERNAL,
+        message: ErrorCode.getMessage(ErrorCode.SERVER_ERROR),
+        code: ErrorCode.SERVER_ERROR,
+      });
+      return;
+    }
+
+    // Default error
     setConnectivityError({
-      type: ConnectivityErrorType.NETWORK,
-      message: error?.message || "An unexpected error occurred",
-      code: null,
+      type: ConnectivityErrorType.INTERNAL,
+      message: ErrorCode.getMessage(ErrorCode.SERVER_ERROR),
+      code: ErrorCode.SERVER_ERROR,
     });
   }, []);
 

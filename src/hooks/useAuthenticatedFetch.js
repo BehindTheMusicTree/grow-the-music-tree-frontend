@@ -1,6 +1,7 @@
 "use client";
 
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
+import { ErrorCode } from "@lib/error-codes";
 
 /**
  * Standard response object for authentication errors
@@ -66,20 +67,43 @@ export function useAuthenticatedFetch(serviceFn) {
   const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
 
   return async (...args) => {
-    const { getSession } = await import("next-auth/react");
-    const session = await getSession();
+    try {
+      const { getSession } = await import("next-auth/react");
+      const session = await getSession();
 
-    if (!session) {
-      setConnectivityError({
-        type: ConnectivityErrorType.AUTH,
-        message: "Please log in to continue",
-        code: "AU001",
-      });
-      return { success: false, error: { message: "Authentication required" } };
+      if (!session) {
+        setConnectivityError({
+          type: ConnectivityErrorType.AUTH,
+          message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED),
+          code: ErrorCode.AUTH_REQUIRED,
+        });
+        return { success: false, error: { message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED) } };
+      }
+
+      const authFetch = createAuthFetch(session);
+      const result = await serviceFn(authFetch, ...args);
+      return { success: true, data: result };
+    } catch (error) {
+      if (error?.message === "Unauthorized" || error?.status === 401) {
+        setConnectivityError({
+          type: ConnectivityErrorType.AUTH,
+          message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED),
+          code: ErrorCode.AUTH_REQUIRED,
+        });
+        return { success: false, error: { message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED) } };
+      }
+
+      if (error?.name === "TypeError" && error?.message === "Failed to fetch") {
+        setConnectivityError({
+          type: ConnectivityErrorType.NETWORK,
+          message: ErrorCode.getMessage(ErrorCode.NETWORK_ERROR),
+          code: ErrorCode.NETWORK_ERROR,
+        });
+        return { success: false, error: { message: ErrorCode.getMessage(ErrorCode.NETWORK_ERROR) } };
+      }
+
+      console.error("API error:", error);
+      throw error;
     }
-
-    const authFetch = createAuthFetch(session);
-    const result = await serviceFn(authFetch, ...args);
-    return { success: true, data: result };
   };
 }
