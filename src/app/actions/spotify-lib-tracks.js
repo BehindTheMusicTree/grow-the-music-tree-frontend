@@ -1,69 +1,21 @@
 "use client";
 
-// Client-side implementation for frontend-only Next.js
-// Replaces server action with direct API call
+import { withAuthProtection } from "@lib/auth/auth-api";
 
 /**
- * Fetch Spotify library tracks directly from client-side
- * @param {number} page - Page number for pagination
- * @param {number} pageSize - Number of items per page
- * @returns {Promise<Object>} - Response with data property containing tracks
+ * Client-side implementation of Spotify library tracks API
+ * @param {Function} authFetch - Authenticated fetch function with session
+ * @param {number} page - Page number for pagination (default: 1)
+ * @param {number} pageSize - Number of items per page (default: 50)
+ * @returns {Promise<Object>} - JSON result from the API
  */
-export async function listSpotifyLibTracks(page = 1, pageSize = 50) {
-  console.log("listSpotifyLibTracks (client-side)");
-  
-  try {
-    // Get the base URL from environment
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    if (!baseUrl) {
-      throw new Error("API base URL is not configured");
-    }
-    
-    // Get auth token - assuming stored in localStorage or similar
-    // This would need to be adapted to how your frontend manages tokens
-    const token = localStorage.getItem("spotify_access_token");
-    if (!token) {
-      return {
-        success: false,
-        error: {
-          type: "auth",
-          code: "unauthorized",
-          message: "Authentication required",
-        },
-      };
-    }
-    
-    // Make authenticated request to the API
-    const response = await fetch(`${baseUrl}/library/uploaded/?page=${page}&pageSize=${pageSize}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    
-    if (!response.ok) {
-      if (response.status === 401) {
-        return {
-          success: false,
-          error: {
-            type: "auth",
-            code: "unauthorized",
-            message: "Authentication required",
-          },
-        };
-      }
-      
-      throw new Error(`API request failed with status ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    // Match the format that withAuthProtection would have returned
-    return {
-      success: true,
-      data: data,
-    };
-  } catch (error) {
-    console.error("Error fetching Spotify tracks:", error);
-    throw error;
-  }
+async function listSpotifyLibTracksImpl(authFetch, page = 1, pageSize = 50) {
+  console.log("listSpotifyLibTracksImpl (client-side)");
+
+  // Use the same endpoint pattern as the server implementation
+  const response = await authFetch(`library/uploaded/?page=${page}&pageSize=${pageSize}`);
+  return response.json();
 }
+
+// Wrap with client-side auth protection - handles session check, errors, etc.
+export const listSpotifyLibTracks = withAuthProtection(listSpotifyLibTracksImpl);
