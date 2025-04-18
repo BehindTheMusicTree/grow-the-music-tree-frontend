@@ -1,15 +1,13 @@
 "use client";
 
-import BasePopup from "./BasePopup";
 import { FaSpotify } from "react-icons/fa";
 import PropTypes from "prop-types";
 import Button from "@components/ui/Button";
-import { PopupTitle } from "../PopupTitle";
 
 export default function SpotifyAuthPopup({ onAuthenticate, className = "" }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="popup-title"
@@ -21,7 +19,7 @@ export default function SpotifyAuthPopup({ onAuthenticate, className = "" }) {
             Connect to Spotify
           </h3>
         </div>
-        
+
         {/* Green content area */}
         <div className="bg-green-500 p-6">
           <div className="flex flex-col items-center space-y-8">

@@ -7,7 +7,7 @@ import Button from "@components/ui/Button";
 export function PopupTitle({ title, onClose, isDismissable }) {
   return (
     <div className="flex items-center justify-between">
-      <h3 id="popup-title" className="text-gray-600">
+      <h3 id="popup-title" className="text-gray-100 bg-black/50">
         {title}
       </h3>
       {isDismissable && (
