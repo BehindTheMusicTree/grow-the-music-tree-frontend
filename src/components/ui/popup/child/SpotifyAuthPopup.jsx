@@ -5,13 +5,13 @@ import { FaSpotify } from "react-icons/fa";
 import PropTypes from "prop-types";
 import Button from "@components/ui/Button";
 
-export default function SpotifyAuthPopup({ message, onAuthenticate, className = "" }) {
+export default function SpotifyAuthPopup({ onAuthenticate, className = "" }) {
   return (
     <BasePopup title="Connect to Spotify" className={`max-w-md ${className}`}>
       <div className="flex flex-col items-center space-y-8 py-4">
         <FaSpotify className="text-[#1DB954] text-7xl" />
         <div className="space-y-3 text-center">
-          <p className="text-xl font-medium text-gray-800">{message}</p>
+          <p className="text-xl font-medium text-gray-800">Connect with Spotify</p>
           <p className="text-sm text-gray-500">Access your Spotify library and playlists seamlessly</p>
         </div>
         <Button
