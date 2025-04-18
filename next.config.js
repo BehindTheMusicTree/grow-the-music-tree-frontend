@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   // Configure webpack to handle the special imports and disable minimization
   webpack: (config, { isServer }) => {
     // Disable minimization for both client and server bundles
