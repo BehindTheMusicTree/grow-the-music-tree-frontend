@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 
 const SessionContext = createContext();
 
@@ -37,14 +37,14 @@ export const SessionProvider = ({ children }) => {
     setStatus("idle");
   }, []);
 
-  const updateSession = (newSession) => {
+  const updateSession = useCallback((newSession) => {
     if (newSession) {
       localStorage.setItem("session", JSON.stringify(newSession));
     } else {
       localStorage.removeItem("session");
     }
     setSession(newSession);
-  };
+  }, []);
 
   const value = {
     data: session,

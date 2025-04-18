@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
+
 import { useSession } from "@contexts/SessionContext";
 import { exchangeSpotifyCode } from "@lib/api-service/spotify-auth";
 
@@ -52,20 +53,18 @@ export const SpotifyAuthProvider = ({ children }) => {
     window.location.href = `${SPOTIFY_AUTH_URL}?${params.toString()}`;
   };
 
-  const handleCallback = async (code) => {
-    try {
+  const handleCallback = useCallback(
+    async (code) => {
+      console.log("handleCallback called", { code });
       const data = await exchangeSpotifyCode(code);
-
       updateSession({
         accessToken: data.access_token,
         refreshToken: data.refresh_token,
         expiresAt: data.expires_at,
       });
-    } catch (error) {
-      console.error("Failed to exchange Spotify code:", error);
-      throw error;
-    }
-  };
+    },
+    [updateSession]
+  );
 
   const logout = () => {
     updateSession(null);

@@ -99,8 +99,13 @@ export function ConnectivityErrorProvider({ children }) {
 
     // Handle unhandled rejections (catches server action errors)
     const handleUnhandledRejection = (event) => {
-      console.log("Unhandled rejection caught by ConnectivityErrorProvider:", event.reason);
-      handleConnectivityError(event.reason);
+      const error = event.reason;
+      // Skip fetch-related errors as they're handled by the fetch interceptor
+      if (error?.name === "TypeError" && error?.message === "Failed to fetch") {
+        return;
+      }
+      console.log("Unhandled rejection caught by ConnectivityErrorProvider:", error);
+      handleConnectivityError(error);
     };
 
     window.addEventListener("unhandledrejection", handleUnhandledRejection);

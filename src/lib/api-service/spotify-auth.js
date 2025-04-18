@@ -21,7 +21,7 @@ export function getSpotifyAuthUrl() {
 }
 
 export async function exchangeSpotifyCode(code) {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/spotify`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}auth/spotify`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
