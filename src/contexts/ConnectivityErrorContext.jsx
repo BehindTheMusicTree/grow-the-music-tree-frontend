@@ -10,6 +10,7 @@ const ConnectivityErrorType = {
   NONE: "none",
   AUTH: "auth",
   NETWORK: "network",
+  INTERNAL: "internal",
 };
 
 export function ConnectivityErrorProvider({ children }) {
@@ -29,6 +30,12 @@ export function ConnectivityErrorProvider({ children }) {
     ) {
       console.log("Auth error detected");
       setConnectivityError({ type: ConnectivityErrorType.AUTH, message: "Please log in to continue" });
+      return;
+    }
+
+    if (error?.name === "InternalServerError" || error?.status === 500) {
+      console.log("Internal error detected");
+      setConnectivityError({ type: ConnectivityErrorType.INTERNAL, message: "An internal error occured" });
       return;
     }
 
