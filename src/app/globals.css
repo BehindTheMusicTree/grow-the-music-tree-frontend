@@ -24,19 +24,11 @@
   border: 3px solid var(--primary);
 }
 
-#root {
-  width: 100%;
-}
-
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   font-size: 14px;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -47,24 +39,20 @@
   --secondary: #85c1e9;
 }
 
-#root {
-  color: #213547;
-  background-color: #ffffff;
-  width: 100%;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
 body {
   margin: 0;
   width: 100%;
   min-width: 320px;
   min-height: 100vh;
   display: flex;
+  color: #213547;
+  background-color: #ffffff;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
 }
 
 h1 {
