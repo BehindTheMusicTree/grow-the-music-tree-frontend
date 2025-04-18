@@ -1,4 +1,4 @@
-import { withAuthProtection } from "@lib/auth/auth-api";
+import { withAuthProtection } from "@hooks/useAuthenticatedFetch";
 
 // List tracks with authFetch
 async function listUploadedTracksImpl(authFetch, page = 1, pageSize = 50) {

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { withAuthProtection } from "@lib/auth/auth-api";
+import { withAuthProtection } from "@hooks/useAuthenticatedFetch";
 
 /**
  * Handler for downloading track files

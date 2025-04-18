@@ -62,14 +62,14 @@ export function createAuthFetch(session) {
  * @param {Function} clientAction - The client action to wrap with authentication
  * @returns {Function} - Wrapped function that handles auth and error standardization
  */
-export function useAuthProtection(clientAction) {
+export function useAuthenticatedFetch(clientAction) {
   // Get connectivity error handlers from context
   const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
 
   // Return the wrapped function
   return async (...args) => {
     try {
-      console.log("useAuthProtection (hook version)");
+      console.log("useAuthenticatedFetch");
       // For client-side, we need to import getSession dynamically to avoid
       // server-side import issues
       const { getSession } = await import("next-auth/react");

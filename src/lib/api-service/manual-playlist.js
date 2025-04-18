@@ -1,4 +1,4 @@
-import { withAuthProtection } from "@lib/auth/auth-api";
+import { withAuthProtection } from "@hooks/useAuthenticatedFetch";
 
 async function listManualPlaylistsImpl(authFetch, page = 1, pageSize = 50) {
   const response = await authFetch(`manual-playlists/?page=${page}&pageSize=${pageSize}`);

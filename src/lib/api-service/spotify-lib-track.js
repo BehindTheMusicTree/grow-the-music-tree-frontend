@@ -1,6 +1,6 @@
 "use client";
 
-import { withAuthProtection } from "@lib/auth/auth-api";
+import { withAuthProtection } from "@hooks/useAuthenticatedFetch";
 
 /**
  * Client-side Spotify API service
