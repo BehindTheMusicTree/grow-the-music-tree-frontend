@@ -19,9 +19,9 @@ function Popup({ type, content, onClose }) {
     case "networkError":
       return <NetworkErrorPopup {...content} onClose={onClose} />;
     case "authError":
-      return <SpotifyAuthErrorPopup {...content} onClose={onClose} />;
+      return <SpotifyAuthErrorPopup {...content} />;
     case "spotifyAuth":
-      return <SpotifyAuthPopup {...content} onClose={onClose} />;
+      return <SpotifyAuthPopup {...content} />;
     case "genreDeletion":
       return <GenreDeletionPopup {...content} onClose={onClose} />;
     case "trackUpload":

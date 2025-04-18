@@ -16,7 +16,7 @@ export function PopupProvider({ children }) {
   }, []);
 
   return (
-    <PopupContext.Provider value={{ showPopup, hidePopup }}>
+    <PopupContext.Provider value={{ showPopup, hidePopup, activePopup }}>
       {children}
       {activePopup && <Popup type={activePopup.type} content={activePopup.content} onClose={hidePopup} />}
     </PopupContext.Provider>
