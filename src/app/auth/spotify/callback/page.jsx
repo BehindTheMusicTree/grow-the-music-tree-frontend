@@ -3,11 +3,13 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSpotifyAuth } from "@contexts/SpotifyAuthContext";
+import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 
 export default function SpotifyCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { handleCallback } = useSpotifyAuth();
+  const { setConnectivityError, ConnectivityErrorType, ErrorCode } = useConnectivityError();
 
   useEffect(() => {
     const code = searchParams.get("code");
@@ -22,12 +24,17 @@ export default function SpotifyCallback() {
         router.push("/");
       } catch (error) {
         console.error("Failed to exchange Spotify code:", error);
-        router.push("/?error=auth_failed");
+        setConnectivityError({
+          type: ConnectivityErrorType.SPOTIFY_AUTH_ERROR,
+          message: ErrorCode.getMessage(ErrorCode.SPOTIFY_AUTH_ERROR),
+          code: ErrorCode.SPOTIFY_AUTH_ERROR,
+        });
+        router.push("/");
       }
     };
 
     handleAuth();
-  }, [searchParams, router, handleCallback]);
+  }, [searchParams, router, handleCallback, setConnectivityError, ConnectivityErrorType, ErrorCode]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">
