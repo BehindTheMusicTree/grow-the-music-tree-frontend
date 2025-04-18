@@ -17,12 +17,12 @@ import { useAuthenticatedFetch } from "@hooks/useAuthenticatedFetch";
 async function listSpotifyLibTracksImpl(authFetch, page = 1, pageSize = 50) {
   console.log("fetchSpotifyLibTracks (client API service)");
 
-  const response = await authFetch(`library/uploaded/?page=${page}&pageSize=${pageSize}`);
+  const response = await authFetch(`spotify-lib-tracks/?page=${page}&pageSize=${pageSize}`);
   return response.json();
 }
 
-// Export the wrapped API function
-export const listSpotifyLibTracks = useAuthenticatedFetch(listSpotifyLibTracksImpl);
+// Export the pure implementations
+export { listSpotifyLibTracksImpl };
 
 /**
  * Additional Spotify API functions can be added here

@@ -1,40 +1,28 @@
 import { useAuthenticatedFetch } from "@hooks/useAuthenticatedFetch";
 
-// List tracks with authFetch
+// Pure API service implementations
 async function listUploadedTracksImpl(authFetch, page = 1, pageSize = 50) {
-  const response = await authFetch(`library/uploaded/?page=${page}&pageSize=${pageSize}`);
+  const response = await authFetch(`uploaded-tracks/?page=${page}&pageSize=${pageSize}`);
   return response.json();
 }
 
-// Upload track with authFetch
-async function uploadTrackImpl(authFetch, formData) {
-  const response = await authFetch("library/uploaded/", {
+async function uploadTrackImpl(authFetch, trackData) {
+  const response = await authFetch("uploaded-tracks/", {
     method: "POST",
-    body: formData,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(trackData),
   });
-
   return response.json();
 }
 
-// Update track with authFetch
-async function updateUploadedTrackImpl(authFetch, uploadedTrackUuid, uploadedTrackData) {
-  const transformedData = {
-    ...uploadedTrackData,
-    artistsNames: uploadedTrackData.artistName ? [uploadedTrackData.artistName] : uploadedTrackData.artistsNames,
-    artistName: undefined,
-    genre: uploadedTrackData.genre?.uuid || uploadedTrackData.genreName,
-    genreName: undefined,
-  };
-
-  const response = await authFetch(`library/uploaded/${uploadedTrackUuid}/`, {
+async function updateUploadedTrackImpl(authFetch, trackId, trackData) {
+  const response = await authFetch(`uploaded-tracks/${trackId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(transformedData),
+    body: JSON.stringify(trackData),
   });
-
   return response.json();
 }
 
-export const listUploadedTracks = useAuthenticatedFetch(listUploadedTracksImpl);
-export const uploadTrack = useAuthenticatedFetch(uploadTrackImpl);
-export const updateUploadedTrack = useAuthenticatedFetch(updateUploadedTrackImpl);
+// Export the pure implementations
+export { listUploadedTracksImpl, uploadTrackImpl, updateUploadedTrackImpl };

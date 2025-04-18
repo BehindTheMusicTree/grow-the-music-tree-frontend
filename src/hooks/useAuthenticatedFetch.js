@@ -57,61 +57,29 @@ export function createAuthFetch(session) {
 }
 
 /**
- * Hook that provides an auth-protected function wrapper
+ * Hook that wraps an API service function with authentication and error handling
  *
- * @param {Function} clientAction - The client action to wrap with authentication
- * @returns {Function} - Wrapped function that handles auth and error standardization
+ * @param {Function} serviceFn - The API service function to wrap
+ * @returns {Function} - Wrapped function that handles auth and errors
  */
-export function useAuthenticatedFetch(clientAction) {
-  // Get connectivity error handlers from context
+export function useAuthenticatedFetch(serviceFn) {
   const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
 
-  // Return the wrapped function
   return async (...args) => {
-    try {
-      console.log("useAuthenticatedFetch");
-      // For client-side, we need to import getSession dynamically to avoid
-      // server-side import issues
-      const { getSession } = await import("next-auth/react");
-      const session = await getSession();
-      console.log("session", session);
+    const { getSession } = await import("next-auth/react");
+    const session = await getSession();
 
-      if (!session) {
-        console.log("No session, setting auth error");
-        setConnectivityError({
-          type: ConnectivityErrorType.AUTH,
-          message: "Please log in to continue",
-          code: "AU001",
-        });
-        return { success: false, error: { message: "Authentication required" } };
-      }
-
-      // Create authenticated fetch helper
-      const authFetch = createAuthFetch(session);
-
-      // Call the original action with authFetch and args
-      const result = await clientAction(authFetch, ...args);
-
-      // Wrap successful result
-      return {
-        success: true,
-        data: result,
-      };
-    } catch (error) {
-      // Handle auth errors from external APIs
-      if (error?.message === "Unauthorized" || error?.status === 401) {
-        console.log("Caught auth error from external API");
-        setConnectivityError({
-          type: ConnectivityErrorType.AUTH,
-          message: "Please log in to continue",
-          code: "AU001",
-        });
-        return { success: false, error: { message: "Authentication required" } };
-      }
-
-      // Pass through other errors
-      console.error("Client action error:", error);
-      throw error;
+    if (!session) {
+      setConnectivityError({
+        type: ConnectivityErrorType.AUTH,
+        message: "Please log in to continue",
+        code: "AU001",
+      });
+      return { success: false, error: { message: "Authentication required" } };
     }
+
+    const authFetch = createAuthFetch(session);
+    const result = await serviceFn(authFetch, ...args);
+    return { success: true, data: result };
   };
 }

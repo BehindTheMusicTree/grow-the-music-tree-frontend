@@ -1,12 +1,8 @@
 import { useAuthenticatedFetch } from "@hooks/useAuthenticatedFetch";
 
+// Pure API service implementations
 async function listManualPlaylistsImpl(authFetch, page = 1, pageSize = 50) {
   const response = await authFetch(`manual-playlists/?page=${page}&pageSize=${pageSize}`);
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch genre playlists");
-  }
-
   return response.json();
 }
 
@@ -16,13 +12,8 @@ async function createManualPlaylistImpl(authFetch, playlistData) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(playlistData),
   });
-
-  if (!response.ok) {
-    throw new Error("Failed to create manual playlist");
-  }
-
   return response.json();
 }
 
-export const listManualPlaylists = useAuthenticatedFetch(listManualPlaylistsImpl);
-export const createManualPlaylist = useAuthenticatedFetch(createManualPlaylistImpl);
+// Export the pure implementations
+export { listManualPlaylistsImpl, createManualPlaylistImpl };
