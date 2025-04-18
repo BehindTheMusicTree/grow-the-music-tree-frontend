@@ -8,7 +8,7 @@ import {
   listUploadedTracks as listUploadedTracksApi,
   uploadTrack as uploadTrackApi,
   updateUploadedTrack as updateUploadedTrackApi,
-} from "@lib/api-service/uploaded-track";
+} from "@lib/api-service-service/uploaded-track";
 
 const UploadedTrackContext = createContext();
 

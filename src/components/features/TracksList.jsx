@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { listUploadedTracks } from "@lib/api-service/uploaded-track";
+import { listUploadedTracks } from "@lib/api-service-service/uploaded-track";
 
 export default function TracksList({ initialData }) {
   const router = useRouter();

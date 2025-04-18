@@ -1,8 +1,5 @@
 "use client";
 
-import { getServerSession } from "next-auth";
-import { authOptions } from "@lib/auth/auth-spotify";
-
 /**
  * Standard response object for authentication errors
  * @typedef {Object} AuthResponse
@@ -69,49 +66,6 @@ export function createAuthFetch(session) {
     }
 
     return response;
-  };
-}
-
-/**
- * Server-side wrapper that handles auth and provides standard response format
- * Returns response objects instead of throwing errors for auth issues
- */
-export function withAuthProtection(serverAction) {
-  return async (...args) => {
-    console.log("withAuthProtection");
-    console.log(args);
-    try {
-      // Check authentication using authOptions
-      const session = await getServerSession(authOptions);
-
-      if (!session) {
-        // Return auth error response instead of throwing
-        console.log("Not authenticated, returning auth error response");
-        return createAuthErrorResponse();
-      }
-
-      // Create authenticated fetch helper
-      const authFetch = createAuthFetch(session);
-
-      // Call the original action with authFetch and args
-      const result = await serverAction(authFetch, ...args);
-
-      // Wrap successful result
-      return {
-        success: true,
-        data: result,
-      };
-    } catch (error) {
-      // Handle auth errors from external APIs
-      if (error?.message === "Unauthorized" || error?.status === 401) {
-        console.log("Caught auth error from external API");
-        return createAuthErrorResponse();
-      }
-
-      // Pass through other errors
-      console.error("Server action error:", error);
-      throw error;
-    }
   };
 }
 
