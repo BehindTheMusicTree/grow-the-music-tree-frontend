@@ -57,8 +57,7 @@ export function createAuthFetch(session) {
 }
 
 /**
- * Client-side hook that provides an auth-protected function wrapper
- * Only use this inside React components
+ * Hook that provides an auth-protected function wrapper
  *
  * @param {Function} clientAction - The client action to wrap with authentication
  * @returns {Function} - Wrapped function that handles auth and error standardization
