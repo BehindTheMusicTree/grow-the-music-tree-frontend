@@ -9,12 +9,13 @@ import InvalidInputPopup from "./child/InvalidInputPopup";
 import SpotifyAuthPopup from "./child/SpotifyAuthPopup";
 import SpotifyAuthErrorPopup from "./child/SpotifyAuthErrorPopup";
 import UploadedTrackEditionPopup from "./child/UploadedTrackEditionPopup";
-import NonAuthErrorPopup from "./child/NonAuthErrorPopup";
+import InternalErrorPopup from "./child/InternalErrorPopup";
 
 function Popup({ type, content, onClose }) {
   switch (type) {
     case "networkError":
-      return <NonAuthErrorPopup {...content} onClose={onClose} />;
+    case "error": // Handle both network and general errors
+      return <InternalErrorPopup {...content} onClose={onClose} />;
     case "authError":
       return <SpotifyAuthErrorPopup {...content} onClose={onClose} />;
     case "spotifyAuth":
