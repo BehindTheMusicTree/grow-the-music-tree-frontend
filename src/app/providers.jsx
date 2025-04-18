@@ -25,23 +25,23 @@ export default function Providers({ children }) {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
-        <PopupProvider>
-          <ConnectivityErrorProvider>
-            <UploadedTrackProvider>
-              <GenrePlaylistProvider>
-                <PlayerProvider>
-                  <TrackListProvider>
-                    <SpotifyAuthProvider>
+        <ConnectivityErrorProvider>
+          <SpotifyAuthProvider>
+            <PopupProvider>
+              <UploadedTrackProvider>
+                <GenrePlaylistProvider>
+                  <PlayerProvider>
+                    <TrackListProvider>
                       <SpotifyLibTracksProvider>
                         <TrackListSidebarVisibilityProvider>{children}</TrackListSidebarVisibilityProvider>
                       </SpotifyLibTracksProvider>
-                    </SpotifyAuthProvider>
-                  </TrackListProvider>
-                </PlayerProvider>
-              </GenrePlaylistProvider>
-            </UploadedTrackProvider>
-          </ConnectivityErrorProvider>
-        </PopupProvider>
+                    </TrackListProvider>
+                  </PlayerProvider>
+                </GenrePlaylistProvider>
+              </UploadedTrackProvider>
+            </PopupProvider>
+          </SpotifyAuthProvider>
+        </ConnectivityErrorProvider>
       </SessionProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
