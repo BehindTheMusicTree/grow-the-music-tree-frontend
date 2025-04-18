@@ -19,7 +19,7 @@ export default function SpotifyAuthPopup({ message, onAuthenticate, className = 
           className="bg-[#1DB954] hover:bg-[#1DB954]/90 text-white w-full max-w-xs transform transition-all duration-200 hover:scale-[1.02] shadow-lg hover:shadow-xl"
         >
           <FaSpotify className="mr-2 text-lg" />
-          Connect with Spotify
+          Music Tree requires Spotify authentication
         </Button>
       </div>
     </BasePopup>
