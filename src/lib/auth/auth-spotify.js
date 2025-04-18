@@ -4,13 +4,13 @@ import SpotifyProvider from "next-auth/providers/spotify";
 export const authOptions = {
   providers: [
     SpotifyProvider({
-      clientId: process.env.SPOTIFY_CLIENT_ID,
+      clientId: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
       // No client secret - we'll handle token exchange in our API
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET, // Required by Provider but won't be used
+      clientSecret: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET, // Required by Provider but won't be used
       authorization: {
         params: {
-          scope: process.env.SPOTIFY_SCOPE,
-          redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
+          scope: process.env.NEXT_PUBLIC_SPOTIFY_SCOPE,
+          redirect_uri: process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI,
         },
       },
     }),
@@ -25,7 +25,7 @@ export const authOptions = {
           },
           body: JSON.stringify({
             code: account.code,
-            redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
+            redirect_uri: process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI,
           }),
         });
 
