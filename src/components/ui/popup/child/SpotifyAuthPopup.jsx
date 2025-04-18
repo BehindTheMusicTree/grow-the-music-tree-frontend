@@ -3,8 +3,11 @@
 import { FaSpotify } from "react-icons/fa";
 import PropTypes from "prop-types";
 import Button from "@components/ui/Button";
+import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 
-export default function SpotifyAuthPopup({ onAuthenticate, className = "" }) {
+export default function SpotifyAuthPopup({ className = "" }) {
+  const handleSpotifyAuth = useSpotifyAuth();
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
@@ -30,7 +33,7 @@ export default function SpotifyAuthPopup({ onAuthenticate, className = "" }) {
               </p>
             </div>
             <Button
-              onClick={onAuthenticate}
+              onClick={handleSpotifyAuth}
               className="bg-black hover:bg-black/80 px-8 py-4 text-white w-fit transform transition-all duration-200 hover:scale-[1.02] shadow-lg hover:shadow-xl relative"
             >
               <div className="flex items-center">
@@ -46,6 +49,5 @@ export default function SpotifyAuthPopup({ onAuthenticate, className = "" }) {
 }
 
 SpotifyAuthPopup.propTypes = {
-  onAuthenticate: PropTypes.func.isRequired,
   className: PropTypes.string,
 };
