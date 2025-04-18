@@ -4,6 +4,7 @@ import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { listGenrePlaylists } from "@lib/api-service/genre-playlist";
+import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
 
 const GenrePlaylistContext = createContext();
 
@@ -24,7 +25,7 @@ export const GenrePlaylistProvider = ({ children }) => {
     error,
   } = useQuery({
     queryKey: ["genrePlaylists"],
-    queryFn: listGenrePlaylists,
+    queryFn: useAuthenticatedApi(listGenrePlaylists),
   });
 
   const value = {
