@@ -8,7 +8,7 @@ const ConnectivityErrorContext = createContext(null);
 
 const ConnectivityErrorType = {
   NONE: "none",
-  AUTH: "auth",
+  AUTH_REQUIRED: "authRequired",
   NETWORK: "network",
   INTERNAL: "internal",
   BAD_REQUEST: "badRequest",
@@ -45,7 +45,7 @@ export function ConnectivityErrorProvider({ children }) {
         });
       } else {
         setConnectivityError({
-          type: ConnectivityErrorType.AUTH,
+          type: ConnectivityErrorType.AUTH_REQUIRED,
           message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED),
           code: ErrorCode.AUTH_REQUIRED,
         });

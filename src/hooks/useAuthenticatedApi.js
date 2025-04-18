@@ -63,7 +63,7 @@ export function useAuthenticatedApi(serviceFn) {
 
       if (!session) {
         setConnectivityError({
-          type: ConnectivityErrorType.AUTH,
+          type: ConnectivityErrorType.AUTH_REQUIRED,
           message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED),
           code: ErrorCode.AUTH_REQUIRED,
         });
@@ -76,7 +76,7 @@ export function useAuthenticatedApi(serviceFn) {
     } catch (error) {
       if (error?.message === "Unauthorized" || error?.status === 401) {
         setConnectivityError({
-          type: ConnectivityErrorType.AUTH,
+          type: ConnectivityErrorType.AUTH_REQUIRED,
           message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED),
           code: ErrorCode.AUTH_REQUIRED,
         });
