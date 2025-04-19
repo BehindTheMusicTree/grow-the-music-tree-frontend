@@ -44,12 +44,6 @@ export default function InternalErrorPopup({ operationErrors, onClose }) {
               {process.env.NEXT_PUBLIC_CONTACT_EMAIL}
             </a>
           </p>
-          <Button
-            onClick={onClose}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
-          >
-            Try Again
-          </Button>
         </div>
       </div>
     </BasePopup>
