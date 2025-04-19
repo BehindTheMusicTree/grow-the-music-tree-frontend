@@ -19,9 +19,22 @@ export default function SpotifyCallback() {
     setIsProcessing(true);
     authAttempted.current = true;
 
-    await handleCallback(code);
-
-    setIsProcessing(false);
+    try {
+      await handleCallback(code);
+    } catch (error) {
+      console.error("Spotify auth error:", error);
+      // Enhanced error logging to help with troubleshooting
+      if (error?.message === "Failed to fetch") {
+        console.error(
+          "Network error detected in Spotify callback. Check if API server is running at:",
+          process.env.NEXT_PUBLIC_API_BASE_URL
+        );
+      }
+      // Re-throw the error so it can be caught by the fetchInterceptor
+      throw error;
+    } finally {
+      setIsProcessing(false);
+    }
   }, [searchParams, handleCallback, isProcessing]);
 
   useEffect(() => {
