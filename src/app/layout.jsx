@@ -22,14 +22,18 @@ function AppContent({ children }) {
   const { showPopup, hidePopup, activePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
   const { connectivityError, clearConnectivityError, ConnectivityErrorType } = useConnectivityError();
-  const hasPopupRef = useRef(false);
+  const currentPopupTypeRef = useRef(null);
 
   useEffect(() => {
-    hasPopupRef.current = activePopup !== null;
+    currentPopupTypeRef.current = activePopup?.type || null;
   }, [activePopup]);
 
   useEffect(() => {
-    if (connectivityError?.type !== ConnectivityErrorType.NONE && !hasPopupRef.current) {
+    if (
+      connectivityError?.type !== ConnectivityErrorType.NONE &&
+      !(currentPopupTypeRef.current in [ConnectivityErrorType.NETWORK, ConnectivityErrorType.INTERNAL]) &&
+      connectivityError?.type !== currentPopupTypeRef.current
+    ) {
       let popupType = "networkError";
       let title = "Network Error";
 
