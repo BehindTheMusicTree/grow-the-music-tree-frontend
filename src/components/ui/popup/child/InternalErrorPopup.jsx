@@ -4,9 +4,9 @@ import BasePopup from "./BasePopup";
 import { AlertCircle } from "lucide-react";
 import PropTypes from "prop-types";
 
-export default function InternalErrorPopup({ title, operationErrors, className = "" }) {
+export default function InternalErrorPopup({ operationErrors }) {
   return (
-    <BasePopup title={title} isDismissable={false} className={`max-w-lg ${className}`}>
+    <BasePopup title={"Internal Error"} isDismissable={false}>
       <div className="space-y-4">
         {operationErrors &&
           operationErrors.map((errorObject, index) => (

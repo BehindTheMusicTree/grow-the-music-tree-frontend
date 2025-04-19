@@ -3,9 +3,9 @@
 import BasePopup from "./BasePopup";
 import PropTypes from "prop-types";
 
-export default function NetworkErrorPopup({ title, className = "" }) {
+export default function NetworkErrorPopup() {
   return (
-    <BasePopup title={title} isDismissable={false} className={`max-w-lg ${className}`}>
+    <BasePopup title={"Network Error"} isDismissable={false}>
       <div className="space-y-4">
         <p>It seems that you are not connected to the internet. Please check your connection and try again.</p>
       </div>

@@ -44,7 +44,6 @@ function AppContent({ children }) {
         connectivityError.type === ConnectivityErrorType.INTERNAL
       ) {
         popupType = "internalError";
-        title = "Internal Error";
       } else if (connectivityError.type === ConnectivityErrorType.NETWORK) {
         popupType = "networkError";
         title = "Network Error";
