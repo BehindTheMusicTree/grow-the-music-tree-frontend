@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 
 import { useSession } from "@contexts/SessionContext";
-import { exchangeSpotifyCode } from "@lib/api-service/spotify-auth";
+import { getApiTokenFromSpotifyCode } from "@lib/api-service/spotify-auth";
 
 const SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize";
 
@@ -56,7 +56,7 @@ export const SpotifyAuthProvider = ({ children }) => {
   const handleCallback = useCallback(
     async (code) => {
       console.log("handleCallback called", { code });
-      const data = await exchangeSpotifyCode(code);
+      const data = await getApiTokenFromSpotifyCode(code);
       updateSession({
         accessToken: data.access_token,
         refreshToken: data.refresh_token,

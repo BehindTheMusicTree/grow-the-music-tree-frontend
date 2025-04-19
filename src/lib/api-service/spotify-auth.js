@@ -20,7 +20,7 @@ export function getSpotifyAuthUrl() {
   return `${SPOTIFY_AUTH_URL}?${params.toString()}`;
 }
 
-export async function exchangeSpotifyCode(code) {
+export async function getApiTokenFromSpotifyCode(code) {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}auth/spotify`, {
     method: "POST",
     headers: {
@@ -32,10 +32,7 @@ export async function exchangeSpotifyCode(code) {
     }),
   });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to exchange Spotify code");
-  }
-
+  // Let the fetchInterceptor handle non-OK responses naturally
+  // by not throwing a custom error here
   return response.json();
 }

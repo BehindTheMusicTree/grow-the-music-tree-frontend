@@ -34,8 +34,7 @@ function AppContent({ children }) {
       !(currentPopupTypeRef.current in [ConnectivityErrorType.NETWORK, ConnectivityErrorType.INTERNAL]) &&
       connectivityError?.type !== currentPopupTypeRef.current
     ) {
-      let popupType = "networkError";
-      let title = "Network Error";
+      let popupType = "";
 
       if (connectivityError.type === ConnectivityErrorType.AUTH_REQUIRED) {
         popupType = "authRequired";
@@ -46,11 +45,9 @@ function AppContent({ children }) {
         popupType = "internalError";
       } else if (connectivityError.type === ConnectivityErrorType.NETWORK) {
         popupType = "networkError";
-        title = "Network Error";
       }
 
       showPopup(popupType, {
-        title,
         message: connectivityError.message,
         debugCode: connectivityError.code,
         onClose: () => {
