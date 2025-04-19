@@ -20,9 +20,7 @@ export function getSpotifyAuthUrl() {
   return `${SPOTIFY_AUTH_URL}?${params.toString()}`;
 }
 
-export async function exchangeSpotifyCode(code) {
-  // This fetch call will be intercepted by the fetchInterceptor
-  // The interceptor will throw standardized errors for non-OK responses
+export async function getApiTokenFromSpotifyCode(code) {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}auth/spotify`, {
     method: "POST",
     headers: {
