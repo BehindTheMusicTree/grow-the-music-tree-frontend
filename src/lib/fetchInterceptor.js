@@ -23,6 +23,7 @@ export const setupFetchInterceptor = (handleError) => {
     };
 
     try {
+      console.log(`Fetch request to: ${url}`);
       const response = await originalFetch(...args);
 
       // Handle response errors
@@ -50,11 +51,25 @@ export const setupFetchInterceptor = (handleError) => {
 
       return response;
     } catch (error) {
+      console.log("Fetch interceptor caught error:", error);
+
+      // Specifically handle network errors like ERR_CONNECTION_REFUSED
+      if (error instanceof TypeError && error.message === "Failed to fetch") {
+        console.log("Network error detected: Connection likely refused");
+        // Enhance the error with additional metadata
+        error.isNetworkError = true;
+        error.errorType = "NETWORK_CONNECTION_ERROR";
+        error.friendlyMessage =
+          "Unable to connect to the server. Please check your network or the server might be down.";
+      }
+
       // If it's not our error object, add the request details
       if (!error.request) {
         error.request = requestDetails;
       }
+
       // Pass the error to the centralized handler
+      console.log("Passing error to central handler:", error);
       handleError(error);
       throw error; // Re-throw to maintain fetch error behavior
     }

@@ -25,6 +25,21 @@ export function ConnectivityErrorProvider({ children }) {
   const handleConnectivityError = useCallback((error) => {
     console.log("ConnectivityErrorProvider handling error:", error);
 
+    // Handle network errors first
+    if (
+      (error?.name === "TypeError" && error?.message === "Failed to fetch") ||
+      error?.isNetworkError === true ||
+      error?.errorType === "NETWORK_CONNECTION_ERROR"
+    ) {
+      console.log("Network error detected by ConnectivityErrorProvider");
+      setConnectivityError({
+        type: ConnectivityErrorType.NETWORK,
+        message: error?.friendlyMessage || ErrorCode.getMessage(ErrorCode.NETWORK_ERROR),
+        code: ErrorCode.NETWORK_ERROR,
+      });
+      return;
+    }
+
     // Handle session expiration and auth errors
     if (
       error?.name === "AuthenticationError" ||
@@ -50,16 +65,6 @@ export function ConnectivityErrorProvider({ children }) {
           code: ErrorCode.AUTH_REQUIRED,
         });
       }
-      return;
-    }
-
-    // Handle network errors
-    if (error?.name === "TypeError" && error?.message === "Failed to fetch") {
-      setConnectivityError({
-        type: ConnectivityErrorType.NETWORK,
-        message: ErrorCode.getMessage(ErrorCode.NETWORK_ERROR),
-        code: ErrorCode.NETWORK_ERROR,
-      });
       return;
     }
 
@@ -100,11 +105,13 @@ export function ConnectivityErrorProvider({ children }) {
     // Handle unhandled rejections (catches server action errors)
     const handleUnhandledRejection = (event) => {
       const error = event.reason;
-      // Skip fetch-related errors as they're handled by the fetch interceptor
-      if (error?.name === "TypeError" && error?.message === "Failed to fetch") {
-        return;
-      }
-      console.log("Unhandled rejection caught by ConnectivityErrorProvider:", error);
+
+      // Process all errors, including fetch errors, to ensure nothing is missed
+      console.log("ConnectivityErrorProvider: Processing unhandled rejection through fallback handler");
+
+      // Note: We don't need to enhance network errors as the handleConnectivityError function
+      // already checks for "TypeError" with "Failed to fetch" message
+
       handleConnectivityError(error);
     };
 
