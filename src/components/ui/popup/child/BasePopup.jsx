@@ -13,6 +13,7 @@ export default function BasePopup({
   isDismissable = true,
   className = "",
   type = "default", // default | fullscreen | bottom-sheet | alert
+  icon,
 }) {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -40,7 +41,7 @@ export default function BasePopup({
       aria-labelledby="popup-title"
     >
       <div className={getPopupClasses()} onClick={(e) => e.stopPropagation()}>
-        <PopupTitle title={title} onClose={onClose} isDismissable={isDismissable} />
+        <PopupTitle title={title} onClose={onClose} isDismissable={isDismissable} icon={icon} />
         <div className="mt-4">{children}</div>
       </div>
     </div>
