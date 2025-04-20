@@ -20,7 +20,7 @@ export function getSpotifyAuthUrl() {
   return `${SPOTIFY_AUTH_URL}?${params.toString()}`;
 }
 
-export async function getApiTokenFromSpotifyCode(code) {
+export async function authenticateWithSpotifyCode(code) {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}auth/spotify/`, {
     method: "POST",
     headers: {
