@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 
 import { useSession } from "@contexts/SessionContext";
-import { getApiTokenFromSpotifyCode } from "@lib/api-service/spotify-auth";
+import { authenticateWithSpotifyCode } from "@lib/api-service/spotify-auth";
 
 const SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize";
 
@@ -23,6 +23,7 @@ export const SpotifyAuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
   const [expiresAt, setExpiresAt] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     if (session?.accessToken) {
@@ -30,11 +31,13 @@ export const SpotifyAuthProvider = ({ children }) => {
       setAccessToken(session.accessToken);
       setRefreshToken(session.refreshToken);
       setExpiresAt(session.expiresAt);
+      setUser(session.user);
     } else {
       setIsAuthenticated(false);
       setAccessToken(null);
       setRefreshToken(null);
       setExpiresAt(null);
+      setUser(null);
     }
   }, [session]);
 
@@ -56,11 +59,12 @@ export const SpotifyAuthProvider = ({ children }) => {
   const handleCallback = useCallback(
     async (code) => {
       console.log("handleCallback called", { code });
-      const data = await getApiTokenFromSpotifyCode(code);
+      const data = await authenticateWithSpotifyCode(code);
       updateSession({
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token,
-        expiresAt: data.expires_at,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        expiresAt: data.expiresAt,
+        spotifyUser: data.user,
       });
     },
     [updateSession]
@@ -75,6 +79,7 @@ export const SpotifyAuthProvider = ({ children }) => {
     accessToken,
     refreshToken,
     expiresAt,
+    user,
     status,
     handleSpotifyAuth,
     handleCallback,
