@@ -3,7 +3,10 @@
 import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { listUploadedTracks, updateUploadedTrack as updateUploadedTrackApi } from "@lib/api-service/uploaded-track";
+import {
+  listUploadedTracks,
+  updateUploadedTrack as updateUploadedTrackApi,
+} from "@lib/music-tree-api-service/uploaded-track";
 import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
 const UploadedTrackContext = createContext();
 

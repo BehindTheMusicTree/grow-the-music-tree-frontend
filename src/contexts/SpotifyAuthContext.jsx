@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 
 import { useSession } from "@contexts/SessionContext";
-import { authenticateWithSpotifyCode } from "@lib/api-service/spotify-auth";
+import { authenticateWithSpotifyCode } from "@lib/music-tree-api-service/spotify-auth";
 
 const SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize";
 
