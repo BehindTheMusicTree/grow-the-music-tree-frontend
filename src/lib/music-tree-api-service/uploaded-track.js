@@ -5,7 +5,7 @@ export async function listUploadedTracks(authFetch, page = 1, pageSize = 50) {
     page: page.toString(),
     pageSize: pageSize.toString(),
   });
-  const response = await authFetch(`library/uploaded-tracks/?${params.toString()}`);
+  const response = await authFetch(`library/uploaded-tracks?${params.toString()}`);
   return response.json();
 }
 
