@@ -1,7 +1,11 @@
 "use client";
 
-export async function listUploadedTracks(page = 1, pageSize = 50) {
-  const response = await fetch(`library/uploaded-tracks/?page=${page}&pageSize=${pageSize}`);
+export async function listUploadedTracks(authFetch, page = 1, pageSize = 50) {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString(),
+  });
+  const response = await authFetch(`library/uploaded-tracks/?${params.toString()}`);
   return response.json();
 }
 
