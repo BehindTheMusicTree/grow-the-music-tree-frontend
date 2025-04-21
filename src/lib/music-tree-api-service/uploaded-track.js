@@ -9,8 +9,8 @@ export async function listUploadedTracks(authFetch, page = 1, pageSize = 50) {
   return response.json();
 }
 
-export async function uploadTrack(trackData) {
-  const response = await fetch("library/uploaded-tracks/", {
+export async function uploadTrack(authFetch, trackData) {
+  const response = await authFetch("library/uploaded-tracks/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(trackData),
@@ -18,8 +18,8 @@ export async function uploadTrack(trackData) {
   return response.json();
 }
 
-export async function updateUploadedTrack(trackId, trackData) {
-  const response = await fetch(`library/uploaded-tracks/${trackId}`, {
+export async function updateUploadedTrack(authFetch, trackId, trackData) {
+  const response = await authFetch(`library/uploaded-tracks/${trackId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(trackData),
