@@ -1,8 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
-
 import { useSession } from "@contexts/SessionContext";
+import { createContext, useContext, useCallback } from "react";
+
 import { authenticateWithSpotifyCode } from "@lib/music-tree-api-service/spotify-auth";
 
 const SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize";
@@ -18,29 +18,7 @@ export const useSpotifyAuth = () => {
 };
 
 export const SpotifyAuthProvider = ({ children }) => {
-  const { data: session, status, updateSession } = useSession();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [accessToken, setAccessToken] = useState(null);
-  const [refreshToken, setRefreshToken] = useState(null);
-  const [expiresAt, setExpiresAt] = useState(null);
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    if (session?.accessToken) {
-      setIsAuthenticated(true);
-      setAccessToken(session.accessToken);
-      setRefreshToken(session.refreshToken);
-      setExpiresAt(session.expiresAt);
-      setUser(session.user);
-    } else {
-      setIsAuthenticated(false);
-      setAccessToken(null);
-      setRefreshToken(null);
-      setExpiresAt(null);
-      setUser(null);
-    }
-  }, [session]);
-
+  const { updateSession } = useSession();
   const handleSpotifyAuth = () => {
     if (!process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || !process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI) {
       throw new Error("Spotify configuration is missing. Please check your environment variables.");
@@ -88,12 +66,6 @@ export const SpotifyAuthProvider = ({ children }) => {
   };
 
   const value = {
-    isAuthenticated,
-    accessToken,
-    refreshToken,
-    expiresAt,
-    user,
-    status,
     handleSpotifyAuth,
     handleCallback,
     logout,
