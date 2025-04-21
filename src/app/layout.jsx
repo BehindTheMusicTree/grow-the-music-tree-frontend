@@ -25,8 +25,6 @@ function AppContent({ children }) {
   const currentConnectivityErrorTypeRef = useRef(null);
 
   useEffect(() => {
-    console.log("currentPopupTypeRef.current", currentConnectivityErrorTypeRef.current);
-    console.log("connectivityError type", connectivityError?.type);
     if (
       connectivityError?.type !== ConnectivityErrorType.NONE &&
       ![ConnectivityErrorType.NETWORK, ConnectivityErrorType.INTERNAL].includes(
