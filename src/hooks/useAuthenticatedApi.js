@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback } from "react";
 import { useSession } from "@contexts/SessionContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { ErrorCode } from "@contexts/error-codes";
