@@ -22,17 +22,17 @@ function AppContent({ children }) {
   const { showPopup, hidePopup, activePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
   const { connectivityError, clearConnectivityError, ConnectivityErrorType } = useConnectivityError();
-  const currentPopupTypeRef = useRef(null);
+  const currentConnectivityErrorTypeRef = useRef(null);
 
   useEffect(() => {
-    currentPopupTypeRef.current = activePopup?.type || null;
-  }, [activePopup]);
-
-  useEffect(() => {
+    console.log("currentPopupTypeRef.current", currentConnectivityErrorTypeRef.current);
+    console.log("connectivityError type", connectivityError?.type);
     if (
       connectivityError?.type !== ConnectivityErrorType.NONE &&
-      !(currentPopupTypeRef.current in [ConnectivityErrorType.NETWORK, ConnectivityErrorType.INTERNAL]) &&
-      connectivityError?.type !== currentPopupTypeRef.current
+      ![ConnectivityErrorType.NETWORK, ConnectivityErrorType.INTERNAL].includes(
+        currentConnectivityErrorTypeRef.current
+      ) &&
+      connectivityError?.type !== currentConnectivityErrorTypeRef.current
     ) {
       let popupType = "";
 
@@ -47,6 +47,7 @@ function AppContent({ children }) {
         popupType = "networkError";
       }
 
+      currentConnectivityErrorTypeRef.current = connectivityError?.type;
       showPopup(popupType, {
         message: connectivityError.message,
         debugCode: connectivityError.code,
