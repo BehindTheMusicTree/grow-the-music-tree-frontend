@@ -20,6 +20,7 @@ export const useUploadedTracks = () => {
 
 export const UploadedTrackProvider = ({ children }) => {
   const queryClient = useQueryClient();
+  const authenticatedApi = useAuthenticatedApi(listUploadedTracks);
 
   const {
     data: uploadedTracks = [],
@@ -27,7 +28,13 @@ export const UploadedTrackProvider = ({ children }) => {
     error,
   } = useQuery({
     queryKey: ["uploadedTracks"],
-    queryFn: useAuthenticatedApi(listUploadedTracks),
+    queryFn: async () => {
+      const result = await authenticatedApi(1, 50);
+      if (!result.success) {
+        throw new Error(result.error.message);
+      }
+      return result.data;
+    },
   });
 
   const updateUploadedTrack = useMutation({
