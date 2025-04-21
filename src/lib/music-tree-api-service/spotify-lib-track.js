@@ -5,6 +5,6 @@ export async function listSpotifyLibTracks(authFetch, page = 1, pageSize = 50) {
     page: page.toString(),
     pageSize: pageSize.toString(),
   });
-  const response = await authFetch(`library/spotify-lib-tracks?${params.toString()}`);
+  const response = await authFetch(`library/spotify?${params.toString()}`);
   return response.json();
 }
