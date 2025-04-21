@@ -1,39 +1,43 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSpotifyAuth } from "@contexts/SpotifyAuthContext";
+import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
+import { ErrorCode } from "@contexts/ConnectivityErrorContext";
 
 export default function SpotifyCallback() {
   const searchParams = useSearchParams();
   const { handleCallback } = useSpotifyAuth();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const authAttempted = useRef(false);
+  const processingRef = useRef(false);
+  const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
 
   const handleAuth = useCallback(async () => {
     const code = searchParams.get("code");
-    if (!code || isProcessing || authAttempted.current) {
+    if (!code || processingRef.current) {
       return;
     }
 
-    setIsProcessing(true);
-    authAttempted.current = true;
+    processingRef.current = true;
 
-    await handleCallback(code);
-    setIsProcessing(false);
-  }, [searchParams, handleCallback, isProcessing]);
+    try {
+      await handleCallback(code);
+    } catch (error) {
+      console.error("Authentication error:", error);
+      setConnectivityError({
+        type: ConnectivityErrorType.INTERNAL,
+        message: ErrorCode.getMessage(ErrorCode.INTERNAL),
+        code: ErrorCode.INTERNAL,
+      });
+    } finally {
+      processingRef.current = false;
+    }
+  }, [searchParams, handleCallback, setConnectivityError, ConnectivityErrorType]);
 
   useEffect(() => {
+    // Run authentication process once on mount
     handleAuth();
-
-    // Cleanup function to reset processing state
-    // This ensures we don't get stuck in processing state if there's an error
-    return () => {
-      if (isProcessing) {
-        setIsProcessing(false);
-      }
-    };
-  }, [handleAuth, isProcessing]);
+  }, [handleAuth]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">
