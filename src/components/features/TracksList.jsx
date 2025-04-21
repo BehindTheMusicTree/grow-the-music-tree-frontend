@@ -2,11 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { listUploadedTracks } from "@lib/music-tree-api-service/uploaded-track";
+import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
 
 export default function TracksList({ initialData }) {
   const { data, loading } = useQuery({
     queryKey: ["tracks", 1, 50],
-    queryFn: () => listUploadedTracks(1, 50),
+    queryFn: useAuthenticatedApi(listUploadedTracks),
     initialData,
     staleTime: 60 * 1000, // Consider data fresh for 1 minute
     retry: false,
