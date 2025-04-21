@@ -2,6 +2,7 @@
 
 import { useSession } from "@contexts/SessionContext";
 import { createContext, useContext, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 import { authenticateWithSpotifyCode } from "@lib/music-tree-api-service/spotify-auth";
 
@@ -19,6 +20,8 @@ export const useSpotifyAuth = () => {
 
 export const SpotifyAuthProvider = ({ children }) => {
   const { updateSession } = useSession();
+  const router = useRouter();
+
   const handleSpotifyAuth = () => {
     if (!process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || !process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI) {
       throw new Error("Spotify configuration is missing. Please check your environment variables.");
@@ -52,13 +55,13 @@ export const SpotifyAuthProvider = ({ children }) => {
       const originalUrl = localStorage.getItem("spotifyAuthRedirect");
       if (originalUrl) {
         localStorage.removeItem("spotifyAuthRedirect");
-        window.location.href = originalUrl;
+        router.push(originalUrl);
       } else {
         // Fallback to home page if no original URL is found
-        window.location.href = "/";
+        router.push("/");
       }
     },
-    [updateSession]
+    [updateSession, router]
   );
 
   const logout = () => {
