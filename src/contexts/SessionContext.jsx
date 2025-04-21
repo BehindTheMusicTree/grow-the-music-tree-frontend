@@ -38,6 +38,7 @@ export const SessionProvider = ({ children }) => {
   }, []);
 
   const updateSession = useCallback((newSession) => {
+    console.log("updateSession", newSession);
     if (newSession) {
       localStorage.setItem("session", JSON.stringify(newSession));
     } else {
