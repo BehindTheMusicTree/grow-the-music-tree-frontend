@@ -46,6 +46,9 @@ export const SpotifyAuthProvider = ({ children }) => {
       throw new Error("Spotify configuration is missing. Please check your environment variables.");
     }
 
+    // Store the current URL before redirecting to Spotify auth
+    localStorage.setItem("spotifyAuthRedirect", window.location.href);
+
     const params = new URLSearchParams({
       client_id: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
       response_type: "code",
@@ -66,6 +69,16 @@ export const SpotifyAuthProvider = ({ children }) => {
         expiresAt: data.expiresAt,
         spotifyUser: data.user,
       });
+
+      // Get the original URL from localStorage and redirect back
+      const originalUrl = localStorage.getItem("spotifyAuthRedirect");
+      if (originalUrl) {
+        localStorage.removeItem("spotifyAuthRedirect");
+        window.location.href = originalUrl;
+      } else {
+        // Fallback to home page if no original URL is found
+        window.location.href = "/";
+      }
     },
     [updateSession]
   );
