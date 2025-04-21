@@ -6,7 +6,7 @@ import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "./t
 import GenrePlaylistsTree from "./tree/GenrePlaylistTree";
 
 export default function GenrePlaylists() {
-  const { groupedGenrePlaylists, handleGenreAddAction } = useGenrePlaylists();
+  const { groupedGenrePlaylists, handleGenreAddAction, loading } = useGenrePlaylists();
 
   return (
     <GenreGettingAssignedNewParentProvider>
@@ -23,7 +23,9 @@ export default function GenrePlaylists() {
           +
         </div>
         <div className="flex flex-col text-gray-800">
-          {groupedGenrePlaylists ? (
+          {loading ? (
+            <p>Loading data...</p>
+          ) : groupedGenrePlaylists ? (
             Object.entries(groupedGenrePlaylists).map(([uuid, genrePlaylistsTree]) => {
               return (
                 <GenrePlaylistsTree
@@ -34,7 +36,7 @@ export default function GenrePlaylists() {
               );
             })
           ) : (
-            <p>Loading data.</p>
+            <p>No data found.</p>
           )}
         </div>
       </div>
