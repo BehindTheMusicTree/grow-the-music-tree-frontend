@@ -29,7 +29,7 @@ export function ConnectivityErrorProvider({ children }) {
     if (
       (error?.name === "TypeError" && error?.message === "Failed to fetch") ||
       error?.isNetworkError === true ||
-      error?.errorType === "NETWORK_CONNECTION_ERROR"
+      error?.errorType === ConnectivityErrorType.NETWORK
     ) {
       console.log("Network error detected by ConnectivityErrorProvider");
       setConnectivityError({
