@@ -16,13 +16,21 @@ export const useSpotifyLibTracks = () => {
 };
 
 export const SpotifyLibTracksProvider = ({ children }) => {
+  const authenticatedApi = useAuthenticatedApi(listSpotifyLibTracks);
+
   const {
     data: spotifyLibTracks,
     loading,
     error,
   } = useQuery({
     queryKey: ["spotifyLibTracks"],
-    queryFn: useAuthenticatedApi(listSpotifyLibTracks),
+    queryFn: async () => {
+      const result = await authenticatedApi(1, 50);
+      if (!result.success) {
+        throw new Error(result.error.message);
+      }
+      return result.data;
+    },
   });
 
   const value = {
