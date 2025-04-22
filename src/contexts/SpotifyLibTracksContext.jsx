@@ -6,8 +6,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
 import {
   listSpotifyLibTracks,
-  quickSyncSpotifyLibTracks,
-  fullSyncSpotifyLibTracks,
+  quickSyncSpotifyLibTracks as quickSyncSpotifyLibTracksApi,
+  fullSyncSpotifyLibTracks as fullSyncSpotifyLibTracksApi,
 } from "@lib/music-tree-api-service/spotify-lib-track";
 import { useSession } from "@contexts/SessionContext";
 
@@ -48,7 +48,7 @@ export const SpotifyLibTracksProvider = ({ children }) => {
     enabled: !isSessionLoading && !!session,
   });
 
-  const authenticatedQuickSyncSpotifyLibTracks = useAuthenticatedApi(quickSyncSpotifyLibTracks);
+  const authenticatedQuickSyncSpotifyLibTracks = useAuthenticatedApi(quickSyncSpotifyLibTracksApi);
   const { mutate: quickSyncSpotifyLibTracks, isPending: isQuickSyncPending } = useMutation({
     mutationFn: async () => {
       const result = await authenticatedQuickSyncSpotifyLibTracks();
@@ -56,7 +56,7 @@ export const SpotifyLibTracksProvider = ({ children }) => {
     },
   });
 
-  const authenticatedFullSyncSpotifyLibTracks = useAuthenticatedApi(fullSyncSpotifyLibTracks);
+  const authenticatedFullSyncSpotifyLibTracks = useAuthenticatedApi(fullSyncSpotifyLibTracksApi);
   const { mutate: fullSyncSpotifyLibTracks, isPending: isFullSyncPending } = useMutation({
     mutationFn: async () => {
       const result = await authenticatedFullSyncSpotifyLibTracks();
