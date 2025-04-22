@@ -14,19 +14,16 @@ export const useSession = () => {
 
 export const SessionProvider = ({ children }) => {
   const [session, setSession] = useState(null);
-  const [status, setStatus] = useState("loading");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check localStorage for existing session
     const storedSession = localStorage.getItem("session");
     if (storedSession) {
       try {
         const parsedSession = JSON.parse(storedSession);
-        // Check if session has required fields
         if (parsedSession.accessToken) {
           setSession(parsedSession);
         } else {
-          // Invalid session data, clear it
           localStorage.removeItem("session");
         }
       } catch (error) {
@@ -34,13 +31,11 @@ export const SessionProvider = ({ children }) => {
         localStorage.removeItem("session");
       }
     }
-    setStatus("idle");
+    setIsLoading(false);
   }, []);
 
   const updateSession = useCallback((newSession) => {
-    console.log("updateSession", newSession);
     if (newSession && newSession.accessToken) {
-      // Ensure all required fields are present
       const completeSession = {
         accessToken: newSession.accessToken,
         refreshToken: newSession.refreshToken || null,
@@ -57,7 +52,7 @@ export const SessionProvider = ({ children }) => {
 
   const value = {
     session,
-    status,
+    isLoading,
     updateSession,
   };
 
