@@ -3,8 +3,9 @@
 import { useSession } from "@contexts/SessionContext";
 import { createContext, useContext, useCallback } from "react";
 import { useRouter } from "next/navigation";
-
+import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { authenticateWithSpotifyCode } from "@lib/music-tree-api-service/spotify-auth";
+import { ErrorCode } from "@contexts/error-codes";
 
 const SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize";
 
@@ -20,6 +21,7 @@ export const useSpotifyAuth = () => {
 
 export const SpotifyAuthProvider = ({ children }) => {
   const { updateSession } = useSession();
+  const { setConnectivityError, connectivityErrorTypes } = useConnectivityError();
   const router = useRouter();
 
   const handleSpotifyAuth = () => {
@@ -44,7 +46,14 @@ export const SpotifyAuthProvider = ({ children }) => {
     async (code) => {
       console.log("handleCallback called", { code });
       const data = await authenticateWithSpotifyCode(code);
-      console.log("handleCallback: data", data);
+      if (data.error) {
+        setConnectivityError({
+          message: "Failed to authenticate to API from Spotify code",
+          type: connectivityErrorTypes.INTERNAL,
+          error: data.error,
+          errorCode: ErrorCode.SPOTIFY_AUTH_CALLBACK_FAILED,
+        });
+      }
       updateSession({
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,

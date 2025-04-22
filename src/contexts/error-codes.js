@@ -14,6 +14,7 @@ export class ErrorCode {
   static NOT_FOUND = "AP002";
   static SERVER_ERROR = "AP003";
   static VALIDATION_ERROR = "AP004";
+  static SPOTIFY_AUTH_CALLBACK_FAILED = "AP005";
 
   // Business logic errors
   static INVALID_OPERATION = "BL001";
