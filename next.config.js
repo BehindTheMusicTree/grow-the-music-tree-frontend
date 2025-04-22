@@ -3,9 +3,8 @@
 const nextConfig = {
   reactStrictMode: false,
   // Configure webpack to handle the special imports and disable minimization
-  webpack: (config, { isServer }) => {
-    // Disable minimization for both client and server bundles
-    config.optimization.minimize = false;
+  webpack: (config) => {
+    config.optimization.minimize = true;
 
     // Configure aliases
     config.resolve.alias = {
