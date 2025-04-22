@@ -5,6 +5,6 @@ export async function listGenrePlaylists(authFetch, page = 1, pageSize = 50) {
     page: page.toString(),
     pageSize: pageSize.toString(),
   });
-  const response = await authFetch(`genre-playlist?${params.toString()}`);
+  const response = await authFetch(`genre-playlists?${params.toString()}`);
   return response.json();
 }
