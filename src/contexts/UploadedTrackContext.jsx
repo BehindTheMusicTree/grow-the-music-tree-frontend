@@ -3,11 +3,14 @@
 import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { useSession } from "@contexts/SessionContext";
 import {
   listUploadedTracks,
   updateUploadedTrack as updateUploadedTrackApi,
 } from "@lib/music-tree-api-service/uploaded-track";
 import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
+
 const UploadedTrackContext = createContext();
 
 export const useUploadedTracks = () => {
@@ -21,7 +24,7 @@ export const useUploadedTracks = () => {
 export const UploadedTrackProvider = ({ children }) => {
   const queryClient = useQueryClient();
   const authenticatedApi = useAuthenticatedApi(listUploadedTracks);
-
+  const { session, isLoading: isSessionLoading } = useSession();
   const {
     data: uploadedTracks = [],
     loading,
@@ -36,6 +39,7 @@ export const UploadedTrackProvider = ({ children }) => {
       }
       return result.data.results;
     },
+    enabled: !isSessionLoading && !!session,
   });
 
   const updateUploadedTrack = useMutation({
