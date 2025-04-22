@@ -11,7 +11,7 @@ export default function Banner() {
       <div className="w-full mx-auto relative">
         <div className="flex items-center">
           <div className="mr-3">
-            <Image src={logo} alt="logo" width={48} height={48} />
+            <Image src={logo} alt="logo" width={48} height={48} style={{ height: "auto" }} />
           </div>
           <div>
             <h1 className="text-2xl font-bold">Music Tree</h1>
