@@ -19,6 +19,7 @@ export const useGenrePlaylists = () => {
 
 export const GenrePlaylistProvider = ({ children }) => {
   const queryClient = useQueryClient();
+  const authenticatedApi = useAuthenticatedApi(listGenrePlaylists);
 
   const {
     data: genrePlaylists = [],
@@ -26,7 +27,13 @@ export const GenrePlaylistProvider = ({ children }) => {
     error,
   } = useQuery({
     queryKey: ["genrePlaylists"],
-    queryFn: useAuthenticatedApi(listGenrePlaylists),
+    queryFn: async () => {
+      const result = await authenticatedApi(1, 50);
+      if (!result.success) {
+        throw new Error(result.error.message);
+      }
+      return result.data.results;
+    },
   });
 
   const value = {
