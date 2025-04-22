@@ -4,6 +4,7 @@ import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { useSession } from "@contexts/SessionContext";
 import { listGenrePlaylists } from "@lib/music-tree-api-service/genre-playlist";
 import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
 
@@ -20,6 +21,7 @@ export const useGenrePlaylists = () => {
 export const GenrePlaylistProvider = ({ children }) => {
   const queryClient = useQueryClient();
   const authenticatedApi = useAuthenticatedApi(listGenrePlaylists);
+  const { session, isLoading: isSessionLoading } = useSession();
 
   const {
     data: genrePlaylists = [],
@@ -34,6 +36,7 @@ export const GenrePlaylistProvider = ({ children }) => {
       }
       return result.data.results;
     },
+    enabled: !isSessionLoading && !!session,
   });
 
   const value = {
