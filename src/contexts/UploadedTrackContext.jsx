@@ -30,10 +30,11 @@ export const UploadedTrackProvider = ({ children }) => {
     queryKey: ["uploadedTracks"],
     queryFn: async () => {
       const result = await authenticatedApi(1, 50);
+      console.log("UploadedTrackProvider", result);
       if (!result.success) {
         throw new Error(result.error.message);
       }
-      return result.data;
+      return result.data.results;
     },
   });
 
