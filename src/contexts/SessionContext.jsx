@@ -56,5 +56,9 @@ export const SessionProvider = ({ children }) => {
     updateSession,
   };
 
+  if (isLoading) {
+    return null;
+  }
+
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 };
