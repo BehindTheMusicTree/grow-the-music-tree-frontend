@@ -3,6 +3,7 @@
 import { createContext, useContext, useCallback, useEffect, useState } from "react";
 import { setupFetchInterceptor } from "@lib/fetchInterceptor";
 import { ErrorCode } from "./error-codes";
+import { useSession } from "./SessionContext";
 
 const ConnectivityErrorContext = createContext(null);
 
@@ -21,6 +22,18 @@ export function ConnectivityErrorProvider({ children }) {
     message: null,
     code: null,
   });
+  const { session } = useSession();
+
+  useEffect(() => {
+    console.log("ConnectivityErrorProvider: session changed", session);
+    if (session) {
+      setConnectivityError({
+        type: ConnectivityErrorType.NONE,
+        message: null,
+        code: null,
+      });
+    }
+  }, [session]);
 
   const handleConnectivityError = useCallback((error) => {
     console.log("ConnectivityErrorProvider handling error:", error);
