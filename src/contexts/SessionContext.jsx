@@ -22,11 +22,11 @@ export const SessionProvider = ({ children }) => {
     if (storedSession) {
       try {
         const parsedSession = JSON.parse(storedSession);
-        // Check if session is still valid
-        if (parsedSession.expiresAt > Date.now()) {
+        // Check if session has required fields
+        if (parsedSession.accessToken) {
           setSession(parsedSession);
         } else {
-          // Session expired, clear it
+          // Invalid session data, clear it
           localStorage.removeItem("session");
         }
       } catch (error) {
@@ -39,12 +39,20 @@ export const SessionProvider = ({ children }) => {
 
   const updateSession = useCallback((newSession) => {
     console.log("updateSession", newSession);
-    if (newSession) {
-      localStorage.setItem("session", JSON.stringify(newSession));
+    if (newSession && newSession.accessToken) {
+      // Ensure all required fields are present
+      const completeSession = {
+        accessToken: newSession.accessToken,
+        refreshToken: newSession.refreshToken || null,
+        expiresAt: newSession.expiresAt || null,
+        spotifyUser: newSession.spotifyUser || null,
+      };
+      localStorage.setItem("session", JSON.stringify(completeSession));
+      setSession(completeSession);
     } else {
       localStorage.removeItem("session");
+      setSession(null);
     }
-    setSession(newSession);
   }, []);
 
   const value = {

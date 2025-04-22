@@ -44,24 +44,25 @@ export const SpotifyAuthProvider = ({ children }) => {
     async (code) => {
       console.log("handleCallback called", { code });
       const data = await authenticateWithSpotifyCode(code);
+      console.log("handleCallback: data", data);
       updateSession({
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,
         expiresAt: data.expiresAt,
-        spotifyUser: data.user,
+        spotifyUser: data.spotifyUser,
       });
 
       // Get the original URL from localStorage and redirect back
       const originalUrl = localStorage.getItem("spotifyAuthRedirect");
       if (originalUrl) {
         localStorage.removeItem("spotifyAuthRedirect");
-        router.push(originalUrl);
+        // router.push(originalUrl);
       } else {
         // Fallback to home page if no original URL is found
-        router.push("/");
+        // router.push("/");
       }
     },
-    [updateSession, router]
+    [updateSession]
   );
 
   const logout = () => {

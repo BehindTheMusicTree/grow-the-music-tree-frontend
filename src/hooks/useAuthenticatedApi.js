@@ -55,11 +55,12 @@ function createAuthFetch(session) {
  */
 export function useAuthenticatedApi(serviceFn) {
   const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
-  const { data: session } = useSession();
+  const { session } = useSession();
 
   return async (...args) => {
     try {
       if (!session?.accessToken) {
+        console.log("useAuthenticatedApi: no session");
         setConnectivityError({
           type: ConnectivityErrorType.AUTH_REQUIRED,
           message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED),
