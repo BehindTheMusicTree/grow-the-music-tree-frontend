@@ -22,18 +22,26 @@ export function ConnectivityErrorProvider({ children }) {
     message: null,
     code: null,
   });
-  const { session } = useSession();
+  const { session, isLoading: isSessionLoading } = useSession();
 
   useEffect(() => {
     console.log("ConnectivityErrorProvider: session changed", session);
-    if (session) {
-      setConnectivityError({
-        type: ConnectivityErrorType.NONE,
-        message: null,
-        code: null,
-      });
+    if (!isSessionLoading) {
+      if (session) {
+        setConnectivityError({
+          type: ConnectivityErrorType.NONE,
+          message: null,
+          code: null,
+        });
+      } else {
+        setConnectivityError({
+          type: ConnectivityErrorType.AUTH_REQUIRED,
+          message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED),
+          code: ErrorCode.AUTH_REQUIRED,
+        });
+      }
     }
-  }, [session]);
+  }, [session, isSessionLoading]);
 
   const handleConnectivityError = useCallback((error) => {
     console.log("ConnectivityErrorProvider handling error:", error);
