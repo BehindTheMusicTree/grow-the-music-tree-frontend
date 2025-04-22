@@ -41,12 +41,15 @@
 
 body {
   margin: 0;
-  width: 100%;
+  width: 100vw;
   min-width: 320px;
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   color: #213547;
   background-color: #ffffff;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 a {
