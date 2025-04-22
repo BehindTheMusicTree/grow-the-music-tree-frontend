@@ -35,7 +35,7 @@ export default function BasePopup({
   // Popup content to be rendered
   const popupContent = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="popup-title"
