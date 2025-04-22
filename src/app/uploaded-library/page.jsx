@@ -12,12 +12,7 @@ import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useUploadedTracks } from "@contexts/UploadedTrackContext";
 
-export default function UploadedLibrary() {
-  const { uploadedTracks } = useUploadedTracks();
-  const { playerUploadedTrackObject, handlePlayPauseAction } = usePlayer();
-  const { showPopup } = usePopup();
-  const { playNewTrackListFromUploadedTrackUuid } = useTrackList();
-
+function UploadButtons({ onFileChange }) {
   const fileInputRef = useRef();
   const directoryInputRef = useRef();
 
@@ -28,6 +23,37 @@ export default function UploadedLibrary() {
   const handleDirectoryUploadAction = () => {
     directoryInputRef.current.click();
   };
+
+  return (
+    <div className="flex my-4">
+      <div>
+        <input type="file" ref={fileInputRef} style={{ display: "none" }} multiple onChange={onFileChange} />
+        <button className="action-round-button" onClick={handleFileUploadAction}>
+          <FaFileUpload size={32} />
+        </button>
+      </div>
+      <div className="ml-2">
+        <input
+          type="file"
+          ref={directoryInputRef}
+          style={{ display: "none" }}
+          multiple
+          webkitdirectory=""
+          onChange={onFileChange}
+        />
+        <button className="action-round-button" onClick={handleDirectoryUploadAction}>
+          <FaFolderOpen size={32} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function UploadedLibrary() {
+  const { uploadedTracks } = useUploadedTracks();
+  const { playerUploadedTrackObject, handlePlayPauseAction } = usePlayer();
+  const { showPopup } = usePopup();
+  const { playNewTrackListFromUploadedTrackUuid } = useTrackList();
 
   const handleFileChange = (event) => {
     showPopup("trackUpload", {
@@ -47,23 +73,7 @@ export default function UploadedLibrary() {
 
   return (
     <div className="uploaded-library">
-      <input type="file" ref={fileInputRef} style={{ display: "none" }} multiple onChange={handleFileChange} />
-      <input
-        type="file"
-        ref={directoryInputRef}
-        style={{ display: "none" }}
-        multiple
-        webkitdirectory=""
-        onChange={handleFileChange}
-      />
-      <div className="flex my-4">
-        <button className="action-round-button" onClick={handleFileUploadAction}>
-          <FaFileUpload size={32} />
-        </button>
-        <button className="action-round-button ml-2" onClick={handleDirectoryUploadAction}>
-          <FaFolderOpen size={32} />
-        </button>
-      </div>
+      <UploadButtons onFileChange={handleFileChange} />
       <div className="overflow-x-auto rounded-lg border border-gray-300 shadow-sm">
         <table className="min-w-full divide-y divide-gray-300">
           <thead className="bg-gray-100">
