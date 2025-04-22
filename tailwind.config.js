@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
 const playerHeight = "80px";
-export default {
+const config = {
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   theme: {
     extend: {
@@ -146,3 +146,5 @@ export default {
     },
   ],
 };
+
+export default config;
