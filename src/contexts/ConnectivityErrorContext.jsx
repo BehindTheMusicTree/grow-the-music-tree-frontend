@@ -93,6 +93,7 @@ export function ConnectivityErrorProvider({ children }) {
 
     // Handle bad requests
     if (error?.status === 400) {
+      console.error("Bad request error response:", error?.response);
       setConnectivityError({
         type: ConnectivityErrorType.BAD_REQUEST,
         message: ErrorCode.getMessage(ErrorCode.BAD_REQUEST),
