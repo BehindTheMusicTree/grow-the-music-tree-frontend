@@ -45,6 +45,14 @@ function AppContent({ children }) {
         connectivityError.type === ConnectivityErrorType.INTERNAL
       ) {
         popupType = "internalError";
+        showPopup(popupType, {
+          message: connectivityError.message,
+          debugCode: connectivityError.code,
+          onClose: () => {
+            clearConnectivityError();
+            hidePopup();
+          },
+        });
       } else if (connectivityError.type === ConnectivityErrorType.NETWORK) {
         popupType = "networkError";
       }
