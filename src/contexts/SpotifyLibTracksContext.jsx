@@ -2,8 +2,8 @@
 
 import { createContext, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { listSpotifyLibTracks } from "@lib/music-tree-api-service/spotify-lib-track";
 import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
+import { listSpotifyLibTracks } from "@lib/music-tree-api-service/spotify-lib-track";
 
 const SpotifyLibTracksContext = createContext();
 
@@ -29,7 +29,8 @@ export const SpotifyLibTracksProvider = ({ children }) => {
       if (!result.success) {
         throw new Error(result.error.message);
       }
-      return result.data;
+      console.log("spotifyLibTracks", result.data);
+      return result.data.results;
     },
   });
 
