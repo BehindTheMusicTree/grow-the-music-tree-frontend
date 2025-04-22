@@ -11,7 +11,7 @@ export default function InternalErrorPopup({ debugCode }) {
         <AlertCircle className="h-16 w-16 text-red-500" strokeWidth={1.5} />
 
         <div>
-          <p className="text-gray-600">
+          <p className="text-center text-gray-600">
             Please try again. If the problem persists, contact us at{" "}
             <a href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`} className="text-blue-600 hover:text-blue-800">
               {process.env.NEXT_PUBLIC_CONTACT_EMAIL}
@@ -20,7 +20,7 @@ export default function InternalErrorPopup({ debugCode }) {
         </div>
 
         {debugCode && (
-          <div className="text-sm text-center text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
+          <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
             Error Code: {debugCode}
           </div>
         )}
