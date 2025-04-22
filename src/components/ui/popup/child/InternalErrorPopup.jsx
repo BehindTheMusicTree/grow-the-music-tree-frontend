@@ -4,21 +4,11 @@ import BasePopup from "./BasePopup";
 import { AlertTriangle, AlertCircle } from "lucide-react";
 import PropTypes from "prop-types";
 
-export default function InternalErrorPopup({ message, onClose, debugCode }) {
+export default function InternalErrorPopup({ debugCode }) {
   return (
     <BasePopup title="Internal Error" isDismissable={false} icon={AlertTriangle}>
       <div className="flex flex-col items-center space-y-6 py-4">
         <AlertCircle className="h-16 w-16 text-red-500" strokeWidth={1.5} />
-
-        <div className="space-y-4 w-full">
-          <p className="text-red-600 font-semibold text-center">{message}</p>
-        </div>
-
-        {debugCode && (
-          <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
-            Error Code: {debugCode}
-          </div>
-        )}
 
         <div>
           <p className="text-gray-600">
@@ -28,6 +18,12 @@ export default function InternalErrorPopup({ message, onClose, debugCode }) {
             </a>
           </p>
         </div>
+
+        {debugCode && (
+          <div className="text-sm text-center text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
+            Error Code: {debugCode}
+          </div>
+        )}
       </div>
     </BasePopup>
   );
