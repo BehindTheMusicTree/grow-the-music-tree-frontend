@@ -103,45 +103,48 @@ export default function UploadedLibrary() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {uploadedTracks?.map((uploadedTrack, index) => (
-              <tr key={uploadedTrack.uuid} className="hover:bg-gray-50 group">
-                <td className="uploaded-library-item w-10 px-3 py-2 text-center">
-                  <UploadedTrackPositionPlayPause
-                    position={index + 1}
-                    uuid={uploadedTrack.uuid}
-                    handlePlayPauseClick={() => handlePlayPauseClick(uploadedTrack.uuid)}
-                  />
-                </td>
-                <td className="uploaded-library-item w-full px-3 py-2 text-sm truncate">{uploadedTrack.title}</td>
-                <td className="uploaded-library-item w-32 px-3 py-2 text-sm truncate">
-                  {uploadedTrack.artist ? uploadedTrack.artist.name : ""}
-                </td>
-                <td className="uploaded-library-item w-32 px-3 py-2 text-sm truncate">
-                  {uploadedTrack.album ? uploadedTrack.album.name : ""}
-                </td>
-                <td className="uploaded-library-item w-32 px-3 py-2 text-sm truncate">
-                  {uploadedTrack.genre ? uploadedTrack.genre.name : ""}
-                </td>
-                <td className="uploaded-library-item w-24 px-3 py-2 text-center">
-                  <Rating
-                    rating={uploadedTrack.rating}
-                    handleChange={() => {
-                      return;
-                    }}
-                  />
-                </td>
-                <td className="uploaded-library-item w-20 px-3 py-2 text-sm text-center">
-                  {formatTime(uploadedTrack.file.durationInSec)}
-                </td>
-                <td className="uploaded-library-item w-16 px-3 py-2 text-sm text-center">
-                  {uploadedTrack.file.extension.replace(".", "")}
-                </td>
-                <td className="uploaded-library-item w-20 px-3 py-2 text-sm text-center">
-                  {uploadedTrack.file.bitrateInKbps} kbps
-                </td>
-                <td className="uploaded-library-item w-16 px-3 py-2 text-sm text-center">{uploadedTrack.playCount}</td>
-              </tr>
-            ))}
+            {uploadedTracks &&
+              uploadedTracks.map((uploadedTrack, index) => (
+                <tr key={uploadedTrack.uuid} className="hover:bg-gray-50 group">
+                  <td className="uploaded-library-item w-10 px-3 py-2 text-center">
+                    <UploadedTrackPositionPlayPause
+                      position={index + 1}
+                      uuid={uploadedTrack.uuid}
+                      handlePlayPauseClick={() => handlePlayPauseClick(uploadedTrack.uuid)}
+                    />
+                  </td>
+                  <td className="uploaded-library-item w-full px-3 py-2 text-sm truncate">{uploadedTrack.title}</td>
+                  <td className="uploaded-library-item w-32 px-3 py-2 text-sm truncate">
+                    {uploadedTrack.artist ? uploadedTrack.artist.name : ""}
+                  </td>
+                  <td className="uploaded-library-item w-32 px-3 py-2 text-sm truncate">
+                    {uploadedTrack.album ? uploadedTrack.album.name : ""}
+                  </td>
+                  <td className="uploaded-library-item w-32 px-3 py-2 text-sm truncate">
+                    {uploadedTrack.genre ? uploadedTrack.genre.name : ""}
+                  </td>
+                  <td className="uploaded-library-item w-24 px-3 py-2 text-center">
+                    <Rating
+                      rating={uploadedTrack.rating}
+                      handleChange={() => {
+                        return;
+                      }}
+                    />
+                  </td>
+                  <td className="uploaded-library-item w-20 px-3 py-2 text-sm text-center">
+                    {formatTime(uploadedTrack.file.durationInSec)}
+                  </td>
+                  <td className="uploaded-library-item w-16 px-3 py-2 text-sm text-center">
+                    {uploadedTrack.file.extension.replace(".", "")}
+                  </td>
+                  <td className="uploaded-library-item w-20 px-3 py-2 text-sm text-center">
+                    {uploadedTrack.file.bitrateInKbps} kbps
+                  </td>
+                  <td className="uploaded-library-item w-16 px-3 py-2 text-sm text-center">
+                    {uploadedTrack.playCount}
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
