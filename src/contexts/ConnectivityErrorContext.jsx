@@ -22,7 +22,7 @@ export function ConnectivityErrorProvider({ children }) {
     message: null,
     code: null,
   });
-  const { session, isLoading: isSessionLoading } = useSession();
+  const { session, isLoading: isSessionLoading, updateSession } = useSession();
 
   useEffect(() => {
     console.log("ConnectivityErrorProvider: session changed", session);
@@ -71,6 +71,8 @@ export function ConnectivityErrorProvider({ children }) {
       error?.response?.status === 401
     ) {
       console.log("Auth error detected");
+
+      updateSession(null);
 
       // Check if it's a session expiration case
       if (error?.response?.headers?.get("x-auth-error") === "session-expired") {
