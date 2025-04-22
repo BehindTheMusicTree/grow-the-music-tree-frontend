@@ -1,7 +1,11 @@
 "use client";
 
 export async function listGenrePlaylists(page = 1, pageSize = 50) {
-  const response = await fetch(`genre-playlist/?page=${page}&pageSize=${pageSize}`);
+  const params = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString(),
+  });
+  const response = await fetch(`genre-playlist?${params.toString()}`);
   return response.json();
 }
 
