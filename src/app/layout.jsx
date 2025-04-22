@@ -78,7 +78,7 @@ function AppContent({ children }) {
         }}
       >
         <Menu className="fixed left-0 z-40" />
-        <main className="flex-grow ml-16">{children}</main>
+        <main className="flex-grow mx-8">{children}</main>
         {isTrackListSidebarVisible && <TrackListSidebar className="fixed right-0 z-40" />}
       </div>
 
