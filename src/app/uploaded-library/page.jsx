@@ -56,7 +56,7 @@ export default function UploadedLibrary() {
         webkitdirectory=""
         onChange={handleFileChange}
       />
-      <div className="flex mb-4">
+      <div className="flex my-4">
         <button className="action-round-button" onClick={handleFileUploadAction}>
           <FaFileUpload size={32} />
         </button>
