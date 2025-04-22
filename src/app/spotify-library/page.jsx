@@ -2,10 +2,11 @@
 
 import { FaSpinner } from "react-icons/fa";
 import { MdError } from "react-icons/md";
+import SyncButton from "@components/features/SyncButton";
 import { useSpotifyLibTracks } from "@contexts/SpotifyLibTracksContext";
 
 export default function SpotifyLibrary() {
-  const { spotifyLibTracks, error, loading } = useSpotifyLibTracks();
+  const { spotifyLibTracks, error, loading, syncSpotifyLibrary } = useSpotifyLibTracks();
 
   if (loading) {
     return (
@@ -28,6 +29,7 @@ export default function SpotifyLibrary() {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Your Spotify Library</h1>
+      <SyncButton onSync={syncSpotifyLibrary} isLoading={loading} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {spotifyLibTracks &&
           spotifyLibTracks.map((track) => (
