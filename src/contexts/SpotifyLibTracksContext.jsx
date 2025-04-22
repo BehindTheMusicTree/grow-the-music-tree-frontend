@@ -1,10 +1,14 @@
 "use client";
 
-import { createContext, useContext } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { createContext, useContext, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
-import { listSpotifyLibTracks } from "@lib/music-tree-api-service/spotify-lib-track";
+import {
+  listSpotifyLibTracks,
+  quickSyncSpotifyLibTracks,
+  fullSyncSpotifyLibTracks,
+} from "@lib/music-tree-api-service/spotify-lib-track";
 import { useSession } from "@contexts/SessionContext";
 
 const SpotifyLibTracksContext = createContext();
@@ -18,29 +22,76 @@ export const useSpotifyLibTracks = () => {
 };
 
 export const SpotifyLibTracksProvider = ({ children }) => {
-  const authenticatedApi = useAuthenticatedApi(listSpotifyLibTracks);
+  const authenticatedListSpotifyLibTracks = useAuthenticatedApi(listSpotifyLibTracks);
   const { session, isLoading: isSessionLoading } = useSession();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalTracks, setTotalTracks] = useState(0);
+
+  const queryClient = useQueryClient();
+
   const {
     data: spotifyLibTracks,
-    loading,
+    isLoading: loading,
     error,
   } = useQuery({
-    queryKey: ["spotifyLibTracks"],
+    queryKey: ["spotifyLibTracks", currentPage, pageSize],
     queryFn: async () => {
-      const result = await authenticatedApi(1, 50);
+      const result = await authenticatedListSpotifyLibTracks(currentPage, pageSize);
       if (!result.success) {
         throw new Error(result.error.message);
       }
-      console.log("spotifyLibTracks", result.data);
+
+      setTotalTracks(result.data.total);
       return result.data.results;
     },
     enabled: !isSessionLoading && !!session,
   });
 
+  const authenticatedQuickSyncSpotifyLibTracks = useAuthenticatedApi(quickSyncSpotifyLibTracks);
+  const { mutate: quickSyncSpotifyLibTracks, isPending: isQuickSyncPending } = useMutation({
+    mutationFn: async () => {
+      const result = await authenticatedQuickSyncSpotifyLibTracks();
+      return result.data.results;
+    },
+  });
+
+  const authenticatedFullSyncSpotifyLibTracks = useAuthenticatedApi(fullSyncSpotifyLibTracks);
+  const { mutate: fullSyncSpotifyLibTracks, isPending: isFullSyncPending } = useMutation({
+    mutationFn: async () => {
+      const result = await authenticatedFullSyncSpotifyLibTracks();
+      return result.data.results;
+    },
+  });
+
+  const onPageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const onPageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
+  const refreshTracks = () => {
+    queryClient.invalidateQueries({ queryKey: ["spotifyLibTracks"] });
+  };
+
   const value = {
     spotifyLibTracks,
     loading,
     error,
+    quickSyncSpotifyLibTracks,
+    isQuickSyncPending,
+    fullSyncSpotifyLibTracks,
+    isFullSyncPending,
+    currentPage,
+    pageSize,
+    totalTracks,
+    totalPages: Math.ceil(totalTracks / pageSize),
+    onPageChange,
+    onPageSizeChange,
+    refreshTracks,
   };
 
   return <SpotifyLibTracksContext.Provider value={value}>{children}</SpotifyLibTracksContext.Provider>;
