@@ -59,16 +59,6 @@ export function useAuthenticatedApi(serviceFn) {
 
   return async (...args) => {
     try {
-      if (!session?.accessToken) {
-        console.log("useAuthenticatedApi: no session");
-        setConnectivityError({
-          type: ConnectivityErrorType.AUTH_REQUIRED,
-          message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED),
-          code: ErrorCode.AUTH_REQUIRED,
-        });
-        return { success: false, error: { message: ErrorCode.getMessage(ErrorCode.AUTH_REQUIRED) } };
-      }
-
       const authFetch = createAuthFetch(session);
       const result = await serviceFn(authFetch, ...args);
       return { success: true, data: result };
