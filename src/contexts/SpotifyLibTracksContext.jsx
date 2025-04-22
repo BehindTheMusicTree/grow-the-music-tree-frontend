@@ -52,6 +52,10 @@ export const SpotifyLibTracksProvider = ({ children }) => {
   const { mutate: quickSyncSpotifyLibTracks, isPending: isQuickSyncPending } = useMutation({
     mutationFn: async () => {
       const result = await authenticatedQuickSyncSpotifyLibTracks();
+      if (!result.success) {
+        console.error("Quick sync error:", result.error);
+        throw new Error(result.error.message);
+      }
       return result.data.results;
     },
   });
