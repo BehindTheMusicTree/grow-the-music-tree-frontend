@@ -48,7 +48,7 @@ export const SessionProvider = ({ children }) => {
   }, []);
 
   const value = {
-    data: session,
+    session,
     status,
     updateSession,
   };
