@@ -1,53 +1,15 @@
 "use client";
 
-import { useRef } from "react";
-import { FaFileUpload, FaFolderOpen } from "react-icons/fa";
 import { FaRegClock } from "react-icons/fa";
 
 import { formatTime } from "@lib/utils/formatting";
 import Rating from "@components/features/Rating";
+import UploadButtons from "@components/features/UploadButtons";
 import UploadedTrackPositionPlayPause from "@components/features/UploadedTrackPositionPlayPause";
 import { usePlayer } from "@contexts/PlayerContext";
 import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useUploadedTracks } from "@contexts/UploadedTrackContext";
-
-function UploadButtons({ onFileChange }) {
-  const fileInputRef = useRef();
-  const directoryInputRef = useRef();
-
-  const handleFileUploadAction = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleDirectoryUploadAction = () => {
-    directoryInputRef.current.click();
-  };
-
-  return (
-    <div className="flex my-4">
-      <div>
-        <input type="file" ref={fileInputRef} style={{ display: "none" }} multiple onChange={onFileChange} />
-        <button className="action-round-button" onClick={handleFileUploadAction}>
-          <FaFileUpload size={32} />
-        </button>
-      </div>
-      <div className="ml-2">
-        <input
-          type="file"
-          ref={directoryInputRef}
-          style={{ display: "none" }}
-          multiple
-          webkitdirectory=""
-          onChange={onFileChange}
-        />
-        <button className="action-round-button" onClick={handleDirectoryUploadAction}>
-          <FaFolderOpen size={32} />
-        </button>
-      </div>
-    </div>
-  );
-}
 
 export default function UploadedLibrary() {
   const { uploadedTracks } = useUploadedTracks();
