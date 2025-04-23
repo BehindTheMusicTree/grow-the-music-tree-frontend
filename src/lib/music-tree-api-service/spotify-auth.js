@@ -32,24 +32,5 @@ export async function authenticateWithSpotifyCode(code) {
     }),
   });
 
-  // Explicitly handle non-OK responses to ensure they're properly caught
-  if (!response.ok) {
-    // Create a standardized error object similar to what fetchInterceptor would create
-    const error = new Error(`Request to "${response.url}" failed with status ${response.status}`);
-    error.response = {
-      status: response.status,
-      headers: Object.fromEntries(response.headers.entries()),
-      url: response.url,
-    };
-
-    // Internal server errors (500)
-    if (response.status >= 500) {
-      error.name = "ServerError";
-    }
-
-    throw error;
-  }
-
-  // Parse JSON for successful responses
-  return response.json();
+  return response;
 }
