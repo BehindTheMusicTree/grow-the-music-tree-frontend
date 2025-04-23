@@ -1,5 +1,5 @@
 import { UploadedTrack } from "@/types/domain/uploadedTrack";
-import { ApiUploadedTrackDto } from "@/types/api/uploadedTrack";
+import { ApiUploadedTrackDto } from "@/types/dto/uploadedTrack";
 
 export function mapUploadedTrackDtoToDomain(dto: ApiUploadedTrackDto): UploadedTrack {
   return {
