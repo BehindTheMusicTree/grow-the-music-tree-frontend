@@ -1,19 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  image?: string;
-}
-
-interface Session {
-  user: User | null;
-  accessToken: string | null;
-  isAuthenticated: boolean;
-}
+import { Session } from "../types/Session";
 
 interface SessionContextType {
   session: Session;
@@ -22,9 +10,9 @@ interface SessionContextType {
 }
 
 const defaultSession: Session = {
-  user: null,
   accessToken: null,
-  isAuthenticated: false,
+  refreshToken: null,
+  expiresAt: null,
 };
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);

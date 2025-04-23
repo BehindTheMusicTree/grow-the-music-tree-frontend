@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "@contexts/SessionContext";
+import { useSession, Session } from "@contexts/SessionContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 
 interface FetchOptions extends RequestInit {
@@ -18,10 +18,6 @@ interface ApiResponse<T> {
 interface ResponseError extends Error {
   status?: number;
   response?: Response;
-}
-
-interface Session {
-  accessToken: string | null;
 }
 
 export type AuthFetch = (endpoint: string, options?: FetchOptions) => Promise<Response>;
