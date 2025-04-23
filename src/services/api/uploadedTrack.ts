@@ -1,7 +1,7 @@
 import { AuthFetch } from "@/hooks/useAuthenticatedApi";
 import { UploadedTrack, TrackData } from "@/types/domain/uploadedTrack";
 import { ApiUploadedTrackDto } from "@/types/dto/uploadedTrack";
-import { mapUploadedTrackDtoToDomain } from "@/mappers/uploadedTrack";
+import { mapUploadedTrackDtoToDomain } from "@/mappers/uploaded-track";
 import { ApiResponse } from "@/types/api";
 
 export class UploadedTrackService {
