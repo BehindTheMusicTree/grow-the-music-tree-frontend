@@ -45,30 +45,32 @@ export const SpotifyAuthProvider = ({ children }) => {
   const handleCallback = useCallback(
     async (code) => {
       console.log("handleCallback called", { code });
-      const data = await authenticateWithSpotifyCode(code);
-      if (data.error) {
+      const response = await authenticateWithSpotifyCode(code);
+      if (!response.ok) {
         setConnectivityError({
           message: "Failed to authenticate to API from Spotify code",
           type: connectivityErrorTypes.INTERNAL,
-          error: data.error,
+          error: response.error,
           errorCode: ErrorCode.SPOTIFY_AUTH_CALLBACK_FAILED,
         });
-      }
-      updateSession({
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-        expiresAt: data.expiresAt,
-        spotifyUser: data.spotifyUser,
-      });
-
-      // Get the original URL from localStorage and redirect back
-      const originalUrl = localStorage.getItem("spotifyAuthRedirect");
-      if (originalUrl) {
-        localStorage.removeItem("spotifyAuthRedirect");
-        // router.push(originalUrl);
       } else {
-        // Fallback to home page if no original URL is found
-        // router.push("/");
+        const data = await response.json();
+        updateSession({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+          expiresAt: data.expiresAt,
+          spotifyUser: data.spotifyUser,
+        });
+
+        // Get the original URL from localStorage and redirect back
+        const originalUrl = localStorage.getItem("spotifyAuthRedirect");
+        if (originalUrl) {
+          localStorage.removeItem("spotifyAuthRedirect");
+          // router.push(originalUrl);
+        } else {
+          // Fallback to home page if no original URL is found
+          // router.push("/");
+        }
       }
     },
     [updateSession]
