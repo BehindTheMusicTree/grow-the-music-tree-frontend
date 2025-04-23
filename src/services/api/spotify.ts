@@ -1,11 +1,11 @@
 import { AuthFetch } from "@/hooks/useAuthenticatedApi";
 import { SpotifyUser, SpotifyPlaylist, SpotifyTrack } from "@/models/interfaces/spotify";
-import { ApiSpotifyUserDto, ApiSpotifyPlaylistDto, ApiSpotifyLibTrackDto } from "@/types/api/spotify";
+import { ApiSpotifyUserDto, ApiSpotifyPlaylistDto, ApiSpotifyLibTrackDto } from "@/types/dto/spotify";
 import {
   mapSpotifyUserDtoToDomain,
   mapSpotifyPlaylistDtoToDomain,
-  mapSpotifyTrackDtoToDomain,
-} from "@/mappers/spotify";
+  mapSpotifyLibTrackDtoToDomain,
+} from "@/mappers/spotify-lib-track";
 import { ApiResponse } from "@/types/api";
 
 export class SpotifyService {
@@ -35,6 +35,6 @@ export class SpotifyService {
     if (!apiResponse.success || !apiResponse.data) {
       throw new Error(apiResponse.error?.message || "Failed to fetch track");
     }
-    return mapSpotifyTrackDtoToDomain(apiResponse.data);
+    return mapSpotifyLibTrackDtoToDomain(apiResponse.data);
   }
 }
