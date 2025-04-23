@@ -1,31 +1,30 @@
 "use client";
 
-import { useState, useEffect, ReactNode } from "react";
+import { useState, useEffect, ReactNode, ElementType } from "react";
 import { createPortal } from "react-dom";
-import { PopupTitle } from "../PopupTitle";
+import Popup from "@components/ui/popup/Popup";
+import { PopupTitle } from "@components/ui/popup/PopupTitle";
 
-type PopupType = "default" | "fullscreen" | "bottom-sheet" | "alert";
+type PopupType = "default" | "success" | "error" | "warning" | "info";
 
 interface BasePopupProps {
   title: string;
   children: ReactNode;
+  isOpen: boolean;
   onClose: () => void;
-  isDismissable?: boolean;
-  className?: string;
-  contentClassName?: string;
   type?: PopupType;
-  icon?: ReactNode;
+  icon?: ElementType;
+  isDismissable?: boolean;
 }
 
-export default function BasePopup({
+export function BasePopup({
   title,
   children,
+  isOpen,
   onClose,
-  isDismissable = true,
-  className = "",
-  contentClassName = "",
   type = "default",
   icon,
+  isDismissable = true,
 }: BasePopupProps) {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -37,11 +36,12 @@ export default function BasePopup({
     const baseClasses = "bg-white rounded-lg p-4";
     const typeClasses: Record<PopupType, string> = {
       default: "w-full max-w-lg",
-      fullscreen: "w-full h-full rounded-none",
-      "bottom-sheet": "w-full max-w-lg fixed bottom-0 rounded-b-none",
-      alert: "w-full max-w-md",
+      success: "w-full max-w-lg",
+      error: "w-full max-w-lg",
+      warning: "w-full max-w-lg",
+      info: "w-full max-w-lg",
     };
-    return `${baseClasses} ${typeClasses[type]} ${className}`;
+    return `${baseClasses} ${typeClasses[type]}`;
   };
 
   // Popup content to be rendered
@@ -54,7 +54,7 @@ export default function BasePopup({
     >
       <div className={getPopupClasses()} onClick={(e) => e.stopPropagation()}>
         <PopupTitle title={title} onClose={onClose} isDismissable={isDismissable} icon={icon} />
-        <div className={`pt-4 ${contentClassName}`}>{children}</div>
+        <div className="pt-4">{children}</div>
       </div>
     </div>
   );
