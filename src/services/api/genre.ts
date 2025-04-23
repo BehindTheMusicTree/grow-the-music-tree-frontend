@@ -1,6 +1,6 @@
 import { AuthFetch } from "@/hooks/useAuthenticatedApi";
 import { Genre, GenreWithRelations } from "@/models/interfaces/genre";
-import { ApiGenreDto, ApiGenreWithRelationsDto } from "@/types/api/genre";
+import { ApiGenreDto, ApiGenreWithRelationsDto } from "@/types/dto/genre";
 import { mapGenreDtoToDomain, mapGenreWithRelationsDtoToDomain } from "@/mappers/genre";
 import { ApiResponse } from "@/types/api";
 
