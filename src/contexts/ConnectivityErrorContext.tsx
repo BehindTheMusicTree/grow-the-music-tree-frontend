@@ -2,14 +2,6 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 
-export enum ConnectivityErrorType {
-  NONE = "NONE",
-  NETWORK = "NETWORK",
-  AUTH_REQUIRED = "AUTH_REQUIRED",
-  BAD_REQUEST = "BAD_REQUEST",
-  INTERNAL = "INTERNAL",
-}
-
 interface ConnectivityError {
   type: ConnectivityErrorType;
   message: string;
@@ -20,7 +12,6 @@ interface ConnectivityErrorContextType {
   connectivityError: ConnectivityError | null;
   setConnectivityError: (error: ConnectivityError | null) => void;
   clearConnectivityError: () => void;
-  ConnectivityErrorType: typeof ConnectivityErrorType;
 }
 
 const ConnectivityErrorContext = createContext<ConnectivityErrorContextType | undefined>(undefined);
@@ -42,7 +33,6 @@ export function ConnectivityErrorProvider({ children }: ConnectivityErrorProvide
         connectivityError,
         setConnectivityError,
         clearConnectivityError,
-        ConnectivityErrorType,
       }}
     >
       {children}
