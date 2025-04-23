@@ -25,7 +25,10 @@ interface Session {
 }
 
 export type AuthFetch = (endpoint: string, options?: FetchOptions) => Promise<Response>;
-type ServiceFn<T> = (authFetch: AuthFetch, ...args: unknown[]) => Promise<Response>;
+type ServiceFn<T extends Response, Args extends unknown[] = unknown[]> = (
+  authFetch: AuthFetch,
+  ...args: Args
+) => Promise<T>;
 
 function createAuthFetch(session: Session) {
   return async (endpoint: string, options: FetchOptions = {}) => {
@@ -59,11 +62,11 @@ function createAuthFetch(session: Session) {
   };
 }
 
-export function useAuthenticatedApi<T>(serviceFn: ServiceFn<T>) {
+export function useAuthenticatedApi<T, Args extends unknown[] = unknown[]>(serviceFn: ServiceFn<T, Args>) {
   const { setConnectivityError } = useConnectivityError();
   const { session } = useSession();
 
-  return async (...args: unknown[]): Promise<ApiResponse<T>> => {
+  return async (...args: Args): Promise<ApiResponse<T>> => {
     try {
       const authFetch = createAuthFetch(session);
       const response = await serviceFn(authFetch, ...args);
