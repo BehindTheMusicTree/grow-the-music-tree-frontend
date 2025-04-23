@@ -5,7 +5,7 @@ import { createContext, useContext, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { authenticateWithSpotifyCode } from "@lib/music-tree-api-service/spotify-auth";
-import { ErrorCode } from "@lib/errors/error-codes";
+import { ErrorCode } from "@lib/connectivity-errors/codes";
 
 const SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize";
 

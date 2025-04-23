@@ -2,7 +2,7 @@
 
 import { useSession } from "@contexts/SessionContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
-import { ErrorCode } from "@lib/errors/error-codes";
+import { ErrorCode } from "@lib/connectivity-errors/codes";
 
 /**
  * Creates an authenticated fetch function with auth headers pre-applied
