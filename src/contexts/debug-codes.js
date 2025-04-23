@@ -1,4 +1,4 @@
-export class ErrorCode {
+export class DebugCode {
   // Authentication errors
   static AUTH_REQUIRED = "AU001";
   static SESSION_EXPIRED = "AU002";
@@ -27,21 +27,21 @@ export class ErrorCode {
 
   static getMessage(code) {
     const messages = {
-      [ErrorCode.AUTH_REQUIRED]: "Authentication required",
-      [ErrorCode.SESSION_EXPIRED]: "Session expired",
-      [ErrorCode.INVALID_CREDENTIALS]: "Invalid credentials",
-      [ErrorCode.NETWORK_ERROR]: "Network error",
-      [ErrorCode.TIMEOUT]: "Request timed out",
-      [ErrorCode.CONNECTION_FAILED]: "Connection failed",
-      [ErrorCode.BAD_REQUEST]: "Invalid request",
-      [ErrorCode.NOT_FOUND]: "Resource not found",
-      [ErrorCode.SERVER_ERROR]: "Server error",
-      [ErrorCode.VALIDATION_ERROR]: "Validation error",
-      [ErrorCode.INVALID_OPERATION]: "Invalid operation",
-      [ErrorCode.RESOURCE_CONFLICT]: "Resource conflict",
-      [ErrorCode.QUOTA_EXCEEDED]: "Quota exceeded",
-      [ErrorCode.MISSING_CONFIG]: "Missing configuration",
-      [ErrorCode.INVALID_CONFIG]: "Invalid configuration",
+      [DebugCode.AUTH_REQUIRED]: "Authentication required",
+      [DebugCode.SESSION_EXPIRED]: "Session expired",
+      [DebugCode.INVALID_CREDENTIALS]: "Invalid credentials",
+      [DebugCode.NETWORK_ERROR]: "Network error",
+      [DebugCode.TIMEOUT]: "Request timed out",
+      [DebugCode.CONNECTION_FAILED]: "Connection failed",
+      [DebugCode.BAD_REQUEST]: "Invalid request",
+      [DebugCode.NOT_FOUND]: "Resource not found",
+      [DebugCode.SERVER_ERROR]: "Server error",
+      [DebugCode.VALIDATION_ERROR]: "Validation error",
+      [DebugCode.INVALID_OPERATION]: "Invalid operation",
+      [DebugCode.RESOURCE_CONFLICT]: "Resource conflict",
+      [DebugCode.QUOTA_EXCEEDED]: "Quota exceeded",
+      [DebugCode.MISSING_CONFIG]: "Missing configuration",
+      [DebugCode.INVALID_CONFIG]: "Invalid configuration",
     };
 
     return messages[code] || "Unknown error";
