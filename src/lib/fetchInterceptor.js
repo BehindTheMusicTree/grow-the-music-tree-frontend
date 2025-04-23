@@ -1,5 +1,7 @@
 "use client";
 
+import { FetchErrorType } from "./fetchErrorTypes";
+
 // Store the original fetch only in browser environments
 const originalFetch = typeof window !== "undefined" ? window.fetch : null;
 
@@ -23,27 +25,31 @@ export const setupFetchInterceptor = (handleError) => {
     };
 
     try {
-      console.log(`setupFetchInterceptor Fetch request to: ${url}`);
+      console.log(`Fetch request to: ${url}`);
       const response = await originalFetch(...args);
 
       // Handle response errors
       if (!response.ok) {
-        console.log("setupFetchInterceptor Response error:", response);
-        // Create a standardized error object with original request details
-        const error = new Error(`Request to "${response.url}" failed with status ${response.status}`);
+        console.log("Response error:", response);
+        const errorType = FetchErrorType.getTypeFromStatus(response.status);
+        const specificError = FetchErrorType.getSpecificErrorFromStatus(response.status);
+
+        const error = new Error(FetchErrorType.getMessageFromError({ response }));
         error.response = {
           status: response.status,
           headers: Object.fromEntries(response.headers.entries()),
           url: response.url,
         };
         error.request = requestDetails;
+        error.type = errorType;
+        error.specificError = specificError;
 
         // Special handling for authentication errors
         if (response.status === 401) {
           error.name = "AuthenticationError";
           // Check for session expiration header
           if (response.headers.get("x-auth-error") === "session-expired") {
-            error.name = "SessionExpiredError";
+            error.specificError = FetchErrorType.AUTH.SESSION_EXPIRED;
           }
         }
 
@@ -52,16 +58,15 @@ export const setupFetchInterceptor = (handleError) => {
 
       return response;
     } catch (error) {
-      console.log("setupFetchInterceptor Fetch interceptor caught error:", error);
+      console.log("Fetch interceptor caught error:", error);
 
       // Specifically handle network errors like ERR_CONNECTION_REFUSED
       if (error instanceof TypeError && error.message === "Failed to fetch") {
-        console.log("setupFetchInterceptor Network error detected: Connection likely refused");
-        // Enhance the error with additional metadata
+        console.log("Network error detected: Connection likely refused");
         error.isNetworkError = true;
-        error.errorType = "NETWORK_CONNECTION_ERROR";
-        error.friendlyMessage =
-          "Unable to connect to the server. Please check your network or the server might be down.";
+        error.type = FetchErrorType.NETWORK;
+        error.specificError = FetchErrorType.NETWORK.CONNECTION_REFUSED;
+        error.friendlyMessage = FetchErrorType.getMessageFromError(error);
       }
 
       // If it's not our error object, add the request details
@@ -70,7 +75,7 @@ export const setupFetchInterceptor = (handleError) => {
       }
 
       // Pass the error to the centralized handler
-      console.log("setupFetchInterceptor Passing error to central handler:", error);
+      console.log("Passing error to central handler:", error);
       handleError(error);
       throw error; // Re-throw to maintain fetch error behavior
     }
