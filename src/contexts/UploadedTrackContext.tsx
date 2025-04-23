@@ -30,7 +30,7 @@ const UploadedTrackContext = createContext<UploadedTrackContextType | null>(null
 export const UploadedTrackProvider = ({ children }: { children: ReactNode }) => {
   const { session } = useSession();
   const queryClient = useQueryClient();
-  const authFetch = useAuthenticatedApi();
+  const authFetch = useAuthenticatedApi<PaginatedResponse<UploadedTrack>>(listUploadedTracksApi);
 
   const {
     data: uploadedTracksResponse,
@@ -39,7 +39,7 @@ export const UploadedTrackProvider = ({ children }: { children: ReactNode }) => 
     refetch: refreshTracks,
   } = useQuery({
     queryKey: ["uploadedTracks"],
-    queryFn: () => listUploadedTracksApi(authFetch as AuthFetch),
+    queryFn: () => authFetch(),
     enabled: !!session,
   });
 

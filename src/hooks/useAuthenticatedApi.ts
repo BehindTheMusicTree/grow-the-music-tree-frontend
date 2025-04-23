@@ -25,10 +25,7 @@ interface Session {
 }
 
 export type AuthFetch = (endpoint: string, options?: FetchOptions) => Promise<Response>;
-type ServiceFn<T extends Response, Args extends unknown[] = unknown[]> = (
-  authFetch: AuthFetch,
-  ...args: Args
-) => Promise<T>;
+type ServiceFn<T, Args extends unknown[] = unknown[]> = (authFetch: AuthFetch, ...args: Args) => Promise<T>;
 
 function createAuthFetch(session: Session) {
   return async (endpoint: string, options: FetchOptions = {}) => {
