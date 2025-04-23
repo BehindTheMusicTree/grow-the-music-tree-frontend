@@ -2,7 +2,6 @@
 
 import { useSession } from "@contexts/SessionContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
-import { ErrorCode } from "@lib/connectivity-errors/codes";
 
 interface FetchOptions extends RequestInit {
   resolveOnError?: boolean;
@@ -25,7 +24,7 @@ interface Session {
   accessToken: string | null;
 }
 
-type AuthFetch = (endpoint: string, options?: FetchOptions) => Promise<Response>;
+export type AuthFetch = (endpoint: string, options?: FetchOptions) => Promise<Response>;
 type ServiceFn<T> = (authFetch: AuthFetch, ...args: unknown[]) => Promise<Response>;
 
 function createAuthFetch(session: Session) {
@@ -61,7 +60,7 @@ function createAuthFetch(session: Session) {
 }
 
 export function useAuthenticatedApi<T>(serviceFn: ServiceFn<T>) {
-  const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
+  const { setConnectivityError } = useConnectivityError();
   const { session } = useSession();
 
   return async (...args: unknown[]): Promise<ApiResponse<T>> => {
@@ -75,7 +74,7 @@ export function useAuthenticatedApi<T>(serviceFn: ServiceFn<T>) {
 
       if (customError?.message === "Unauthorized" || customError?.status === 401) {
         setConnectivityError({
-          type: ConnectivityErrorType.AUTH_REQUIRED,
+          type: "AUTH_REQUIRED",
           message: "Authentication is required to access this resource",
           code: "AUTH_REQUIRED",
         });
@@ -84,7 +83,7 @@ export function useAuthenticatedApi<T>(serviceFn: ServiceFn<T>) {
 
       if (customError?.name === "TypeError" && customError?.message === "Failed to fetch") {
         setConnectivityError({
-          type: ConnectivityErrorType.INTERNAL,
+          type: "INTERNAL",
           message: "An internal server error occurred",
           code: "INTERNAL",
         });
