@@ -2,8 +2,11 @@
 
 import { useSession } from "@contexts/SessionContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
-import { ErrorCode, CustomError, getMessage } from "@types/error";
-import { Session, ConnectivityErrorType } from "@types/context";
+import { ErrorCode } from "@lib/connectivity-errors/codes";
+
+interface FetchOptions extends RequestInit {
+  resolveOnError?: boolean;
+}
 
 interface ApiResponse<T> {
   success: boolean;
@@ -13,9 +16,17 @@ interface ApiResponse<T> {
   };
 }
 
-interface FetchOptions extends RequestInit {
-  resolveOnError?: boolean;
+interface CustomError extends Error {
+  status?: number;
+  response?: Response;
 }
+
+interface Session {
+  accessToken: string | null;
+}
+
+type AuthFetch = (endpoint: string, options?: FetchOptions) => Promise<Response>;
+type ServiceFn<T> = (authFetch: AuthFetch, ...args: unknown[]) => Promise<Response>;
 
 function createAuthFetch(session: Session) {
   return async (endpoint: string, options: FetchOptions = {}) => {
@@ -49,22 +60,11 @@ function createAuthFetch(session: Session) {
   };
 }
 
-type ServiceFn<T> = (fetch: ReturnType<typeof createAuthFetch>, ...args: unknown[]) => Promise<Response>;
-
 export function useAuthenticatedApi<T>(serviceFn: ServiceFn<T>) {
   const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
   const { session } = useSession();
 
   return async (...args: unknown[]): Promise<ApiResponse<T>> => {
-    if (!session) {
-      setConnectivityError({
-        type: ConnectivityErrorType.AUTH_REQUIRED,
-        message: getMessage(ErrorCode.AUTH_REQUIRED),
-        code: ErrorCode.AUTH_REQUIRED,
-      });
-      return { success: false, error: { message: getMessage(ErrorCode.AUTH_REQUIRED) } };
-    }
-
     try {
       const authFetch = createAuthFetch(session);
       const response = await serviceFn(authFetch, ...args);
@@ -76,19 +76,19 @@ export function useAuthenticatedApi<T>(serviceFn: ServiceFn<T>) {
       if (customError?.message === "Unauthorized" || customError?.status === 401) {
         setConnectivityError({
           type: ConnectivityErrorType.AUTH_REQUIRED,
-          message: getMessage(ErrorCode.AUTH_REQUIRED),
-          code: ErrorCode.AUTH_REQUIRED,
+          message: "Authentication is required to access this resource",
+          code: "AUTH_REQUIRED",
         });
-        return { success: false, error: { message: getMessage(ErrorCode.AUTH_REQUIRED) } };
+        return { success: false, error: { message: "Authentication is required to access this resource" } };
       }
 
       if (customError?.name === "TypeError" && customError?.message === "Failed to fetch") {
         setConnectivityError({
           type: ConnectivityErrorType.INTERNAL,
-          message: getMessage(ErrorCode.INTERNAL),
-          code: ErrorCode.INTERNAL,
+          message: "An internal server error occurred",
+          code: "INTERNAL",
         });
-        return { success: false, error: { message: getMessage(ErrorCode.INTERNAL) } };
+        return { success: false, error: { message: "An internal server error occurred" } };
       }
 
       console.error("API error:", error);

@@ -1,15 +1,50 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import { ConnectivityError, ConnectivityErrorContextType, ConnectivityErrorType } from "@types/context";
 
-const ConnectivityErrorContext = createContext<ConnectivityErrorContextType | null>(null);
+export enum ConnectivityErrorType {
+  NONE = "NONE",
+  NETWORK = "NETWORK",
+  AUTH_REQUIRED = "AUTH_REQUIRED",
+  BAD_REQUEST = "BAD_REQUEST",
+  INTERNAL = "INTERNAL",
+}
 
-export function ConnectivityErrorProvider({ children }: { children: ReactNode }) {
+interface ConnectivityError {
+  type: ConnectivityErrorType;
+  message: string;
+  code?: string;
+}
+
+interface ConnectivityErrorContextType {
+  connectivityError: ConnectivityError | null;
+  setConnectivityError: (error: ConnectivityError | null) => void;
+  clearConnectivityError: () => void;
+  ConnectivityErrorType: typeof ConnectivityErrorType;
+}
+
+const ConnectivityErrorContext = createContext<ConnectivityErrorContextType | undefined>(undefined);
+
+interface ConnectivityErrorProviderProps {
+  children: ReactNode;
+}
+
+export function ConnectivityErrorProvider({ children }: ConnectivityErrorProviderProps) {
   const [connectivityError, setConnectivityError] = useState<ConnectivityError | null>(null);
 
+  const clearConnectivityError = () => {
+    setConnectivityError(null);
+  };
+
   return (
-    <ConnectivityErrorContext.Provider value={{ connectivityError, setConnectivityError, ConnectivityErrorType }}>
+    <ConnectivityErrorContext.Provider
+      value={{
+        connectivityError,
+        setConnectivityError,
+        clearConnectivityError,
+        ConnectivityErrorType,
+      }}
+    >
       {children}
     </ConnectivityErrorContext.Provider>
   );
@@ -17,7 +52,7 @@ export function ConnectivityErrorProvider({ children }: { children: ReactNode })
 
 export function useConnectivityError() {
   const context = useContext(ConnectivityErrorContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useConnectivityError must be used within a ConnectivityErrorProvider");
   }
   return context;

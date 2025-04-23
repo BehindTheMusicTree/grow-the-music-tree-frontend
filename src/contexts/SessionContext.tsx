@@ -1,19 +1,51 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import { Session, SessionContextType } from "@types/context";
 
-const SessionContext = createContext<SessionContextType | null>(null);
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  image?: string;
+}
 
-export function SessionProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
+interface Session {
+  user: User | null;
+  accessToken: string | null;
+  isAuthenticated: boolean;
+}
 
-  return <SessionContext.Provider value={{ session, setSession }}>{children}</SessionContext.Provider>;
+interface SessionContextType {
+  session: Session;
+  setSession: (session: Session) => void;
+  clearSession: () => void;
+}
+
+const defaultSession: Session = {
+  user: null,
+  accessToken: null,
+  isAuthenticated: false,
+};
+
+const SessionContext = createContext<SessionContextType | undefined>(undefined);
+
+interface SessionProviderProps {
+  children: ReactNode;
+}
+
+export function SessionProvider({ children }: SessionProviderProps) {
+  const [session, setSession] = useState<Session>(defaultSession);
+
+  const clearSession = () => {
+    setSession(defaultSession);
+  };
+
+  return <SessionContext.Provider value={{ session, setSession, clearSession }}>{children}</SessionContext.Provider>;
 }
 
 export function useSession() {
   const context = useContext(SessionContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useSession must be used within a SessionProvider");
   }
   return context;
