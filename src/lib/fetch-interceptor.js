@@ -1,6 +1,6 @@
 "use client";
 
-import { FetchErrorType } from "./fetchErrorTypes";
+import { ErrorHandler, NetworkError, AuthError, ServerError, ClientError } from "./errors/error-types";
 
 // Store the original fetch only in browser environments
 const originalFetch = typeof window !== "undefined" ? window.fetch : null;
@@ -31,25 +31,19 @@ export const setupFetchInterceptor = (handleError) => {
       // Handle response errors
       if (!response.ok) {
         console.log("Response error:", response);
-        const errorType = FetchErrorType.getTypeFromStatus(response.status);
-        const specificError = FetchErrorType.getSpecificErrorFromStatus(response.status);
-
-        const error = new Error(FetchErrorType.getMessageFromError({ response }));
+        let error = ErrorHandler.getErrorFromStatus(response.status);
         error.response = {
           status: response.status,
           headers: Object.fromEntries(response.headers.entries()),
           url: response.url,
         };
         error.request = requestDetails;
-        error.type = errorType;
-        error.specificError = specificError;
 
         // Special handling for authentication errors
         if (response.status === 401) {
-          error.name = "AuthenticationError";
           // Check for session expiration header
           if (response.headers.get("x-auth-error") === "session-expired") {
-            error.specificError = FetchErrorType.AUTH.SESSION_EXPIRED;
+            error = AuthError.SESSION_EXPIRED;
           }
         }
 
@@ -57,16 +51,14 @@ export const setupFetchInterceptor = (handleError) => {
       }
 
       return response;
-    } catch (error) {
-      console.log("Fetch interceptor caught error:", error);
+    } catch (caughtError) {
+      console.log("Fetch interceptor caught error:", caughtError);
+      let error = caughtError;
 
       // Specifically handle network errors like ERR_CONNECTION_REFUSED
       if (error instanceof TypeError && error.message === "Failed to fetch") {
         console.log("Network error detected: Connection likely refused");
-        error.isNetworkError = true;
-        error.type = FetchErrorType.NETWORK;
-        error.specificError = FetchErrorType.NETWORK.CONNECTION_REFUSED;
-        error.friendlyMessage = FetchErrorType.getMessageFromError(error);
+        error = NetworkError.CONNECTION_REFUSED;
       }
 
       // If it's not our error object, add the request details
@@ -77,7 +69,24 @@ export const setupFetchInterceptor = (handleError) => {
       // Pass the error to the centralized handler
       console.log("Passing error to central handler:", error);
       handleError(error);
-      throw error; // Re-throw to maintain fetch error behavior
+
+      if (error instanceof Error) {
+        throw error;
+      }
+
+      if (error.name === "AbortError") {
+        throw NetworkError.TIMEOUT;
+      }
+
+      if (!navigator.onLine) {
+        throw NetworkError.OFFLINE;
+      }
+
+      if (error.message?.includes("Failed to fetch")) {
+        throw NetworkError.CONNECTION_REFUSED;
+      }
+
+      throw ServerError.INTERNAL;
     }
   };
 
