@@ -23,11 +23,12 @@ export const setupFetchInterceptor = (handleError) => {
     };
 
     try {
-      console.log(`Fetch request to: ${url}`);
+      console.log(`setupFetchInterceptor Fetch request to: ${url}`);
       const response = await originalFetch(...args);
 
       // Handle response errors
       if (!response.ok) {
+        console.log("setupFetchInterceptor Response error:", response);
         // Create a standardized error object with original request details
         const error = new Error(`Request to "${response.url}" failed with status ${response.status}`);
         error.response = {
@@ -51,11 +52,11 @@ export const setupFetchInterceptor = (handleError) => {
 
       return response;
     } catch (error) {
-      console.log("Fetch interceptor caught error:", error);
+      console.log("setupFetchInterceptor Fetch interceptor caught error:", error);
 
       // Specifically handle network errors like ERR_CONNECTION_REFUSED
       if (error instanceof TypeError && error.message === "Failed to fetch") {
-        console.log("Network error detected: Connection likely refused");
+        console.log("setupFetchInterceptor Network error detected: Connection likely refused");
         // Enhance the error with additional metadata
         error.isNetworkError = true;
         error.errorType = "NETWORK_CONNECTION_ERROR";
@@ -69,7 +70,7 @@ export const setupFetchInterceptor = (handleError) => {
       }
 
       // Pass the error to the centralized handler
-      console.log("Passing error to central handler:", error);
+      console.log("setupFetchInterceptor Passing error to central handler:", error);
       handleError(error);
       throw error; // Re-throw to maintain fetch error behavior
     }
