@@ -61,7 +61,8 @@ export function useAuthenticatedApi(serviceFn) {
     try {
       const authFetch = createAuthFetch(session);
       const response = await serviceFn(authFetch, ...args);
-      return { success: true, data: await response.json() };
+      const data = await response.json;
+      return { success: true, data };
     } catch (error) {
       if (error?.message === "Unauthorized" || error?.status === 401) {
         setConnectivityError({
