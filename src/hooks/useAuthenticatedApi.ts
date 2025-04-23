@@ -15,7 +15,7 @@ interface ApiResponse<T> {
   };
 }
 
-interface CustomError extends Error {
+interface ResponseError extends Error {
   status?: number;
   response?: Response;
 }
@@ -41,7 +41,7 @@ function createAuthFetch(session: Session) {
 
     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
     if (!baseUrl) {
-      const error = new Error("API base URL is not configured") as CustomError;
+      const error = new Error("API base URL is not configured") as ResponseError;
       error.name = "ConfigurationError";
       throw error;
     }
@@ -52,7 +52,7 @@ function createAuthFetch(session: Session) {
     });
 
     if (!response.ok && !resolveOnError) {
-      const error = new Error(`API request failed with status ${response.status}`) as CustomError;
+      const error = new Error(`API request failed with status ${response.status}`) as ResponseError;
       error.status = response.status;
       error.response = response;
       throw error;
@@ -73,7 +73,7 @@ export function useAuthenticatedApi<T, Args extends unknown[] = unknown[]>(servi
       const data = await response.json();
       return { success: true, data };
     } catch (error) {
-      const customError = error as CustomError;
+      const customError = error as ResponseError;
 
       if (customError?.message === "Unauthorized" || customError?.status === 401) {
         setConnectivityError({
