@@ -21,10 +21,6 @@ interface AppContentProps {
   children: ReactNode;
 }
 
-interface ComponentProps {
-  className?: string;
-}
-
 function AppContent({ children }: AppContentProps) {
   const { playerUploadedTrackObject } = usePlayer();
   const { showPopup, hidePopup, activePopup } = usePopup();
