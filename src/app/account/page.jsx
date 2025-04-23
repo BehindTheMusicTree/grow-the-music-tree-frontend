@@ -1,9 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+import { useSession } from "@contexts/SessionContext";
+
 export default function AccountPage() {
+  const { updateSession } = useSession();
+  const router = useRouter();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -107,9 +112,8 @@ export default function AccountPage() {
               <button
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
                 onClick={() => {
-                  // Implement logout functionality
-                  // SpotifyOAuthService.logout();
-                  window.location.reload();
+                  router.push("/");
+                  updateSession(null);
                 }}
               >
                 Disconnect Account
