@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { listUploadedTracks } from "@lib/music-tree-api-service/uploaded-track";
-import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
+import { listUploadedTracks } from "@/lib/music-tree-api-service/uploaded-track";
+import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
 
 export default function TracksList({ initialData }) {
   const { data, loading } = useQuery({

@@ -3,13 +3,13 @@
 import { createContext, useContext, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
+import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
 import {
   listSpotifyLibTracks,
   quickSyncSpotifyLibTracks as quickSyncSpotifyLibTracksApi,
   fullSyncSpotifyLibTracks as fullSyncSpotifyLibTracksApi,
-} from "@lib/music-tree-api-service/spotify-lib-track";
-import { useSession } from "@contexts/SessionContext";
+} from "@/lib/music-tree-api-service/spotify-lib-track";
+import { useSession } from "@/contexts/SessionContext";
 
 const SpotifyLibTracksContext = createContext();
 

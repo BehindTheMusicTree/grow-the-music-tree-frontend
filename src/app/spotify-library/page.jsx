@@ -2,8 +2,8 @@
 
 import { FaSpinner, FaSync } from "react-icons/fa";
 import { MdError, MdSyncProblem } from "react-icons/md";
-import Pagination from "@components/ui/Pagination";
-import { useSpotifyLibTracks } from "@contexts/SpotifyLibTracksContext";
+import Pagination from "@/components/ui/Pagination";
+import { useSpotifyLibTracks } from "@/contexts/SpotifyLibTracksContext";
 
 export default function SpotifyLibrary() {
   const {

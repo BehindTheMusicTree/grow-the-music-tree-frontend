@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Button from "@components/ui/Button";
-import { createGenrePlaylist } from "@lib/music-tree-api-service/genre-playlist";
+import Button from "@/components/ui/Button";
+import { createGenrePlaylist } from "@/lib/music-tree-api-service/genre-playlist";
 
 export default function CreatePlaylistForm() {
   const [formData, setFormData] = useState({

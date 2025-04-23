@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthFetch } from "@hooks/useAuthenticatedApi";
+import { AuthFetch } from "@/hooks/useAuthenticatedApi";
 
 export interface TrackData {
   title: string;

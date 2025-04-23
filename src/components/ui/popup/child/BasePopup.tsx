@@ -2,8 +2,8 @@
 
 import { useState, useEffect, ReactNode, ElementType } from "react";
 import { createPortal } from "react-dom";
-import Popup from "@components/ui/popup/Popup";
-import { PopupTitle } from "@components/ui/popup/PopupTitle";
+import Popup from "@/components/ui/popup/Popup";
+import { PopupTitle } from "@/components/ui/popup/PopupTitle";
 
 type PopupType = "default" | "success" | "error" | "warning" | "info";
 

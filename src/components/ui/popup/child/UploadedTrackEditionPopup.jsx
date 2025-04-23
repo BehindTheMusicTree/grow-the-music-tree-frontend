@@ -2,8 +2,8 @@
 
 import PropTypes from "prop-types";
 import { formatTime } from "@utils/formatting";
-import Rating from "@components/features/Rating";
-import Button from "@components/ui/Button";
+import Rating from "@/components/features/Rating";
+import Button from "@/components/ui/Button";
 import BasePopup from "./BasePopup";
 
 export default function UploadedTrackEditionPopup({

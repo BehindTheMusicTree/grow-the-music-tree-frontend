@@ -4,9 +4,9 @@ import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { useSession } from "@contexts/SessionContext";
-import { listGenrePlaylists } from "@lib/music-tree-api-service/genre-playlist";
-import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
+import { useSession } from "@/contexts/SessionContext";
+import { listGenrePlaylists } from "@/lib/music-tree-api-service/genre-playlist";
+import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
 
 const GenrePlaylistContext = createContext();
 

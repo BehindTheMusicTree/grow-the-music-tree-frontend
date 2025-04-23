@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useAuthenticatedApi } from "./useAuthenticatedApi";
-import { ErrorCode, getMessage } from "@lib/connectivity-errors/codes";
+import { ErrorCode, getMessage } from "@/lib/connectivity-errors/codes";
 
 interface Track {
   id: string;

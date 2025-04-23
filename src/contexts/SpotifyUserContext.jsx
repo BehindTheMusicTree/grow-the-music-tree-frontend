@@ -2,8 +2,8 @@
 
 import { createContext, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
-import { retrieveSpotifyUser as retrieveSpotifyUserApi } from "@lib/music-tree-api-service/spotify-user";
+import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
+import { retrieveSpotifyUser as retrieveSpotifyUserApi } from "@/lib/music-tree-api-service/spotify-user";
 
 const SpotifyUserContext = createContext();
 

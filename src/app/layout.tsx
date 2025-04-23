@@ -1,19 +1,19 @@
 "use client";
 
 import { useEffect, useRef, ReactNode } from "react";
-import { initSentry } from "@lib/sentry";
+import { initSentry } from "@/lib/sentry";
 import "./globals.css";
 
-import Providers from "@app/providers";
-import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
-import { usePopup } from "@contexts/PopupContext";
-import { usePlayer } from "@contexts/PlayerContext";
-import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
-import Banner from "@components/features/banner/Banner";
-import Menu from "@components/features/Menu";
-import Player from "@components/features/player/Player";
-import TrackListSidebar from "@components/features/track-list-sidebar/TrackListSidebar";
-import Popup from "@components/ui/popup/Popup";
+import Providers from "@/app/providers";
+import { useConnectivityError } from "@/contexts/ConnectivityErrorContext";
+import { usePopup } from "@/contexts/PopupContext";
+import { usePlayer } from "@/contexts/PlayerContext";
+import { useTrackListSidebarVisibility } from "@/contexts/TrackListSidebarVisibilityContext";
+import Banner from "@/components/features/banner/Banner";
+import Menu from "@/components/features/Menu";
+import Player from "@/components/features/player/Player";
+import TrackListSidebar from "@/components/features/track-list-sidebar/TrackListSidebar";
+import Popup from "@/components/ui/popup/Popup";
 
 initSentry();
 

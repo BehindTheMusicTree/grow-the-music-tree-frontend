@@ -1,8 +1,8 @@
 "use client";
 
 import { ReactNode } from "react";
-import TrackList from "@components/features/track-list/TrackList";
-import { usePlayer } from "@contexts/PlayerContext";
+import TrackList from "@/components/features/track-list/TrackList";
+import { usePlayer } from "@/contexts/PlayerContext";
 
 interface TrackListSidebarProps {
   className?: string;

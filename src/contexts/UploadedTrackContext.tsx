@@ -3,7 +3,7 @@
 import { createContext, useContext, ReactNode } from "react";
 import { useQuery, useMutation, useQueryClient, UseMutationResult } from "@tanstack/react-query";
 
-import { useSession } from "@contexts/SessionContext";
+import { useSession } from "@/contexts/SessionContext";
 import {
   listUploadedTracks as listUploadedTracksApi,
   updateUploadedTrack as updateUploadedTrackApi,
@@ -11,8 +11,8 @@ import {
   TrackData,
   UploadedTrack,
   PaginatedResponse,
-} from "@lib/music-tree-api-service/uploaded-track";
-import { useAuthenticatedApi, type AuthFetch } from "@hooks/useAuthenticatedApi";
+} from "@/lib/music-tree-api-service/uploaded-track";
+import { useAuthenticatedApi, type AuthFetch } from "@/hooks/useAuthenticatedApi";
 
 interface UpdateTrackData extends Partial<TrackData> {}
 

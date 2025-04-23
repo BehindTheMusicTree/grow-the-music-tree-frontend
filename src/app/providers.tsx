@@ -1,11 +1,11 @@
 "use client";
 
 import { ReactNode } from "react";
-import { SessionProvider } from "@contexts/SessionContext";
-import { PlayerProvider } from "@contexts/PlayerContext";
-import { PopupProvider } from "@contexts/PopupContext";
-import { ConnectivityErrorProvider } from "@contexts/ConnectivityErrorContext";
-import { TrackListSidebarVisibilityProvider } from "@contexts/TrackListSidebarVisibilityContext";
+import { SessionProvider } from "@/contexts/SessionContext";
+import { PlayerProvider } from "@/contexts/PlayerContext";
+import { PopupProvider } from "@/contexts/PopupContext";
+import { ConnectivityErrorProvider } from "@/contexts/ConnectivityErrorContext";
+import { TrackListSidebarVisibilityProvider } from "@/contexts/TrackListSidebarVisibilityContext";
 
 interface ProvidersProps {
   children: NonNullable<ReactNode>;

@@ -2,8 +2,8 @@
 
 import { FaSpotify } from "react-icons/fa";
 import PropTypes from "prop-types";
-import Button from "@components/ui/Button";
-import { useSpotifyAuth } from "@contexts/SpotifyAuthContext";
+import Button from "@/components/ui/Button";
+import { useSpotifyAuth } from "@/contexts/SpotifyAuthContext";
 import BasePopup from "./BasePopup";
 
 export default function SpotifyAuthPopup({ className = "" }) {

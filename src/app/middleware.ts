@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { validateServerEnv } from "@lib/public-env-validator";
+import { validateServerEnv } from "@/lib/public-env-validator";
 import { NextRequest } from "next/server";
 
 // Validate environment variables once at initialization

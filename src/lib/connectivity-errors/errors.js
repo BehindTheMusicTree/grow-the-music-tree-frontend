@@ -1,4 +1,4 @@
-import { ErrorCode } from "@contexts/error-codes";
+import { ErrorCode } from "@/contexts/error-codes";
 
 // Base error type for all errors
 export class Error {
