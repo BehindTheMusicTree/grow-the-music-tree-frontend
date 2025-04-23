@@ -4,7 +4,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSpotifyAuth } from "@contexts/SpotifyAuthContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
-import { ErrorCode } from "@contexts/error-codes";
+import { ErrorCode } from "@lib/errors/error-codes";
 
 export default function SpotifyCallback() {
   const searchParams = useSearchParams();
@@ -27,7 +27,7 @@ export default function SpotifyCallback() {
       setConnectivityError({
         type: ConnectivityErrorType.INTERNAL,
         message: ErrorCode.getMessage(ErrorCode.INTERNAL),
-        code: ErrorCode.INTERNAL,
+        debugCode: ErrorCode.INTERNAL,
       });
     } finally {
       processingRef.current = false;
