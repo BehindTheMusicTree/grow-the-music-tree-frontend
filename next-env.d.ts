@@ -1,6 +1,5 @@
 /// <reference types="next" />
 /// <reference types="next/image-types/global" />
 
-declare module "@contexts/*";
-declare module "@types/*";
-declare module "@lib/*";
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/app/api-reference/config/typescript for more information.
