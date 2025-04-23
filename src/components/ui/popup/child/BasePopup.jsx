@@ -12,6 +12,7 @@ export default function BasePopup({
   onClose,
   isDismissable = true,
   className = "",
+  contentClassName = "",
   type = "default", // default | fullscreen | bottom-sheet | alert
   icon,
 }) {
@@ -42,7 +43,7 @@ export default function BasePopup({
     >
       <div className={getPopupClasses()} onClick={(e) => e.stopPropagation()}>
         <PopupTitle title={title} onClose={onClose} isDismissable={isDismissable} icon={icon} />
-        <div className="mt-4">{children}</div>
+        <div className={`pt-4 ${contentClassName}`}>{children}</div>
       </div>
     </div>
   );
