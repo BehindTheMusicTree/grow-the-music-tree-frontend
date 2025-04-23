@@ -1,6 +1,6 @@
 "use client";
 
-import { ErrorHandler, NetworkError, AuthError, ServerError, ClientError } from "./connectivity-errors/error-types";
+import { ErrorHandler, NetworkError, AuthError, ServerError } from "./connectivity-errors/error-types";
 
 // Store the original fetch only in browser environments
 const originalFetch = typeof window !== "undefined" ? window.fetch : null;
