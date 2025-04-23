@@ -32,11 +32,23 @@ export interface PaginatedResponse<T> {
   results: T[];
 }
 
+interface ApiDetailedUploadedTrackResponse {
+  id: string;
+  name: string;
+  artists: string[];
+  album: string;
+  spotifyId: string;
+  spotifyUri: string;
+  spotifyUrl: string;
+  durationMs: number;
+  imageUrl?: string;
+}
+
 export async function listUploadedTracks(
   authFetch: AuthFetch,
   page = 1,
   pageSize = 50
-): Promise<PaginatedResponse<UploadedTrack>> {
+): Promise<PaginatedResponse<ApiDetailedUploadedTrackResponse>> {
   const params = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString(),

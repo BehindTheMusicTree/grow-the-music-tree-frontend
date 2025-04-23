@@ -1,16 +1,7 @@
 "use client";
 
-export interface SpotifyAuthResponse {
-  accessToken: string;
-  refreshToken: string;
-  expiresAt: number;
-  spotifyUser: {
-    id: string;
-    display_name: string;
-    email: string;
-    images?: { url: string }[];
-  };
-}
+import { AuthFetch } from "@/hooks/useAuthenticatedApi";
+import { SpotifyAuthResponse } from "@/models/user/spotify";
 
 export const SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize";
 export const SPOTIFY_SCOPES = [

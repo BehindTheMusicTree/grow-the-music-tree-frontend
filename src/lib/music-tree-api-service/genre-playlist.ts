@@ -1,11 +1,19 @@
 "use client";
 
 import { AuthFetch } from "@/hooks/useAuthenticatedApi";
+import { GenrePlaylist } from "@models/GenrePlaylist";
+import { SpotifyUser } from "@/models/interfaces/spotify";
 
-export interface GenrePlaylist {
+interface ApiGenrePlaylistResponse {
   id: string;
   name: string;
   description?: string;
+  spotifyId: string;
+  spotifyUri: string;
+  spotifyUrl: string;
+  owner: SpotifyUser;
+  tracksCount: number;
+  imageUrl?: string;
 }
 
 export interface PaginatedResponse<T> {

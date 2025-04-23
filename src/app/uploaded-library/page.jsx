@@ -9,10 +9,10 @@ import UploadedTrackPositionPlayPause from "@/components/features/UploadedTrackP
 import { usePlayer } from "@/contexts/PlayerContext";
 import { usePopup } from "@/contexts/PopupContext";
 import { useTrackList } from "@/contexts/TrackListContext";
-import { useUploadedTracks } from "@/contexts/UploadedTrackContext";
+import { useListUploadedTracks } from "@/hooks/useUploadedTrack";
 
 export default function UploadedLibrary() {
-  const { uploadedTracks } = useUploadedTracks();
+  const { data: uploadedTracks = [] } = useListUploadedTracks();
   const { playerUploadedTrackObject, handlePlayPauseAction } = usePlayer();
   const { showPopup } = usePopup();
   const { playNewTrackListFromUploadedTrackUuid } = useTrackList();
