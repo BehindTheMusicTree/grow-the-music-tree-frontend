@@ -10,7 +10,7 @@ export async function listSpotifyLibTracks(authFetch, page = 1, pageSize = 50) {
 }
 
 export async function quickSyncSpotifyLibTracks(authFetch) {
-  const response = await authFetch("library/spotify/sync/quick", {
+  const response = await authFetch("library/spotify/sync/quick/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -20,7 +20,7 @@ export async function quickSyncSpotifyLibTracks(authFetch) {
 }
 
 export async function fullSyncSpotifyLibTracks(authFetch) {
-  const response = await authFetch("library/spotify/sync/full", {
+  const response = await authFetch("library/spotify/sync/full/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
