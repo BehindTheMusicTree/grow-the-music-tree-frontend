@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, ReactNode } from "react";
 import { initSentry } from "@lib/sentry";
 import "./globals.css";
 
@@ -17,12 +17,22 @@ import Popup from "@components/ui/popup/Popup";
 
 initSentry();
 
-function AppContent({ children }) {
+interface AppContentProps {
+  children: ReactNode;
+}
+
+interface ComponentProps {
+  className?: string;
+}
+
+function AppContent({ children }: AppContentProps) {
   const { playerUploadedTrackObject } = usePlayer();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
   const { connectivityError, clearConnectivityError, ConnectivityErrorType } = useConnectivityError();
-  const currentConnectivityErrorTypeRef = useRef(null);
+  const currentConnectivityErrorTypeRef = useRef<
+    (typeof ConnectivityErrorType)[keyof typeof ConnectivityErrorType] | null
+  >(null);
 
   useEffect(() => {
     console.log("AppContent: connectivityError changed", connectivityError);
@@ -32,7 +42,7 @@ function AppContent({ children }) {
     } else if (
       connectivityError?.type !== ConnectivityErrorType.NONE &&
       ![ConnectivityErrorType.NETWORK, ConnectivityErrorType.INTERNAL].includes(
-        currentConnectivityErrorTypeRef.current
+        currentConnectivityErrorTypeRef.current as (typeof ConnectivityErrorType)[keyof typeof ConnectivityErrorType]
       ) &&
       connectivityError?.type !== currentConnectivityErrorTypeRef.current
     ) {
@@ -96,7 +106,11 @@ function AppContent({ children }) {
   );
 }
 
-export default function RootLayout({ children }) {
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body>
