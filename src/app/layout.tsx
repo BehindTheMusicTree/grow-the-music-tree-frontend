@@ -25,7 +25,7 @@ function AppContent({ children }: AppContentProps) {
   const { playerUploadedTrackObject } = usePlayer();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-  const { connectivityError, clearConnectivityError, ConnectivityErrorType } = useConnectivityError();
+  const { connectivityError, clearConnectivityError } = useConnectivityError();
   const currentConnectivityErrorTypeRef = useRef<
     (typeof ConnectivityErrorType)[keyof typeof ConnectivityErrorType] | null
   >(null);
