@@ -4,11 +4,9 @@ import { useEffect, useRef, ReactNode } from "react";
 import { initSentry } from "@/lib/sentry";
 import "./globals.css";
 import { Inter } from "next/font/google";
-import type { Metadata } from "next";
 
 import Providers from "@/app/providers";
 import { PopupProvider } from "@/contexts/PopupContext";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { useConnectivityError } from "@/contexts/ConnectivityErrorContext";
 import { usePopup } from "@/contexts/PopupContext";
 import { usePlayer } from "@/contexts/PlayerContext";
@@ -24,11 +22,6 @@ import InternalErrorPopup from "@/components/ui/popup/child/InternalErrorPopup";
 initSentry();
 
 const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "Bodzify Ultimate Music Guide",
-  description: "Your ultimate guide to music",
-};
 
 interface AppContentProps {
   children: ReactNode;
@@ -112,13 +105,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={inter.className}>
-        <AuthProvider>
-          <PopupProvider>
-            <Providers>
-              <AppContent>{children}</AppContent>
-            </Providers>
-          </PopupProvider>
-        </AuthProvider>
+        <PopupProvider>
+          <Providers>
+            <AppContent>{children}</AppContent>
+          </Providers>
+        </PopupProvider>
       </body>
     </html>
   );
