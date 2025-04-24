@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useState, useContext, ReactNode } from "react";
-import Track from "@/models/domain/spotify-lib-track";
+import Track from "@/models/domain/uploaded-track";
 
 interface TrackListContextType {
   trackList: Track[];
