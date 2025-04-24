@@ -29,23 +29,6 @@ export enum ErrorCode {
   CLIENT_INTERNAL_ERROR = "CLI4004",
 }
 
-// Type guards
-export function isNetworkError(code: ErrorCode): boolean {
-  return code.startsWith("NET");
-}
-
-export function isApiError(code: ErrorCode): boolean {
-  return code.startsWith("API");
-}
-
-export function isAuthError(code: ErrorCode): boolean {
-  return code.startsWith("AUT");
-}
-
-export function isClientError(code: ErrorCode): boolean {
-  return code.startsWith("CLI");
-}
-
 export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCode.NETWORK_OFFLINE]: "Network connection unavailable",
   [ErrorCode.NETWORK_TIMEOUT]: "Request timed out",
