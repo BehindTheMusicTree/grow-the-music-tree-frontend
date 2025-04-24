@@ -5,16 +5,18 @@ import { initSentry } from "@/lib/sentry";
 import "./globals.css";
 
 import Providers from "@/app/providers";
-import { useAppError } from "@/contexts/AppErrorContext";
+import { useConnectivityError } from "@/contexts/ConnectivityErrorContext";
 import { usePopup } from "@/contexts/PopupContext";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@/contexts/TrackListSidebarVisibilityContext";
+import { ConnectivityError, NetworkError, AuthError, ServerError, BadRequestError } from "@/types/app-errors/app-error";
 import Banner from "@/components/features/banner/Banner";
 import Menu from "@/components/features/Menu";
 import Player from "@/components/features/player/Player";
 import TrackListSidebar from "@/components/features/track-list-sidebar/TrackListSidebar";
 import Popup from "@/components/ui/popup/Popup";
-import { AppErrorType } from "@/types/app-errors/app-error-types";
+import NetworkErrorPopup from "@/components/ui/popup/child/NetworkErrorPopup";
+
 initSentry();
 
 interface AppContentProps {
@@ -25,29 +27,27 @@ function AppContent({ children }: AppContentProps) {
   const { playerUploadedTrackObject } = usePlayer();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-  const { appError: connectivityError, clearAppError: clearConnectivityError } = useAppError();
-  const currentAppErrorTypeRef = useRef<AppErrorType | null>(null);
+  const { connectivityError, clearConnectivityError } = useConnectivityError();
+  const currentConnectivityErrorTypeRef = useRef<typeof ConnectivityError | null>(null);
 
   useEffect(() => {
     console.log("AppContent: connectivityError changed", connectivityError);
-    if (connectivityError?.type === ConnectivityErrorType.NONE && currentAppErrorTypeRef.current !== null) {
-      currentAppErrorTypeRef.current = null;
-      hidePopup();
+
+    if (connectivityError === null) {
+      if (currentConnectivityErrorTypeRef.current !== null) {
+        currentConnectivityErrorTypeRef.current = null;
+        hidePopup();
+      }
     } else if (
-      connectivityError?.type !== ConnectivityErrorType.NONE &&
-      ![ConnectivityErrorType.NETWORK, ConnectivityErrorType.INTERNAL].includes(
-        currentAppErrorTypeRef.current as (typeof ConnectivityErrorType)[keyof typeof ConnectivityErrorType]
-      ) &&
-      connectivityError?.type !== currentAppErrorTypeRef.current
+      currentConnectivityErrorTypeRef.current !== null &&
+      ![NetworkError, ServerError].includes(currentConnectivityErrorTypeRef.current) &&
+      !(connectivityError instanceof currentConnectivityErrorTypeRef.current)
     ) {
       let popupType = "";
 
-      if (connectivityError.type === ConnectivityErrorType.AUTH_REQUIRED) {
+      if (connectivityError instanceof AuthError) {
         popupType = "authRequired";
-      } else if (
-        connectivityError.type === ConnectivityErrorType.BAD_REQUEST ||
-        connectivityError.type === ConnectivityErrorType.INTERNAL
-      ) {
+      } else if (connectivityError instanceof BadRequestError || connectivityError instanceof ServerError) {
         popupType = "internalError";
         showPopup(popupType, {
           message: connectivityError.message,
@@ -57,11 +57,11 @@ function AppContent({ children }: AppContentProps) {
             hidePopup();
           },
         });
-      } else if (connectivityError.type === ConnectivityErrorType.NETWORK) {
-        popupType = "networkError";
+      } else if (connectivityError instanceof NetworkError) {
+        popupType = typeof NetworkErrorPopup;
       }
 
-      currentAppErrorTypeRef.current = connectivityError?.type;
+      currentConnectivityErrorTypeRef.current = typeof connectivityError;
       showPopup(popupType, {
         message: connectivityError.message,
         debugCode: connectivityError.code,
