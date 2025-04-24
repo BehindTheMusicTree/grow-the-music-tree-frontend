@@ -3,7 +3,7 @@
 import { AlertTriangle, AlertCircle } from "lucide-react";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 
-interface InternalErrorPopupProps extends BasePopupProps {
+export interface InternalErrorPopupProps extends BasePopupProps {
   debugCode?: string;
 }
 
