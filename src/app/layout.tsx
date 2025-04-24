@@ -5,7 +5,7 @@ import { initSentry } from "@/lib/sentry";
 import "./globals.css";
 
 import Providers from "@/app/providers";
-import { useConnectivityError } from "@/contexts/ConnectivityErrorContext";
+import { useAppError } from "@/contexts/AppErrorContext";
 import { usePopup } from "@/contexts/PopupContext";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@/contexts/TrackListSidebarVisibilityContext";
@@ -25,7 +25,7 @@ function AppContent({ children }: AppContentProps) {
   const { playerUploadedTrackObject } = usePlayer();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-  const { connectivityError, clearConnectivityError } = useConnectivityError();
+  const { appError: connectivityError, clearAppError: clearConnectivityError } = useAppError();
   const currentConnectivityErrorTypeRef = useRef<
     (typeof ConnectivityErrorType)[keyof typeof ConnectivityErrorType] | null
   >(null);

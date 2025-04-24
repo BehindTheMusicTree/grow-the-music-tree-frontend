@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { useSession } from "@/contexts/SessionContext";
-import { useConnectivityError } from "@/contexts/ConnectivityErrorContext";
+import { useAppError } from "@/contexts/AppErrorContext";
 
 interface SpotifyAuthConfig {
   clientId: string;
@@ -18,7 +18,7 @@ const spotifyAuthConfig: SpotifyAuthConfig = {
 
 export function useSpotifyAuth() {
   const { session, setSession } = useSession();
-  const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
+  const { setAppError: setConnectivityError, ConnectivityErrorType } = useAppError();
 
   const login = useCallback(() => {
     const authUrl = new URL("https://accounts.spotify.com/authorize");
