@@ -3,6 +3,7 @@ import { ArtistMinimumSchema } from "./artist";
 import { AlbumMinimumSchema } from "./album";
 import { GenreMinimumSchema } from "./genre";
 import { FileDetailedSchema } from "./file";
+import { PlaylistMinimumSchema } from "./playlist";
 
 export const UploadedTrackDetailedSchema = z.object({
   uuid: z.string().uuid(),
@@ -15,11 +16,11 @@ export const UploadedTrackDetailedSchema = z.object({
   genre: GenreMinimumSchema,
   rating: z.number().min(0).max(10).optional(),
   language: z.string().optional(),
-  playlistsPublic: z.array(z.string()).optional(),
-  playCount: z.number().default(0),
+  playlists: z.array(PlaylistMinimumSchema),
+  playCount: z.number().min(0),
   archived: z.boolean(),
   createdOn: z.string().datetime(),
-  updatedOn: z.string().datetime(),
+  updatedOn: z.string().datetime().optional(),
 });
 
 export type UploadedTrackDetailed = z.infer<typeof UploadedTrackDetailedSchema>;
