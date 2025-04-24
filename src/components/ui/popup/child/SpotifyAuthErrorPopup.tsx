@@ -3,7 +3,7 @@
 import { FaSpotify } from "react-icons/fa";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 import Button from "@/components/ui/Button";
-import { useSpotifyAuth } from "@/contexts/SpotifyAuthContext";
+import { useSpotifyAuth } from "@/hooks/SpotifyAuthContext";
 
 interface SpotifyAuthErrorPopupProps extends BasePopupProps {
   message: string;
