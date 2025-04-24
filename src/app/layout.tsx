@@ -13,7 +13,7 @@ import { usePlayer } from "@/contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@/contexts/TrackListSidebarVisibilityContext";
 import { ConnectivityError, NetworkError, AuthError, ServerError, BadRequestError } from "@/types/app-errors/app-error";
 import Banner from "@/components/features/banner/Banner";
-import Menu from "@/components/features/Menu";
+import Menu from "@/components/features/menu/Menu";
 import Player from "@/components/features/player/Player";
 import TrackListSidebar from "@/components/features/track-list-sidebar/TrackListSidebar";
 import NetworkErrorPopup from "@/components/ui/popup/child/NetworkErrorPopup";
@@ -75,7 +75,7 @@ function AppContent({ children }: AppContentProps) {
 
   return (
     <div className="app flex flex-col h-screen">
-      <Banner className="fixed top-0 z-50" />
+      <Banner className="fixed w-full top-0 z-50" />
 
       <div
         className="center bg-gray-100 flex-grow flex overflow-y-auto"

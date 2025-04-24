@@ -10,7 +10,7 @@ interface BannerProps {
 
 export default function Banner({ className }: BannerProps) {
   return (
-    <div className={`py-2 px-3 bg-black text-gray-100 ${className}`}>
+    <div className={`banner py-2 px-3 bg-black text-gray-100 ${className}`}>
       <div className="w-full mx-auto relative">
         <div className="flex items-center">
           <div className="mr-3">
