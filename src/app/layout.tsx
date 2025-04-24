@@ -96,7 +96,7 @@ function AppContent({ children }: AppContentProps) {
       </div>
 
       {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />}
-      {activePopup && <Popup type={activePopup.type} content={activePopup.content} onClose={hidePopup} />}
+      {activePopup}
     </div>
   );
 }
