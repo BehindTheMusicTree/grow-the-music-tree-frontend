@@ -19,16 +19,3 @@ export const FileDetailedSchema = z.object({
 });
 
 export type FileDetailed = z.infer<typeof FileDetailedSchema>;
-
-export const FileMinimumSchema = FileDetailedSchema.pick({
-  filename: true,
-  extension: true,
-  durationInSec: true,
-  durationStrInHourMinSec: true,
-  sizeInBytes: true,
-  sizeInKo: true,
-  sizeInMo: true,
-  bitrateInKbps: true,
-});
-
-export type FileMinimum = z.infer<typeof FileMinimumSchema>;

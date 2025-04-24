@@ -2,11 +2,13 @@ import { z } from "zod";
 import { ArtistMinimumSchema } from "./artist";
 import { AlbumMinimumSchema } from "./album";
 import { GenreMinimumSchema } from "./genre";
+import { FileDetailedSchema } from "./file";
+
 export const UploadedTrackDetailedSchema = z.object({
   uuid: z.string().uuid(),
   relativeUrl: z.string(),
   title: z.string(),
-  file: z.string(),
+  file: FileDetailedSchema,
   artists: z.array(ArtistMinimumSchema),
   album: AlbumMinimumSchema,
   trackNumber: z.number().optional(),
