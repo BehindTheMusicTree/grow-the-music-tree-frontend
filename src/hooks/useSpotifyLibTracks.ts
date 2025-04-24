@@ -3,22 +3,22 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
 import { PaginatedResponse, PaginatedResponseSchema } from "@/types/api/pagination";
-import { SpotifyLibTrackSimpleSchema, SpotifyLibTrackSimple } from "@/types/api/spotify";
+import { SpotifyLibTrackDetailedSchema, SpotifyLibTrackDetailed } from "@/models/domain/spotify";
 
 export function useListSpotifyLibTracks(page = 1, pageSize = 20) {
-  const listTracks = useAuthenticatedApi<PaginatedResponse<SpotifyLibTrackSimple>>(async (authFetch) => {
+  const listTracks = useAuthenticatedApi<PaginatedResponse<SpotifyLibTrackDetailed>>(async (authFetch) => {
     const response = await authFetch(`spotify/library/tracks?page=${page}&pageSize=${pageSize}`);
     return response.json();
   });
 
-  return useQuery<PaginatedResponse<SpotifyLibTrackSimple>>({
+  return useQuery<PaginatedResponse<SpotifyLibTrackDetailed>>({
     queryKey: ["spotifyLibTracks", page, pageSize],
     queryFn: async () => {
       const response = await listTracks();
       if (!response.success) {
         throw new Error(response.error?.message);
       }
-      return PaginatedResponseSchema(SpotifyLibTrackSimpleSchema).parse(response.data);
+      return PaginatedResponseSchema(SpotifyLibTrackDetailedSchema).parse(response.data);
     },
   });
 }
