@@ -1,16 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFetchWrapper } from "./useFetchWrapper";
+import { PaginatedResponse } from "@/types/api/pagination";
 import { GenreSchema, Genre } from "@/models/domain/genre";
 import { GenreFormValues } from "@/schemas/genreFormSchema";
+import { GenreListResponseSchema, BaseGenre } from "@/types/api/genre";
 
 export function useListGenres(page = 1, pageSize = 50) {
   const { fetch } = useFetchWrapper();
 
-  return useQuery<Genre[]>({
+  return useQuery<PaginatedResponse<BaseGenre>>({
     queryKey: ["genres", "list", page, pageSize],
     queryFn: async () => {
-      const response = await fetch("genre/", true);
-      return GenreSchema.array().parse(response);
+      const response = await fetch("genre/", true, {}, { page, pageSize });
+      return GenreListResponseSchema.parse(response);
     },
   });
 }
