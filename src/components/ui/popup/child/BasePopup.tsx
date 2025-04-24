@@ -2,7 +2,6 @@
 
 import { useState, useEffect, ReactNode, ElementType } from "react";
 import { createPortal } from "react-dom";
-import Popup from "@/components/ui/popup/Popup";
 import { PopupTitle } from "@/components/ui/popup/PopupTitle";
 
 type PopupType = "default" | "success" | "error" | "warning" | "info";
@@ -17,15 +16,7 @@ interface BasePopupProps {
   isDismissable?: boolean;
 }
 
-export function BasePopup({
-  title,
-  children,
-  isOpen,
-  onClose,
-  type = "default",
-  icon,
-  isDismissable = true,
-}: BasePopupProps) {
+export function BasePopup({ title, children, onClose, type = "default", icon, isDismissable = true }: BasePopupProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
