@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ArtistMinimumSchema } from "./artist";
 import { AlbumMinimumSchema } from "./album";
-
+import { GenreMinimumSchema } from "./genre";
 export const UploadedTrackDetailedSchema = z.object({
   uuid: z.string().uuid(),
   relativeUrl: z.string(),
@@ -10,8 +10,8 @@ export const UploadedTrackDetailedSchema = z.object({
   artists: z.array(ArtistMinimumSchema),
   album: AlbumMinimumSchema,
   trackNumber: z.number().optional(),
-  genre: z.string().optional(),
-  rating: z.number().min(0).max(5).optional(),
+  genre: GenreMinimumSchema,
+  rating: z.number().min(0).max(10).optional(),
   language: z.string().optional(),
   playlistsPublic: z.array(z.string()).optional(),
   playCount: z.number().default(0),
