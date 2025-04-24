@@ -1,55 +1,36 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useAuthenticatedApi } from "./useAuthenticatedApi";
+import { useQuery } from "@tanstack/react-query";
+import { useFetchWrapper } from "./useFetchWrapper";
 import { ErrorCode, getMessage } from "@/lib/connectivity-errors/codes";
-
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  albumArt: string;
-  duration: string;
-}
+import { ApiSpotifyLibTrackDto } from "@/types/dto/spotify";
 
 interface SpotifyLibTracksResponse {
-  items: Track[];
-  total: number;
-  limit: number;
-  offset: number;
+  items: ApiSpotifyLibTrackDto[];
 }
 
 export function useSpotifyLibTracks() {
-  const [tracks, setTracks] = useState<Track[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchTracks = useAuthenticatedApi<SpotifyLibTracksResponse>(async (authFetch) => {
-    return authFetch("/api/spotify/library/tracks");
+  const fetchTracks = useFetchWrapper<SpotifyLibTracksResponse>(async (authFetch) => {
+    const response = await authFetch("/api/spotify/library/tracks");
+    const data = await response.json();
+    return data;
   });
 
-  const loadTracks = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["spotifyLibTracks"],
+    queryFn: async () => {
       const response = await fetchTracks();
       if (response.success && response.data) {
-        setTracks(response.data.items);
-      } else {
-        setError(response.error?.message || getMessage(ErrorCode.INTERNAL));
+        return response.data.items;
       }
-    } catch (error) {
-      setError(getMessage(ErrorCode.INTERNAL));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [fetchTracks]);
+      throw new Error(response.error?.message || getMessage(ErrorCode.INTERNAL));
+    },
+  });
 
   return {
-    tracks,
+    tracks: data || [],
     isLoading,
-    error,
-    loadTracks,
+    error: error?.message || null,
+    loadTracks: refetch,
   };
 }
