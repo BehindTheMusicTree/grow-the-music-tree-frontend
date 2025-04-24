@@ -57,6 +57,11 @@ export class ServerError extends ConnectivityError {
   }
 }
 
+/**
+ * Union type of all error classes.
+ * Required because TypeScript's type system doesn't automatically recognize
+ * class inheritance for type checking in instanceof expressions.
+ */
 export type AppErrorType =
   | AppError
   | ClientError
