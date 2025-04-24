@@ -3,7 +3,7 @@
 import { useSession } from "@/contexts/SessionContext";
 import { createContext, useContext, useCallback, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { useAppError } from "@/contexts/AppErrorContext";
+import { useConnectivityError } from "@/contexts/AppErrorContext";
 import { authenticateWithSpotifyCode, SpotifyAuthResponse } from "@/lib/music-tree-api-service/spotify-auth";
 import { ErrorCode } from "@/lib/errors/codes";
 
@@ -29,7 +29,7 @@ interface SpotifyAuthProviderProps {
 
 export const SpotifyAuthProvider = ({ children }: SpotifyAuthProviderProps) => {
   const { updateSession } = useSession();
-  const { setAppError: setConnectivityError, connectivityErrorTypes } = useAppError();
+  const { setAppError: setConnectivityError, connectivityErrorTypes } = useConnectivityError();
   const router = useRouter();
 
   const handleSpotifyAuth = () => {

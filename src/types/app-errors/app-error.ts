@@ -22,6 +22,13 @@ export class ConnectivityError extends AppError {
   }
 }
 
+export class BadRequestError extends ConnectivityError {
+  constructor(code: ErrorCode) {
+    super(code);
+    this.name = "BadRequestError";
+  }
+}
+
 export class NetworkError extends ConnectivityError {
   constructor(code: ErrorCode) {
     super(code);

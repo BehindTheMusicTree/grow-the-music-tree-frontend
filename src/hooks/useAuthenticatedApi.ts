@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, Session } from "@/contexts/SessionContext";
-import { useAppError } from "@/contexts/AppErrorContext";
+import { useConnectivityError } from "@/contexts/AppErrorContext";
 
 interface FetchOptions extends RequestInit {
   resolveOnError?: boolean;
@@ -56,7 +56,7 @@ function createAuthFetch(session: Session) {
 }
 
 export function useAuthenticatedApi<T, Args extends unknown[] = unknown[]>(serviceFn: ServiceFn<T, Args>) {
-  const { setAppError: setConnectivityError } = useAppError();
+  const { setAppError: setConnectivityError } = useConnectivityError();
   const { session } = useSession();
 
   return async (...args: Args): Promise<ApiResponse<T>> => {
