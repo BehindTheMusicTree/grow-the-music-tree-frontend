@@ -1,17 +1,11 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import { BasePopup, BasePopupProps } from "@/components/ui/popup/BasePopup";
-
-interface PopupState {
-  popup: typeof BasePopup;
-  content: BasePopupProps;
-}
 
 interface PopupContextType {
-  showPopup: (popupComponent: typeof BasePopup, content?: BasePopupProps) => void;
+  showPopup: (popup: ReactNode) => void;
   hidePopup: () => void;
-  activePopup: PopupState | null;
+  activePopup: ReactNode | null;
 }
 
 const PopupContext = createContext<PopupContextType | undefined>(undefined);
@@ -21,10 +15,10 @@ interface PopupProviderProps {
 }
 
 export function PopupProvider({ children }: PopupProviderProps) {
-  const [activePopup, setActivePopup] = useState<PopupState | null>(null);
+  const [activePopup, setActivePopup] = useState<ReactNode | null>(null);
 
-  const showPopup = (popup: typeof BasePopup, content: BasePopupProps) => {
-    setActivePopup({ popup, content });
+  const showPopup = (popup: ReactNode) => {
+    setActivePopup(popup);
   };
 
   const hidePopup = () => {
