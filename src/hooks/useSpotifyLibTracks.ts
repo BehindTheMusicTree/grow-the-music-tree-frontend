@@ -1,36 +1,66 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { useFetchWrapper } from "./useFetchWrapper";
-import { ErrorCode, getMessage } from "@/lib/connectivity-errors/codes";
-import { ApiSpotifyLibTrackDto } from "@/types/dto/spotify";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
+import { PaginatedResponse, PaginatedResponseSchema } from "@/types/api/pagination";
+import { SpotifyLibTrackSimpleSchema, SpotifyLibTrackSimple } from "@/types/api/spotify";
 
-interface SpotifyLibTracksResponse {
-  items: ApiSpotifyLibTrackDto[];
-}
-
-export function useSpotifyLibTracks() {
-  const fetchTracks = useFetchWrapper<SpotifyLibTracksResponse>(async (authFetch) => {
-    const response = await authFetch("/api/spotify/library/tracks");
-    const data = await response.json();
-    return data;
+export function useListSpotifyLibTracks(page = 1, pageSize = 20) {
+  const listTracks = useAuthenticatedApi<PaginatedResponse<SpotifyLibTrackSimple>>(async (authFetch) => {
+    const response = await authFetch(`spotify/library/tracks?page=${page}&pageSize=${pageSize}`);
+    return response.json();
   });
 
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["spotifyLibTracks"],
+  return useQuery<PaginatedResponse<SpotifyLibTrackSimple>>({
+    queryKey: ["spotifyLibTracks", page, pageSize],
     queryFn: async () => {
-      const response = await fetchTracks();
-      if (response.success && response.data) {
-        return response.data.items;
+      const response = await listTracks();
+      if (!response.success) {
+        throw new Error(response.error?.message);
       }
-      throw new Error(response.error?.message || getMessage(ErrorCode.INTERNAL));
+      return PaginatedResponseSchema(SpotifyLibTrackSimpleSchema).parse(response.data);
     },
   });
+}
 
-  return {
-    tracks: data || [],
-    isLoading,
-    error: error?.message || null,
-    loadTracks: refetch,
-  };
+export function useQuickSyncSpotifyLibTracks() {
+  const queryClient = useQueryClient();
+  const quickSync = useAuthenticatedApi(async (authFetch) => {
+    const response = await authFetch("spotify/library/tracks/sync/quick", { method: "POST" });
+    return response.json();
+  });
+
+  return useMutation({
+    mutationFn: async () => {
+      const response = await quickSync();
+      if (!response.success) {
+        throw new Error(response.error?.message);
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["spotifyLibTracks"] });
+    },
+  });
+}
+
+export function useFullSyncSpotifyLibTracks() {
+  const queryClient = useQueryClient();
+  const fullSync = useAuthenticatedApi(async (authFetch) => {
+    const response = await authFetch("spotify/library/tracks/sync/full", { method: "POST" });
+    return response.json();
+  });
+
+  return useMutation({
+    mutationFn: async () => {
+      const response = await fullSync();
+      if (!response.success) {
+        throw new Error(response.error?.message);
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["spotifyLibTracks"] });
+    },
+  });
 }
