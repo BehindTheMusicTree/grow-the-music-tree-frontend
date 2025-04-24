@@ -1,8 +1,5 @@
 "use client";
 
-import { AuthFetch } from "@/hooks/useAuthenticatedApi";
-import { SpotifyAuthResponse } from "@/models/user/spotify";
-
 export const SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize";
 export const SPOTIFY_SCOPES = [
   "user-read-email",
