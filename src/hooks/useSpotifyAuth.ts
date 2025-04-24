@@ -1,78 +1,73 @@
 "use client";
 
-import { useCallback } from "react";
 import { useSession } from "@/contexts/SessionContext";
+import { useRouter } from "next/navigation";
 import { useConnectivityError } from "@/contexts/ConnectivityErrorContext";
-
-interface SpotifyAuthConfig {
-  clientId: string;
-  redirectUri: string;
-  scopes: string;
-}
-
-const spotifyAuthConfig: SpotifyAuthConfig = {
-  clientId: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || "",
-  redirectUri: process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI || "",
-  scopes: process.env.NEXT_PUBLIC_SPOTIFY_SCOPES || "",
-};
+import {
+  authenticateWithSpotifyCode,
+  SPOTIFY_AUTH_URL,
+  SPOTIFY_SCOPES,
+} from "@/lib/music-tree-api-service/spotify-auth";
+import { ErrorCode } from "@/types/app-errors/app-error-codes";
+import { ApiError } from "@/types/app-errors/app-error";
 
 export function useSpotifyAuth() {
-  const { session, setSession } = useSession();
-  const { setAppError: setConnectivityError, ConnectivityErrorType } = useConnectivityError();
+  const { setSession } = useSession();
+  const { setConnectivityError } = useConnectivityError();
+  const router = useRouter();
 
-  const login = useCallback(() => {
-    const authUrl = new URL("https://accounts.spotify.com/authorize");
-    authUrl.searchParams.append("client_id", spotifyAuthConfig.clientId);
-    authUrl.searchParams.append("response_type", "token");
-    authUrl.searchParams.append("redirect_uri", spotifyAuthConfig.redirectUri);
-    authUrl.searchParams.append("scope", spotifyAuthConfig.scopes);
-    window.location.href = authUrl.toString();
-  }, []);
+  const handleSpotifyAuth = () => {
+    if (!process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || !process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI) {
+      throw new Error("Spotify configuration is missing. Please check your environment variables.");
+    }
 
-  const logout = useCallback(() => {
-    setSession({
-      user: null,
-      accessToken: null,
-      isAuthenticated: false,
+    localStorage.setItem("spotifyAuthRedirect", window.location.href);
+
+    const params = new URLSearchParams({
+      client_id: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
+      response_type: "code",
+      redirect_uri: process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI,
+      scope: SPOTIFY_SCOPES,
     });
-  }, [setSession]);
 
-  const handleAuthCallback = useCallback(
-    (hash: string) => {
-      try {
-        const params = new URLSearchParams(hash.substring(1));
-        const accessToken = params.get("access_token");
-        const expiresIn = params.get("expires_in");
+    window.location.href = `${SPOTIFY_AUTH_URL}?${params.toString()}`;
+  };
 
-        if (!accessToken) {
-          setConnectivityError({
-            type: ConnectivityErrorType.AUTH_REQUIRED,
-            message: getMessage(ErrorCode.AUTH_REQUIRED),
-            code: ErrorCode.AUTH_REQUIRED,
-          });
-          return;
-        }
+  const handleCallback = async (code: string) => {
+    console.log("handleCallback called", { code });
+    const response = await authenticateWithSpotifyCode(code);
+    if (!response.ok) {
+      const error = new ApiError(ErrorCode.API_AUTH_ERROR);
+      setConnectivityError(error);
+    } else {
+      const data = await response.json();
+      setSession({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        expiresAt: data.expiresAt,
+      });
 
-        setSession({
-          user: null, // User info would be fetched separately
-          accessToken,
-          isAuthenticated: true,
-        });
-      } catch (error) {
-        setConnectivityError({
-          type: ConnectivityErrorType.INTERNAL,
-          message: getMessage(ErrorCode.INTERNAL),
-          code: ErrorCode.INTERNAL,
-        });
+      const originalUrl = localStorage.getItem("spotifyAuthRedirect");
+      if (originalUrl) {
+        localStorage.removeItem("spotifyAuthRedirect");
+        // router.push(originalUrl);
+      } else {
+        // router.push("/");
       }
-    },
-    [setConnectivityError, setSession]
-  );
+    }
+  };
+
+  const logout = () => {
+    setSession({
+      accessToken: null,
+      refreshToken: null,
+      expiresAt: null,
+    });
+  };
 
   return {
-    isAuthenticated: session.isAuthenticated,
-    login,
+    handleSpotifyAuth,
+    handleCallback,
     logout,
-    handleAuthCallback,
   };
 }
