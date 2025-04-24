@@ -1,9 +1,8 @@
 "use client";
 
-import { ReactNode } from "react";
 import classnames from "classnames";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 
 interface PaginationProps {
   currentPage: number;
