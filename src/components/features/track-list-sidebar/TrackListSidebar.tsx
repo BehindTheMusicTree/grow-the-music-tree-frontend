@@ -1,52 +1,60 @@
 "use client";
 
-import { ReactNode } from "react";
-import TrackList from "@/components/features/track-list/TrackList";
-import { usePlayer } from "@/contexts/PlayerContext";
+import TrackItem from "./TrackItem";
+import { capitalizeFirstLetter } from "@lib/utils/formatting";
+import { useTrackList } from "@contexts/TrackListContext";
+import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
+import { TRACK_LIST_ORIGIN_TYPE } from "@lib/utils/constants";
+import TrackListOrigin from "@/models/client/track-list/TrackListOrigin";
 
-interface TrackListSidebarProps {
-  className?: string;
-}
-
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  albumArt: string;
-  duration: string;
-}
-
-export default function TrackListSidebar({ className }: TrackListSidebarProps) {
-  const { playerUploadedTrackObject, setPlayerUploadedTrackObject } = usePlayer();
-
-  const handleTrackClick = (track: Track) => {
-    setPlayerUploadedTrackObject(track);
-  };
-
-  // Example tracks - in a real app, these would come from a state or API
-  const exampleTracks: Track[] = [
-    {
-      id: "1",
-      title: "Example Track 1",
-      artist: "Artist 1",
-      albumArt: "/placeholder.jpg",
-      duration: "3:45",
-    },
-    {
-      id: "2",
-      title: "Example Track 2",
-      artist: "Artist 2",
-      albumArt: "/placeholder.jpg",
-      duration: "4:20",
-    },
-  ];
+export default function TrackListSidebar() {
+  const { trackList } = useTrackList();
+  const { hideTrackListSidebar } = useTrackListSidebarVisibility();
 
   return (
-    <aside className={`w-80 bg-gray-900 h-full overflow-y-auto ${className}`}>
-      <div className="p-4">
-        <h2 className="text-xl font-bold text-white mb-4">Track List</h2>
-        <TrackList tracks={exampleTracks} onTrackClick={handleTrackClick} />
+    <div className="track-list-sidebar absolute bottom-player right-0 w-144 rounded-2xl bg-gray-950 pb-1">
+      <div className="header flex h-16 px-4 py-2 text-gray-400">
+        <div className="origin flex text-xl ">
+          <div className="from h-auto flex flex-col justify-center items-center mr-2">From</div>
+          <div className="name-container flex flex-col justify-center items-center text-gray-300 font-bold pr-2 max-w-trackListName">
+            <div className="name text-overflow">
+              {trackList.origin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST
+                ? origin.object.name
+                : `${origin.object.title} ` + (origin.object.artist ? `by ${origin.object.artist.name}` : "")}
+            </div>
+          </div>
+        </div>
+        <div className="info flex flex-col justify-center items-center text-m pt-1 mr-2">
+          {trackList.origin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST
+            ? "• " + capitalizeFirstLetter(origin.object.type || "") + " playlist • "
+            : "• track playlist • "}
+          {trackList.length + " track" + (trackList.length > 1 ? "s •" : " •")}
+        </div>
+        <div
+          className="flex-grow flex flex-col items-end justify-center h-full cursor-pointer"
+          onClick={hideTrackListSidebar}
+        >
+          &#10005;
+        </div>
       </div>
-    </aside>
+      {/* 80px is player height, 100px is the banner, 56px the track list header, 3.5px the track list bottom padding */}
+      <ul className={"track-list overflow-auto max-h-[calc(100vh-180px-56px-3.5px)] list-none p-0 m-0"}>
+        {trackList.map((track, index) => (
+          <li key={track.id}>
+            <TrackItem
+              uploadedTrack={{
+                uuid: track.id,
+                title: track.title,
+                artist: { name: track.artist },
+                file: {
+                  durationInSec: parseInt(track.duration.split(":")[0]) * 60 + parseInt(track.duration.split(":")[1]),
+                },
+              }}
+              position={index + 1}
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

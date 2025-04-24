@@ -1,14 +1,7 @@
 "use client";
 
 import { createContext, useState, useContext, ReactNode } from "react";
-
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  albumArt: string;
-  duration: string;
-}
+import Track from "@/models/domain/spotify-lib-track
 
 interface TrackListContextType {
   trackList: Track[];
