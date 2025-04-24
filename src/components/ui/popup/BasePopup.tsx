@@ -10,7 +10,7 @@ type PopupType = "default" | "success" | "error" | "warning" | "info";
 export interface BasePopupProps {
   title: string;
   children: ReactNode;
-  onClose: () => void;
+  onClose?: () => void;
   type?: PopupType;
   icon?: LucideIcon;
   isDismissable?: boolean;
