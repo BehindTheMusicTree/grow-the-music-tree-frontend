@@ -14,9 +14,9 @@ export const GenreDetailedSchema = UuidResourceSchema.extend({
     uuid: z.string().uuid(),
     name: z.string(),
   }),
-  libraryTracks: z.array(z.unknown()), // Adjust type based on track structure
-  libraryTracksCount: z.number(),
-  libraryTracksArchivedCount: z.number(),
+  uploadedTracks: z.array(z.unknown()), // Adjust type based on track structure
+  uploadedTracksCount: z.number(),
+  uploadedTracksArchivedCount: z.number(),
   updatedOn: z.string().datetime().nullable(),
 });
 
@@ -28,9 +28,9 @@ export const GenreSimpleSchema = GenreDetailedSchema.omit({
   root: true,
   children: true,
   criteriaPlaylist: true,
-  libraryTracks: true,
-  libraryTracksCount: true,
-  libraryTracksArchivedCount: true,
+  uploadedTracks: true,
+  uploadedTracksCount: true,
+  uploadedTracksArchivedCount: true,
   updatedOn: true,
 });
 
