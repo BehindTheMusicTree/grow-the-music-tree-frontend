@@ -5,7 +5,7 @@ import { createContext, useContext, useCallback, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useConnectivityError } from "@/contexts/ConnectivityErrorContext";
 import { authenticateWithSpotifyCode, SpotifyAuthResponse } from "@/lib/music-tree-api-service/spotify-auth";
-import { ErrorCode } from "@/lib/connectivity-errors/codes";
+import { ErrorCode } from "@/lib/errors/codes";
 
 interface SpotifyAuthContextType {
   handleSpotifyAuth: () => void;
