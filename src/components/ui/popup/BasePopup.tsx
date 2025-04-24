@@ -13,7 +13,7 @@ export interface BasePopupProps {
   className?: string;
 }
 
-export abstract class BasePopupComponent<P extends BasePopupProps = BasePopupProps> {
+export abstract class BasePopup<P extends BasePopupProps = BasePopupProps> {
   abstract render(props: P): ReactNode;
 
   protected renderBase(props: P) {

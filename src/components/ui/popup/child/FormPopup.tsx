@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { BasePopupComponent, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "../BasePopup";
 
 interface FormPopupProps extends BasePopupProps {
   onSubmit: (e: React.FormEvent) => void;
@@ -11,7 +11,7 @@ interface FormPopupProps extends BasePopupProps {
   loading?: boolean;
 }
 
-export default class FormPopup extends BasePopupComponent<FormPopupProps> {
+export default class FormPopup extends BasePopup<FormPopupProps> {
   render(props: FormPopupProps) {
     return this.renderBase({
       ...props,

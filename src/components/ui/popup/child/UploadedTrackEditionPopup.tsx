@@ -3,7 +3,7 @@
 import { formatTime } from "@utils/formatting";
 import Rating from "@/components/features/Rating";
 import Button from "@/components/ui/Button";
-import { BasePopupComponent, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "../BasePopup";
 
 interface UploadedTrackEditionPopupProps extends BasePopupProps {
   track: {
@@ -26,7 +26,7 @@ interface UploadedTrackEditionPopupProps extends BasePopupProps {
   onSubmit: (e: React.FormEvent) => void;
 }
 
-export default class UploadedTrackEditionPopup extends BasePopupComponent<UploadedTrackEditionPopupProps> {
+export default class UploadedTrackEditionPopup extends BasePopup<UploadedTrackEditionPopupProps> {
   render(props: UploadedTrackEditionPopupProps) {
     return this.renderBase({
       ...props,

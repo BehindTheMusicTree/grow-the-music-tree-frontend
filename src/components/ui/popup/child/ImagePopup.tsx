@@ -1,14 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { BasePopupComponent, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "../BasePopup";
 
 interface ImagePopupProps extends BasePopupProps {
   imageUrl: string;
   alt?: string;
 }
 
-export default class ImagePopup extends BasePopupComponent<ImagePopupProps> {
+export default class ImagePopup extends BasePopup<ImagePopupProps> {
   render(props: ImagePopupProps) {
     return this.renderBase({
       ...props,

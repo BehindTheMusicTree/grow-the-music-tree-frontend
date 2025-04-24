@@ -1,13 +1,13 @@
 "use client";
 
 import { AlertTriangle, AlertCircle } from "lucide-react";
-import { BasePopupComponent, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "../BasePopup";
 
 interface InternalErrorPopupProps extends BasePopupProps {
   debugCode?: string;
 }
 
-export default class InternalErrorPopup extends BasePopupComponent<InternalErrorPopupProps> {
+export default class InternalErrorPopup extends BasePopup<InternalErrorPopupProps> {
   render(props: InternalErrorPopupProps) {
     return this.renderBase({
       ...props,

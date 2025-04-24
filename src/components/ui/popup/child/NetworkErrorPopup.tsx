@@ -1,11 +1,11 @@
 "use client";
 
 import { WifiOff, AlertTriangle } from "lucide-react";
-import { BasePopupComponent, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "../BasePopup";
 
 interface NetworkErrorPopupProps extends BasePopupProps {}
 
-export default class NetworkErrorPopup extends BasePopupComponent<NetworkErrorPopupProps> {
+export default class NetworkErrorPopup extends BasePopup<NetworkErrorPopupProps> {
   render(props: NetworkErrorPopupProps) {
     return this.renderBase({
       ...props,

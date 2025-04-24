@@ -1,7 +1,7 @@
 "use client";
 
 import { MdError } from "react-icons/md";
-import { BasePopupComponent, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "../BasePopup";
 
 interface InvalidInputPopupProps extends BasePopupProps {
   details: {
@@ -10,7 +10,7 @@ interface InvalidInputPopupProps extends BasePopupProps {
   };
 }
 
-export default class InvalidInputPopup extends BasePopupComponent<InvalidInputPopupProps> {
+export default class InvalidInputPopup extends BasePopup<InvalidInputPopupProps> {
   render(props: InvalidInputPopupProps) {
     return this.renderBase({
       ...props,

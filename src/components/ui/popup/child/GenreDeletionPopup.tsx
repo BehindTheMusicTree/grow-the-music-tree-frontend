@@ -1,6 +1,6 @@
 "use client";
 
-import { BasePopupComponent, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "../BasePopup";
 import Button from "@/components/ui/Button";
 
 interface GenreDeletionPopupProps extends BasePopupProps {
@@ -10,7 +10,7 @@ interface GenreDeletionPopupProps extends BasePopupProps {
   onConfirm: (genre: { name: string }) => void;
 }
 
-export default class GenreDeletionPopup extends BasePopupComponent<GenreDeletionPopupProps> {
+export default class GenreDeletionPopup extends BasePopup<GenreDeletionPopupProps> {
   render(props: GenreDeletionPopupProps) {
     const handleConfirm = () => {
       props.onConfirm(props.genre);

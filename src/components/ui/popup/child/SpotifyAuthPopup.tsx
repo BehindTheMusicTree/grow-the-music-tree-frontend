@@ -1,13 +1,13 @@
 "use client";
 
 import { FaSpotify } from "react-icons/fa";
-import { BasePopupComponent, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "../BasePopup";
 import Button from "@/components/ui/Button";
 import { useSpotifyAuth } from "@/contexts/SpotifyAuthContext";
 
 interface SpotifyAuthPopupProps extends BasePopupProps {}
 
-class SpotifyAuthPopupBase extends BasePopupComponent<SpotifyAuthPopupProps> {
+class SpotifyAuthPopupBase extends BasePopup<SpotifyAuthPopupProps> {
   render(props: SpotifyAuthPopupProps) {
     return this.renderBase({
       ...props,

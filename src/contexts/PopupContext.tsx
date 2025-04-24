@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import { BasePopupComponent, BasePopupProps } from "@/components/ui/popup/BasePopup";
+import { BasePopup, BasePopupProps } from "@/components/ui/popup/BasePopup";
 import {
   FormPopup,
   InvalidInputPopup,
@@ -14,7 +14,7 @@ import {
   ImagePopup,
 } from "@/components/ui/popup/child";
 
-type PopupComponent = BasePopupComponent;
+type PopupComponent = BasePopup;
 
 interface PopupState {
   type: PopupComponent;
