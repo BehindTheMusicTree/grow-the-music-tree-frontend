@@ -12,7 +12,7 @@ import { ErrorCode } from "@/types/app-errors/app-error-codes";
 import { ApiError } from "@/types/app-errors/app-error";
 
 export function useSpotifyAuth() {
-  const { setSession } = useSession();
+  const { clearSession, setSession } = useSession();
   const { setConnectivityError } = useConnectivityError();
   const router = useRouter();
 
@@ -58,11 +58,7 @@ export function useSpotifyAuth() {
   };
 
   const logout = () => {
-    setSession({
-      accessToken: null,
-      refreshToken: null,
-      expiresAt: null,
-    });
+    clearSession();
   };
 
   return {
