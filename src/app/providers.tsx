@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import { SessionProvider } from "@/contexts/SessionContext";
 import { PlayerProvider } from "@/contexts/PlayerContext";
 import { PopupProvider } from "@/contexts/PopupContext";
-import { AppErrorProvider } from "@/contexts/ConnectivityErrorContext";
+import { ConnectivityErrorProvider } from "@/contexts/ConnectivityErrorContext";
 import { TrackListSidebarVisibilityProvider } from "@/contexts/TrackListSidebarVisibilityContext";
 
 interface ProvidersProps {
@@ -16,9 +16,9 @@ export default function Providers({ children }: ProvidersProps) {
     <SessionProvider>
       <PlayerProvider>
         <PopupProvider>
-          <AppErrorProvider>
+          <ConnectivityErrorProvider>
             <TrackListSidebarVisibilityProvider>{children}</TrackListSidebarVisibilityProvider>
-          </AppErrorProvider>
+          </ConnectivityErrorProvider>
         </PopupProvider>
       </PlayerProvider>
     </SessionProvider>
