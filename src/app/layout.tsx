@@ -7,6 +7,8 @@ import { Inter } from "next/font/google";
 import type { Metadata } from "next";
 
 import Providers from "@/app/providers";
+import { PopupProvider } from "@/contexts/PopupContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { useConnectivityError } from "@/contexts/ConnectivityErrorContext";
 import { usePopup } from "@/contexts/PopupContext";
 import { usePlayer } from "@/contexts/PlayerContext";
@@ -19,8 +21,6 @@ import TrackListSidebar from "@/components/features/track-list-sidebar/TrackList
 import NetworkErrorPopup from "@/components/ui/popup/child/NetworkErrorPopup";
 import SpotifyAuthPopup from "@/components/ui/popup/child/SpotifyAuthPopup";
 import InternalErrorPopup from "@/components/ui/popup/child/InternalErrorPopup";
-import { PopupProvider } from "@/contexts/PopupContext";
-
 initSentry();
 
 const inter = Inter({ subsets: ["latin"] });
