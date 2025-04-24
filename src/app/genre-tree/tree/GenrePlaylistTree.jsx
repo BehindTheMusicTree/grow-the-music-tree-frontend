@@ -10,7 +10,7 @@ import { useGenrePlaylists } from "@/contexts/GenrePlaylistContext";
 import { usePlayer } from "@/contexts/PlayerContext.jsx";
 import { useGenreGettingAssignedNewParent } from "@/contexts/GenreGettingAssignedNewParentContext.jsx";
 
-import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "@utils/constants.js";
+import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "@/utils/constants.js";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper.jsx";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer.js";

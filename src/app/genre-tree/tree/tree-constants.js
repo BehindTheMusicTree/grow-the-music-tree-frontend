@@ -1,4 +1,4 @@
-import { PRIMARY_COLOR } from "@utils/theme";
+import { PRIMARY_COLOR } from "@/utils/theme";
 
 export const RECTANGLE_COLOR = PRIMARY_COLOR;
 export const RECT_BASE_DIMENSIONS = {

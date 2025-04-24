@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { UploadedTrackService } from "@utils/services";
+import { UploadedTrackService } from "@/utils/services";
 import { useGenrePlaylists } from "@/contexts/GenrePlaylistContext";
 import { useTrackList } from "@/contexts/TrackListContext";
 import { UploadedTrackEditionPopup } from "@/components/ui/popup/UploadedTrackEditionPopup";

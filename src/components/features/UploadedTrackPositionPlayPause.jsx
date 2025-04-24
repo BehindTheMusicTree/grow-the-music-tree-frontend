@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { FaPlay, FaPause } from "react-icons/fa";
 
 import { usePlayer } from "@/contexts/PlayerContext";
-import { PLAY_STATES } from "@utils/constants";
+import { PLAY_STATES } from "@/utils/constants";
 
 export default function UploadedTrackPositionPlayPause({ position, uuid, handlePlayPauseClick }) {
   const { playerUploadedTrackObject, playState } = usePlayer();
