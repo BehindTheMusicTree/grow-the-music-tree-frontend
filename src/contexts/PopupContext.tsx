@@ -2,27 +2,14 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 import { BasePopup, BasePopupProps } from "@/components/ui/popup/BasePopup";
-import {
-  FormPopup,
-  InvalidInputPopup,
-  InternalErrorPopup,
-  NetworkErrorPopup,
-  GenreDeletionPopup,
-  SpotifyAuthPopup,
-  SpotifyAuthErrorPopup,
-  UploadedTrackEditionPopup,
-  ImagePopup,
-} from "@/components/ui/popup/child";
-
-type PopupComponent = BasePopup;
 
 interface PopupState {
-  type: PopupComponent;
+  type: BasePopup;
   content: BasePopupProps;
 }
 
 interface PopupContextType {
-  showPopup: (type: PopupComponent, content: BasePopupProps) => void;
+  showPopup: (type: BasePopup, content: BasePopupProps) => void;
   hidePopup: () => void;
   activePopup: PopupState | null;
 }
@@ -36,7 +23,7 @@ interface PopupProviderProps {
 export function PopupProvider({ children }: PopupProviderProps) {
   const [activePopup, setActivePopup] = useState<PopupState | null>(null);
 
-  const showPopup = (type: PopupComponent, content: BasePopupProps) => {
+  const showPopup = (type: BasePopup, content: BasePopupProps) => {
     setActivePopup({ type, content });
   };
 
