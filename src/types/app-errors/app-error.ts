@@ -56,3 +56,13 @@ export class ServerError extends ConnectivityError {
     this.name = "ServerError";
   }
 }
+
+export type AppErrorType =
+  | AppError
+  | ClientError
+  | ConnectivityError
+  | BadRequestError
+  | NetworkError
+  | ApiError
+  | AuthError
+  | ServerError;

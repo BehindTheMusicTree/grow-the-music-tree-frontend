@@ -45,9 +45,12 @@ function AppContent({ children }: AppContentProps) {
     ) {
       let popupType = "";
 
-      if (connectivityError instanceof AuthError) {
+      if ((connectivityError as ConnectivityError) instanceof AuthError) {
         popupType = "authRequired";
-      } else if (connectivityError instanceof BadRequestError || connectivityError instanceof ServerError) {
+      } else if (
+        (connectivityError as ConnectivityError) instanceof BadRequestError ||
+        (connectivityError as ConnectivityError) instanceof ServerError
+      ) {
         popupType = "internalError";
         showPopup(popupType, {
           message: connectivityError.message,
