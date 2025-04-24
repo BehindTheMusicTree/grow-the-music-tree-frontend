@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, Session } from "@/contexts/SessionContext";
-import { useConnectivityError } from "@/contexts/COnnectivityErrorContext";
+import { useConnectivityError } from "@/contexts/ConnectivityErrorContext";
 
 interface FetchOptions extends RequestInit {
   resolveOnError?: boolean;
