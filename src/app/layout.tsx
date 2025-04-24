@@ -3,6 +3,8 @@
 import { useEffect, useRef, ReactNode } from "react";
 import { initSentry } from "@/lib/sentry";
 import "./globals.css";
+import { Inter } from "next/font/google";
+import type { Metadata } from "next";
 
 import Providers from "@/app/providers";
 import { useConnectivityError } from "@/contexts/ConnectivityErrorContext";
@@ -14,10 +16,19 @@ import Banner from "@/components/features/banner/Banner";
 import Menu from "@/components/features/Menu";
 import Player from "@/components/features/player/Player";
 import TrackListSidebar from "@/components/features/track-list-sidebar/TrackListSidebar";
-import Popup from "@/components/ui/popup/Popup";
 import NetworkErrorPopup from "@/components/ui/popup/child/NetworkErrorPopup";
+import SpotifyAuthPopup from "@/components/ui/popup/child/SpotifyAuthPopup";
+import InternalErrorPopup from "@/components/ui/popup/child/InternalErrorPopup";
+import { PopupProvider } from "@/contexts/PopupContext";
 
 initSentry();
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Bodzify Ultimate Music Guide",
+  description: "Your ultimate guide to music",
+};
 
 interface AppContentProps {
   children: ReactNode;
@@ -43,38 +54,25 @@ function AppContent({ children }: AppContentProps) {
       ![NetworkError, ServerError].includes(currentConnectivityErrorTypeRef.current) &&
       !(connectivityError instanceof currentConnectivityErrorTypeRef.current)
     ) {
-      let popupType = "";
-
+      let popup: ReactNode | null = null;
       if ((connectivityError as ConnectivityError) instanceof AuthError) {
-        popupType = "authRequired";
+        popup = <SpotifyAuthPopup />;
       } else if (
         (connectivityError as ConnectivityError) instanceof BadRequestError ||
         (connectivityError as ConnectivityError) instanceof ServerError
       ) {
-        popupType = "internalError";
-        showPopup(popupType, {
-          message: connectivityError.message,
-          debugCode: connectivityError.code,
-          onClose: () => {
-            clearConnectivityError();
-            hidePopup();
-          },
-        });
+        popup = <InternalErrorPopup errorCode={connectivityError.code} />;
       } else if (connectivityError instanceof NetworkError) {
-        popupType = typeof NetworkErrorPopup;
+        popup = <NetworkErrorPopup />;
       }
 
-      currentConnectivityErrorTypeRef.current = typeof connectivityError;
-      showPopup(popupType, {
-        message: connectivityError.message,
-        debugCode: connectivityError.code,
-        onClose: () => {
-          clearConnectivityError();
-          hidePopup();
-        },
-      });
+      if (popup) {
+        showPopup(popup);
+      }
+
+      currentConnectivityErrorTypeRef.current = connectivityError?.constructor as typeof ConnectivityError;
     }
-  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, ConnectivityErrorType]);
+  }, [connectivityError, showPopup, hidePopup, clearConnectivityError]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {
@@ -103,17 +101,24 @@ function AppContent({ children }: AppContentProps) {
   );
 }
 
-interface RootLayoutProps {
-  children: ReactNode;
-}
-
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <Providers>
-          <AppContent>{children}</AppContent>
-        </Providers>
+      <head>
+        <title>Music Tree</title>
+        <meta
+          name="description"
+          content="Music Tree is a music guide that helps you find the best music for your mood"
+        />
+      </head>
+      <body className={inter.className}>
+        <AuthProvider>
+          <PopupProvider>
+            <Providers>
+              <AppContent>{children}</AppContent>
+            </Providers>
+          </PopupProvider>
+        </AuthProvider>
       </body>
     </html>
   );
