@@ -1,13 +1,13 @@
 "use client";
 
 import { createContext, useState, useContext, ReactNode } from "react";
-import Track from "@/models/domain/uploaded-track";
+import { UploadedTrackDetailed } from "@/models/domain/uploaded-track";
 
 interface TrackListContextType {
-  trackList: Track[];
-  setTrackList: (tracks: Track[]) => void;
-  selectedTrack: Track | null;
-  setSelectedTrack: (track: Track | null) => void;
+  trackList: UploadedTrackDetailed[];
+  setTrackList: (tracks: UploadedTrackDetailed[]) => void;
+  selectedTrack: UploadedTrackDetailed | null;
+  setSelectedTrack: (track: UploadedTrackDetailed | null) => void;
   toTrackAtPosition: (position: number) => void;
   playNewTrackListFromUploadedTrackUuid: (uuid: string) => void;
 }
@@ -19,8 +19,8 @@ interface TrackListProviderProps {
 }
 
 export function TrackListProvider({ children }: TrackListProviderProps) {
-  const [trackList, setTrackList] = useState<Track[]>([]);
-  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
+  const [trackList, setTrackList] = useState<UploadedTrackDetailed[]>([]);
+  const [selectedTrack, setSelectedTrack] = useState<UploadedTrackDetailed | null>(null);
 
   const toTrackAtPosition = (position: number) => {
     if (position >= 0 && position < trackList.length) {
