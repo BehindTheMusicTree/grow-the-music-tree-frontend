@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { SpotifyUserSchema } from "@/models/domain/user/spotify";
+import { SpotifyUserDetailedSchema } from "@/models/domain/spotify-user";
 
 export const ApiAuthTokenSpotifySchema = z.object({
   accessToken: z.string(),
   refreshToken: z.string(),
   expiresAt: z.string().datetime(),
-  spotifyUser: SpotifyUserSchema,
+  spotifyUser: SpotifyUserDetailedSchema,
 });
 
-export type AuthToken = z.infer<typeof ApiAuthTokenSpotifySchema>;
+export type ApiAuthTokenSpotify = z.infer<typeof ApiAuthTokenSpotifySchema>;
