@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UuidResourceSchema } from "./base-resource/uuid";
+import { UuidResourceSchema } from "@/models/domain/uuid-resource";
 
 export const GenreDetailedSchema = UuidResourceSchema.extend({
   ascendants: z.array(z.string().uuid()),
