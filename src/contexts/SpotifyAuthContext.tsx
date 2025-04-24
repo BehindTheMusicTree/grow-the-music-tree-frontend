@@ -3,7 +3,7 @@
 import { useSession } from "@/contexts/SessionContext";
 import { createContext, useContext, useCallback, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { useConnectivityError } from "@/contexts/AppErrorContext";
+import { useConnectivityError } from "@/contexts/COnnectivityErrorContext";
 import { authenticateWithSpotifyCode, SpotifyAuthResponse } from "@/lib/music-tree-api-service/spotify-auth";
 import { ErrorCode } from "@/lib/errors/codes";
 

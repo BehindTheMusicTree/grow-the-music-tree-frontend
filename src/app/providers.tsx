@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import { SessionProvider } from "@/contexts/SessionContext";
 import { PlayerProvider } from "@/contexts/PlayerContext";
 import { PopupProvider } from "@/contexts/PopupContext";
-import { AppErrorProvider } from "@/contexts/AppErrorContext";
+import { AppErrorProvider } from "@/contexts/COnnectivityErrorContext";
 import { TrackListSidebarVisibilityProvider } from "@/contexts/TrackListSidebarVisibilityContext";
 
 interface ProvidersProps {

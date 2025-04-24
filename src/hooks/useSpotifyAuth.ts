@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { useSession } from "@/contexts/SessionContext";
-import { useConnectivityError } from "@/contexts/AppErrorContext";
+import { useConnectivityError } from "@/contexts/COnnectivityErrorContext";
 
 interface SpotifyAuthConfig {
   clientId: string;
