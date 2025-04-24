@@ -1,44 +1,44 @@
 "use client";
 
-import AppError from "@/types/app-errors/app-error";
+import { ConnectivityError } from "@/types/app-errors/app-error";
 import { createContext, useContext, useState, ReactNode } from "react";
 
-interface AppErrorContextType {
-  appError: AppError | null;
-  setAppError: (error: AppError | null) => void;
-  clearAppError: () => void;
+interface ConnectivityErrorContextType {
+  connectivityError: ConnectivityError | null;
+  setConnectivityError: (error: ConnectivityError | null) => void;
+  clearConnectivityError: () => void;
 }
 
-const AppErrorContext = createContext<AppErrorContextType | undefined>(undefined);
+const ConnectivityErrorContext = createContext<ConnectivityErrorContextType | undefined>(undefined);
 
-interface AppErrorProviderProps {
+interface ConnectivityErrorProviderProps {
   children: ReactNode;
 }
 
-export function AppErrorProvider({ children }: AppErrorProviderProps) {
-  const [error, setAppError] = useState<AppError | null>(null);
+export function ConnectivityErrorProvider({ children }: ConnectivityErrorProviderProps) {
+  const [connectivityError, setConnectivityError] = useState<ConnectivityError | null>(null);
 
-  const clearAppError = () => {
-    setAppError(null);
+  const clearConnectivityError = () => {
+    setConnectivityError(null);
   };
 
   return (
-    <AppErrorContext.Provider
+    <ConnectivityErrorContext.Provider
       value={{
-        appError: error,
-        setAppError: setAppError,
-        clearAppError: clearAppError,
+        connectivityError,
+        setConnectivityError,
+        clearConnectivityError,
       }}
     >
       {children}
-    </AppErrorContext.Provider>
+    </ConnectivityErrorContext.Provider>
   );
 }
 
-export function useAppError() {
-  const context = useContext(AppErrorContext);
+export function useConnectivityError() {
+  const context = useContext(ConnectivityErrorContext);
   if (context === undefined) {
-    throw new Error("useAppError must be used within a AppErrorProvider");
+    throw new Error("useConnectivityError must be used within a ConnectivityErrorProvider");
   }
   return context;
 }

@@ -14,7 +14,7 @@ import Menu from "@/components/features/Menu";
 import Player from "@/components/features/player/Player";
 import TrackListSidebar from "@/components/features/track-list-sidebar/TrackListSidebar";
 import Popup from "@/components/ui/popup/Popup";
-
+import { AppErrorType } from "@/types/app-errors/app-error-types";
 initSentry();
 
 interface AppContentProps {
@@ -26,21 +26,19 @@ function AppContent({ children }: AppContentProps) {
   const { showPopup, hidePopup, activePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
   const { appError: connectivityError, clearAppError: clearConnectivityError } = useAppError();
-  const currentConnectivityErrorTypeRef = useRef<
-    (typeof ConnectivityErrorType)[keyof typeof ConnectivityErrorType] | null
-  >(null);
+  const currentAppErrorTypeRef = useRef<AppErrorType | null>(null);
 
   useEffect(() => {
     console.log("AppContent: connectivityError changed", connectivityError);
-    if (connectivityError?.type === ConnectivityErrorType.NONE && currentConnectivityErrorTypeRef.current !== null) {
-      currentConnectivityErrorTypeRef.current = null;
+    if (connectivityError?.type === ConnectivityErrorType.NONE && currentAppErrorTypeRef.current !== null) {
+      currentAppErrorTypeRef.current = null;
       hidePopup();
     } else if (
       connectivityError?.type !== ConnectivityErrorType.NONE &&
       ![ConnectivityErrorType.NETWORK, ConnectivityErrorType.INTERNAL].includes(
-        currentConnectivityErrorTypeRef.current as (typeof ConnectivityErrorType)[keyof typeof ConnectivityErrorType]
+        currentAppErrorTypeRef.current as (typeof ConnectivityErrorType)[keyof typeof ConnectivityErrorType]
       ) &&
-      connectivityError?.type !== currentConnectivityErrorTypeRef.current
+      connectivityError?.type !== currentAppErrorTypeRef.current
     ) {
       let popupType = "";
 
@@ -63,7 +61,7 @@ function AppContent({ children }: AppContentProps) {
         popupType = "networkError";
       }
 
-      currentConnectivityErrorTypeRef.current = connectivityError?.type;
+      currentAppErrorTypeRef.current = connectivityError?.type;
       showPopup(popupType, {
         message: connectivityError.message,
         debugCode: connectivityError.code,
