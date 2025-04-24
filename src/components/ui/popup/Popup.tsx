@@ -1,6 +1,5 @@
 "use client";
 
-import { ReactNode } from "react";
 import { FaTimes } from "react-icons/fa";
 
 interface PopupContent {
