@@ -9,7 +9,7 @@ export interface InternalErrorPopupProps {
 
 export default function InternalErrorPopup({ errorCode }: InternalErrorPopupProps) {
   return (
-    <BasePopup title="Internal Error" isDismissable={false} icon={AlertTriangle} onClose={() => {}}>
+    <BasePopup title="Internal Error" isDismissable={false} icon={AlertTriangle}>
       <div className="flex flex-col items-center space-y-6 py-4">
         <AlertCircle className="h-16 w-16 text-red-500" strokeWidth={1.5} />
         <div>
