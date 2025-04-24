@@ -2,6 +2,7 @@ import { z } from "zod";
 import { UuidResourceSchema } from "@/models/domain/uuid-resource";
 
 export const GenreDetailedSchema = UuidResourceSchema.extend({
+  name: z.string(),
   ascendants: z.array(z.string().uuid()),
   descendants: z.array(z.string().uuid()),
   root: z.object({
@@ -34,3 +35,10 @@ export const GenreSimpleSchema = GenreDetailedSchema.omit({
 });
 
 export type GenreSimple = z.infer<typeof GenreSimpleSchema>;
+
+export const GenreMinimumSchema = GenreDetailedSchema.pick({
+  uuid: true,
+  name: true,
+});
+
+export type GenreMinimum = z.infer<typeof GenreMinimumSchema>;
