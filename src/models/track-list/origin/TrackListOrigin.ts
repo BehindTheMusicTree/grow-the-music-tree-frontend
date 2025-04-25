@@ -3,5 +3,22 @@ import { PlaylistDetailed } from "@schemas/playlist";
 import { TrackListOriginType } from "./TrackListOriginType";
 
 export default class TrackListOrigin {
-  constructor(public type: TrackListOriginType, public object: UploadedTrackDetailed | PlaylistDetailed) {}
+  constructor(public type: TrackListOriginType, public label: string) {}
+}
+
+export class TrackListOriginFromUploadedTrack extends TrackListOrigin {
+  constructor(public uploadedTrack: UploadedTrackDetailed) {
+    super(
+      TrackListOriginType.UPLOADED_TRACK,
+      `${uploadedTrack.title} by ${
+        uploadedTrack.artists ? uploadedTrack.artists.map((artist) => artist.name).join(", ") : ""
+      }`
+    );
+  }
+}
+
+export class TrackListOriginFromPlaylist extends TrackListOrigin {
+  constructor(public playlist: PlaylistDetailed) {
+    super(TrackListOriginType.PLAYLIST, playlist.name);
+  }
 }
