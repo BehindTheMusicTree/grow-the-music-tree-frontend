@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { SpotifyUserDetailedSchema, SpotifyUserDetailed } from "@models/domain/spotify-user";
+import { SpotifyUserDetailedSchema, SpotifyUserDetailed } from "@schemas/spotify-user";
 import { useFetchWrapper } from "./useFetchWrapper";
 
 export function useSpotifyUser() {
