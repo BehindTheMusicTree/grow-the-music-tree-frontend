@@ -6,12 +6,14 @@ import { useTrackList } from "@contexts/TrackListContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 
-export default function TrackListSidebar() {
+export default function TrackListSidebar({ className }: { className?: string }) {
   const { trackList } = useTrackList();
   const { hideTrackListSidebar } = useTrackListSidebarVisibility();
 
   return trackList ? (
-    <div className="track-list-sidebar absolute bottom-player right-0 w-144 rounded-2xl bg-gray-950 pb-1">
+    <div
+      className={`track-list-sidebar absolute bottom-player right-0 w-144 rounded-2xl bg-gray-950 pb-1 ${className}`}
+    >
       <div className="header flex h-16 px-4 py-2 text-gray-400">
         <div className="origin flex text-xl ">
           <div className="from h-auto flex flex-col justify-center items-center mr-2">From</div>
