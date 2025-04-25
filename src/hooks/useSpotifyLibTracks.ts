@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthenticatedApi } from "@hooks/useAuthenticatedApi";
 import { PaginatedResponse, PaginatedResponseSchema } from "@types/api/pagination";
-import { SpotifyLibTrackDetailedSchema, SpotifyLibTrackDetailed } from "@/models/domain/spotify-lib-track";
+import { SpotifyLibTrackDetailedSchema, SpotifyLibTrackDetailed } from "@models/domain/spotify-lib-track";
 
 export function useListSpotifyLibTracks(page = 1, pageSize = 20) {
   const listTracks = useAuthenticatedApi<PaginatedResponse<SpotifyLibTrackDetailed>>(async (authFetch) => {

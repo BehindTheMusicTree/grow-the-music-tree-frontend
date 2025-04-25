@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useState, useContext, ReactNode } from "react";
-import { UploadedTrackDetailed } from "@/models/domain/uploaded-track";
+import { UploadedTrackDetailed } from "@domain/uploaded-track";
 
 interface TrackListContextType {
   trackList: UploadedTrackDetailed[];

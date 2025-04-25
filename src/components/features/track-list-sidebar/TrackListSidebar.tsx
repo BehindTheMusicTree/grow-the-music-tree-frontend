@@ -5,7 +5,7 @@ import { capitalizeFirstLetter } from "@lib/utils/formatting";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 import { TrackListOriginType } from "@lib/utils/constants";
-import TrackListOrigin from "@/models/client/track-list/TrackListOrigin";
+import TrackListOrigin from "@models/client/track-list/TrackListOrigin";
 
 export default function TrackListSidebar() {
   const { trackList } = useTrackList();

@@ -8,7 +8,7 @@ import {
   GenrePlaylistDetailed,
   GenrePlaylistSimpleSchema,
   GenrePlaylistSimple,
-} from "@/models/domain/genre-playlist";
+} from "@models/domain/genre-playlist";
 
 export const useListGenrePlaylists = (page = 1, pageSize = 50) => {
   const { fetch } = useFetchWrapper();
