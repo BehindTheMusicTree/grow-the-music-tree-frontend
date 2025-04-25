@@ -25,7 +25,9 @@
       "@popups/*": ["src/components/ui/popups/*"],
       "@lib/*": ["src/lib/*"],
       "@utils/*": ["src/lib/utils/*"],
-      "@types/*": ["src/types/*"]
+      "@types/*": ["src/types/*"],
+      "@models/*": ["src/models/*"],
+      "@domain/*": ["src/models/domain/*"]
     },
     "plugins": [
       {
