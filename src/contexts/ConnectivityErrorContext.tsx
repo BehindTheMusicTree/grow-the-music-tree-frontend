@@ -1,6 +1,6 @@
 "use client";
 
-import { AppErrorType } from "@types/app-errors/app-error";
+import { AppErrorType } from "@app-types/app-errors/app-error";
 import { createContext, useContext, useState, ReactNode } from "react";
 
 interface ConnectivityErrorContextType {

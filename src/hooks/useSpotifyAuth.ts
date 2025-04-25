@@ -8,8 +8,8 @@ import {
   SPOTIFY_AUTH_URL,
   SPOTIFY_SCOPES,
 } from "@lib/music-tree-api-service/spotify-auth";
-import { ErrorCode } from "@types/app-errors/app-error-codes";
-import { ApiError } from "@types/app-errors/app-error";
+import { ErrorCode } from "@app-types/app-errors/app-error-codes";
+import { ApiError } from "@app-types/app-errors/app-error";
 
 export function useSpotifyAuth() {
   const { clearSession, setSession } = useSession();

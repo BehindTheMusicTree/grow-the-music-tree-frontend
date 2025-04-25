@@ -11,7 +11,13 @@ import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
-import { ConnectivityError, NetworkError, AuthError, ServerError, BadRequestError } from "@types/app-errors/app-error";
+import {
+  ConnectivityError,
+  NetworkError,
+  AuthError,
+  ServerError,
+  BadRequestError,
+} from "@app-types/app-errors/app-error";
 import Banner from "@components/features/banner/Banner";
 import Menu from "@components/features/menu/Menu";
 import Player from "@components/features/player/Player";

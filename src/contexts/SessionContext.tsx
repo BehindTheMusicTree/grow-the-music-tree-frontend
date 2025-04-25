@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import { Session } from "@types/Session";
+import { Session } from "@app-types/Session";
 
 interface SessionContextType {
   session: Session;

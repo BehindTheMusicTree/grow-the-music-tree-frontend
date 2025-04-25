@@ -2,7 +2,7 @@
 
 import { AlertTriangle, AlertCircle } from "lucide-react";
 import { BasePopup } from "../BasePopup";
-import { ErrorCode } from "@types/app-errors/app-error-codes";
+import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 export interface InternalErrorPopupProps {
   errorCode: ErrorCode;
 }
