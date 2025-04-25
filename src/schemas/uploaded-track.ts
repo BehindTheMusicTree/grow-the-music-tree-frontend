@@ -4,9 +4,9 @@ import { AlbumMinimumSchema } from "./album";
 import { GenreMinimumSchema } from "./genre";
 import { FileDetailedSchema } from "./file";
 import { PlaylistMinimumSchema } from "./playlist";
+import { UuidResourceSchema } from "./uuid-resource";
 
-export const UploadedTrackDetailedSchema = z.object({
-  uuid: z.string().uuid(),
+export const UploadedTrackDetailedSchema = UuidResourceSchema.extend({
   relativeUrl: z.string(),
   title: z.string(),
   file: FileDetailedSchema,
@@ -25,7 +25,7 @@ export const UploadedTrackDetailedSchema = z.object({
 
 export type UploadedTrackDetailed = z.infer<typeof UploadedTrackDetailedSchema>;
 
-export const UploadedTrackMinimumSchema = UploadedTrackDetailedSchema.pick({
+export const UploadedTrackSimpleSchema = UploadedTrackDetailedSchema.pick({
   uuid: true,
   title: true,
   artists: true,
@@ -37,30 +37,29 @@ export const UploadedTrackMinimumSchema = UploadedTrackDetailedSchema.pick({
   playCount: true,
 });
 
-export type UploadedTrackMinimum = z.infer<typeof UploadedTrackMinimumSchema>;
+export type UploadedTrackSimple = z.infer<typeof UploadedTrackSimpleSchema>;
 
-export const UploadedTrackSimpleWithoutAlbumWithTrackNumberSchema = UploadedTrackMinimumSchema.pick({
-  uuid: true,
-  title: true,
-  artists: true,
-  trackNumber: true,
-  genre: true,
-  rating: true,
-  language: true,
-  playCount: true,
+export const UploadedTrackSimpleWithoutAlbumWithTrackNumberSchema = UploadedTrackSimpleSchema.omit({
+  album: true,
 });
 
 export type UploadedTrackSimpleWithoutAlbumWithTrackNumber = z.infer<
   typeof UploadedTrackSimpleWithoutAlbumWithTrackNumberSchema
 >;
 
-export const UploadedTrackWithoutAlbumPlaylistGenreSerializer = UploadedTrackMinimumSchema.pick({
+export const UploadedTrackSimpleWithoutAlbumGenreSerializer = UploadedTrackSimpleSchema.omit({
+  album: true,
+  genre: true,
+});
+
+export type UploadedTrackSimpleWithoutAlbumPlaylistGenre = z.infer<
+  typeof UploadedTrackSimpleWithoutAlbumGenreSerializer
+>;
+
+export const UploadedTrackMinimumSchema = UploadedTrackDetailedSchema.pick({
   uuid: true,
   title: true,
   artists: true,
-  rating: true,
-  language: true,
-  playCount: true,
 });
 
-export type UploadedTrackWithoutAlbumPlaylistGenre = z.infer<typeof UploadedTrackWithoutAlbumPlaylistGenreSerializer>;
+export type UploadedTrackMinimum = z.infer<typeof UploadedTrackMinimumSchema>;
