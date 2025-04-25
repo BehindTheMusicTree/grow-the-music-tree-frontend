@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { UploadedTrackPlaylistRelWithoutPlaylistSchema } from "@schemas/uploaded-track-playlist-rel";
+import { UuidResourceSchema } from "./uuid-resource";
+import { UploadedTrackPlaylistRelWithoutPlaylistSchema } from "./uploaded-track-playlist-rel";
 
-export const PlaylistDetailedSchema = z.object({
-  uuid: z.string().uuid(),
+export const PlaylistDetailedSchema = UuidResourceSchema.extend({
   name: z.string(),
   typeLabel: z.string(),
   uploadedTracksNotArchivedCount: z.number(),
