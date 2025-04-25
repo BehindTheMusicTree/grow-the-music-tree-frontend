@@ -17,9 +17,9 @@ export const PlaylistDetailedSchema = UuidResourceSchema.extend({
 
 export type PlaylistDetailed = z.infer<typeof PlaylistDetailedSchema>;
 
-export const PlaylistMinimumSchema = PlaylistDetailedSchema.pick({
-  uuid: true,
-  name: true,
+export const PlaylistMinimumSchema = z.object({
+  uuid: z.string().uuid(),
+  name: z.string(),
 });
 
 export type PlaylistMinimum = z.infer<typeof PlaylistMinimumSchema>;

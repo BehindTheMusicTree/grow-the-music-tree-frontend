@@ -18,10 +18,10 @@ export const AlbumDetailedSchema = z.object({
 
 export type AlbumDetailed = z.infer<typeof AlbumDetailedSchema>;
 
-export const AlbumMinimumSchema = AlbumDetailedSchema.pick({
-  uuid: true,
-  name: true,
-  album_artists: true,
+export const AlbumMinimumSchema = z.object({
+  uuid: z.string().uuid(),
+  name: z.string(),
+  album_artists: z.array(ArtistMinimumSchema),
 });
 
 export type AlbumMinimum = z.infer<typeof AlbumMinimumSchema>;
