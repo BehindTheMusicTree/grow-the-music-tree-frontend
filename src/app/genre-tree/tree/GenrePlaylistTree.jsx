@@ -10,7 +10,7 @@ import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
 import { usePlayer } from "@contexts/PlayerContext.jsx";
 import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssignedNewParentContext.jsx";
 
-import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "@/utils/constants.js";
+import { PlayStates, TrackListOriginType } from "@/utils/constants.js";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper.jsx";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer.js";
@@ -51,8 +51,8 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     (genrePlaylist) => {
       if (
         !trackListOrigin ||
-        playState === PLAY_STATES.STOPPED ||
-        trackListOrigin.type !== TRACK_LIST_ORIGIN_TYPE.PLAYLIST ||
+        playState === PlayStates.STOPPED ||
+        trackListOrigin.type !== TrackListOriginType.PLAYLIST ||
         trackListOrigin.object.uuid !== genrePlaylist.uuid
       ) {
         if (genrePlaylist.uploadedTracksCount > 0) {
@@ -60,7 +60,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
         }
       } else if (
         trackListOrigin &&
-        trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
+        trackListOrigin.type === TrackListOriginType.PLAYLIST &&
         trackListOrigin.object.uuid === genrePlaylist.uuid
       ) {
         handlePlayPauseAction();

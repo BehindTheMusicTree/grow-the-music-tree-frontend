@@ -1,11 +1,11 @@
-export enum PLAY_STATES {
+export enum PlayStates {
   PLAYING = "PLAYING",
   PAUSED = "PAUSED",
   STOPPED = "STOPPED",
   LOADING = "LOADING",
 }
 
-export enum TRACK_LIST_ORIGIN_TYPE {
+export enum TrackListOriginType {
   PLAYLIST = "PLAYLIST",
   UPLOADED_TRACK = "UPLOADED_TRACK",
 }

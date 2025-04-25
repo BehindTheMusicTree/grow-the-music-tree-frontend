@@ -3,7 +3,7 @@ import { MdMoreVert, MdModeEdit } from "react-icons/md";
 import { FaPlus, FaTrashAlt, FaPlay, FaPause, FaSpinner, FaFileUpload } from "react-icons/fa";
 import { PiGraphFill } from "react-icons/pi";
 
-import { PLAY_STATES, TRACK_LIST_ORIGIN_TYPE } from "@/utils/constants";
+import { PlayStates, TrackListOriginType } from "@/utils/constants";
 import {
   RECTANGLE_COLOR,
   RECT_BASE_DIMENSIONS,
@@ -280,9 +280,9 @@ export function addActionsGroup(d3, genrePlaylist, genrePlaylistGroup, callbacks
 
   const spinnerVisibilityFunction = (d) =>
     trackListOrigin &&
-    trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
+    trackListOrigin.type === TrackListOriginType.PLAYLIST &&
     trackListOrigin.object.uuid === d.data.uuid &&
-    playState === PLAY_STATES.LOADING
+    playState === PlayStates.LOADING
       ? "visible"
       : "hidden";
 
@@ -310,9 +310,9 @@ export function addActionsGroup(d3, genrePlaylist, genrePlaylistGroup, callbacks
     .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
     .style("visibility", function (d) {
       return trackListOrigin &&
-        trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
+        trackListOrigin.type === TrackListOriginType.PLAYLIST &&
         trackListOrigin.object.uuid === d.data.uuid &&
-        playState === PLAY_STATES.LOADING
+        playState === PlayStates.LOADING
         ? "hidden"
         : "visible";
     })
@@ -338,14 +338,14 @@ export function addActionsGroup(d3, genrePlaylist, genrePlaylistGroup, callbacks
 
       const isThisPlaylistPlaying =
         trackListOrigin &&
-        trackListOrigin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST &&
+        trackListOrigin.type === TrackListOriginType.PLAYLIST &&
         trackListOrigin.object.uuid === d.data.uuid;
       let element;
       if (isThisPlaylistPlaying) {
-        if (playState === PLAY_STATES.LOADING) {
+        if (playState === PlayStates.LOADING) {
           return "";
         }
-        element = playState === PLAY_STATES.PLAYING ? pauseElement : playElement;
+        element = playState === PlayStates.PLAYING ? pauseElement : playElement;
       } else {
         element = playElement;
       }

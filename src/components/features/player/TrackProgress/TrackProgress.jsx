@@ -6,7 +6,7 @@ import raf from "raf";
 import ReactHowler from "react-howler";
 
 import { usePlayer } from "@contexts/PlayerContext";
-import { PLAY_STATES } from "@lib/utils/constants";
+import { PlayStates } from "@lib/utils/constants";
 import { formatTime } from "@lib/utils/formatting";
 
 export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek }) {
@@ -89,7 +89,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
       }
 
       previousSeekRef.current = currentSeek;
-      if (playState === PLAY_STATES.PLAYING && !isSeeking) {
+      if (playState === PlayStates.PLAYING && !isSeeking) {
         rafIdRef.current = raf(() => {
           renderSeekPosition();
         });
@@ -98,7 +98,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
   };
 
   useEffect(() => {
-    if (playState === PLAY_STATES.PLAYING) {
+    if (playState === PlayStates.PLAYING) {
       if (isSeeking) {
         cancelRaf();
       } else if (seek >= Math.floor(playerUploadedTrackObject.durationInSec)) {
@@ -107,10 +107,10 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
         playerRef.current.seek(seek);
         renderSeekPosition();
       }
-    } else if (playState === PLAY_STATES.PAUSED && !isSeeking) {
+    } else if (playState === PlayStates.PAUSED && !isSeeking) {
       cancelRaf();
-    } else if (playState === PLAY_STATES.STOPPED && !isSeeking && seek > 0) {
-      setPlayState(PLAY_STATES.PAUSED);
+    } else if (playState === PlayStates.STOPPED && !isSeeking && seek > 0) {
+      setPlayState(PlayStates.PAUSED);
     }
   }, [isSeeking, playState]);
 
@@ -131,12 +131,12 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
 
   useEffect(() => {
     if (seek === 0) {
-      if (playState === PLAY_STATES.LOADING) {
-        setPlayState(PLAY_STATES.PLAYING);
-      } else if (playState === PLAY_STATES.PAUSED) {
+      if (playState === PlayStates.LOADING) {
+        setPlayState(PlayStates.PLAYING);
+      } else if (playState === PlayStates.PAUSED) {
         playerRef.current.seek(0);
-        setPlayState(PLAY_STATES.STOPPED);
-      } else if (playState === PLAY_STATES.PLAYING) {
+        setPlayState(PlayStates.STOPPED);
+      } else if (playState === PlayStates.PLAYING) {
         playerRef.current.seek(0);
         renderSeekPosition();
       }
@@ -145,12 +145,12 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
 
   return (
     <div className="flex flex justify-center items-center w-full">
-      {playState !== PLAY_STATES.LOADING ? (
+      {playState !== PlayStates.LOADING ? (
         <ReactHowler
           ref={playerRef}
           src={[playerUploadedTrackObject.blobUrl]}
           html5={true}
-          playing={playState === PLAY_STATES.PLAYING}
+          playing={playState === PlayStates.PLAYING}
           format={[playerUploadedTrackObject.uploadedTrack.file.extension.replace(".", "")]}
           onLoadError={handleLoadError}
           onEnd={handleTrackEnd}

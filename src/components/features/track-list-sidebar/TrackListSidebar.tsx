@@ -4,7 +4,7 @@ import TrackItem from "./TrackItem";
 import { capitalizeFirstLetter } from "@lib/utils/formatting";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
-import { TRACK_LIST_ORIGIN_TYPE } from "@lib/utils/constants";
+import { TrackListOriginType } from "@lib/utils/constants";
 import TrackListOrigin from "@/models/client/track-list/TrackListOrigin";
 
 export default function TrackListSidebar() {
@@ -18,14 +18,14 @@ export default function TrackListSidebar() {
           <div className="from h-auto flex flex-col justify-center items-center mr-2">From</div>
           <div className="name-container flex flex-col justify-center items-center text-gray-300 font-bold pr-2 max-w-trackListName">
             <div className="name text-overflow">
-              {trackList.origin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST
+              {trackList.origin.type === TrackListOriginType.PLAYLIST
                 ? origin.object.name
                 : `${origin.object.title} ` + (origin.object.artist ? `by ${origin.object.artist.name}` : "")}
             </div>
           </div>
         </div>
         <div className="info flex flex-col justify-center items-center text-m pt-1 mr-2">
-          {trackList.origin.type === TRACK_LIST_ORIGIN_TYPE.PLAYLIST
+          {trackList.origin.type === TrackListOriginType.PLAYLIST
             ? "• " + capitalizeFirstLetter(origin.object.type || "") + " playlist • "
             : "• track playlist • "}
           {trackList.length + " track" + (trackList.length > 1 ? "s •" : " •")}
