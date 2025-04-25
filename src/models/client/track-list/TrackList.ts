@@ -1,3 +1,5 @@
+import { UploadedTrackDetailed } from "@domain/uploaded-track";
+import TrackListOrigin from "./TrackListOrigin";
 export default class TrackList {
-  constructor(public type: string, public name: string) {}
+  constructor(public uploadedTracks: UploadedTrackDetailed[], public origin: TrackListOrigin) {}
 }
