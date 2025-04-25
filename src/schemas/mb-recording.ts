@@ -1,31 +1,14 @@
 import { z } from "zod";
-
+import { MbArtistDetailedSchema } from "./mb-artist";
 export const MbRecordingDetailedSchema = z.object({
-  uuid: z.string().uuid(),
-  mbid: z.string(),
+  musicbrainzId: z.string().uuid(),
   title: z.string(),
-  artists: z.array(
-    z.object({
-      uuid: z.string().uuid(),
-      name: z.string(),
-      mbid: z.string(),
-    })
-  ),
-  durationInSec: z.number(),
+  score: z.number().min(0).max(1),
+  musicbrainzArtists: z.array(MbArtistDetailedSchema),
+  musicbrainzLink: z.string().url(),
+  durationInSec: z.number().min(0),
   durationStrInHourMinSec: z.string(),
-  createdOn: z.string().datetime(),
-  updatedOn: z.string().datetime(),
+  releaseDate: z.string().datetime(),
 });
 
 export type MusicbrainzRecordingDetailed = z.infer<typeof MbRecordingDetailedSchema>;
-
-export const MbRecordingMinimumSchema = MbRecordingDetailedSchema.pick({
-  uuid: true,
-  mbid: true,
-  title: true,
-  artists: true,
-  durationInSec: true,
-  durationStrInHourMinSec: true,
-});
-
-export type MusicbrainzRecordingMinimum = z.infer<typeof MbRecordingMinimumSchema>;
