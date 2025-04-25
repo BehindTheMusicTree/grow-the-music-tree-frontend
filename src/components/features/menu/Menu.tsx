@@ -33,12 +33,12 @@ const menuGroups = {
   ],
 };
 
-export default function Menu() {
+export default function Menu({ className }: { className?: string }) {
   return (
-    <nav className="bg-black flex flex-col justify-start items-start p-2 h-full">
+    <nav className={`menu bg-black flex flex-col justify-start items-start p-2 h-full w-fit ${className}`}>
       <MenuGroup items={menuGroups.genreTree} />
       <MenuGroup items={menuGroups.library} />
-      <MenuGroup items={menuGroups.account} className="mt-auto" />
+      <MenuGroup items={menuGroups.account} />
     </nav>
   );
 }
