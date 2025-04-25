@@ -2,10 +2,11 @@
 
 import { createContext, useState, useContext, ReactNode } from "react";
 import { UploadedTrackDetailed } from "@schemas/uploaded-track";
+import TrackList from "@models/track-list/TrackList";
 
 interface TrackListContextType {
-  trackList: UploadedTrackDetailed[];
-  setTrackList: (tracks: UploadedTrackDetailed[]) => void;
+  trackList: TrackList | null;
+  setTrackList: (trackList: TrackList) => void;
   selectedTrack: UploadedTrackDetailed | null;
   setSelectedTrack: (track: UploadedTrackDetailed | null) => void;
   toTrackAtPosition: (position: number) => void;
@@ -19,12 +20,12 @@ interface TrackListProviderProps {
 }
 
 export function TrackListProvider({ children }: TrackListProviderProps) {
-  const [trackList, setTrackList] = useState<UploadedTrackDetailed[]>([]);
+  const [trackList, setTrackList] = useState<TrackList | null>(null);
   const [selectedTrack, setSelectedTrack] = useState<UploadedTrackDetailed | null>(null);
 
   const toTrackAtPosition = (position: number) => {
-    if (position >= 0 && position < trackList.length) {
-      setSelectedTrack(trackList[position]);
+    if (trackList && position >= 0 && position < trackList.uploadedTracks.length) {
+      setSelectedTrack(trackList.uploadedTracks[position]);
     }
   };
 
