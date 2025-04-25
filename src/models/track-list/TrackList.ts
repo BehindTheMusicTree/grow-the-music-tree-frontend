@@ -1,9 +1,6 @@
 import { UploadedTrackDetailed } from "@schemas/uploaded-track";
-import { PlaylistDetailed } from "@schemas/playlist";
+import TrackListOrigin from "./origin/TrackListOrigin";
 
 export default class TrackList {
-  constructor(
-    public uploadedTracks: UploadedTrackDetailed[],
-    public origin: UploadedTrackDetailed | PlaylistDetailed
-  ) {}
+  constructor(public uploadedTracks: UploadedTrackDetailed[], public origin: TrackListOrigin) {}
 }
