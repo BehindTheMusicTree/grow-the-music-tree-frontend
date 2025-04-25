@@ -27,7 +27,8 @@
       "@utils/*": ["src/lib/utils/*"],
       "@types/*": ["src/types/*"],
       "@models/*": ["src/models/*"],
-      "@domain/*": ["src/models/domain/*"]
+      "@domain/*": ["src/models/domain/*"],
+      "@schemas/*": ["src/schemas/*"]
     },
     "plugins": [
       {
