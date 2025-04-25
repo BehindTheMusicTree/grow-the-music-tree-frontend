@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthenticatedApi, AuthFetch } from "./useAuthenticatedApi";
 import { UploadedTrackService } from "@/services/uploadedTrack";
-import { UploadedTrack, PaginatedResponse, TrackData } from "@/lib/music-tree-api-service/uploaded-track";
+import { UploadedTrack, PaginatedResponse, TrackData } from "@lib/music-tree-api-service/uploaded-track";
 
 const uploadedTrackService = (authFetch: AuthFetch) => new UploadedTrackService(authFetch);
 

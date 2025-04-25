@@ -1,5 +1,5 @@
-import { useSession } from "@/contexts/SessionContext";
-import { fetchWrapper as rawFetch } from "@/lib";
+import { useSession } from "@contexts/SessionContext";
+import { fetchWrapper as rawFetch } from "@lib";
 
 export const useFetchWrapper = () => {
   const { session } = useSession();

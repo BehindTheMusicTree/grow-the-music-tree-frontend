@@ -3,7 +3,7 @@
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { MdError } from "react-icons/md";
-import { useGenrePlaylists } from "@/contexts/GenrePlaylistContext";
+import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
 
 export default function TrackUploadPopup({ content, onClose }) {
   const { setRefreshGenrePlaylistsSignal, uploadTracks } = useGenrePlaylists();

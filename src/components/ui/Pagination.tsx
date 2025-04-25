@@ -2,7 +2,7 @@
 
 import classnames from "classnames";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@components/ui/Button";
 
 interface PaginationProps {
   currentPage: number;

@@ -2,14 +2,14 @@
 
 import { FaRegClock } from "react-icons/fa";
 
-import { formatTime } from "@/lib/utils/formatting";
-import Rating from "@/components/features/Rating";
-import UploadButtons from "@/components/features/UploadButtons";
-import UploadedTrackPositionPlayPause from "@/components/features/UploadedTrackPositionPlayPause";
-import { usePlayer } from "@/contexts/PlayerContext";
-import { usePopup } from "@/contexts/PopupContext";
-import { useTrackList } from "@/contexts/TrackListContext";
-import { useListUploadedTracks } from "@/hooks/useUploadedTrack";
+import { formatTime } from "@lib/utils/formatting";
+import Rating from "@components/features/Rating";
+import UploadButtons from "@components/features/UploadButtons";
+import UploadedTrackPositionPlayPause from "@components/features/UploadedTrackPositionPlayPause";
+import { usePlayer } from "@contexts/PlayerContext";
+import { usePopup } from "@contexts/PopupContext";
+import { useTrackList } from "@contexts/TrackListContext";
+import { useListUploadedTracks } from "@hooks/useUploadedTrack";
 
 export default function UploadedLibrary() {
   const { data: uploadedTracks = [] } = useListUploadedTracks();

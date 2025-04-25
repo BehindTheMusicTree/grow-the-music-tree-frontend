@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import { usePlayer } from "@/contexts/PlayerContext";
+import { usePlayer } from "@contexts/PlayerContext";
 import PlayerControls from "./PlayerControls";
 
 interface PlayerProps {

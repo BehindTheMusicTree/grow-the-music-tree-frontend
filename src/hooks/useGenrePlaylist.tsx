@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useFetchWrapper } from "./useFetchWrapper";
-import { PaginatedResponse, PaginatedResponseSchema } from "@/types/api/pagination";
+import { PaginatedResponse, PaginatedResponseSchema } from "@types/api/pagination";
 import {
   GenrePlaylistDetailedSchema,
   GenrePlaylistDetailed,

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-import { useSession } from "@/contexts/SessionContext";
+import { useSession } from "@contexts/SessionContext";
 
 export default function AccountPage() {
   const { updateSession } = useSession();

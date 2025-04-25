@@ -2,7 +2,7 @@
 
 import { useState, useEffect, ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { PopupTitle } from "@/components/ui/popup/PopupTitle";
+import { PopupTitle } from "@components/ui/popup/PopupTitle";
 import { LucideIcon } from "lucide-react";
 
 type PopupType = "default" | "success" | "error" | "warning" | "info";

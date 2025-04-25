@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import { useSpotifyAuth } from "@/contexts/SpotifyAuthContext";
-import { useConnectivityError } from "@/contexts/ConnectivityErrorContext";
-import { ErrorCode } from "@/lib/connectivity-errors/codes";
+import { useSpotifyAuth } from "@contexts/SpotifyAuthContext";
+import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
+import { ErrorCode } from "@lib/connectivity-errors/codes";
 
 export default function SpotifyCallback() {
   const searchParams = useSearchParams();

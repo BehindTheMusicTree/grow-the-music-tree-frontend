@@ -1,7 +1,7 @@
 "use client";
 
 import SearchForm from "./SearchForm";
-import logo from "@/assets/images/logos/tree.png";
+import logo from "@assets/images/logos/tree.png";
 import Image from "next/image";
 
 interface BannerProps {

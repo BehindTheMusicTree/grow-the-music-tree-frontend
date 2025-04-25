@@ -5,9 +5,9 @@ import PropTypes from "prop-types";
 import raf from "raf";
 import ReactHowler from "react-howler";
 
-import { usePlayer } from "@/contexts/PlayerContext";
-import { PLAY_STATES } from "@/lib/utils/constants";
-import { formatTime } from "@/lib/utils/formatting";
+import { usePlayer } from "@contexts/PlayerContext";
+import { PLAY_STATES } from "@lib/utils/constants";
+import { formatTime } from "@lib/utils/formatting";
 
 export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek }) {
   const {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { usePopup } from "@/contexts/PopupContext";
+import { usePopup } from "@contexts/PopupContext";
 
 interface Genre {
   name: string;

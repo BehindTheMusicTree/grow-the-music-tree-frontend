@@ -1,24 +1,24 @@
 "use client";
 
 import { useEffect, useRef, ReactNode } from "react";
-import { initSentry } from "@/lib/sentry";
+import { initSentry } from "@lib/sentry";
 import "./globals.css";
 import { Inter } from "next/font/google";
 
-import Providers from "@/app/providers";
-import { PopupProvider } from "@/contexts/PopupContext";
-import { useConnectivityError } from "@/contexts/ConnectivityErrorContext";
-import { usePopup } from "@/contexts/PopupContext";
-import { usePlayer } from "@/contexts/PlayerContext";
-import { useTrackListSidebarVisibility } from "@/contexts/TrackListSidebarVisibilityContext";
-import { ConnectivityError, NetworkError, AuthError, ServerError, BadRequestError } from "@/types/app-errors/app-error";
-import Banner from "@/components/features/banner/Banner";
-import Menu from "@/components/features/menu/Menu";
-import Player from "@/components/features/player/Player";
-import TrackListSidebar from "@/components/features/track-list-sidebar/TrackListSidebar";
-import NetworkErrorPopup from "@/components/ui/popup/child/NetworkErrorPopup";
-import SpotifyAuthPopup from "@/components/ui/popup/child/SpotifyAuthPopup";
-import InternalErrorPopup from "@/components/ui/popup/child/InternalErrorPopup";
+import Providers from "@app/providers";
+import { PopupProvider } from "@contexts/PopupContext";
+import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
+import { usePopup } from "@contexts/PopupContext";
+import { usePlayer } from "@contexts/PlayerContext";
+import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
+import { ConnectivityError, NetworkError, AuthError, ServerError, BadRequestError } from "@types/app-errors/app-error";
+import Banner from "@components/features/banner/Banner";
+import Menu from "@components/features/menu/Menu";
+import Player from "@components/features/player/Player";
+import TrackListSidebar from "@components/features/track-list-sidebar/TrackListSidebar";
+import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
+import SpotifyAuthPopup from "@components/ui/popup/child/SpotifyAuthPopup";
+import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 initSentry();
 
 const inter = Inter({ subsets: ["latin"] });
