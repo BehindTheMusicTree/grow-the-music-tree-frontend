@@ -18,6 +18,7 @@ import {
   ServerError,
   BadRequestError,
 } from "@app-types/app-errors/app-error";
+
 import Banner from "@components/features/banner/Banner";
 import Menu from "@components/features/menu/Menu";
 import Player from "@components/features/player/Player";
@@ -25,8 +26,8 @@ import TrackListSidebar from "@components/features/track-list-sidebar/TrackListS
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
 import SpotifyAuthPopup from "@components/ui/popup/child/SpotifyAuthPopup";
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
+import { setupFetchInterceptor } from "@lib/fetch-interceptor";
 import { BANNER_HEIGHT, PLAYER_HEIGHT } from "@constants/layout";
-
 initSentry();
 
 const inter = Inter({ subsets: ["latin"] });
@@ -35,8 +36,18 @@ function AppContent({ children }: { children: ReactNode }) {
   const { playerUploadedTrackObject } = usePlayer();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-  const { connectivityError, clearConnectivityError } = useConnectivityError();
+  const { connectivityError, setConnectivityError, clearConnectivityError } = useConnectivityError();
   const currentConnectivityErrorTypeRef = useRef<typeof ConnectivityError | null>(null);
+
+  useEffect(() => {
+    const cleanup = setupFetchInterceptor((error) => {
+      // Handle errors globally here
+      console.error("Global fetch error:", error);
+      setConnectivityError(error);
+    });
+
+    return cleanup; // Cleanup when component unmounts
+  }, []);
 
   useEffect(() => {
     console.log("AppContent: playerUploadedTrackObject changed", playerUploadedTrackObject);
