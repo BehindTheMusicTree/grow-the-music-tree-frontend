@@ -1,16 +1,11 @@
 "use client";
 
-import { ErrorHandler, NetworkError, AuthError, ServerError, CustomError } from "./connectivity-errors/error-types";
-
-type RequestDetails = {
-  url: string | Request | URL;
-  method?: string;
-  headers?: Record<string, string>;
-  body?: BodyInit | null;
-  [key: string]: unknown;
-};
-
-type ErrorHandlerFunction = (error: CustomError) => void;
+import { AppError } from "@app-types/app-errors/app-error";
+import {
+  createAppErrorFromHttpUrlAndStatus,
+  createAppErrorFromErrorCode,
+} from "@app-types/app-errors/app-error-factory";
+import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
 // Store the original fetch only in browser environments
 const originalFetch: typeof fetch | null = typeof window !== "undefined" ? window.fetch : null;
@@ -18,25 +13,12 @@ const originalFetch: typeof fetch | null = typeof window !== "undefined" ? windo
 /**
  * Sets up a global fetch interceptor that handles errors consistently
  */
-export const setupFetchInterceptor = (handleError: ErrorHandlerFunction): (() => void) => {
+export const setupFetchInterceptor = (handleError: (error: Error) => void): (() => void) => {
   // Skip setup in SSR environments
   if (typeof window === "undefined") return () => {};
 
   window.fetch = async (...args: Parameters<typeof fetch>): Promise<Response> => {
-    const [url, requestInit = {}] = args;
-
-    // Clone the request init to preserve the original request details
-    const headers = new Headers(requestInit.headers);
-    const requestDetails: RequestDetails = {
-      url,
-      method: requestInit.method || "GET",
-      headers: Array.from(headers.entries()).reduce((acc, [key, value]) => {
-        acc[key] = value;
-        return acc;
-      }, {} as Record<string, string>),
-      body: requestInit.body,
-      ...requestInit,
-    };
+    const [url] = args;
 
     try {
       console.log(`Fetch request to: ${url}`);
@@ -48,68 +30,39 @@ export const setupFetchInterceptor = (handleError: ErrorHandlerFunction): (() =>
       // Handle response errors
       if (!response.ok) {
         console.log("Response error:", response);
-        let error = ErrorHandler.getErrorFromStatus(response.status);
-        error.response = {
-          status: response.status,
-          headers: Object.fromEntries(response.headers.entries()),
-          url: response.url,
-        };
-        error.request = requestDetails;
-
-        // Special handling for authentication errors
-        if (response.status === 401) {
-          // Check for session expiration header
-          if (response.headers.get("x-auth-error") === "session-expired") {
-            error = AuthError.SESSION_EXPIRED;
-          }
-        }
-
-        throw error;
+        throw createAppErrorFromHttpUrlAndStatus(response.url, response.status);
       }
 
       return response;
     } catch (caughtError: unknown) {
       console.log("Fetch interceptor caught error:", caughtError);
-      let error: CustomError;
 
-      if (caughtError instanceof CustomError) {
-        error = caughtError;
-      } else if (caughtError instanceof Error) {
-        error = new CustomError(caughtError.message);
-        error.name = caughtError.name;
-        error.stack = caughtError.stack;
-      } else {
-        error = new CustomError("Unknown error occurred");
-      }
-
-      // Specifically handle network errors like ERR_CONNECTION_REFUSED
-      if (error instanceof TypeError && error.message === "Failed to fetch") {
-        console.log("Network error detected: Connection likely refused");
-        error = NetworkError.CONNECTION_REFUSED;
-      }
-
-      // If it's not our error object, add the request details
-      if (!error.request) {
-        error.request = requestDetails;
-      }
-
-      // Pass the error to the centralized handler
-      console.log("Passing error to central handler:", error);
-      handleError(error);
-
-      if (error.name === "AbortError") {
-        throw NetworkError.TIMEOUT;
-      }
-
+      let error: Error;
       if (!navigator.onLine) {
-        throw NetworkError.OFFLINE;
+        error = createAppErrorFromErrorCode(ErrorCode.NETWORK_OFFLINE);
       }
 
-      if (error.message?.includes("Failed to fetch")) {
-        throw NetworkError.CONNECTION_REFUSED;
+      if (caughtError instanceof AppError) {
+        error = caughtError;
+      } else {
+        if (caughtError instanceof Error) {
+          // Specifically handle network errors like ERR_CONNECTION_REFUSED
+          if (caughtError instanceof TypeError && caughtError.message === "Failed to fetch") {
+            console.log("Network error detected: Connection likely refused");
+            error = createAppErrorFromErrorCode(ErrorCode.NETWORK_CONNECTION_REFUSED);
+          } else if (caughtError.name === "AbortError") {
+            error = createAppErrorFromErrorCode(ErrorCode.NETWORK_ABORT_ERROR);
+          } else if (caughtError.message?.includes("Failed to fetch")) {
+            error = createAppErrorFromErrorCode(ErrorCode.NETWORK_FAILED_TO_FETCH);
+          } else {
+            error = createAppErrorFromErrorCode(ErrorCode.NETWORK_UNKNOWN);
+          }
+        } else {
+          error = createAppErrorFromErrorCode(ErrorCode.NETWORK_UNKNOWN);
+        }
       }
 
-      throw ServerError.INTERNAL;
+      handleError(error);
     }
   };
 
