@@ -14,10 +14,12 @@ import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibil
 import {
   ConnectivityError,
   NetworkError,
-  AuthError,
+  AuthRequired,
   ServerError,
   BadRequestError,
 } from "@app-types/app-errors/app-error";
+import { ErrorBoundary } from "@components/core/ErrorBoundary";
+import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
 import Banner from "@components/features/banner/Banner";
 import Menu from "@components/features/menu/Menu";
@@ -25,8 +27,6 @@ import Player from "@components/features/player/Player";
 import TrackListSidebar from "@components/features/track-list-sidebar/TrackListSidebar";
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
 import SpotifyAuthPopup from "@components/ui/popup/child/SpotifyAuthPopup";
-import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
-import { setupFetchInterceptor } from "@lib/fetch-interceptor";
 import { BANNER_HEIGHT, PLAYER_HEIGHT } from "@constants/layout";
 initSentry();
 
@@ -34,57 +34,9 @@ const inter = Inter({ subsets: ["latin"] });
 
 function AppContent({ children }: { children: ReactNode }) {
   const { playerUploadedTrackObject } = usePlayer();
-  const { showPopup, hidePopup, activePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-  const { connectivityError, setConnectivityError, clearConnectivityError } = useConnectivityError();
-  const currentConnectivityErrorTypeRef = useRef<typeof ConnectivityError | null>(null);
-
-  useEffect(() => {
-    const cleanup = setupFetchInterceptor((error) => {
-      // Handle errors globally here
-      console.error("Global fetch error:", error);
-      if (error instanceof ConnectivityError) {
-        setConnectivityError(error);
-      }
-    });
-
-    return cleanup; // Cleanup when component unmounts
-  }, [setConnectivityError]);
 
   useEffect(() => {}, [playerUploadedTrackObject]);
-
-  useEffect(() => {
-    console.log("AppContent: connectivityError changed", connectivityError);
-
-    if (connectivityError === null) {
-      if (currentConnectivityErrorTypeRef.current !== null) {
-        currentConnectivityErrorTypeRef.current = null;
-        hidePopup();
-      }
-    } else if (
-      currentConnectivityErrorTypeRef.current !== null &&
-      ![NetworkError, ServerError].includes(currentConnectivityErrorTypeRef.current) &&
-      !(connectivityError instanceof currentConnectivityErrorTypeRef.current)
-    ) {
-      let popup: ReactNode | null = null;
-      if ((connectivityError as ConnectivityError) instanceof AuthError) {
-        popup = <SpotifyAuthPopup />;
-      } else if (
-        (connectivityError as ConnectivityError) instanceof BadRequestError ||
-        (connectivityError as ConnectivityError) instanceof ServerError
-      ) {
-        popup = <InternalErrorPopup errorCode={connectivityError.code} />;
-      } else if (connectivityError instanceof NetworkError) {
-        popup = <NetworkErrorPopup />;
-      }
-
-      if (popup) {
-        showPopup(popup);
-      }
-
-      currentConnectivityErrorTypeRef.current = connectivityError?.constructor as typeof ConnectivityError;
-    }
-  }, [connectivityError, showPopup, hidePopup, clearConnectivityError]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {
@@ -108,12 +60,58 @@ function AppContent({ children }: { children: ReactNode }) {
       </div>
 
       {/* {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />} */}
-      {activePopup}
     </div>
   );
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
+  const currentConnectivityErrorTypeRef = useRef<typeof ConnectivityError | null>(null);
+  const { showPopup, hidePopup, activePopup } = usePopup();
+  const { connectivityError, setConnectivityError, clearConnectivityError } = useConnectivityError();
+
+  const isConnectivityError = (error: unknown): error is ConnectivityError => {
+    return error instanceof ConnectivityError;
+  };
+
+  useEffect(() => {
+    if (connectivityError === null) {
+      if (currentConnectivityErrorTypeRef.current !== null) {
+        currentConnectivityErrorTypeRef.current = null;
+        hidePopup();
+      }
+    } else if (
+      currentConnectivityErrorTypeRef.current !== null &&
+      ![NetworkError, ServerError].includes(currentConnectivityErrorTypeRef.current) &&
+      !(connectivityError instanceof currentConnectivityErrorTypeRef.current)
+    ) {
+      let popup: ReactNode | null = null;
+      const error = connectivityError as ConnectivityError;
+      if (error instanceof AuthRequired) {
+        popup = <SpotifyAuthPopup />;
+      } else if (error instanceof BadRequestError || error instanceof ServerError) {
+        popup = <InternalErrorPopup errorCode={error.code} />;
+      } else if (error instanceof NetworkError) {
+        popup = (
+          <NetworkErrorPopup title="Network Error">
+            Please check your internet connection and try again.
+          </NetworkErrorPopup>
+        );
+      }
+
+      if (popup) {
+        showPopup(popup);
+      }
+
+      currentConnectivityErrorTypeRef.current = error.constructor as typeof ConnectivityError;
+    }
+  }, [connectivityError, showPopup, hidePopup, clearConnectivityError]);
+
+  const handleError = (error: Error) => {
+    if (error instanceof ConnectivityError) {
+      setConnectivityError(error);
+    }
+  };
+
   return (
     <html lang="en">
       <head>
@@ -124,11 +122,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={inter.className}>
-        <PopupProvider>
-          <Providers>
-            <AppContent>{children}</AppContent>
-          </Providers>
-        </PopupProvider>
+        <Providers>
+          <PopupProvider>
+            <ErrorBoundary onError={handleError}>
+              <AppContent>{children}</AppContent>
+              {activePopup}
+            </ErrorBoundary>
+          </PopupProvider>
+        </Providers>
       </body>
     </html>
   );
