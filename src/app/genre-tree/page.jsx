@@ -2,13 +2,13 @@
 
 import { GenreGettingAssignedNewParentProvider } from "@contexts/GenreGettingAssignedNewParentContext";
 import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
-import { useCreateGenre } from "@hooks/useCreateGenre";
 import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "./tree/tree-constants";
-import GenrePlaylistsTree from "./tree/GenrePlaylistTree";
+import { useGenreCreation } from "@hooks/useGenreCreation";
+import GenrePlaylistsTree from "./tree/GenrePlaylistsTree";
 
-export default function GenrePlaylists() {
+export default function GenreTree() {
   const { groupedGenrePlaylists, loading } = useListGenrePlaylists();
-  const { mutate: createGenre } = useCreateGenre();
+  const { showCreationPopup, GenreCreationComponent } = useGenreCreation();
 
   return (
     <GenreGettingAssignedNewParentProvider>
@@ -20,7 +20,7 @@ export default function GenrePlaylists() {
             height: GENRE_PLAYLIST_TREE_RECT_DIMENSIONS.HEIGHT + "px",
             border: "1px solid black",
           }}
-          onClick={handleGenreAddAction}
+          onClick={() => showCreationPopup()}
         >
           +
         </div>
@@ -33,7 +33,7 @@ export default function GenrePlaylists() {
                 <GenrePlaylistsTree
                   key={`${uuid}`}
                   genrePlaylistsTree={genrePlaylistsTree}
-                  handleGenreAddAction={handleGenreAddAction}
+                  handleGenreAddAction={() => showCreationPopup()}
                 />
               );
             })
@@ -41,6 +41,7 @@ export default function GenrePlaylists() {
             <p>No data found.</p>
           )}
         </div>
+        <GenreCreationComponent />
       </div>
     </GenreGettingAssignedNewParentProvider>
   );
