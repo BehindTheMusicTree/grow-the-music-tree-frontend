@@ -1,9 +1,14 @@
 import { z } from "zod";
 
-export const GenreFormSchema = z.object({
+export const GenreCreateSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  description: z.string().optional(),
-  parentId: z.string().optional(),
+  parentUuid: z.string().optional(),
 });
 
-export type GenreFormValues = z.infer<typeof GenreFormSchema>;
+export const GenreUpdateSchema = z.object({
+  name: z.string().optional(),
+  parentUuid: z.string().optional(),
+});
+
+export type GenreCreateValues = z.infer<typeof GenreCreateSchema>;
+export type GenreUpdateValues = z.infer<typeof GenreUpdateSchema>;
