@@ -84,7 +84,7 @@ function AppContent({ children }: AppContentProps) {
       <Banner className="fixed w-full top-0 z-50" />
 
       <div
-        className="center bg-gray-100 flex-grow flex overflow-y-auto"
+        className="center bg-gray-100 flex-grow flex"
         style={{
           maxHeight: playerUploadedTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
         }}
@@ -94,7 +94,7 @@ function AppContent({ children }: AppContentProps) {
         {isTrackListSidebarVisible && <TrackListSidebar className="fixed right-0 z-40" />}
       </div>
 
-      {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />}
+      {/* {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />} */}
       {activePopup}
     </div>
   );
