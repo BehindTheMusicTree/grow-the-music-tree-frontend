@@ -6,7 +6,7 @@ import { Button } from "@components/ui/Button";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 import { UploadedTrackUpdateValues } from "@schemas/uploaded-track/form";
 import { UploadedTrackDetailed } from "@schemas/uploaded-track/response";
-// Only allow custom props
+
 type UploadedTrackEditionPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   uploadedTrack: UploadedTrackDetailed;
   formValues: UploadedTrackUpdateValues;
