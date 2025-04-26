@@ -4,29 +4,30 @@ import { MdError } from "react-icons/md";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 
 type TrackUploadPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
-  requestErrors?: string;
+  isUploadingTrack?: boolean;
+  error?: Error;
 };
 
 // @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
 export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps> {
   render() {
-    const { requestErrors, ...rest } = this.props;
+    const { isUploadingTrack, error, ...rest } = this.props;
     return this.renderBase({
       ...rest,
       title: "Upload Track",
       isDismissable: true,
       children: (
         <div>
-          {requestErrors ? (
+          {error ? (
             <div>
               <div className="flex items-center">
                 <MdError size={20} color="red" />
                 <h3 className="ml-1">An error occurred</h3>
               </div>
-              <div className="mt-2 text-red-500">{requestErrors}</div>
+              <div className="mt-2 text-red-500">{error.message}</div>
             </div>
           ) : (
-            <h3>Uploading...</h3>
+            <div>{isUploadingTrack ? <h3>Uploading...</h3> : <h3>Uploaded</h3>}</div>
           )}
         </div>
       ),
