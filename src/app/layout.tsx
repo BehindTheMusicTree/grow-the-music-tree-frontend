@@ -35,43 +35,11 @@ const inter = Inter({ subsets: ["latin"] });
 function AppContent({ children }: { children: ReactNode }) {
   const { playerUploadedTrackObject } = usePlayer();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-
-  useEffect(() => {}, [playerUploadedTrackObject]);
-
-  // Calculate dynamic heights based on player visibility
-  const centerMaxHeight = {
-    centerWithPlayer: `calc(100vh - ${BANNER_HEIGHT + PLAYER_HEIGHT}px)`,
-    centerWithoutPlayer: `calc(100vh - ${BANNER_HEIGHT}px)`,
-  };
-
-  return (
-    <div className="app col h-screen">
-      <Banner className="banner fixed w-full top-0 z-50 h-banner" />
-
-      <div
-        className="center fixed top-banner bg-gray-100 h-full w-full flex"
-        style={{
-          maxHeight: playerUploadedTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
-        }}
-      >
-        <Menu className="menu left-0 z-40" />
-        <main className="flex-grow mx-8">{children}</main>
-        {isTrackListSidebarVisible && <TrackListSidebar className="fixed right-0 z-40" />}
-      </div>
-
-      {/* {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />} */}
-    </div>
-  );
-}
-
-export default function RootLayout({ children }: { children: ReactNode }) {
   const currentConnectivityErrorTypeRef = useRef<typeof ConnectivityError | null>(null);
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, setConnectivityError, clearConnectivityError } = useConnectivityError();
 
-  const isConnectivityError = (error: unknown): error is ConnectivityError => {
-    return error instanceof ConnectivityError;
-  };
+  useEffect(() => {}, [playerUploadedTrackObject]);
 
   useEffect(() => {
     if (connectivityError === null) {
@@ -112,6 +80,38 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     }
   };
 
+  // Calculate dynamic heights based on player visibility
+  const centerMaxHeight = {
+    centerWithPlayer: `calc(100vh - ${BANNER_HEIGHT + PLAYER_HEIGHT}px)`,
+    centerWithoutPlayer: `calc(100vh - ${BANNER_HEIGHT}px)`,
+  };
+
+  return (
+    <ErrorBoundary onError={handleError}>
+      <div className="app col h-screen">
+        <Banner className="banner fixed w-full top-0 z-50 h-banner" />
+
+        <div
+          className="center fixed top-banner bg-gray-100 h-full w-full flex"
+          style={{
+            maxHeight: playerUploadedTrackObject
+              ? centerMaxHeight.centerWithPlayer
+              : centerMaxHeight.centerWithoutPlayer,
+          }}
+        >
+          <Menu className="menu left-0 z-40" />
+          <main className="flex-grow mx-8">{children}</main>
+          {isTrackListSidebarVisible && <TrackListSidebar className="fixed right-0 z-40" />}
+        </div>
+
+        {/* {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />} */}
+      </div>
+      {activePopup}
+    </ErrorBoundary>
+  );
+}
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -124,10 +124,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className={inter.className}>
         <Providers>
           <PopupProvider>
-            <ErrorBoundary onError={handleError}>
-              <AppContent>{children}</AppContent>
-              {activePopup}
-            </ErrorBoundary>
+            <AppContent>{children}</AppContent>
           </PopupProvider>
         </Providers>
       </body>
