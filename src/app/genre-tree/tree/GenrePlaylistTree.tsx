@@ -52,7 +52,7 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
           file: file,
           genre: selectingFileGenreUuidRef.current,
         };
-        const uploadedTrack = uploadTrack(uploadedTrackCreationValues);
+        uploadTrack(uploadedTrackCreationValues);
 
         showPopup(<TrackUploadPopup isUploadingTrack={isUploadingTrack} error={uploadTrackError} />);
       }
