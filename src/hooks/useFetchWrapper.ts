@@ -1,5 +1,5 @@
 import { useSession } from "@contexts/SessionContext";
-import { fetchWrapper as rawFetch } from "@lib";
+import { fetchWrapper as rawFetch } from "@lib/fetch-wrapper";
 
 export const useFetchWrapper = () => {
   const { session } = useSession();
@@ -10,7 +10,7 @@ export const useFetchWrapper = () => {
     options: RequestInit = {},
     queryParams?: Record<string, string | number | boolean>
   ) => {
-    const url = fromBackend ? `${process.env.NEXT_PUBLIC_API_URL}${backendEndpointOrUrl}` : backendEndpointOrUrl;
+    const url = fromBackend ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${backendEndpointOrUrl}` : backendEndpointOrUrl;
     return rawFetch<T>(url, options, session?.accessToken || undefined, queryParams);
   };
 
