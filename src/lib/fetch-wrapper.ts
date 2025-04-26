@@ -31,7 +31,6 @@ export const fetchWrapper = async <T>(
   };
 
   try {
-    console.log("finalUrl", finalUrl);
     const res = await fetch(finalUrl, finalOptions);
 
     // Handle response errors
@@ -41,7 +40,7 @@ export const fetchWrapper = async <T>(
 
     return res.json();
   } catch (caughtError: unknown) {
-    console.log("caughtError", caughtError);
+    console.log("fetchWrapper caughtError", caughtError);
     let error: Error;
 
     if (!navigator.onLine) {
@@ -52,13 +51,10 @@ export const fetchWrapper = async <T>(
       // Specifically handle network errors like ERR_CONNECTION_REFUSED
       if (caughtError instanceof TypeError) {
         if (caughtError.message === "Failed to fetch") {
-          console.log("Failed to fetch");
           error = createAppErrorFromErrorCode(ErrorCode.NETWORK_FAILED_TO_FETCH);
         } else if (caughtError.message === "Network request failed") {
-          console.log("Network request failed");
           error = createAppErrorFromErrorCode(ErrorCode.NETWORK_CONNECTION_REFUSED);
         } else {
-          console.log("Unknown network error");
           error = createAppErrorFromErrorCode(ErrorCode.NETWORK_UNKNOWN);
         }
       } else if (caughtError.name === "AbortError") {

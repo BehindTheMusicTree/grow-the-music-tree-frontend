@@ -18,7 +18,6 @@ import {
   ServerError,
   BadRequestError,
 } from "@app-types/app-errors/app-error";
-import { ErrorBoundary } from "@components/core/ErrorBoundary";
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
 import Banner from "@components/features/banner/Banner";
@@ -38,6 +37,30 @@ function AppContent({ children }: { children: ReactNode }) {
   const currentConnectivityErrorTypeRef = useRef<typeof ConnectivityError | null>(null);
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, setConnectivityError, clearConnectivityError } = useConnectivityError();
+
+  useEffect(() => {
+    const handleGlobalError = (event: ErrorEvent) => {
+      console.error("Global error caught:", event.error);
+      if (event.error instanceof ConnectivityError) {
+        setConnectivityError(event.error);
+      }
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error("Unhandled promise rejection caught:", event.reason);
+      if (event.reason instanceof ConnectivityError) {
+        setConnectivityError(event.reason);
+      }
+    };
+
+    window.addEventListener("error", handleGlobalError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener("error", handleGlobalError);
+      window.removeEventListener("unhandledrejection", handleUnhandledRejection);
+    };
+  }, [setConnectivityError]);
 
   useEffect(() => {}, [playerUploadedTrackObject]);
 
@@ -74,12 +97,6 @@ function AppContent({ children }: { children: ReactNode }) {
     }
   }, [connectivityError, showPopup, hidePopup, clearConnectivityError]);
 
-  const handleError = (error: Error) => {
-    if (error instanceof ConnectivityError) {
-      setConnectivityError(error);
-    }
-  };
-
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {
     centerWithPlayer: `calc(100vh - ${BANNER_HEIGHT + PLAYER_HEIGHT}px)`,
@@ -87,27 +104,23 @@ function AppContent({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ErrorBoundary onError={handleError}>
-      <div className="app col h-screen">
-        <Banner className="banner fixed w-full top-0 z-50 h-banner" />
+    <div className="app col h-screen">
+      <Banner className="banner fixed w-full top-0 z-50 h-banner" />
 
-        <div
-          className="center fixed top-banner bg-gray-100 h-full w-full flex"
-          style={{
-            maxHeight: playerUploadedTrackObject
-              ? centerMaxHeight.centerWithPlayer
-              : centerMaxHeight.centerWithoutPlayer,
-          }}
-        >
-          <Menu className="menu left-0 z-40" />
-          <main className="flex-grow mx-8">{children}</main>
-          {isTrackListSidebarVisible && <TrackListSidebar className="fixed right-0 z-40" />}
-        </div>
-
-        {/* {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />} */}
+      <div
+        className="center fixed top-banner bg-gray-100 h-full w-full flex"
+        style={{
+          maxHeight: playerUploadedTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
+        }}
+      >
+        <Menu className="menu left-0 z-40" />
+        <main className="flex-grow mx-8">{children}</main>
+        {isTrackListSidebarVisible && <TrackListSidebar className="fixed right-0 z-40" />}
       </div>
+
+      {/* {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />} */}
       {activePopup}
-    </ErrorBoundary>
+    </div>
   );
 }
 
