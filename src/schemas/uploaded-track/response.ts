@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { ArtistMinimumSchema } from "../artist";
-import { AlbumMinimumSchema } from "../album";
+import { AlbumMinimumSchema } from "../album/shared";
 import { GenreMinimumSchema } from "../genre/response";
 import { FileDetailedSchema } from "../file";
-import { PlaylistMinimumSchema } from "../playlist";
+import { PlaylistMinimumSchema } from "../playlist/shared";
 import { UuidResourceSchema } from "../uuid-resource";
 
 export const UploadedTrackDetailedSchema = UuidResourceSchema.extend({
