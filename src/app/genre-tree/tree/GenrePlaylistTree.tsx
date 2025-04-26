@@ -12,9 +12,12 @@ import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssigned
 
 import { PlayStates } from "@models/PlayStates";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
+
 import { GenrePlaylistSimple } from "@schemas/genre-playlist";
 import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
 import { UploadedTrackCreationValues } from "@schemas/uploaded-track/form";
+import { GenreUpdateValues } from "@schemas/genre/form";
+import InvalidInputPopup from "@components/ui/popup/child/InvalidInputPopup";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer";
@@ -26,7 +29,7 @@ type GenrePlaylistTreeProps = {
 export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTreeProps) {
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup } = usePopup();
-  const { toTrackAtPosition, trackList: trackListOrigin } = useTrackList();
+  const { toTrackAtPosition, trackList } = useTrackList();
   const { mutate: uploadTrack, isPending: isUploadingTrack, error: uploadTrackError } = useUploadTrack();
   const { mutate: createGenre } = useCreateGenre();
   const { mutate: updateGenre } = useUpdateGenre();
@@ -63,23 +66,23 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
   const handlePlayPauseIconAction = useCallback(
     (genrePlaylist: GenrePlaylistSimple) => {
       if (
-        !trackListOrigin ||
+        !trackList ||
         !isPlaying ||
-        trackListOrigin.type !== TrackListOriginType.PLAYLIST ||
-        trackListOrigin.object.uuid !== genrePlaylist.uuid
+        trackList.origin.type !== TrackListOriginType.PLAYLIST ||
+        trackList.origin.uuid !== genrePlaylist.uuid
       ) {
         if (genrePlaylist.uploadedTracksNotArchivedCount > 0) {
           toTrackAtPosition(0);
         }
       } else if (
-        trackListOrigin &&
-        trackListOrigin.type === TrackListOriginType.PLAYLIST &&
-        trackListOrigin.object.uuid === genrePlaylist.uuid
+        trackList &&
+        trackList.origin.type === TrackListOriginType.PLAYLIST &&
+        trackList.origin.uuid === genrePlaylist.uuid
       ) {
         setIsPlaying(!isPlaying);
       }
     },
-    [trackListOrigin, isPlaying, toTrackAtPosition, setIsPlaying]
+    [trackList, isPlaying, toTrackAtPosition, setIsPlaying]
   );
 
   useEffect(() => {
@@ -103,14 +106,22 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
     const transformedTreeData = setupTreeLayout(d3, treeData, highestVerticalCoordinate);
 
     const updateGenreParent = async (genreUuid: string, parentUuid: string) => {
-      await updateGenre({ uuid: genreUuid, data: { parentUuid } });
+      updateGenre.mutate({ uuid: genreUuid, data: { parentUuid } });
     };
 
     const handleRenameGenre = async (genreUuid: string, newName: string) => {
-      const result = await updateGenre({ uuid: genreUuid, data: { name: newName } });
-      if (!result.success) {
-        if (result.code === 2001) {
-          showPopup("invalidInput", result);
+      try {
+        updateGenre.mutate({ uuid: genreUuid, data: { name: newName } });
+      } catch (error: unknown) {
+        if (error && typeof error === "object" && "code" in error && error.code === 2001) {
+          showPopup(
+            <InvalidInputPopup
+              details={{
+                message: "Invalid genre name",
+                fieldErrors: { name: [{ message: "This name is already taken", code: "2001" }] },
+              }}
+            />
+          );
         }
       }
     };
@@ -120,7 +131,7 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
       previousRenderingVisibleActionsContainerGenrePlaylist,
       genreUuidGettingAssignedNewParent: genreGettingAssignedNewParent?.uuid || null,
       forbiddenNewParentsUuids: [],
-      trackListOrigin,
+      trackListOrigin: trackList?.origin,
       playState: isPlaying ? PlayStates.PLAYING : PlayStates.STOPPED,
       handlePlayPauseIconAction,
       fileInputRef,
@@ -142,7 +153,7 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
   }, [
     genrePlaylistTree,
     isPlaying,
-    trackListOrigin,
+    trackList?.origin,
     genreGettingAssignedNewParent,
     previousRenderingVisibleActionsContainerGenrePlaylist,
     svgWidth,
