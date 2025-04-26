@@ -19,7 +19,7 @@ import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree }
 /**
  * Component that renders a D3 tree visualization of genre playlists
  */
-export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
+export default function GenrePlaylistTree({ genrePlaylistTree }) {
   const { playState, handlePlayPauseAction } = usePlayer();
   const { showPopup } = usePopup();
   const { playNewTrackListFromPlaylistUuid, origin: trackListOrigin } = useTrackList();
@@ -77,7 +77,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     d3.select(svgRef.current).selectAll("*").remove();
 
     // Build tree hierarchy
-    const root = buildTreeHierarchy(d3, genrePlaylistsTree);
+    const root = buildTreeHierarchy(d3, genrePlaylistTree);
 
     // Create tree layout
     const treeData = createTreeLayout(d3, root);
@@ -128,7 +128,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       }
     };
   }, [
-    genrePlaylistsTree,
+    genrePlaylistTree,
     playState,
     trackListOrigin,
     genreUuidGettingAssignedNewParent,
@@ -152,6 +152,6 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   );
 }
 
-GenrePlaylistsTree.propTypes = {
-  genrePlaylistsTree: PropTypes.array.isRequired,
+GenrePlaylistTree.propTypes = {
+  genrePlaylistTree: PropTypes.array.isRequired,
 };

@@ -22,11 +22,11 @@ import {
 /**
  * Builds the hierarchical tree structure from flat data
  */
-export function buildTreeHierarchy(d3, genrePlaylistsTree) {
+export function buildTreeHierarchy(d3, genrePlaylistTree) {
   return d3
     .stratify()
     .id((d) => d.uuid)
-    .parentId((d) => d.parent?.uuid || null)(genrePlaylistsTree);
+    .parentId((d) => d.parent?.uuid || null)(genrePlaylistTree);
 }
 
 /**

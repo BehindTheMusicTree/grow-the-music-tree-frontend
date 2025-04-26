@@ -43,7 +43,7 @@ export function useCreateGenre() {
   const { fetch } = useFetchWrapper();
 
   return useMutation<GenreDetailed, Error, GenreCreationValues>({
-    mutationFn: async (data) => {
+    mutationFn: async (data: GenreCreationValues) => {
       const payload = mapGenreFormToPayload(data);
       const response = await fetch("genre/", true, {
         method: "POST",

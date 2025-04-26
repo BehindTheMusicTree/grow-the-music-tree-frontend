@@ -5,22 +5,33 @@ import { BasePopup, BasePopupProps } from "../BasePopup";
 import { GenreCreationValues } from "@schemas/genre/form";
 
 type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
-  formValues: GenreCreationValues;
-  onFormChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (values: GenreCreationValues) => void;
   onClose?: () => void;
 };
 
 // @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
 export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProps> {
+  state = {
+    name: "",
+  };
+
+  handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ name: e.target.value });
+  };
+
+  handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    this.props.onSubmit({ name: this.state.name });
+  };
+
   render() {
-    const { formValues, onFormChange, onSubmit, onClose, ...rest } = this.props;
+    const { onClose, ...rest } = this.props;
     return this.renderBase({
       ...rest,
       title: "Create Genre",
       isDismissable: true,
       children: (
-        <form onSubmit={onSubmit} className="space-y-6">
+        <form onSubmit={this.handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
@@ -28,8 +39,8 @@ export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProp
                 <input
                   type="text"
                   name="name"
-                  value={formValues.name ?? ""}
-                  onChange={onFormChange}
+                  value={this.state.name}
+                  onChange={this.handleChange}
                   className="w-full px-3 py-2 border rounded-md"
                 />
               </div>
