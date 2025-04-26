@@ -9,7 +9,7 @@ import {
   SPOTIFY_SCOPES,
 } from "@lib/music-tree-api-service/spotify-auth";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
-import { ApiError } from "@app-types/app-errors/app-error";
+import { BackendError } from "@app-types/app-errors/app-error";
 
 export function useSpotifyAuth() {
   const { clearSession, setSession } = useSession();
@@ -37,7 +37,7 @@ export function useSpotifyAuth() {
     console.log("handleCallback called", { code });
     const response = await authenticateWithSpotifyCode(code);
     if (!response.ok) {
-      const error = new ApiError(ErrorCode.API_AUTH_ERROR);
+      const error = new BackendError(ErrorCode.API_AUTH_ERROR);
       setConnectivityError(error);
     } else {
       const data = await response.json();

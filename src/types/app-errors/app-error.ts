@@ -36,7 +36,7 @@ export class NetworkError extends ConnectivityError {
   }
 }
 
-export class ApiError extends ConnectivityError {
+export class BackendError extends ConnectivityError {
   constructor(code: ErrorCode) {
     super(code);
     this.name = "ApiError";
@@ -68,6 +68,6 @@ export type AppErrorType =
   | ConnectivityError
   | BadRequestError
   | NetworkError
-  | ApiError
+  | BackendError
   | AuthError
   | ServerError;

@@ -10,7 +10,7 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCode.NETWORK_FETCH_ERROR]: "Failed to fetch data",
 
   // API Errors
-  [ErrorCode.API_UNAVAILABLE]: "Service temporarily unavailable",
+  [ErrorCode.BACKEND_UNAVAILABLE]: "Service temporarily unavailable",
   [ErrorCode.API_RATE_LIMIT]: "Too many requests, please try again later",
   [ErrorCode.API_AUTH_ERROR]: "Authentication failed",
   [ErrorCode.API_INTERNAL_ERROR]: "Internal server error",
