@@ -11,7 +11,7 @@ import { usePlayer } from "@contexts/PlayerContext";
 import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssignedNewParentContext";
 
 import { PlayStates } from "@models/PlayStates";
-import { TrackListOriginType } from "@models/track-list/TrackListOriginType";
+import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer.js";
