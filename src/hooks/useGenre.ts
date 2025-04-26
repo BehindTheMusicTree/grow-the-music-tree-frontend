@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFetchWrapper } from "./useFetchWrapper";
 import { PaginatedResponse, PaginatedResponseSchema } from "@app-types/api/pagination";
 import { GenreDetailedSchema, GenreDetailed, GenreSimpleSchema, GenreSimple } from "@schemas/genre";
-import { GenreFormValues } from "@schemas/genreFormSchema";
+import { GenreCreateValues, GenreUpdateValues } from "@schemas/genreFormSchema";
 import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
 
 export function useListGenres(page = 1, pageSize = 50) {
@@ -34,11 +34,17 @@ export function useCreateGenre() {
   const { invalidateGenrePlaylists } = useListGenrePlaylists();
   const { fetch } = useFetchWrapper();
 
-  return useMutation<GenreDetailed, Error, GenreFormValues>({
+  return useMutation<GenreDetailed, Error, GenreCreateValues>({
     mutationFn: async (data) => {
+      const payload = {
+        ...data,
+        parent: data.parentUuid,
+      };
+      delete payload.parentUuid;
+
       const response = await fetch("genre/", true, {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
       return GenreDetailedSchema.parse(response);
     },
@@ -54,11 +60,17 @@ export function useUpdateGenre() {
   const { fetch } = useFetchWrapper();
   const { invalidateGenrePlaylists } = useListGenrePlaylists();
 
-  return useMutation<GenreDetailed, Error, { uuid: string; data: GenreFormValues }>({
+  const mutate = useMutation<GenreDetailed, Error, { uuid: string; data: GenreUpdateValues }>({
     mutationFn: async ({ uuid, data }) => {
+      const payload = {
+        ...data,
+        parent: data.parentUuid,
+      };
+      delete payload.parentUuid;
+
       const response = await fetch(`genre/${uuid}`, true, {
         method: "PUT",
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
       return GenreDetailedSchema.parse(response);
     },
@@ -68,6 +80,16 @@ export function useUpdateGenre() {
       invalidateGenrePlaylists();
     },
   });
+
+  const renameGenre = (uuid: string, name: string) => {
+    mutate.mutate({ uuid, data: { name } });
+  };
+
+  const updateGenreParent = (uuid: string, parentUuid: string) => {
+    mutate.mutate({ uuid, data: { parentUuid: parentUuid } });
+  };
+
+  return { mutate, renameGenre, updateGenreParent };
 }
 
 export function useDeleteGenre() {
