@@ -3,6 +3,7 @@ import { useFetchWrapper } from "./useFetchWrapper";
 import { PaginatedResponse, PaginatedResponseSchema } from "@app-types/api/pagination";
 import { GenreDetailedSchema, GenreDetailed, GenreSimpleSchema, GenreSimple } from "@schemas/genre";
 import { GenreFormValues } from "@schemas/genreFormSchema";
+import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
 
 export function useListGenres(page = 1, pageSize = 50) {
   const { fetch } = useFetchWrapper();
@@ -30,6 +31,7 @@ export function useRetrieveGenre(id: string) {
 
 export function useCreateGenre() {
   const queryClient = useQueryClient();
+  const { invalidateGenrePlaylists } = useListGenrePlaylists();
   const { fetch } = useFetchWrapper();
 
   return useMutation<GenreDetailed, Error, GenreFormValues>({
@@ -42,6 +44,7 @@ export function useCreateGenre() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["genres"] });
+      invalidateGenrePlaylists();
     },
   });
 }
@@ -49,6 +52,7 @@ export function useCreateGenre() {
 export function useUpdateGenre() {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
+  const { invalidateGenrePlaylists } = useListGenrePlaylists();
 
   return useMutation<GenreDetailed, Error, { uuid: string; data: GenreFormValues }>({
     mutationFn: async ({ uuid, data }) => {
@@ -61,6 +65,7 @@ export function useUpdateGenre() {
     onSuccess: (_, { uuid }) => {
       queryClient.invalidateQueries({ queryKey: ["genres"] });
       queryClient.invalidateQueries({ queryKey: ["genres", "detail", uuid] });
+      invalidateGenrePlaylists();
     },
   });
 }
@@ -68,7 +73,7 @@ export function useUpdateGenre() {
 export function useDeleteGenre() {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
-
+  const { invalidateGenrePlaylists } = useListGenrePlaylists();
   return useMutation<GenreDetailed, Error, { uuid: string }>({
     mutationFn: async ({ uuid }) => {
       const response = await fetch(`genre/${uuid}`, true, {
@@ -79,6 +84,7 @@ export function useDeleteGenre() {
     onSuccess: (_, { uuid }) => {
       queryClient.invalidateQueries({ queryKey: ["genres"] });
       queryClient.invalidateQueries({ queryKey: ["genres", "detail", uuid] });
+      invalidateGenrePlaylists();
     },
   });
 }
