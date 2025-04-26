@@ -29,16 +29,16 @@ initSentry();
 
 const inter = Inter({ subsets: ["latin"] });
 
-interface AppContentProps {
-  children: ReactNode;
-}
-
-function AppContent({ children }: AppContentProps) {
+function AppContent({ children }: { children: ReactNode }) {
   const { playerUploadedTrackObject } = usePlayer();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
   const { connectivityError, clearConnectivityError } = useConnectivityError();
   const currentConnectivityErrorTypeRef = useRef<typeof ConnectivityError | null>(null);
+
+  useEffect(() => {
+    console.log("AppContent: playerUploadedTrackObject changed", playerUploadedTrackObject);
+  }, [playerUploadedTrackObject]);
 
   useEffect(() => {
     console.log("AppContent: connectivityError changed", connectivityError);
@@ -81,10 +81,10 @@ function AppContent({ children }: AppContentProps) {
 
   return (
     <div className="app col h-screen">
-      <Banner className="banner fixed w-full top-0 z-50 h-16" />
+      <Banner className="banner fixed w-full top-0 z-50 h-banner" />
 
       <div
-        className="center fixed top-16 bg-gray-100 h-full w-full flex"
+        className="center fixed top-banner bg-gray-100 h-full w-full flex"
         style={{
           maxHeight: playerUploadedTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
         }}

@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
 const playerHeight = "80px";
+const bannerHeight = "63.5px";
 const config = {
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   theme: {
@@ -38,9 +39,10 @@ const config = {
         "play-l-offset": "15px",
         "play-r-offset": "13px",
         player: playerHeight,
+        banner: bannerHeight,
       },
       height: {
-        banner: "100px",
+        banner: bannerHeight,
         player: playerHeight,
         menuitem: "45px",
       },
