@@ -1,23 +1,22 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useFetchWrapper } from "./useFetchWrapper";
-import { PaginatedResponse, PaginatedResponseSchema } from "@app-types/api/pagination";
+import { useFetchWrapper } from "@hooks/useFetchWrapper";
 import {
   GenrePlaylistDetailedSchema,
   GenrePlaylistDetailed,
   GenrePlaylistSimpleSchema,
   GenrePlaylistSimple,
 } from "@schemas/genre-playlist";
+import { PaginatedResponse, PaginatedResponseSchema } from "@app-types/api/pagination";
 
 export const useListGenrePlaylists = (page = 1, pageSize = 50) => {
-  const { fetch } = useFetchWrapper();
   const queryClient = useQueryClient();
-
+  const { fetch } = useFetchWrapper();
   const query = useQuery<PaginatedResponse<GenrePlaylistSimple>>({
     queryKey: ["genrePlaylists", page, pageSize],
     queryFn: async () => {
-      const response = await fetch("genre-playlists", true, {}, { page, pageSize });
+      const response = await fetch("genre-playlist/", true, {}, { page, pageSize });
       return PaginatedResponseSchema(GenrePlaylistSimpleSchema).parse(response);
     },
   });
@@ -37,8 +36,20 @@ export const useRetrieveGenrePlaylist = (id: string) => {
   return useQuery<GenrePlaylistDetailed>({
     queryKey: ["genrePlaylists", id],
     queryFn: async () => {
-      const response = await fetch(`genre-playlists/${id}`);
+      const response = await fetch(`genre-playlist/${id}`, true);
       return GenrePlaylistDetailedSchema.parse(response);
     },
+  });
+};
+
+export const useGenrePlaylist = (genre: string) => {
+  const { fetch } = useFetchWrapper();
+  return useQuery({
+    queryKey: ["genre-playlist", genre],
+    queryFn: async () => {
+      const response = await fetch(`genre-playlist/genre/${genre}`, true);
+      return response;
+    },
+    enabled: !!genre,
   });
 };
