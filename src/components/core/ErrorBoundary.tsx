@@ -30,10 +30,6 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   render() {
-    if (this.state.hasError) {
-      return null;
-    }
-
     return this.props.children;
   }
 }
