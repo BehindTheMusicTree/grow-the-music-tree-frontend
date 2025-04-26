@@ -1,14 +1,25 @@
 "use client";
 
+import { useState } from "react";
 import { GenreGettingAssignedNewParentProvider } from "@contexts/GenreGettingAssignedNewParentContext";
 import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
 import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "./tree/tree-constants";
 import { useGenreCreation } from "@hooks/useGenreCreation";
+import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenrePlaylistsTree from "./tree/GenrePlaylistsTree";
+import { GenreCreationValues } from "@schemas/genre/form";
+import { GenrePlaylistSimple } from "@schemas/genre-playlist";
 
 export default function GenreTree() {
-  const { groupedGenrePlaylists, loading } = useListGenrePlaylists();
-  const { showCreationPopup, GenreCreationComponent } = useGenreCreation();
+  const { data: genrePlaylists, isLoading } = useListGenrePlaylists();
+  const { create } = useGenreCreation();
+  const [showPopup, setShowPopup] = useState(false);
+  const [parentUuid, setParentUuid] = useState<string | undefined>();
+
+  const handleSubmit = async (values: GenreCreationValues) => {
+    await create({ ...values, parentUuid });
+    setShowPopup(false);
+  };
 
   return (
     <GenreGettingAssignedNewParentProvider>
@@ -20,20 +31,26 @@ export default function GenreTree() {
             height: GENRE_PLAYLIST_TREE_RECT_DIMENSIONS.HEIGHT + "px",
             border: "1px solid black",
           }}
-          onClick={() => showCreationPopup()}
+          onClick={() => {
+            setParentUuid(undefined);
+            setShowPopup(true);
+          }}
         >
           +
         </div>
         <div className="flex flex-col text-gray-800">
-          {loading ? (
+          {isLoading ? (
             <p>Loading data...</p>
-          ) : groupedGenrePlaylists ? (
-            Object.entries(groupedGenrePlaylists).map(([uuid, genrePlaylistsTree]) => {
+          ) : genrePlaylists?.results ? (
+            Object.entries(genrePlaylists.results).map(([uuid, genrePlaylistsTree]) => {
               return (
                 <GenrePlaylistsTree
                   key={`${uuid}`}
                   genrePlaylistsTree={genrePlaylistsTree}
-                  handleGenreAddAction={() => showCreationPopup()}
+                  handleGenreAddAction={(parentUuid: string) => {
+                    setParentUuid(parentUuid);
+                    setShowPopup(true);
+                  }}
                 />
               );
             })
@@ -41,7 +58,7 @@ export default function GenreTree() {
             <p>No data found.</p>
           )}
         </div>
-        <GenreCreationComponent />
+        {showPopup && <GenreCreationPopup onClose={() => setShowPopup(false)} onSubmit={handleSubmit} />}
       </div>
     </GenreGettingAssignedNewParentProvider>
   );
