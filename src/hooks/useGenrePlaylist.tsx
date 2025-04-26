@@ -41,15 +41,3 @@ export const useRetrieveGenrePlaylist = (id: string) => {
     },
   });
 };
-
-export const useGenrePlaylist = (genre: string) => {
-  const { fetch } = useFetchWrapper();
-  return useQuery({
-    queryKey: ["genre-playlist", genre],
-    queryFn: async () => {
-      const response = await fetch(`genre-playlist/genre/${genre}`, true);
-      return response;
-    },
-    enabled: !!genre,
-  });
-};
