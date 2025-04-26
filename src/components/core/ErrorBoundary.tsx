@@ -1,10 +1,10 @@
 "use client";
 
-import { Component, ErrorInfo, ReactNode } from "react";
+import { Component, ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
-  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  onError?: (error: Error) => void;
 }
 
 interface State {
@@ -21,9 +21,9 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error) {
     if (this.props.onError) {
-      this.props.onError(error, errorInfo);
+      this.props.onError(error);
     }
   }
 
