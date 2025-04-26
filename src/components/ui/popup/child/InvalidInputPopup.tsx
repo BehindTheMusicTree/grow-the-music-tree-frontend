@@ -1,30 +1,34 @@
 "use client";
 
 import { MdError } from "react-icons/md";
-import { BasePopup, BasePopupProps } from "../PopupContainer";
+import { BasePopup, BasePopupProps } from "../BasePopup";
 
-interface InvalidInputPopupProps extends BasePopupProps {
+// Only allow details as a custom prop
+type InvalidInputPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   details: {
     message: string;
     fieldErrors?: Record<string, Array<{ message: string; code: string }>>;
   };
-}
+};
 
+// @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
 export default class InvalidInputPopup extends BasePopup<InvalidInputPopupProps> {
-  render(props: InvalidInputPopupProps) {
+  render() {
+    const { details, ...rest } = this.props;
     return this.renderBase({
-      ...props,
+      ...rest,
       title: "Invalid Input",
-      className: "max-w-md",
+      isDismissable: true,
+      icon: MdError,
       children: (
         <div className="space-y-4">
           <div className="flex items-center">
             <MdError size={20} color="red" />
-            <h3 className="ml-1">{props.details.message}</h3>
+            <h3 className="ml-1">{details.message}</h3>
           </div>
-          {props.details.fieldErrors && (
+          {details.fieldErrors && (
             <div className="mt-4">
-              {Object.entries(props.details.fieldErrors).map(([fieldName, errors]) => (
+              {Object.entries(details.fieldErrors).map(([fieldName, errors]) => (
                 <div key={fieldName} className="mb-2">
                   <h4 className="font-semibold">{fieldName}</h4>
                   <ul className="ml-4">
