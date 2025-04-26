@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import PropTypes from "prop-types";
 import * as d3 from "d3";
 
 import { usePopup } from "@contexts/PopupContext";
@@ -12,67 +11,74 @@ import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssigned
 
 import { PlayStates } from "@models/PlayStates";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
+import { GenrePlaylistSimple } from "@schemas/genre-playlist";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper";
-import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer.js";
+import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer";
 
-/**
- * Component that renders a D3 tree visualization of genre playlists
- */
-export default function GenrePlaylistTree({ genrePlaylistTree }) {
-  const { playState, handlePlayPauseAction } = usePlayer();
+type GenrePlaylistTreeProps = {
+  genrePlaylistTree: GenrePlaylistSimple[];
+};
+
+type TrackListOrigin = {
+  type: TrackListOriginType;
+  object: {
+    uuid: string;
+  };
+};
+
+export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTreeProps) {
+  const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup } = usePopup();
-  const { playNewTrackListFromPlaylistUuid, origin: trackListOrigin } = useTrackList();
+  const { toTrackAtPosition, origin: trackListOrigin } = useTrackList();
   const { mutate: createGenre } = useCreateGenre();
   const { mutate: updateGenre } = useUpdateGenre();
   const { mutate: deleteGenre } = useDeleteGenre();
   const [
     previousRenderingVisibleActionsContainerGenrePlaylist,
     setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
-  ] = useState(null);
-  const { genreUuidGettingAssignedNewParent, forbiddenNewParentsUuids, setGenreGettingAssignedNewParent } =
-    useGenreGettingAssignedNewParent();
+  ] = useState<GenrePlaylistSimple | null>(null);
+  const { genreGettingAssignedNewParent, setGenreGettingAssignedNewParent } = useGenreGettingAssignedNewParent();
   const [svgWidth, setSvgWidth] = useState(0);
   const [svgHeight, setSvgHeight] = useState(0);
 
-  const svgRef = useRef(null);
-  const fileInputRef = useRef(null);
-  const selectingFileGenreUuidRef = useRef(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const selectingFileGenreUuidRef = useRef<string | null>(null);
 
-  /**
-   * Handles file selection for track upload
-   */
-  async function handleFileChange(event) {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     showPopup("trackUpload", {
       files: event.target.files,
       genreUuid: selectingFileGenreUuidRef.current,
     });
-    event.target.value = null;
-  }
+    event.target.value = "";
+  };
 
   const handlePlayPauseIconAction = useCallback(
-    (genrePlaylist) => {
+    (genrePlaylist: GenrePlaylistSimple) => {
       if (
         !trackListOrigin ||
-        playState === PlayStates.STOPPED ||
+        !isPlaying ||
         trackListOrigin.type !== TrackListOriginType.PLAYLIST ||
         trackListOrigin.object.uuid !== genrePlaylist.uuid
       ) {
-        if (genrePlaylist.uploadedTracksCount > 0) {
-          playNewTrackListFromPlaylistUuid(genrePlaylist.uuid);
+        if (genrePlaylist.uploadedTracksNotArchivedCount > 0) {
+          toTrackAtPosition(0);
         }
       } else if (
         trackListOrigin &&
         trackListOrigin.type === TrackListOriginType.PLAYLIST &&
         trackListOrigin.object.uuid === genrePlaylist.uuid
       ) {
-        handlePlayPauseAction();
+        setIsPlaying(!isPlaying);
       }
     },
-    [trackListOrigin, playState, playNewTrackListFromPlaylistUuid, handlePlayPauseAction]
+    [trackListOrigin, isPlaying, toTrackAtPosition, setIsPlaying]
   );
 
   useEffect(() => {
+    if (!svgRef.current) return;
+
     // Clear any previous SVG content
     d3.select(svgRef.current).selectAll("*").remove();
 
@@ -90,11 +96,11 @@ export default function GenrePlaylistTree({ genrePlaylistTree }) {
     // Transform coordinates for SVG
     const transformedTreeData = setupTreeLayout(d3, treeData, highestVerticalCoordinate);
 
-    const updateGenreParent = async (genreUuid, parentUuid) => {
-      await updateGenreParent(genreUuid, parentUuid);
+    const updateGenreParent = async (genreUuid: string, parentUuid: string) => {
+      await updateGenre({ uuid: genreUuid, data: { parentUuid } });
     };
 
-    const handleRenameGenre = async (genreUuid, newName) => {
+    const handleRenameGenre = async (genreUuid: string, newName: string) => {
       const result = await updateGenre({ uuid: genreUuid, data: { name: newName } });
       if (!result.success) {
         if (result.code === 2001) {
@@ -106,10 +112,10 @@ export default function GenrePlaylistTree({ genrePlaylistTree }) {
     // Render the tree
     const svg = renderTree(d3, svgRef, transformedTreeData, width, height, {
       previousRenderingVisibleActionsContainerGenrePlaylist,
-      genreUuidGettingAssignedNewParent,
-      forbiddenNewParentsUuids,
+      genreUuidGettingAssignedNewParent: genreGettingAssignedNewParent?.uuid || null,
+      forbiddenNewParentsUuids: [],
       trackListOrigin,
-      playState,
+      playState: isPlaying ? PlayStates.PLAYING : PlayStates.STOPPED,
       handlePlayPauseIconAction,
       fileInputRef,
       selectingFileGenreUuidRef,
@@ -129,19 +135,17 @@ export default function GenrePlaylistTree({ genrePlaylistTree }) {
     };
   }, [
     genrePlaylistTree,
-    playState,
+    isPlaying,
     trackListOrigin,
-    genreUuidGettingAssignedNewParent,
-    forbiddenNewParentsUuids,
+    genreGettingAssignedNewParent,
     previousRenderingVisibleActionsContainerGenrePlaylist,
     svgWidth,
     svgHeight,
     createGenre,
     handlePlayPauseIconAction,
     setGenreGettingAssignedNewParent,
-    updateGenreParent,
+    updateGenre,
     showPopup,
-    renameGenre,
   ]);
 
   return (
@@ -151,7 +155,3 @@ export default function GenrePlaylistTree({ genrePlaylistTree }) {
     </div>
   );
 }
-
-GenrePlaylistTree.propTypes = {
-  genrePlaylistTree: PropTypes.array.isRequired,
-};
