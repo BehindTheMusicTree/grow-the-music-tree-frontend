@@ -15,7 +15,7 @@ export interface BasePopupProps {
   className?: string;
 }
 
-export class BasePopup<P extends BasePopupProps = BasePopupProps, S = {}> extends Component<P, S> {
+export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> extends Component<P, S> {
   renderBase(props: BasePopupProps) {
     const { title, children, onClose, type = "default", icon, isDismissable = true, className } = props;
     const baseClasses = "bg-white rounded-lg p-4";
