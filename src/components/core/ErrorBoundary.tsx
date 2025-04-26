@@ -1,8 +1,6 @@
 "use client";
 
 import { Component, ErrorInfo, ReactNode } from "react";
-import { usePopup } from "@contexts/PopupContext";
-import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
 interface Props {
@@ -35,7 +33,19 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
-      return <InternalErrorPopup errorCode={ErrorCode.CLIENT_INTERNAL_ERROR} />;
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen p-4">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h1>
+            <p className="text-gray-600 mb-4">We're sorry, but something went wrong. Please try refreshing the page.</p>
+            {this.state.error && (
+              <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                Error: {this.state.error.message}
+              </div>
+            )}
+          </div>
+        </div>
+      );
     }
 
     return this.props.children;
