@@ -20,7 +20,7 @@ export const UploadedTrackFormSchema = z.object({
   albumName: z.string().max(ALBUM_NAME_LEN_MAX).optional().nullable(),
   albumArtistsNames: z.array(z.string()).max(ALBUM_ARTISTS_NAMES_FIELD_LEN_MAX).optional().nullable(),
   trackNumber: z.number().int().positive().optional().nullable(),
-  genre: z.string().optional().nullable(), // Genre name
+  genre: z.string().uuid().optional().nullable().or(z.string().optional().nullable()), // Genre name or uuid
   rating: z.number().min(0).max(5).optional().nullable(),
   language: z.string().max(LANGUAGE_LEN_MAX).optional().nullable(),
 });
