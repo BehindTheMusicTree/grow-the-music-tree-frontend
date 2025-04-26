@@ -23,5 +23,15 @@ export const UploadedTrackFormSchema = z.object({
   genre: z.string().uuid().or(z.string()).optional().nullable(), // Accepts UUID or name
   rating: z.number().min(0).max(5).optional().nullable(),
   language: z.string().max(LANGUAGE_LEN_MAX).optional().nullable(),
+});
+
+export const UploadedTrackCreateSchema = UploadedTrackFormSchema.extend({
+  File: z.instanceof(File),
+});
+
+export const UploadedTrackUpdateSchema = UploadedTrackFormSchema.extend({
   archived: z.boolean().optional(),
 });
+
+export type UploadedTrackCreateValues = z.infer<typeof UploadedTrackCreateSchema>;
+export type UploadedTrackUpdateValues = z.infer<typeof UploadedTrackUpdateSchema>;
