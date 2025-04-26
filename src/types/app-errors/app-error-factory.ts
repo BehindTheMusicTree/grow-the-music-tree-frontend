@@ -1,5 +1,5 @@
 import { ErrorCode } from "./app-error-codes";
-import { AppError, NetworkError, BackendError, AuthError as AuthRequired, ClientError, ServerError } from "./app-error";
+import { AppError, NetworkError, BackendError, AuthRequired, ClientError, ServerError } from "./app-error";
 
 export function createAppErrorFromErrorCode(code: ErrorCode): AppError {
   if ([ErrorCode.BACKEND_UNAUTHORIZED, ErrorCode.SESSION_EXPIRED, ErrorCode.SESSION_REQUIRED].includes(code)) {

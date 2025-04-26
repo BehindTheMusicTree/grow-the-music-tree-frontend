@@ -43,7 +43,7 @@ export class BackendError extends ConnectivityError {
   }
 }
 
-export class AuthError extends ConnectivityError {
+export class AuthRequired extends ConnectivityError {
   constructor(code: ErrorCode) {
     super(code);
     this.name = "AuthError";
@@ -69,5 +69,5 @@ export type AppErrorType =
   | BadRequestError
   | NetworkError
   | BackendError
-  | AuthError
+  | AuthRequired
   | ServerError;
