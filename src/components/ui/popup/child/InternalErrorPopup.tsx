@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertTriangle, AlertCircle } from "lucide-react";
-import { BasePopup } from "../BasePopup";
+import { BasePopup } from "../PopupContainer";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 export interface InternalErrorPopupProps {
   errorCode: ErrorCode;

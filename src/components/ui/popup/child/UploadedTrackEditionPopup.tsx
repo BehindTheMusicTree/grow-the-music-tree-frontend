@@ -3,7 +3,7 @@
 import { formatTime } from "@lib/utils/formatting";
 import Rating from "@components/features/Rating";
 import { Button } from "@components/ui/Button";
-import { BasePopup, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "../PopupContainer";
 
 interface UploadedTrackEditionPopupProps extends Omit<BasePopupProps, "title" | "children"> {
   track: {

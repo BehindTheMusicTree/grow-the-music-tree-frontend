@@ -1,7 +1,7 @@
 "use client";
 
 import { WifiOff, AlertTriangle } from "lucide-react";
-import { BasePopup } from "../BasePopup";
+import { BasePopup } from "../PopupContainer";
 
 export default function NetworkErrorPopup() {
   return (

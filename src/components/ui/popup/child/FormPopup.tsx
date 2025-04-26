@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@components/ui/Button";
-import { BasePopup, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "../PopupContainer";
 
 interface FormPopupProps extends BasePopupProps {
   onSubmit: (e: React.FormEvent) => void;

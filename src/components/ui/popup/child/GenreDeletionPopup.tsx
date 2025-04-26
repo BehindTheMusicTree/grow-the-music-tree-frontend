@@ -1,6 +1,6 @@
 "use client";
 
-import { BasePopup, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "../PopupContainer";
 import { Button } from "@components/ui/Button";
 
 interface GenreDeletionPopupProps extends BasePopupProps {

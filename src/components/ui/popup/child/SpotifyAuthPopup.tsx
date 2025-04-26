@@ -1,7 +1,7 @@
 "use client";
 
 import { FaSpotify } from "react-icons/fa";
-import { BasePopup } from "../BasePopup";
+import { BasePopup } from "../PopupContainer";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { Button } from "@components/ui/Button";
 

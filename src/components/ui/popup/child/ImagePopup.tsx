@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { BasePopup, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "../PopupContainer";
 
 interface ImagePopupProps extends BasePopupProps {
   imageUrl: string;

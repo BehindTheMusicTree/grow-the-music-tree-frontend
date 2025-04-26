@@ -52,7 +52,7 @@ export function useTrackEdition() {
 
     refreshUploadedTrack(updatedTrack);
     if (track.genre?.name !== updatedTrack.genre?.name) {
-      track;
+      invalidateGenrePlaylists();
     }
 
     setShow(false);

@@ -1,7 +1,7 @@
 "use client";
 
 import { MdError } from "react-icons/md";
-import { BasePopup, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "../PopupContainer";
 
 interface InvalidInputPopupProps extends BasePopupProps {
   details: {
