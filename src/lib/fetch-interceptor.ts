@@ -26,11 +26,14 @@ export const setupFetchInterceptor = (handleError: ErrorHandlerFunction): (() =>
     const [url, requestInit = {}] = args;
 
     // Clone the request init to preserve the original request details
-    const headers = requestInit.headers ? new Headers(requestInit.headers) : new Headers();
+    const headers = new Headers(requestInit.headers);
     const requestDetails: RequestDetails = {
       url,
       method: requestInit.method || "GET",
-      headers: Object.fromEntries(headers.entries()),
+      headers: Array.from(headers.entries()).reduce((acc, [key, value]) => {
+        acc[key] = value;
+        return acc;
+      }, {} as Record<string, string>),
       body: requestInit.body,
       ...requestInit,
     };
@@ -91,7 +94,7 @@ export const setupFetchInterceptor = (handleError: ErrorHandlerFunction): (() =>
       }
 
       // Pass the error to the centralized handler
-      console.log("Passing error to central central handler:", error);
+      console.log("Passing error to central handler:", error);
       handleError(error);
 
       if (error.name === "AbortError") {
