@@ -1,12 +1,12 @@
 "use client";
 
 import { GenreGettingAssignedNewParentProvider } from "@contexts/GenreGettingAssignedNewParentContext";
-import { useGenrePlaylists } from "@hooks/useGenrePlaylists";
+import { useGenrePlaylist } from "@hooks/useGenrePlaylist";
 import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "./tree/tree-constants";
 import GenrePlaylistsTree from "./tree/GenrePlaylistTree";
 
 export default function GenrePlaylists() {
-  const { groupedGenrePlaylists, handleGenreAddAction, loading } = useGenrePlaylists();
+  const { groupedGenrePlaylists, handleGenreAddAction, loading } = useGenrePlaylist();
 
   return (
     <GenreGettingAssignedNewParentProvider>

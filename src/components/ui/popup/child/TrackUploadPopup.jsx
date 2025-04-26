@@ -3,10 +3,10 @@
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { MdError } from "react-icons/md";
-import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
+import { useGenrePlaylist } from "@contexts/GenrePlaylistContext";
 
 export default function TrackUploadPopup({ content, onClose }) {
-  const { setRefreshGenrePlaylistsSignal, uploadTracks } = useGenrePlaylists();
+  const { setRefreshGenrePlaylistsSignal, uploadTracks } = useGenrePlaylist();
   const isPostingRef = useRef(false);
 
   useEffect(() => {

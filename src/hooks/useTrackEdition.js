@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { UploadedTrackService } from "@/utils/services";
-import { useGenrePlaylists } from "@hooks/useGenrePlaylists";
+import { useGenrePlaylist } from "@hooks/useGenrePlaylist";
 import { useTrackList } from "@contexts/TrackListContext";
 import { UploadedTrackEditionPopup } from "@components/ui/popup/UploadedTrackEditionPopup";
 import { FORM_RATING_NULL_VALUE } from "@constants/rating";
