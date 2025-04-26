@@ -12,6 +12,7 @@ import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssigned
 import { PlayStates } from "@models/PlayStates";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 import { GenrePlaylistSimple } from "@schemas/genre-playlist";
+import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer";
@@ -20,17 +21,10 @@ type GenrePlaylistTreeProps = {
   genrePlaylistTree: GenrePlaylistSimple[];
 };
 
-type TrackListOrigin = {
-  type: TrackListOriginType;
-  object: {
-    uuid: string;
-  };
-};
-
 export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTreeProps) {
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup } = usePopup();
-  const { toTrackAtPosition, origin: trackListOrigin } = useTrackList();
+  const { toTrackAtPosition, trackList: trackListOrigin } = useTrackList();
   const { mutate: createGenre } = useCreateGenre();
   const { mutate: updateGenre } = useUpdateGenre();
   const { mutate: deleteGenre } = useDeleteGenre();
@@ -47,10 +41,7 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
   const selectingFileGenreUuidRef = useRef<string | null>(null);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    showPopup("trackUpload", {
-      files: event.target.files,
-      genreUuid: selectingFileGenreUuidRef.current,
-    });
+    showPopup(<TrackUploadPopup files={event.target.files} genreUuid={selectingFileGenreUuidRef.current} />);
     event.target.value = "";
   };
 
