@@ -1,11 +1,11 @@
 "use client";
 
-import { AppErrorType } from "@app-types/app-errors/app-error";
+import { ConnectivityError } from "@app-types/app-errors/app-error";
 import { createContext, useContext, useState, ReactNode } from "react";
 
 interface ConnectivityErrorContextType {
-  connectivityError: AppErrorType | null;
-  setConnectivityError: (error: AppErrorType | null) => void;
+  connectivityError: ConnectivityError | null;
+  setConnectivityError: (error: ConnectivityError | null) => void;
   clearConnectivityError: () => void;
 }
 
@@ -16,7 +16,7 @@ interface ConnectivityErrorProviderProps {
 }
 
 export function ConnectivityErrorProvider({ children }: ConnectivityErrorProviderProps) {
-  const [connectivityError, setConnectivityError] = useState<AppErrorType | null>(null);
+  const [connectivityError, setConnectivityError] = useState<ConnectivityError | null>(null);
 
   const clearConnectivityError = () => {
     setConnectivityError(null);

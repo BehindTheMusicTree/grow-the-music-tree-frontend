@@ -43,7 +43,9 @@ function AppContent({ children }: { children: ReactNode }) {
     const cleanup = setupFetchInterceptor((error) => {
       // Handle errors globally here
       console.error("Global fetch error:", error);
-      setConnectivityError(error);
+      if (error instanceof ConnectivityError) {
+        setConnectivityError(error);
+      }
     });
 
     return cleanup; // Cleanup when component unmounts
