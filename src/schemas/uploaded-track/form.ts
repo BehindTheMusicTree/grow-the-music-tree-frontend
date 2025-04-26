@@ -20,13 +20,13 @@ export const UploadedTrackFormSchema = z.object({
   albumName: z.string().max(ALBUM_NAME_LEN_MAX).optional().nullable(),
   albumArtistsNames: z.array(z.string()).max(ALBUM_ARTISTS_NAMES_FIELD_LEN_MAX).optional().nullable(),
   trackNumber: z.number().int().positive().optional().nullable(),
-  genre: z.string().uuid().or(z.string()).optional().nullable(), // Accepts UUID or name
+  genre: z.string().optional().nullable(), // Genre name
   rating: z.number().min(0).max(5).optional().nullable(),
   language: z.string().max(LANGUAGE_LEN_MAX).optional().nullable(),
 });
 
 export const UploadedTrackCreateSchema = UploadedTrackFormSchema.extend({
-  File: z.instanceof(File),
+  file: z.instanceof(File),
 });
 
 export const UploadedTrackUpdateSchema = UploadedTrackFormSchema.extend({
