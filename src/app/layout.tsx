@@ -49,11 +49,9 @@ function AppContent({ children }: { children: ReactNode }) {
     });
 
     return cleanup; // Cleanup when component unmounts
-  }, []);
+  }, [setConnectivityError]);
 
-  useEffect(() => {
-    console.log("AppContent: playerUploadedTrackObject changed", playerUploadedTrackObject);
-  }, [playerUploadedTrackObject]);
+  useEffect(() => {}, [playerUploadedTrackObject]);
 
   useEffect(() => {
     console.log("AppContent: connectivityError changed", connectivityError);
