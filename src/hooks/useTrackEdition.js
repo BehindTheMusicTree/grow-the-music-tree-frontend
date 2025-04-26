@@ -2,15 +2,14 @@
 
 import { useState } from "react";
 import { UploadedTrackService } from "@/utils/services";
-import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
+import { useGenrePlaylists } from "@hooks/useGenrePlaylists";
 import { useTrackList } from "@contexts/TrackListContext";
 import { UploadedTrackEditionPopup } from "@components/ui/popup/UploadedTrackEditionPopup";
-import { FORM_RATING_NULL_VALUE } from "@lib/utils/constants";
+import { FORM_RATING_NULL_VALUE } from "@constants/rating";
 
 export function useTrackEdition() {
   const [show, setShow] = useState(false);
   const [track, setTrack] = useState(null);
-  const { setRefreshGenrePlaylistsSignal } = useGenrePlaylists();
   const { refreshUploadedTrack } = useTrackList();
 
   const [formValues, setFormValues] = useState({
@@ -53,7 +52,7 @@ export function useTrackEdition() {
 
     refreshUploadedTrack(updatedTrack);
     if (track.genre?.name !== updatedTrack.genre?.name) {
-      setRefreshGenrePlaylistsSignal(1);
+      track;
     }
 
     setShow(false);
