@@ -34,7 +34,7 @@ const inter = Inter({ subsets: ["latin"] });
 function AppContent({ children }: { children: ReactNode }) {
   const { playerUploadedTrackObject } = usePlayer();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-  const currentConnectivityErrorTypeRef = useRef<typeof ConnectivityError | null>(null);
+  const currentConnectivityErrorRef = useRef<typeof ConnectivityError | null>(null);
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, clearConnectivityError } = useConnectivityError();
 
@@ -43,14 +43,14 @@ function AppContent({ children }: { children: ReactNode }) {
   useEffect(() => {
     console.log("AppContent useEffect connectivityError", connectivityError);
     if (connectivityError === null) {
-      if (currentConnectivityErrorTypeRef.current !== null) {
-        currentConnectivityErrorTypeRef.current = null;
+      if (currentConnectivityErrorRef.current !== null) {
+        currentConnectivityErrorRef.current = null;
         hidePopup();
       }
     } else if (
-      currentConnectivityErrorTypeRef.current !== null &&
-      ![NetworkError, ServerError].includes(currentConnectivityErrorTypeRef.current) &&
-      !(connectivityError instanceof currentConnectivityErrorTypeRef.current)
+      currentConnectivityErrorRef.current == null ||
+      (![NetworkError, ServerError].includes(currentConnectivityErrorRef.current) &&
+        !(connectivityError instanceof currentConnectivityErrorRef.current))
     ) {
       let popup: ReactNode | null = null;
       const error = connectivityError as ConnectivityError;
@@ -70,7 +70,7 @@ function AppContent({ children }: { children: ReactNode }) {
         showPopup(popup);
       }
 
-      currentConnectivityErrorTypeRef.current = error.constructor as typeof ConnectivityError;
+      currentConnectivityErrorRef.current = error.constructor as typeof ConnectivityError;
     }
   }, [connectivityError, showPopup, hidePopup, clearConnectivityError]);
 
