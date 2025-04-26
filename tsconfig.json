@@ -24,6 +24,7 @@
       "@components/*": ["src/components/*"],
       "@popups/*": ["src/components/ui/popups/*"],
       "@lib/*": ["src/lib/*"],
+      "@constants/*": ["src/lib/constants/*"],
       "@utils/*": ["src/lib/utils/*"],
       "@app-types/*": ["src/types/*"],
       "@models/*": ["src/models/*"],
