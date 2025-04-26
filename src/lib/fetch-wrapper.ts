@@ -50,8 +50,17 @@ export const fetchWrapper = async <T>(
       error = caughtError;
     } else if (caughtError instanceof Error) {
       // Specifically handle network errors like ERR_CONNECTION_REFUSED
-      if (caughtError instanceof TypeError && caughtError.message === "Failed to fetch") {
-        error = createAppErrorFromErrorCode(ErrorCode.NETWORK_CONNECTION_REFUSED);
+      if (caughtError instanceof TypeError) {
+        if (caughtError.message === "Failed to fetch") {
+          console.log("Failed to fetch");
+          error = createAppErrorFromErrorCode(ErrorCode.NETWORK_FAILED_TO_FETCH);
+        } else if (caughtError.message === "Network request failed") {
+          console.log("Network request failed");
+          error = createAppErrorFromErrorCode(ErrorCode.NETWORK_CONNECTION_REFUSED);
+        } else {
+          console.log("Unknown network error");
+          error = createAppErrorFromErrorCode(ErrorCode.NETWORK_UNKNOWN);
+        }
       } else if (caughtError.name === "AbortError") {
         error = createAppErrorFromErrorCode(ErrorCode.NETWORK_ABORT_ERROR);
       } else if (caughtError.message?.includes("Failed to fetch")) {
