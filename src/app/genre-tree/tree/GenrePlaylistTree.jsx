@@ -6,7 +6,7 @@ import * as d3 from "d3";
 
 import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
-import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
+import { useGenrePlaylists } from "@hooks/useGenrePlaylists";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssignedNewParentContext";
 
