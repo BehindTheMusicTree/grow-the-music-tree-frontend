@@ -6,6 +6,7 @@ import * as d3 from "d3";
 import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useUpdateGenre, useCreateGenre, useDeleteGenre } from "@hooks/useGenre";
+import { useUploadTrack } from "@hooks/useUploadedTrack";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssignedNewParentContext";
 
@@ -13,6 +14,7 @@ import { PlayStates } from "@models/PlayStates";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 import { GenrePlaylistSimple } from "@schemas/genre-playlist";
 import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
+import { UploadedTrackCreationValues } from "@schemas/uploaded-track/form";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer";
@@ -25,6 +27,7 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup } = usePopup();
   const { toTrackAtPosition, trackList: trackListOrigin } = useTrackList();
+  const { mutate: uploadTrack, isPending: isUploadingTrack, error: uploadTrackError } = useUploadTrack();
   const { mutate: createGenre } = useCreateGenre();
   const { mutate: updateGenre } = useUpdateGenre();
   const { mutate: deleteGenre } = useDeleteGenre();
@@ -41,7 +44,19 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
   const selectingFileGenreUuidRef = useRef<string | null>(null);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    showPopup(<TrackUploadPopup files={event.target.files} genreUuid={selectingFileGenreUuidRef.current} />);
+    const files = event.target.files;
+    if (files) {
+      const file = files[0];
+      if (file) {
+        const uploadedTrackCreationValues: UploadedTrackCreationValues = {
+          file: file,
+          genre: selectingFileGenreUuidRef.current,
+        };
+        const uploadedTrack = uploadTrack(uploadedTrackCreationValues);
+
+        showPopup(<TrackUploadPopup isUploadingTrack={isUploadingTrack} error={uploadTrackError} />);
+      }
+    }
     event.target.value = "";
   };
 
