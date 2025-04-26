@@ -16,10 +16,7 @@ export default function Banner({ className }: BannerProps) {
           <div className="mr-3">
             <Image src={logo} alt="logo" width={48} style={{ height: "auto" }} />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">Music Tree</h1>
-            <h3 className="text-sm">by Bodzify</h3>
-          </div>
+          <h1 className="text-2xl font-bold">Music Tree</h1>
         </div>
         <div className="search w-64 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <SearchForm />
