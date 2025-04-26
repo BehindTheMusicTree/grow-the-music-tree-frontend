@@ -80,16 +80,16 @@ function AppContent({ children }: AppContentProps) {
   };
 
   return (
-    <div className="app flex flex-col h-screen">
-      <Banner className="banner w-full top-0 z-50" />
+    <div className="app col h-screen">
+      <Banner className="banner fixed w-full top-0 z-50 h-16" />
 
       <div
-        className="center bg-gray-100 flex-grow flex"
+        className="center fixed top-16 bg-gray-100 h-full w-full flex"
         style={{
           maxHeight: playerUploadedTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
         }}
       >
-        <Menu className="menu fixed left-0 z-40" />
+        <Menu className="menu left-0 z-40" />
         <main className="flex-grow mx-8">{children}</main>
         {isTrackListSidebarVisible && <TrackListSidebar className="fixed right-0 z-40" />}
       </div>
