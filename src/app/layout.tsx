@@ -36,35 +36,12 @@ function AppContent({ children }: { children: ReactNode }) {
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
   const currentConnectivityErrorTypeRef = useRef<typeof ConnectivityError | null>(null);
   const { showPopup, hidePopup, activePopup } = usePopup();
-  const { connectivityError, setConnectivityError, clearConnectivityError } = useConnectivityError();
-
-  useEffect(() => {
-    const handleGlobalError = (event: ErrorEvent) => {
-      console.error("Global error caught:", event.error);
-      if (event.error instanceof ConnectivityError) {
-        setConnectivityError(event.error);
-      }
-    };
-
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      console.error("Unhandled promise rejection caught:", event.reason);
-      if (event.reason instanceof ConnectivityError) {
-        setConnectivityError(event.reason);
-      }
-    };
-
-    window.addEventListener("error", handleGlobalError);
-    window.addEventListener("unhandledrejection", handleUnhandledRejection);
-
-    return () => {
-      window.removeEventListener("error", handleGlobalError);
-      window.removeEventListener("unhandledrejection", handleUnhandledRejection);
-    };
-  }, [setConnectivityError]);
+  const { connectivityError, clearConnectivityError } = useConnectivityError();
 
   useEffect(() => {}, [playerUploadedTrackObject]);
 
   useEffect(() => {
+    console.log("AppContent useEffect connectivityError", connectivityError);
     if (connectivityError === null) {
       if (currentConnectivityErrorTypeRef.current !== null) {
         currentConnectivityErrorTypeRef.current = null;

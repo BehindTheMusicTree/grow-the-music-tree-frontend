@@ -12,8 +12,9 @@ export const fetchWrapper = async <T>(
   url: string,
   options: RequestInit = {},
   accessToken?: string,
-  queryParams?: Record<string, string | number | boolean>
-): Promise<T> => {
+  queryParams?: Record<string, string | number | boolean>,
+  handleError?: (error: Error) => void
+): Promise<T | null> => {
   const urlWithParams = queryParams
     ? `${url}${url.includes("?") ? "&" : "?"}${new URLSearchParams(
         Object.entries(queryParams).map(([key, value]) => [key, String(value)])
@@ -68,6 +69,11 @@ export const fetchWrapper = async <T>(
       error = createAppErrorFromErrorCode(ErrorCode.NETWORK_UNKNOWN);
     }
 
-    throw error;
+    if (handleError) {
+      handleError(error);
+      return null;
+    } else {
+      throw error;
+    }
   }
 };
