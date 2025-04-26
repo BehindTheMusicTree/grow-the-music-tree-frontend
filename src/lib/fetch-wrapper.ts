@@ -12,9 +12,7 @@ export const fetchWrapper = async <T>(
   url: string,
   options: RequestInit = {},
   accessToken?: string,
-  queryParams?: Record<string, string | number | boolean>,
-  requestInterceptor?: RequestInterceptor,
-  responseInterceptor?: ResponseInterceptor
+  queryParams?: Record<string, string | number | boolean>
 ): Promise<T> => {
   const urlWithParams = queryParams
     ? `${url}${url.includes("?") ? "&" : "?"}${new URLSearchParams(
@@ -22,8 +20,8 @@ export const fetchWrapper = async <T>(
       ).toString()}`
     : url;
 
-  let finalUrl = urlWithParams;
-  let finalOptions: RequestInit = {
+  const finalUrl = urlWithParams;
+  const finalOptions: RequestInit = {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -32,12 +30,8 @@ export const fetchWrapper = async <T>(
     },
   };
 
-  // Apply request interceptor if provided
-  if (requestInterceptor) {
-    [finalUrl, finalOptions] = await requestInterceptor(finalUrl, finalOptions);
-  }
-
   try {
+    console.log("finalUrl", finalUrl);
     const res = await fetch(finalUrl, finalOptions);
 
     // Handle response errors
@@ -45,13 +39,9 @@ export const fetchWrapper = async <T>(
       throw createAppErrorFromHttpUrlAndStatus(res.url, res.status);
     }
 
-    // Apply response interceptor if provided
-    if (responseInterceptor) {
-      return responseInterceptor<T>(res);
-    }
-
     return res.json();
   } catch (caughtError: unknown) {
+    console.log("caughtError", caughtError);
     let error: Error;
 
     if (!navigator.onLine) {
