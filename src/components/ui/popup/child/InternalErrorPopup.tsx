@@ -8,6 +8,7 @@ type InternalErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon
   errorCode: ErrorCode;
 };
 
+// @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
 export default class InternalErrorPopup extends BasePopup<InternalErrorPopupProps> {
   render() {
     const { errorCode, ...rest } = this.props;
