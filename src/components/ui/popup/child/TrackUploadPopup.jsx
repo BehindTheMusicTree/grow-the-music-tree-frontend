@@ -1,20 +1,20 @@
 "use client";
 
 import PropTypes from "prop-types";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { MdError } from "react-icons/md";
 import { useGenrePlaylist } from "@contexts/GenrePlaylistContext";
 
-export default function TrackUploadPopup({ content, onClose }) {
+export default function TrackUploadPopup({ files, genreUuid, requestErrors, onClose }) {
   const { setRefreshGenrePlaylistsSignal, uploadTracks } = useGenrePlaylist();
   const isPostingRef = useRef(false);
 
   useEffect(() => {
     async function handleUpload() {
-      if (content && !isPostingRef.current) {
+      if (files && !isPostingRef.current) {
         isPostingRef.current = true;
         try {
-          const response = await uploadTracks(content.files, content.genreUuid);
+          const response = await uploadTracks(files, genreUuid);
           if (!response.ok) {
             const error = await response.json();
             throw new Error(error.message || "Upload failed");
@@ -27,7 +27,7 @@ export default function TrackUploadPopup({ content, onClose }) {
       }
     }
     handleUpload();
-  }, [content, setRefreshGenrePlaylistsSignal, onClose, uploadTracks]);
+  }, [files, genreUuid, setRefreshGenrePlaylistsSignal, onClose, uploadTracks]);
 
   return (
     <div>
