@@ -25,15 +25,15 @@ export const GenrePlaylistDetailedSchema = baseSchema.extend({
 
 export type GenrePlaylistDetailed = z.infer<typeof GenrePlaylistDetailedSchema>;
 
-export const GenrePlaylistSimpleSchema = GenrePlaylistDetailedSchema.omit({
-  uploadedTrackPlaylistRels: true,
-  uploadedTracksNotArchivedCount: true,
-  durationInSec: true,
-  durationStrInHourMinSec: true,
-  uploadedTracksArchivedCount: true,
+export const GenrePlaylistSimpleSchema = GenrePlaylistDetailedSchema.pick({
+  uuid: true,
+  name: true,
   genre: true,
-  root: true,
   parent: true,
+  root: true,
+  uploadedTracksNotArchivedCount: true,
+  createdOn: true,
+  updatedOn: true,
 });
 
 export type GenrePlaylistSimple = z.infer<typeof GenrePlaylistSimpleSchema>;
