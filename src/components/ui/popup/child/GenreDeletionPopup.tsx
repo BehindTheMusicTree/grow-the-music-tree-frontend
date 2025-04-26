@@ -1,36 +1,44 @@
 "use client";
 
-import { BasePopup, BasePopupProps } from "../PopupContainer";
+import { BasePopup, BasePopupProps } from "../BasePopup";
 import { Button } from "@components/ui/Button";
+import { Trash2 } from "lucide-react";
 
-interface GenreDeletionPopupProps extends BasePopupProps {
-  genre: {
-    name: string;
-  };
+// Only allow genre and onConfirm as custom props
+type GenreDeletionPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
+  genre: { name: string };
   onConfirm: (genre: { name: string }) => void;
-}
+};
 
-export default function GenreDeletionPopup({ genre, onConfirm, onClose, ...props }: GenreDeletionPopupProps) {
-  const handleConfirm = () => {
-    onConfirm(genre);
-    onClose?.();
+// @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
+export default class GenreDeletionPopup extends BasePopup<GenreDeletionPopupProps> {
+  handleConfirm = () => {
+    this.props.onConfirm(this.props.genre);
+    this.props.onClose?.();
   };
 
-  return (
-    <BasePopup {...props} title="Delete Genre" onClose={onClose}>
-      <div className="space-y-4">
-        <p className="text-gray-700">
-          Are you sure you want to delete the genre &quot;{genre.name}&quot;? This action cannot be undone.
-        </p>
-        <div className="flex justify-end space-x-3">
-          <Button onClick={onClose} variant="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirm} variant="danger">
-            Delete
-          </Button>
+  render() {
+    const { genre, onClose, ...rest } = this.props;
+    return this.renderBase({
+      ...rest,
+      title: "Delete Genre",
+      isDismissable: true,
+      icon: Trash2,
+      children: (
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            Are you sure you want to delete the genre &quot;{genre.name}&quot;? This action cannot be undone.
+          </p>
+          <div className="flex justify-end space-x-3">
+            <Button onClick={onClose} variant="secondary">
+              Cancel
+            </Button>
+            <Button onClick={this.handleConfirm} variant="danger">
+              Delete
+            </Button>
+          </div>
         </div>
-      </div>
-    </BasePopup>
-  );
+      ),
+    });
+  }
 }
