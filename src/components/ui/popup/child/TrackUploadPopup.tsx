@@ -5,7 +5,7 @@ import { BasePopup, BasePopupProps } from "../BasePopup";
 
 type TrackUploadPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   isUploadingTrack?: boolean;
-  error?: Error;
+  error?: Error | null;
 };
 
 // @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
