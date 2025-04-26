@@ -4,15 +4,16 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import * as d3 from "d3";
 
-import { usePopup } from "@contexts/PopupContext.jsx";
-import { useTrackList } from "@contexts/TrackListContext.jsx";
+import { usePopup } from "@contexts/PopupContext";
+import { useTrackList } from "@contexts/TrackListContext";
 import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
-import { usePlayer } from "@contexts/PlayerContext.jsx";
+import { usePlayer } from "@contexts/PlayerContext";
 import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssignedNewParentContext.jsx";
 
-import { PlayStates, TrackListOriginType } from "@constants.js";
+import { PlayStates } from "@models/PlayStates";
+import { TrackListOriginType } from "@models/TrackListOriginType";
 
-import { buildTreeHierarchy } from "./TreeNodeHelper.jsx";
+import { buildTreeHierarchy } from "./TreeNodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer.js";
 
 /**
