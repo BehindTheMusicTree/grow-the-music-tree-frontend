@@ -6,7 +6,7 @@ import * as d3 from "d3";
 
 import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
-import { useGenrePlaylists } from "@hooks/useGenrePlaylists";
+import { useUpdateGenre, useCreateGenre, useDeleteGenre } from "@hooks/useGenre";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssignedNewParentContext";
 
@@ -22,8 +22,10 @@ import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree }
 export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
   const { playState, handlePlayPauseAction } = usePlayer();
   const { showPopup } = usePopup();
-  const { handleGenreAddAction, updateGenreParent, renameGenre } = useGenrePlaylists();
   const { playNewTrackListFromPlaylistUuid, origin: trackListOrigin } = useTrackList();
+  const { mutate: createGenre } = useCreateGenre();
+  const { mutate: updateGenre } = useUpdateGenre();
+  const { mutate: deleteGenre } = useDeleteGenre();
   const [
     previousRenderingVisibleActionsContainerGenrePlaylist,
     setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
@@ -93,7 +95,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     };
 
     const handleRenameGenre = async (genreUuid, newName) => {
-      const result = await renameGenre(genreUuid, newName);
+      const result = await updateGenre({ uuid: genreUuid, data: { name: newName } });
       if (!result.success) {
         if (result.code === 2001) {
           showPopup("invalidInput", result);
@@ -111,13 +113,12 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
       handlePlayPauseIconAction,
       fileInputRef,
       selectingFileGenreUuidRef,
-      handleGenreAddAction,
+      createGenre,
       setGenreGettingAssignedNewParent,
       updateGenreParent,
       handleRenameGenre,
       showPopup,
       setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
-      renameGenre,
     });
 
     // Cleanup on unmount
@@ -135,7 +136,7 @@ export default function GenrePlaylistsTree({ genrePlaylistsTree }) {
     previousRenderingVisibleActionsContainerGenrePlaylist,
     svgWidth,
     svgHeight,
-    handleGenreAddAction,
+    createGenre,
     handlePlayPauseIconAction,
     setGenreGettingAssignedNewParent,
     updateGenreParent,
