@@ -1,31 +1,45 @@
 "use client";
 
-import { ErrorHandler, NetworkError, AuthError, ServerError } from "./connectivity-errors/error-types";
+import { ErrorHandler, NetworkError, AuthError, ServerError, CustomError } from "./connectivity-errors/error-types";
+
+type RequestDetails = {
+  url: string | Request | URL;
+  method?: string;
+  headers?: Record<string, string>;
+  body?: BodyInit | null;
+  [key: string]: unknown;
+};
+
+type ErrorHandlerFunction = (error: CustomError) => void;
 
 // Store the original fetch only in browser environments
-const originalFetch = typeof window !== "undefined" ? window.fetch : null;
+const originalFetch: typeof fetch | null = typeof window !== "undefined" ? window.fetch : null;
 
 /**
  * Sets up a global fetch interceptor that handles errors consistently
  */
-export const setupFetchInterceptor = (handleError) => {
+export const setupFetchInterceptor = (handleError: ErrorHandlerFunction): (() => void) => {
   // Skip setup in SSR environments
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined") return () => {};
 
-  window.fetch = async (...args) => {
+  window.fetch = async (...args: Parameters<typeof fetch>): Promise<Response> => {
     const [url, requestInit = {}] = args;
 
     // Clone the request init to preserve the original request details
-    const requestDetails = {
+    const headers = requestInit.headers ? new Headers(requestInit.headers) : new Headers();
+    const requestDetails: RequestDetails = {
       url,
       method: requestInit.method || "GET",
-      headers: requestInit.headers ? Object.fromEntries(new Headers(requestInit.headers).entries()) : {},
+      headers: Object.fromEntries(headers.entries()),
       body: requestInit.body,
       ...requestInit,
     };
 
     try {
       console.log(`Fetch request to: ${url}`);
+      if (!originalFetch) {
+        throw new Error("Fetch is not available in this environment");
+      }
       const response = await originalFetch(...args);
 
       // Handle response errors
@@ -51,9 +65,19 @@ export const setupFetchInterceptor = (handleError) => {
       }
 
       return response;
-    } catch (caughtError) {
+    } catch (caughtError: unknown) {
       console.log("Fetch interceptor caught error:", caughtError);
-      let error = caughtError;
+      let error: CustomError;
+
+      if (caughtError instanceof CustomError) {
+        error = caughtError;
+      } else if (caughtError instanceof Error) {
+        error = new CustomError(caughtError.message);
+        error.name = caughtError.name;
+        error.stack = caughtError.stack;
+      } else {
+        error = new CustomError("Unknown error occurred");
+      }
 
       // Specifically handle network errors like ERR_CONNECTION_REFUSED
       if (error instanceof TypeError && error.message === "Failed to fetch") {
@@ -67,12 +91,8 @@ export const setupFetchInterceptor = (handleError) => {
       }
 
       // Pass the error to the centralized handler
-      console.log("Passing error to central handler:", error);
+      console.log("Passing error to central central handler:", error);
       handleError(error);
-
-      if (error instanceof Error) {
-        throw error;
-      }
 
       if (error.name === "AbortError") {
         throw NetworkError.TIMEOUT;
@@ -92,7 +112,7 @@ export const setupFetchInterceptor = (handleError) => {
 
   // Return a cleanup function
   return () => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && originalFetch) {
       window.fetch = originalFetch;
     }
   };
