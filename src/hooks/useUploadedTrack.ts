@@ -1,19 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuthenticatedApi, AuthFetch } from "./useAuthenticatedApi";
-import { UploadedTrackService } from "@/services/uploadedTrack";
-import { UploadedTrack, PaginatedResponse, TrackData } from "@lib/music-tree-api-service/uploaded-track";
-
-const uploadedTrackService = (authFetch: AuthFetch) => new UploadedTrackService(authFetch);
+import { useFetchWrapper } from "./useFetchWrapper";
+import { UploadedTrackCreationValues, UploadedTrackUpdateValues } from "@schemas/uploaded-track/form";
 
 export function useListUploadedTracks() {
-  const listTracks = useAuthenticatedApi<PaginatedResponse<UploadedTrack>>((authFetch) =>
-    uploadedTrackService(authFetch).listTracks()
-  );
+  const { fetch } = useFetchWrapper();
 
   return useQuery({
     queryKey: ["uploadedTracks"],
     queryFn: async () => {
-      const response = await listTracks();
+      const response = await fetch("uploaded-track/", true);
       if (!response.success || !response.data) {
         throw new Error(response.error?.message || "Failed to fetch uploaded tracks");
       }
@@ -22,15 +17,32 @@ export function useListUploadedTracks() {
   });
 }
 
+export function useUploadTrack() {
+  const { fetch } = useFetchWrapper();
+  return useMutation({
+    mutationFn: async (uploadedTrackCreationValues: UploadedTrackCreationValues) => {
+      const response = await fetch("uploaded-track/", true, {
+        method: "POST",
+        body: JSON.stringify(uploadedTrackCreationValues),
+      });
+      if (!response.success || !response.data) {
+        throw new Error(response.error?.message || "Failed to upload track");
+      }
+      return response.data;
+    },
+  });
+}
+
 export function useUpdateUploadedTrack() {
+  const { fetch } = useFetchWrapper();
   const queryClient = useQueryClient();
-  const updateTrack = useAuthenticatedApi<UploadedTrack, [string, Partial<TrackData>]>((authFetch, trackId, data) =>
-    uploadedTrackService(authFetch).updateTrack(trackId, data)
-  );
 
   return useMutation({
-    mutationFn: async ({ trackId, data }: { trackId: string; data: Partial<TrackData> }) => {
-      const response = await updateTrack(trackId, data);
+    mutationFn: async ({ trackUuid, data }: { trackUuid: string; data: UploadedTrackUpdateValues }) => {
+      const response = await fetch(`uploaded-track/${trackUuid}`, true, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
       if (!response.success || !response.data) {
         throw new Error(response.error?.message || "Failed to update track");
       }
@@ -43,12 +55,10 @@ export function useUpdateUploadedTrack() {
 }
 
 export function useDownloadTrack() {
-  const downloadTrack = useAuthenticatedApi<Response, [string]>((authFetch, trackId) =>
-    uploadedTrackService(authFetch).downloadTrack(trackId)
-  );
+  const { fetch } = useFetchWrapper();
 
-  return async (trackId: string): Promise<Response> => {
-    const response = await downloadTrack(trackId);
+  return async (trackUuid: string): Promise<Response> => {
+    const response = await fetch(`uploaded-track/${trackUuid}/download`, true);
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || "Failed to download track");
     }
