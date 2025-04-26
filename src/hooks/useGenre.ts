@@ -29,6 +29,14 @@ export function useRetrieveGenre(id: string) {
   });
 }
 
+function mapGenreFormToPayload<T extends { parentUuid?: string }>(formData: T) {
+  const { parentUuid, ...rest } = formData;
+  return {
+    ...rest,
+    parent: parentUuid,
+  };
+}
+
 export function useCreateGenre() {
   const queryClient = useQueryClient();
   const { invalidateGenrePlaylists } = useListGenrePlaylists();
@@ -36,12 +44,7 @@ export function useCreateGenre() {
 
   return useMutation<GenreDetailed, Error, GenreCreateValues>({
     mutationFn: async (data) => {
-      const payload = {
-        ...data,
-        parent: data.parentUuid,
-      };
-      delete payload.parentUuid;
-
+      const payload = mapGenreFormToPayload(data);
       const response = await fetch("genre/", true, {
         method: "POST",
         body: JSON.stringify(payload),
@@ -62,12 +65,7 @@ export function useUpdateGenre() {
 
   const mutate = useMutation<GenreDetailed, Error, { uuid: string; data: GenreUpdateValues }>({
     mutationFn: async ({ uuid, data }) => {
-      const payload = {
-        ...data,
-        parent: data.parentUuid,
-      };
-      delete payload.parentUuid;
-
+      const payload = mapGenreFormToPayload(data);
       const response = await fetch(`genre/${uuid}`, true, {
         method: "PUT",
         body: JSON.stringify(payload),
