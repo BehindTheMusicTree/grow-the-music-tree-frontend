@@ -3,7 +3,7 @@ import { MdMoreVert, MdModeEdit } from "react-icons/md";
 import { FaPlus, FaTrashAlt, FaPlay, FaPause, FaSpinner, FaFileUpload } from "react-icons/fa";
 import { PiGraphFill } from "react-icons/pi";
 
-import { PlayStates, TrackListOriginType } from "@/utils/constants";
+import { PlayStates, TrackListOriginType } from "@constants";
 import {
   RECTANGLE_COLOR,
   RECT_BASE_DIMENSIONS,
