@@ -25,6 +25,8 @@ import TrackListSidebar from "@components/features/track-list-sidebar/TrackListS
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
 import SpotifyAuthPopup from "@components/ui/popup/child/SpotifyAuthPopup";
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
+import { BANNER_HEIGHT, PLAYER_HEIGHT } from "@constants/layout";
+
 initSentry();
 
 const inter = Inter({ subsets: ["latin"] });
@@ -75,8 +77,8 @@ function AppContent({ children }: { children: ReactNode }) {
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {
-    centerWithPlayer: "calc(100vh - 180px)", // Assuming banner is 100px and player is 80px
-    centerWithoutPlayer: "calc(100vh - 100px)", // Only accounting for banner
+    centerWithPlayer: `calc(100vh - ${BANNER_HEIGHT + PLAYER_HEIGHT}px)`,
+    centerWithoutPlayer: `calc(100vh - ${BANNER_HEIGHT}px)`,
   };
 
   return (
