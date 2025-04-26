@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFetchWrapper } from "./useFetchWrapper";
 import { PaginatedResponse, PaginatedResponseSchema } from "@app-types/api/pagination";
 import { GenreDetailedSchema, GenreDetailed, GenreSimpleSchema, GenreSimple } from "@schemas/genre/response";
-import { GenreCreateValues, GenreUpdateValues } from "@schemas/genre/form";
+import { GenreCreationValues, GenreUpdateValues } from "@schemas/genre/form";
 import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
 
 export function useListGenres(page = 1, pageSize = 50) {
@@ -42,7 +42,7 @@ export function useCreateGenre() {
   const { invalidateGenrePlaylists } = useListGenrePlaylists();
   const { fetch } = useFetchWrapper();
 
-  return useMutation<GenreDetailed, Error, GenreCreateValues>({
+  return useMutation<GenreDetailed, Error, GenreCreationValues>({
     mutationFn: async (data) => {
       const payload = mapGenreFormToPayload(data);
       const response = await fetch("genre/", true, {

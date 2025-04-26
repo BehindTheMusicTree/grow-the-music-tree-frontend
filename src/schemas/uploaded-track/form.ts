@@ -33,5 +33,5 @@ export const UploadedTrackUpdateSchema = UploadedTrackFormSchema.extend({
   archived: z.boolean().optional(),
 });
 
-export type UploadedTrackCreateValues = z.infer<typeof UploadedTrackCreateSchema>;
+export type UploadedTrackCreationValues = z.infer<typeof UploadedTrackCreateSchema>;
 export type UploadedTrackUpdateValues = z.infer<typeof UploadedTrackUpdateSchema>;
