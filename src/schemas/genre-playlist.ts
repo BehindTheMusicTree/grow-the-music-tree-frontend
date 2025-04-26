@@ -12,7 +12,7 @@ export type GenrePlaylistMinimum = z.infer<typeof GenrePlaylistMinimumSchema>;
 
 export const GenrePlaylistDetailedSchema = baseSchema.extend({
   uploadedTrackPlaylistRels: z.array(UploadedTrackPlaylistRelWithoutPlaylistSchema),
-  uploadedTracksNotArchivedCountPublic: z.number().min(0),
+  uploadedTracksNotArchivedCount: z.number().min(0),
   durationInSec: z.number().min(0),
   durationStrInHourMinSec: z.string(),
   uploadedTracksArchivedCount: z.number().min(0),
@@ -27,7 +27,7 @@ export type GenrePlaylistDetailed = z.infer<typeof GenrePlaylistDetailedSchema>;
 
 export const GenrePlaylistSimpleSchema = GenrePlaylistDetailedSchema.omit({
   uploadedTrackPlaylistRels: true,
-  uploadedTracksNotArchivedCountPublic: true,
+  uploadedTracksNotArchivedCount: true,
   durationInSec: true,
   durationStrInHourMinSec: true,
   uploadedTracksArchivedCount: true,
