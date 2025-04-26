@@ -4,7 +4,7 @@ import { FaPlus, FaTrashAlt, FaPlay, FaPause, FaSpinner, FaFileUpload } from "re
 import { PiGraphFill } from "react-icons/pi";
 
 import { PlayStates } from "@models/PlayStates";
-import { TrackListOriginType } from "@models/TrackListOriginType";
+import { TrackListOriginType } from "@models/track-list/TrackListOriginType";
 
 import {
   RECTANGLE_COLOR,
