@@ -63,6 +63,7 @@ export const setupFetchInterceptor = (handleError: (error: Error) => void): (() 
       }
 
       handleError(error);
+      throw error;
     }
   };
 
