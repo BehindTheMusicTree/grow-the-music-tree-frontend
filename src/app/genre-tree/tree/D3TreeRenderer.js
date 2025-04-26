@@ -1,6 +1,6 @@
 import { addGrid } from "../d3Helper";
 import { appendPaths } from "./TreeHelper";
-import { addMoreIconContainer, addActionsGroup, addParentSelectionOverlay } from "./TreeNodeHelper.jsx";
+import { addMoreIconContainer, addActionsGroup, addParentSelectionOverlay } from "./TreeNodeHelper";
 import {
   RECT_BASE_DIMENSIONS,
   HORIZONTAL_SEPARATOON_BETWEEN_NODES,

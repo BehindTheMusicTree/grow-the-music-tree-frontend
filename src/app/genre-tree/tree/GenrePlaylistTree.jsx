@@ -8,7 +8,7 @@ import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useGenrePlaylists } from "@contexts/GenrePlaylistContext";
 import { usePlayer } from "@contexts/PlayerContext";
-import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssignedNewParentContext.jsx";
+import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssignedNewParentContext";
 
 import { PlayStates } from "@models/PlayStates";
 import { TrackListOriginType } from "@models/TrackListOriginType";
