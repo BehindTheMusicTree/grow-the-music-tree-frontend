@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { ArtistMinimumSchema } from "./artist";
-import { AlbumMinimumSchema } from "./album";
-import { GenreMinimumSchema } from "./genre";
-import { FileDetailedSchema } from "./file";
-import { PlaylistMinimumSchema } from "./playlist";
-import { UuidResourceSchema } from "./uuid-resource";
+import { ArtistMinimumSchema } from "../artist";
+import { AlbumMinimumSchema } from "../album";
+import { GenreMinimumSchema } from "../genre/response";
+import { FileDetailedSchema } from "../file";
+import { PlaylistMinimumSchema } from "../playlist";
+import { UuidResourceSchema } from "../uuid-resource";
 
 export const UploadedTrackDetailedSchema = UuidResourceSchema.extend({
   relativeUrl: z.string(),

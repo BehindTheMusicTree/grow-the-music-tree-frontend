@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useState, useContext, ReactNode } from "react";
-import { UploadedTrackDetailed } from "@schemas/uploaded-track";
+import { UploadedTrackDetailed } from "@schemas/uploaded-track/response";
 import TrackList from "@models/track-list/TrackList";
 
 interface TrackListContextType {

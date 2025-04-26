@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UploadedTrackDetailedSchema } from "./uploaded-track";
+import { UploadedTrackDetailedSchema } from "./uploaded-track/response";
 
 export const UploadedTrackPlaylistRelWithoutPlaylistSchema = z.object({
   uploadedTrack: UploadedTrackDetailedSchema,

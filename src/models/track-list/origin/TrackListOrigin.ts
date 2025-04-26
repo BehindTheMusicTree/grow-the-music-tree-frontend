@@ -1,4 +1,4 @@
-import { UploadedTrackDetailed } from "@schemas/uploaded-track";
+import { UploadedTrackDetailed } from "@schemas/uploaded-track/response";
 import { PlaylistDetailed } from "@schemas/playlist";
 import { TrackListOriginType } from "./TrackListOriginType";
 
