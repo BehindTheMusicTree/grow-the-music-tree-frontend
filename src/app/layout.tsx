@@ -49,6 +49,7 @@ function AppContent({ children }: { children: ReactNode }) {
   useEffect(() => {}, [playerUploadedTrackObject]);
 
   useEffect(() => {
+    console.log("layout connectivityError", connectivityError);
     if (connectivityError === null) {
       if (currentConnectivityErrorRef.current !== null) {
         currentConnectivityErrorRef.current = null;
