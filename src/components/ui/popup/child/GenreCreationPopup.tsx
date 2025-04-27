@@ -43,6 +43,7 @@ export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProp
                   value={this.state.name}
                   onChange={this.handleChange}
                   className="w-full px-3 py-2 border rounded-md"
+                  autoFocus
                 />
               </div>
             </div>
