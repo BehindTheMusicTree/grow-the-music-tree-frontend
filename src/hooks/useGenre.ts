@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFetchWrapper } from "./useFetchWrapper";
-import { PaginatedResponse, PaginatedResponseSchema } from "@app-types/api/pagination";
+import { PaginatedResponseSchema, PaginatedResponse } from "@schemas/PaginatedResponse";
 import { GenreDetailedSchema, GenreDetailed, GenreSimpleSchema, GenreSimple } from "@schemas/domain/genre/response";
 import { GenreCreationValues, GenreUpdateValues } from "@schemas/domain/genre/form";
 import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
