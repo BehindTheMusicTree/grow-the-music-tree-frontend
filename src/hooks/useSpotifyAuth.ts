@@ -1,11 +1,13 @@
 "use client";
 
-import { useSession } from "@contexts/SessionContext";
+import { useCallback } from "react";
 import { useRouter } from "next/navigation";
+
+import { useSession } from "@contexts/SessionContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
+import { useFetchWrapper } from "@hooks/useFetchWrapper";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
-import { useFetchWrapper } from "@hooks/useFetchWrapper";
 
 export function useSpotifyAuth() {
   const { clearSession, setSession } = useSession();
@@ -30,41 +32,44 @@ export function useSpotifyAuth() {
     window.location.href = `${process.env.NEXT_PUBLIC_SPOTIFY_AUTH_URL}?${params.toString()}`;
   };
 
-  const authToBackendFromSpotifyCode = async (code: string) => {
-    console.log("authToBackendFromSpotifyCode called", { code });
-    type SpotifyAuthResponse = {
-      accessToken: string;
-      refreshToken: string;
-      expiresAt: number;
-    };
-    const response = await fetch<Response>("auth/spotify/", true, false, {
-      method: "POST",
-      body: JSON.stringify({ code }),
-    });
-    if (!response?.ok) {
-      const error = new BackendError(ErrorCode.BACKEND_AUTH_ERROR);
-      setConnectivityError(error);
-    } else {
-      const data = (await response.json()) as SpotifyAuthResponse;
-      setSession({
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-        expiresAt: data.expiresAt,
+  const authToBackendFromSpotifyCode = useCallback(
+    async (code: string) => {
+      console.log("authToBackendFromSpotifyCode called", { code });
+      type SpotifyAuthResponse = {
+        accessToken: string;
+        refreshToken: string;
+        expiresAt: number;
+      };
+      const response = await fetch<Response>("auth/spotify/", true, false, {
+        method: "POST",
+        body: JSON.stringify({ code }),
       });
-
-      const originalUrl = localStorage.getItem("spotifyAuthRedirect");
-      if (originalUrl) {
-        localStorage.removeItem("spotifyAuthRedirect");
-        // router.push(originalUrl);
+      if (!response?.ok) {
+        const error = new BackendError(ErrorCode.BACKEND_AUTH_ERROR);
+        setConnectivityError(error);
       } else {
-        // router.push("/");
-      }
-    }
-  };
+        const data = (await response.json()) as SpotifyAuthResponse;
+        setSession({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+          expiresAt: data.expiresAt,
+        });
 
-  const logout = () => {
+        const originalUrl = localStorage.getItem("spotifyAuthRedirect");
+        if (originalUrl) {
+          localStorage.removeItem("spotifyAuthRedirect");
+          // router.push(originalUrl);
+        } else {
+          // router.push("/");
+        }
+      }
+    },
+    [fetch, setSession, setConnectivityError]
+  );
+
+  const logout = useCallback(() => {
     clearSession();
-  };
+  }, [clearSession]);
 
   return {
     handleSpotifyOAuth,
