@@ -26,7 +26,7 @@ export function useListSpotifyLibTracks(page = 1, pageSize = 20) {
 export function useQuickSyncSpotifyLibTracks() {
   const queryClient = useQueryClient();
   const quickSync = useAuthenticatedApi(async (authFetch) => {
-    const response = await authFetch("spotify/library/tracks/sync/quick", { method: "POST" });
+    const response = await authFetch("library/spotify/sync/quick", { method: "POST" });
     return response.json();
   });
 
@@ -47,7 +47,7 @@ export function useQuickSyncSpotifyLibTracks() {
 export function useFullSyncSpotifyLibTracks() {
   const queryClient = useQueryClient();
   const fullSync = useAuthenticatedApi(async (authFetch) => {
-    const response = await authFetch("spotify/library/tracks/sync/full", { method: "POST" });
+    const response = await authFetch("library/spotify/sync/full", { method: "POST" });
     return response.json();
   });
 

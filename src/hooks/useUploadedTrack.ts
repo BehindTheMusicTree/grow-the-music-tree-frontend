@@ -8,7 +8,7 @@ export function useListUploadedTracks() {
   return useQuery({
     queryKey: ["uploadedTracks"],
     queryFn: async () => {
-      const response = await fetch("uploaded-track/", true);
+      const response = await fetch("library/uploaded/", true);
       if (!response.success || !response.data) {
         throw new Error(response.error?.message || "Failed to fetch uploaded tracks");
       }
@@ -21,7 +21,7 @@ export function useUploadTrack() {
   const { fetch } = useFetchWrapper();
   return useMutation({
     mutationFn: async (uploadedTrackCreationValues: UploadedTrackCreationValues) => {
-      const response = await fetch("uploaded-track/", true, true, {
+      const response = await fetch("library/uploaded/", true, true, {
         method: "POST",
         body: JSON.stringify(uploadedTrackCreationValues),
       });
@@ -39,7 +39,7 @@ export function useUpdateUploadedTrack() {
 
   return useMutation({
     mutationFn: async ({ uuid: uuid, data }: { uuid: string; data: UploadedTrackUpdateValues }) => {
-      const response = await fetch(`uploaded-tracks/${uuid}`, true, true, {
+      const response = await fetch(`library/uploaded/${uuid}`, true, true, {
         method: "PUT",
         body: JSON.stringify(data),
       });
@@ -58,7 +58,7 @@ export function useDownloadTrack() {
   const { fetch } = useFetchWrapper();
 
   return async (uuid: string): Promise<Response> => {
-    const response = await fetch(`uploaded-tracks/${uuid}/download`, true);
+    const response = await fetch(`library/uploaded/${uuid}/download`, true);
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || "Failed to download track");
     }
