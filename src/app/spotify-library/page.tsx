@@ -73,54 +73,59 @@ export default function SpotifyLibrary() {
   }
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Your Spotify Library</h1>
-        <div className="text-sm text-gray-500">
-          Showing {spotifyLibTracks.length} of {total} tracks
-        </div>
-      </div>
-
-      <div className="flex space-x-4 mb-6">
-        <button
-          className="flex items-center px-4 py-2 bg-[#1DB954] text-white rounded hover:bg-[#1AA84A] disabled:opacity-50"
-          onClick={handleQuickSync}
-          disabled={isQuickSyncPending || isFullSyncPending}
-        >
-          <FaSync className={isQuickSyncPending ? "animate-spin mr-2" : "mr-2"} />
-          Quick Sync
-        </button>
-        <button
-          className="flex items-center px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 disabled:opacity-50"
-          onClick={handleFullSync}
-          disabled={isQuickSyncPending || isFullSyncPending}
-        >
-          <MdSyncProblem className={isFullSyncPending ? "animate-spin mr-2" : "mr-2"} />
-          Full Sync
-          <span className="ml-1 text-xs">(may take longer)</span>
-        </button>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {spotifyLibTracks.map((spotifyLibTrack: SpotifyLibTrackSimple) => (
-          <div key={spotifyLibTrack.spotifyId} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <h2 className="font-semibold">{spotifyLibTrack.name}</h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              {spotifyLibTrack.spotifyArtists.map((artist) => artist.name).join(", ")}
-            </p>
-            <p className="text-gray-500 text-sm">{spotifyLibTrack.album}</p>
-            <p className="text-gray-500 text-sm">{spotifyLibTrack.durationStrInHourMinSec}</p>
+    <div className="flex flex-col h-screen">
+      <div className="flex-none p-4">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Your Spotify Library</h1>
+          <div className="text-sm text-gray-500">
+            Showing {spotifyLibTracks.length} of {total} tracks
           </div>
-        ))}
+        </div>
+
+        <div className="flex space-x-4 mb-6">
+          <button
+            className="flex items-center px-4 py-2 bg-[#1DB954] text-white rounded hover:bg-[#1AA84A] disabled:opacity-50"
+            onClick={handleQuickSync}
+            disabled={isQuickSyncPending || isFullSyncPending}
+          >
+            <FaSync className={isQuickSyncPending ? "animate-spin mr-2" : "mr-2"} />
+            Quick Sync
+          </button>
+          <button
+            className="flex items-center px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 disabled:opacity-50"
+            onClick={handleFullSync}
+            disabled={isQuickSyncPending || isFullSyncPending}
+          >
+            <MdSyncProblem className={isFullSyncPending ? "animate-spin mr-2" : "mr-2"} />
+            Full Sync
+            <span className="ml-1 text-xs">(may take longer)</span>
+          </button>
+        </div>
       </div>
 
-      <div className="mt-2 text-center text-sm text-gray-500">
-        Page {currentPage} of {totalPages} • {total} total tracks
-      </div>
-      {isFetchingNextPage && (
-        <div className="flex justify-center mt-4">
-          <FaSpinner className="text-[#1DB954] text-2xl animate-spin" />
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {spotifyLibTracks.map((spotifyLibTrack) => (
+            <div key={spotifyLibTrack.spotifyId} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+              <h2 className="font-semibold">{spotifyLibTrack.name}</h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                {spotifyLibTrack.spotifyArtists.map((artist) => artist.name).join(", ")}
+              </p>
+              <p className="text-gray-500 text-sm">{spotifyLibTrack.album}</p>
+              <p className="text-gray-500 text-sm">{spotifyLibTrack.durationStrInHourMinSec}</p>
+            </div>
+          ))}
         </div>
-      )}
+
+        <div className="mt-2 text-center text-sm text-gray-500">
+          Page {currentPage} of {totalPages} • {total} total tracks
+        </div>
+        {isFetchingNextPage && (
+          <div className="flex justify-center mt-4">
+            <FaSpinner className="text-[#1DB954] text-2xl animate-spin" />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
