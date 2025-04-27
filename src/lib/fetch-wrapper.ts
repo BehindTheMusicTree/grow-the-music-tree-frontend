@@ -1,10 +1,4 @@
-import { AppError } from "@app-types/app-errors/app-error";
-import {
-  createAppErrorFromUrlAndStatus,
-  createAppErrorFromErrorCode,
-  createNetworkOrBackendError,
-} from "@app-types/app-errors/app-error-factory";
-import { ErrorCode } from "@app-types/app-errors/app-error-codes";
+import { createAppErrorFromUrlAndStatus, createNetworkOrBackendError } from "@app-types/app-errors/app-error-factory";
 
 export type RequestInterceptor = (url: string, options: RequestInit) => Promise<[string, RequestInit]>;
 export type ResponseInterceptor = <T>(response: Response) => Promise<T>;
