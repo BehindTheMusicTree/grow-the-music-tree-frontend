@@ -7,13 +7,14 @@ import { Button } from "@components/ui/Button";
 import { FaSpotify } from "react-icons/fa";
 import React from "react";
 
-type SpotifyAuthPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable">;
+type SpotifyAuthPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
+  handleSpotifyAuth: () => void;
+};
 
 // @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
 class SpotifyAuthPopup extends BasePopup<SpotifyAuthPopupProps> {
   render() {
-    // handleSpotifyAuth will be passed as a prop
-    const { handleSpotifyAuth, ...rest } = this.props as any;
+    const { handleSpotifyAuth, ...rest } = this.props;
     return this.renderBase({
       ...rest,
       title: "Connect to Spotify",
