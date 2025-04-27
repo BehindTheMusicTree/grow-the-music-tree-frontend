@@ -5,9 +5,11 @@ export type ResponseInterceptor = <T>(response: Response) => Promise<T>;
 
 export const fetchWrapper = async <T>(
   url: string,
+  requiresAuth: boolean,
   options: RequestInit = {},
   accessToken?: string,
   queryParams?: Record<string, string | number | boolean>,
+  handleMissingRequiredSession?: () => void,
   handleError?: (error: Error) => void
 ): Promise<T | null> => {
   const urlWithParams = queryParams
@@ -25,6 +27,11 @@ export const fetchWrapper = async <T>(
       ...(options.headers || {}),
     },
   };
+
+  if (requiresAuth && !accessToken) {
+    handleMissingRequiredSession?.();
+    return null;
+  }
 
   try {
     const res = await fetch(finalUrl, finalOptions);

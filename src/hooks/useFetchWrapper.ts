@@ -15,6 +15,10 @@ export const useFetchWrapper = () => {
     }
   };
 
+  const handleMissingRequiredSession = () => {
+    setConnectivityError(createAppErrorFromErrorCode(ErrorCode.SESSION_REQUIRED));
+  };
+
   const fetch = <T>(
     backendEndpointOrUrl: string,
     fromBackend: boolean = true,
@@ -22,12 +26,16 @@ export const useFetchWrapper = () => {
     options: RequestInit = {},
     queryParams?: Record<string, string | number | boolean>
   ) => {
-    if (requiresAuth && !session?.accessToken) {
-      setConnectivityError(createAppErrorFromErrorCode(ErrorCode.SESSION_REQUIRED));
-      return;
-    }
     const url = fromBackend ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${backendEndpointOrUrl}` : backendEndpointOrUrl;
-    return rawFetch<T>(url, options, session?.accessToken || undefined, queryParams, handleError);
+    return rawFetch<T>(
+      url,
+      requiresAuth,
+      options,
+      session?.accessToken || undefined,
+      queryParams,
+      handleMissingRequiredSession,
+      handleError
+    );
   };
 
   return { fetch };
