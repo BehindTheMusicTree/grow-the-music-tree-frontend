@@ -1,7 +1,8 @@
 import { AppError } from "@app-types/app-errors/app-error";
 import {
-  createAppErrorFromHttpUrlAndStatus,
+  createAppErrorFromUrlAndStatus,
   createAppErrorFromErrorCode,
+  createNetworkOrBackendError,
 } from "@app-types/app-errors/app-error-factory";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
@@ -36,38 +37,13 @@ export const fetchWrapper = async <T>(
 
     // Handle response errors
     if (!res.ok) {
-      throw createAppErrorFromHttpUrlAndStatus(res.url, res.status);
+      throw createAppErrorFromUrlAndStatus(res.url, res.status);
     }
 
     return res.json();
   } catch (caughtError: unknown) {
     console.log("fetchWrapper caughtError", caughtError);
-    let error: Error;
-
-    if (!navigator.onLine) {
-      error = createAppErrorFromErrorCode(ErrorCode.NETWORK_OFFLINE);
-    } else if (caughtError instanceof AppError) {
-      error = caughtError;
-    } else if (caughtError instanceof Error) {
-      // Specifically handle network errors like ERR_CONNECTION_REFUSED
-      if (caughtError instanceof TypeError) {
-        if (caughtError.message === "Failed to fetch") {
-          error = createAppErrorFromErrorCode(ErrorCode.NETWORK_FAILED_TO_FETCH);
-        } else if (caughtError.message === "Network request failed") {
-          error = createAppErrorFromErrorCode(ErrorCode.NETWORK_CONNECTION_REFUSED);
-        } else {
-          error = createAppErrorFromErrorCode(ErrorCode.NETWORK_UNKNOWN);
-        }
-      } else if (caughtError.name === "AbortError") {
-        error = createAppErrorFromErrorCode(ErrorCode.NETWORK_ABORT_ERROR);
-      } else if (caughtError.message?.includes("Failed to fetch")) {
-        error = createAppErrorFromErrorCode(ErrorCode.NETWORK_FAILED_TO_FETCH);
-      } else {
-        error = createAppErrorFromErrorCode(ErrorCode.NETWORK_UNKNOWN);
-      }
-    } else {
-      error = createAppErrorFromErrorCode(ErrorCode.NETWORK_UNKNOWN);
-    }
+    const error = createNetworkOrBackendError(caughtError, finalUrl);
 
     if (handleError) {
       handleError(error);
