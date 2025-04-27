@@ -42,12 +42,12 @@ export const fetchWrapper = async <T>(
     return res.json();
   } catch (caughtError: unknown) {
     let appError: AppError | null = null;
-    console.log("caughtError", caughtError);
     if (caughtError instanceof AppError) {
       appError = caughtError;
     } else {
       appError = createNetworkOrBackendError(caughtError, finalUrl);
     }
+    console.log("appError", appError);
 
     if (handleError && appError) {
       handleError(appError);
