@@ -104,17 +104,59 @@ export default function SpotifyLibrary() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {spotifyLibTracks.map((spotifyLibTrack) => (
-            <div key={spotifyLibTrack.spotifyId} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-              <h2 className="font-semibold">{spotifyLibTrack.name}</h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                {spotifyLibTrack.spotifyArtists.map((artist) => artist.name).join(", ")}
-              </p>
-              <p className="text-gray-500 text-sm">{spotifyLibTrack.album}</p>
-              <p className="text-gray-500 text-sm">{spotifyLibTrack.durationStrInHourMinSec}</p>
-            </div>
-          ))}
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >
+                  Track
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >
+                  Artists
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >
+                  Album
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >
+                  Duration
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+              {spotifyLibTracks.map((spotifyLibTrack) => (
+                <tr key={spotifyLibTrack.spotifyId} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">{spotifyLibTrack.name}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {spotifyLibTrack.spotifyArtists.map((artist) => artist.name).join(", ")}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{spotifyLibTrack.album}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {spotifyLibTrack.durationStrInHourMinSec}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         <div className="mt-2 text-center text-sm text-gray-500">
