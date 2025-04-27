@@ -16,7 +16,7 @@ export const useListGenrePlaylists = (page = 1, pageSize = 50) => {
   const query = useQuery<PaginatedResponse<GenrePlaylistSimple>>({
     queryKey: ["genrePlaylists", page, pageSize],
     queryFn: async () => {
-      const response = await fetch("genre-playlist/", true, {}, { page, pageSize });
+      const response = await fetch("genre-playlists/", true, true, {}, { page, pageSize });
       return PaginatedResponseSchema(GenrePlaylistSimpleSchema).parse(response);
     },
   });
@@ -31,12 +31,12 @@ export const useListGenrePlaylists = (page = 1, pageSize = 50) => {
   };
 };
 
-export const useRetrieveGenrePlaylist = (id: string) => {
+export const useRetrieveGenrePlaylist = (uuid: string) => {
   const { fetch } = useFetchWrapper();
   return useQuery<GenrePlaylistDetailed>({
-    queryKey: ["genrePlaylists", id],
+    queryKey: ["genrePlaylists", uuid],
     queryFn: async () => {
-      const response = await fetch(`genre-playlist/${id}`, true);
+      const response = await fetch(`genre-playlists/${uuid}`, true);
       return GenrePlaylistDetailedSchema.parse(response);
     },
   });
