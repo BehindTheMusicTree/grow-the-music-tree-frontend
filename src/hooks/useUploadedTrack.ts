@@ -38,14 +38,8 @@ export function useUpdateUploadedTrack() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      trackUuid: uploadedTrackUuid,
-      data,
-    }: {
-      trackUuid: string;
-      data: UploadedTrackUpdateValues;
-    }) => {
-      const response = await fetch(`uploaded-tracks/${uploadedTrackUuid}`, true, true, {
+    mutationFn: async ({ uuid: uuid, data }: { uuid: string; data: UploadedTrackUpdateValues }) => {
+      const response = await fetch(`uploaded-tracks/${uuid}`, true, true, {
         method: "PUT",
         body: JSON.stringify(data),
       });
@@ -63,8 +57,8 @@ export function useUpdateUploadedTrack() {
 export function useDownloadTrack() {
   const { fetch } = useFetchWrapper();
 
-  return async (uploadedTrackUuid: string): Promise<Response> => {
-    const response = await fetch(`uploaded-tracks/${uploadedTrackUuid}/download`, true);
+  return async (uuid: string): Promise<Response> => {
+    const response = await fetch(`uploaded-tracks/${uuid}/download`, true);
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || "Failed to download track");
     }
