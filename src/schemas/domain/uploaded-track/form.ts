@@ -25,7 +25,7 @@ export const UploadedTrackFormSchema = z.object({
   language: z.string().max(LANGUAGE_LEN_MAX).optional().nullable(),
 });
 
-export const UploadedTrackCreateSchema = UploadedTrackFormSchema.extend({
+export const UploadedTrackCreationSchema = UploadedTrackFormSchema.extend({
   file: z.instanceof(File),
 });
 
@@ -33,5 +33,5 @@ export const UploadedTrackUpdateSchema = UploadedTrackFormSchema.extend({
   archived: z.boolean().optional(),
 });
 
-export type UploadedTrackCreationValues = z.infer<typeof UploadedTrackCreateSchema>;
+export type UploadedTrackCreationValues = z.infer<typeof UploadedTrackCreationSchema>;
 export type UploadedTrackUpdateValues = z.infer<typeof UploadedTrackUpdateSchema>;
