@@ -47,12 +47,12 @@ export function useCreateGenre() {
   const { fetch } = useFetchWrapper();
   const [formErrors, setFormErrors] = useState<{ field: string; message: string }[]>([]);
 
-  const mutate = useMutation<GenreDetailed, Error, GenreCreationValues>({
+  const mutate = useMutation<GenreDetailed | null, Error, GenreCreationValues>({
     mutationFn: async (data: unknown) => {
       try {
         const validatedData = GenreCreationSchema.parse(data);
         const payload = mapGenreFormToPayload(validatedData);
-        const response = await fetch("genre/", true, true, {
+        const response = await fetch("genres/", true, true, {
           method: "POST",
           body: JSON.stringify(payload),
         });
@@ -90,7 +90,7 @@ export function useUpdateGenre() {
   const mutate = useMutation<GenreDetailed, Error, { uuid: string; data: GenreUpdateValues }>({
     mutationFn: async ({ uuid, data }) => {
       const payload = mapGenreFormToPayload(data);
-      const response = await fetch(`genre/${uuid}`, true, true, {
+      const response = await fetch(`genres/${uuid}`, true, true, {
         method: "PUT",
         body: JSON.stringify(payload),
       });
@@ -120,7 +120,7 @@ export function useDeleteGenre() {
   const { invalidateGenrePlaylists } = useListGenrePlaylists();
   return useMutation<GenreDetailed, Error, { uuid: string }>({
     mutationFn: async ({ uuid }) => {
-      const response = await fetch(`genre/${uuid}`, true, {
+      const response = await fetch(`genres/${uuid}`, true, true, {
         method: "DELETE",
       });
       return GenreDetailedSchema.parse(response);
