@@ -7,7 +7,7 @@ import {
   GenrePlaylistDetailed,
   GenrePlaylistSimpleSchema,
 } from "@schemas/domain/genre-playlist";
-import { PaginatedResponseSchema } from "@schemas/PaginatedResponse";
+import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 
 export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBLIC_GENRE_PLAYLISTS_PAGE_SIZE || 50) => {
   const queryClient = useQueryClient();

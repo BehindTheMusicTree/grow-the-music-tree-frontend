@@ -2,7 +2,7 @@
 
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
-import { PaginatedResponseSchema } from "@schemas/PaginatedResponse";
+import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { SpotifyLibTrackSimpleSchema } from "@schemas/domain/spotify/spotify-lib-track";
 
 export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTIFY_LIB_TRACKS_PAGE_SIZE || 50) {
