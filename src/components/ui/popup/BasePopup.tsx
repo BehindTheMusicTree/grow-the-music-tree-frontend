@@ -9,7 +9,7 @@ export interface BasePopupProps {
   title: string;
   children: ReactNode;
   onClose?: () => void;
-  type?: "default" | "success" | "error" | "warning" | "info";
+  type?: "default" | "success" | "error" | "warning" | "info" | "spotify";
   icon?: LucideIcon;
   isDismissable?: boolean;
   className?: string;
@@ -28,27 +28,28 @@ export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> ex
       className,
       contentClassName,
     } = props;
-    const baseClasses = "bg-white rounded-lg p-4";
+    const baseClasses = "bg-white rounded-lg";
     const typeClasses: Record<string, string> = {
       default: "w-full max-w-lg",
       success: "w-full max-w-lg",
       error: "w-full max-w-lg",
       warning: "w-full max-w-lg",
       info: "w-full max-w-lg",
+      spotify: "w-full max-w-md",
     };
-    const popupContent = (
+    const popupComponent = (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-blue/50 backdrop-blur-sm"
         role="dialog"
         aria-modal="true"
         aria-labelledby="popup-title"
       >
         <div className={`${baseClasses} ${typeClasses[type]} ${className || ""}`} onClick={(e) => e.stopPropagation()}>
           <PopupTitle title={title} onClose={onClose ?? (() => {})} isDismissable={isDismissable} icon={icon} />
-          <div className={`pt-4 ${contentClassName || ""}`}>{children}</div>
+          <div className={`popup-content pt-4 ${contentClassName || ""}`}>{children}</div>
         </div>
       </div>
     );
-    return createPortal(popupContent, document.body);
+    return createPortal(popupComponent, document.body);
   }
 }

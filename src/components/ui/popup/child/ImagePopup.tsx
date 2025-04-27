@@ -5,7 +5,7 @@ import { BasePopup, BasePopupProps } from "../BasePopup";
 import { Image as ImageIcon } from "lucide-react";
 
 // Only allow imageUrl and alt as custom props
-type ImagePopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable" | "contentClassName"> & {
+type ImagePopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   imageUrl: string;
   alt?: string;
 };

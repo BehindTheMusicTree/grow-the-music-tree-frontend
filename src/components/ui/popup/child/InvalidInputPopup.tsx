@@ -4,10 +4,7 @@ import { MdError } from "react-icons/md";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 
 // Only allow details as a custom prop
-type InvalidInputPopupProps = Omit<
-  BasePopupProps,
-  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
-> & {
+type InvalidInputPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   details: {
     message: string;
     fieldErrors?: Record<string, Array<{ message: string; code: string }>>;

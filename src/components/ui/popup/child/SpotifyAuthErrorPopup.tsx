@@ -6,10 +6,7 @@ import { Button } from "@components/ui/Button";
 import { User } from "lucide-react";
 
 // Only allow message, details, and onClose as custom props
-type SpotifyAuthErrorPopupProps = Omit<
-  BasePopupProps,
-  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
-> & {
+type SpotifyAuthErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   message: string;
   details?: string;
   onClose: () => void;

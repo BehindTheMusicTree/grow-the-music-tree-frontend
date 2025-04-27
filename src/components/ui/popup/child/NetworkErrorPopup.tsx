@@ -4,10 +4,7 @@ import { ReactNode } from "react";
 import { AlertTriangle } from "lucide-react";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 
-type NetworkErrorPopupProps = Omit<
-  BasePopupProps,
-  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
-> & {
+type NetworkErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   title: string;
   children: ReactNode;
 };

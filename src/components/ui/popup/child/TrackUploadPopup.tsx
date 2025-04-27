@@ -3,10 +3,7 @@
 import { MdError } from "react-icons/md";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 
-type TrackUploadPopupProps = Omit<
-  BasePopupProps,
-  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
-> & {
+type TrackUploadPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   isUploadingTrack?: boolean;
   error?: Error | null;
 };

@@ -4,10 +4,7 @@ import { AlertTriangle, AlertCircle } from "lucide-react";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
-type InternalErrorPopupProps = Omit<
-  BasePopupProps,
-  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
-> & {
+type InternalErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   errorCode: ErrorCode;
 };
 

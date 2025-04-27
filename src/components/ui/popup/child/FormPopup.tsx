@@ -5,7 +5,7 @@ import { BasePopup, BasePopupProps } from "../BasePopup";
 import { ReactNode } from "react";
 
 // Only allow custom props
-type FormPopupProps = Omit<BasePopupProps, "title" | "icon" | "isDismissable" | "contentClassName"> & {
+type FormPopupProps = Omit<BasePopupProps, "title" | "icon" | "isDismissable"> & {
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   submitText?: string;

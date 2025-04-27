@@ -5,10 +5,7 @@ import { Button } from "@components/ui/Button";
 import { Trash2 } from "lucide-react";
 
 // Only allow genre and onConfirm as custom props
-type GenreDeletionPopupProps = Omit<
-  BasePopupProps,
-  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
-> & {
+type GenreDeletionPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   genre: { name: string };
   onConfirm: (genre: { name: string }) => void;
 };
