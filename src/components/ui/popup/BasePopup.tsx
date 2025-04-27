@@ -37,7 +37,7 @@ export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> ex
       >
         <div className={`${baseClasses} ${typeClasses[type]} ${className || ""}`} onClick={(e) => e.stopPropagation()}>
           <PopupTitle title={title} onClose={onClose ?? (() => {})} isDismissable={isDismissable} icon={icon} />
-          <div className={`popup-content py-4 -m-4 mb-4 rounded-b-lg ${type === "spotify" ? "bg-green-500" : ""}`}>
+          <div className={`popup-content p-4 -m-4 mb-4 rounded-b-lg ${type === "spotify" ? "bg-green-500" : ""}`}>
             {children}
           </div>
         </div>
