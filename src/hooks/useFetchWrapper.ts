@@ -10,9 +10,7 @@ export const useFetchWrapper = () => {
   const { setConnectivityError } = useConnectivityError();
 
   const handleError = (error: Error) => {
-    console.log("useFetchWrapper handleError", error);
     if (error instanceof ConnectivityError) {
-      console.log("useFetchWrapper setConnectivityError", error);
       setConnectivityError(error);
     }
   };
