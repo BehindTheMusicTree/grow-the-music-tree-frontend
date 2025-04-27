@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
-import { PaginatedResponse, PaginatedResponseSchema } from "@app-types/api/pagination";
+import { PaginatedResponseSchema, PaginatedResponse } from "@schemas/PaginatedResponse";
 import { SpotifyLibTrackDetailedSchema, SpotifyLibTrackDetailed } from "@schemas/domain/spotify-lib-track";
 
 export function useListSpotifyLibTracks(page = 1, pageSize = 20) {
