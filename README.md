@@ -28,7 +28,7 @@ Create a `.env.development.api-{local|remote}` file in the root of the project w
 NODE_ENV=development
 
 NEXT_PUBLIC_BASE_URL_WITHOUT_PORT={base-url-without-port}
-NEXT_PUBLIC_API_BASE_URL={api-base-url}
+NEXT_PUBLIC_BACKEND_BASE_URL={api-base-url}
 NEXT_PUBLIC_CONTACT_EMAIL=garcia.andreas.1991@gmail.com
 NEXT_PUBLIC_SENTRY_IS_ACTIVE=false
 

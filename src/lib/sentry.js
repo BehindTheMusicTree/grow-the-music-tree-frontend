@@ -10,7 +10,7 @@ export function initSentry() {
       // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
       tracePropagationTargets: [
         "localhost",
-        new RegExp(`^${process.env.NEXT_PUBLIC_API_BASE_URL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+        new RegExp(`^${process.env.NEXT_PUBLIC_BACKEND_BASE_URL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
       ],
       // Session Replay
       replaysSessionSampleRate: 1.0, // Set sample at a lower rate in production (e.g. 0.1 for 10% of sessions)

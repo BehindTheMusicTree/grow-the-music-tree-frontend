@@ -25,7 +25,7 @@ export function getSpotifyAuthUrl(): string {
 }
 
 export async function authenticateWithSpotifyCode(code: string): Promise<Response> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}auth/spotify/`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}auth/spotify/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

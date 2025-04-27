@@ -24,7 +24,7 @@ export function createAppErrorFromHttpUrlAndErrorMessage(url: string, error: Err
 }
 
 export function createAppErrorFromUrlAndStatus(url: string, status: number): AppError {
-  const isBackendError = url.includes(process.env.NEXT_PUBLIC_API_BASE_URL || "");
+  const isBackendError = url.includes(process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "");
   if (status === 400) {
     if (isBackendError) {
       return createAppErrorFromErrorCode(ErrorCode.BACKEND_BAD_REQUEST);
@@ -72,7 +72,7 @@ export function createAppErrorFromUrlAndStatus(url: string, status: number): App
 }
 
 export function createNetworkOrBackendError(error: unknown, url: string): AppError {
-  const isBackendError = url.includes(process.env.NEXT_PUBLIC_API_BASE_URL || "");
+  const isBackendError = url.includes(process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "");
 
   if (!navigator.onLine) {
     return createAppErrorFromErrorCode(ErrorCode.NETWORK_OFFLINE);

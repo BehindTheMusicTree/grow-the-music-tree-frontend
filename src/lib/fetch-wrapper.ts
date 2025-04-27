@@ -28,7 +28,6 @@ export const fetchWrapper = async <T>(
     },
   };
 
-  console.log("rawfetch", requiresAuth, accessToken);
   if (requiresAuth && !accessToken) {
     handleMissingRequiredSession?.();
     return null;

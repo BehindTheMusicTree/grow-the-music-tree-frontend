@@ -3,20 +3,25 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
-import { PaginatedResponseSchema } from "@schemas/PaginatedResponse";
-import { SpotifyLibTrackDetailedSchema } from "@schemas/domain/spotify-lib-track";
+import { PaginatedResponseSchema, PaginatedResponse } from "@schemas/PaginatedResponse";
+import { SpotifyLibTrackDetailedSchema, SpotifyLibTrackDetailed } from "@schemas/domain/spotify-lib-track";
 
 export function useListSpotifyLibTracks(pageSize = 20) {
   const { fetch } = useFetchWrapper();
 
   return useInfiniteQuery({
-    queryKey: ["spotifyLibTracks"],
+    queryKey: ["spotifyLibTracks", pageSize],
     queryFn: async ({ pageParam = 1 }) => {
       const response = await fetch(`library/spotify?page=${pageParam}&pageSize=${pageSize}`);
-      return PaginatedResponseSchema(SpotifyLibTrackDetailedSchema).parse(response);
+      console.log("spotify lib tracks response", response);
+      const parsed = PaginatedResponseSchema(SpotifyLibTrackDetailedSchema).parse(response);
+      return {
+        ...parsed,
+        page: pageParam,
+      };
     },
     getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.totalPages) {
+      if (lastPage.next) {
         return lastPage.page + 1;
       }
       return undefined;
@@ -32,9 +37,11 @@ export function useQuickSyncSpotifyLibTracks() {
   return useMutation({
     mutationFn: async () => {
       const response = await fetch("library/spotify/sync/quick/", true, true, { method: "POST" });
+      console.log("quick sync response", response);
       return response;
     },
     onSuccess: () => {
+      console.log("quick sync success, invalidating queries");
       queryClient.invalidateQueries({ queryKey: ["spotifyLibTracks"] });
     },
   });

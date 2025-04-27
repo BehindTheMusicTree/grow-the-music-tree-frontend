@@ -63,7 +63,7 @@ jobs:
             rm -f ${{ env.ENV_FILE }} &&
             echo 'NODE_ENV=test' >> $ENV_FILE &&
             echo 'NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_API_BASE_URL=https://${{ vars.DOMAIN_NAME }}/api/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_BACKEND_BASE_URL=https://${{ vars.DOMAIN_NAME }}/api/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ vars.SENTRY_IS_ACTIVE }}' >> ${{ env.ENV_FILE }}
           "
 
