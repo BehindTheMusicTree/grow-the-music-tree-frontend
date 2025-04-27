@@ -101,7 +101,7 @@ export default function SpotifyLibrary() {
         </button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {spotifyLibTracks.map((spotifyLibTrack) => (
+        {spotifyLibTracks.map((spotifyLibTrack: SpotifyLibTrackSimple) => (
           <div key={spotifyLibTrack.spotifyId} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
             <h2 className="font-semibold">{spotifyLibTrack.name}</h2>
             <p className="text-gray-600 dark:text-gray-400">
