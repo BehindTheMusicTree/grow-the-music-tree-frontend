@@ -7,7 +7,7 @@ import { useSession } from "@contexts/SessionContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
-import { BackendError } from "@app-types/app-errors/app-error";
+import { createAppErrorFromErrorCode } from "@app-types/app-errors/app-error-factory";
 
 export function useSpotifyAuth() {
   const { clearSession, setSession } = useSession();
@@ -34,26 +34,29 @@ export function useSpotifyAuth() {
 
   const authToBackendFromSpotifyCode = useCallback(
     async (code: string) => {
+      const setCreateBackendAuthConnectivityError = () => {
+        return setConnectivityError(createAppErrorFromErrorCode(ErrorCode.BACKEND_AUTH_ERROR));
+      };
       console.log("authToBackendFromSpotifyCode called", { code });
-      type SpotifyAuthResponse = {
+      type BackendSpotifyAuthResponse = {
         accessToken: string;
         refreshToken: string;
         expiresAt: number;
       };
-      const response = await fetch<Response>("auth/spotify/", true, false, {
-        method: "POST",
-        body: JSON.stringify({ code }),
-      });
-      if (!response?.ok) {
-        const error = new BackendError(ErrorCode.BACKEND_AUTH_ERROR);
-        setConnectivityError(error);
-      } else {
-        const data = (await response.json()) as SpotifyAuthResponse;
-        setSession({
-          accessToken: data.accessToken,
-          refreshToken: data.refreshToken,
-          expiresAt: data.expiresAt,
+      try {
+        const backEndSporifyAuthResponse = await fetch<BackendSpotifyAuthResponse>("auth/spotify/", true, false, {
+          method: "POST",
+          body: JSON.stringify({ code }),
         });
+        if (!backEndSporifyAuthResponse) {
+          setCreateBackendAuthConnectivityError();
+        } else {
+          setSession({
+            accessToken: backEndSporifyAuthResponse.accessToken,
+            refreshToken: backEndSporifyAuthResponse.refreshToken,
+            expiresAt: backEndSporifyAuthResponse.expiresAt,
+          });
+        }
 
         const originalUrl = localStorage.getItem("spotifyAuthRedirect");
         if (originalUrl) {
@@ -62,6 +65,9 @@ export function useSpotifyAuth() {
         } else {
           // router.push("/");
         }
+      } catch (e) {
+        console.log("authToBackendFromSpotifyCode error", e);
+        setCreateBackendAuthConnectivityError();
       }
     },
     [fetch, setSession, setConnectivityError]
