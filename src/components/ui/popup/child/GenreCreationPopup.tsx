@@ -7,6 +7,7 @@ import { GenreCreationValues } from "@schemas/domain/genre/form";
 type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   onSubmit: (values: GenreCreationValues) => void;
   onClose?: () => void;
+  formErrors?: { field: string; message: string }[];
 };
 
 // @ts-expect-error: ommitted props are set internally by the popup
@@ -25,7 +26,7 @@ export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProp
   };
 
   render() {
-    const { onClose, ...rest } = this.props;
+    const { onClose, formErrors, ...rest } = this.props;
     return this.renderBase({
       ...rest,
       title: "Create Genre",
@@ -46,7 +47,15 @@ export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProp
               </div>
             </div>
           </div>
-
+          {formErrors && formErrors.length > 0 && (
+            <div className="flex justify-end gap-3">
+              {formErrors.map((error) => (
+                <p key={error.field} className="text-red-500">
+                  {error.message}
+                </p>
+              ))}
+            </div>
+          )}
           <div className="flex justify-end gap-3">
             <Button onClick={onClose} variant="secondary">
               Cancel

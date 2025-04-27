@@ -1,9 +1,13 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ZodError } from "zod";
+
 import { useFetchWrapper } from "./useFetchWrapper";
 import { PaginatedResponseSchema } from "@schemas/PaginatedResponse";
 import { GenreDetailedSchema, GenreDetailed, GenreSimpleSchema } from "@schemas/domain/genre/response";
 import { GenreCreationValues, GenreUpdateValues } from "@schemas/domain/genre/form";
 import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
+import { GenreCreationSchema, GenreUpdateSchema } from "@schemas/domain/genre/form";
 
 export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50) {
   const { fetch } = useFetchWrapper();
@@ -41,21 +45,41 @@ export function useCreateGenre() {
   const queryClient = useQueryClient();
   const { invalidateGenrePlaylists } = useListGenrePlaylists();
   const { fetch } = useFetchWrapper();
+  const [formErrors, setFormErrors] = useState<{ field: string; message: string }[]>([]);
 
-  return useMutation<GenreDetailed, Error, GenreCreationValues>({
-    mutationFn: async (data: GenreCreationValues) => {
-      const payload = mapGenreFormToPayload(data);
-      const response = await fetch("genre/", true, true, {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
-      return GenreDetailedSchema.parse(response);
+  const mutate = useMutation<GenreDetailed, Error, GenreCreationValues>({
+    mutationFn: async (data: unknown) => {
+      try {
+        const validatedData = GenreCreationSchema.parse(data);
+        const payload = mapGenreFormToPayload(validatedData);
+        const response = await fetch("genre/", true, true, {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        return GenreDetailedSchema.parse(response);
+      } catch (error) {
+        console.log("catch error", error);
+        if (error instanceof ZodError) {
+          const fieldErrors = error.errors.map((error) => ({
+            field: error.path.join("."),
+            message: error.message,
+          }));
+          setFormErrors(fieldErrors);
+        }
+        return null;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["genres"] });
       invalidateGenrePlaylists();
     },
+    onError: (error) => {
+      console.error(error);
+      setFormErrors([{ field: "genre", message: "An error occurred while creating the genre" }]);
+    },
   });
+
+  return { ...mutate, formErrors };
 }
 
 export function useUpdateGenre() {

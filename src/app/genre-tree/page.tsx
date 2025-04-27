@@ -11,7 +11,7 @@ import { GenreCreationValues } from "@schemas/domain/genre/form";
 
 export default function GenreTree() {
   const { data: genrePlaylists, isLoading } = useListGenrePlaylists();
-  const { mutate: createGenre } = useCreateGenre();
+  const { mutate: createGenre, isPending: isCreatingGenre, formErrors } = useCreateGenre();
   const { showPopup } = usePopup();
 
   return (
