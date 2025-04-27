@@ -37,10 +37,7 @@ export function createAppErrorFromUrlAndStatus(url: string, status: number, json
   const isBackendError = url.includes(process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "");
   if (status === 400) {
     if (isBackendError) {
-      console.log("backend invalid input");
-      const error = createAppErrorFromErrorCode(ErrorCode.BACKEND_INVALID_INPUT, json);
-      console.log("backend", error);
-      return error;
+      return createAppErrorFromErrorCode(ErrorCode.BACKEND_INVALID_INPUT, json);
     } else {
       return createAppErrorFromErrorCode(ErrorCode.SERVICE_BAD_REQUEST);
     }
