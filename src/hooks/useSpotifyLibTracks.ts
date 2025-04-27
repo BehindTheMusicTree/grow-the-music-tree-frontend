@@ -1,21 +1,27 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
-import { PaginatedResponseSchema } from "@schemas/PaginatedResponse";
-import { SpotifyLibTrackDetailedSchema } from "@schemas/domain/spotify-lib-track";
+import { PaginatedResponseSchema, PaginatedResponse } from "@schemas/PaginatedResponse";
+import { SpotifyLibTrackDetailedSchema, SpotifyLibTrackDetailed } from "@schemas/domain/spotify-lib-track";
 
-export function useListSpotifyLibTracks(page = 1, pageSize = 20) {
+export function useListSpotifyLibTracks(pageSize = 20) {
   const { fetch } = useFetchWrapper();
 
-  return useQuery({
-    queryKey: ["spotifyLibTracks", page, pageSize],
-    queryFn: async () => {
-      const response = await fetch(`library/spotify?page=${page}&pageSize=${pageSize}`);
-      console.log("spotifyLibTracks response", response);
+  return useInfiniteQuery({
+    queryKey: ["spotifyLibTracks"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await fetch(`library/spotify?page=${pageParam}&pageSize=${pageSize}`);
       return PaginatedResponseSchema(SpotifyLibTrackDetailedSchema).parse(response);
     },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.totalPages) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
   });
 }
 
