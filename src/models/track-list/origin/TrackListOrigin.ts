@@ -1,5 +1,5 @@
-import { UploadedTrackDetailed } from "@schemas/uploaded-track/response";
-import { PlaylistDetailed } from "@schemas/playlist";
+import { UploadedTrackDetailed } from "@schemas/domain/uploaded-track/response";
+import { PlaylistDetailed } from "@schemas/domain/playlist";
 import { TrackListOriginType } from "./TrackListOriginType";
 
 export default class TrackListOrigin {

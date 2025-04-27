@@ -13,10 +13,10 @@ import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssigned
 import { PlayStates } from "@models/PlayStates";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 
-import { GenrePlaylistSimple } from "@schemas/genre-playlist";
+import { GenrePlaylistSimple } from "@schemas/domain/genre-playlist";
 import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
-import { UploadedTrackCreationValues } from "@schemas/uploaded-track/form";
-import { GenreUpdateValues } from "@schemas/genre/form";
+import { UploadedTrackCreationValues } from "@schemas/domain/uploaded-track/form";
+import { GenreUpdateValues } from "@schemas/domain/genre/form";
 import InvalidInputPopup from "@components/ui/popup/child/InvalidInputPopup";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper";

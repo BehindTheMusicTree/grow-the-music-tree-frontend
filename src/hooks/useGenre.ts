@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFetchWrapper } from "./useFetchWrapper";
 import { PaginatedResponse, PaginatedResponseSchema } from "@app-types/api/pagination";
-import { GenreDetailedSchema, GenreDetailed, GenreSimpleSchema, GenreSimple } from "@schemas/genre/response";
-import { GenreCreationValues, GenreUpdateValues } from "@schemas/genre/form";
+import { GenreDetailedSchema, GenreDetailed, GenreSimpleSchema, GenreSimple } from "@schemas/domain/genre/response";
+import { GenreCreationValues, GenreUpdateValues } from "@schemas/domain/genre/form";
 import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
 
 export function useListGenres(page = 1, pageSize = 50) {

@@ -7,7 +7,7 @@ import {
   GenrePlaylistDetailed,
   GenrePlaylistSimpleSchema,
   GenrePlaylistSimple,
-} from "@schemas/genre-playlist";
+} from "@schemas/domain/genre-playlist";
 import { PaginatedResponse, PaginatedResponseSchema } from "@app-types/api/pagination";
 
 export const useListGenrePlaylists = (page = 1, pageSize = 50) => {

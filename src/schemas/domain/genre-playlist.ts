@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { UuidResourceSchema } from "@schemas/uuid-resource";
-import { UploadedTrackPlaylistRelWithoutPlaylistSchema } from "@schemas/uploaded-track-playlist-rel";
-import { GenreMinimumSchema } from "@schemas/genre/response";
+import { UuidResourceSchema } from "@schemas/domain/uuid-resource";
+import { UploadedTrackPlaylistRelWithoutPlaylistSchema } from "@schemas/domain/uploaded-track-playlist-rel";
+import { GenreMinimumSchema } from "@schemas/domain/genre/response";
 
 const baseSchema = UuidResourceSchema.extend({
   name: z.string(),
