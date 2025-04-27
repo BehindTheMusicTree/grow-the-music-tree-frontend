@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GenreMinimumSchema } from "./response";
+import { GenreMinimumSchema } from "@schemas/domain/genre/response/minimum";
 
 export const GenreLineageRelWithoutDescendantsSchema = z.object({
   ascendants: z.array(GenreMinimumSchema),

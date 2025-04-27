@@ -3,11 +3,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ZodError } from "zod";
 
 import { useFetchWrapper } from "./useFetchWrapper";
-import { PaginatedResponseSchema } from "@schemas/PaginatedResponse";
-import { GenreDetailedSchema, GenreDetailed, GenreSimpleSchema } from "@schemas/domain/genre/response";
-import { GenreCreationValues, GenreUpdateValues } from "@schemas/domain/genre/form";
 import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
-import { GenreCreationSchema, GenreUpdateSchema } from "@schemas/domain/genre/form";
+import { PaginatedResponseSchema } from "@schemas/PaginatedResponse";
+import { GenreDetailedSchema, GenreDetailed } from "@schemas/domain/genre/response/detailed";
+import { GenreSimpleSchema } from "@schemas/domain/genre/response/simple";
+import { GenreCreationValues } from "@schemas/domain/genre/forms/creation";
+import { GenreUpdateValues } from "@schemas/domain/genre/forms/update";
 
 export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50) {
   const { fetch } = useFetchWrapper();
