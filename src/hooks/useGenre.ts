@@ -45,7 +45,7 @@ export function useCreateGenre() {
   return useMutation<GenreDetailed, Error, GenreCreationValues>({
     mutationFn: async (data: GenreCreationValues) => {
       const payload = mapGenreFormToPayload(data);
-      const response = await fetch("genre/", true, {
+      const response = await fetch("genre/", true, true, {
         method: "POST",
         body: JSON.stringify(payload),
       });
@@ -66,7 +66,7 @@ export function useUpdateGenre() {
   const mutate = useMutation<GenreDetailed, Error, { uuid: string; data: GenreUpdateValues }>({
     mutationFn: async ({ uuid, data }) => {
       const payload = mapGenreFormToPayload(data);
-      const response = await fetch(`genre/${uuid}`, true, {
+      const response = await fetch(`genre/${uuid}`, true, true, {
         method: "PUT",
         body: JSON.stringify(payload),
       });

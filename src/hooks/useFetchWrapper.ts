@@ -20,9 +20,9 @@ export const useFetchWrapper = () => {
   const fetch = <T>(
     backendEndpointOrUrl: string,
     fromBackend: boolean = true,
+    requiresAuth: boolean = true,
     options: RequestInit = {},
-    queryParams?: Record<string, string | number | boolean>,
-    requiresAuth: boolean = true
+    queryParams?: Record<string, string | number | boolean>
   ) => {
     if (requiresAuth && !session?.accessToken) {
       setConnectivityError(createAppErrorFromErrorCode(ErrorCode.SESSION_REQUIRED));

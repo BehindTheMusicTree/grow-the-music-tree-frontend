@@ -8,7 +8,7 @@ import { ErrorCode } from "@lib/connectivity-errors/codes";
 
 export default function SpotifyCallback() {
   const searchParams = useSearchParams();
-  const { handleCallback } = useSpotifyAuth();
+  const { authToBackendFromSpotifyCode } = useSpotifyAuth();
   const processingRef = useRef(false);
   const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
 
@@ -21,7 +21,7 @@ export default function SpotifyCallback() {
     processingRef.current = true;
 
     try {
-      await handleCallback(code);
+      await authToBackendFromSpotifyCode(code);
     } catch (error) {
       console.error("Authentication error:", error);
       setConnectivityError({
@@ -32,7 +32,7 @@ export default function SpotifyCallback() {
     } finally {
       processingRef.current = false;
     }
-  }, [searchParams, handleCallback, setConnectivityError, ConnectivityErrorType]);
+  }, [searchParams, authToBackendFromSpotifyCode, setConnectivityError, ConnectivityErrorType]);
 
   useEffect(() => {
     // Run authentication process once on mount
