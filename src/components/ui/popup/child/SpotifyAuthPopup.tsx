@@ -21,7 +21,6 @@ export default class SpotifyAuthPopup extends BasePopup<SpotifyAuthPopupProps> {
       isDismissable: false,
       icon: User,
       type: "spotify",
-      contentClassName: "bg-green-500 p-6 rounded-b-lg",
       children: (
         <div className="flex flex-col items-center space-y-7">
           <div className="text-center px-2">

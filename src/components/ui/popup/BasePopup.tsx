@@ -18,16 +18,7 @@ export interface BasePopupProps {
 
 export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> extends Component<P, S> {
   renderBase(props: BasePopupProps) {
-    const {
-      title,
-      children,
-      onClose,
-      type = "default",
-      icon,
-      isDismissable = true,
-      className,
-      contentClassName,
-    } = props;
+    const { title, children, onClose, type = "default", icon, isDismissable = true, className } = props;
     const baseClasses = "bg-white rounded-lg";
     const typeClasses: Record<string, string> = {
       default: "w-full max-w-lg",
@@ -39,14 +30,16 @@ export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> ex
     };
     const popupComponent = (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-blue/50 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
         role="dialog"
         aria-modal="true"
         aria-labelledby="popup-title"
       >
         <div className={`${baseClasses} ${typeClasses[type]} ${className || ""}`} onClick={(e) => e.stopPropagation()}>
           <PopupTitle title={title} onClose={onClose ?? (() => {})} isDismissable={isDismissable} icon={icon} />
-          <div className={`popup-content pt-4 ${contentClassName || ""}`}>{children}</div>
+          <div className={`popup-content py-4 -m-4 mb-4 rounded-b-lg ${type === "spotify" ? "bg-green-500" : ""}`}>
+            {children}
+          </div>
         </div>
       </div>
     );
