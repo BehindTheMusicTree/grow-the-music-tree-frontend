@@ -10,5 +10,5 @@ export const GenreUpdateSchema = z.object({
   parentUuid: z.string().optional(),
 });
 
-export type GenreCreateValues = z.infer<typeof GenreCreateSchema>;
+export type GenreCreationValues = z.infer<typeof GenreCreateSchema>;
 export type GenreUpdateValues = z.infer<typeof GenreUpdateSchema>;
