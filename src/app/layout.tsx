@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, ReactNode } from "react";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+
 import { initSentry } from "@lib/sentry";
 import "./globals.css";
-import { Inter } from "next/font/google";
 import Providers from "@app/providers";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { PopupProvider } from "@contexts/PopupContext";
@@ -11,6 +13,18 @@ import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
+
+import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
+
+import Banner from "@components/features/banner/Banner";
+import Menu from "@components/features/menu/Menu";
+import Player from "@components/features/player/Player";
+import TrackListSidebar from "@components/features/track-list-sidebar/TrackListSidebar";
+
+import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
+import SpotifyAuthPopup from "@components/ui/popup/child/SpotifyAuthPopup";
+
+import { BANNER_HEIGHT, PLAYER_HEIGHT } from "@constants/layout";
 import {
   ConnectivityError,
   NetworkError,
@@ -20,18 +34,15 @@ import {
   ClientError,
   ServiceError,
 } from "@app-types/app-errors/app-error";
-import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
-import Banner from "@components/features/banner/Banner";
-import Menu from "@components/features/menu/Menu";
-import Player from "@components/features/player/Player";
-import TrackListSidebar from "@components/features/track-list-sidebar/TrackListSidebar";
-import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
-import SpotifyAuthPopup from "@components/ui/popup/child/SpotifyAuthPopup";
-import { BANNER_HEIGHT, PLAYER_HEIGHT } from "@constants/layout";
 initSentry();
 
 const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Music Tree",
+  description: "Your ultimate music guide",
+};
 
 function AppContent({ children }: { children: ReactNode }) {
   const { playerUploadedTrackObject } = usePlayer();
@@ -103,9 +114,9 @@ function AppContent({ children }: { children: ReactNode }) {
   );
 }
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <title>Music Tree</title>
         <meta
