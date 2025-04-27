@@ -9,7 +9,8 @@ import React from "react";
 
 type SpotifyAuthPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable">;
 
-class SpotifyAuthPopupClass extends BasePopup<SpotifyAuthPopupProps> {
+// @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
+class SpotifyAuthPopup extends BasePopup<SpotifyAuthPopupProps> {
   render() {
     // handleSpotifyAuth will be passed as a prop
     const { handleSpotifyAuth, ...rest } = this.props as any;
@@ -42,5 +43,5 @@ class SpotifyAuthPopupClass extends BasePopup<SpotifyAuthPopupProps> {
 
 export default function SpotifyAuthPopup(props: SpotifyAuthPopupProps) {
   const { handleSpotifyAuth } = useSpotifyAuth();
-  return <SpotifyAuthPopupClass {...props} handleSpotifyAuth={handleSpotifyAuth} />;
+  return <SpotifyAuthPopup {...props} handleSpotifyAuth={handleSpotifyAuth} />;
 }
