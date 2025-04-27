@@ -13,7 +13,7 @@ interface PopupTitleProps {
 
 export function PopupTitle({ title, onClose, isDismissable, icon: Icon }: PopupTitleProps) {
   return (
-    <div className="popup-title flex items-center justify-between bg-black p-4 -m-4 mb-4 rounded-t-lg">
+    <div className="popup-title flex items-center justify-between bg-black p-4 mb-4 rounded-t-lg">
       <div className="flex items-center gap-2">
         {Icon && <Icon className="h-5 w-5 text-white" />}
         <h3 id="popup-title" className="text-white font-semibold">
