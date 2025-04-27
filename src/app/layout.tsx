@@ -44,7 +44,6 @@ function AppContent({ children }: { children: ReactNode }) {
   useEffect(() => {}, [playerUploadedTrackObject]);
 
   useEffect(() => {
-    console.log("AppContent useEffect connectivityError", connectivityError);
     if (connectivityError === null) {
       if (currentConnectivityErrorRef.current !== null) {
         currentConnectivityErrorRef.current = null;
@@ -75,7 +74,7 @@ function AppContent({ children }: { children: ReactNode }) {
 
       currentConnectivityErrorRef.current = error.constructor as typeof ConnectivityError;
     }
-  }, [connectivityError, showPopup, hidePopup, clearConnectivityError]);
+  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, handleSpotifyOAuth]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {
