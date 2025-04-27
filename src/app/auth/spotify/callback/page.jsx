@@ -2,17 +2,20 @@
 
 import { useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
+
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
+import { createAppErrorFromErrorCode } from "@app-types/app-errors/app-error-factory";
 
-export default function SpotifyCallback() {
+export default function SpotifyOAuthCallback() {
   const searchParams = useSearchParams();
   const { authToBackendFromSpotifyCode } = useSpotifyAuth();
   const processingRef = useRef(false);
-  const { setConnectivityError, ConnectivityErrorType } = useConnectivityError();
+  const { setConnectivityError } = useConnectivityError();
 
-  const handleAuth = useCallback(async () => {
+  const handleOAuthCallback = useCallback(async () => {
+    console.log("handleOAuthCallback called");
     const code = searchParams.get("code");
     if (!code || processingRef.current) {
       return;
@@ -24,20 +27,16 @@ export default function SpotifyCallback() {
       await authToBackendFromSpotifyCode(code);
     } catch (error) {
       console.error("Authentication error:", error);
-      setConnectivityError({
-        type: ConnectivityErrorType.INTERNAL,
-        message: ErrorCode.getMessage(ErrorCode.INTERNAL),
-        debugCode: ErrorCode.INTERNAL,
-      });
+      setConnectivityError(createAppErrorFromErrorCode(ErrorCode.BACKEND_AUTH_ERROR));
     } finally {
       processingRef.current = false;
     }
-  }, [searchParams, authToBackendFromSpotifyCode, setConnectivityError, ConnectivityErrorType]);
+  }, [searchParams, authToBackendFromSpotifyCode, setConnectivityError]);
 
   useEffect(() => {
     // Run authentication process once on mount
-    handleAuth();
-  }, [handleAuth]);
+    handleOAuthCallback();
+  }, [handleOAuthCallback]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">
