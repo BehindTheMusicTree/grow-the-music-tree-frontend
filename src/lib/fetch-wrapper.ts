@@ -42,7 +42,6 @@ export const fetchWrapper = async <T>(
 
     return res.json();
   } catch (caughtError: unknown) {
-    console.log("fetchWrapper caughtError", caughtError);
     const error = createNetworkOrBackendError(caughtError, finalUrl);
 
     if (handleError) {
