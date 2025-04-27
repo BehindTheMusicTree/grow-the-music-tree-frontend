@@ -3,8 +3,8 @@ import { z } from "zod";
 export const PaginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
   z.object({
     overallTotal: z.number(),
-    next: z.string().url().optional(),
-    previous: z.string().url().optional(),
+    next: z.string().url().nullable(),
+    previous: z.string().url().nullable(),
     results: z.array(itemSchema),
     page: z.number(),
     pageSize: z.number(),
