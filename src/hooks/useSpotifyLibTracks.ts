@@ -9,7 +9,7 @@ import { SpotifyLibTrackDetailedSchema, SpotifyLibTrackDetailed } from "@schemas
 export function useListSpotifyLibTracks(page = 1, pageSize = 20) {
   const { fetch } = useFetchWrapper();
 
-  return useQuery<PaginatedResponse<SpotifyLibTrackDetailed>>({
+  return useQuery({
     queryKey: ["spotifyLibTracks", page, pageSize],
     queryFn: async () => {
       const response = await fetch(`library/spotify?page=${page}&pageSize=${pageSize}`);
