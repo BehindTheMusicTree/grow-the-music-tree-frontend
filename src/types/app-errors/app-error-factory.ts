@@ -1,7 +1,15 @@
 import { ErrorCode } from "./app-error-codes";
-import { AppError, NetworkError, BackendError, AuthRequired, ClientError, ServiceError } from "./app-error";
+import {
+  AppError,
+  NetworkError,
+  BackendError,
+  AuthRequired,
+  ClientError,
+  ServiceError,
+  InvalidInputError,
+} from "./app-error";
 
-export function createAppErrorFromErrorCode(code: ErrorCode): AppError {
+export function createAppErrorFromErrorCode(code: ErrorCode, json?: object): AppError {
   if ([ErrorCode.BACKEND_UNAUTHORIZED, ErrorCode.SESSION_EXPIRED, ErrorCode.SESSION_REQUIRED].includes(code)) {
     return new AuthRequired(code);
   } else if (code.startsWith("NET")) {
@@ -12,6 +20,8 @@ export function createAppErrorFromErrorCode(code: ErrorCode): AppError {
     return new ClientError(code);
   } else if (code.startsWith("SER")) {
     return new ServiceError(code);
+  } else if (code.startsWith("INP")) {
+    return new InvalidInputError(code, json || {});
   }
   return new AppError(code);
 }
@@ -23,11 +33,14 @@ export function createAppErrorFromHttpUrlAndErrorMessage(url: string, error: Err
   return null;
 }
 
-export function createAppErrorFromUrlAndStatus(url: string, status: number): AppError {
+export function createAppErrorFromUrlAndStatus(url: string, status: number, json?: object): AppError {
   const isBackendError = url.includes(process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "");
   if (status === 400) {
     if (isBackendError) {
-      return createAppErrorFromErrorCode(ErrorCode.BACKEND_BAD_REQUEST);
+      console.log("backend invalid input");
+      const error = createAppErrorFromErrorCode(ErrorCode.BACKEND_INVALID_INPUT, json);
+      console.log("backend", error);
+      return error;
     } else {
       return createAppErrorFromErrorCode(ErrorCode.SERVICE_BAD_REQUEST);
     }

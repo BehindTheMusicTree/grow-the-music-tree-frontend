@@ -15,6 +15,13 @@ export class ClientError extends AppError {
   }
 }
 
+export class InvalidInputError extends ClientError {
+  constructor(code: ErrorCode, public readonly json: object) {
+    super(code);
+    this.name = "InvalidInputError";
+  }
+}
+
 export class ConnectivityError extends AppError {
   constructor(code: ErrorCode) {
     super(code);
