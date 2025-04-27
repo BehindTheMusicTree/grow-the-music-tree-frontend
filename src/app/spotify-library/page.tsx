@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 import { FaSpinner, FaSync } from "react-icons/fa";
 import { MdSyncProblem } from "react-icons/md";
@@ -10,10 +10,11 @@ import {
   useQuickSyncSpotifyLibTracks,
   useFullSyncSpotifyLibTracks,
 } from "@hooks/useSpotifyLibTracks";
+import type { SpotifyLibTrackSimple } from "@schemas/domain/spotify/spotify-lib-track";
 
 export default function SpotifyLibrary() {
   const {
-    data,
+    data: spotifyLibTracksResponse,
     isPending: isListingPending,
     fetchNextPage,
     hasNextPage,
@@ -22,16 +23,18 @@ export default function SpotifyLibrary() {
   const { mutate: quickSyncSpotifyLibTracks, isPending: isQuickSyncPending } = useQuickSyncSpotifyLibTracks();
   const { mutate: fullSyncSpotifyLibTracks, isPending: isFullSyncPending } = useFullSyncSpotifyLibTracks();
 
-  console.log("Infinite query data:", data);
-  console.log("Pages:", data?.pages);
-  console.log("First page results:", data?.pages?.[0]?.results);
+  const spotifyLibTracks = useMemo(
+    () => spotifyLibTracksResponse?.pages?.flatMap((page) => page.results) || [],
+    [spotifyLibTracksResponse?.pages]
+  );
 
-  const spotifyLibTracks = data?.pages?.flatMap((page) => page.results) || [];
-  console.log("Flattened tracks:", spotifyLibTracks);
+  console.log("Infinite query data:", spotifyLibTracksResponse);
+  console.log("Pages:", spotifyLibTracksResponse?.pages);
+  console.log("First page results:", spotifyLibTracksResponse?.pages?.[0]?.results);
 
-  const currentPage = data?.pages?.[data.pages.length - 1]?.page || 1;
-  const totalPages = data?.pages?.[0]?.totalPages || 1;
-  const total = data?.pages?.[0]?.overallTotal || 0;
+  const currentPage = spotifyLibTracksResponse?.pages?.[spotifyLibTracksResponse.pages.length - 1]?.page || 1;
+  const totalPages = spotifyLibTracksResponse?.pages?.[0]?.totalPages || 1;
+  const total = spotifyLibTracksResponse?.pages?.[0]?.overallTotal || 0;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,6 +48,12 @@ export default function SpotifyLibrary() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    if (!isListingPending) {
+      console.log("SpotifyLibrary data", spotifyLibTracksResponse);
+    }
+  }, [spotifyLibTracksResponse, isListingPending]);
 
   const handleQuickSync = async () => {
     await quickSyncSpotifyLibTracks();
@@ -93,21 +102,13 @@ export default function SpotifyLibrary() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {spotifyLibTracks.map((spotifyLibTrack) => (
-          <div key={spotifyLibTrack.uuid} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            {spotifyLibTrack.album?.images?.[0]?.url && (
-              <Image
-                src={spotifyLibTrack.album.images[0].url}
-                alt={`${spotifyLibTrack.name} album cover`}
-                className="w-full h-32 object-cover mb-2 rounded"
-                width={100}
-                height={100}
-              />
-            )}
+          <div key={spotifyLibTrack.spotifyId} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
             <h2 className="font-semibold">{spotifyLibTrack.name}</h2>
             <p className="text-gray-600 dark:text-gray-400">
-              {spotifyLibTrack.artists.map((artist) => artist.name).join(", ")}
+              {spotifyLibTrack.spotifyArtists.map((artist) => artist.name).join(", ")}
             </p>
-            {spotifyLibTrack.album && <p className="text-gray-500 text-sm">{spotifyLibTrack.album.name}</p>}
+            <p className="text-gray-500 text-sm">{spotifyLibTrack.album}</p>
+            <p className="text-gray-500 text-sm">{spotifyLibTrack.durationStrInHourMinSec}</p>
           </div>
         ))}
       </div>
