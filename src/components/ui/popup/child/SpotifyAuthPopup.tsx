@@ -2,7 +2,6 @@
 
 import { User } from "lucide-react";
 import { BasePopup, BasePopupProps } from "../BasePopup";
-import { handleSpotifyOAuth } from "@hooks/useSpotifyAuth";
 import { Button } from "@components/ui/Button";
 import { FaSpotify } from "react-icons/fa";
 import React from "react";

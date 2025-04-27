@@ -6,6 +6,7 @@ import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
+
 export function useSpotifyAuth() {
   const { clearSession, setSession } = useSession();
   const { setConnectivityError } = useConnectivityError();

@@ -4,8 +4,8 @@ import { useEffect, useRef, ReactNode } from "react";
 import { initSentry } from "@lib/sentry";
 import "./globals.css";
 import { Inter } from "next/font/google";
-
 import Providers from "@app/providers";
+import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { PopupProvider } from "@contexts/PopupContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
@@ -36,9 +36,10 @@ const inter = Inter({ subsets: ["latin"] });
 function AppContent({ children }: { children: ReactNode }) {
   const { playerUploadedTrackObject } = usePlayer();
   const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-  const currentConnectivityErrorRef = useRef<typeof ConnectivityError | null>(null);
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, clearConnectivityError } = useConnectivityError();
+  const { handleSpotifyOAuth } = useSpotifyAuth();
+  const currentConnectivityErrorRef = useRef<typeof ConnectivityError | null>(null);
 
   useEffect(() => {}, [playerUploadedTrackObject]);
 
@@ -57,7 +58,7 @@ function AppContent({ children }: { children: ReactNode }) {
       let popup: ReactNode | null = null;
       const error = connectivityError as ConnectivityError;
       if (error instanceof AuthRequired) {
-        popup = <SpotifyAuthPopup />;
+        popup = <SpotifyAuthPopup handleSpotifyOAuth={handleSpotifyOAuth} />;
       } else if (error instanceof BadRequestError || error instanceof BackendError || error instanceof ServiceError) {
         popup = <InternalErrorPopup errorCode={error.code} />;
       } else if (error instanceof NetworkError) {
