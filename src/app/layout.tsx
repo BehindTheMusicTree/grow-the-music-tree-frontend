@@ -15,8 +15,10 @@ import {
   ConnectivityError,
   NetworkError,
   AuthRequired,
-  ServerError,
+  BackendError,
   BadRequestError,
+  ClientError,
+  ServiceError,
 } from "@app-types/app-errors/app-error";
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
@@ -49,14 +51,14 @@ function AppContent({ children }: { children: ReactNode }) {
       }
     } else if (
       currentConnectivityErrorRef.current == null ||
-      (![NetworkError, ServerError].includes(currentConnectivityErrorRef.current) &&
+      (![NetworkError, BackendError, ClientError, ServiceError].includes(currentConnectivityErrorRef.current) &&
         !(connectivityError instanceof currentConnectivityErrorRef.current))
     ) {
       let popup: ReactNode | null = null;
       const error = connectivityError as ConnectivityError;
       if (error instanceof AuthRequired) {
         popup = <SpotifyAuthPopup />;
-      } else if (error instanceof BadRequestError || error instanceof ServerError) {
+      } else if (error instanceof BadRequestError || error instanceof BackendError || error instanceof ServiceError) {
         popup = <InternalErrorPopup errorCode={error.code} />;
       } else if (error instanceof NetworkError) {
         popup = (

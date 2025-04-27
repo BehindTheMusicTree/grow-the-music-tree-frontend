@@ -1,5 +1,5 @@
 import { ErrorCode } from "./app-error-codes";
-import { AppError, NetworkError, BackendError, AuthRequired, ClientError, ServerError } from "./app-error";
+import { AppError, NetworkError, BackendError, AuthRequired, ClientError, ServiceError } from "./app-error";
 
 export function createAppErrorFromErrorCode(code: ErrorCode): AppError {
   if ([ErrorCode.BACKEND_UNAUTHORIZED, ErrorCode.SESSION_EXPIRED, ErrorCode.SESSION_REQUIRED].includes(code)) {
@@ -11,7 +11,7 @@ export function createAppErrorFromErrorCode(code: ErrorCode): AppError {
   } else if (code.startsWith("CLI")) {
     return new ClientError(code);
   } else if (code.startsWith("SER")) {
-    return new ServerError(code);
+    return new ServiceError(code);
   }
   return new AppError(code);
 }
