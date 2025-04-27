@@ -5,12 +5,15 @@ import { Button } from "@components/ui/Button";
 import { Trash2 } from "lucide-react";
 
 // Only allow genre and onConfirm as custom props
-type GenreDeletionPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
+type GenreDeletionPopupProps = Omit<
+  BasePopupProps,
+  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
+> & {
   genre: { name: string };
   onConfirm: (genre: { name: string }) => void;
 };
 
-// @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
+// @ts-expect-error: ommitted props are set internally by the popup
 export default class GenreDeletionPopup extends BasePopup<GenreDeletionPopupProps> {
   handleConfirm = () => {
     this.props.onConfirm(this.props.genre);

@@ -4,11 +4,14 @@ import { AlertTriangle, AlertCircle } from "lucide-react";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
-type InternalErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
+type InternalErrorPopupProps = Omit<
+  BasePopupProps,
+  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
+> & {
   errorCode: ErrorCode;
 };
 
-// @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
+// @ts-expect-error: ommitted props are set internally by the popup
 export default class InternalErrorPopup extends BasePopup<InternalErrorPopupProps> {
   render() {
     const { errorCode, ...rest } = this.props;

@@ -7,12 +7,15 @@ import { Button } from "@components/ui/Button";
 import { FaSpotify } from "react-icons/fa";
 import React from "react";
 
-type SpotifyAuthPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
+type SpotifyAuthPopupProps = Omit<
+  BasePopupProps,
+  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
+> & {
   handleSpotifyAuth: () => void;
 };
 
-// @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
-class SpotifyAuthPopup extends BasePopup<SpotifyAuthPopupProps> {
+// @ts-expect-error: ommitted props are set internally by the popup
+export default class SpotifyAuthPopup extends BasePopup<SpotifyAuthPopupProps> {
   render() {
     const { handleSpotifyAuth, ...rest } = this.props;
     return this.renderBase({
@@ -20,10 +23,11 @@ class SpotifyAuthPopup extends BasePopup<SpotifyAuthPopupProps> {
       title: "Connect to Spotify",
       isDismissable: false,
       icon: User,
+      contentClassName: "bg-green-500",
       children: (
         <div className="flex flex-col items-center space-y-8">
           <div className="space-y-3 text-center">
-            <p className="text-lg text-white font-medium">
+            <p className=" text-lg text-white font-medium">
               Music Tree requires Spotify authentication to browse your library and explore new horizons
             </p>
           </div>
@@ -40,9 +44,4 @@ class SpotifyAuthPopup extends BasePopup<SpotifyAuthPopupProps> {
       ),
     });
   }
-}
-
-export default function SpotifyAuthPopup(props: SpotifyAuthPopupProps) {
-  const { handleSpotifyAuth } = useSpotifyAuth();
-  return <SpotifyAuthPopup {...props} handleSpotifyAuth={handleSpotifyAuth} />;
 }

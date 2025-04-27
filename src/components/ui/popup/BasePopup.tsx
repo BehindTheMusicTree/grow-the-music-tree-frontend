@@ -13,11 +13,21 @@ export interface BasePopupProps {
   icon?: LucideIcon;
   isDismissable?: boolean;
   className?: string;
+  contentClassName?: string;
 }
 
 export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> extends Component<P, S> {
   renderBase(props: BasePopupProps) {
-    const { title, children, onClose, type = "default", icon, isDismissable = true, className } = props;
+    const {
+      title,
+      children,
+      onClose,
+      type = "default",
+      icon,
+      isDismissable = true,
+      className,
+      contentClassName,
+    } = props;
     const baseClasses = "bg-white rounded-lg p-4";
     const typeClasses: Record<string, string> = {
       default: "w-full max-w-lg",
@@ -35,7 +45,7 @@ export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> ex
       >
         <div className={`${baseClasses} ${typeClasses[type]} ${className || ""}`} onClick={(e) => e.stopPropagation()}>
           <PopupTitle title={title} onClose={onClose ?? (() => {})} isDismissable={isDismissable} icon={icon} />
-          <div className="pt-4">{children}</div>
+          <div className={`pt-4 ${contentClassName || ""}`}>{children}</div>
         </div>
       </div>
     );

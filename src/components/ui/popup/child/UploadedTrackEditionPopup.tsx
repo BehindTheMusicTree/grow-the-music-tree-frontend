@@ -7,7 +7,10 @@ import { BasePopup, BasePopupProps } from "../BasePopup";
 import { UploadedTrackUpdateValues } from "@schemas/uploaded-track/form";
 import { UploadedTrackDetailed } from "@schemas/uploaded-track/response";
 
-type UploadedTrackEditionPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
+type UploadedTrackEditionPopupProps = Omit<
+  BasePopupProps,
+  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
+> & {
   uploadedTrack: UploadedTrackDetailed;
   formValues: UploadedTrackUpdateValues;
   onFormChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -15,7 +18,7 @@ type UploadedTrackEditionPopupProps = Omit<BasePopupProps, "title" | "children" 
   onClose?: () => void;
 };
 
-// @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
+// @ts-expect-error: ommitted props are set internally by the popup
 export default class UploadedTrackEditionPopup extends BasePopup<UploadedTrackEditionPopupProps> {
   render() {
     const { uploadedTrack, formValues, onFormChange, onSubmit, onClose, ...rest } = this.props;

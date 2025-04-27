@@ -3,12 +3,15 @@
 import { MdError } from "react-icons/md";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 
-type TrackUploadPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
+type TrackUploadPopupProps = Omit<
+  BasePopupProps,
+  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
+> & {
   isUploadingTrack?: boolean;
   error?: Error | null;
 };
 
-// @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
+// @ts-expect-error: ommitted props are set internally by the popup
 export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps> {
   render() {
     const { isUploadingTrack, error, ...rest } = this.props;

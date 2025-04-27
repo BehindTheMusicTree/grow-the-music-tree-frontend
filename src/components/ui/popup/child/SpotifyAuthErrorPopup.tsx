@@ -6,13 +6,16 @@ import { Button } from "@components/ui/Button";
 import { User } from "lucide-react";
 
 // Only allow message, details, and onClose as custom props
-type SpotifyAuthErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
+type SpotifyAuthErrorPopupProps = Omit<
+  BasePopupProps,
+  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
+> & {
   message: string;
   details?: string;
   onClose: () => void;
 };
 
-// @ts-expect-error: title and icon are set internally by the popup
+// @ts-expect-error: ommitted props are set internally by the popup
 export default class SpotifyAuthErrorPopup extends BasePopup<SpotifyAuthErrorPopupProps> {
   render() {
     const { message, details, onClose, ...rest } = this.props;

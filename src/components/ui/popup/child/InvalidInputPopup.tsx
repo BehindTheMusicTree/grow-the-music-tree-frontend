@@ -4,14 +4,17 @@ import { MdError } from "react-icons/md";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 
 // Only allow details as a custom prop
-type InvalidInputPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
+type InvalidInputPopupProps = Omit<
+  BasePopupProps,
+  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
+> & {
   details: {
     message: string;
     fieldErrors?: Record<string, Array<{ message: string; code: string }>>;
   };
 };
 
-// @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
+// @ts-expect-error: ommitted props are set internally by the popup
 export default class InvalidInputPopup extends BasePopup<InvalidInputPopupProps> {
   render() {
     const { details, ...rest } = this.props;

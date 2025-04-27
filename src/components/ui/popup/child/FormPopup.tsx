@@ -5,7 +5,7 @@ import { BasePopup, BasePopupProps } from "../BasePopup";
 import { ReactNode } from "react";
 
 // Only allow custom props
-type FormPopupProps = Omit<BasePopupProps, "title" | "icon" | "isDismissable"> & {
+type FormPopupProps = Omit<BasePopupProps, "title" | "icon" | "isDismissable" | "contentClassName"> & {
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   submitText?: string;
@@ -14,7 +14,7 @@ type FormPopupProps = Omit<BasePopupProps, "title" | "icon" | "isDismissable"> &
   children: ReactNode;
 };
 
-// @ts-expect-error: title and icon are set internally by the popup
+// @ts-expect-error: ommitted props are set internally by the popup
 export default class FormPopup extends BasePopup<FormPopupProps> {
   render() {
     const { onSubmit, onCancel, submitText, cancelText, loading, children, ...rest } = this.props;

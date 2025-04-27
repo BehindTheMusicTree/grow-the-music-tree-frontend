@@ -2,14 +2,17 @@
 
 import { Button } from "@components/ui/Button";
 import { BasePopup, BasePopupProps } from "../BasePopup";
-import { GenreCreationValues } from "@schemas/genre/form";
+import { GenreCreateValues } from "@schemas/genre/form";
 
-type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
-  onSubmit: (values: GenreCreationValues) => void;
+type GenreCreationPopupProps = Omit<
+  BasePopupProps,
+  "title" | "children" | "icon" | "isDismissable" | "contentClassName"
+> & {
+  onSubmit: (values: GenreCreateValues) => void;
   onClose?: () => void;
 };
 
-// @ts-expect-error: title, children, icon, isDismissable are set internally by the popup
+// @ts-expect-error: ommitted props are set internally by the popup
 export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProps> {
   state = {
     name: "",
