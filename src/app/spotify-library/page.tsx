@@ -12,6 +12,39 @@ import {
 } from "@hooks/useSpotifyLibTracks";
 import type { SpotifyLibTrackSimple } from "@schemas/domain/spotify/spotify-lib-track";
 
+function formatDuration(durationStr: string): string {
+  // Remove any leading/trailing whitespace
+  const cleanStr = durationStr.trim();
+
+  // Split by colon to get hours, minutes, seconds
+  const parts = cleanStr.split(":");
+
+  // Handle milliseconds if present
+  const lastPart = parts[parts.length - 1];
+  const [seconds, milliseconds] = lastPart.split(".");
+  parts[parts.length - 1] = seconds; // Replace the last part with just seconds
+
+  // If we have hours (3 parts), format as "H:MM:SS"
+  if (parts.length === 3) {
+    const [hours, minutes, secs] = parts;
+    return `${hours}:${minutes.padStart(2, "0")}:${secs.padStart(2, "0")}`;
+  }
+
+  // If we have minutes and seconds (2 parts), format as "M:SS"
+  if (parts.length === 2) {
+    const [minutes, secs] = parts;
+    return `${minutes}:${secs.padStart(2, "0")}`;
+  }
+
+  // If we only have seconds, format as "0:SS"
+  if (parts.length === 1) {
+    return `0:${parts[0].padStart(2, "0")}`;
+  }
+
+  // Fallback to original string if format is unexpected
+  return durationStr;
+}
+
 export default function SpotifyLibrary() {
   const {
     data: spotifyLibTracksResponse,
@@ -150,7 +183,7 @@ export default function SpotifyLibrary() {
                   </td>
                   <td className="px-4 py-4">
                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {spotifyLibTrack.durationStrInHourMinSec}
+                      {formatDuration(spotifyLibTrack.durationStrInHourMinSec)}
                     </div>
                   </td>
                 </tr>
