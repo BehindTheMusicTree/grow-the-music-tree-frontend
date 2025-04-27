@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, ReactNode } from "react";
-import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
 import { initSentry } from "@lib/sentry";
@@ -38,11 +37,6 @@ import {
 initSentry();
 
 const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "Music Tree",
-  description: "Your ultimate music guide",
-};
 
 function AppContent({ children }: { children: ReactNode }) {
   const { playerUploadedTrackObject } = usePlayer();
