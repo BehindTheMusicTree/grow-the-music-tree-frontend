@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import PropTypes from "prop-types";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 
-import { FORM_RATING_NULL_VALUE } from "@constants";
+import { FORM_RATING_NULL_VALUE } from "@constants/rating";
 
 export default function Rating({ rating, handleChange }) {
   const instanceId = uuidv4();
