@@ -1,7 +1,5 @@
 import { createAppErrorFromUrlAndStatus, createNetworkOrBackendError } from "@app-types/app-errors/app-error-factory";
-
-export type RequestInterceptor = (url: string, options: RequestInit) => Promise<[string, RequestInit]>;
-export type ResponseInterceptor = <T>(response: Response) => Promise<T>;
+import { AppError } from "@app-types/app-errors/app-error";
 
 export const fetchWrapper = async <T>(
   url: string,
@@ -43,14 +41,19 @@ export const fetchWrapper = async <T>(
 
     return res.json();
   } catch (caughtError: unknown) {
+    let appError: AppError | null = null;
     console.log("caughtError", caughtError);
-    const error = createNetworkOrBackendError(caughtError, finalUrl);
+    if (caughtError instanceof AppError) {
+      appError = caughtError;
+    } else {
+      appError = createNetworkOrBackendError(caughtError, finalUrl);
+    }
 
-    if (handleError) {
-      handleError(error);
+    if (handleError && appError) {
+      handleError(appError);
       return null;
     } else {
-      throw error;
+      throw appError;
     }
   }
 };

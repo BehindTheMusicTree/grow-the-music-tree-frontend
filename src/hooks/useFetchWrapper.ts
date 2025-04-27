@@ -1,16 +1,19 @@
-import { useSession } from "@contexts/SessionContext";
-import { fetchWrapper as rawFetch } from "@lib/fetch-wrapper";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
-import { ConnectivityError } from "@app-types/app-errors/app-error";
+import { useSession } from "@contexts/SessionContext";
+import { ConnectivityError, AuthRequired } from "@app-types/app-errors/app-error";
+import { fetchWrapper as rawFetch } from "@lib/fetch-wrapper";
 import { createAppErrorFromErrorCode } from "@app-types/app-errors/app-error-factory";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
 export const useFetchWrapper = () => {
-  const { session } = useSession();
   const { setConnectivityError } = useConnectivityError();
+  const { clearSession } = useSession();
 
   const handleError = (error: Error) => {
     if (error instanceof ConnectivityError) {
+      if (error instanceof AuthRequired) {
+        clearSession();
+      }
       setConnectivityError(error);
     }
   };

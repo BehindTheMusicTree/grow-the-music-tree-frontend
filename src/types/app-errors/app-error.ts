@@ -39,14 +39,14 @@ export class NetworkError extends ConnectivityError {
 export class BackendError extends ConnectivityError {
   constructor(code: ErrorCode) {
     super(code);
-    this.name = "ApiError";
+    this.name = "BackendError";
   }
 }
 
 export class AuthRequired extends ConnectivityError {
   constructor(code: ErrorCode) {
     super(code);
-    this.name = "AuthError";
+    this.name = "AuthRequired";
   }
 }
 

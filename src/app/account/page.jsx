@@ -3,11 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
 import { useSession } from "@contexts/SessionContext";
 
 export default function AccountPage() {
-  const { updateSession } = useSession();
+  const { setSession } = useSession();
   const router = useRouter();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -113,7 +112,7 @@ export default function AccountPage() {
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
                 onClick={() => {
                   router.push("/");
-                  updateSession(null);
+                  setSession(null);
                 }}
               >
                 Disconnect Account

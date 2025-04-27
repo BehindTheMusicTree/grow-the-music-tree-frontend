@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback } from "react";
-import { useRouter } from "next/navigation";
 
 import { useSession } from "@contexts/SessionContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
@@ -12,7 +11,6 @@ import { createAppErrorFromErrorCode } from "@app-types/app-errors/app-error-fac
 export function useSpotifyAuth() {
   const { clearSession, setSession } = useSession();
   const { setConnectivityError } = useConnectivityError();
-  const router = useRouter();
   const { fetch } = useFetchWrapper();
 
   const handleSpotifyOAuth = () => {

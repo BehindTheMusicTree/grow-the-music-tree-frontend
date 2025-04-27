@@ -22,11 +22,16 @@ export function ConnectivityErrorProvider({ children }: ConnectivityErrorProvide
     setConnectivityError(null);
   };
 
+  const handleSetConnectivityError = (error: ConnectivityError | null) => {
+    console.log("Connectivity error changed:", error);
+    setConnectivityError(error);
+  };
+
   return (
     <ConnectivityErrorContext.Provider
       value={{
         connectivityError,
-        setConnectivityError,
+        setConnectivityError: handleSetConnectivityError,
         clearConnectivityError,
       }}
     >
