@@ -3,7 +3,6 @@
 import { useEffect, useRef, ReactNode } from "react";
 import { Inter } from "next/font/google";
 
-import { initSentry } from "@lib/sentry";
 import "./globals.css";
 import Providers from "@app/providers";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
@@ -12,6 +11,7 @@ import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
+import { initSentry } from "@lib/sentry";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
