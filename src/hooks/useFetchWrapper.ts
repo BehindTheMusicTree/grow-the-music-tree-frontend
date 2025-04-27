@@ -7,7 +7,7 @@ import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
 export const useFetchWrapper = () => {
   const { setConnectivityError } = useConnectivityError();
-  const { clearSession } = useSession();
+  const { clearSession, session } = useSession();
 
   const handleError = (error: Error) => {
     if (error instanceof ConnectivityError) {
