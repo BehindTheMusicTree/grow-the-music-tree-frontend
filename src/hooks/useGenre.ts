@@ -1,17 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFetchWrapper } from "./useFetchWrapper";
-import { PaginatedResponseSchema, PaginatedResponse } from "@schemas/PaginatedResponse";
-import { GenreDetailedSchema, GenreDetailed, GenreSimpleSchema, GenreSimple } from "@schemas/domain/genre/response";
+import { PaginatedResponseSchema } from "@schemas/PaginatedResponse";
+import { GenreDetailedSchema, GenreDetailed, GenreSimpleSchema } from "@schemas/domain/genre/response";
 import { GenreCreationValues, GenreUpdateValues } from "@schemas/domain/genre/form";
 import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
 
-export function useListGenres(page = 1, pageSize = 50) {
+export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50) {
   const { fetch } = useFetchWrapper();
 
-  return useQuery<PaginatedResponse<GenreSimple>>({
-    queryKey: ["genres", "list", page, pageSize],
+  return useQuery({
+    queryKey: ["genres", "list", page],
     queryFn: async () => {
-      const response = await fetch("genre/", true, {}, { page, pageSize });
+      const response = await fetch("genre/", true, true, {}, { page, pageSize });
       return PaginatedResponseSchema(GenreSimpleSchema).parse(response);
     },
   });

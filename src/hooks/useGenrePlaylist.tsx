@@ -9,12 +9,12 @@ import {
 } from "@schemas/domain/genre-playlist";
 import { PaginatedResponseSchema } from "@schemas/PaginatedResponse";
 
-export const useListGenrePlaylists = (page = 1, pageSize = 50) => {
+export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBLIC_GENRE_PLAYLISTS_PAGE_SIZE || 50) => {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
 
   const query = useQuery({
-    queryKey: ["genrePlaylists", page, pageSize],
+    queryKey: ["genrePlaylists", page],
     queryFn: async () => {
       const response = await fetch("genre-playlists/", true, true, {}, { page, pageSize });
       return PaginatedResponseSchema(GenrePlaylistSimpleSchema).parse(response);

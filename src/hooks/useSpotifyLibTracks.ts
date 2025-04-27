@@ -3,16 +3,16 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
-import { PaginatedResponseSchema, PaginatedResponse } from "@schemas/PaginatedResponse";
-import { SpotifyLibTrackDetailedSchema, SpotifyLibTrackDetailed } from "@schemas/domain/spotify-lib-track";
+import { PaginatedResponseSchema } from "@schemas/PaginatedResponse";
+import { SpotifyLibTrackDetailedSchema } from "@schemas/domain/spotify-lib-track";
 
-export function useListSpotifyLibTracks(pageSize = 20) {
+export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTIFY_LIB_TRACKS_PAGE_SIZE || 50) {
   const { fetch } = useFetchWrapper();
 
   return useInfiniteQuery({
-    queryKey: ["spotifyLibTracks", pageSize],
+    queryKey: ["spotifyLibTracks"],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await fetch(`library/spotify?page=${pageParam}&pageSize=${pageSize}`);
+      const response = await fetch(`library/spotify`, true, true, {}, { page: pageParam, pageSize });
       console.log("spotify lib tracks response", response);
       const parsed = PaginatedResponseSchema(SpotifyLibTrackDetailedSchema).parse(response);
       return {
