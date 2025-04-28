@@ -3,27 +3,18 @@ import { z } from "zod";
 import { UuidResourceSchema } from "@domain/uuid-resource";
 import { UploadedTrackPlaylistRelWithoutPlaylistSchema } from "@domain/uploaded-track-playlist-rel/without-playlist";
 import { CrteriaMinimumSchema } from "@domain/criteria/response/minimum";
+import { CriteriaPlaylistMinimumSchema } from "@domain/playlist/criteria-playlist/minimum";
 
 export const CriteriaPlaylistDetailedSchema = UuidResourceSchema.extend({
-  uuid: z.string(),
   name: z.string(),
   uploadedTrackPlaylistRels: z.array(UploadedTrackPlaylistRelWithoutPlaylistSchema),
+  uploadedTracksCount: z.number(),
   durationInSec: z.number(),
   durationStrInHourMinSec: z.string(),
   uploadedTracksArchivedCount: z.number(),
   criteria: CrteriaMinimumSchema,
-  genre: z.object({
-    uuid: z.string(),
-    name: z.string(),
-  }),
-  parent: z
-    .object({
-      uuid: z.string(),
-      name: z.string(),
-    })
-    .nullable(),
-  root: z.boolean(),
-  uploadedTracksCount: z.number(),
+  parent: CriteriaPlaylistMinimumSchema,
+  root: CriteriaPlaylistMinimumSchema,
   createdOn: z.string(),
   updatedOn: z.string(),
 });

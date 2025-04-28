@@ -1,15 +1,11 @@
 import { z } from "zod";
-import { GenrePlaylistDetailedSchema } from "@domain/genre-playlist/detailed";
+import { CriteriaPlaylistDetailedSchema } from "./detailed";
 
-export const GenrePlaylistSimpleSchema = GenrePlaylistDetailedSchema.pick({
+export const CriteriaPlaylistSimpleSchema = CriteriaPlaylistDetailedSchema.pick({
   uuid: true,
   name: true,
-  genre: true,
   parent: true,
-  root: true,
-  uploadedTracksCount: true,
   createdOn: true,
-  updatedOn: true,
 });
 
-export type GenrePlaylistSimple = z.infer<typeof GenrePlaylistSimpleSchema>;
+export type CriteriaPlaylistSimple = z.infer<typeof CriteriaPlaylistSimpleSchema>;
