@@ -71,7 +71,7 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
         trackList.origin.type !== TrackListOriginType.PLAYLIST ||
         trackList.origin.uuid !== genrePlaylist.uuid
       ) {
-        if (genrePlaylist.uploadedTracksNotArchivedCount > 0) {
+        if (genrePlaylist.uploadedTracksCount > 0) {
           toTrackAtPosition(0);
         }
       } else if (

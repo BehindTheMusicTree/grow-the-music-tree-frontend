@@ -7,7 +7,7 @@ export const GenrePlaylistSimpleSchema = GenrePlaylistDetailedSchema.pick({
   genre: true,
   parent: true,
   root: true,
-  uploadedTracksNotArchivedCount: true,
+  uploadedTracksCount: true,
   createdOn: true,
   updatedOn: true,
 });

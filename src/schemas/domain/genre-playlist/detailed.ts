@@ -15,7 +15,7 @@ export const GenrePlaylistDetailedSchema = UuidResourceSchema.extend({
     })
     .nullable(),
   root: z.boolean(),
-  uploadedTracksNotArchivedCount: z.number(),
+  uploadedTracksCount: z.number(),
   createdOn: z.string(),
   updatedOn: z.string(),
 });

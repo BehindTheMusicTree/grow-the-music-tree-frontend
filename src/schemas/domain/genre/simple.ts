@@ -14,7 +14,7 @@ export const GenreSimpleSchema = UuidResourceSchema.extend({
   children: z.array(GenreMinimumSchema),
   criteriaPlaylist: GenrePlaylistMinimumSchema,
   uploadedTracksNotArchived: z.array(UploadedTrackMinimumSchema),
-  uploadedTracksNotArchivedCount: z.number(),
+  uploadedTracksCount: z.number(),
   uploadedTracksArchivedCount: z.number(),
   createdOn: z.string().datetime(),
   updatedOn: z.string().datetime().nullable(),
