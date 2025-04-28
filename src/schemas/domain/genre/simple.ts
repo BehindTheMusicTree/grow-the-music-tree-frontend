@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { UuidResourceSchema } from "@schemas/domain/uuid-resource";
+import { UuidResourceSchema } from "@domain/uuid-resource";
 import { GenreLineageRelWithoutDescendantsSchema, GenreLineageRelWithoutAscendantsSchema } from "./lineage-rel";
-import { GenrePlaylistMinimumSchema } from "@schemas/domain/genre-playlist";
-import { UploadedTrackMinimumSchema } from "@schemas/domain/uploaded-track/response/minimum";
+import { GenrePlaylistMinimumSchema } from "@domain/genre-playlist";
+import { UploadedTrackMinimumSchema } from "@domain/uploaded-track/response/minimum";
 import { GenreMinimumSchema } from "./response/minimum";
 
 export const GenreSimpleSchema = UuidResourceSchema.extend({

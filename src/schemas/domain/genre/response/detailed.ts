@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UuidResourceSchema } from "@schemas/domain/uuid-resource";
+import { UuidResourceSchema } from "@domain/uuid-resource";
 import { GenreSimpleSchema } from "../simple";
 
 export const GenreDetailedSchema = UuidResourceSchema.extend({

@@ -1,8 +1,7 @@
 import { z } from "zod";
 
-import { UuidResourceSchema } from "./uuid-resource";
-import { UploadedTrackPlaylistRelWithoutPlaylistSchema } from "./uploaded-track-playlist-rel";
-import { PlaylistMinimumSchema } from "./playlist/shared";
+import { UuidResourceSchema } from "@domain/uuid-resource";
+import { UploadedTrackPlaylistRelWithoutPlaylistSchema } from "@domain/uploaded-track-playlist-rel/without-playlist";
 
 export const PlaylistDetailedSchema = UuidResourceSchema.extend({
   name: z.string(),
@@ -17,4 +16,3 @@ export const PlaylistDetailedSchema = UuidResourceSchema.extend({
 });
 
 export type PlaylistDetailed = z.infer<typeof PlaylistDetailedSchema>;
-export type PlaylistMinimum = z.infer<typeof PlaylistMinimumSchema>;

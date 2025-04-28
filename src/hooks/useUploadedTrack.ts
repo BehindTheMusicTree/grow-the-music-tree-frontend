@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFetchWrapper } from "./useFetchWrapper";
-import { UploadedTrackCreationValues, UploadedTrackUpdateValues } from "@schemas/domain/uploaded-track/form";
+import { UploadedTrackCreationValues, UploadedTrackUpdateValues } from "@domain/uploaded-track/form";
 
 export function useListUploadedTracks() {
   const { fetch } = useFetchWrapper();

@@ -10,7 +10,7 @@ import {
   useQuickSyncSpotifyLibTracks,
   useFullSyncSpotifyLibTracks,
 } from "@hooks/useSpotifyLibTracks";
-import type { SpotifyLibTrackSimple } from "@schemas/domain/spotify/spotify-lib-track";
+import type { SpotifyLibTrackSimple } from "@domain/spotify/spotify-lib-track";
 
 function formatDuration(durationStr: string): string {
   // Remove any leading/trailing whitespace

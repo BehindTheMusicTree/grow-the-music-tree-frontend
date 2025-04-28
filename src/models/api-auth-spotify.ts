@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SpotifyUserDetailedSchema } from "@schemas/domain/spotify-user";
+import { SpotifyUserDetailedSchema } from "@domain/spotify-user";
 
 export const ApiAuthTokenSpotifySchema = z.object({
   accessToken: z.string(),

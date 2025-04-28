@@ -9,7 +9,7 @@ import { useCreateGenre } from "@hooks/useGenre";
 import { usePopup } from "@contexts/PopupContext";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenrePlaylistTree from "./tree/GenrePlaylistTree";
-import { GenreCreationValues } from "@schemas/domain/genre/form";
+import { GenreCreationValues } from "@domain/genre/form";
 
 export default function GenreTree() {
   const { data: genrePlaylists, isLoading } = useListGenrePlaylists();

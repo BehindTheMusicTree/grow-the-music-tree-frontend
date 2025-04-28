@@ -2,11 +2,7 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
-import {
-  GenrePlaylistDetailedSchema,
-  GenrePlaylistDetailed,
-  GenrePlaylistSimpleSchema,
-} from "@schemas/domain/genre-playlist";
+import { GenrePlaylistDetailedSchema, GenrePlaylistDetailed, GenrePlaylistSimpleSchema } from "@domain/genre-playlist";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 
 export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBLIC_GENRE_PLAYLISTS_PAGE_SIZE || 50) => {
@@ -17,7 +13,14 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
     queryKey: ["genrePlaylists", page],
     queryFn: async () => {
       const response = await fetch("genre-playlists/", true, true, {}, { page, pageSize });
-      return PaginatedResponseSchema(GenrePlaylistSimpleSchema).parse(response);
+      console.log("response", response);
+      const parseResult = PaginatedResponseSchema(GenrePlaylistSimpleSchema).safeParse(response);
+      if (!parseResult.success) {
+        console.error("Parsing failed:", parseResult.error);
+        throw parseResult.error;
+      }
+      console.log("parseResult", parseResult.data);
+      return parseResult.data;
     },
   });
 

@@ -2,7 +2,7 @@
 
 import { Button } from "@components/ui/Button";
 import { BasePopup, BasePopupProps } from "../BasePopup";
-import { GenreCreationValues } from "@schemas/domain/genre/form";
+import { GenreCreationValues } from "@domain/genre/form";
 
 type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   onSubmit: (values: GenreCreationValues) => void;

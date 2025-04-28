@@ -28,8 +28,8 @@
       "@utils/*": ["src/lib/utils/*"],
       "@app-types/*": ["src/types/*"],
       "@models/*": ["src/models/*"],
-      "@domain/*": ["src/models/domain/*"],
-      "@schemas/*": ["src/schemas/*"]
+      "@schemas/*": ["src/schemas/*"],
+      "@domain/*": ["src/schemas/domain/*"]
     },
     "plugins": [
       {

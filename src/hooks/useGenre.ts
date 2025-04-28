@@ -5,10 +5,10 @@ import { ZodError } from "zod";
 import { useFetchWrapper } from "./useFetchWrapper";
 import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
-import { GenreDetailedSchema, GenreDetailed } from "@schemas/domain/genre/response/detailed";
-import { GenreSimpleSchema } from "@schemas/domain/genre/response/simple";
-import { GenreCreationValues, GenreCreationSchema } from "@schemas/domain/genre/forms/creation";
-import { GenreUpdateValues, GenreUpdateSchema } from "@schemas/domain/genre/forms/update";
+import { GenreDetailedSchema, GenreDetailed } from "@domain/genre/response/detailed";
+import { GenreSimpleSchema } from "@domain/genre/response/simple";
+import { GenreCreationValues, GenreCreationSchema } from "@domain/genre/forms/creation";
+import { GenreUpdateValues, GenreUpdateSchema } from "@domain/genre/forms/update";
 import { ErrorResponseSchema } from "@schemas/api/error-response";
 import { InvalidInputError } from "@app-types/app-errors/app-error";
 
@@ -62,7 +62,13 @@ export function useCreateGenre() {
         if (!response) {
           throw new Error("No response received from server");
         }
-        return GenreDetailedSchema.parse(response);
+        const parseResult = GenreDetailedSchema.safeParse(response);
+        if (!parseResult.success) {
+          console.error("Parsing failed:", parseResult.error);
+          throw parseResult.error;
+        }
+        console.log("parseResult", parseResult.data);
+        return parseResult.data;
       } catch (error) {
         console.log("catch error", error);
         if (error instanceof InvalidInputError) {

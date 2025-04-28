@@ -3,7 +3,7 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
-import { SpotifyLibTrackSimpleSchema } from "@schemas/domain/spotify/spotify-lib-track";
+import { SpotifyLibTrackSimpleSchema } from "@domain/spotify/spotify-lib-track";
 
 export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTIFY_LIB_TRACKS_PAGE_SIZE || 50) {
   const { fetch } = useFetchWrapper();
@@ -14,8 +14,7 @@ export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTI
       console.log("fetching spotify lib tracks", pageParam, pageSize);
       const response = await fetch(`library/spotify`, true, true, {}, { page: pageParam, pageSize });
       console.log("spotify lib tracks response", response);
-      const PaginatedSpotifyLibTrackSimpleSchema = PaginatedResponseSchema(SpotifyLibTrackSimpleSchema);
-      const parseResult = PaginatedSpotifyLibTrackSimpleSchema.safeParse(response);
+      const parseResult = PaginatedResponseSchema(SpotifyLibTrackSimpleSchema).safeParse(response);
       if (!parseResult.success) {
         console.error("Parsing failed:", parseResult.error);
         throw parseResult.error;

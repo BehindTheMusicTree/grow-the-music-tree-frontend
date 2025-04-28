@@ -4,8 +4,8 @@ import { formatTime } from "@lib/utils/formatting";
 import Rating from "@components/features/Rating";
 import { Button } from "@components/ui/Button";
 import { BasePopup, BasePopupProps } from "../BasePopup";
-import { UploadedTrackUpdateValues } from "@schemas/domain/uploaded-track/form";
-import { UploadedTrackDetailed } from "@schemas/domain/uploaded-track/response";
+import { UploadedTrackUpdateValues } from "@domain/uploaded-track/form";
+import { UploadedTrackDetailed } from "@domain/uploaded-track/response";
 
 type UploadedTrackEditionPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   uploadedTrack: UploadedTrackDetailed;

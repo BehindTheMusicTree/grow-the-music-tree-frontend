@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MbArtistDetailedSchema } from "./mb-artist";
+import { MbArtistDetailedSchema } from "@domain/mb-artist";
 export const MbRecordingDetailedSchema = z.object({
   musicbrainzId: z.string().uuid(),
   title: z.string(),
