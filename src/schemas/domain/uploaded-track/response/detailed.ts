@@ -3,7 +3,7 @@ import { ArtistMinimumSchema } from "@domain/artist";
 import { AlbumMinimumSchema } from "@domain/album/shared";
 import { CrteriaMinimumSchema } from "@schemas/domain/criteria/response/minimum";
 import { FileDetailedSchema } from "@domain/file";
-import { PlaylistMinimumSchema } from "@domain/playlist/shared";
+import { CriteriaPlaylistMinimumSchema } from "@domain/playlist/criteria-playlist/minimum";
 import { UuidResourceSchema } from "@domain/uuid-resource";
 
 export const UploadedTrackDetailedSchema = UuidResourceSchema.extend({
@@ -16,7 +16,7 @@ export const UploadedTrackDetailedSchema = UuidResourceSchema.extend({
   genre: CrteriaMinimumSchema,
   rating: z.number().min(0).max(10).optional(),
   language: z.string().optional(),
-  playlists: z.array(PlaylistMinimumSchema),
+  playlists: z.array(CriteriaPlaylistMinimumSchema),
   playCount: z.number().min(0),
   archived: z.boolean(),
   createdOn: z.string().datetime(),

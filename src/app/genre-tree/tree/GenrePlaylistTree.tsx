@@ -13,17 +13,17 @@ import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssigned
 import { PlayStates } from "@models/PlayStates";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 
-import { GenrePlaylistSimple } from "@domain/genre-playlist";
+import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
 import { UploadedTrackCreationValues } from "@domain/uploaded-track/form";
-import { GenreUpdateValues } from "@domain/genre/form";
+import { CriteriaUpdateValues } from "@domain/criteria/forms/update";
 import InvalidInputPopup from "@components/ui/popup/child/InvalidInputPopup";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer";
 
 type GenrePlaylistTreeProps = {
-  genrePlaylistTree: GenrePlaylistSimple[];
+  genrePlaylistTree: CriteriaPlaylistSimple[];
 };
 
 export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTreeProps) {
@@ -37,7 +37,7 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
   const [
     previousRenderingVisibleActionsContainerGenrePlaylist,
     setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
-  ] = useState<GenrePlaylistSimple | null>(null);
+  ] = useState<CriteriaPlaylistSimple | null>(null);
   const { genreGettingAssignedNewParent, setGenreGettingAssignedNewParent } = useGenreGettingAssignedNewParent();
   const [svgWidth, setSvgWidth] = useState(0);
   const [svgHeight, setSvgHeight] = useState(0);
@@ -64,7 +64,7 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
   };
 
   const handlePlayPauseIconAction = useCallback(
-    (genrePlaylist: GenrePlaylistSimple) => {
+    (genrePlaylist: CriteriaPlaylistSimple) => {
       if (
         !trackList ||
         !isPlaying ||

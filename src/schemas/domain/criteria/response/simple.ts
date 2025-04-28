@@ -4,7 +4,7 @@ import {
   CriteriaLineageRelWithoutDescendantsSchema,
   CriteriaLineageRelWithoutAscendantsSchema,
 } from "../lineage-rel/detailed";
-import { GenrePlaylistMinimumSchema } from "@domain/genre-playlist";
+import { GenrePlaylistMinimumSchema } from "@domain/criteria-playlist";
 import { UploadedTrackMinimumSchema } from "@domain/uploaded-track/response/minimum";
 import { CrteriaMinimumSchema } from "./minimum";
 
