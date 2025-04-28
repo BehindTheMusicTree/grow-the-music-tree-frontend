@@ -5,13 +5,19 @@ export const ErrorResponseSchema = z.object({
   message: z.string(),
   success: z.boolean(),
   details: z.object({
+    code: z.string(),
+    fieldErrors: z
+      .record(
+        z.string(),
+        z.array(
+          z.object({
+            code: z.string(),
+            message: z.string(),
+          })
+        )
+      )
+      .optional(),
     message: z.string(),
-    fieldErrors: z.array(
-      z.object({
-        message: z.string(),
-        code: z.string(),
-      })
-    ),
   }),
 });
 

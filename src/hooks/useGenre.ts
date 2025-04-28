@@ -68,12 +68,14 @@ export function useCreateGenre() {
         if (error instanceof InvalidInputError) {
           console.log("invalid input error", error.json);
           try {
-            const errorResponse = ErrorResponseSchema.parse(error);
+            const errorResponse = ErrorResponseSchema.parse(error.json);
             setFormErrors(
-              errorResponse.details.fieldErrors.map((err) => ({
-                field: err.code,
-                message: err.message,
-              }))
+              Object.entries(errorResponse.details.fieldErrors || {}).flatMap(([field, errors]) =>
+                errors.map((err) => ({
+                  field,
+                  message: err.message,
+                }))
+              )
             );
           } catch (parseError) {
             console.error("Failed to parse error response:", parseError);
@@ -123,10 +125,12 @@ export function useUpdateGenre() {
       try {
         const errorResponse = ErrorResponseSchema.parse(error);
         setFormErrors(
-          errorResponse.details.fieldErrors.map((err) => ({
-            field: err.code,
-            message: err.message,
-          }))
+          Object.entries(errorResponse.details.fieldErrors || {}).flatMap(([field, errors]) =>
+            errors.map((err) => ({
+              field,
+              message: err.message,
+            }))
+          )
         );
       } catch (parseError) {
         console.error("Failed to parse error response:", parseError);
@@ -168,10 +172,12 @@ export function useDeleteGenre() {
       try {
         const errorResponse = ErrorResponseSchema.parse(error);
         setFormErrors(
-          errorResponse.details.fieldErrors.map((err) => ({
-            field: err.code,
-            message: err.message,
-          }))
+          Object.entries(errorResponse.details.fieldErrors || {}).flatMap(([field, errors]) =>
+            errors.map((err) => ({
+              field,
+              message: err.message,
+            }))
+          )
         );
       } catch (parseError) {
         console.error("Failed to parse error response:", parseError);
