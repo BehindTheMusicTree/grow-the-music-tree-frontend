@@ -1,12 +1,13 @@
 import { z } from "zod";
+
 import { UuidResourceSchema } from "@domain/uuid-resource";
-import { GenreSimpleSchema } from "../simple";
+import { CriteriaSimpleSchema } from "./simple";
 
 export const CriteriaDetailedSchema = UuidResourceSchema.extend({
   name: z.string(),
-  parent: GenreSimpleSchema.nullable(),
-  ascendants: z.array(GenreSimpleSchema),
-  descendants: z.array(GenreSimpleSchema),
+  parent: CriteriaSimpleSchema.nullable(),
+  ascendants: z.array(CriteriaSimpleSchema),
+  descendants: z.array(CriteriaSimpleSchema),
   root: z.object({
     uuid: z.string().uuid(),
     name: z.string(),

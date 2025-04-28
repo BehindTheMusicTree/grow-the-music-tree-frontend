@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { UuidResourceSchema } from "@domain/uuid-resource";
 import { CriteriaLineageRelWithoutDescendantsSchema } from "../lineage-rel/without-descendant";
 import { CriteriaLineageRelWithoutAscendantsSchema } from "../lineage-rel/without-ascendant";
