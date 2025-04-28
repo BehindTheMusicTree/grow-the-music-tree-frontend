@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { PlaylistSimpleSchema } from "@domain/playlist/response/simple";
+import { PlaylistMinimumSchema } from "@domain/playlist/minimum";
 
 export const UploadedTrackPlaylistRelWithoutUploadedTrackSchema = z.object({
-  playlist: PlaylistSimpleSchema,
+  playlist: PlaylistMinimumSchema,
   position: z.number().min(0),
 });
 
