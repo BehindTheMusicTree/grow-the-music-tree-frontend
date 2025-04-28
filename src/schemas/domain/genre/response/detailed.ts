@@ -4,7 +4,7 @@ import { GenreSimpleSchema } from "../simple";
 
 export const GenreDetailedSchema = UuidResourceSchema.extend({
   name: z.string(),
-  parent: GenreSimpleSchema,
+  parent: GenreSimpleSchema.nullable(),
   ascendants: z.array(GenreSimpleSchema),
   descendants: z.array(GenreSimpleSchema),
   root: z.object({
