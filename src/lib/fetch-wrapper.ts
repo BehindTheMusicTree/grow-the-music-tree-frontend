@@ -1,4 +1,4 @@
-import { createAppErrorFromUrlAndStatus, createNetworkOrBackendError } from "@app-types/app-errors/app-error-factory";
+import { createAppErrorFromResult, createNetworkOrBackendError } from "@app-types/app-errors/app-error-factory";
 import { AppError } from "@app-types/app-errors/app-error";
 
 export const fetchWrapper = async <T>(
@@ -32,14 +32,15 @@ export const fetchWrapper = async <T>(
   }
 
   try {
-    const res = await fetch(finalUrl, finalOptions);
+    const result = await fetch(finalUrl, finalOptions);
 
     // Handle response errors
-    if (!res.ok) {
-      throw createAppErrorFromUrlAndStatus(res.url, res.status);
+    if (!result.ok) {
+      const appError = await createAppErrorFromResult(result);
+      throw appError;
     }
 
-    return res.json();
+    return result.json();
   } catch (caughtError: unknown) {
     let appError: AppError | null = null;
     if (caughtError instanceof AppError) {

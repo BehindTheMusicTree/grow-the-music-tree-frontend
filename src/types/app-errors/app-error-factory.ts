@@ -8,6 +8,7 @@ import {
   ServiceError,
   InvalidInputError,
 } from "./app-error";
+import { object } from "zod";
 
 export function createAppErrorFromErrorCode(code: ErrorCode, json?: object): AppError {
   if ([ErrorCode.BACKEND_UNAUTHORIZED, ErrorCode.SESSION_EXPIRED, ErrorCode.SESSION_REQUIRED].includes(code)) {
@@ -26,52 +27,62 @@ export function createAppErrorFromErrorCode(code: ErrorCode, json?: object): App
   return new AppError(code);
 }
 
-export function createAppErrorFromHttpUrlAndErrorMessage(url: string, error: Error): AppError | null {
+export async function createAppErrorFromHttpUrlAndErrorMessage(url: string, error: Error): Promise<AppError | null> {
   if (error.message.includes("Failed to fetch") || error.message.includes("Network request failed")) {
-    return createAppErrorFromUrlAndStatus(url, 508);
+    const result = new Response(null, {
+      status: 508,
+    });
+    Object.defineProperty(result, "url", { value: url });
+    const appError = await createAppErrorFromResult(result);
+    return appError;
   }
   return null;
 }
 
-export function createAppErrorFromUrlAndStatus(url: string, status: number, json?: object): AppError {
-  const isBackendError = url.includes(process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "");
-  if (status === 400) {
+export async function createAppErrorFromResult(result: Response): Promise<AppError> {
+  const isBackendError = result.url.includes(process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "");
+  if (result.status === 400) {
     if (isBackendError) {
-      return createAppErrorFromErrorCode(ErrorCode.BACKEND_INVALID_INPUT, json);
+      try {
+        const json = await result.json();
+        return createAppErrorFromErrorCode(ErrorCode.BACKEND_INVALID_INPUT, json);
+      } catch {
+        return createAppErrorFromErrorCode(ErrorCode.BACKEND_INVALID_INPUT);
+      }
     } else {
       return createAppErrorFromErrorCode(ErrorCode.SERVICE_BAD_REQUEST);
     }
-  } else if (status === 401) {
+  } else if (result.status === 401) {
     if (isBackendError) {
       return createAppErrorFromErrorCode(ErrorCode.BACKEND_UNAUTHORIZED);
     } else {
       return createAppErrorFromErrorCode(ErrorCode.SERVICE_UNAUTHORIZED);
     }
-  } else if (status === 403) {
+  } else if (result.status === 403) {
     if (isBackendError) {
       return createAppErrorFromErrorCode(ErrorCode.BACKEND_FORBIDDEN);
     } else {
       return createAppErrorFromErrorCode(ErrorCode.SERVICE_FORBIDDEN);
     }
-  } else if (status === 404) {
+  } else if (result.status === 404) {
     if (isBackendError) {
       return createAppErrorFromErrorCode(ErrorCode.BACKEND_NOT_FOUND);
     } else {
       return createAppErrorFromErrorCode(ErrorCode.SERVICE_NOT_FOUND);
     }
-  } else if (status === 405) {
+  } else if (result.status === 405) {
     if (isBackendError) {
       return createAppErrorFromErrorCode(ErrorCode.BACKEND_METHOD_NOT_ALLOWED);
     } else {
       return createAppErrorFromErrorCode(ErrorCode.SERVICE_METHOD_NOT_ALLOWED);
     }
-  } else if (status === 408) {
+  } else if (result.status === 408) {
     if (isBackendError) {
       return createAppErrorFromErrorCode(ErrorCode.BACKEND_REQUEST_TIMEOUT);
     } else {
       return createAppErrorFromErrorCode(ErrorCode.SERVICE_REQUEST_TIMEOUT);
     }
-  } else if (status === 500) {
+  } else if (result.status === 500) {
     if (isBackendError) {
       return createAppErrorFromErrorCode(ErrorCode.BACKEND_INTERNAL_ERROR);
     } else {

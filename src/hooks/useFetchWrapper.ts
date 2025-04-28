@@ -15,6 +15,8 @@ export const useFetchWrapper = () => {
         clearSession();
       }
       setConnectivityError(error);
+    } else {
+      throw error;
     }
   };
 
