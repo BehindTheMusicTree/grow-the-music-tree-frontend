@@ -15,13 +15,11 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
     queryKey: ["genrePlaylists", page],
     queryFn: async () => {
       const response = await fetch("genre-playlists/", true, true, {}, { page, pageSize });
-      console.log("response", response);
       const parseResult = PaginatedResponseSchema(CriteriaPlaylistSimpleSchema).safeParse(response);
       if (!parseResult.success) {
         console.error("Parsing failed:", parseResult.error);
         throw parseResult.error;
       }
-      console.log("parseResult", parseResult.data);
       return parseResult.data;
     },
   });
