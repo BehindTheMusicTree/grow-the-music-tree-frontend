@@ -6,11 +6,11 @@ export const CriteriaLineageRelWithoutDescendantsSchema = z.object({
   degree: z.number(),
 });
 
-export const CriteriaLineageRelWithoutAscendantsSchema = z.object({
+export const CriteriaLineageRelWithoutAscendantSchema = z.object({
   descendants: z.array(CrteriaMinimumSchema),
   degree: z.number(),
 });
 
-export const CriteriaLineageRelSchema = CriteriaLineageCriteriaLineageRelWithoutDescendantsSchema.merge(
-  CriteriaLineageRelWithoutAscendantsSchema
+export const CriteriaLineageRelSchema = CriteriaLineageCriteriaLineageRelWithoutDescendantSchema.merge(
+  CriteriaLineageRelWithoutAscendantSchema
 );
