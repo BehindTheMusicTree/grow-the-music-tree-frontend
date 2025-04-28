@@ -106,7 +106,7 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
     const transformedTreeData = setupTreeLayout(d3, treeData, highestVerticalCoordinate);
 
     const updateGenreParent = async (genreUuid: string, parentUuid: string) => {
-      updateGenre.mutate({ uuid: genreUuid, data: { parentUuid } });
+      updateGenre.mutate({ uuid: genreUuid, data: { parent: parentUuid } });
     };
 
     const handleRenameGenre = async (genreUuid: string, newName: string) => {

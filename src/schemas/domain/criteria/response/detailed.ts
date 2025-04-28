@@ -2,7 +2,7 @@ import { z } from "zod";
 import { UuidResourceSchema } from "@domain/uuid-resource";
 import { GenreSimpleSchema } from "../simple";
 
-export const GenreDetailedSchema = UuidResourceSchema.extend({
+export const CriteriaDetailedSchema = UuidResourceSchema.extend({
   name: z.string(),
   parent: GenreSimpleSchema.nullable(),
   ascendants: z.array(GenreSimpleSchema),
@@ -22,4 +22,4 @@ export const GenreDetailedSchema = UuidResourceSchema.extend({
   updatedOn: z.string().datetime().nullable(),
 });
 
-export type GenreDetailed = z.infer<typeof GenreDetailedSchema>;
+export type CriteriaDetailed = z.infer<typeof CriteriaDetailedSchema>;

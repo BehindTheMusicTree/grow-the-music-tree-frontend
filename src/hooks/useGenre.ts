@@ -5,10 +5,10 @@ import { ZodError } from "zod";
 import { useFetchWrapper } from "./useFetchWrapper";
 import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
-import { GenreDetailedSchema, GenreDetailed } from "@domain/genre/response/detailed";
-import { GenreSimpleSchema } from "@domain/genre/response/simple";
-import { GenreCreationValues, GenreCreationSchema } from "@domain/genre/forms/creation";
-import { GenreUpdateValues, GenreUpdateSchema } from "@domain/genre/forms/update";
+import { CriteriaDetailedSchema, CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
+import { CriteriaSimpleSchema } from "@schemas/domain/criteria/response/simple";
+import { criteriaCreationValues, CriteriaCreationSchema } from "@schemas/domain/criteria/forms/creation";
+import { CriteriaUpdateValues, CriteriaUpdateSchema } from "@schemas/domain/criteria/forms/update";
 import { ErrorResponseSchema } from "@schemas/api/error-response";
 import { InvalidInputError } from "@app-types/app-errors/app-error";
 
@@ -19,7 +19,7 @@ export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRE
     queryKey: ["genres", "list", page],
     queryFn: async () => {
       const response = await fetch("genre/", true, true, {}, { page, pageSize });
-      return PaginatedResponseSchema(GenreSimpleSchema).parse(response);
+      return PaginatedResponseSchema(CriteriaSimpleSchema).parse(response);
     },
   });
 }
@@ -27,11 +27,11 @@ export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRE
 export function useRetrieveGenre(id: string) {
   const { fetch } = useFetchWrapper();
 
-  return useQuery<GenreDetailed>({
+  return useQuery<CriteriaDetailed>({
     queryKey: ["genres", "detail", id],
     queryFn: async () => {
       const response = await fetch(`genre/${id}`, true);
-      return GenreDetailedSchema.parse(response);
+      return CriteriaDetailedSchema.parse(response);
     },
   });
 }
@@ -50,10 +50,10 @@ export function useCreateGenre() {
   const { fetch } = useFetchWrapper();
   const [formErrors, setFormErrors] = useState<{ field: string; message: string }[]>([]);
 
-  const mutate = useMutation<GenreDetailed | null, Error, GenreCreationValues>({
+  const mutate = useMutation<CriteriaDetailed | null, Error, criteriaCreationValues>({
     mutationFn: async (data: unknown) => {
       try {
-        const validatedData = GenreCreationSchema.parse(data);
+        const validatedData = CriteriaCreationSchema.parse(data);
         const payload = mapGenreFormToPayload(validatedData);
         const response = await fetch("genres/", true, true, {
           method: "POST",
@@ -62,7 +62,7 @@ export function useCreateGenre() {
         if (!response) {
           throw new Error("No response received from server");
         }
-        const parseResult = GenreDetailedSchema.safeParse(response);
+        const parseResult = CriteriaDetailedSchema.safeParse(response);
         if (!parseResult.success) {
           console.error("Parsing failed:", parseResult.error);
           throw parseResult.error;
@@ -113,14 +113,14 @@ export function useUpdateGenre() {
   const { invalidateGenrePlaylists } = useListGenrePlaylists();
   const [formErrors, setFormErrors] = useState<{ field: string; message: string }[]>([]);
 
-  const mutate = useMutation<GenreDetailed, Error, { uuid: string; data: GenreUpdateValues }>({
+  const mutate = useMutation<CriteriaDetailed, Error, { uuid: string; data: CriteriaUpdateValues }>({
     mutationFn: async ({ uuid, data }) => {
       const payload = mapGenreFormToPayload(data);
       const response = await fetch(`genres/${uuid}`, true, true, {
         method: "PUT",
         body: JSON.stringify(payload),
       });
-      return GenreDetailedSchema.parse(response);
+      return CriteriaDetailedSchema.parse(response);
     },
     onSuccess: (_, { uuid }) => {
       queryClient.invalidateQueries({ queryKey: ["genres"] });
@@ -150,7 +150,7 @@ export function useUpdateGenre() {
   };
 
   const updateGenreParent = (uuid: string, parentUuid: string) => {
-    mutate.mutate({ uuid, data: { parentUuid: parentUuid } });
+    mutate.mutate({ uuid, data: { parent: parentUuid } });
   };
 
   return { mutate, renameGenre, updateGenreParent, formErrors };
@@ -162,12 +162,12 @@ export function useDeleteGenre() {
   const { invalidateGenrePlaylists } = useListGenrePlaylists();
   const [formErrors, setFormErrors] = useState<{ field: string; message: string }[]>([]);
 
-  return useMutation<GenreDetailed, Error, { uuid: string }>({
+  return useMutation<CriteriaDetailed, Error, { uuid: string }>({
     mutationFn: async ({ uuid }) => {
       const response = await fetch(`genres/${uuid}`, true, true, {
         method: "DELETE",
       });
-      return GenreDetailedSchema.parse(response);
+      return CriteriaDetailedSchema.parse(response);
     },
     onSuccess: (_, { uuid }) => {
       queryClient.invalidateQueries({ queryKey: ["genres"] });

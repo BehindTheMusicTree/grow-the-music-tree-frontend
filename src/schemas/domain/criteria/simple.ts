@@ -1,17 +1,20 @@
 import { z } from "zod";
 import { UuidResourceSchema } from "@domain/uuid-resource";
-import { GenreLineageRelWithoutDescendantsSchema, GenreLineageRelWithoutAscendantsSchema } from "./lineage-rel";
+import {
+  CriteriaLineageRelWithoutDescendantsSchema,
+  CriteriaLineageRelWithoutAscendantsSchema,
+} from "./lineage-rel/detailed";
 import { GenrePlaylistMinimumSchema } from "@domain/genre-playlist";
 import { UploadedTrackMinimumSchema } from "@domain/uploaded-track/response/minimum";
-import { GenreMinimumSchema } from "./response/minimum";
+import { CrteriaMinimumSchema } from "./response/minimum";
 
 export const GenreSimpleSchema = UuidResourceSchema.extend({
   name: z.string(),
-  parent: GenreMinimumSchema,
-  ascendants: z.array(GenreLineageRelWithoutDescendantsSchema),
-  descendants: z.array(GenreLineageRelWithoutAscendantsSchema),
-  root: GenreMinimumSchema,
-  children: z.array(GenreMinimumSchema),
+  parent: CrteriaMinimumSchema,
+  ascendants: z.array(CriteriaLineageRelWithoutDescendantsSchema),
+  descendants: z.array(CriteriaLineageRelWithoutAscendantsSchema),
+  root: CrteriaMinimumSchema,
+  children: z.array(CrteriaMinimumSchema),
   criteriaPlaylist: GenrePlaylistMinimumSchema,
   uploadedTracksNotArchived: z.array(UploadedTrackMinimumSchema),
   uploadedTracksCount: z.number(),
