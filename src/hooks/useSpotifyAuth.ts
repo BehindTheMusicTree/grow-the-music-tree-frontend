@@ -35,7 +35,6 @@ export function useSpotifyAuth() {
       const setCreateBackendAuthConnectivityError = () => {
         return setConnectivityError(createAppErrorFromErrorCode(ErrorCode.BACKEND_AUTH_ERROR));
       };
-      console.log("authToBackendFromSpotifyCode called", { code });
       type BackendSpotifyAuthResponse = {
         accessToken: string;
         refreshToken: string;
