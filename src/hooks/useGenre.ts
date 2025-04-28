@@ -4,11 +4,13 @@ import { ZodError } from "zod";
 
 import { useFetchWrapper } from "./useFetchWrapper";
 import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
-import { PaginatedResponseSchema } from "@schemas/PaginatedResponse";
+import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { GenreDetailedSchema, GenreDetailed } from "@schemas/domain/genre/response/detailed";
 import { GenreSimpleSchema } from "@schemas/domain/genre/response/simple";
-import { GenreCreationValues } from "@schemas/domain/genre/forms/creation";
-import { GenreUpdateValues } from "@schemas/domain/genre/forms/update";
+import { GenreCreationValues, GenreCreationSchema } from "@schemas/domain/genre/forms/creation";
+import { GenreUpdateValues, GenreUpdateSchema } from "@schemas/domain/genre/forms/update";
+import { ErrorResponseSchema } from "@schemas/api/error-response";
+import { InvalidInputError } from "@app-types/app-errors/app-error";
 
 export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50) {
   const { fetch } = useFetchWrapper();
@@ -57,10 +59,28 @@ export function useCreateGenre() {
           method: "POST",
           body: JSON.stringify(payload),
         });
+        if (!response) {
+          throw new Error("No response received from server");
+        }
         return GenreDetailedSchema.parse(response);
       } catch (error) {
         console.log("catch error", error);
-        if (error instanceof ZodError) {
+        if (error instanceof InvalidInputError) {
+          console.log("invalid input error", error.json);
+          try {
+            const errorResponse = ErrorResponseSchema.parse(error);
+            setFormErrors(
+              errorResponse.details.fieldErrors.map((err) => ({
+                field: err.code,
+                message: err.message,
+              }))
+            );
+          } catch (parseError) {
+            console.error("Failed to parse error response:", parseError);
+            setFormErrors([{ field: "genre", message: "An error occurred while creating the genre" }]);
+          }
+        } else if (error instanceof ZodError) {
+          console.log("zod error");
           const fieldErrors = error.errors.map((error) => ({
             field: error.path.join("."),
             message: error.message,
@@ -74,10 +94,6 @@ export function useCreateGenre() {
       queryClient.invalidateQueries({ queryKey: ["genres"] });
       invalidateGenrePlaylists();
     },
-    onError: (error) => {
-      console.error(error);
-      setFormErrors([{ field: "genre", message: "An error occurred while creating the genre" }]);
-    },
   });
 
   return { ...mutate, formErrors };
@@ -87,6 +103,7 @@ export function useUpdateGenre() {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const { invalidateGenrePlaylists } = useListGenrePlaylists();
+  const [formErrors, setFormErrors] = useState<{ field: string; message: string }[]>([]);
 
   const mutate = useMutation<GenreDetailed, Error, { uuid: string; data: GenreUpdateValues }>({
     mutationFn: async ({ uuid, data }) => {
@@ -102,6 +119,20 @@ export function useUpdateGenre() {
       queryClient.invalidateQueries({ queryKey: ["genres", "detail", uuid] });
       invalidateGenrePlaylists();
     },
+    onError: (error) => {
+      try {
+        const errorResponse = ErrorResponseSchema.parse(error);
+        setFormErrors(
+          errorResponse.details.fieldErrors.map((err) => ({
+            field: err.code,
+            message: err.message,
+          }))
+        );
+      } catch (parseError) {
+        console.error("Failed to parse error response:", parseError);
+        setFormErrors([{ field: "genre", message: "An error occurred while updating the genre" }]);
+      }
+    },
   });
 
   const renameGenre = (uuid: string, name: string) => {
@@ -112,13 +143,15 @@ export function useUpdateGenre() {
     mutate.mutate({ uuid, data: { parentUuid: parentUuid } });
   };
 
-  return { mutate, renameGenre, updateGenreParent };
+  return { mutate, renameGenre, updateGenreParent, formErrors };
 }
 
 export function useDeleteGenre() {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const { invalidateGenrePlaylists } = useListGenrePlaylists();
+  const [formErrors, setFormErrors] = useState<{ field: string; message: string }[]>([]);
+
   return useMutation<GenreDetailed, Error, { uuid: string }>({
     mutationFn: async ({ uuid }) => {
       const response = await fetch(`genres/${uuid}`, true, true, {
@@ -130,6 +163,20 @@ export function useDeleteGenre() {
       queryClient.invalidateQueries({ queryKey: ["genres"] });
       queryClient.invalidateQueries({ queryKey: ["genres", "detail", uuid] });
       invalidateGenrePlaylists();
+    },
+    onError: (error) => {
+      try {
+        const errorResponse = ErrorResponseSchema.parse(error);
+        setFormErrors(
+          errorResponse.details.fieldErrors.map((err) => ({
+            field: err.code,
+            message: err.message,
+          }))
+        );
+      } catch (parseError) {
+        console.error("Failed to parse error response:", parseError);
+        setFormErrors([{ field: "genre", message: "An error occurred while deleting the genre" }]);
+      }
     },
   });
 }
