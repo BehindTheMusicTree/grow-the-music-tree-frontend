@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { UuidResourceSchema } from "@domain/uuid-resource";
-import { CriteriaLineageRelWithoutDescendantsSchema } from "../lineage-rel/without-descendant";
+import { CriteriaLineageRelWithoutDescendantSchema } from "../lineage-rel/without-descendant";
 import { CriteriaLineageRelWithoutAscendantSchema } from "../lineage-rel/without-ascendant";
 import { CriteriaPlaylistMinimumSchema } from "@domain/playlist/criteria-playlist/minimum";
 import { UploadedTrackMinimumSchema } from "@domain/uploaded-track/response/minimum";
@@ -10,7 +10,7 @@ import { CrteriaMinimumSchema } from "./minimum";
 export const CriteriaSimpleSchema = UuidResourceSchema.extend({
   name: z.string(),
   parent: CrteriaMinimumSchema,
-  ascendants: z.array(CriteriaLineageRelWithoutDescendantsSchema),
+  ascendants: z.array(CriteriaLineageRelWithoutDescendantSchema),
   descendants: z.array(CriteriaLineageRelWithoutAscendantSchema),
   root: CrteriaMinimumSchema,
   children: z.array(CrteriaMinimumSchema),

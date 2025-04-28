@@ -1,6 +1,6 @@
-import { CriteriaLineageRelWithoutDescendantsSchema } from "./without-descendant";
+import { CriteriaLineageRelWithoutDescendantSchema } from "./without-descendant";
 import { CriteriaLineageRelWithoutAscendantSchema } from "./without-ascendant";
 
-export const CriteriaLineageRelSchema = CriteriaLineageRelWithoutDescendantsSchema.merge(
+export const CriteriaLineageRelDetailedSchema = CriteriaLineageRelWithoutDescendantSchema.merge(
   CriteriaLineageRelWithoutAscendantSchema
 );
