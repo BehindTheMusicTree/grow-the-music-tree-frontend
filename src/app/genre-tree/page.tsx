@@ -9,7 +9,7 @@ import { useCreateGenre } from "@hooks/useGenre";
 import { usePopup } from "@contexts/PopupContext";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenrePlaylistTree from "./tree/GenrePlaylistTree";
-import { GenreCreationValues } from "@domain/genre/form";
+import { CriteriaCreationValues } from "@domain/criteria/forms/creation";
 
 export default function GenreTree() {
   const { data: genrePlaylists, isLoading } = useListGenrePlaylists();
@@ -19,7 +19,7 @@ export default function GenreTree() {
   const showCreationPopup = useCallback(() => {
     showPopup(
       <GenreCreationPopup
-        onSubmit={(values: GenreCreationValues) => {
+        onSubmit={(values: CriteriaCreationValues) => {
           createGenre(values);
           hidePopup();
         }}

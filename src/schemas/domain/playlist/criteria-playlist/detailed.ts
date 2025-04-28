@@ -13,7 +13,7 @@ export const CriteriaPlaylistDetailedSchema = UuidResourceSchema.extend({
   durationStrInHourMinSec: z.string(),
   uploadedTracksArchivedCount: z.number(),
   criteria: CrteriaMinimumSchema,
-  parent: CriteriaPlaylistMinimumSchema,
+  parent: CriteriaPlaylistMinimumSchema.nullable(),
   root: CriteriaPlaylistMinimumSchema,
   createdOn: z.string(),
   updatedOn: z.string(),

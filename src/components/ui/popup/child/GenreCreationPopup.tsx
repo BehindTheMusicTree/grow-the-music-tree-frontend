@@ -2,10 +2,10 @@
 
 import { Button } from "@components/ui/Button";
 import { BasePopup, BasePopupProps } from "../BasePopup";
-import { GenreCreationValues } from "@domain/genre/form";
+import { CriteriaCreationValues } from "@domain/genre/form";
 
 type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
-  onSubmit: (values: GenreCreationValues) => void;
+  onSubmit: (values: CriteriaCreationValues) => void;
   onClose?: () => void;
   formErrors?: { field: string; message: string }[];
 };
