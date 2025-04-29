@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MbRecordingDetailedSchema } from "@domain/mb-recording";
+import { MbRecordingDetailedSchema } from "@schemas/domain/mb/mb-recording";
 
 export const FileDetailedSchema = z.object({
   filename: z.string(),

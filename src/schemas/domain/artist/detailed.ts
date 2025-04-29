@@ -11,10 +11,3 @@ export const ArtistDetailedSchema = z.object({
 });
 
 export type ArtistDetailed = z.infer<typeof ArtistDetailedSchema>;
-
-export const ArtistMinimumSchema = z.object({
-  uuid: z.string().uuid(),
-  name: z.string(),
-});
-
-export type ArtistMinimum = z.infer<typeof ArtistMinimumSchema>;

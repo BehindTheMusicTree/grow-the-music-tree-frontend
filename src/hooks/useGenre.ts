@@ -7,8 +7,8 @@ import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { CriteriaDetailedSchema, CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
 import { CriteriaSimpleSchema } from "@schemas/domain/criteria/response/simple";
-import { criteriaCreationValues, CriteriaCreationSchema } from "@schemas/domain/criteria/forms/creation";
-import { CriteriaUpdateValues, CriteriaUpdateSchema } from "@schemas/domain/criteria/forms/update";
+import { criteriaCreationValues, CriteriaCreationSchema } from "@schemas/domain/criteria/form/creation";
+import { CriteriaUpdateValues, CriteriaUpdateSchema } from "@schemas/domain/criteria/form/update";
 import { ErrorResponseSchema } from "@schemas/api/error-response";
 import { InvalidInputError } from "@app-types/app-errors/app-error";
 
