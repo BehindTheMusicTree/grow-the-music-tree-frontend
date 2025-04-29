@@ -16,8 +16,6 @@ import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
 import InvalidInputPopup from "@components/ui/popup/child/InvalidInputPopup";
 import { UploadedTrackCreationValues } from "@domain/uploaded-track/form/creation";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
-import { CriteriaUpdateValues } from "@domain/criteria/form/update";
-import { CriteriaPlaylistDetailed } from "@domain/playlist/criteria-playlist/detailed";
 import { CriteriaCreationValues } from "@domain/criteria/form/creation";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper";

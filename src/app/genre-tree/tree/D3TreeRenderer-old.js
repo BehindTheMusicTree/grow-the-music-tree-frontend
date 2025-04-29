@@ -91,6 +91,7 @@ export function renderTree(d3, svgRef, treeData, svgWidth, svgHeight, callbacks)
       return `translate(${translateX}, ${translateY})`;
     });
 
+  console.log("forbiddenNewParentsUuids", forbiddenNewParentsUuids);
   const aGenreIsGettingAssignedNewParent = forbiddenNewParentsUuids !== null;
   const genreIsAPotentialChoiceForTheGenreGettingAssignedANewParent = (d) =>
     d.data.criteria && aGenreIsGettingAssignedNewParent && !forbiddenNewParentsUuids.includes(d.data.criteria.uuid);
