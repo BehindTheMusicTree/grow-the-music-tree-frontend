@@ -49,7 +49,7 @@ export default function GenreTree() {
   }, [formErrors, showCreationPopup]);
 
   return (
-    <div className="mt-2 flex flex-col">
+    <div className="mt-2 flex flex-col overflow-y-auto h-screen">
       <div
         className="mt-5 flex justify-center items-center text-center hover:bg-gray-400 hover:text-gray-800 cursor-pointer"
         style={{
