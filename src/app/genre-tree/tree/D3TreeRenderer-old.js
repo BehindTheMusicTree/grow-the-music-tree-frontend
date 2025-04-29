@@ -57,7 +57,7 @@ export function setupTreeLayout(d3, treeData, highestVerticalCoordinate) {
 export function renderTree(d3, svgRef, treeData, svgWidth, svgHeight, callbacks) {
   const {
     previousRenderingVisibleActionsContainerGenrePlaylist,
-    genreUuidGettingAssignedNewParent,
+    genrePlaylistGettingAssignedNewParent,
     forbiddenNewParentsUuids,
     trackListOrigin,
     playState,
@@ -65,7 +65,7 @@ export function renderTree(d3, svgRef, treeData, svgWidth, svgHeight, callbacks)
     fileInputRef,
     selectingFileGenreUuidRef,
     handleGenreAddAction,
-    setGenreGettingAssignedNewParent,
+    setGenrePlaylistGettingAssignedNewParent,
     updateGenreParent,
     renameGenre,
     showPopup,
@@ -122,7 +122,7 @@ export function renderTree(d3, svgRef, treeData, svgWidth, svgHeight, callbacks)
         fileInputRef,
         selectingFileGenreUuidRef,
         handleGenreAddAction,
-        setGenreGettingAssignedNewParent,
+        setGenrePlaylistGettingAssignedNewParent,
         renameGenre,
         showPopup,
         trackListOrigin,
@@ -158,8 +158,8 @@ export function renderTree(d3, svgRef, treeData, svgWidth, svgHeight, callbacks)
           const parentNode = d3.select(this.parentNode);
           addParentSelectionOverlay(d3, parentNode, {
             updateGenreParent,
-            genreUuidGettingAssignedNewParent,
-            setGenreGettingAssignedNewParent,
+            genrePlaylistGettingAssignedNewParent,
+            setGenrePlaylistGettingAssignedNewParent,
           });
         }
       }
@@ -175,7 +175,7 @@ export function renderTree(d3, svgRef, treeData, svgWidth, svgHeight, callbacks)
       fileInputRef,
       selectingFileGenreUuidRef,
       handleGenreAddAction,
-      setGenreGettingAssignedNewParent,
+      setGenrePlaylistGettingAssignedNewParent,
       renameGenre,
       showPopup,
       trackListOrigin,

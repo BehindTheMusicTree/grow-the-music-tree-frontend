@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { ArtistMinimumSchema } from "@domain/artist";
+
+import { ArtistMinimumSchema } from "@domain/artist/minimum";
 import { AlbumMinimumSchema } from "@schemas/domain/album/minimum";
 import { CrteriaMinimumSchema } from "@schemas/domain/criteria/response/minimum";
 import { FileDetailedSchema } from "@schemas/domain/uploaded-track/file";

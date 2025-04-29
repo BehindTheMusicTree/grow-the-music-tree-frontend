@@ -8,6 +8,7 @@ import * as d3 from "d3";
 import { PlayStates } from "@models/PlayStates";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
+import { CriteriaCreationValues } from "@domain/criteria/form/creation";
 
 import {
   RECTANGLE_COLOR,
@@ -29,7 +30,7 @@ interface Callbacks {
   handlePlayPauseIconAction: (genrePlaylist: CriteriaPlaylistSimple) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
   selectingFileGenreUuidRef: React.MutableRefObject<string | null>;
-  addGenre: (name: string, parentUuid: string) => Promise<{ success: boolean; error?: { message: string } }>;
+  handleGenreAddAction: (genreCreationValues: CriteriaCreationValues) => void;
   setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
   renameGenre: (uuid: string, name: string, showPopup: (title: string, message: string) => void) => Promise<void>;
   showPopup: (title: string, message: string) => void;
@@ -105,7 +106,7 @@ export function addMoreIconContainer(
 export function addActionContainer(
   d3: typeof import("d3"),
   actionsContainerHeight: number,
-  actionsContainerGroup: D3Selection,
+  actionsContainerGroup: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>,
   position: number,
   className: string,
   onclick: (event: MouseEvent, d: D3Node) => void,
@@ -116,8 +117,8 @@ export function addActionContainer(
   const actionContainerGroup = actionsContainerGroup
     .append("g")
     .attr("class", `${className} cursor-pointer`)
-    .on("click", function (event: MouseEvent, d: D3Node) {
-      onclick(event, d);
+    .on("click", function (this: SVGGElement, event: MouseEvent, d: unknown) {
+      onclick(event, d as D3Node);
     })
     .on("mouseover", function () {
       d3.select(this).selectAll("div").classed("bg-gray-500", true);
@@ -132,7 +133,9 @@ export function addActionContainer(
     .attr("y", -actionsContainerHeight / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * (position - 1))
     .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
     .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
-    .style("visibility", iconContainerVisibilityFunction)
+    .style("visibility", function (this: SVGForeignObjectElement, d: unknown) {
+      return iconContainerVisibilityFunction(d as D3Node);
+    })
     .html(function () {
       return ReactDOMServer.renderToString(<div className="tree-action-icon-container">{iconDiv}</div>);
     });
@@ -143,9 +146,9 @@ export function addActionContainer(
     .attr("y", -actionsContainerHeight / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * (position - 1))
     .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
     .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
-    .html(function (d: D3Node) {
+    .html(function (this: SVGForeignObjectElement, d: unknown) {
       return ReactDOMServer.renderToString(
-        <div className="change-parent-label-container tree-action-label-container">{labelFunction(d)}</div>
+        <div className="change-parent-label-container tree-action-label-container">{labelFunction(d as D3Node)}</div>
       );
     });
 
@@ -158,14 +161,14 @@ export function addActionContainer(
 export function addActionsGroup(
   d3: typeof import("d3"),
   genrePlaylist: CriteriaPlaylistSimple,
-  genrePlaylistGroup: D3Selection,
+  genrePlaylistGroup: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>,
   callbacks: Callbacks
 ) {
   const {
     handlePlayPauseIconAction,
     fileInputRef,
     selectingFileGenreUuidRef,
-    addGenre,
+    handleGenreAddAction,
     setGenrePlaylistGettingAssignedNewParent,
     renameGenre,
     showPopup,
@@ -237,10 +240,7 @@ export function addActionsGroup(
       genrePlaylistGroup.dispatch("mouseleave");
       const name = prompt("New genre name:");
       if (name) {
-        const result = await addGenre(name, d.data.criteria.uuid);
-        if (!result.success) {
-          showPopup("Error", result.error.message);
-        }
+        handleGenreAddAction({ name, parent: d.data.criteria.uuid });
       }
     };
 
@@ -357,12 +357,7 @@ export function addActionsGroup(
               : "none",
         }}
       />
-      <FaSpinner
-        className="tree-icon animate-spin"
-        size={SPINNER_ICON_SIZE}
-        color="white"
-        style={{ display: spinnerVisibilityFunction(d) ? "block" : "none" }}
-      />
+      <FaSpinner className="tree-icon animate-spin" size={SPINNER_ICON_SIZE} color="white" />
     </>,
     (d) => {
       if (
@@ -407,7 +402,7 @@ export function addActionsGroup(
  */
 export function addParentSelectionOverlay(
   d3: typeof import("d3"),
-  parentNode: D3Selection,
+  parentNode: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>,
   callbacks: Pick<Callbacks, "updateGenreParent" | "setGenrePlaylistGettingAssignedNewParent"> & {
     genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null;
   }
@@ -415,7 +410,7 @@ export function addParentSelectionOverlay(
   const { updateGenreParent, genrePlaylistGettingAssignedNewParent, setGenrePlaylistGettingAssignedNewParent } =
     callbacks;
 
-  let selectAsNewParentGroup = parentNode.select("#select-as-new-parent-group");
+  let selectAsNewParentGroup = parentNode.select<SVGGElement>("#select-as-new-parent-group");
   if (selectAsNewParentGroup.empty()) {
     selectAsNewParentGroup = parentNode
       .append("g")
@@ -449,9 +444,9 @@ export function addParentSelectionOverlay(
           </div>
         );
       })
-      .on("click", function (event: MouseEvent, d: D3Node) {
+      .on("click", function (this: SVGForeignObjectElement, event: MouseEvent, d: unknown) {
         if (genrePlaylistGettingAssignedNewParent) {
-          updateGenreParent(genrePlaylistGettingAssignedNewParent.uuid, d.data.criteria.uuid);
+          updateGenreParent(genrePlaylistGettingAssignedNewParent.uuid, (d as D3Node).data.criteria.uuid);
           setGenrePlaylistGettingAssignedNewParent(null);
         }
       });
