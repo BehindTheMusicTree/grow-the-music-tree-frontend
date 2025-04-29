@@ -14,13 +14,14 @@ export default function GenrePlaylistsPage() {
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-bold mb-6">Genre Playlists</h1>
-      <div className="rounded-md border">
+      <div className="rounded-md border max-h-[calc(100vh-200px)] overflow-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Description</TableHead>
-              <TableHead>Genre</TableHead>
+              <TableHead>Parent</TableHead>
+              <TableHead>Root</TableHead>
               <TableHead>Track Count</TableHead>
             </TableRow>
           </TableHeader>
@@ -38,16 +39,20 @@ export default function GenrePlaylistsPage() {
                       <Skeleton className="h-4 w-[100px]" />
                     </TableCell>
                     <TableCell>
+                      <Skeleton className="h-4 w-[100px]" />
+                    </TableCell>
+                    <TableCell>
                       <Skeleton className="h-4 w-[50px]" />
                     </TableCell>
                   </TableRow>
                 ))
-              : data?.items.map((playlist) => (
+              : data?.results.map((playlist) => (
                   <TableRow key={playlist.uuid}>
                     <TableCell className="font-medium">{playlist.name}</TableCell>
-                    <TableCell>{playlist.description}</TableCell>
-                    <TableCell>{playlist.genre}</TableCell>
-                    <TableCell>{playlist.trackCount}</TableCell>
+                    <TableCell>{playlist.criteria.name}</TableCell>
+                    <TableCell>{playlist.parent?.name || "/"}</TableCell>
+                    <TableCell>{playlist.root?.name}</TableCell>
+                    <TableCell>{playlist.uploadedTracksCount}</TableCell>
                   </TableRow>
                 ))}
           </TableBody>
