@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { ArtistMinimumSchema } from "@domain/artist";
-import { AlbumMinimumSchema } from "@domain/album/shared";
+import { AlbumMinimumSchema } from "@schemas/domain/album/minimum";
 import { CrteriaMinimumSchema } from "@schemas/domain/criteria/response/minimum";
-import { FileDetailedSchema } from "@domain/file";
+import { FileDetailedSchema } from "@schemas/domain/uploaded-track/file";
 import { CriteriaPlaylistMinimumSchema } from "@domain/playlist/criteria-playlist/minimum";
 import { UuidResourceSchema } from "@domain/uuid-resource";
 

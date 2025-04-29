@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { ArtistMinimumSchema } from "../artist";
+
+import { ArtistMinimumSchema } from "@domain/artist/minimum";
 
 export const AlbumMinimumSchema = z.object({
   uuid: z.string().uuid(),
