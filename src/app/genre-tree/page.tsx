@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { FaTree } from "react-icons/fa";
 
 import { usePopup } from "@contexts/PopupContext";
 import { useListGenrePlaylists } from "@hooks/useGenrePlaylist";
@@ -50,6 +51,18 @@ export default function GenreTree() {
 
   return (
     <div className="mt-2 flex flex-col overflow-y-auto h-screen">
+      <div className="flex justify-end p-4 gap-2">
+        <button
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center gap-2"
+          onClick={() => {
+            // TODO: Implement load reference tree genre functionality
+            console.log("Load reference tree genre clicked");
+          }}
+        >
+          <FaTree className="w-5 h-5" />
+          Load reference tree genre
+        </button>
+      </div>
       <div
         className="mt-5 flex justify-center items-center text-center hover:bg-gray-400 hover:text-gray-800 cursor-pointer"
         style={{
