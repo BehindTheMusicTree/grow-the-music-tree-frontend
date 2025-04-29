@@ -8,25 +8,32 @@ import { useTrackList } from "@contexts/TrackListContext";
 import { useUpdateGenre, useCreateGenre, useDeleteGenre } from "@hooks/useGenre";
 import { useUploadTrack } from "@hooks/useUploadedTrack";
 import { usePlayer } from "@contexts/PlayerContext";
-import { useGenreGettingAssignedNewParent } from "@contexts/GenreGettingAssignedNewParentContext";
 
 import { PlayStates } from "@models/PlayStates";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 
-import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
-import { UploadedTrackCreationValues } from "@domain/uploaded-track/form";
-import { CriteriaUpdateValues } from "@domain/criteria/forms/update";
 import InvalidInputPopup from "@components/ui/popup/child/InvalidInputPopup";
+import { UploadedTrackCreationValues } from "@domain/uploaded-track/form/creation";
+import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
+import { CriteriaUpdateValues } from "@domain/criteria/form/update";
+import { CriteriaPlaylistDetailed } from "@domain/playlist/criteria-playlist/detailed";
+import { CriteriaCreationValues } from "@domain/criteria/form/creation";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer";
 
 type GenrePlaylistTreeProps = {
   genrePlaylistTree: CriteriaPlaylistSimple[];
+  genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null;
+  setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
 };
 
-export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTreeProps) {
+export default function GenrePlaylistTree({
+  genrePlaylistTree,
+  genrePlaylistGettingAssignedNewParent,
+  setGenrePlaylistGettingAssignedNewParent,
+}: GenrePlaylistTreeProps) {
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup } = usePopup();
   const { toTrackAtPosition, trackList } = useTrackList();
@@ -38,7 +45,6 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
     previousRenderingVisibleActionsContainerGenrePlaylist,
     setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
   ] = useState<CriteriaPlaylistSimple | null>(null);
-  const { genreGettingAssignedNewParent, setGenreGettingAssignedNewParent } = useGenreGettingAssignedNewParent();
   const [svgWidth, setSvgWidth] = useState(0);
   const [svgHeight, setSvgHeight] = useState(0);
 
@@ -126,18 +132,22 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
       }
     };
 
+    const handleGenreAddAction = (genreCreationValues: CriteriaCreationValues) => {
+      createGenre(genreCreationValues);
+    };
+
     // Render the tree
     const svg = renderTree(d3, svgRef, transformedTreeData, width, height, {
       previousRenderingVisibleActionsContainerGenrePlaylist,
-      genreUuidGettingAssignedNewParent: genreGettingAssignedNewParent?.uuid || null,
+      genrePlaylistGettingAssignedNewParent,
       forbiddenNewParentsUuids: [],
       trackListOrigin: trackList?.origin,
       playState: isPlaying ? PlayStates.PLAYING : PlayStates.STOPPED,
       handlePlayPauseIconAction,
       fileInputRef,
       selectingFileGenreUuidRef,
-      createGenre,
-      setGenreGettingAssignedNewParent,
+      handleGenreAddAction,
+      setGenrePlaylistGettingAssignedNewParent,
       updateGenreParent,
       handleRenameGenre,
       showPopup,
@@ -154,13 +164,13 @@ export default function GenrePlaylistTree({ genrePlaylistTree }: GenrePlaylistTr
     genrePlaylistTree,
     isPlaying,
     trackList?.origin,
-    genreGettingAssignedNewParent,
+    genrePlaylistGettingAssignedNewParent,
     previousRenderingVisibleActionsContainerGenrePlaylist,
     svgWidth,
     svgHeight,
     createGenre,
     handlePlayPauseIconAction,
-    setGenreGettingAssignedNewParent,
+    setGenrePlaylistGettingAssignedNewParent,
     updateGenre,
     showPopup,
   ]);
