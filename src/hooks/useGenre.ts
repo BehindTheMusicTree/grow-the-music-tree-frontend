@@ -44,6 +44,29 @@ function mapGenreFormToPayload<T extends { parentUuid?: string }>(formData: T) {
   };
 }
 
+export function useLoadReferenceTreeGenre() {
+  const { fetch } = useFetchWrapper();
+  const queryClient = useQueryClient();
+  const { invalidateGenrePlaylists } = useListGenrePlaylists();
+
+  return useMutation({
+    mutationFn: async () => {
+      const response = await fetch("genres/tree/load-reference/", true, true, {
+        method: "POST",
+      });
+      const parseResult = CriteriaDetailedSchema.safeParse(response);
+      if (!parseResult.success) {
+        throw new Error("Failed to parse response");
+      }
+      return parseResult.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["genres"] });
+      invalidateGenrePlaylists();
+    },
+  });
+}
+
 export function useCreateGenre() {
   const queryClient = useQueryClient();
   const { invalidateGenrePlaylists } = useListGenrePlaylists();
