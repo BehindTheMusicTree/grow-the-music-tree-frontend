@@ -53,11 +53,13 @@ export function useCreateGenre() {
   const mutate = useMutation<CriteriaDetailed | null, Error, criteriaCreationValues>({
     mutationFn: async (data: unknown) => {
       try {
-        const validatedData = CriteriaCreationSchema.parse(data);
-        const payload = mapGenreFormToPayload(validatedData);
+        const validatedData = CriteriaCreationSchema.safeParse(data);
+        if (!validatedData.success) {
+          throw new Error("Invalid data");
+        }
         const response = await fetch("genres/", true, true, {
           method: "POST",
-          body: JSON.stringify(payload),
+          body: JSON.stringify(validatedData.data),
         });
         if (!response) {
           throw new Error("No response received from server");
