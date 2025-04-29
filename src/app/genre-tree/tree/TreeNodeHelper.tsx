@@ -1,4 +1,4 @@
-import React from "react";
+import { useRef } from "react";
 import ReactDOMServer from "react-dom/server";
 import { MdMoreVert, MdModeEdit } from "react-icons/md";
 import { FaPlus, FaTrashAlt, FaPlay, FaPause, FaSpinner, FaFileUpload } from "react-icons/fa";
@@ -30,7 +30,7 @@ interface Callbacks {
   handlePlayPauseIconAction: (genrePlaylist: CriteriaPlaylistSimple) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
   selectingFileGenreUuidRef: React.MutableRefObject<string | null>;
-  handleGenreAddAction: (genreCreationValues: CriteriaCreationValues) => void;
+  handleGenreCreationAction: (CriteriaCreationValues: CriteriaCreationValues) => void;
   setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
   renameGenre: (uuid: string, name: string, showPopup: (title: string, message: string) => void) => Promise<void>;
   showPopup: (title: string, message: string) => void;
@@ -59,9 +59,8 @@ export function addMoreIconContainer(
   d3: typeof import("d3"),
   genrePlaylist: CriteriaPlaylistSimple,
   group: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>,
-  callbacks: Pick<Callbacks, "handleMoreActionEnterMouse">
+  handleMoreActionEnterMouse: (event: MouseEvent, d: D3Node, genrePlaylist: CriteriaPlaylistSimple) => void
 ) {
-  const { handleMoreActionEnterMouse } = callbacks;
   const moreIconContainer = group.select("#more-icon-container-" + genrePlaylist.uuid);
 
   if (moreIconContainer.empty()) {
@@ -162,18 +161,33 @@ export function addActionsGroup(
   d3: typeof import("d3"),
   genrePlaylist: CriteriaPlaylistSimple,
   genrePlaylistGroup: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>,
-  callbacks: Callbacks
+  callbacks: {
+    handlePlayPauseIconAction: (genrePlaylist: CriteriaPlaylistSimple) => void;
+    fileInputRef: React.RefObject<HTMLInputElement>;
+    selectingFileGenreUuidRef: React.MutableRefObject<string | null>;
+    handleGenreCreationAction: (CriteriaCreationValues: CriteriaCreationValues) => void;
+    setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
+    renameGenre: (uuid: string, name: string, showPopup: (title: string, message: string) => void) => Promise<void>;
+    showPopup: (title: string, message: string) => void;
+    trackListOrigin: {
+      type: TrackListOriginType;
+      uuid: string;
+    };
+    playState: PlayStates;
+    handleMoreActionEnterMouse: (event: MouseEvent, d: D3Node, genrePlaylist: CriteriaPlaylistSimple) => void;
+  }
 ) {
   const {
     handlePlayPauseIconAction,
     fileInputRef,
     selectingFileGenreUuidRef,
-    handleGenreAddAction,
+    handleGenreCreationAction,
     setGenrePlaylistGettingAssignedNewParent,
     renameGenre,
     showPopup,
     trackListOrigin,
     playState,
+    handleMoreActionEnterMouse,
   } = callbacks;
 
   const actionsGroup = genrePlaylistGroup.append("g").attr("id", "actions-container-" + genrePlaylist.uuid);
@@ -240,7 +254,7 @@ export function addActionsGroup(
       genrePlaylistGroup.dispatch("mouseleave");
       const name = prompt("New genre name:");
       if (name) {
-        handleGenreAddAction({ name, parent: d.data.criteria.uuid });
+        handleGenreCreationAction({ name, parent: d.data.criteria.uuid });
       }
     };
 
@@ -391,7 +405,7 @@ export function addActionsGroup(
   );
 
   actionsGroup.on("mouseenter", function () {
-    addMoreIconContainer(d3, genrePlaylist, genrePlaylistGroup, callbacks);
+    addMoreIconContainer(d3, genrePlaylist, genrePlaylistGroup, handleMoreActionEnterMouse);
   });
 
   return actionsGroup;

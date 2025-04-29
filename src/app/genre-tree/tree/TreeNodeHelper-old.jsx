@@ -129,7 +129,7 @@ export function addActionsGroup(d3, genrePlaylist, genrePlaylistGroup, callbacks
     fileInputRef,
     selectingFileGenreUuidRef,
     addGenre,
-    setGenreGettingAssignedNewParent,
+    setGenrePlaylistGettingAssignedNewParent,
     renameGenre,
     showPopup,
     trackListOrigin,
@@ -223,7 +223,7 @@ export function addActionsGroup(d3, genrePlaylist, genrePlaylistGroup, callbacks
 
     const changeParentActionOnclick = (event, d) => {
       genrePlaylistGroup.dispatch("mouseleave");
-      setGenreGettingAssignedNewParent(d.data.criteria);
+      setGenrePlaylistGettingAssignedNewParent(d.data.criteria);
     };
 
     addActionContainer(
@@ -389,7 +389,7 @@ export function addActionsGroup(d3, genrePlaylist, genrePlaylistGroup, callbacks
  * Adds the parent selection overlay to a node
  */
 export function addParentSelectionOverlay(d3, parentNode, callbacks) {
-  const { updateGenreParent, genreUuidGettingAssignedNewParent, setGenreGettingAssignedNewParent } = callbacks;
+  const { updateGenreParent, genreUuidGettingAssignedNewParent, setGenrePlaylistGettingAssignedNewParent } = callbacks;
 
   let selectAsNewParentGroup = parentNode.select("#select-as-new-parent-group");
   if (selectAsNewParentGroup.empty()) {
@@ -427,7 +427,7 @@ export function addParentSelectionOverlay(d3, parentNode, callbacks) {
       })
       .on("click", function (event, d) {
         updateGenreParent(genreUuidGettingAssignedNewParent, d.data.criteria.uuid);
-        setGenreGettingAssignedNewParent(null);
+        setGenrePlaylistGettingAssignedNewParent(null);
       });
   }
 

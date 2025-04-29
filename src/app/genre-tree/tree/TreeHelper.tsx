@@ -8,7 +8,7 @@ type D3Link = d3.HierarchyLink<CriteriaPlaylistSimple>;
 export function appendPaths(
   d3: typeof import("d3"),
   svg: D3Selection,
-  treeData: d3.HierarchyNode<CriteriaPlaylistSimple>,
+  treeData: D3Node,
   xOffset: number,
   yOffset: number
 ) {

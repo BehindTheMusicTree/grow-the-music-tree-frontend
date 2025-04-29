@@ -132,8 +132,8 @@ export default function GenrePlaylistTree({
       }
     };
 
-    const handleGenreAddAction = (genreCreationValues: CriteriaCreationValues) => {
-      createGenre(genreCreationValues);
+    const handleGenreCreationAction = (CriteriaCreationValues: CriteriaCreationValues) => {
+      createGenre(CriteriaCreationValues);
     };
 
     // Render the tree
@@ -146,7 +146,7 @@ export default function GenrePlaylistTree({
       handlePlayPauseIconAction,
       fileInputRef,
       selectingFileGenreUuidRef,
-      handleGenreAddAction,
+      handleGenreCreationAction,
       setGenrePlaylistGettingAssignedNewParent,
       updateGenreParent,
       handleRenameGenre,
