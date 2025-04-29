@@ -1,7 +1,7 @@
 "use client";
 
 import { PiGraphLight } from "react-icons/pi";
-import { FaSpotify, FaCloudUploadAlt, FaUser } from "react-icons/fa";
+import { FaSpotify, FaCloudUploadAlt, FaUser, FaList } from "react-icons/fa";
 import { MenuGroup } from "./MenuGroup";
 
 const menuGroups = {
@@ -13,6 +13,11 @@ const menuGroups = {
     },
   ],
   library: [
+    {
+      href: "/genre-playlists",
+      label: "Genre Playlists",
+      icon: <FaList className="text-xl" />,
+    },
     {
       href: "/uploaded-library",
       label: "Uploaded Library",

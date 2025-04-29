@@ -44,3 +44,30 @@ export const useRetrieveGenrePlaylist = (uuid: string) => {
     },
   });
 };
+
+export const useListAllGenrePlaylists = () => {
+  const queryClient = useQueryClient();
+  const { fetch } = useFetchWrapper();
+
+  const query = useQuery({
+    queryKey: ["allGenrePlaylists"],
+    queryFn: async () => {
+      const response = await fetch("genre-playlists/", true, true, {}, { page: 1, pageSize: 1000 });
+      const parseResult = PaginatedResponseSchema(CriteriaPlaylistSimpleSchema).safeParse(response);
+      if (!parseResult.success) {
+        console.error("Parsing failed:", parseResult.error);
+        throw parseResult.error;
+      }
+      return parseResult.data;
+    },
+  });
+
+  const invalidateAllGenrePlaylists = () => {
+    queryClient.invalidateQueries({ queryKey: ["allGenrePlaylists"] });
+  };
+
+  return {
+    ...query,
+    invalidateAllGenrePlaylists,
+  };
+};

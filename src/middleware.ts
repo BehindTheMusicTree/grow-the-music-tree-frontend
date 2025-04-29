@@ -12,14 +12,10 @@ try {
 
 export function middleware(request: NextRequest) {
   try {
-    console.log("middleware: request", request);
-    console.log("middleware: request.nextUrl.pathname", request.nextUrl.pathname);
     // Redirect root to music page
     if (request.nextUrl.pathname === "/") {
-      console.log("middleware: redirecting to /genre-tree");
-      return NextResponse.redirect(new URL("/genre-tree", request.url));
+      return NextResponse.redirect(new URL("/genre-playlists", request.url));
     }
-    console.log("middleware: returning NextResponse.next()");
 
     return NextResponse.next();
   } catch (error) {
