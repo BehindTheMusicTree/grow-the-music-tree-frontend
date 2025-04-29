@@ -12,7 +12,7 @@ export default function SpotifyOAuthCallback() {
   const searchParams = useSearchParams();
   const { authToBackendFromSpotifyCode } = useSpotifyAuth();
   const { setConnectivityError } = useConnectivityError();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isPending, setisPending] = useState(true);
   const [error, setError] = useState(null);
   const authAttempted = useRef(false);
 
@@ -26,13 +26,13 @@ export default function SpotifyOAuthCallback() {
 
       if (error) {
         setError(new Error(`Spotify authentication failed: ${error}`));
-        setIsLoading(false);
+        setisPending(false);
         return;
       }
 
       if (!code) {
         setError(new Error("No authorization code received from Spotify"));
-        setIsLoading(false);
+        setisPending(false);
         return;
       }
 
@@ -47,14 +47,14 @@ export default function SpotifyOAuthCallback() {
           setError(new Error("An unexpected error occurred. Please try again later."));
         }
       } finally {
-        setIsLoading(false);
+        setisPending(false);
       }
     };
 
     handleAuth();
   }, [authToBackendFromSpotifyCode, router, searchParams]); // Empty dependency array since we only want this to run once
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
