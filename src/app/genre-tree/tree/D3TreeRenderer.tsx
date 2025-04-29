@@ -1,3 +1,5 @@
+"use client";
+
 import * as d3 from "d3";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { CriteriaCreationValues } from "@domain/criteria/form/creation";
@@ -116,6 +118,7 @@ export function renderTree(
 
   appendPaths(d3, svg, treeData, RECT_BASE_DIMENSIONS.WIDTH / 2, RECT_BASE_DIMENSIONS.HEIGHT / 2);
 
+  // Hack to invert the tree so that x is horizontal and y is vertical
   const nodes = svg
     .selectAll<SVGGElement, D3Node>("g.node")
     .data(treeData.descendants())

@@ -1,3 +1,5 @@
+"use client";
+
 import { useRef } from "react";
 import ReactDOMServer from "react-dom/server";
 import { MdMoreVert, MdModeEdit } from "react-icons/md";
