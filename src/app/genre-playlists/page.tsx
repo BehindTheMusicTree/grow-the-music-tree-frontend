@@ -7,7 +7,7 @@ import { Input } from "@components/ui/input";
 import { useState, useMemo, ChangeEvent } from "react";
 
 export default function GenrePlaylistsPage() {
-  const { data, isLoading, error } = useListFullGenrePlaylists();
+  const { data, isPending, error } = useListFullGenrePlaylists();
   const [nameFilter, setNameFilter] = useState("");
   const [parentFilter, setParentFilter] = useState("");
   const [rootFilter, setRootFilter] = useState("");
@@ -82,7 +82,7 @@ export default function GenrePlaylistsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading
+            {isPending
               ? Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
                     <TableCell>
