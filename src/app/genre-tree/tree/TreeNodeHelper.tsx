@@ -47,11 +47,11 @@ interface Callbacks {
 /**
  * Builds the hierarchical tree structure from flat data
  */
-export function buildTreeHierarchy(d3: typeof import("d3"), genrePlaylistTree: CriteriaPlaylistSimple[]) {
+export function buildTreeHierarchy(d3: typeof import("d3"), GenrePlaylistTreePerRoot: CriteriaPlaylistSimple[]) {
   return d3
     .stratify<CriteriaPlaylistSimple>()
     .id((d) => d.uuid)
-    .parentId((d) => d.parent?.uuid || null)(genrePlaylistTree);
+    .parentId((d) => d.parent?.uuid || null)(GenrePlaylistTreePerRoot);
 }
 
 /**

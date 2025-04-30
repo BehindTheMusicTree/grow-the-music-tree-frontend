@@ -21,17 +21,17 @@ import { CriteriaCreationValues } from "@domain/criteria/form/creation";
 import { buildTreeHierarchy } from "./TreeNodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer";
 
-type GenrePlaylistTreeProps = {
-  genrePlaylistTree: CriteriaPlaylistSimple[];
+type GenrePlaylistTreePerRootProps = {
+  GenrePlaylistTreePerRoot: CriteriaPlaylistSimple[];
   genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null;
   setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
 };
 
-export default function GenrePlaylistTree({
-  genrePlaylistTree,
+export default function GenrePlaylistTreePerRoot({
+  GenrePlaylistTreePerRoot,
   genrePlaylistGettingAssignedNewParent,
   setGenrePlaylistGettingAssignedNewParent,
-}: GenrePlaylistTreeProps) {
+}: GenrePlaylistTreePerRootProps) {
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup } = usePopup();
   const { toTrackAtPosition, trackList } = useTrackList();
@@ -96,7 +96,7 @@ export default function GenrePlaylistTree({
     d3.select(svgRef.current).selectAll("*").remove();
 
     // Build tree hierarchy
-    const root = buildTreeHierarchy(d3, genrePlaylistTree);
+    const root = buildTreeHierarchy(d3, GenrePlaylistTreePerRoot);
 
     // Create tree layout
     const treeData = createTreeLayout(d3, root);
@@ -159,7 +159,7 @@ export default function GenrePlaylistTree({
       }
     };
   }, [
-    genrePlaylistTree,
+    GenrePlaylistTreePerRoot,
     isPlaying,
     trackList?.origin,
     genrePlaylistGettingAssignedNewParent,
