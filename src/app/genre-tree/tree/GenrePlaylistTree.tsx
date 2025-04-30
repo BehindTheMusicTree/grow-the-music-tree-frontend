@@ -41,7 +41,7 @@ export default function GenrePlaylistTree({
   const { mutate: deleteGenre } = useDeleteGenre();
   const [
     previousRenderingVisibleActionsContainerGenrePlaylist,
-    setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
+    setPreviousRenderingVisibleActionsContainerGenrePlaylist,
   ] = useState<CriteriaPlaylistSimple | null>(null);
   const [svgWidth, setSvgWidth] = useState(0);
   const [svgHeight, setSvgHeight] = useState(0);
@@ -149,7 +149,7 @@ export default function GenrePlaylistTree({
       updateGenreParent,
       handleRenameGenre,
       showPopup,
-      setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
+      setPreviousRenderingVisibleActionsContainerGenrePlaylist,
     });
 
     // Cleanup on unmount

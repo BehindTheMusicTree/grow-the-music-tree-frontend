@@ -43,7 +43,7 @@ interface TreeCallbacks {
     showPopup: (title: string, message: string) => void
   ) => Promise<void>;
   showPopup: (title: string, message: string) => void;
-  setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
+  setPreviousRenderingVisibleActionsContainerGenrePlaylist: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
 }
 
 export function calculateSvgDimensions(d3: typeof import("d3"), treeData: D3Node): SvgDimensions {
@@ -100,7 +100,7 @@ export function renderTree(
     updateGenreParent,
     handleRenameGenre: renameGenre,
     showPopup,
-    setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid,
+    setPreviousRenderingVisibleActionsContainerGenrePlaylist,
   } = callbacks;
 
   if (!svgRef.current) {
@@ -153,9 +153,11 @@ export function renderTree(
 
   const handleMoreActionEnterMouse = (event: MouseEvent, d: D3Node, genrePlaylist: CriteriaPlaylistSimple) => {
     event.stopPropagation();
+
     const genrePlaylistUuid = genrePlaylist.uuid;
     const group = d3.select<SVGGElement, unknown>("#group-" + genrePlaylistUuid);
     const actionsContainer = group.select<SVGGElement>("#actions-container-" + genrePlaylistUuid);
+
     if (actionsContainer.empty()) {
       addMoreIconContainer(d3, genrePlaylist, group, handleMoreActionEnterMouse);
       addActionsGroup(d3, genrePlaylist, group, {
@@ -170,6 +172,7 @@ export function renderTree(
         playState,
         handleMoreActionEnterMouse,
       });
+      setPreviousRenderingVisibleActionsContainerGenrePlaylist(d.data);
     }
   };
 
@@ -196,7 +199,6 @@ export function renderTree(
     })
     .on("mouseover", function (event, d) {
       if (!aGenreIsGettingAssignedNewParent) {
-        setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(d.data);
         addMoreIconContainer(
           d3,
           d.data,
@@ -226,6 +228,10 @@ export function renderTree(
     });
 
   if (previousRenderingVisibleActionsContainerGenrePlaylist) {
+    console.log(
+      "previousRenderingVisibleActionsContainerGenrePlaylist",
+      previousRenderingVisibleActionsContainerGenrePlaylist
+    );
     const group = d3.select<SVGGElement, unknown>(
       "#group-" + previousRenderingVisibleActionsContainerGenrePlaylist.uuid
     );
@@ -247,7 +253,7 @@ export function renderTree(
   nodes.each(function (d: D3Node) {
     const group = d3.select<SVGGElement, unknown>(this);
     group.on("mouseleave", function (event) {
-      setPreviousRenderingVisibleActionsContainerGenrePlaylistUuid(null);
+      setPreviousRenderingVisibleActionsContainerGenrePlaylist(null);
       d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid).remove();
       d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid).remove();
     });
