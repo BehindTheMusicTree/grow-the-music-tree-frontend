@@ -9,7 +9,7 @@ type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon
   onSubmit: (values: CriteriaCreationValues) => void;
   onClose?: () => void;
   formErrors?: { field: string; message: string }[];
-  parent?: CriteriaMinimum;
+  parent?: CriteriaMinimum | null;
 };
 
 // @ts-expect-error: ommitted props are set internally by the popup
@@ -42,7 +42,7 @@ export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProp
               <input
                 type="text"
                 name="parent"
-                value={this.state.parent?.name || ""}
+                value={this.state.parent?.name || "(root genre)"}
                 className="w-full px-3 py-2 border rounded-md"
                 disabled
               />
