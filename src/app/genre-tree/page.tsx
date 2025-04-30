@@ -13,7 +13,6 @@ import { CriteriaCreationValues } from "@domain/criteria/form/creation";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
 import GenrePlaylistTreePerRoot from "./tree/GenrePlaylistTreePerRoot";
-import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "./tree/tree-constants";
 import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
 
 export default function GenreTree() {
@@ -72,7 +71,6 @@ export default function GenreTree() {
           <IconTextButton
             icon={Plus}
             text="Add root"
-            size="lg"
             onClick={() => {
               showCriteriaCreationPopup();
             }}
