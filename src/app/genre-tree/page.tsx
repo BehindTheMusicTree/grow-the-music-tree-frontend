@@ -14,6 +14,7 @@ import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simpl
 import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
 import GenrePlaylistTreePerRoot from "./tree/GenrePlaylistTreePerRoot";
 import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
+import { GenreTreeSkeleton } from "./tree/GenreTreeSkeleton";
 
 export default function GenreTree() {
   const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists();
@@ -87,7 +88,7 @@ export default function GenreTree() {
         </div>
       </div>
       {isLoadingReferenceTreeGenre || isListingGenrePlaylists ? (
-        <p>Loading...</p>
+        <GenreTreeSkeleton />
       ) : (
         <>
           <div className="tree-container flex flex-col text-gray-800 w-full overflow-x-auto overflow-y-auto">
