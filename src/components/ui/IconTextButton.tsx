@@ -1,10 +1,11 @@
 "use client";
 
 import { LucideIcon } from "lucide-react";
+import { IconType } from "react-icons";
 import { Button, ButtonProps } from "./Button";
 
 interface IconTextButtonProps extends Omit<ButtonProps, "children"> {
-  icon: LucideIcon;
+  icon: LucideIcon | IconType;
   text: string;
   iconPosition?: "left" | "right";
 }
