@@ -34,23 +34,12 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
   };
 };
 
-export const useRetrieveGenrePlaylist = (uuid: string) => {
-  const { fetch } = useFetchWrapper();
-  return useQuery<CriteriaPlaylistDetailed>({
-    queryKey: ["genrePlaylists", uuid],
-    queryFn: async () => {
-      const response = await fetch(`genre-playlists/${uuid}`, true);
-      return CriteriaPlaylistDetailedSchema.parse(response);
-    },
-  });
-};
-
-export const useListAllGenrePlaylists = () => {
+export const useListFullGenrePlaylists = () => {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
 
   const query = useQuery({
-    queryKey: ["allGenrePlaylists"],
+    queryKey: ["fullGenrePlaylists"],
     queryFn: async () => {
       const response = await fetch("genre-playlists/", true, true, {}, { page: 1, pageSize: 1000 });
       const parseResult = PaginatedResponseSchema(CriteriaPlaylistSimpleSchema).safeParse(response);
@@ -62,12 +51,31 @@ export const useListAllGenrePlaylists = () => {
     },
   });
 
-  const invalidateAllGenrePlaylists = () => {
-    queryClient.invalidateQueries({ queryKey: ["allGenrePlaylists"] });
+  const invalidatefullGenrePlaylists = () => {
+    queryClient.invalidateQueries({ queryKey: ["fullGenrePlaylists"] });
   };
 
   return {
     ...query,
-    invalidateAllGenrePlaylists,
+    invalidatefullGenrePlaylists,
+  };
+};
+
+export const useRetrieveGenrePlaylist = (uuid: string) => {
+  const { fetch } = useFetchWrapper();
+  return useQuery<CriteriaPlaylistDetailed>({
+    queryKey: ["genrePlaylists", uuid],
+    queryFn: async () => {
+      const response = await fetch(`genre-playlists/${uuid}`, true);
+      return CriteriaPlaylistDetailedSchema.parse(response);
+    },
+  });
+};
+
+export const useInvalidateAllGenrePlaylistQueries = () => {
+  const queryClient = useQueryClient();
+  return () => {
+    queryClient.invalidateQueries({ queryKey: ["genrePlaylists"] });
+    queryClient.invalidateQueries({ queryKey: ["fullGenrePlaylists"] });
   };
 };
