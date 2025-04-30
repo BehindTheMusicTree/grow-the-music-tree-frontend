@@ -77,7 +77,7 @@ export default function GenreTree() {
       ) : (
         <>
           <div
-            className="mt-5 flex justify-center items-center text-center hover:bg-gray-400 hover:text-gray-800 cursor-pointer"
+            className="mt-5 justify-center items-center text-center hover:bg-gray-400 hover:text-gray-800 cursor-pointer"
             style={{
               width: GENRE_PLAYLIST_TREE_RECT_DIMENSIONS.WIDTH + "px",
               height: GENRE_PLAYLIST_TREE_RECT_DIMENSIONS.HEIGHT + "px",
@@ -89,7 +89,7 @@ export default function GenreTree() {
           >
             +
           </div>
-          <div className="tree-container flex flex-col text-gray-800 min-w-max overflow-x-auto overflow-y-auto">
+          <div className="tree-container flex flex-col text-gray-800 w-full overflow-x-auto overflow-y-auto">
             {Object.entries(groupedGenrePlaylistsByRoot).map(([uuid, genrePlaylistTree]) => {
               // Wrap in array to match expected props type
               return (
