@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { FaTree } from "react-icons/fa";
+import { Plus } from "lucide-react";
+import { IconTextButton } from "@components/ui/IconTextButton";
 
 import { usePopup } from "@contexts/PopupContext";
 import { useListFullGenrePlaylists } from "@hooks/useGenrePlaylist";
@@ -65,35 +67,31 @@ export default function GenreTree() {
 
   return (
     <div className="mt-4 flex flex-col h-screen">
-      <div className="flex justify-start">
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500"
-          onClick={() => {
-            loadReferenceTreeGenre();
-          }}
-          disabled={isLoadingReferenceTreeGenre || isListingGenrePlaylists}
-        >
-          <FaTree className="w-5 h-5" />
-          Load reference tree genre
-        </button>
+      <div className="actions-container flex justify-start">
+        <div className="flex justify-start">
+          <IconTextButton
+            icon={Plus}
+            text="Add root"
+            size="lg"
+            onClick={() => {
+              showCriteriaCreationPopup();
+            }}
+          />
+          <IconTextButton
+            icon={FaTree}
+            text="Load the reference tree genre"
+            className="ml-2"
+            onClick={() => {
+              loadReferenceTreeGenre();
+            }}
+            disabled={isLoadingReferenceTreeGenre || isListingGenrePlaylists}
+          />
+        </div>
       </div>
       {isLoadingReferenceTreeGenre || isListingGenrePlaylists ? (
         <p>Loading...</p>
       ) : (
         <>
-          <div
-            className="mt-5 justify-center items-center text-center hover:bg-gray-400 hover:text-gray-800 cursor-pointer"
-            style={{
-              width: GENRE_PLAYLIST_TREE_RECT_DIMENSIONS.WIDTH + "px",
-              height: GENRE_PLAYLIST_TREE_RECT_DIMENSIONS.HEIGHT + "px",
-              border: "1px solid black",
-            }}
-            onClick={() => {
-              showCriteriaCreationPopup();
-            }}
-          >
-            +
-          </div>
           <div className="tree-container flex flex-col text-gray-800 w-full overflow-x-auto overflow-y-auto">
             {Object.entries(groupedGenrePlaylistsByRoot).map(([uuid, genrePlaylistTreePerRoot]) => {
               // Wrap in array to match expected props type
