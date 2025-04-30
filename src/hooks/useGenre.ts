@@ -95,9 +95,7 @@ export function useCreateGenre() {
         console.log("parseResult", parseResult.data);
         return parseResult.data;
       } catch (error) {
-        console.log("catch error", error);
         if (error instanceof InvalidInputError) {
-          console.log("invalid input error", error.json);
           try {
             const errorResponse = ErrorResponseSchema.parse(error.json);
             setFormErrors(
