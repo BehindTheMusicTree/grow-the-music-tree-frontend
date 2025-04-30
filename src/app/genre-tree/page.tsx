@@ -14,7 +14,7 @@ import GenrePlaylistTree from "./tree/GenrePlaylistTree";
 import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "./tree/tree-constants";
 
 export default function GenreTree() {
-  const { data: genrePlaylists, isPending: isListingGenrePlaylists, isLoading, lol } = useListFullGenrePlaylists();
+  const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists();
   const { mutate: createGenre, formErrors } = useCreateGenre();
   const { mutate: loadReferenceTreeGenre, isPending: isLoadingReferenceTreeGenre } = useLoadReferenceTreeGenre();
 
