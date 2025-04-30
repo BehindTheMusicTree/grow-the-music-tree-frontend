@@ -87,6 +87,7 @@ export function useCreateGenre() {
         if (!response) {
           throw new Error("No response received from server");
         }
+        console.log("response", response);
         const parseResult = CriteriaDetailedSchema.safeParse(response);
         if (!parseResult.success) {
           console.error("Parsing failed:", parseResult.error);

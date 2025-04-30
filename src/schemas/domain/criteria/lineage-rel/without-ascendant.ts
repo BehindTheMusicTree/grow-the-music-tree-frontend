@@ -1,7 +1,9 @@
 import { z } from "zod";
-import { CrteriaMinimumSchema } from "@schemas/domain/criteria/response/minimum";
+import { CriteriaMinimumSchema } from "@schemas/domain/criteria/response/minimum";
 
 export const CriteriaLineageRelWithoutAscendantSchema = z.object({
-  descendants: z.array(CrteriaMinimumSchema),
+  descendant: CriteriaMinimumSchema,
   degree: z.number(),
 });
+
+export type CriteriaLineageRelWithoutAscendant = z.infer<typeof CriteriaLineageRelWithoutAscendantSchema>;

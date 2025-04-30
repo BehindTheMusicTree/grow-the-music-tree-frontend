@@ -1,23 +1,21 @@
 import { z } from "zod";
 
 import { UuidResourceSchema } from "@domain/uuid-resource";
-import { CriteriaSimpleSchema } from "./simple";
+import { CriteriaMinimumSchema } from "./minimum";
+import { CriteriaPlaylistMinimumSchema } from "@domain/playlist/criteria-playlist/minimum";
+import { UploadedTrackMinimumSchema } from "@domain/uploaded-track/response/minimum";
+import { CriteriaLineageRelWithoutAscendantSchema } from "../lineage-rel/without-ascendant";
+import { CriteriaLineageRelWithoutDescendantSchema } from "../lineage-rel/without-descendant";
 
 export const CriteriaDetailedSchema = UuidResourceSchema.extend({
   name: z.string(),
-  parent: CriteriaSimpleSchema.nullable(),
-  ascendants: z.array(CriteriaSimpleSchema),
-  descendants: z.array(CriteriaSimpleSchema),
-  root: z.object({
-    uuid: z.string().uuid(),
-    name: z.string(),
-  }),
-  children: z.array(z.string().uuid()),
-  criteriaPlaylist: z.object({
-    uuid: z.string().uuid(),
-    name: z.string(),
-  }),
-  uploadedTracks: z.array(z.unknown()),
+  parent: CriteriaMinimumSchema.nullable(),
+  ascendants: z.array(CriteriaLineageRelWithoutDescendantSchema),
+  descendants: z.array(CriteriaLineageRelWithoutAscendantSchema),
+  root: CriteriaMinimumSchema,
+  children: z.array(CriteriaMinimumSchema),
+  criteriaPlaylist: CriteriaPlaylistMinimumSchema,
+  uploadedTracks: z.array(UploadedTrackMinimumSchema),
   uploadedTracksCount: z.number(),
   uploadedTracksArchivedCount: z.number(),
   updatedOn: z.string().datetime().nullable(),

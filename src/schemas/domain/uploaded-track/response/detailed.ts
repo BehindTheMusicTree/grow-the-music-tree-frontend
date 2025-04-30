@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { ArtistMinimumSchema } from "@domain/artist/minimum";
 import { AlbumMinimumSchema } from "@schemas/domain/album/minimum";
-import { CrteriaMinimumSchema } from "@schemas/domain/criteria/response/minimum";
+import { CriteriaMinimumSchema } from "@schemas/domain/criteria/response/minimum";
 import { FileDetailedSchema } from "@schemas/domain/uploaded-track/file";
 import { CriteriaPlaylistMinimumSchema } from "@domain/playlist/criteria-playlist/minimum";
 import { UuidResourceSchema } from "@domain/uuid-resource";
@@ -14,7 +14,7 @@ export const UploadedTrackDetailedSchema = UuidResourceSchema.extend({
   artists: z.array(ArtistMinimumSchema),
   album: AlbumMinimumSchema,
   trackNumber: z.number().optional(),
-  genre: CrteriaMinimumSchema,
+  genre: CriteriaMinimumSchema,
   rating: z.number().min(0).max(10).optional(),
   language: z.string().optional(),
   playlists: z.array(CriteriaPlaylistMinimumSchema),
