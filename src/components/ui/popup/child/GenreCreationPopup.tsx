@@ -3,16 +3,19 @@
 import { Button } from "@components/ui/Button";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 import { CriteriaCreationValues } from "@domain/criteria/form/creation";
+import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
 
 type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   onSubmit: (values: CriteriaCreationValues) => void;
   onClose?: () => void;
   formErrors?: { field: string; message: string }[];
+  parent?: CriteriaMinimum;
 };
 
 // @ts-expect-error: ommitted props are set internally by the popup
 export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProps> {
   state = {
+    parent: this.props.parent,
     name: "",
   };
 
@@ -35,17 +38,25 @@ export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProp
         <form onSubmit={this.handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={this.state.name}
-                  onChange={this.handleChange}
-                  className="w-full px-3 py-2 border rounded-md"
-                  autoFocus
-                />
-              </div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Parent</label>
+              <input
+                type="text"
+                name="parent"
+                value={this.state.parent?.name || ""}
+                className="w-full px-3 py-2 border rounded-md"
+                disabled
+              />
+            </div>
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <input
+                type="text"
+                name="name"
+                value={this.state.name}
+                onChange={this.handleChange}
+                className="w-full px-3 py-2 border rounded-md"
+                autoFocus
+              />
             </div>
           </div>
           {formErrors && formErrors.length > 0 && (

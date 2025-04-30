@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import ReactDOMServer from "react-dom/server";
 import { MdMoreVert, MdModeEdit } from "react-icons/md";
 import { FaPlus, FaTrashAlt, FaPlay, FaPause, FaSpinner, FaFileUpload } from "react-icons/fa";
@@ -10,7 +9,7 @@ import * as d3 from "d3";
 import { PlayStates } from "@models/PlayStates";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
-import { CriteriaCreationValues } from "@domain/criteria/form/creation";
+import { CriteriaMinimum } from "@domain/criteria/response/minimum";
 
 import {
   RECTANGLE_COLOR,
@@ -32,7 +31,7 @@ interface Callbacks {
   handlePlayPauseIconAction: (genrePlaylist: CriteriaPlaylistSimple) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
   selectingFileGenreUuidRef: React.MutableRefObject<string | null>;
-  handleGenreCreationAction: (CriteriaCreationValues: CriteriaCreationValues) => void;
+  handleGenreCreationAction: (parent: string) => void;
   setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
   renameGenre: (uuid: string, name: string, showPopup: (title: string, message: string) => void) => Promise<void>;
   showPopup: (title: string, message: string) => void;
@@ -167,7 +166,7 @@ export function addActionsGroup(
     handlePlayPauseIconAction: (genrePlaylist: CriteriaPlaylistSimple) => void;
     fileInputRef: React.RefObject<HTMLInputElement>;
     selectingFileGenreUuidRef: React.MutableRefObject<string | null>;
-    handleGenreCreationAction: (CriteriaCreationValues: CriteriaCreationValues) => void;
+    handleGenreCreationAction: (parent: CriteriaMinimum) => void;
     setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
     renameGenre: (uuid: string, name: string, showPopup: (title: string, message: string) => void) => Promise<void>;
     showPopup: (title: string, message: string) => void;
@@ -254,10 +253,7 @@ export function addActionsGroup(
   if (!isGenreless) {
     const addChildActionOnclick = async (event: MouseEvent, d: D3Node) => {
       genrePlaylistGroup.dispatch("mouseleave");
-      const name = prompt("New genre name:");
-      if (name) {
-        handleGenreCreationAction({ name, parent: d.data.criteria.uuid });
-      }
+      handleGenreCreationAction(d.data.criteria);
     };
 
     addActionContainer(

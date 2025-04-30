@@ -1,10 +1,12 @@
 "use client";
 
 import * as d3 from "d3";
+
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
-import { CriteriaCreationValues } from "@domain/criteria/form/creation";
+import { CriteriaMinimum } from "@domain/criteria/response/minimum";
 import { PlayStates } from "@models/PlayStates";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
+
 import {
   RECT_BASE_DIMENSIONS,
   HORIZONTAL_SEPARATOON_BETWEEN_NODES,
@@ -16,6 +18,7 @@ import {
 import { addGrid } from "../d3Helper";
 import { appendPaths } from "./TreeHelper";
 import { addMoreIconContainer, addActionsGroup, addParentSelectionOverlay } from "./TreeNodeHelper";
+
 type D3Selection = d3.Selection<SVGGElement, unknown, null, undefined>;
 type D3Node = d3.HierarchyNode<CriteriaPlaylistSimple>;
 
@@ -34,7 +37,7 @@ interface TreeCallbacks {
   handlePlayPauseIconAction: (genrePlaylist: CriteriaPlaylistSimple) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
   selectingFileGenreUuidRef: React.MutableRefObject<string | null>;
-  handleGenreCreationAction: (CriteriaCreationValues: CriteriaCreationValues) => void;
+  handleGenreCreationAction: (parent: CriteriaMinimum | null) => void;
   setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
   updateGenreParent: (genreUuid: string, newParentUuid: string) => Promise<void>;
   handleRenameGenre: (

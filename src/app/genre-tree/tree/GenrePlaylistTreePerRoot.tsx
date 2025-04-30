@@ -16,7 +16,7 @@ import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
 import InvalidInputPopup from "@components/ui/popup/child/InvalidInputPopup";
 import { UploadedTrackCreationValues } from "@domain/uploaded-track/form/creation";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
-import { CriteriaCreationValues } from "@domain/criteria/form/creation";
+import { CriteriaMinimum } from "@domain/criteria/response/minimum";
 
 import { buildTreeHierarchy } from "./TreeNodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer";
@@ -25,12 +25,14 @@ type GenrePlaylistTreePerRootProps = {
   genrePlaylistTreePerRoot: CriteriaPlaylistSimple[];
   genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null;
   setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
+  handleGenreCreationAction: (parent: CriteriaMinimum | null) => void;
 };
 
 export default function GenrePlaylistTreePerRoot({
   genrePlaylistTreePerRoot,
   genrePlaylistGettingAssignedNewParent,
   setGenrePlaylistGettingAssignedNewParent,
+  handleGenreCreationAction,
 }: GenrePlaylistTreePerRootProps) {
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup } = usePopup();
@@ -130,10 +132,6 @@ export default function GenrePlaylistTreePerRoot({
       }
     };
 
-    const handleGenreCreationAction = (CriteriaCreationValues: CriteriaCreationValues) => {
-      createGenre(CriteriaCreationValues);
-    };
-
     // Render the tree
     const svg = renderTree(d3, svgRef, transformedTreeData, width, height, {
       previousRenderingVisibleActionsContainerGenrePlaylist,
@@ -171,6 +169,7 @@ export default function GenrePlaylistTreePerRoot({
     setGenrePlaylistGettingAssignedNewParent,
     updateGenre,
     showPopup,
+    handleGenreCreationAction,
   ]);
 
   return (

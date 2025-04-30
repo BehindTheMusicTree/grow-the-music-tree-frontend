@@ -12,6 +12,7 @@ import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simpl
 import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
 import GenrePlaylistTreePerRoot from "./tree/GenrePlaylistTreePerRoot";
 import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "./tree/tree-constants";
+import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
 
 export default function GenreTree() {
   const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists();
@@ -28,17 +29,21 @@ export default function GenreTree() {
     [genrePlaylists?.results]
   );
 
-  const showCreationPopup = useCallback(() => {
-    showPopup(
-      <GenreCreationPopup
-        onSubmit={(values: CriteriaCreationValues) => {
-          createGenre(values);
-          hidePopup();
-        }}
-        formErrors={formErrors}
-      />
-    );
-  }, [formErrors, createGenre, hidePopup, showPopup]);
+  const showCriteriaCreationPopup = useCallback(
+    (parent: CriteriaMinimum | null = null) => {
+      showPopup(
+        <GenreCreationPopup
+          parent={parent}
+          onSubmit={(values: CriteriaCreationValues) => {
+            createGenre(values);
+            hidePopup();
+          }}
+          formErrors={formErrors}
+        />
+      );
+    },
+    [formErrors, createGenre, hidePopup, showPopup]
+  );
 
   // Use a ref to track if we've already shown the popup for the current errors
   const previousErrorsRef = useRef<typeof formErrors>([]);
@@ -52,11 +57,11 @@ export default function GenreTree() {
       (previousErrorsRef.current.length === 0 ||
         JSON.stringify(previousErrorsRef.current) !== JSON.stringify(formErrors))
     ) {
-      showCreationPopup();
+      showCriteriaCreationPopup();
     }
     // Update our ref with current errors
     previousErrorsRef.current = formErrors || [];
-  }, [formErrors, showCreationPopup]);
+  }, [formErrors, showCriteriaCreationPopup]);
 
   return (
     <div className="mt-4 flex flex-col h-screen">
@@ -84,7 +89,7 @@ export default function GenreTree() {
               border: "1px solid black",
             }}
             onClick={() => {
-              showCreationPopup();
+              showCriteriaCreationPopup();
             }}
           >
             +
@@ -98,6 +103,7 @@ export default function GenreTree() {
                   genrePlaylistTreePerRoot={genrePlaylistTreePerRoot}
                   genrePlaylistGettingAssignedNewParent={genrePlaylistGettingAssignedNewParent}
                   setGenrePlaylistGettingAssignedNewParent={setGenrePlaylistGettingAssignedNewParent}
+                  handleGenreCreationAction={showCriteriaCreationPopup}
                 />
               );
             })}
