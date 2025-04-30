@@ -14,8 +14,12 @@ export function appendPaths(
 ) {
   const linkGenerator = d3
     .linkHorizontal<D3Link, D3Node>()
-    .x((d) => (d as unknown as D3Link).source.x! + xOffset)
-    .y((d) => (d as unknown as D3Link).source.y! + yOffset);
+    .x((d: D3Node) => {
+      return d.x! + xOffset;
+    })
+    .y((d: D3Node) => {
+      return d.y! + yOffset;
+    });
 
   svg
     .selectAll("path.link")
