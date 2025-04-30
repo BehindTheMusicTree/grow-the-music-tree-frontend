@@ -10,7 +10,7 @@ import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import { CriteriaCreationValues } from "@domain/criteria/form/creation";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
-import GenrePlaylistTreePerRoot from "./tree/GenrePlaylistTreePerRootPerRoot";
+import GenrePlaylistTreePerRoot from "./tree/GenrePlaylistTreePerRoot";
 import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "./tree/tree-constants";
 
 export default function GenreTree() {
@@ -90,12 +90,12 @@ export default function GenreTree() {
             +
           </div>
           <div className="tree-container flex flex-col text-gray-800 w-full overflow-x-auto overflow-y-auto">
-            {Object.entries(groupedGenrePlaylistsByRoot).map(([uuid, GenrePlaylistTreePerRoot]) => {
+            {Object.entries(groupedGenrePlaylistsByRoot).map(([uuid, genrePlaylistTreePerRoot]) => {
               // Wrap in array to match expected props type
               return (
                 <GenrePlaylistTreePerRoot
                   key={`${uuid}`}
-                  GenrePlaylistTreePerRoot={GenrePlaylistTreePerRoot}
+                  genrePlaylistTreePerRoot={genrePlaylistTreePerRoot}
                   genrePlaylistGettingAssignedNewParent={genrePlaylistGettingAssignedNewParent}
                   setGenrePlaylistGettingAssignedNewParent={setGenrePlaylistGettingAssignedNewParent}
                 />

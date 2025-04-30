@@ -22,13 +22,13 @@ import { buildTreeHierarchy } from "./TreeNodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer";
 
 type GenrePlaylistTreePerRootProps = {
-  GenrePlaylistTreePerRoot: CriteriaPlaylistSimple[];
+  genrePlaylistTreePerRoot: CriteriaPlaylistSimple[];
   genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null;
   setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
 };
 
 export default function GenrePlaylistTreePerRoot({
-  GenrePlaylistTreePerRoot,
+  genrePlaylistTreePerRoot,
   genrePlaylistGettingAssignedNewParent,
   setGenrePlaylistGettingAssignedNewParent,
 }: GenrePlaylistTreePerRootProps) {
@@ -96,7 +96,7 @@ export default function GenrePlaylistTreePerRoot({
     d3.select(svgRef.current).selectAll("*").remove();
 
     // Build tree hierarchy
-    const root = buildTreeHierarchy(d3, GenrePlaylistTreePerRoot);
+    const root = buildTreeHierarchy(d3, genrePlaylistTreePerRoot);
 
     // Create tree layout
     const treeData = createTreeLayout(d3, root);
@@ -159,7 +159,7 @@ export default function GenrePlaylistTreePerRoot({
       }
     };
   }, [
-    GenrePlaylistTreePerRoot,
+    genrePlaylistTreePerRoot,
     isPlaying,
     trackList?.origin,
     genrePlaylistGettingAssignedNewParent,
