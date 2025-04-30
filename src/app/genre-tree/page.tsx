@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { FaTree } from "react-icons/fa";
 
 import { usePopup } from "@contexts/PopupContext";
-import { useListAllGenrePlaylists } from "@hooks/useGenrePlaylist";
+import { useListFullGenrePlaylists } from "@hooks/useGenrePlaylist";
 import { useCreateGenre, useLoadReferenceTreeGenre } from "@hooks/useGenre";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import { CriteriaCreationValues } from "@domain/criteria/form/creation";
@@ -14,7 +14,7 @@ import GenrePlaylistTree from "./tree/GenrePlaylistTree";
 import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "./tree/tree-constants";
 
 export default function GenreTree() {
-  const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListAllGenrePlaylists();
+  const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists();
   const { mutate: createGenre, isPending: isCreatingGenre, formErrors } = useCreateGenre();
   const { mutate: loadReferenceTreeGenre, isPending: isLoadingReferenceTreeGenre } = useLoadReferenceTreeGenre();
 
