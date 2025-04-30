@@ -228,10 +228,6 @@ export function renderTree(
     });
 
   if (previousRenderingVisibleActionsContainerGenrePlaylist) {
-    console.log(
-      "previousRenderingVisibleActionsContainerGenrePlaylist",
-      previousRenderingVisibleActionsContainerGenrePlaylist
-    );
     const group = d3.select<SVGGElement, unknown>(
       "#group-" + previousRenderingVisibleActionsContainerGenrePlaylist.uuid
     );
