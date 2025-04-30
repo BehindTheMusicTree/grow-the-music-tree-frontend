@@ -1,11 +1,11 @@
 "use client";
 
-import { useListAllGenrePlaylists } from "@hooks/useGenrePlaylist";
+import { useListFullGenrePlaylists } from "@hooks/useGenrePlaylist";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@components/ui/table";
 import { Skeleton } from "@components/ui/skeleton";
 
 export default function GenrePlaylistsPage() {
-  const { data, isLoading, error } = useListAllGenrePlaylists();
+  const { data, isLoading, error } = useListFullGenrePlaylists();
 
   if (error) {
     return <div>Error loading genre playlists</div>;
