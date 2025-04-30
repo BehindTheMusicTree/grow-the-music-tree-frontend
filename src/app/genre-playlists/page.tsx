@@ -9,20 +9,19 @@ import { useState, useMemo, ChangeEvent } from "react";
 export default function GenrePlaylistsPage() {
   const { data, isLoading, error } = useListFullGenrePlaylists();
   const [nameFilter, setNameFilter] = useState("");
-  const [criteriaFilter, setCriteriaFilter] = useState("");
   const [parentFilter, setParentFilter] = useState("");
   const [rootFilter, setRootFilter] = useState("");
-
+  const [uuidFilter, setUuidFilter] = useState("");
   const filteredData = useMemo(() => {
     if (!data?.results) return [];
-    return data.results.filter((playlist) => {
-      const nameMatch = playlist.name.toLowerCase().includes(nameFilter.toLowerCase());
-      const criteriaMatch = playlist.criteria.name.toLowerCase().includes(criteriaFilter.toLowerCase());
-      const parentMatch = (playlist.parent?.name || "/").toLowerCase().includes(parentFilter.toLowerCase());
-      const rootMatch = (playlist.root?.name || "").toLowerCase().includes(rootFilter.toLowerCase());
-      return nameMatch && criteriaMatch && parentMatch && rootMatch;
+    return data.results.filter((criteriaPlaylist) => {
+      const uuidMatch = criteriaPlaylist.uuid.toLowerCase().includes(uuidFilter.toLowerCase());
+      const nameMatch = criteriaPlaylist.name.toLowerCase().includes(nameFilter.toLowerCase());
+      const parentMatch = (criteriaPlaylist.parent?.name || "/").toLowerCase().includes(parentFilter.toLowerCase());
+      const rootMatch = (criteriaPlaylist.root?.name || "").toLowerCase().includes(rootFilter.toLowerCase());
+      return uuidMatch && nameMatch && parentMatch && rootMatch;
     });
-  }, [data?.results, nameFilter, criteriaFilter, parentFilter, rootFilter]);
+  }, [data?.results, nameFilter, parentFilter, rootFilter, uuidFilter]);
 
   if (error) {
     return <div>Error loading genre playlists</div>;
@@ -35,7 +34,17 @@ export default function GenrePlaylistsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>UUID</TableHead>
+              <TableHead>
+                <div className="flex flex-col gap-2">
+                  <span>UUID</span>
+                  <Input
+                    placeholder="Filter..."
+                    value={uuidFilter}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setUuidFilter(e.target.value)}
+                    className="h-8 mb-2"
+                  />
+                </div>
+              </TableHead>
               <TableHead>
                 <div className="flex flex-col gap-2">
                   <span>Name</span>
@@ -43,18 +52,7 @@ export default function GenrePlaylistsPage() {
                     placeholder="Filter..."
                     value={nameFilter}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setNameFilter(e.target.value)}
-                    className="h-8"
-                  />
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex flex-col gap-2">
-                  <span>Criteria</span>
-                  <Input
-                    placeholder="Filter..."
-                    value={criteriaFilter}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setCriteriaFilter(e.target.value)}
-                    className="h-8"
+                    className="h-8 mb-2"
                   />
                 </div>
               </TableHead>
@@ -65,7 +63,7 @@ export default function GenrePlaylistsPage() {
                     placeholder="Filter..."
                     value={parentFilter}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setParentFilter(e.target.value)}
-                    className="h-8"
+                    className="h-8 mb-2"
                   />
                 </div>
               </TableHead>
@@ -76,7 +74,7 @@ export default function GenrePlaylistsPage() {
                     placeholder="Filter..."
                     value={rootFilter}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setRootFilter(e.target.value)}
-                    className="h-8"
+                    className="h-8 mb-2"
                   />
                 </div>
               </TableHead>
@@ -94,9 +92,6 @@ export default function GenrePlaylistsPage() {
                       <Skeleton className="h-4 w-[200px]" />
                     </TableCell>
                     <TableCell>
-                      <Skeleton className="h-4 w-[300px]" />
-                    </TableCell>
-                    <TableCell>
                       <Skeleton className="h-4 w-[100px]" />
                     </TableCell>
                     <TableCell>
@@ -107,14 +102,13 @@ export default function GenrePlaylistsPage() {
                     </TableCell>
                   </TableRow>
                 ))
-              : filteredData.map((playlist) => (
-                  <TableRow key={playlist.uuid}>
-                    <TableCell className="font-medium">{playlist.uuid}</TableCell>
-                    <TableCell className="font-medium">{playlist.name}</TableCell>
-                    <TableCell>{playlist.criteria.name}</TableCell>
-                    <TableCell>{playlist.parent?.name || "/"}</TableCell>
-                    <TableCell>{playlist.root?.name}</TableCell>
-                    <TableCell>{playlist.uploadedTracksCount}</TableCell>
+              : filteredData.map((criteriaPlaylist) => (
+                  <TableRow key={criteriaPlaylist.uuid}>
+                    <TableCell className="font-medium">{criteriaPlaylist.uuid}</TableCell>
+                    <TableCell className="font-medium">{criteriaPlaylist.name}</TableCell>
+                    <TableCell>{criteriaPlaylist.parent?.name || "/"}</TableCell>
+                    <TableCell>{criteriaPlaylist.root?.name}</TableCell>
+                    <TableCell>{criteriaPlaylist.uploadedTracksCount}</TableCell>
                   </TableRow>
                 ))}
           </TableBody>
