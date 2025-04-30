@@ -7,7 +7,7 @@ import ReactHowler from "react-howler";
 
 import { usePlayer } from "@contexts/PlayerContext";
 import { PlayStates } from "@lib/utils/constants";
-import { formatTime } from "@lib/utils/formatting";
+import { formatTime } from "@utils/formatting";
 
 export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek }) {
   const {

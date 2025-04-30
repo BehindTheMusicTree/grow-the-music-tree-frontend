@@ -18,6 +18,7 @@ export default function GenrePlaylistsPage() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>UUID</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Parent</TableHead>
@@ -29,6 +30,9 @@ export default function GenrePlaylistsPage() {
             {isLoading
               ? Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
+                    <TableCell>
+                      <Skeleton className="h-4 w-[200px]" />
+                    </TableCell>
                     <TableCell>
                       <Skeleton className="h-4 w-[200px]" />
                     </TableCell>
@@ -48,6 +52,7 @@ export default function GenrePlaylistsPage() {
                 ))
               : data?.results.map((playlist) => (
                   <TableRow key={playlist.uuid}>
+                    <TableCell className="font-medium">{playlist.uuid}</TableCell>
                     <TableCell className="font-medium">{playlist.name}</TableCell>
                     <TableCell>{playlist.criteria.name}</TableCell>
                     <TableCell>{playlist.parent?.name || "/"}</TableCell>

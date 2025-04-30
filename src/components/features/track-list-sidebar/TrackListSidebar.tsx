@@ -1,7 +1,7 @@
 "use client";
 
 import TrackItem from "./TrackItem";
-import { capitalizeFirstLetter } from "@lib/utils/formatting";
+import { capitalizeFirstLetter } from "@utils/formatting";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";

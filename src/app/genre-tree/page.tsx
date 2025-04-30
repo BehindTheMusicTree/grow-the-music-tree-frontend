@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { FaTree } from "react-icons/fa";
 
 import { usePopup } from "@contexts/PopupContext";
@@ -9,6 +9,7 @@ import { useCreateGenre, useLoadReferenceTreeGenre } from "@hooks/useGenre";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import { CriteriaCreationValues } from "@domain/criteria/form/creation";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
+import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
 import GenrePlaylistTree from "./tree/GenrePlaylistTree";
 import { RECT_BASE_DIMENSIONS as GENRE_PLAYLIST_TREE_RECT_DIMENSIONS } from "./tree/tree-constants";
 
@@ -20,6 +21,12 @@ export default function GenreTree() {
   const { showPopup, hidePopup } = usePopup();
   const [genrePlaylistGettingAssignedNewParent, setGenrePlaylistGettingAssignedNewParent] =
     useState<CriteriaPlaylistSimple | null>(null);
+
+  const groupedGenrePlaylistsByRoot = useMemo(
+    () =>
+      genrePlaylists?.results ? getGenrePlaylistsGroupedByRoot(genrePlaylists.results as CriteriaPlaylistSimple[]) : {},
+    [genrePlaylists?.results]
+  );
 
   const showCreationPopup = useCallback(() => {
     showPopup(
@@ -83,21 +90,17 @@ export default function GenreTree() {
             +
           </div>
           <div className="flex flex-col text-gray-800">
-            {genrePlaylists?.results ? (
-              Object.entries(genrePlaylists.results).map(([uuid, genrePlaylistTree]) => {
-                // Wrap in array to match expected props type
-                return (
-                  <GenrePlaylistTree
-                    key={`${uuid}`}
-                    genrePlaylistTree={[genrePlaylistTree]}
-                    genrePlaylistGettingAssignedNewParent={genrePlaylistGettingAssignedNewParent}
-                    setGenrePlaylistGettingAssignedNewParent={setGenrePlaylistGettingAssignedNewParent}
-                  />
-                );
-              })
-            ) : (
-              <p>No data found.</p>
-            )}
+            {Object.entries(groupedGenrePlaylistsByRoot).map(([uuid, genrePlaylistTree]) => {
+              // Wrap in array to match expected props type
+              return (
+                <GenrePlaylistTree
+                  key={`${uuid}`}
+                  genrePlaylistTree={genrePlaylistTree}
+                  genrePlaylistGettingAssignedNewParent={genrePlaylistGettingAssignedNewParent}
+                  setGenrePlaylistGettingAssignedNewParent={setGenrePlaylistGettingAssignedNewParent}
+                />
+              );
+            })}
           </div>
         </>
       )}

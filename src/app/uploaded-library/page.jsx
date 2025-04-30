@@ -2,7 +2,7 @@
 
 import { FaRegClock } from "react-icons/fa";
 
-import { formatTime } from "@lib/utils/formatting";
+import { formatTime } from "@utils/formatting";
 import Rating from "@components/features/Rating";
 import UploadButtons from "@components/features/UploadButtons";
 import UploadedTrackPositionPlayPause from "@components/features/UploadedTrackPositionPlayPause";

@@ -1,6 +1,6 @@
 "use client";
 
-import { formatTime } from "@lib/utils/formatting";
+import { formatTime } from "@utils/formatting";
 import Rating from "@components/features/Rating";
 import { Button } from "@components/ui/Button";
 import { BasePopup, BasePopupProps } from "../BasePopup";

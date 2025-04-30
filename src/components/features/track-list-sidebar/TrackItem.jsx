@@ -3,7 +3,7 @@
 import PropTypes from "prop-types";
 import { MdMoreVert } from "react-icons/md";
 
-import { formatTime } from "@lib/utils/formatting";
+import { formatTime } from "@utils/formatting";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackList } from "@contexts/TrackListContext";
