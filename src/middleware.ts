@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
   try {
     // Redirect root to music page
     if (request.nextUrl.pathname === "/") {
-      return NextResponse.redirect(new URL("/genre-playlists", request.url));
+      return NextResponse.redirect(new URL("/genre-tree", request.url));
     }
 
     return NextResponse.next();
