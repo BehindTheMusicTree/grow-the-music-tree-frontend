@@ -36,8 +36,8 @@ export default function GenreTree() {
       showPopup(
         <GenreCreationPopup
           parent={parent}
-          onSubmit={(values: CriteriaCreationValues) => {
-            createGenre(values);
+          onSubmit={({ name, parent }: { name: string; parent?: string }) => {
+            createGenre({ name, parent });
             hidePopup();
           }}
           formErrors={formErrors}

@@ -2,11 +2,10 @@
 
 import { Button } from "@components/ui/Button";
 import { BasePopup, BasePopupProps } from "../BasePopup";
-import { CriteriaCreationValues } from "@domain/criteria/form/creation";
 import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
 
 type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
-  onSubmit: (values: CriteriaCreationValues) => void;
+  onSubmit: (values: { name: string; parent?: string }) => void;
   onClose?: () => void;
   formErrors?: { field: string; message: string }[];
   parent?: CriteriaMinimum | null;
@@ -25,7 +24,7 @@ export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProp
 
   handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    this.props.onSubmit({ name: this.state.name });
+    this.props.onSubmit({ name: this.state.name, parent: this.state.parent?.uuid || undefined });
   };
 
   render() {
