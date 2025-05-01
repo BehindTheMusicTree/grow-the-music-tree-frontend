@@ -1,14 +1,5 @@
 import { NextResponse } from "next/server";
-import { validateServerEnv } from "@lib/public-env-validator";
 import { NextRequest } from "next/server";
-
-// Validate environment variables once at initialization
-// This will throw early if any required variables are missing
-try {
-  validateServerEnv();
-} catch (error) {
-  console.error("Server Initialization Error:", error);
-}
 
 export function middleware(request: NextRequest) {
   try {

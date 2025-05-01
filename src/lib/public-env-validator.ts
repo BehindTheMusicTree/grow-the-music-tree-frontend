@@ -2,7 +2,7 @@
 
 let checkPerformed = false;
 
-interface ClientEnvVars {
+interface EnvVars {
   NEXT_PUBLIC_BASE_URL_WITHOUT_PORT: string | undefined;
   NEXT_PUBLIC_CONTACT_EMAIL: string | undefined;
   NEXT_PUBLIC_BACKEND_BASE_URL: string | undefined;
@@ -12,11 +12,11 @@ interface ClientEnvVars {
   NEXT_PUBLIC_SPOTIFY_REDIRECT_URI: string | undefined;
 }
 
-export function validateClientEnv(): void {
+export function validateEnv(): void {
   if (typeof window !== "undefined" && !checkPerformed) {
     checkPerformed = true;
 
-    const clientEnvVars: ClientEnvVars = {
+    const clientEnvVars: EnvVars = {
       NEXT_PUBLIC_BASE_URL_WITHOUT_PORT: process.env.NEXT_PUBLIC_BASE_URL_WITHOUT_PORT,
       NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
       NEXT_PUBLIC_BACKEND_BASE_URL: process.env.NEXT_PUBLIC_BACKEND_BASE_URL,
@@ -28,32 +28,6 @@ export function validateClientEnv(): void {
 
     let hasMissingEnvVars = false;
     for (const [key, value] of Object.entries(clientEnvVars)) {
-      if (value === undefined || value === "") {
-        console.error(`Environment variable ${key} is ${value === "" ? "empty" : "undefined"}`);
-        hasMissingEnvVars = true;
-      }
-    }
-    if (hasMissingEnvVars) {
-      throw new Error("❌ Missing environment variables");
-    }
-    console.log("✅ All environment variables are defined");
-  }
-}
-
-export function validateServerEnv(): void {
-  if (typeof window === "undefined") {
-    const serverEnvVars: ClientEnvVars = {
-      NEXT_PUBLIC_BASE_URL_WITHOUT_PORT: process.env.NEXT_PUBLIC_BASE_URL_WITHOUT_PORT,
-      NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
-      NEXT_PUBLIC_BACKEND_BASE_URL: process.env.NEXT_PUBLIC_BACKEND_BASE_URL,
-      NEXT_PUBLIC_SENTRY_IS_ACTIVE: process.env.NEXT_PUBLIC_SENTRY_IS_ACTIVE,
-      NEXT_PUBLIC_SPOTIFY_CLIENT_ID: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
-      NEXT_PUBLIC_SPOTIFY_SCOPES: process.env.NEXT_PUBLIC_SPOTIFY_SCOPES,
-      NEXT_PUBLIC_SPOTIFY_REDIRECT_URI: process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI,
-    };
-
-    let hasMissingEnvVars = false;
-    for (const [key, value] of Object.entries(serverEnvVars)) {
       if (value === undefined || value === "") {
         console.error(`Environment variable ${key} is ${value === "" ? "empty" : "undefined"}`);
         hasMissingEnvVars = true;
