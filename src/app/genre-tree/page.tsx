@@ -90,12 +90,11 @@ export default function GenreTree() {
         <GenreTreeSkeleton />
       ) : (
         <>
-          <div className="tree-container flex flex-col p-4 text-gray-800 w-full overflow-x-auto overflow-y-auto">
+          <div className="tree-container flex flex-col p-4 text-gray-800 w-full overflow-x-auto overflow-y-auto relative">
             {Object.entries(groupedGenrePlaylistsByRoot).map(([uuid, genrePlaylistTreePerRoot]) => {
-              // Wrap in array to match expected props type
               return (
-                <div key={`${uuid}`}>
-                  <div className="tree-root-name-container text-lg fixed top-0 left-0 z-70 p-4">
+                <div key={`${uuid}`} className="relative">
+                  <div className="tree-root-name-container text-lg absolute top-0 left-0 -z-10 p-4">
                     <div className="text-9xl text-gray-500 font-bold mb-2 text-left">
                       {genrePlaylistTreePerRoot[0].root.name}
                     </div>
