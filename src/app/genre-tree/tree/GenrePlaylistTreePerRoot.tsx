@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import * as d3 from "d3";
 
 import { usePopup } from "@contexts/PopupContext";
@@ -41,7 +41,7 @@ export default function GenrePlaylistTreePerRoot({
   const { toTrackAtPosition, trackList } = useTrackList();
   const { mutate: uploadTrack, isPending: isUploadingTrack, error: uploadTrackError } = useUploadTrack();
   const { mutate: createGenre } = useCreateGenre();
-  const { mutate: updateGenre } = useUpdateGenre();
+  const { renameGenre, updateGenreParent } = useUpdateGenre();
   const { mutate: deleteGenre } = useDeleteGenre();
   const [
     previousRenderingVisibleActionsContainerGenrePlaylist,
@@ -93,12 +93,7 @@ export default function GenrePlaylistTreePerRoot({
     [trackList, isPlaying, toTrackAtPosition, setIsPlaying]
   );
 
-  useEffect(() => {
-    if (!svgRef.current) return;
-
-    // Clear any previous SVG content
-    d3.select(svgRef.current).selectAll("*").remove();
-
+  const { reshapedTreeData } = useMemo(() => {
     // Build tree hierarchy
     const root = buildTreeHierarchy(d3, genrePlaylistTreePerRoot);
 
@@ -111,15 +106,24 @@ export default function GenrePlaylistTreePerRoot({
     setSvgHeight(height);
 
     // Transform coordinates for SVG
-    const transformedTreeData = setupTreeLayout(d3, treeData, highestVerticalCoordinate);
+    const reshapedTreeData = setupTreeLayout(d3, treeData, highestVerticalCoordinate);
+
+    return { reshapedTreeData };
+  }, [genrePlaylistTreePerRoot]);
+
+  useEffect(() => {
+    if (!svgRef.current) return;
+
+    // Clear any previous SVG content
+    d3.select(svgRef.current).selectAll("*").remove();
 
     const updateGenreParent = async (genreUuid: string, parentUuid: string) => {
-      updateGenre.mutate({ uuid: genreUuid, data: { parent: parentUuid } });
+      updateGenreParent(genreUuid, parentUuid);
     };
 
     const handleRenameGenre = async (genreUuid: string, newName: string) => {
       try {
-        updateGenre.mutate({ uuid: genreUuid, data: { name: newName } });
+        renameGenre(genreUuid, newName);
       } catch (error: unknown) {
         if (error && typeof error === "object" && "code" in error && error.code === 2001) {
           showPopup(
@@ -135,7 +139,7 @@ export default function GenrePlaylistTreePerRoot({
     };
 
     // Render the tree
-    const svg = renderTree(d3, svgRef, transformedTreeData, width, height, {
+    const svg = renderTree(d3, svgRef, reshapedTreeData, svgWidth, svgHeight, {
       previousRenderingVisibleActionsContainerGenrePlaylist,
       genrePlaylistGettingAssignedNewParent,
       forbiddenNewParentsUuids: [],
@@ -169,9 +173,11 @@ export default function GenrePlaylistTreePerRoot({
     createGenre,
     handlePlayPauseIconAction,
     setGenrePlaylistGettingAssignedNewParent,
-    updateGenre,
+    updateGenreParent,
     showPopup,
     handleGenreCreationAction,
+    reshapedTreeData,
+    renameGenre,
   ]);
 
   return (
