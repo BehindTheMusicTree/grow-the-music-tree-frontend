@@ -97,18 +97,19 @@ export default function GenreTree() {
                   key={`${uuid}`}
                   className="tree-per-root-container relative mt-2 mr-16 p-2 bg-gray-50 rounded-lg inline-block w-fit"
                 >
-                  <div className="tree-root-name-container absolute top-0 left-0 z-10">
+                  <div className="tree-root-name-container absolute top-0 left-0 z-0">
                     <div className="text-9xl text-gray-500 font-bold text-left">
                       {genrePlaylistTreePerRoot[0].root.name}
                     </div>
                   </div>
-                  <GenrePlaylistTreePerRoot
-                    className="z-20"
-                    genrePlaylistTreePerRoot={genrePlaylistTreePerRoot}
-                    genrePlaylistGettingAssignedNewParent={genrePlaylistGettingAssignedNewParent}
-                    setGenrePlaylistGettingAssignedNewParent={setGenrePlaylistGettingAssignedNewParent}
-                    handleGenreCreationAction={showCriteriaCreationPopup}
-                  />
+                  <div className="graph-container relative z-10">
+                    <GenrePlaylistTreePerRoot
+                      genrePlaylistTreePerRoot={genrePlaylistTreePerRoot}
+                      genrePlaylistGettingAssignedNewParent={genrePlaylistGettingAssignedNewParent}
+                      setGenrePlaylistGettingAssignedNewParent={setGenrePlaylistGettingAssignedNewParent}
+                      handleGenreCreationAction={showCriteriaCreationPopup}
+                    />
+                  </div>
                 </div>
               );
             })}
