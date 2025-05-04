@@ -36,7 +36,12 @@ import {
 
 initSentry();
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  fallback: ["system-ui", "sans-serif"],
+});
 
 function AppContent({ children }: { children: ReactNode }) {
   const { playerUploadedTrackObject } = usePlayer();
