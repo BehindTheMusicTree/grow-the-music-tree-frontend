@@ -93,22 +93,26 @@ export default function GenrePlaylistTreePerRoot({
     [trackList, isPlaying, toTrackAtPosition, setIsPlaying]
   );
 
-  const { reshapedTreeData } = useMemo(() => {
+  const { treeData } = useMemo(() => {
     // Build tree hierarchy
     const root = buildTreeHierarchy(d3, genrePlaylistTreePerRoot);
 
     // Create tree layout
-    const treeData = createTreeLayout(d3, root);
+    const originalTreeData = createTreeLayout(d3, root);
 
     // Calculate dimensions
-    const { svgWidth: width, svgHeight: height, highestVerticalCoordinate } = calculateSvgDimensions(d3, treeData);
+    const {
+      svgWidth: width,
+      svgHeight: height,
+      highestVerticalCoordinate,
+    } = calculateSvgDimensions(d3, originalTreeData);
     setSvgWidth(width);
     setSvgHeight(height);
 
     // Transform coordinates for SVG
-    const reshapedTreeData = setupTreeLayout(d3, treeData, highestVerticalCoordinate);
+    const reshapedTreeData = setupTreeLayout(d3, originalTreeData, highestVerticalCoordinate);
 
-    return { reshapedTreeData };
+    return { treeData: reshapedTreeData };
   }, [genrePlaylistTreePerRoot]);
 
   useEffect(() => {
@@ -139,7 +143,7 @@ export default function GenrePlaylistTreePerRoot({
     };
 
     // Render the tree
-    const svg = renderTree(d3, svgRef, reshapedTreeData, svgWidth, svgHeight, {
+    const svg = renderTree(d3, svgRef, treeData, svgWidth, svgHeight, {
       previousRenderingVisibleActionsContainerGenrePlaylist,
       genrePlaylistGettingAssignedNewParent,
       forbiddenNewParentsUuids: [],
@@ -176,7 +180,7 @@ export default function GenrePlaylistTreePerRoot({
     updateGenreParent,
     showPopup,
     handleGenreCreationAction,
-    reshapedTreeData,
+    treeData,
     renameGenre,
   ]);
 
