@@ -95,7 +95,7 @@ export default function GenreTree() {
               return (
                 <div
                   key={`${uuid}`}
-                  className="tree-per-root-container relative mt-2 mr-4 p-2 bg-gray-50 rounded-lg inline-block w-fit"
+                  className="tree-per-root-container relative mt-2 mr-16 p-2 bg-gray-50 rounded-lg inline-block w-fit"
                 >
                   <div className="tree-root-name-container absolute top-0 left-0 z-10">
                     <div className="text-9xl text-gray-500 font-bold text-left">
