@@ -142,8 +142,7 @@ export default function GenrePlaylistTreePerRoot({
       }
     };
 
-    // Render the tree
-    const svg = renderTree(d3, svgRef, treeData, svgWidth, svgHeight, {
+    renderTree(d3, svgRef, treeData, svgWidth, svgHeight, {
       previousRenderingVisibleActionsContainerGenrePlaylist,
       genrePlaylistGettingAssignedNewParent,
       forbiddenNewParentsUuids: [],
