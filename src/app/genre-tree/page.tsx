@@ -50,7 +50,6 @@ export default function GenreTree() {
   const previousErrorsRef = useRef<typeof formErrors>([]);
 
   useEffect(() => {
-    console.log("formErrors", formErrors);
     // Only show popup if errors exist AND we didn't have errors before (to prevent infinite loop)
     if (
       formErrors &&
