@@ -22,6 +22,7 @@ import { buildTreeHierarchy } from "./TreeNodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer";
 
 type GenrePlaylistTreePerRootProps = {
+  className?: string;
   genrePlaylistTreePerRoot: CriteriaPlaylistSimple[];
   genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null;
   setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
@@ -29,6 +30,7 @@ type GenrePlaylistTreePerRootProps = {
 };
 
 export default function GenrePlaylistTreePerRoot({
+  className,
   genrePlaylistTreePerRoot,
   genrePlaylistGettingAssignedNewParent,
   setGenrePlaylistGettingAssignedNewParent,
@@ -173,7 +175,7 @@ export default function GenrePlaylistTreePerRoot({
   ]);
 
   return (
-    <div>
+    <div className={className}>
       <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
       <svg ref={svgRef} width={svgWidth} height={svgHeight} className="mt-5"></svg>
     </div>
