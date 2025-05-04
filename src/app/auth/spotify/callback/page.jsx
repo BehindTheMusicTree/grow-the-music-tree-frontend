@@ -1,17 +1,20 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
-import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
 
 export default function SpotifyOAuthCallback() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParamsObj = useSearchParams();
+  // Extract needed values right after unwrapping to prevent enumeration warnings
+  const unwrappedParams = React.use(searchParamsObj);
+  const code = unwrappedParams.get("code");
+  const errorParam = unwrappedParams.get("error");
+
   const { authToBackendFromSpotifyCode } = useSpotifyAuth();
-  const { setConnectivityError } = useConnectivityError();
   const [isPending, setisPending] = useState(true);
   const [error, setError] = useState(null);
   const authAttempted = useRef(false);
@@ -20,12 +23,8 @@ export default function SpotifyOAuthCallback() {
     const handleAuth = async () => {
       if (authAttempted.current) return;
       authAttempted.current = true;
-
-      const code = searchParams.get("code");
-      const error = searchParams.get("error");
-
-      if (error) {
-        setError(new Error(`Spotify authentication failed: ${error}`));
+      if (errorParam) {
+        setError(new Error(`Spotify authentication failed: ${errorParam}`));
         setisPending(false);
         return;
       }
@@ -52,7 +51,7 @@ export default function SpotifyOAuthCallback() {
     };
 
     handleAuth();
-  }, [authToBackendFromSpotifyCode, router, searchParams]); // Empty dependency array since we only want this to run once
+  }, [authToBackendFromSpotifyCode, router, code, errorParam]); // Using the extracted values as dependencies
 
   if (isPending) {
     return (
