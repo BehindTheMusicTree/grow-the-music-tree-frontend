@@ -159,13 +159,6 @@ export default function GenrePlaylistTreePerRoot({
       showPopup,
       setPreviousRenderingVisibleActionsContainerGenrePlaylist,
     });
-
-    // Cleanup on unmount
-    return () => {
-      if (svg) {
-        svg.selectAll("*").remove();
-      }
-    };
   }, [
     genrePlaylistTreePerRoot,
     isPlaying,
@@ -183,6 +176,15 @@ export default function GenrePlaylistTreePerRoot({
     treeData,
     renameGenre,
   ]);
+
+  useEffect(() => {
+    const svgElement = svgRef.current;
+    return () => {
+      if (svgElement) {
+        d3.select(svgElement).selectAll("*").remove();
+      }
+    };
+  }, []);
 
   return (
     <div className={className}>
