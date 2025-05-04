@@ -8,11 +8,12 @@ import { BackendError } from "@app-types/app-errors/app-error";
 
 export default function SpotifyOAuthCallback() {
   const router = useRouter();
-  const searchParamsObj = useSearchParams();
-  // Extract needed values right after unwrapping to prevent enumeration warnings
-  const unwrappedParams = React.use(searchParamsObj);
-  const code = unwrappedParams.get("code");
-  const errorParam = unwrappedParams.get("error");
+
+  // In client components, useSearchParams() already returns the unwrapped value
+  // No need for React.use() in client components (marked with "use client")
+  const searchParams = useSearchParams();
+  const code = searchParams.get("code");
+  const errorParam = searchParams.get("error");
 
   const { authToBackendFromSpotifyCode } = useSpotifyAuth();
   const [isPending, setisPending] = useState(true);
@@ -23,6 +24,7 @@ export default function SpotifyOAuthCallback() {
     const handleAuth = async () => {
       if (authAttempted.current) return;
       authAttempted.current = true;
+
       if (errorParam) {
         setError(new Error(`Spotify authentication failed: ${errorParam}`));
         setisPending(false);
@@ -51,7 +53,7 @@ export default function SpotifyOAuthCallback() {
     };
 
     handleAuth();
-  }, [authToBackendFromSpotifyCode, router, code, errorParam]); // Using the extracted values as dependencies
+  }, [authToBackendFromSpotifyCode, router, code, errorParam]);
 
   if (isPending) {
     return (
