@@ -94,13 +94,19 @@ export default function GenreTree() {
             {Object.entries(groupedGenrePlaylistsByRoot).map(([uuid, genrePlaylistTreePerRoot]) => {
               // Wrap in array to match expected props type
               return (
-                <GenrePlaylistTreePerRoot
-                  key={`${uuid}`}
-                  genrePlaylistTreePerRoot={genrePlaylistTreePerRoot}
-                  genrePlaylistGettingAssignedNewParent={genrePlaylistGettingAssignedNewParent}
-                  setGenrePlaylistGettingAssignedNewParent={setGenrePlaylistGettingAssignedNewParent}
-                  handleGenreCreationAction={showCriteriaCreationPopup}
-                />
+                <div key={`${uuid}`}>
+                  <div className="tree-root-name-container text-lg fixed top-0 left-0 z-70 p-4">
+                    <div className="text-9xl text-gray-500 font-bold mb-2 text-left">
+                      {genrePlaylistTreePerRoot[0].root.name}
+                    </div>
+                  </div>
+                  <GenrePlaylistTreePerRoot
+                    genrePlaylistTreePerRoot={genrePlaylistTreePerRoot}
+                    genrePlaylistGettingAssignedNewParent={genrePlaylistGettingAssignedNewParent}
+                    setGenrePlaylistGettingAssignedNewParent={setGenrePlaylistGettingAssignedNewParent}
+                    handleGenreCreationAction={showCriteriaCreationPopup}
+                  />
+                </div>
               );
             })}
           </div>
