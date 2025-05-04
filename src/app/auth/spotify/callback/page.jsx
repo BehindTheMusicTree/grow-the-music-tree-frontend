@@ -8,9 +8,6 @@ import { BackendError } from "@app-types/app-errors/app-error";
 
 export default function SpotifyOAuthCallback() {
   const router = useRouter();
-
-  // In client components, useSearchParams() already returns the unwrapped value
-  // No need for React.use() in client components (marked with "use client")
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
   const errorParam = searchParams.get("error");
