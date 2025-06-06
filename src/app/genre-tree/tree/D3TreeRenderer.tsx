@@ -5,7 +5,7 @@ import * as d3 from "d3";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { CriteriaMinimum } from "@domain/criteria/response/minimum";
 import { PlayStates } from "@models/PlayStates";
-import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
+import TrackListOrigin from "@models/track-list/origin/TrackListOrigin";
 
 import {
   RECT_BASE_DIMENSIONS,
@@ -29,16 +29,10 @@ interface SvgDimensions {
 }
 
 interface TreeCallbacks {
-  previousRenderingVisibleActionsContainerGenrePlaylist: CriteriaPlaylistSimple | null;
-  genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null;
-  forbiddenNewParentsUuids: string[] | null;
-  trackListOrigin: { type: TrackListOriginType; uuid: string } | undefined;
-  playState: PlayStates;
   handlePlayPauseIconAction: (genrePlaylist: CriteriaPlaylistSimple) => void;
-  fileInputRef: React.RefObject<HTMLInputElement>;
-  selectingFileGenreUuidRef: React.MutableRefObject<string | null>;
   handleGenreCreationAction: (parent: CriteriaMinimum | null) => void;
   setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
+  setForbiddenNewParentsUuids: React.Dispatch<React.SetStateAction<string[]>>;
   updateGenreParent: (genreUuid: string, newParentUuid: string) => Promise<void>;
   handleRenameGenre: (
     criteriaUuid: string,
@@ -87,19 +81,20 @@ export function renderTree(
   treeData: D3Node,
   svgWidth: number,
   svgHeight: number,
+  previousRenderingVisibleActionsContainerGenrePlaylist: CriteriaPlaylistSimple | null,
+  genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null,
+  forbiddenNewParentsUuids: string[] | null,
+  trackListOrigin: TrackListOrigin | null,
+  playState: PlayStates,
+  fileInputRef: React.RefObject<HTMLInputElement>,
+  selectingFileGenreUuidRef: React.MutableRefObject<string | null>,
   callbacks: TreeCallbacks
 ): D3Selection {
   const {
-    previousRenderingVisibleActionsContainerGenrePlaylist,
-    genrePlaylistGettingAssignedNewParent,
-    forbiddenNewParentsUuids,
-    trackListOrigin,
-    playState,
     handlePlayPauseIconAction,
-    fileInputRef,
-    selectingFileGenreUuidRef,
     handleGenreCreationAction,
     setGenrePlaylistGettingAssignedNewParent,
+    setForbiddenNewParentsUuids,
     updateGenreParent,
     handleRenameGenre: renameGenre,
     showPopup,
@@ -135,10 +130,6 @@ export function renderTree(
       return `translate(${translateX}, ${translateY})`;
     });
 
-  const aGenreIsGettingAssignedNewParent = forbiddenNewParentsUuids != null && forbiddenNewParentsUuids.length > 0;
-  const genreIsAPotentialChoiceForTheGenreGettingAssignedANewParent = (d: D3Node) =>
-    d.data.criteria && aGenreIsGettingAssignedNewParent && forbiddenNewParentsUuids?.includes(d.data.criteria.uuid);
-
   nodes
     .append("rect")
     .attr("class", "node-base-rect")
@@ -148,10 +139,10 @@ export function renderTree(
     .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
     .attr("fill", RECTANGLE_COLOR)
     .style("stroke", function (d) {
-      return genreIsAPotentialChoiceForTheGenreGettingAssignedANewParent(d) ? "blue" : "none";
+      return d.data.criteria ? "blue" : "none";
     })
     .style("stroke-width", function (d) {
-      return genreIsAPotentialChoiceForTheGenreGettingAssignedANewParent(d) ? "2px" : "0px";
+      return d.data.criteria ? "2px" : "0px";
     });
 
   const handleMoreActionEnterMouse = (event: MouseEvent, d: D3Node, genrePlaylist: CriteriaPlaylistSimple) => {
@@ -166,7 +157,7 @@ export function renderTree(
       addActionsGroup(d3, genrePlaylist, group, {
         handlePlayPauseIconAction,
         fileInputRef,
-        selectingFileGenreUuidRef,
+        selectingFileGenreUuidRef: selectingFileGenreUuidRef,
         handleGenreCreationAction,
         setGenrePlaylistGettingAssignedNewParent,
         renameGenre,
@@ -192,16 +183,16 @@ export function renderTree(
     .on("mouseleave", function (event, d) {
       const parentNode = this.parentNode as SVGGElement;
       if (parentNode) {
-        d3.select<SVGGElement, unknown>(parentNode)
-          .select<SVGGElement>("#more-icon-container-" + d.data.uuid)
-          .remove();
-        d3.select<SVGGElement, unknown>(parentNode)
-          .select<SVGGElement>("#actions-container-" + d.data.uuid)
-          .remove();
+        // d3.select<SVGGElement, unknown>(parentNode)
+        //   .select<SVGGElement>("#more-icon-container-" + d.data.uuid)
+        //   .remove();
+        // d3.select<SVGGElement, unknown>(parentNode)
+        //   .select<SVGGElement>("#actions-container-" + d.data.uuid)
+        //   .remove();
       }
     })
     .on("mouseover", function (event, d) {
-      if (!aGenreIsGettingAssignedNewParent) {
+      if (!d.data.criteria) {
         addMoreIconContainer(
           d3,
           d.data,
@@ -213,48 +204,15 @@ export function renderTree(
           >,
           handleMoreActionEnterMouse
         );
-      } else {
-        if (genreIsAPotentialChoiceForTheGenreGettingAssignedANewParent(d)) {
-          const parentNode = d3.select<SVGGElement, unknown>(this.parentNode as SVGGElement) as unknown as d3.Selection<
-            SVGGElement,
-            unknown,
-            HTMLElement,
-            unknown
-          >;
-          addParentSelectionOverlay(d3, parentNode, {
-            updateGenreParent,
-            genrePlaylistGettingAssignedNewParent: genrePlaylistGettingAssignedNewParent!,
-            setGenrePlaylistGettingAssignedNewParent,
-          });
-        }
       }
     });
-
-  if (previousRenderingVisibleActionsContainerGenrePlaylist) {
-    const group = d3.select<SVGGElement, unknown>(
-      "#group-" + previousRenderingVisibleActionsContainerGenrePlaylist.uuid
-    );
-    addMoreIconContainer(d3, previousRenderingVisibleActionsContainerGenrePlaylist, group, handleMoreActionEnterMouse);
-    addActionsGroup(d3, previousRenderingVisibleActionsContainerGenrePlaylist, group, {
-      handlePlayPauseIconAction,
-      fileInputRef,
-      selectingFileGenreUuidRef,
-      handleGenreCreationAction,
-      setGenrePlaylistGettingAssignedNewParent,
-      renameGenre,
-      showPopup,
-      trackListOrigin: trackListOrigin!,
-      playState,
-      handleMoreActionEnterMouse,
-    });
-  }
 
   nodes.each(function (d: D3Node) {
     const group = d3.select<SVGGElement, unknown>(this);
     group.on("mouseleave", function (event) {
       setPreviousRenderingVisibleActionsContainerGenrePlaylist(null);
-      d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid).remove();
-      d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid).remove();
+      // d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid).remove();
+      // d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid).remove();
     });
   });
 

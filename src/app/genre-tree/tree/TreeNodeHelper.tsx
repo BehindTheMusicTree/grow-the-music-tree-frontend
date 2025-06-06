@@ -94,7 +94,7 @@ export function addMoreIconContainer(
       .on("mouseleave", function (this: SVGForeignObjectElement) {
         const parent = this.parentNode as Element;
         if (parent) {
-          d3.select(parent).remove();
+          // d3.select(parent).remove();
         }
       });
   }
@@ -428,7 +428,7 @@ export function addParentSelectionOverlay(
       .append("g")
       .attr("class", "select-as-new-parent-group cursor-pointer")
       .on("mouseleave", function () {
-        d3.select(this).remove();
+        // d3.select(this).remove();
       });
 
     selectAsNewParentGroup

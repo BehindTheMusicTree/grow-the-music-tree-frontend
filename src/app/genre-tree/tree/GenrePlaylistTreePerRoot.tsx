@@ -36,6 +36,7 @@ export default function GenrePlaylistTreePerRoot({
   setGenrePlaylistGettingAssignedNewParent,
   handleGenreCreationAction,
 }: GenrePlaylistTreePerRootProps) {
+  const [forbiddenNewParentsUuids, setForbiddenNewParentsUuids] = useState<string[]>([]);
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup } = usePopup();
   const { toTrackAtPosition, trackList } = useTrackList();
@@ -142,37 +143,47 @@ export default function GenrePlaylistTreePerRoot({
       }
     };
 
-    renderTree(d3, svgRef, treeData, svgWidth, svgHeight, {
+    renderTree(
+      d3,
+      svgRef,
+      treeData,
+      svgWidth,
+      svgHeight,
       previousRenderingVisibleActionsContainerGenrePlaylist,
       genrePlaylistGettingAssignedNewParent,
-      forbiddenNewParentsUuids: [],
-      trackListOrigin: trackList?.origin,
-      playState: isPlaying ? PlayStates.PLAYING : PlayStates.STOPPED,
-      handlePlayPauseIconAction,
+      forbiddenNewParentsUuids,
+      trackList ? trackList.origin : null,
+      isPlaying ? PlayStates.PLAYING : PlayStates.STOPPED,
       fileInputRef,
       selectingFileGenreUuidRef,
-      handleGenreCreationAction,
-      setGenrePlaylistGettingAssignedNewParent,
-      updateGenreParent,
-      handleRenameGenre,
-      showPopup,
-      setPreviousRenderingVisibleActionsContainerGenrePlaylist,
-    });
+      {
+        setForbiddenNewParentsUuids,
+        handlePlayPauseIconAction,
+        handleGenreCreationAction,
+        setGenrePlaylistGettingAssignedNewParent,
+        updateGenreParent,
+        handleRenameGenre,
+        showPopup,
+        setPreviousRenderingVisibleActionsContainerGenrePlaylist,
+      }
+    );
   }, [
     genrePlaylistTreePerRoot,
     isPlaying,
     trackList?.origin,
     genrePlaylistGettingAssignedNewParent,
+    forbiddenNewParentsUuids,
+    trackList,
     previousRenderingVisibleActionsContainerGenrePlaylist,
     svgWidth,
     svgHeight,
+    treeData,
     createGenre,
     handlePlayPauseIconAction,
     setGenrePlaylistGettingAssignedNewParent,
     updateGenreParent,
     showPopup,
     handleGenreCreationAction,
-    treeData,
     renameGenre,
   ]);
 
