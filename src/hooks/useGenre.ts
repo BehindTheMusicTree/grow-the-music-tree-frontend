@@ -89,7 +89,7 @@ export function useUpdateGenre() {
     }),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
-      const response = await fetch(`genres/${uuid}`, true, true, {
+      const response = await fetch(`genres/${uuid}/`, true, true, {
         method: "PUT",
         body: JSON.stringify(data),
       });
