@@ -1,0 +1,30 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Description:
+Do not add comments that are generic, uninformative, or do not help explain the code. Only add comments when they are necessary to clarify complex logic, document important decisions, or provide essential context that is not obvious from the code itself.
+Examples of Comments to Avoid:
+// changed
+// updated
+// fix
+// temp
+// test
+// edit
+// remove
+// add
+// debug
+// new
+// old code
+// here
+// stuff
+Why:
+Such comments do not provide any meaningful information to someone reading the code. They do not explain what was changed, why it was changed, or how the code works. They clutter the codebase and make it harder to maintain.
+Good Comment Example:
+// Use binary search for efficiency because the list is sorted
+function findItem(list, item) { ... }
+Bad Comment Example:
+function findItem(list, item) { ... } // changed
+Summary:
+Only add comments when they help others understand the code. Avoid generic or placeholder comments that do not add value.
