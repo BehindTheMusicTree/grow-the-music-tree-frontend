@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UploadedTrackFormSchema } from "../form";
+import { UploadedTrackFormSchema } from "./form";
 
 export const UploadedTrackCreationSchema = UploadedTrackFormSchema.extend({
   file: z.instanceof(File),
