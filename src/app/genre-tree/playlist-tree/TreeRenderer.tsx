@@ -14,10 +14,10 @@ import {
   MORE_ICON_WIDTH,
   ACTIONS_CONTAINER_DIMENSIONS_MAX,
   RECTANGLE_COLOR,
-} from "./tree-constants";
-import { addGrid } from "../d3Helper";
-import { appendPaths } from "./TreeHelper";
-import { addMoreIconContainer, addActionsGroup, addParentSelectionOverlay } from "./TreeNodeHelper";
+} from "./constants";
+import { addGrid } from "../d3-helper/d3-grid-helper";
+import { appendPaths } from "../d3-helper/d3-path-helper";
+import { addMoreIconContainer, addActionsGroup, addParentSelectionOverlay } from "./NodeHelper";
 
 type D3Selection = d3.Selection<SVGGElement, unknown, null, undefined>;
 type D3Node = d3.HierarchyNode<CriteriaPlaylistSimple>;

@@ -18,8 +18,8 @@ import { UploadedTrackCreationValues } from "@domain/uploaded-track/form/creatio
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { CriteriaMinimum } from "@domain/criteria/response/minimum";
 
-import { buildTreeHierarchyStructure } from "./TreeNodeHelper";
-import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer";
+import { buildTreeHierarchyStructure } from "./NodeHelper";
+import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./TreeRenderer";
 
 type GenrePlaylistTreePerRootProps = {
   className?: string;

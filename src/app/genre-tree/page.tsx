@@ -11,9 +11,9 @@ import { useCreateGenre, useLoadReferenceTreeGenre } from "@hooks/useGenre";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
-import GenrePlaylistTreePerRoot from "./tree/GenrePlaylistTreePerRoot";
 import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
-import { GenreTreeSkeleton } from "./tree/GenreTreeSkeleton";
+import GenrePlaylistTreePerRoot from "./playlist-tree/TreePerRoot";
+import { GenreTreeSkeleton } from "./Skeleton";
 
 export default function GenreTree() {
   const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists();

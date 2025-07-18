@@ -22,7 +22,7 @@ import {
   ACTION_ICON_CONTAINER_DIMENSIONS,
   ACTION_LABEL_CONTAINER_DIMENSIONS,
   SPINNER_ICON_SIZE,
-} from "./tree-constants";
+} from "./constants";
 
 type D3Node = d3.HierarchyNode<CriteriaPlaylistSimple>;
 
