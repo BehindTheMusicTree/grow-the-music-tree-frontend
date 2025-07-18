@@ -264,7 +264,7 @@ export function addActionsGroup(
       5,
       "add-child-container",
       addChildActionOnclick,
-      () => <FaPlus className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
+      () => <FaPlus className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
       () => "Add sub-genre"
     );
 
