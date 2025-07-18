@@ -18,7 +18,7 @@ import { UploadedTrackCreationValues } from "@domain/uploaded-track/form/creatio
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { CriteriaMinimum } from "@domain/criteria/response/minimum";
 
-import { buildTreeHierarchy } from "./TreeNodeHelper";
+import { buildTreeHierarchy as buildTreeHierarchyStructure } from "./TreeNodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./D3TreeRenderer";
 
 type GenrePlaylistTreePerRootProps = {
@@ -96,7 +96,7 @@ export default function GenrePlaylistTreePerRoot({
 
   const { treeData } = useMemo(() => {
     // Build tree hierarchy
-    const root = buildTreeHierarchy(d3, genrePlaylistTreePerRoot);
+    const root = buildTreeHierarchyStructure(d3, genrePlaylistTreePerRoot);
 
     // Create tree layout
     const originalTreeData = createTreeLayout(d3, root);
