@@ -183,17 +183,6 @@ export function renderTree(
     .html(function (d) {
       return `<div class="tree-info">${d.data.name}</div>`;
     })
-    .on("mouseleave", function (event, d) {
-      const parentNode = this.parentNode as SVGGElement;
-      if (parentNode) {
-        d3.select<SVGGElement, unknown>(parentNode)
-          .select<SVGGElement>("#more-icon-container-" + d.data.uuid)
-          .remove();
-        d3.select<SVGGElement, unknown>(parentNode)
-          .select<SVGGElement>("#actions-container-" + d.data.uuid)
-          .remove();
-      }
-    })
     .on("mouseover", function (event, d) {
       addMoreIconContainer(
         d3,
