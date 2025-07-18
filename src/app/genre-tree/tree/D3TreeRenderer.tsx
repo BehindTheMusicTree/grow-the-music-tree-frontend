@@ -139,18 +139,21 @@ export function renderTree(
     .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
     .attr("fill", RECTANGLE_COLOR)
     .style("stroke", function (d) {
-      return d.data.criteria ? "blue" : "none";
+      return d.data.criteria && forbiddenNewParentsUuids && forbiddenNewParentsUuids.includes(d.data.criteria.uuid)
+        ? "blue"
+        : "none";
     })
     .style("stroke-width", function (d) {
-      return d.data.criteria ? "2px" : "0px";
+      return d.data.criteria && forbiddenNewParentsUuids && forbiddenNewParentsUuids.includes(d.data.criteria.uuid)
+        ? "2px"
+        : "0px";
     });
 
   const handleMoreActionEnterMouse = (event: MouseEvent, d: D3Node, genrePlaylist: CriteriaPlaylistSimple) => {
     event.stopPropagation();
 
-    const genrePlaylistUuid = genrePlaylist.uuid;
-    const group = d3.select<SVGGElement, unknown>("#group-" + genrePlaylistUuid);
-    const actionsContainer = group.select<SVGGElement>("#actions-container-" + genrePlaylistUuid);
+    const group = d3.select<SVGGElement, unknown>("#group-" + genrePlaylist.uuid);
+    const actionsContainer = group.select<SVGGElement>("#actions-container-" + genrePlaylist.uuid);
 
     if (actionsContainer.empty()) {
       addMoreIconContainer(d3, genrePlaylist, group, handleMoreActionEnterMouse);
@@ -192,19 +195,17 @@ export function renderTree(
       }
     })
     .on("mouseover", function (event, d) {
-      if (!d.data.criteria) {
-        addMoreIconContainer(
-          d3,
-          d.data,
-          d3.select<SVGGElement, unknown>(this.parentNode as SVGGElement) as unknown as d3.Selection<
-            SVGGElement,
-            unknown,
-            HTMLElement,
-            unknown
-          >,
-          handleMoreActionEnterMouse
-        );
-      }
+      addMoreIconContainer(
+        d3,
+        d.data,
+        d3.select<SVGGElement, unknown>(this.parentNode as SVGGElement) as unknown as d3.Selection<
+          SVGGElement,
+          unknown,
+          HTMLElement,
+          unknown
+        >,
+        handleMoreActionEnterMouse
+      );
     });
 
   nodes.each(function (d: D3Node) {
