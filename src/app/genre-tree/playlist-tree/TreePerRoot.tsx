@@ -19,7 +19,7 @@ import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simpl
 import { CriteriaMinimum } from "@domain/criteria/response/minimum";
 
 import { buildTreeHierarchyStructure } from "./NodeHelper";
-import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./TreeRenderer";
+import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./tree-renderer";
 
 type GenrePlaylistTreePerRootProps = {
   className?: string;
@@ -121,11 +121,8 @@ export default function GenrePlaylistTreePerRoot({
     if (!svgRef.current) return;
 
     // Clear any previous SVG content
+    console.log("[DEBUG] Clearing SVG and rerendering tree");
     d3.select(svgRef.current).selectAll("*").remove();
-
-    const updateGenreParent = async (genreUuid: string, parentUuid: string) => {
-      updateGenreParent(genreUuid, parentUuid);
-    };
 
     const handleRenameGenre = async (genreUuid: string, newName: string) => {
       try {
