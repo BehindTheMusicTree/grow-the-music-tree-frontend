@@ -81,7 +81,7 @@ export function renderTree(
   treeData: D3Node,
   svgWidth: number,
   svgHeight: number,
-  previousRenderingVisibleActionsContainerGenrePlaylist: CriteriaPlaylistSimple | null,
+  visibleActionsContainerGenrePlaylistUuid: string | null, // <-- new param
   genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null,
   forbiddenNewParentsUuids: string[] | null,
   trackListOrigin: TrackListOrigin | null,
@@ -169,7 +169,7 @@ export function renderTree(
         playState,
         handleMoreActionEnterMouse,
       });
-      setPreviousRenderingVisibleActionsContainerGenrePlaylist(d.data);
+      // setPreviousRenderingVisibleActionsContainerGenrePlaylist(d.data); // REMOVE THIS
     }
   };
 
@@ -199,8 +199,14 @@ export function renderTree(
 
   nodes.each(function (d: D3Node) {
     const group = d3.select<SVGGElement, unknown>(this);
+    // If this node's uuid matches, show actions immediately
+    if (visibleActionsContainerGenrePlaylistUuid && d.data.uuid === visibleActionsContainerGenrePlaylistUuid) {
+      const fakeEvent = { stopPropagation: () => {} } as unknown as MouseEvent;
+      handleMoreActionEnterMouse(fakeEvent, d, d.data);
+    }
     group.on("mouseleave", function (event) {
-      setPreviousRenderingVisibleActionsContainerGenrePlaylist(null);
+      console.log("[DEBUG] Removing more icon and actions container from node group mouseleave", d.data.uuid);
+      // setPreviousRenderingVisibleActionsContainerGenrePlaylist(null); // REMOVE THIS
       d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid).remove();
       d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid).remove();
     });
