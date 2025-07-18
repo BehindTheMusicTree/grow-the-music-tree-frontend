@@ -392,7 +392,7 @@ export function addActionsGroup(
       }
       return "Play";
     },
-    (d) => d.data.uploadedTracksCount > 0 // disabled if no tracks
+    (d) => d.data.uploadedTracksCount > 0
   );
 
   const uploadTrackActionOnclick = (event: MouseEvent, d: D3Node) => {
@@ -409,7 +409,7 @@ export function addActionsGroup(
     3,
     "upload-track-container",
     uploadTrackActionOnclick,
-    () => <FaFileUpload className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
+    () => <FaFileUpload className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
     () => "Upload track"
   );
 
