@@ -68,7 +68,7 @@ export function addMoreIconContainer(
   const moreIconContainer = group.select("#more-icon-container-" + genrePlaylist.uuid);
 
   if (moreIconContainer.empty()) {
-    const moreIconContainer = group.append("g").attr("id", "more-icon-container-" + genrePlaylist.uuid);
+        const moreIconContainer = group.append("g").attr("id", "more-icon-container-" + genrePlaylist.uuid);
 
     moreIconContainer
       .append("rect")
