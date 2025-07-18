@@ -199,14 +199,11 @@ export function renderTree(
 
   nodes.each(function (d: D3Node) {
     const group = d3.select<SVGGElement, unknown>(this);
-    // If this node's uuid matches, show actions immediately
     if (visibleActionsContainerGenrePlaylistUuid && d.data.uuid === visibleActionsContainerGenrePlaylistUuid) {
       const fakeEvent = { stopPropagation: () => {} } as unknown as MouseEvent;
       handleMoreActionEnterMouse(fakeEvent, d, d.data);
     }
-    group.on("mouseleave", function (event) {
-      console.log("[DEBUG] Removing more icon and actions container from node group mouseleave", d.data.uuid);
-      // setVisibleActionsContainerGenrePlaylistUuid(null); // REMOVE THIS
+    group.on("mouseleave", function () {
       d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid).remove();
       d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid).remove();
     });

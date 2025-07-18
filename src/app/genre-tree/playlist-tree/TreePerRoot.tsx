@@ -119,7 +119,6 @@ export default function GenrePlaylistTreePerRoot({
     if (!svgRef.current) return;
 
     // Clear any previous SVG content
-    console.log("[DEBUG] Clearing SVG and rerendering tree");
     d3.select(svgRef.current).selectAll("*").remove();
 
     const handleRenameGenre = async (genreUuid: string, newName: string) => {
