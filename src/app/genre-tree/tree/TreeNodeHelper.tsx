@@ -113,9 +113,8 @@ export function addActionContainer(
   position: number,
   className: string,
   onclick: (event: MouseEvent, d: D3Node) => void,
-  iconDiv: React.ReactNode,
-  labelFunction: (d: D3Node) => string,
-  iconContainerVisibilityFunction: (d: D3Node) => string = () => "visible"
+  iconFunction: (d: D3Node) => React.ReactNode,
+  labelFunction: (d: D3Node) => string
 ) {
   const actionContainerGroup = actionsContainerGroup
     .append("g")
@@ -136,11 +135,10 @@ export function addActionContainer(
     .attr("y", -actionsContainerHeight / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * (position - 1))
     .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
     .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
-    .style("visibility", function (this: SVGForeignObjectElement, d: unknown) {
-      return iconContainerVisibilityFunction(d as D3Node);
-    })
-    .html(function () {
-      return ReactDOMServer.renderToString(<div className="tree-action-icon-container">{iconDiv}</div>);
+    .html(function (this: SVGForeignObjectElement, d: unknown) {
+      return ReactDOMServer.renderToString(
+        <div className="tree-action-icon-container">{iconFunction(d as D3Node)}</div>
+      );
     });
 
   actionContainerGroup
@@ -266,7 +264,7 @@ export function addActionsGroup(
       3,
       "add-child-container",
       addChildActionOnclick,
-      <FaPlus className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
+      () => <FaPlus className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
       () => "Add sub-genre"
     );
 
@@ -282,7 +280,7 @@ export function addActionsGroup(
       4,
       "change-parent-container",
       changeParentActionOnclick,
-      <PiGraphFill className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
+      () => <PiGraphFill className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
       () => "Change parent"
     );
 
@@ -301,7 +299,7 @@ export function addActionsGroup(
       5,
       "rename-container",
       renameGenreActionOnclick,
-      <MdModeEdit className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
+      () => <MdModeEdit className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
       () => "Rename"
     );
 
@@ -319,7 +317,7 @@ export function addActionsGroup(
       6,
       "delete-container",
       deleteGenreActionOnclick,
-      <FaTrashAlt className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
+      () => <FaTrashAlt className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
       () => "Delete"
     );
   }
@@ -328,14 +326,6 @@ export function addActionsGroup(
     handlePlayPauseIconAction(d.data);
   };
 
-  const spinnerVisibilityFunction = (d: D3Node) =>
-    trackListOrigin &&
-    trackListOrigin.type === TrackListOriginType.PLAYLIST &&
-    trackListOrigin.uuid === d.data.uuid &&
-    playState === PlayStates.LOADING
-      ? "visible"
-      : "hidden";
-
   addActionContainer(
     d3,
     actionsContainerHeight,
@@ -343,48 +333,30 @@ export function addActionsGroup(
     1,
     "play-pause-container",
     playPauseActionOnclick,
-    <>
-      <FaPlay
-        className="tree-icon"
-        size={ACTION_ICON_SIZE}
-        color="white"
-        style={{
-          display:
-            !trackListOrigin ||
-            trackListOrigin.type !== TrackListOriginType.PLAYLIST ||
-            trackListOrigin.uuid !== genrePlaylist.uuid ||
-            playState === PlayStates.STOPPED
-              ? "block"
-              : "none",
-        }}
-      />
-      <FaPause
-        className="tree-icon"
-        size={ACTION_ICON_SIZE}
-        color="white"
-        style={{
-          display:
-            trackListOrigin &&
-            trackListOrigin.type === TrackListOriginType.PLAYLIST &&
-            trackListOrigin.uuid === genrePlaylist.uuid &&
-            playState === PlayStates.PLAYING
-              ? "block"
-              : "none",
-        }}
-      />
-      <FaSpinner className="tree-icon animate-spin" size={SPINNER_ICON_SIZE} color="white" />
-    </>,
     (d) => {
       if (
         trackListOrigin &&
         trackListOrigin.type === TrackListOriginType.PLAYLIST &&
         trackListOrigin.uuid === d.data.uuid
       ) {
-        return playState === PlayStates.PLAYING ? "Pause" : "Play";
+        if (playState === PlayStates.PLAYING) {
+          return <FaPause className="tree-icon" size={ACTION_ICON_SIZE} color="white" />;
+        } else if (playState === PlayStates.LOADING) {
+          return <FaSpinner className="tree-icon animate-spin" size={SPINNER_ICON_SIZE} color="white" />;
+        }
+      }
+      return <FaPlay className="tree-icon" size={ACTION_ICON_SIZE} color="white" />;
+    },
+    (d) => {
+      if (
+        trackListOrigin &&
+        trackListOrigin.type === TrackListOriginType.PLAYLIST &&
+        trackListOrigin.uuid === d.data.uuid
+      ) {
+        return playState === PlayStates.PLAYING ? "Pause" : playState === PlayStates.LOADING ? "Loading" : "Play";
       }
       return "Play";
-    },
-    spinnerVisibilityFunction
+    }
   );
 
   const uploadTrackActionOnclick = (event: MouseEvent, d: D3Node) => {
@@ -401,7 +373,7 @@ export function addActionsGroup(
     2,
     "upload-track-container",
     uploadTrackActionOnclick,
-    <FaFileUpload className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
+    () => <FaFileUpload className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
     () => "Upload track"
   );
 
