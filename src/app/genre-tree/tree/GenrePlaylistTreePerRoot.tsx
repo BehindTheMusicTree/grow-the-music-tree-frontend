@@ -74,6 +74,7 @@ export default function GenrePlaylistTreePerRoot({
 
   const handlePlayPauseIconAction = useCallback(
     (genrePlaylist: CriteriaPlaylistSimple) => {
+      console.log("handlePlayPauseIconAction", genrePlaylist);
       if (
         !trackList ||
         !isPlaying ||

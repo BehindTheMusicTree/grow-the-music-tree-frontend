@@ -261,7 +261,7 @@ export function addActionsGroup(
       d3,
       actionsContainerHeight,
       actionsGroup,
-      3,
+      5,
       "add-child-container",
       addChildActionOnclick,
       () => <FaPlus className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
@@ -277,7 +277,7 @@ export function addActionsGroup(
       d3,
       actionsContainerHeight,
       actionsGroup,
-      4,
+      6,
       "change-parent-container",
       changeParentActionOnclick,
       () => <PiGraphFill className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
@@ -296,7 +296,7 @@ export function addActionsGroup(
       d3,
       actionsContainerHeight,
       actionsGroup,
-      5,
+      4,
       "rename-container",
       renameGenreActionOnclick,
       () => <MdModeEdit className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
@@ -314,7 +314,7 @@ export function addActionsGroup(
       d3,
       actionsContainerHeight,
       actionsGroup,
-      6,
+      7,
       "delete-container",
       deleteGenreActionOnclick,
       () => <FaTrashAlt className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
@@ -331,6 +331,24 @@ export function addActionsGroup(
     actionsContainerHeight,
     actionsGroup,
     1,
+    "track-count-container",
+    () => {}, // no-op for non-clickable
+    () => (
+      <span
+        className="tree-icon flex items-center justify-center text-white text-lg font-bold"
+        style={{ width: ACTION_ICON_SIZE, height: ACTION_ICON_SIZE }}
+      >
+        #
+      </span>
+    ),
+    (d) => `${d.data.uploadedTracksCount ?? 0} tracks`
+  );
+
+  addActionContainer(
+    d3,
+    actionsContainerHeight,
+    actionsGroup,
+    2,
     "play-pause-container",
     playPauseActionOnclick,
     (d) => {
@@ -370,7 +388,7 @@ export function addActionsGroup(
     d3,
     actionsContainerHeight,
     actionsGroup,
-    2,
+    3,
     "upload-track-container",
     uploadTrackActionOnclick,
     () => <FaFileUpload className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed

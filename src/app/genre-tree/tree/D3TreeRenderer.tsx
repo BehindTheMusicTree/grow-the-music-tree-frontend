@@ -185,14 +185,14 @@ export function renderTree(
     })
     .on("mouseleave", function (event, d) {
       const parentNode = this.parentNode as SVGGElement;
-      if (parentNode) {
-        d3.select<SVGGElement, unknown>(parentNode)
-          .select<SVGGElement>("#more-icon-container-" + d.data.uuid)
-          .remove();
-        d3.select<SVGGElement, unknown>(parentNode)
-          .select<SVGGElement>("#actions-container-" + d.data.uuid)
-          .remove();
-      }
+      // if (parentNode) {
+      //   d3.select<SVGGElement, unknown>(parentNode)
+      //     .select<SVGGElement>("#more-icon-container-" + d.data.uuid)
+      //     .remove();
+      //   d3.select<SVGGElement, unknown>(parentNode)
+      //     .select<SVGGElement>("#actions-container-" + d.data.uuid)
+      //     .remove();
+      // }
     })
     .on("mouseover", function (event, d) {
       addMoreIconContainer(
@@ -211,9 +211,9 @@ export function renderTree(
   nodes.each(function (d: D3Node) {
     const group = d3.select<SVGGElement, unknown>(this);
     group.on("mouseleave", function (event) {
-      setPreviousRenderingVisibleActionsContainerGenrePlaylist(null);
-      d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid).remove();
-      d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid).remove();
+      // setPreviousRenderingVisibleActionsContainerGenrePlaylist(null);
+      // d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid).remove();
+      // d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid).remove();
     });
   });
 
