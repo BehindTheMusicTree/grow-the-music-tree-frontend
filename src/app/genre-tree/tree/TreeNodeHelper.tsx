@@ -114,16 +114,21 @@ export function addActionContainer(
   className: string,
   onclick: (event: MouseEvent, d: D3Node) => void,
   iconFunction: (d: D3Node) => React.ReactNode,
-  labelFunction: (d: D3Node) => string
+  labelFunction: (d: D3Node) => string,
+  enabledFunction: (d: D3Node) => boolean = () => true // new param, default true
 ) {
   const actionContainerGroup = actionsContainerGroup
     .append("g")
     .attr("class", `${className} cursor-pointer`)
     .on("click", function (this: SVGGElement, event: MouseEvent, d: unknown) {
-      onclick(event, d as D3Node);
+      if (enabledFunction(d as D3Node)) {
+        onclick(event, d as D3Node);
+      }
     })
-    .on("mouseover", function () {
-      d3.select(this).selectAll("div").classed("bg-gray-500", true);
+    .on("mouseover", function (event: MouseEvent, d: unknown) {
+      if (enabledFunction(d as D3Node)) {
+        d3.select(this).selectAll("div").classed("bg-gray-500", true);
+      }
     })
     .on("mouseout", function () {
       d3.select(this).selectAll("div").classed("bg-gray-500", false);
@@ -136,8 +141,9 @@ export function addActionContainer(
     .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
     .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
     .html(function (this: SVGForeignObjectElement, d: unknown) {
+      const enabled = enabledFunction(d as D3Node);
       return ReactDOMServer.renderToString(
-        <div className="tree-action-icon-container">{iconFunction(d as D3Node)}</div>
+        <div className={`tree-action-icon-container${!enabled ? " opacity-50" : ""}`}>{iconFunction(d as D3Node)}</div>
       );
     });
 
@@ -148,10 +154,21 @@ export function addActionContainer(
     .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
     .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
     .html(function (this: SVGForeignObjectElement, d: unknown) {
+      const enabled = enabledFunction(d as D3Node);
       return ReactDOMServer.renderToString(
-        <div className="change-parent-label-container tree-action-label-container">{labelFunction(d as D3Node)}</div>
+        <div className={`change-parent-label-container tree-action-label-container${!enabled ? " opacity-50" : ""}`}>
+          {labelFunction(d as D3Node)}
+        </div>
       );
     });
+
+  const datum =
+    actionContainerGroup.datum && typeof actionContainerGroup.datum === "function"
+      ? actionContainerGroup.datum()
+      : undefined;
+  if (datum !== undefined && !enabledFunction(datum as D3Node)) {
+    actionContainerGroup.classed("cursor-pointer", false).classed("cursor-not-allowed", true);
+  }
 
   return actionContainerGroup;
 }
@@ -374,7 +391,8 @@ export function addActionsGroup(
         return playState === PlayStates.PLAYING ? "Pause" : playState === PlayStates.LOADING ? "Loading" : "Play";
       }
       return "Play";
-    }
+    },
+    (d) => d.data.uploadedTracksCount > 0 // disabled if no tracks
   );
 
   const uploadTrackActionOnclick = (event: MouseEvent, d: D3Node) => {
