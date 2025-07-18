@@ -40,7 +40,7 @@ interface TreeCallbacks {
     showPopup: (title: string, message: string) => void
   ) => Promise<void>;
   showPopup: (title: string, message: string) => void;
-  setPreviousRenderingVisibleActionsContainerGenrePlaylist: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
+  setVisibleActionsContainerGenrePlaylistUuid: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
 }
 
 export function calculateSvgDimensions(d3: typeof import("d3"), treeData: D3Node): SvgDimensions {
@@ -81,7 +81,7 @@ export function renderTree(
   treeData: D3Node,
   svgWidth: number,
   svgHeight: number,
-  visibleActionsContainerGenrePlaylistUuid: string | null, // <-- new param
+  visibleActionsContainerGenrePlaylistUuid: string | null,
   genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null,
   forbiddenNewParentsUuids: string[] | null,
   trackListOrigin: TrackListOrigin | null,
@@ -98,7 +98,7 @@ export function renderTree(
     updateGenreParent,
     handleRenameGenre: renameGenre,
     showPopup,
-    setPreviousRenderingVisibleActionsContainerGenrePlaylist,
+    setVisibleActionsContainerGenrePlaylistUuid,
   } = callbacks;
 
   if (!svgRef.current) {
@@ -169,7 +169,7 @@ export function renderTree(
         playState,
         handleMoreActionEnterMouse,
       });
-      // setPreviousRenderingVisibleActionsContainerGenrePlaylist(d.data); // REMOVE THIS
+      // setVisibleActionsContainerGenrePlaylistUuid(d.data); // REMOVE THIS
     }
   };
 
@@ -206,7 +206,7 @@ export function renderTree(
     }
     group.on("mouseleave", function (event) {
       console.log("[DEBUG] Removing more icon and actions container from node group mouseleave", d.data.uuid);
-      // setPreviousRenderingVisibleActionsContainerGenrePlaylist(null); // REMOVE THIS
+      // setVisibleActionsContainerGenrePlaylistUuid(null); // REMOVE THIS
       d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid).remove();
       d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid).remove();
     });

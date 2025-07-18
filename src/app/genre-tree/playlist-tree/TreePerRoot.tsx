@@ -44,10 +44,8 @@ export default function GenrePlaylistTreePerRoot({
   const { mutate: createGenre } = useCreateGenre();
   const { renameGenre, updateGenreParent } = useUpdateGenre();
   const { mutate: deleteGenre } = useDeleteGenre();
-  const [
-    previousRenderingVisibleActionsContainerGenrePlaylist,
-    setPreviousRenderingVisibleActionsContainerGenrePlaylist,
-  ] = useState<CriteriaPlaylistSimple | null>(null);
+  const [visibleActionsContainerGenrePlaylistUuid, setVisibleActionsContainerGenrePlaylistUuid] =
+    useState<CriteriaPlaylistSimple | null>(null);
   const [svgWidth, setSvgWidth] = useState(0);
   const [svgHeight, setSvgHeight] = useState(0);
 
@@ -147,7 +145,7 @@ export default function GenrePlaylistTreePerRoot({
       treeData,
       svgWidth,
       svgHeight,
-      previousRenderingVisibleActionsContainerGenrePlaylist,
+      visibleActionsContainerGenrePlaylistUuid,
       genrePlaylistGettingAssignedNewParent,
       forbiddenNewParentsUuids,
       trackList ? trackList.origin : null,
@@ -162,7 +160,7 @@ export default function GenrePlaylistTreePerRoot({
         updateGenreParent,
         handleRenameGenre,
         showPopup,
-        setPreviousRenderingVisibleActionsContainerGenrePlaylist,
+        setVisibleActionsContainerGenrePlaylistUuid,
       }
     );
   }, [
@@ -172,7 +170,7 @@ export default function GenrePlaylistTreePerRoot({
     genrePlaylistGettingAssignedNewParent,
     forbiddenNewParentsUuids,
     trackList,
-    previousRenderingVisibleActionsContainerGenrePlaylist,
+    visibleActionsContainerGenrePlaylistUuid,
     svgWidth,
     svgHeight,
     treeData,
