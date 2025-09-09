@@ -40,7 +40,7 @@ interface TreeCallbacks {
     showPopup: (title: string, message: string) => void
   ) => Promise<void>;
   showPopup: (title: string, message: string) => void;
-  setVisibleActionsContainerGenrePlaylistUuid: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
+  setVisibleActionsContainerGenrePlaylist: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
 }
 
 export function calculateSvgDimensions(d3: typeof import("d3"), treeData: D3Node): SvgDimensions {
@@ -81,7 +81,7 @@ export function renderTree(
   treeData: D3Node,
   svgWidth: number,
   svgHeight: number,
-  visibleActionsContainerGenrePlaylistUuid: string | null,
+  visibleActionsContainerGenrePlaylist: CriteriaPlaylistSimple | null,
   genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null,
   forbiddenNewParentsUuids: string[] | null,
   trackListOrigin: TrackListOrigin | null,
@@ -98,7 +98,7 @@ export function renderTree(
     updateGenreParent,
     handleRenameGenre: renameGenre,
     showPopup,
-    setVisibleActionsContainerGenrePlaylistUuid,
+    setVisibleActionsContainerGenrePlaylist,
   } = callbacks;
 
   if (!svgRef.current) {
@@ -169,7 +169,7 @@ export function renderTree(
         playState,
         handleMoreActionEnterMouse,
       });
-      // setVisibleActionsContainerGenrePlaylistUuid(d.data); // REMOVE THIS
+      // setVisibleActionsContainerGenrePlaylist(d.data); // REMOVE THIS
     }
   };
 
@@ -199,7 +199,7 @@ export function renderTree(
 
   nodes.each(function (d: D3Node) {
     const group = d3.select<SVGGElement, unknown>(this);
-    if (visibleActionsContainerGenrePlaylistUuid && d.data.uuid === visibleActionsContainerGenrePlaylistUuid) {
+    if (visibleActionsContainerGenrePlaylist && d.data.uuid === visibleActionsContainerGenrePlaylist.uuid) {
       const fakeEvent = { stopPropagation: () => {} } as unknown as MouseEvent;
       handleMoreActionEnterMouse(fakeEvent, d, d.data);
     }
