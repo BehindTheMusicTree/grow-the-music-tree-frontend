@@ -184,17 +184,20 @@ export function renderTree(
       return `<div class="tree-info">${d.data.name}</div>`;
     })
     .on("mouseover", function (event, d) {
-      addMoreIconContainer(
-        d3,
-        d.data,
-        d3.select<SVGGElement, unknown>(this.parentNode as SVGGElement) as unknown as d3.Selection<
-          SVGGElement,
-          unknown,
-          HTMLElement,
-          unknown
-        >,
-        handleMoreActionEnterMouse
-      );
+      // Don't show more container when assigning new parent
+      if (!genrePlaylistGettingAssignedNewParent) {
+        addMoreIconContainer(
+          d3,
+          d.data,
+          d3.select<SVGGElement, unknown>(this.parentNode as SVGGElement) as unknown as d3.Selection<
+            SVGGElement,
+            unknown,
+            HTMLElement,
+            unknown
+          >,
+          handleMoreActionEnterMouse
+        );
+      }
     });
 
   nodes.each(function (d: D3Node) {
