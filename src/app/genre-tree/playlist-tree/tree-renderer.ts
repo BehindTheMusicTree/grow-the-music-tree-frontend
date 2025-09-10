@@ -203,9 +203,26 @@ export function renderTree(
       const fakeEvent = { stopPropagation: () => {} } as unknown as MouseEvent;
       handleMoreActionEnterMouse(fakeEvent, d, d.data);
     }
+
+    group.on("mouseenter", function () {
+      // Add parent selection overlay when a genre is being assigned a new parent
+      if (
+        genrePlaylistGettingAssignedNewParent &&
+        d.data.criteria &&
+        d.data.uuid !== genrePlaylistGettingAssignedNewParent.uuid
+      ) {
+        addParentSelectionOverlay(d3, group as unknown as d3.Selection<SVGGElement, unknown, HTMLElement, unknown>, {
+          updateGenreParent,
+          setGenrePlaylistGettingAssignedNewParent,
+          genrePlaylistGettingAssignedNewParent,
+        });
+      }
+    });
+
     group.on("mouseleave", function () {
       d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid).remove();
       d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid).remove();
+      d3.select<SVGGElement, unknown>("#select-as-new-parent-group").remove();
     });
   });
 
