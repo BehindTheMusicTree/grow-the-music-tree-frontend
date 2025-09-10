@@ -225,7 +225,7 @@ export function renderTree(
     group.on("mouseleave", function () {
       d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid).remove();
       d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid).remove();
-      d3.select<SVGGElement, unknown>("#select-as-new-parent-group").remove();
+      d3.select<SVGGElement, unknown>("#select-as-new-parent-group-" + d.data.uuid).remove();
     });
   });
 

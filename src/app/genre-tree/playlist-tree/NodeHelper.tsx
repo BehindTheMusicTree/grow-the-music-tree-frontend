@@ -68,7 +68,7 @@ export function addMoreIconContainer(
   const moreIconContainer = group.select("#more-icon-container-" + genrePlaylist.uuid);
 
   if (moreIconContainer.empty()) {
-        const moreIconContainer = group.append("g").attr("id", "more-icon-container-" + genrePlaylist.uuid);
+    const moreIconContainer = group.append("g").attr("id", "more-icon-container-" + genrePlaylist.uuid);
 
     moreIconContainer
       .append("rect")
@@ -433,10 +433,12 @@ export function addParentSelectionOverlay(
   const { updateGenreParent, genrePlaylistGettingAssignedNewParent, setGenrePlaylistGettingAssignedNewParent } =
     callbacks;
 
-  let selectAsNewParentGroup = parentNode.select<SVGGElement>("#select-as-new-parent-group");
+  const nodeUuid = (parentNode.datum() as D3Node).data.uuid;
+  let selectAsNewParentGroup = parentNode.select<SVGGElement>("#select-as-new-parent-group-" + nodeUuid);
   if (selectAsNewParentGroup.empty()) {
     selectAsNewParentGroup = parentNode
       .append("g")
+      .attr("id", "select-as-new-parent-group-" + nodeUuid)
       .attr("class", "select-as-new-parent-group cursor-pointer")
       .on("mouseleave", function () {
         d3.select(this).remove();
