@@ -471,7 +471,7 @@ export function addParentSelectionOverlay(
       })
       .on("click", function (this: SVGForeignObjectElement, event: MouseEvent, d: unknown) {
         if (genrePlaylistGettingAssignedNewParent) {
-          updateGenreParent(genrePlaylistGettingAssignedNewParent.uuid, (d as D3Node).data.criteria.uuid);
+          updateGenreParent(genrePlaylistGettingAssignedNewParent.criteria.uuid, (d as D3Node).data.criteria.uuid);
           setGenrePlaylistGettingAssignedNewParent(null);
         }
       });
