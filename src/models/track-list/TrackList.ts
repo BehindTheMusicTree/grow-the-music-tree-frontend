@@ -1,4 +1,4 @@
-import { UploadedTrackDetailed } from "@domain/uploaded-track/response";
+import { UploadedTrackDetailed } from "@domain/uploaded-track/response/detailed";
 import TrackListOrigin, {
   TrackListOriginFromUploadedTrack,
   TrackListOriginFromPlaylist,
