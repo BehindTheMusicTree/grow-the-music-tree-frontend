@@ -458,7 +458,7 @@ export function addParentSelectionOverlay(
       .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
       .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
       .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
-      .attr("fill", "grey");
+      .attr("fill", "green");
 
     selectAsNewParentGroup
       .append("foreignObject")
