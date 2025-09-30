@@ -5,7 +5,7 @@ import * as d3 from "d3";
 
 import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
-import { useUpdateGenre, useCreateGenre, useDeleteGenre } from "@hooks/useGenre";
+import { useUpdateGenre, useCreateGenre, useDeleteGenre, useFetchGenre } from "@hooks/useGenre";
 import { useUploadTrack } from "@hooks/useUploadedTrack";
 import { usePlayer } from "@contexts/PlayerContext";
 
@@ -17,6 +17,7 @@ import InvalidInputPopup from "@components/ui/popup/child/InvalidInputPopup";
 import { UploadedTrackCreationValues } from "@domain/uploaded-track/form/creation";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { CriteriaMinimum } from "@domain/criteria/response/minimum";
+import { CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
 
 import { buildTreeHierarchyStructure } from "./NodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./tree-renderer";
@@ -24,16 +25,16 @@ import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree }
 type GenrePlaylistTreePerRootProps = {
   className?: string;
   genrePlaylistTreePerRoot: CriteriaPlaylistSimple[];
-  genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null;
-  setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
+  genreGettingAssignedNewParent: CriteriaDetailed | null;
+  setGenreGettingAssignedNewParent: (genre: CriteriaDetailed | null) => void;
   handleGenreCreationAction: (parent: CriteriaMinimum | null) => void;
 };
 
 export default function GenrePlaylistTreePerRoot({
   className,
   genrePlaylistTreePerRoot,
-  genrePlaylistGettingAssignedNewParent,
-  setGenrePlaylistGettingAssignedNewParent,
+  genreGettingAssignedNewParent,
+  setGenreGettingAssignedNewParent,
   handleGenreCreationAction,
 }: GenrePlaylistTreePerRootProps) {
   const [forbiddenNewParentsUuids, setForbiddenNewParentsUuids] = useState<string[]>([]);
@@ -43,7 +44,8 @@ export default function GenrePlaylistTreePerRoot({
   const { mutate: uploadTrack, isPending: isUploadingTrack, error: uploadTrackError } = useUploadTrack();
   const { mutate: createGenre } = useCreateGenre();
   const { renameGenre, updateGenreParent } = useUpdateGenre();
-  const { mutate: deleteGenre } = useDeleteGenre();
+  const { mutate: _deleteGenre } = useDeleteGenre();
+  const fetchGenre = useFetchGenre();
   const [visibleActionsContainerGenrePlaylist, setVisibleActionsContainerGenrePlaylist] =
     useState<CriteriaPlaylistSimple | null>(null);
   const [svgWidth, setSvgWidth] = useState(0);
@@ -115,6 +117,14 @@ export default function GenrePlaylistTreePerRoot({
     return { treeData: reshapedTreeData };
   }, [genrePlaylistTreePerRoot]);
 
+  // Calculate forbidden UUIDs for the genre getting assigned a new parent
+  const genreGettingAssignedNewParentForbiddenUuids = useMemo(() => {
+    if (!genreGettingAssignedNewParent) return [];
+
+    const descendantUuids = genreGettingAssignedNewParent.descendants.map((d) => d.descendant.uuid);
+    return [genreGettingAssignedNewParent.uuid, ...descendantUuids];
+  }, [genreGettingAssignedNewParent]);
+
   useEffect(() => {
     if (!svgRef.current) return;
 
@@ -145,7 +155,8 @@ export default function GenrePlaylistTreePerRoot({
       svgWidth,
       svgHeight,
       visibleActionsContainerGenrePlaylist,
-      genrePlaylistGettingAssignedNewParent,
+      genreGettingAssignedNewParent,
+      genreGettingAssignedNewParentForbiddenUuids,
       forbiddenNewParentsUuids,
       trackList ? trackList.origin : null,
       isPlaying ? PlayStates.PLAYING : PlayStates.STOPPED,
@@ -155,7 +166,8 @@ export default function GenrePlaylistTreePerRoot({
         setForbiddenNewParentsUuids,
         handlePlayPauseIconAction,
         handleGenreCreationAction,
-        setGenrePlaylistGettingAssignedNewParent,
+        setGenreGettingAssignedNewParent,
+        fetchGenre,
         updateGenreParent,
         handleRenameGenre,
         showPopup,
@@ -166,7 +178,8 @@ export default function GenrePlaylistTreePerRoot({
     genrePlaylistTreePerRoot,
     isPlaying,
     trackList?.origin,
-    genrePlaylistGettingAssignedNewParent,
+    genreGettingAssignedNewParent,
+    genreGettingAssignedNewParentForbiddenUuids,
     forbiddenNewParentsUuids,
     trackList,
     visibleActionsContainerGenrePlaylist,
@@ -175,11 +188,12 @@ export default function GenrePlaylistTreePerRoot({
     treeData,
     createGenre,
     handlePlayPauseIconAction,
-    setGenrePlaylistGettingAssignedNewParent,
+    setGenreGettingAssignedNewParent,
     updateGenreParent,
     showPopup,
     handleGenreCreationAction,
     renameGenre,
+    fetchGenre,
   ]);
 
   useEffect(() => {
