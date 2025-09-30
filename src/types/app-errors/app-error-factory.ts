@@ -8,7 +8,6 @@ import {
   ServiceError,
   InvalidInputError,
 } from "./app-error";
-import { object } from "zod";
 
 export function createAppErrorFromErrorCode(code: ErrorCode, json?: object): AppError {
   if ([ErrorCode.BACKEND_UNAUTHORIZED, ErrorCode.SESSION_EXPIRED, ErrorCode.SESSION_REQUIRED].includes(code)) {
