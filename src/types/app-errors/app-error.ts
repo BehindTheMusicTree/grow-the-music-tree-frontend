@@ -20,6 +20,10 @@ export class InvalidInputError extends ClientError {
     super(code);
     this.name = "InvalidInputError";
   }
+
+  toString(): string {
+    return `${super.toString()}\nJSON: ${JSON.stringify(this.json, null, 2)}`;
+  }
 }
 
 export class ConnectivityError extends AppError {
