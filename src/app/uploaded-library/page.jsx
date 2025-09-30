@@ -12,7 +12,8 @@ import { useTrackList } from "@contexts/TrackListContext";
 import { useListUploadedTracks } from "@hooks/useUploadedTrack";
 
 export default function UploadedLibrary() {
-  const { data: uploadedTracks = [] } = useListUploadedTracks();
+  const { data: uploadedTracksResponse } = useListUploadedTracks();
+  const uploadedTracks = uploadedTracksResponse?.results || [];
   const { playerUploadedTrackObject, handlePlayPauseAction } = usePlayer();
   const { showPopup } = usePopup();
   const { playNewTrackListFromUploadedTrackUuid } = useTrackList();

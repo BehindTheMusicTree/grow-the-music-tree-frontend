@@ -4,7 +4,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFetchWrapper } from "./useFetchWrapper";
 import { useInvalidateAllGenrePlaylistQueries } from "./useGenrePlaylist";
 import { UploadedTrackDetailedSchema } from "@domain/uploaded-track/response/detailed";
-import { UploadedTrackSimpleSchema } from "@domain/uploaded-track/response/simple/simple";
 import { UploadedTrackCreationSchema } from "@domain/uploaded-track/form/creation";
 import { UploadedTrackUpdateSchema } from "@domain/uploaded-track/form/update";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
@@ -17,7 +16,12 @@ export function useListUploadedTracks(page = 1, pageSize = process.env.NEXT_PUBL
     queryKey: ["uploadedTracks", "list", page],
     queryFn: async () => {
       const response = await fetch("library/uploaded/", true, true, {}, { page, pageSize });
-      return PaginatedResponseSchema(UploadedTrackSimpleSchema).parse(response);
+      const result = PaginatedResponseSchema(UploadedTrackDetailedSchema).safeParse(response);
+      if (!result.success) {
+        console.error("Parsing failed:", result.error);
+        throw result.error;
+      }
+      return result.data;
     },
   });
 }

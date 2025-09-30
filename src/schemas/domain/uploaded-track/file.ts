@@ -7,15 +7,18 @@ export const FileDetailedSchema = z.object({
   md5HasBeenCorrected: z.boolean(),
   durationInSec: z.number(),
   durationStrInHourMinSec: z.string(),
-  fingerprintMissingCause: z.string().optional(),
-  sizeInBytes: z.number(),
+  fingerprintMissingCause: z.string().nullable().optional(),
+  sizeInBytes: z.union([z.number(), z.string()]).transform((val) => (typeof val === "string" ? parseFloat(val) : val)),
   sizeInKo: z.number(),
   sizeInMo: z.number(),
   bitrateInKbps: z.number(),
-  musicbrainzRecording: MbRecordingDetailedSchema,
-  musicbrainzRecordingMissingCause: z.string().optional(),
+  musicbrainzRecording: MbRecordingDetailedSchema.nullable(),
+  musicbrainzRecordingMissingCause: z
+    .union([z.string(), z.object({})])
+    .nullable()
+    .optional(),
   createdOn: z.string().datetime(),
-  updatedOn: z.string().datetime(),
+  updatedOn: z.string().datetime().nullable(),
 });
 
 export type FileDetailed = z.infer<typeof FileDetailedSchema>;

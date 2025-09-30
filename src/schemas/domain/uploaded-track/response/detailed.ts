@@ -12,16 +12,16 @@ export const UploadedTrackDetailedSchema = UuidResourceSchema.extend({
   title: z.string(),
   file: FileDetailedSchema,
   artists: z.array(ArtistMinimumSchema),
-  album: AlbumMinimumSchema,
-  trackNumber: z.number().optional(),
+  album: AlbumMinimumSchema.nullable(),
+  trackNumber: z.number().nullable().optional(),
   genre: CriteriaMinimumSchema,
-  rating: z.number().min(0).max(10).optional(),
-  language: z.string().optional(),
+  rating: z.number().min(0).max(10).nullable().optional(),
+  language: z.string().nullable().optional(),
   playlists: z.array(CriteriaPlaylistMinimumSchema),
   playCount: z.number().min(0),
   archived: z.boolean(),
   createdOn: z.string().datetime(),
-  updatedOn: z.string().datetime().optional(),
+  updatedOn: z.string().datetime().nullable().optional(),
 });
 
 export type UploadedTrackDetailed = z.infer<typeof UploadedTrackDetailedSchema>;
