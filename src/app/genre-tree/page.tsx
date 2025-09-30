@@ -12,6 +12,7 @@ import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
 import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
+import { CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
 import GenrePlaylistTreePerRoot from "./playlist-tree/TreePerRoot";
 import { GenreTreeSkeleton } from "./Skeleton";
 
@@ -21,8 +22,7 @@ export default function GenreTree() {
   const { mutate: loadReferenceTreeGenre, isPending: isLoadingReferenceTreeGenre } = useLoadReferenceTreeGenre();
 
   const { showPopup, hidePopup } = usePopup();
-  const [genrePlaylistGettingAssignedNewParent, setGenrePlaylistGettingAssignedNewParent] =
-    useState<CriteriaPlaylistSimple | null>(null);
+  const [genreGettingAssignedNewParent, setGenreGettingAssignedNewParent] = useState<CriteriaDetailed | null>(null);
 
   const groupedGenrePlaylistsByRoot = useMemo(
     () =>
@@ -104,8 +104,8 @@ export default function GenreTree() {
                   <div className="graph-container relative z-10">
                     <GenrePlaylistTreePerRoot
                       genrePlaylistTreePerRoot={genrePlaylistTreePerRoot}
-                      genrePlaylistGettingAssignedNewParent={genrePlaylistGettingAssignedNewParent}
-                      setGenrePlaylistGettingAssignedNewParent={setGenrePlaylistGettingAssignedNewParent}
+                      genreGettingAssignedNewParent={genreGettingAssignedNewParent}
+                      setGenreGettingAssignedNewParent={setGenreGettingAssignedNewParent}
                       handleGenreCreationAction={showCriteriaCreationPopup}
                     />
                   </div>
