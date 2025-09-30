@@ -18,6 +18,7 @@ import {
 import { addGrid } from "../d3-helper/d3-grid-helper";
 import { appendPaths } from "../d3-helper/d3-path-helper";
 import { addMoreIconContainer, addActionsGroup, addParentSelectionOverlay } from "./NodeHelper";
+import { CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
 
 type D3Selection = d3.Selection<SVGGElement, unknown, null, undefined>;
 type D3Node = d3.HierarchyNode<CriteriaPlaylistSimple>;
@@ -31,7 +32,8 @@ interface SvgDimensions {
 interface TreeCallbacks {
   handlePlayPauseIconAction: (genrePlaylist: CriteriaPlaylistSimple) => void;
   handleGenreCreationAction: (parent: CriteriaMinimum | null) => void;
-  setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
+  setGenreGettingAssignedNewParent: (genre: CriteriaDetailed | null) => void;
+  fetchGenre: (criteriaUuid: string) => Promise<CriteriaDetailed>;
   setForbiddenNewParentsUuids: React.Dispatch<React.SetStateAction<string[]>>;
   updateGenreParent: (genreUuid: string, newParentUuid: string) => Promise<void>;
   handleRenameGenre: (
@@ -82,7 +84,8 @@ export function renderTree(
   svgWidth: number,
   svgHeight: number,
   visibleActionsContainerGenrePlaylist: CriteriaPlaylistSimple | null,
-  genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null,
+  genreGettingAssignedNewParent: CriteriaDetailed | null,
+  genreGettingAssignedNewParentForbiddenUuids: string[] | null,
   forbiddenNewParentsUuids: string[] | null,
   trackListOrigin: TrackListOrigin | null,
   playState: PlayStates,
@@ -93,12 +96,12 @@ export function renderTree(
   const {
     handlePlayPauseIconAction,
     handleGenreCreationAction,
-    setGenrePlaylistGettingAssignedNewParent,
-    setForbiddenNewParentsUuids,
+    setGenreGettingAssignedNewParent,
+    fetchGenre,
     updateGenreParent,
     handleRenameGenre: renameGenre,
     showPopup,
-    setVisibleActionsContainerGenrePlaylist,
+    setVisibleActionsContainerGenrePlaylist: _setVisibleActionsContainerGenrePlaylist,
   } = callbacks;
 
   if (!svgRef.current) {
@@ -137,16 +140,18 @@ export function renderTree(
     .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
     .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
     .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
-    .attr("fill", RECTANGLE_COLOR)
-    .style("stroke", function (d) {
-      return d.data.criteria && forbiddenNewParentsUuids && forbiddenNewParentsUuids.includes(d.data.criteria.uuid)
-        ? "blue"
-        : "none";
-    })
-    .style("stroke-width", function (d) {
-      return d.data.criteria && forbiddenNewParentsUuids && forbiddenNewParentsUuids.includes(d.data.criteria.uuid)
-        ? "2px"
-        : "0px";
+    .attr("fill", function (d) {
+      // Grey out forbidden nodes (the genre itself and its descendants)
+      const isForbidden =
+        d.data.criteria &&
+        ((forbiddenNewParentsUuids && forbiddenNewParentsUuids.includes(d.data.criteria.uuid)) ||
+          (genreGettingAssignedNewParentForbiddenUuids &&
+            genreGettingAssignedNewParentForbiddenUuids.includes(d.data.criteria.uuid)));
+
+      if (isForbidden) {
+        return "#cccccc";
+      }
+      return RECTANGLE_COLOR;
     });
 
   const handleMoreActionEnterMouse = (event: MouseEvent, d: D3Node, genrePlaylist: CriteriaPlaylistSimple) => {
@@ -162,7 +167,8 @@ export function renderTree(
         fileInputRef,
         selectingFileGenreUuidRef: selectingFileGenreUuidRef,
         handleGenreCreationAction,
-        setGenrePlaylistGettingAssignedNewParent,
+        setGenreGettingAssignedNewParent,
+        fetchGenre,
         renameGenre,
         showPopup,
         trackListOrigin: trackListOrigin!,
@@ -181,11 +187,23 @@ export function renderTree(
     .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
     .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
     .html(function (d) {
-      return `<div class="tree-info">${d.data.name}</div>`;
+      const isForbidden =
+        d.data.criteria &&
+        ((forbiddenNewParentsUuids && forbiddenNewParentsUuids.includes(d.data.criteria.uuid)) ||
+          (genreGettingAssignedNewParentForbiddenUuids &&
+            genreGettingAssignedNewParentForbiddenUuids.includes(d.data.criteria.uuid)));
+      const textColor = isForbidden ? "color: #888888;" : "";
+      return `<div class="tree-info" style="${textColor}">${d.data.name}</div>`;
     })
     .on("mouseover", function (event, d) {
-      // Don't show more container when assigning new parent
-      if (!genrePlaylistGettingAssignedNewParent) {
+      // Don't show more container when assigning new parent or for forbidden nodes
+      const isForbidden =
+        d.data.criteria &&
+        ((forbiddenNewParentsUuids && forbiddenNewParentsUuids.includes(d.data.criteria.uuid)) ||
+          (genreGettingAssignedNewParentForbiddenUuids &&
+            genreGettingAssignedNewParentForbiddenUuids.includes(d.data.criteria.uuid)));
+
+      if (!genreGettingAssignedNewParent && !isForbidden) {
         addMoreIconContainer(
           d3,
           d.data,
@@ -209,15 +227,18 @@ export function renderTree(
 
     group.on("mouseenter", function () {
       // Add parent selection overlay when a genre is being assigned a new parent
-      if (
-        genrePlaylistGettingAssignedNewParent &&
+      // Don't show overlay for forbidden nodes (includes the genre itself and its descendants)
+      const isForbidden =
         d.data.criteria &&
-        d.data.uuid !== genrePlaylistGettingAssignedNewParent.uuid
-      ) {
+        ((forbiddenNewParentsUuids && forbiddenNewParentsUuids.includes(d.data.criteria.uuid)) ||
+          (genreGettingAssignedNewParentForbiddenUuids &&
+            genreGettingAssignedNewParentForbiddenUuids.includes(d.data.criteria.uuid)));
+
+      if (genreGettingAssignedNewParent && d.data.criteria && !isForbidden) {
         addParentSelectionOverlay(d3, group as unknown as d3.Selection<SVGGElement, unknown, HTMLElement, unknown>, {
           updateGenreParent,
-          setGenrePlaylistGettingAssignedNewParent,
-          genrePlaylistGettingAssignedNewParent,
+          setGenreGettingAssignedNewParent,
+          genreGettingAssignedNewParent,
         });
       }
     });
