@@ -17,10 +17,13 @@ export const fetchWrapper = async <T>(
     : url;
 
   const finalUrl = urlWithParams;
+
+  // Don't set Content-Type for FormData - let browser set it with boundary
+  const isFormData = options.body instanceof FormData;
   const finalOptions: RequestInit = {
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
       ...(options.headers || {}),
     },

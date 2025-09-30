@@ -31,9 +31,46 @@ export function useUploadTrack() {
     inputSchema: UploadedTrackCreationSchema,
     outputSchema: UploadedTrackDetailedSchema,
     mutationFn: async (data) => {
+      const formData = new FormData();
+      formData.append("file", data.file);
+
+      if (data.track_file_fingerprint_must_be_unique !== undefined) {
+        formData.append("track_file_fingerprint_must_be_unique", String(data.track_file_fingerprint_must_be_unique));
+      }
+      if (data.title !== undefined && data.title !== null) {
+        formData.append("title", data.title);
+      }
+      if (data.force_title_generation !== undefined) {
+        formData.append("force_title_generation", String(data.force_title_generation));
+      }
+      if (data.artists_names !== undefined && data.artists_names !== null) {
+        formData.append("artists_names", data.artists_names);
+      }
+      if (data.album_name !== undefined && data.album_name !== null) {
+        formData.append("album_name", data.album_name);
+      }
+      if (data.album_artists_names !== undefined && data.album_artists_names !== null) {
+        formData.append("album_artists_names", data.album_artists_names);
+      }
+      if (data.track_number !== undefined) {
+        formData.append("track_number", String(data.track_number));
+      }
+      if (data.genre !== undefined && data.genre !== null) {
+        formData.append("genre", data.genre);
+      }
+      if (data.rating !== undefined) {
+        formData.append("rating", String(data.rating));
+      }
+      if (data.language !== undefined && data.language !== null) {
+        formData.append("language", data.language);
+      }
+
       const response = await fetch("library/uploaded/", true, true, {
         method: "POST",
-        body: JSON.stringify(data),
+        body: formData,
+        headers: {
+          // Remove Content-Type header to let browser set it with boundary for FormData
+        },
       });
       return response;
     },

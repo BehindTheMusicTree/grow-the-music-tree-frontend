@@ -5,8 +5,7 @@ import * as d3 from "d3";
 
 import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
-import { useUpdateGenre, useCreateGenre, useDeleteGenre, useFetchGenre } from "@hooks/useGenre";
-import { useUploadTrack } from "@hooks/useUploadedTrack";
+import { useUpdateGenre, useCreateGenre, useFetchGenre } from "@hooks/useGenre";
 import { usePlayer } from "@contexts/PlayerContext";
 
 import { PlayStates } from "@models/PlayStates";
@@ -14,7 +13,6 @@ import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginTy
 
 import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
 import InvalidInputPopup from "@components/ui/popup/child/InvalidInputPopup";
-import { UploadedTrackCreationValues } from "@domain/uploaded-track/form/creation";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { CriteriaMinimum } from "@domain/criteria/response/minimum";
 import { CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
@@ -41,10 +39,8 @@ export default function GenrePlaylistTreePerRoot({
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup } = usePopup();
   const { toTrackAtPosition, trackList } = useTrackList();
-  const { mutate: uploadTrack, isPending: isUploadingTrack, error: uploadTrackError } = useUploadTrack();
   const { mutate: createGenre } = useCreateGenre();
   const { renameGenre, updateGenreParent } = useUpdateGenre();
-  const { mutate: _deleteGenre } = useDeleteGenre();
   const fetchGenre = useFetchGenre();
   const [visibleActionsContainerGenrePlaylist, setVisibleActionsContainerGenrePlaylist] =
     useState<CriteriaPlaylistSimple | null>(null);
@@ -57,17 +53,20 @@ export default function GenrePlaylistTreePerRoot({
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files) {
-      const file = files[0];
-      if (file) {
-        const uploadedTrackCreationValues: UploadedTrackCreationValues = {
-          file: file,
-          genre: selectingFileGenreUuidRef.current,
-        };
-        uploadTrack(uploadedTrackCreationValues);
-
-        showPopup(<TrackUploadPopup isUploadingTrack={isUploadingTrack} error={uploadTrackError} />);
-      }
+    if (files && files.length > 0) {
+      const fileArray = Array.from(files);
+      showPopup(
+        <TrackUploadPopup
+          files={fileArray}
+          genre={selectingFileGenreUuidRef.current}
+          onComplete={(uploadedTracks) => {
+            console.log("Upload completed:", uploadedTracks);
+          }}
+          onClose={() => {
+            // Popup will close automatically
+          }}
+        />
+      );
     }
     event.target.value = "";
   };
