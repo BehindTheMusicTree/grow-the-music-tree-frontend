@@ -17,20 +17,8 @@ export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRE
   return useQuery({
     queryKey: ["genres", "list", page],
     queryFn: async () => {
-      const response = await fetch("genre/", true, true, {}, { page, pageSize });
+      const response = await fetch("genres/", true, true, {}, { page, pageSize });
       return PaginatedResponseSchema(CriteriaSimpleSchema).parse(response);
-    },
-  });
-}
-
-export function useRetrieveGenre(id: string) {
-  const { fetch } = useFetchWrapper();
-
-  return useQuery<CriteriaDetailed>({
-    queryKey: ["genres", "detail", id],
-    queryFn: async () => {
-      const response = await fetch(`genre/${id}`, true);
-      return CriteriaDetailedSchema.parse(response);
     },
   });
 }
@@ -40,7 +28,7 @@ export function useFetchGenre() {
 
   return useCallback(
     async (id: string): Promise<CriteriaDetailed> => {
-      const response = await fetch(`genre/${id}`, true);
+      const response = await fetch(`genres/${id}/`, true);
       return CriteriaDetailedSchema.parse(response);
     },
     [fetch]
@@ -119,8 +107,11 @@ export function useUpdateGenre() {
     mutate({ uuid, data: { name } });
   };
 
-  const updateGenreParent = (uuid: string, parentUuid: string) => {
-    mutate({ uuid, data: { parent: parentUuid } });
+  const updateGenreParent = async (uuid: string, parentUuid: string) => {
+    return new Promise<void>((resolve) => {
+      mutate({ uuid, data: { parent: parentUuid } });
+      resolve();
+    });
   };
 
   return { mutate, renameGenre, updateGenreParent, formErrors };
