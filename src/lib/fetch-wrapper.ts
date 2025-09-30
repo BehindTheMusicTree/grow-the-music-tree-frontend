@@ -48,7 +48,7 @@ export const fetchWrapper = async <T>(
     } else {
       appError = createNetworkOrBackendError(caughtError, finalUrl);
     }
-    console.log("appError", appError);
+    console.log("appError", appError.toString());
 
     if (handleError && appError) {
       handleError(appError);
