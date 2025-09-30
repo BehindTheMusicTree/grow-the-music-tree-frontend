@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 
 import { useFetchWrapper } from "./useFetchWrapper";
 import { useInvalidateAllGenrePlaylistQueries } from "@hooks/useGenrePlaylist";
@@ -32,6 +33,18 @@ export function useRetrieveGenre(id: string) {
       return CriteriaDetailedSchema.parse(response);
     },
   });
+}
+
+export function useFetchGenre() {
+  const { fetch } = useFetchWrapper();
+
+  return useCallback(
+    async (id: string): Promise<CriteriaDetailed> => {
+      const response = await fetch(`genre/${id}`, true);
+      return CriteriaDetailedSchema.parse(response);
+    },
+    [fetch]
+  );
 }
 
 export function useLoadReferenceTreeGenre() {
