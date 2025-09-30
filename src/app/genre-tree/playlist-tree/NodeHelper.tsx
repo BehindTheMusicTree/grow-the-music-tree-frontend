@@ -10,6 +10,7 @@ import { PlayStates } from "@models/PlayStates";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { CriteriaMinimum } from "@domain/criteria/response/minimum";
+import { CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
 
 import {
   RECTANGLE_COLOR,
@@ -32,7 +33,7 @@ interface Callbacks {
   fileInputRef: React.RefObject<HTMLInputElement>;
   selectingFileGenreUuidRef: React.MutableRefObject<string | null>;
   handleGenreCreationAction: (parent: string) => void;
-  setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
+  setGenreGettingAssignedNewParent: (genre: CriteriaDetailed | null) => void;
   renameGenre: (uuid: string, name: string, showPopup: (title: string, message: string) => void) => Promise<void>;
   showPopup: (title: string, message: string) => void;
   trackListOrigin?: {
@@ -185,7 +186,8 @@ export function addActionsGroup(
     fileInputRef: React.RefObject<HTMLInputElement>;
     selectingFileGenreUuidRef: React.MutableRefObject<string | null>;
     handleGenreCreationAction: (parent: CriteriaMinimum) => void;
-    setGenrePlaylistGettingAssignedNewParent: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
+    setGenreGettingAssignedNewParent: (genre: CriteriaDetailed | null) => void;
+    fetchGenre: (criteriaUuid: string) => Promise<CriteriaDetailed>;
     renameGenre: (uuid: string, name: string, showPopup: (title: string, message: string) => void) => Promise<void>;
     showPopup: (title: string, message: string) => void;
     trackListOrigin: {
@@ -201,7 +203,8 @@ export function addActionsGroup(
     fileInputRef,
     selectingFileGenreUuidRef,
     handleGenreCreationAction,
-    setGenrePlaylistGettingAssignedNewParent,
+    setGenreGettingAssignedNewParent,
+    fetchGenre,
     renameGenre,
     showPopup,
     trackListOrigin,
@@ -285,9 +288,14 @@ export function addActionsGroup(
       () => "Add sub-genre"
     );
 
-    const changeParentActionOnclick = (event: MouseEvent, d: D3Node) => {
+    const changeParentActionOnclick = async (event: MouseEvent, d: D3Node) => {
       genrePlaylistGroup.dispatch("mouseleave");
-      setGenrePlaylistGettingAssignedNewParent(d.data);
+      try {
+        const detailedCriteria = await fetchGenre(d.data.criteria.uuid);
+        setGenreGettingAssignedNewParent(detailedCriteria);
+      } catch (error) {
+        console.error("Failed to fetch detailed criteria:", error);
+      }
     };
 
     addActionContainer(
@@ -320,7 +328,7 @@ export function addActionsGroup(
       () => "Rename"
     );
 
-    const deleteGenreActionOnclick = (event: MouseEvent, d: D3Node) => {
+    const deleteGenreActionOnclick = (_event: MouseEvent, _d: D3Node) => {
       genrePlaylistGroup.dispatch("mouseleave");
       if (confirm("Are you sure you want to delete this genre?")) {
         // TODO: Implement delete genre
@@ -426,12 +434,11 @@ export function addActionsGroup(
 export function addParentSelectionOverlay(
   d3: typeof import("d3"),
   parentNode: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>,
-  callbacks: Pick<Callbacks, "updateGenreParent" | "setGenrePlaylistGettingAssignedNewParent"> & {
-    genrePlaylistGettingAssignedNewParent: CriteriaPlaylistSimple | null;
+  callbacks: Pick<Callbacks, "updateGenreParent" | "setGenreGettingAssignedNewParent"> & {
+    genreGettingAssignedNewParent: CriteriaDetailed | null;
   }
 ) {
-  const { updateGenreParent, genrePlaylistGettingAssignedNewParent, setGenrePlaylistGettingAssignedNewParent } =
-    callbacks;
+  const { updateGenreParent, genreGettingAssignedNewParent, setGenreGettingAssignedNewParent } = callbacks;
 
   const nodeUuid = (parentNode.datum() as D3Node).data.uuid;
   let selectAsNewParentGroup = parentNode.select<SVGGElement>("#select-as-new-parent-group-" + nodeUuid);
@@ -470,9 +477,9 @@ export function addParentSelectionOverlay(
         );
       })
       .on("click", function (this: SVGForeignObjectElement, event: MouseEvent, d: unknown) {
-        if (genrePlaylistGettingAssignedNewParent) {
-          updateGenreParent(genrePlaylistGettingAssignedNewParent.criteria.uuid, (d as D3Node).data.criteria.uuid);
-          setGenrePlaylistGettingAssignedNewParent(null);
+        if (genreGettingAssignedNewParent) {
+          updateGenreParent(genreGettingAssignedNewParent.uuid, (d as D3Node).data.criteria.uuid);
+          setGenreGettingAssignedNewParent(null);
         }
       });
   }
