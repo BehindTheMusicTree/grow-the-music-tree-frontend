@@ -50,25 +50,14 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
   const processedTrackUuidRef = useRef<string | null>(null);
 
   // Download track data when UUID changes
-  const {
-    data: downloadData,
-    isLoading: isDownloading,
-    error: downloadError,
-  } = useDownloadTrack(currentTrackUuid || "");
+  const { data: downloadData, isLoading: isDownloading } = useDownloadTrack(currentTrackUuid || "");
 
   // Debug logging removed to prevent console spam
 
   const handleDownloadComplete = useCallback(
     async (downloadData: unknown) => {
-      console.log("handleDownloadComplete called with:", {
-        downloadData: downloadData ? "Present" : "Missing",
-        downloadDataType: typeof downloadData,
-        isArrayBuffer: downloadData instanceof ArrayBuffer,
-      });
-
       try {
         setIsLoading(true);
-        console.log("Set isLoading to true");
 
         // Create blob from ArrayBuffer data
         if (!(downloadData instanceof ArrayBuffer)) {
@@ -76,20 +65,16 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
         }
 
         const blob = new Blob([downloadData], { type: "audio/mpeg" });
-        console.log("Created blob:", { size: blob.size, type: blob.type });
 
         const audioUrl = URL.createObjectURL(blob);
-        console.log("Created audio URL:", audioUrl);
 
         // Create audio element
         const audio = new Audio(audioUrl);
         audio.volume = volume / 100; // Set initial volume
         audioElementRef.current = audio;
-        console.log("Created audio element");
 
         // Set up audio event listeners
         audio.addEventListener("loadedmetadata", () => {
-          console.log("Audio loadedmetadata event fired, duration:", audio.duration);
           setDuration(audio.duration);
         });
 
@@ -98,7 +83,6 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
         });
 
         audio.addEventListener("ended", () => {
-          console.log("Audio ended event fired");
           setPlayState(PlayStates.STOPPED);
           setIsPlaying(false);
         });
@@ -107,9 +91,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
           console.error("Audio error event fired:", e);
         });
 
-        audio.addEventListener("canplay", () => {
-          console.log("Audio canplay event fired");
-        });
+        audio.addEventListener("canplay", () => {});
 
         // Update player object with audio ready
         setPlayerUploadedTrackObject((prev) => {
@@ -118,7 +100,6 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
             return prev;
           }
 
-          console.log("Updating player object with audio ready");
           const updatedPlayerObject = {
             ...prev,
             audioUrl,
@@ -129,7 +110,6 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
 
           setPlayState(PlayStates.PLAYING);
           setIsPlaying(true);
-          console.log("Attempting to play audio");
           audio.play().catch((error) => {
             console.error("Error playing audio:", error);
           });
@@ -147,7 +127,6 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
           };
         });
       } finally {
-        console.log("Setting isLoading to false");
         setIsLoading(false);
       }
     },
@@ -173,8 +152,6 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
   }, []);
 
   const loadTrackForPlayer = (track: UploadedTrackDetailed) => {
-    console.log("loadTrackForPlayer called with track:", track.uuid, track.title);
-
     // Reset processed track UUID for new track
     processedTrackUuidRef.current = null;
 
@@ -184,12 +161,10 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       isReady: false,
     };
     setPlayerUploadedTrackObject(playerObject);
-    console.log("Set playerUploadedTrackObject");
 
     // Trigger download by setting UUID
     setCurrentTrackUuid(track.uuid);
     setIsLoading(true);
-    console.log("Set currentTrackUuid and isLoading");
   };
 
   const handlePlayPauseAction = () => {

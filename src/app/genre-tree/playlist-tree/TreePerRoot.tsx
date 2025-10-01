@@ -6,6 +6,7 @@ import * as d3 from "d3";
 import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useUpdateGenre, useCreateGenre, useFetchGenre } from "@hooks/useGenre";
+import { useFetchGenrePlaylistDetailed } from "@hooks/useGenrePlaylist";
 import { usePlayer } from "@contexts/PlayerContext";
 
 import { PlayStates } from "@models/PlayStates";
@@ -38,10 +39,11 @@ export default function GenrePlaylistTreePerRoot({
   const [forbiddenNewParentsUuids, setForbiddenNewParentsUuids] = useState<string[]>([]);
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup } = usePopup();
-  const { toTrackAtPosition, trackList } = useTrackList();
+  const { trackList, playNewTrackListFromGenrePlaylist } = useTrackList();
   const { mutate: createGenre } = useCreateGenre();
   const { renameGenre, updateGenreParent } = useUpdateGenre();
   const fetchGenre = useFetchGenre();
+  const { mutate: fetchGenrePlaylistDetailed } = useFetchGenrePlaylistDetailed();
   const [visibleActionsContainerGenrePlaylist, setVisibleActionsContainerGenrePlaylist] =
     useState<CriteriaPlaylistSimple | null>(null);
   const [svgWidth, setSvgWidth] = useState(0);
@@ -72,26 +74,33 @@ export default function GenrePlaylistTreePerRoot({
   };
 
   const handlePlayPauseIconAction = useCallback(
-    (genrePlaylist: CriteriaPlaylistSimple) => {
-      console.log("handlePlayPauseIconAction", genrePlaylist);
+    async (genrePlaylist: CriteriaPlaylistSimple) => {
+      // If already playing this playlist, toggle play/pause
       if (
-        !trackList ||
-        !isPlaying ||
-        trackList.origin.type !== TrackListOriginType.PLAYLIST ||
-        trackList.origin.uuid !== genrePlaylist.uuid
-      ) {
-        if (genrePlaylist.uploadedTracksCount > 0) {
-          toTrackAtPosition(0);
-        }
-      } else if (
         trackList &&
         trackList.origin.type === TrackListOriginType.PLAYLIST &&
         trackList.origin.uuid === genrePlaylist.uuid
       ) {
         setIsPlaying(!isPlaying);
+        return;
       }
+
+      // If playlist has no tracks, do nothing
+      if (genrePlaylist.uploadedTracksCount === 0) {
+        return;
+      }
+
+      // Fetch detailed genre playlist and play it
+      fetchGenrePlaylistDetailed(genrePlaylist.uuid, {
+        onSuccess: (detailedPlaylist) => {
+          playNewTrackListFromGenrePlaylist(detailedPlaylist);
+        },
+        onError: (error) => {
+          console.error("Failed to fetch detailed genre playlist:", error);
+        },
+      });
     },
-    [trackList, isPlaying, toTrackAtPosition, setIsPlaying]
+    [trackList, isPlaying, setIsPlaying, playNewTrackListFromGenrePlaylist, fetchGenrePlaylistDetailed]
   );
 
   const { treeData } = useMemo(() => {

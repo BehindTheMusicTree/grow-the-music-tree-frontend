@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
 
 import { CriteriaPlaylistSimpleSchema } from "@domain/playlist/criteria-playlist/simple";
@@ -67,6 +67,17 @@ export const useRetrieveGenrePlaylist = (uuid: string) => {
   return useQuery<CriteriaPlaylistDetailed>({
     queryKey: ["genrePlaylists", uuid],
     queryFn: async () => {
+      const response = await fetch(`genre-playlists/${uuid}`, true);
+      return CriteriaPlaylistDetailedSchema.parse(response);
+    },
+  });
+};
+
+export const useFetchGenrePlaylistDetailed = () => {
+  const { fetch } = useFetchWrapper();
+
+  return useMutation<CriteriaPlaylistDetailed, Error, string>({
+    mutationFn: async (uuid: string) => {
       const response = await fetch(`genre-playlists/${uuid}`, true);
       return CriteriaPlaylistDetailedSchema.parse(response);
     },

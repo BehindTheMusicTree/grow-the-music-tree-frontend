@@ -7,7 +7,7 @@ import { CriteriaPlaylistMinimumSchema } from "@domain/playlist/criteria-playlis
 
 export const CriteriaPlaylistDetailedSchema = UuidResourceSchema.extend({
   name: z.string(),
-  uploadedTrackPlaylistRels: z.array(UploadedTrackPlaylistRelWithoutPlaylistSchema),
+  uploadedTrackPlaylistRelations: z.array(UploadedTrackPlaylistRelWithoutPlaylistSchema),
   uploadedTracksCount: z.number(),
   durationInSec: z.number(),
   durationStrInHourMinSec: z.string(),

@@ -2,8 +2,12 @@
 
 import { createContext, useState, useContext, ReactNode } from "react";
 import { UploadedTrackDetailed } from "@domain/uploaded-track/response/detailed";
-import TrackList, { TrackListFromUploadedTrack } from "@models/track-list/TrackList";
-import { TrackListOriginFromUploadedTrack } from "@models/track-list/origin/TrackListOrigin";
+import TrackList, { TrackListFromUploadedTrack, TrackListFromCriteriaPlaylist } from "@models/track-list/TrackList";
+import {
+  TrackListOriginFromUploadedTrack,
+  TrackListOriginFromCriteriaPlaylist,
+} from "@models/track-list/origin/TrackListOrigin";
+import { CriteriaPlaylistDetailed } from "@schemas/domain/playlist/criteria-playlist/detailed";
 import { usePlayer } from "./PlayerContext";
 
 interface TrackListContextType {
@@ -13,6 +17,7 @@ interface TrackListContextType {
   setSelectedTrack: (track: UploadedTrackDetailed | null) => void;
   toTrackAtPosition: (position: number) => void;
   playNewTrackListFromUploadedTrackUuid: (track: UploadedTrackDetailed) => void;
+  playNewTrackListFromGenrePlaylist: (genrePlaylist: CriteriaPlaylistDetailed) => void;
 }
 
 const TrackListContext = createContext<TrackListContextType | undefined>(undefined);
@@ -47,6 +52,31 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
     loadTrackForPlayer(track);
   };
 
+  const playNewTrackListFromGenrePlaylist = (genrePlaylist: CriteriaPlaylistDetailed) => {
+    // Extract tracks from playlist relationships and sort by position
+    const tracks = genrePlaylist.uploadedTrackPlaylistRelations
+      .sort((a, b) => a.position - b.position)
+      .map((rel) => rel.uploadedTrack);
+
+    if (tracks.length === 0) {
+      console.warn("No tracks found in genre playlist");
+      return;
+    }
+
+    // Create track list origin
+    const origin = new TrackListOriginFromCriteriaPlaylist(genrePlaylist);
+
+    // Create new track list with all tracks from the playlist
+    const newTrackList = new TrackListFromCriteriaPlaylist(tracks, origin);
+
+    // Set the track list and selected track (first track)
+    setTrackList(newTrackList);
+    setSelectedTrack(tracks[0]);
+
+    // Delegate audio loading to PlayerContext
+    loadTrackForPlayer(tracks[0]);
+  };
+
   return (
     <TrackListContext.Provider
       value={{
@@ -56,6 +86,7 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
         setSelectedTrack,
         toTrackAtPosition,
         playNewTrackListFromUploadedTrackUuid,
+        playNewTrackListFromGenrePlaylist,
       }}
     >
       {children}
