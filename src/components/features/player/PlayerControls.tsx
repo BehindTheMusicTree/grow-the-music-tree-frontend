@@ -21,7 +21,7 @@ export default function PlayerControls({ isPlaying, onPlayPause, onNext, onPrevi
       </button>
       <button
         onClick={onPlayPause}
-        className="w-16 h-16 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+        className="w-16 h-16 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 hover:text-white transition-all duration-200 hover:scale-105"
         aria-label={isPlaying ? "Pause" : "Play"}
       >
         {isPlaying ? <FaPause size={24} /> : <FaPlay size={24} className="ml-1" />}
