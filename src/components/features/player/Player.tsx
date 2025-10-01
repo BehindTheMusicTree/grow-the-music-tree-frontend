@@ -68,13 +68,14 @@ export default function Player({ className }: PlayerProps) {
             )}
           </div>
         </div>
-        <div className="flex justify-center flex-1">
+        <div className="flex flex-col justify-center items-center flex-1 space-y-3">
           <PlayerControls
             isPlaying={isPlaying}
             onPlayPause={handlePlayPauseAction}
             onNext={handleNext}
             onPrevious={handlePrevious}
           />
+          <ProgressBar />
         </div>
         <div className="flex items-center justify-end flex-1">
           <div className="flex items-center space-x-4">
@@ -98,9 +99,6 @@ export default function Player({ className }: PlayerProps) {
             </button>
           </div>
         </div>
-      </div>
-      <div className="mt-4">
-        <ProgressBar />
       </div>
     </div>
   );
