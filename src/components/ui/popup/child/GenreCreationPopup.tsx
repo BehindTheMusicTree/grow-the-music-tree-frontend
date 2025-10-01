@@ -26,6 +26,10 @@ export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProp
     this.props.onSubmit({ name: this.state.name, parent: this.state.parent?.uuid || undefined });
   };
 
+  handleOkClick = () => {
+    this.props.onSubmit({ name: this.state.name, parent: this.state.parent?.uuid || undefined });
+  };
+
   render() {
     const { onClose, formErrors, ...rest } = this.props;
     return this.renderBase({
@@ -36,7 +40,7 @@ export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProp
       showCancelButton: true,
       okButtonText: "Save",
       cancelButtonText: "Cancel",
-      onOk: () => this.handleSubmit({} as React.FormEvent),
+      onOk: this.handleOkClick,
       onCancel: onClose,
       children: (
         <form onSubmit={this.handleSubmit} className="space-y-6">
