@@ -18,15 +18,15 @@ export default function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
-        <PlayerProvider>
-          <PopupProvider>
-            <ConnectivityErrorProvider>
+        <ConnectivityErrorProvider>
+          <PlayerProvider>
+            <PopupProvider>
               <TrackListSidebarVisibilityProvider>
                 <TrackListProvider>{children}</TrackListProvider>
               </TrackListSidebarVisibilityProvider>
-            </ConnectivityErrorProvider>
-          </PopupProvider>
-        </PlayerProvider>
+            </PopupProvider>
+          </PlayerProvider>
+        </ConnectivityErrorProvider>
       </SessionProvider>
     </QueryClientProvider>
   );
