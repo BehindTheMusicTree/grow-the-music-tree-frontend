@@ -27,6 +27,8 @@ export default function TrackListSidebar({ className }: { className?: string }) 
         <div className="info flex flex-col justify-center items-center text-m pt-1 mr-2">
           {trackList && trackList.origin.type === TrackListOriginType.PLAYLIST
             ? "• " + capitalizeFirstLetter(trackList.origin.type || "") + " playlist • "
+            : trackList && trackList.origin.type === TrackListOriginType.GENRE_PLAYLIST
+            ? "• Genre playlist • "
             : "• track playlist • "}
           {trackList.uploadedTracks.length + " track" + (trackList.uploadedTracks.length > 1 ? "s •" : " •")}
         </div>

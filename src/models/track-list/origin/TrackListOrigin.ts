@@ -27,6 +27,6 @@ export class TrackListOriginFromPlaylist extends TrackListOrigin {
 
 export class TrackListOriginFromCriteriaPlaylist extends TrackListOrigin {
   constructor(public criteriaPlaylist: CriteriaPlaylistDetailed) {
-    super(TrackListOriginType.PLAYLIST, criteriaPlaylist.name, criteriaPlaylist.uuid);
+    super(TrackListOriginType.GENRE_PLAYLIST, criteriaPlaylist.name, criteriaPlaylist.uuid);
   }
 }
