@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { usePlayer } from "@contexts/PlayerContext";
 import PlayerControls from "./PlayerControls";
 
@@ -36,9 +37,11 @@ export default function Player({ className }: PlayerProps) {
     <div className={`w-full bg-gray-900 text-white p-4 ${className}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center">
-          <img
+          <Image
             src="/assets/album-cover-default.png"
             alt={playerUploadedTrackObject.uploadedTrack.title}
+            width={64}
+            height={64}
             className="w-16 h-16 rounded"
           />
           <div className="ml-4">
