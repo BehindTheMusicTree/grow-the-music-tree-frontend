@@ -80,7 +80,7 @@ export default function Player({ className }: PlayerProps) {
             </div>
             <button
               onClick={toggleTrackListSidebar}
-              className="text-gray-400 hover:text-white"
+              className="text-gray-400 hover:text-white bg-transparent"
               aria-label="Toggle tracklist"
             >
               <FaList size={20} />
