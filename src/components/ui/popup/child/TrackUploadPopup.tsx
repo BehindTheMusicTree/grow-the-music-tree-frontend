@@ -126,6 +126,17 @@ function TrackUploadContent({
     }
   }, [uploadItems, currentUploadIndex, isUploading, startNextUpload]);
 
+  // Check if all uploads are complete
+  useEffect(() => {
+    if (uploadItems.length > 0 && currentUploadIndex >= uploadItems.length && !isUploading) {
+      setAllComplete(true);
+      const successfulTracks = uploadItems
+        .filter((item) => item.status === "success" && item.uploadedTrack)
+        .map((item) => item.uploadedTrack);
+      onComplete?.(successfulTracks);
+    }
+  }, [uploadItems, currentUploadIndex, isUploading, onComplete]);
+
   const getStatusIcon = (status: UploadStatus) => {
     switch (status) {
       case "success":
@@ -192,13 +203,14 @@ function TrackUploadContent({
           <div className="text-sm text-gray-600">
             {successfulCount} successful, {errorCount} failed
           </div>
-          <button
-            onClick={onClose}
-            className="flex items-center space-x-1 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors"
-          >
-            <MdClose size={16} />
-            <span>Close</span>
-          </button>
+          <div className="flex justify-end">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded text-sm font-medium transition-colors"
+            >
+              OK
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -217,7 +229,7 @@ export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps> {
     return this.renderBase({
       ...rest,
       title: `Upload Tracks (${successfulCount}/${totalCount})`,
-      isDismissable: false, // Will be updated by content component
+      isDismissable: true,
       children: <TrackUploadContent files={files} genre={genre} onComplete={onComplete} onClose={onClose} />,
     });
   }

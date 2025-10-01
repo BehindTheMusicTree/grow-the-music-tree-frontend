@@ -38,7 +38,7 @@ export default function GenrePlaylistTreePerRoot({
 }: GenrePlaylistTreePerRootProps) {
   const [forbiddenNewParentsUuids, setForbiddenNewParentsUuids] = useState<string[]>([]);
   const { isPlaying, setIsPlaying } = usePlayer();
-  const { showPopup } = usePopup();
+  const { showPopup, hidePopup } = usePopup();
   const { trackList, playNewTrackListFromGenrePlaylist } = useTrackList();
   const { mutate: createGenre } = useCreateGenre();
   const { renameGenre, updateGenreParent } = useUpdateGenre();
@@ -65,7 +65,7 @@ export default function GenrePlaylistTreePerRoot({
             console.log("Upload completed:", uploadedTracks);
           }}
           onClose={() => {
-            // Popup will close automatically
+            hidePopup();
           }}
         />
       );

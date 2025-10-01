@@ -10,19 +10,31 @@ import { usePlayer } from "@contexts/PlayerContext";
 import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useListUploadedTracks } from "@hooks/useUploadedTrack";
+import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
 
 export default function UploadedLibrary() {
   const { data: uploadedTracksResponse } = useListUploadedTracks();
   const uploadedTracks = uploadedTracksResponse?.results || [];
   const { playerUploadedTrackObject, handlePlayPauseAction } = usePlayer();
-  const { showPopup } = usePopup();
+  const { showPopup, hidePopup } = usePopup();
   const { playNewTrackListFromUploadedTrackUuid } = useTrackList();
 
   const handleFileChange = (event) => {
-    showPopup("trackUpload", {
-      files: Array.from(event.target.files),
-      directory: null,
-    });
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      showPopup(
+        <TrackUploadPopup
+          files={Array.from(files)}
+          genre={null}
+          onComplete={(uploadedTracks) => {
+            console.log("Upload completed:", uploadedTracks);
+          }}
+          onClose={() => {
+            hidePopup();
+          }}
+        />
+      );
+    }
     event.target.value = null;
   };
 
