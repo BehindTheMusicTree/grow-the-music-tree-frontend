@@ -118,15 +118,9 @@ export function useDownloadTrack(uuid: string) {
   return useQuery({
     queryKey: ["uploadedTracks", "download", uuid],
     queryFn: async () => {
-      const response = (await fetch(`library/uploaded/${uuid}/download`, true)) as {
-        success: boolean;
-        data?: unknown;
-        error?: { message?: string };
-      };
-      if (!response.success || !response.data) {
-        throw new Error(response.error?.message || "Failed to download track");
-      }
-      return response.data;
+      const response = await fetch(`library/uploaded/${uuid}/download`, true, true, {}, undefined, true);
+    
+      return response;
     },
     enabled: !!uuid,
   });

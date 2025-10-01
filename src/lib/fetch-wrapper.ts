@@ -8,7 +8,8 @@ export const fetchWrapper = async <T>(
   accessToken?: string,
   queryParams?: Record<string, string | number | boolean>,
   handleMissingRequiredSession?: () => void,
-  handleError?: (error: Error) => void
+  handleError?: (error: Error) => void,
+  expectBinary: boolean = false
 ): Promise<T | null> => {
   const urlWithParams = queryParams
     ? `${url}${url.includes("?") ? "&" : "?"}${new URLSearchParams(
@@ -37,13 +38,17 @@ export const fetchWrapper = async <T>(
   try {
     const result = await fetch(finalUrl, finalOptions);
 
-    // Handle response errors
     if (!result.ok) {
       const appError = await createAppErrorFromResult(result);
       throw appError;
     }
 
-    return result.json();
+    // Return binary data or JSON based on expectBinary flag
+    if (expectBinary) {
+      return result.arrayBuffer() as T;
+    } else {
+      return result.json();
+    }
   } catch (caughtError: unknown) {
     let appError: AppError | null = null;
     if (caughtError instanceof AppError) {

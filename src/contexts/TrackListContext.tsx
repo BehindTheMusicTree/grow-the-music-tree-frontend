@@ -5,7 +5,6 @@ import { UploadedTrackDetailed } from "@domain/uploaded-track/response/detailed"
 import TrackList, { TrackListFromUploadedTrack } from "@models/track-list/TrackList";
 import { TrackListOriginFromUploadedTrack } from "@models/track-list/origin/TrackListOrigin";
 import { usePlayer } from "./PlayerContext";
-import { PlayStates } from "@models/PlayStates";
 
 interface TrackListContextType {
   trackList: TrackList | null;
@@ -25,7 +24,7 @@ interface TrackListProviderProps {
 export function TrackListProvider({ children }: TrackListProviderProps) {
   const [trackList, setTrackList] = useState<TrackList | null>(null);
   const [selectedTrack, setSelectedTrack] = useState<UploadedTrackDetailed | null>(null);
-  const { setPlayerUploadedTrackObject, setPlayState } = usePlayer();
+  const { loadTrackForPlayer } = usePlayer();
 
   const toTrackAtPosition = (position: number) => {
     if (trackList && position >= 0 && position < trackList.uploadedTracks.length) {
@@ -44,11 +43,8 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
     setTrackList(newTrackList);
     setSelectedTrack(track);
 
-    // Set the player track directly (no conversion needed)
-    setPlayerUploadedTrackObject(track);
-
-    // Start playback
-    setPlayState(PlayStates.PLAYING);
+    // Delegate audio loading to PlayerContext
+    loadTrackForPlayer(track);
   };
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { usePlayer } from "@contexts/PlayerContext";
 import PlayerControls from "./PlayerControls";
 
@@ -9,7 +9,7 @@ interface PlayerProps {
 }
 
 export default function Player({ className }: PlayerProps) {
-  const { playerUploadedTrackObject } = usePlayer();
+  const { playerUploadedTrackObject, isLoading } = usePlayer();
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(50);
 
@@ -38,13 +38,19 @@ export default function Player({ className }: PlayerProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <img
-            src="/assets/images/album-cover-default.png"
-            alt={playerUploadedTrackObject.title}
+            src="/assets/album-cover-default.png"
+            alt={playerUploadedTrackObject.uploadedTrack.title}
             className="w-16 h-16 rounded"
           />
           <div className="ml-4">
-            <h3 className="font-bold">{playerUploadedTrackObject.title}</h3>
-            <p className="text-gray-400">{playerUploadedTrackObject.artists.map((artist) => artist.name).join(", ")}</p>
+            <h3 className="font-bold">{playerUploadedTrackObject.uploadedTrack.title}</h3>
+            <p className="text-gray-400">
+              {playerUploadedTrackObject.uploadedTrack.artists.map((artist) => artist.name).join(", ")}
+            </p>
+            {isLoading && <p className="text-yellow-400 text-sm">Loading audio...</p>}
+            {playerUploadedTrackObject.loadError && (
+              <p className="text-red-400 text-sm">{playerUploadedTrackObject.loadError}</p>
+            )}
           </div>
         </div>
         <PlayerControls

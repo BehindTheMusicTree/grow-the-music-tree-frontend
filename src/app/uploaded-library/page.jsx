@@ -27,7 +27,7 @@ export default function UploadedLibrary() {
   };
 
   const handlePlayPauseClick = (uploadedTrack) => {
-    if (playerUploadedTrackObject && playerUploadedTrackObject.uuid === uploadedTrack.uuid) {
+    if (playerUploadedTrackObject && playerUploadedTrackObject.uploadedTrack.uuid === uploadedTrack.uuid) {
       handlePlayPauseAction();
     } else {
       playNewTrackListFromUploadedTrackUuid(uploadedTrack);

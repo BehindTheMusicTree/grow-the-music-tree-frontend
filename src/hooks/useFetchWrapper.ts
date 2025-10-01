@@ -29,7 +29,8 @@ export const useFetchWrapper = () => {
     fromBackend: boolean = true,
     requiresAuth: boolean = true,
     options: RequestInit = {},
-    queryParams?: Record<string, string | number | boolean>
+    queryParams?: Record<string, string | number | boolean>,
+    expectBinary: boolean = false
   ) => {
     const url = fromBackend
       ? `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${backendEndpointOrUrl}`
@@ -41,7 +42,8 @@ export const useFetchWrapper = () => {
       session?.accessToken || undefined,
       queryParams,
       handleMissingRequiredSession,
-      handleError
+      handleError,
+      expectBinary
     );
   };
 
