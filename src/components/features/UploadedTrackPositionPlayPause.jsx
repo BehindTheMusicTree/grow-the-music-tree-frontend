@@ -16,9 +16,7 @@ export default function UploadedTrackPositionPlayPause({ position, uuid, handleP
     >
       <div className="group-hover:hidden">
         <div>
-          {playerUploadedTrackObject &&
-          playerUploadedTrackObject.uploadedTrack.uuid === uuid &&
-          playState !== PlayStates.STOPPED ? (
+          {playerUploadedTrackObject && playerUploadedTrackObject.uuid === uuid && playState !== PlayStates.STOPPED ? (
             <div className="flex space-x-1 items-end">
               <div
                 className={`w-playingbar bg-green-500 h-3 origin-bottom ${
@@ -44,9 +42,7 @@ export default function UploadedTrackPositionPlayPause({ position, uuid, handleP
         </div>
       </div>
       <div className="hidden group-hover:flex items-center justify-center">
-        {playerUploadedTrackObject &&
-        playerUploadedTrackObject.uploadedTrack.uuid === uuid &&
-        playState === PlayStates.PLAYING ? (
+        {playerUploadedTrackObject && playerUploadedTrackObject.uuid === uuid && playState === PlayStates.PLAYING ? (
           <FaPause />
         ) : (
           <FaPlay />

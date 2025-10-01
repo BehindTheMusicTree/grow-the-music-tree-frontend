@@ -26,11 +26,11 @@ export default function UploadedLibrary() {
     event.target.value = null;
   };
 
-  const handlePlayPauseClick = (uploadedTrackUuid) => {
-    if (playerUploadedTrackObject && playerUploadedTrackObject.uploadedTrack.uuid == uploadedTrackUuid) {
+  const handlePlayPauseClick = (uploadedTrack) => {
+    if (playerUploadedTrackObject && playerUploadedTrackObject.uuid === uploadedTrack.uuid) {
       handlePlayPauseAction();
     } else {
-      playNewTrackListFromUploadedTrackUuid(uploadedTrackUuid);
+      playNewTrackListFromUploadedTrackUuid(uploadedTrack);
     }
   };
 
@@ -82,7 +82,7 @@ export default function UploadedLibrary() {
                   <UploadedTrackPositionPlayPause
                     position={index + 1}
                     uuid={uploadedTrack.uuid}
-                    handlePlayPauseClick={() => handlePlayPauseClick(uploadedTrack.uuid)}
+                    handlePlayPauseClick={() => handlePlayPauseClick(uploadedTrack)}
                   />
                 </td>
                 <td className="uploaded-library-item w-full px-3 py-2 text-sm truncate">{uploadedTrack.title}</td>

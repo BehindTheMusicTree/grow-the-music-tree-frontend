@@ -1,18 +1,12 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  albumArt: string;
-  duration: string;
-}
+import { PlayStates } from "@models/PlayStates";
+import { UploadedTrackDetailed } from "@domain/uploaded-track/response/detailed";
 
 interface PlayerContextType {
-  playerUploadedTrackObject: Track | null;
-  setPlayerUploadedTrackObject: (track: Track | null) => void;
+  playerUploadedTrackObject: UploadedTrackDetailed | null;
+  setPlayerUploadedTrackObject: (track: UploadedTrackDetailed | null) => void;
   isPlaying: boolean;
   setIsPlaying: (isPlaying: boolean) => void;
   currentTime: number;
@@ -21,6 +15,9 @@ interface PlayerContextType {
   setDuration: (duration: number) => void;
   volume: number;
   setVolume: (volume: number) => void;
+  playState: PlayStates;
+  setPlayState: (state: PlayStates) => void;
+  handlePlayPauseAction: () => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -30,11 +27,25 @@ interface PlayerProviderProps {
 }
 
 export function PlayerProvider({ children }: PlayerProviderProps) {
-  const [playerUploadedTrackObject, setPlayerUploadedTrackObject] = useState<Track | null>(null);
+  const [playerUploadedTrackObject, setPlayerUploadedTrackObject] = useState<UploadedTrackDetailed | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(50);
+  const [playState, setPlayState] = useState<PlayStates>(PlayStates.STOPPED);
+
+  const handlePlayPauseAction = () => {
+    if (playState === PlayStates.PLAYING) {
+      setPlayState(PlayStates.PAUSED);
+      setIsPlaying(false);
+    } else if (playState === PlayStates.PAUSED) {
+      setPlayState(PlayStates.PLAYING);
+      setIsPlaying(true);
+    } else if (playState === PlayStates.STOPPED && playerUploadedTrackObject) {
+      setPlayState(PlayStates.PLAYING);
+      setIsPlaying(true);
+    }
+  };
 
   return (
     <PlayerContext.Provider
@@ -49,6 +60,9 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
         setDuration,
         volume,
         setVolume,
+        playState,
+        setPlayState,
+        handlePlayPauseAction,
       }}
     >
       {children}

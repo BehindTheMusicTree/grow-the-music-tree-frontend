@@ -38,13 +38,13 @@ export default function Player({ className }: PlayerProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <img
-            src={playerUploadedTrackObject.albumArt}
+            src="/assets/images/album-cover-default.png"
             alt={playerUploadedTrackObject.title}
             className="w-16 h-16 rounded"
           />
           <div className="ml-4">
             <h3 className="font-bold">{playerUploadedTrackObject.title}</h3>
-            <p className="text-gray-400">{playerUploadedTrackObject.artist}</p>
+            <p className="text-gray-400">{playerUploadedTrackObject.artists.map((artist) => artist.name).join(", ")}</p>
           </div>
         </div>
         <PlayerControls
