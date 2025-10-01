@@ -92,7 +92,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
       >
         <Menu className="menu left-0 z-40" />
         <main className="flex-grow w-full mx-8">{children}</main>
-        {isTrackListSidebarVisible && <TrackListSidebar className="fixed right-0 z-40" />}
+        {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
       </div>
 
       {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />}
