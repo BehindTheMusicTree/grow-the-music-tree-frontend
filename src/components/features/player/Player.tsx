@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import { FaVolumeUp, FaList } from "react-icons/fa";
+import { FaVolumeUp, FaVolumeMute, FaList } from "react-icons/fa";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 import PlayerControls from "./PlayerControls";
@@ -16,6 +16,8 @@ export default function Player({ className }: PlayerProps) {
   const { playerUploadedTrackObject, isLoading, isPlaying, volume, setVolume, handlePlayPauseAction, currentTime } =
     usePlayer();
   const { toggleTrackListSidebar } = useTrackListSidebarVisibility();
+  const [isMuted, setIsMuted] = useState(false);
+  const [previousVolume, setPreviousVolume] = useState(volume);
 
   const handleNext = () => {
     // Implement next track logic
@@ -39,6 +41,25 @@ export default function Player({ className }: PlayerProps) {
     // Update audio element volume if it exists
     if (playerUploadedTrackObject?.audioElement) {
       playerUploadedTrackObject.audioElement.volume = newVolume / 100;
+    }
+  };
+
+  const handleVolumeToggle = () => {
+    if (isMuted) {
+      // Unmute: restore previous volume
+      setVolume(previousVolume);
+      if (playerUploadedTrackObject?.audioElement) {
+        playerUploadedTrackObject.audioElement.volume = previousVolume / 100;
+      }
+      setIsMuted(false);
+    } else {
+      // Mute: save current volume and set to 0
+      setPreviousVolume(volume);
+      setVolume(0);
+      if (playerUploadedTrackObject?.audioElement) {
+        playerUploadedTrackObject.audioElement.volume = 0;
+      }
+      setIsMuted(true);
     }
   };
 
@@ -80,7 +101,13 @@ export default function Player({ className }: PlayerProps) {
         <div className="flex items-center justify-end flex-1">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <FaVolumeUp className="text-gray-400" size={16} />
+              <button
+                onClick={handleVolumeToggle}
+                className="text-gray-400 hover:text-white bg-transparent transition-colors"
+                aria-label={isMuted ? "Unmute" : "Mute"}
+              >
+                {isMuted ? <FaVolumeMute size={16} /> : <FaVolumeUp size={16} />}
+              </button>
               <input
                 type="range"
                 min="0"
