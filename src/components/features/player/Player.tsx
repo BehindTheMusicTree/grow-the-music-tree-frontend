@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { FaVolumeUp, FaList } from "react-icons/fa";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 import PlayerControls from "./PlayerControls";
@@ -36,8 +37,8 @@ export default function Player({ className }: PlayerProps) {
 
   return (
     <div className={`w-full bg-gray-900 text-white p-4 ${className}`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
+      <div className="flex items-center">
+        <div className="flex items-center flex-1">
           <Image
             src="/assets/album-cover-default.png"
             alt={playerUploadedTrackObject.uploadedTrack.title}
@@ -56,15 +57,36 @@ export default function Player({ className }: PlayerProps) {
             )}
           </div>
         </div>
-        <PlayerControls
-          isPlaying={isPlaying}
-          onPlayPause={handlePlayPauseAction}
-          onNext={handleNext}
-          onPrevious={handlePrevious}
-          onVolumeChange={handleVolumeChange}
-          currentVolume={volume}
-          onToggleTracklist={toggleTrackListSidebar}
-        />
+        <div className="flex justify-center flex-1">
+          <PlayerControls
+            isPlaying={isPlaying}
+            onPlayPause={handlePlayPauseAction}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+          />
+        </div>
+        <div className="flex items-center justify-end flex-1">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <FaVolumeUp className="text-gray-400" size={16} />
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={volume}
+                onChange={(e) => handleVolumeChange(Number(e.target.value))}
+                className="w-24"
+              />
+            </div>
+            <button
+              onClick={toggleTrackListSidebar}
+              className="text-gray-400 hover:text-white"
+              aria-label="Toggle tracklist"
+            >
+              <FaList size={20} />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
