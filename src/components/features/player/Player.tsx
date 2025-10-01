@@ -6,6 +6,7 @@ import { FaVolumeUp, FaList } from "react-icons/fa";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 import PlayerControls from "./PlayerControls";
+import ProgressBar from "./ProgressBar";
 
 interface PlayerProps {
   className?: string;
@@ -87,6 +88,9 @@ export default function Player({ className }: PlayerProps) {
             </button>
           </div>
         </div>
+      </div>
+      <div className="mt-4">
+        <ProgressBar />
       </div>
     </div>
   );
