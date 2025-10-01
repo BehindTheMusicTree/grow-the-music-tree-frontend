@@ -96,10 +96,17 @@ export function addMoreIconContainer(
         handleMoreActionEnterMouse(event, d as D3Node, genrePlaylist);
       })
       .on("mouseleave", function (this: SVGForeignObjectElement) {
-        const parent = this.parentNode as Element;
-        if (parent) {
-          d3.select(parent).remove();
-        }
+        // Add a small delay to allow moving to the actions container
+        setTimeout(() => {
+          // Check if actions container exists - if it does, don't remove the more container
+          const actionsContainer = d3.select<SVGGElement, unknown>("#actions-container-" + genrePlaylist.uuid);
+          if (actionsContainer.empty()) {
+            const parent = this.parentNode as Element;
+            if (parent) {
+              d3.select(parent).remove();
+            }
+          }
+        }, 100);
       });
   }
 }
@@ -423,6 +430,15 @@ export function addActionsGroup(
 
   actionsGroup.on("mouseenter", function () {
     addMoreIconContainer(d3, genrePlaylist, genrePlaylistGroup, handleMoreActionEnterMouse);
+  });
+
+  // Prevent actions container from being removed when hovering over it
+  actionsGroup.on("mouseleave", function () {
+    // Add a small delay to allow moving back to the more container or node
+    setTimeout(() => {
+      d3.select<SVGGElement, unknown>("#more-icon-container-" + genrePlaylist.uuid).remove();
+      d3.select<SVGGElement, unknown>("#actions-container-" + genrePlaylist.uuid).remove();
+    }, 100);
   });
 
   return actionsGroup;

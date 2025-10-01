@@ -243,10 +243,21 @@ export function renderTree(
       }
     });
 
-    group.on("mouseleave", function () {
-      d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid).remove();
-      d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid).remove();
-      d3.select<SVGGElement, unknown>("#select-as-new-parent-group-" + d.data.uuid).remove();
+    group.on("mouseleave", function (event) {
+      // Add a small delay to allow moving to the more container or actions container
+      setTimeout(() => {
+        // Check if mouse is still over any part of the node group (including more/actions containers)
+        const rect = (this as Element).getBoundingClientRect();
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+
+        // Only remove if mouse is not over the node area
+        if (mouseX < rect.left || mouseX > rect.right || mouseY < rect.top || mouseY > rect.bottom) {
+          d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid).remove();
+          d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid).remove();
+          d3.select<SVGGElement, unknown>("#select-as-new-parent-group-" + d.data.uuid).remove();
+        }
+      }, 100);
     });
   });
 
