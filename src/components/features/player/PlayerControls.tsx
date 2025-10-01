@@ -14,21 +14,21 @@ export default function PlayerControls({ isPlaying, onPlayPause, onNext, onPrevi
     <div className="flex items-center space-x-4">
       <button
         onClick={onPrevious}
-        className="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+        className="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-200 hover:text-white transition-colors"
         aria-label="Previous track"
       >
         <FaStepBackward size={16} />
       </button>
       <button
         onClick={onPlayPause}
-        className="w-16 h-16 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 hover:text-white transition-all duration-200 hover:scale-105"
+        className="w-16 h-16 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-200 hover:text-white transition-all duration-200 hover:scale-105"
         aria-label={isPlaying ? "Pause" : "Play"}
       >
         {isPlaying ? <FaPause size={24} /> : <FaPlay size={24} className="ml-1" />}
       </button>
       <button
         onClick={onNext}
-        className="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+        className="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-200 hover:text-white transition-colors"
         aria-label="Next track"
       >
         <FaStepForward size={16} />
