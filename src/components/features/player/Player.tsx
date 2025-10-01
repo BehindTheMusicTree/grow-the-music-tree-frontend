@@ -36,7 +36,7 @@ export default function Player({ className }: PlayerProps) {
   }
 
   return (
-    <div className={`w-full bg-gray-900 text-white p-4 ${className}`}>
+    <div className={`w-full bg-black text-white p-4 ${className}`}>
       <div className="flex items-center">
         <div className="flex items-center flex-1">
           <Image
