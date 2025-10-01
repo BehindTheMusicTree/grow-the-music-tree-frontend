@@ -1,40 +1,9 @@
-"use client";
-
-import { useEffect, useRef, ReactNode } from "react";
 import { Inter } from "next/font/google";
-
+import { metadata } from "./metadata";
 import "./globals.css";
 import Providers from "@app/providers";
-import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { PopupProvider } from "@contexts/PopupContext";
-import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
-import { usePopup } from "@contexts/PopupContext";
-import { usePlayer } from "@contexts/PlayerContext";
-import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
-import { initSentry } from "@lib/sentry";
-
-import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
-
-import Banner from "@components/features/banner/Banner";
-import Menu from "@components/features/menu/Menu";
-import Player from "@components/features/player/Player";
-import TrackListSidebar from "@components/features/track-list-sidebar/TrackListSidebar";
-
-import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
-import SpotifyAuthPopup from "@components/ui/popup/child/SpotifyAuthPopup";
-
-import { BANNER_HEIGHT, PLAYER_HEIGHT } from "@constants/layout";
-import {
-  ConnectivityError,
-  NetworkError,
-  AuthRequired,
-  BackendError,
-  BadRequestError,
-  ClientError,
-  ServiceError,
-} from "@app-types/app-errors/app-error";
-
-initSentry();
+import AppContent from "./AppContent";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -43,86 +12,9 @@ const inter = Inter({
   fallback: ["system-ui", "sans-serif"],
 });
 
-function AppContent({ children }: { children: ReactNode }) {
-  const { playerUploadedTrackObject } = usePlayer();
-  const isTrackListSidebarVisible = useTrackListSidebarVisibility();
-  const { showPopup, hidePopup, activePopup } = usePopup();
-  const { connectivityError, clearConnectivityError } = useConnectivityError();
-  const { handleSpotifyOAuth } = useSpotifyAuth();
-  const currentConnectivityErrorRef = useRef<typeof ConnectivityError | null>(null);
-
-  useEffect(() => {}, [playerUploadedTrackObject]);
-
-  useEffect(() => {
-    if (connectivityError === null) {
-      if (currentConnectivityErrorRef.current !== null) {
-        currentConnectivityErrorRef.current = null;
-        hidePopup();
-      }
-    } else if (
-      currentConnectivityErrorRef.current == null ||
-      (![NetworkError, BackendError, ClientError, ServiceError].includes(currentConnectivityErrorRef.current) &&
-        !(connectivityError instanceof currentConnectivityErrorRef.current))
-    ) {
-      let popup: ReactNode | null = null;
-      const error = connectivityError as ConnectivityError;
-      if (error instanceof AuthRequired) {
-        popup = <SpotifyAuthPopup handleSpotifyOAuth={handleSpotifyOAuth} />;
-      } else if (error instanceof BadRequestError || error instanceof BackendError || error instanceof ServiceError) {
-        popup = <InternalErrorPopup errorCode={error.code} />;
-      } else if (error instanceof NetworkError) {
-        popup = (
-          <NetworkErrorPopup title="Network Error">
-            Please check your internet connection and try again.
-          </NetworkErrorPopup>
-        );
-      }
-
-      if (popup) {
-        showPopup(popup);
-      }
-
-      currentConnectivityErrorRef.current = error.constructor as typeof ConnectivityError;
-    }
-  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, handleSpotifyOAuth]);
-
-  // Calculate dynamic heights based on player visibility
-  const centerMaxHeight = {
-    centerWithPlayer: `calc(100vh - ${BANNER_HEIGHT + PLAYER_HEIGHT}px)`,
-    centerWithoutPlayer: `calc(100vh - ${BANNER_HEIGHT}px)`,
-  };
-
-  return (
-    <div className="app col h-screen">
-      <Banner className="banner fixed w-full top-0 z-50 h-banner" />
-
-      <div
-        className="center fixed top-banner bg-gray-100 h-full w-full flex"
-        style={{
-          maxHeight: playerUploadedTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
-        }}
-      >
-        <Menu className="menu left-0 z-40" />
-        <main className="flex-grow w-full mx-8">{children}</main>
-        {isTrackListSidebarVisible && <TrackListSidebar className="fixed right-0 z-40" />}
-      </div>
-
-      {/* {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />} */}
-      {activePopup}
-    </div>
-  );
-}
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <title>Music Tree</title>
-        <meta
-          name="description"
-          content="Music Tree is a music guide that helps you find the best music for your mood"
-        />
-      </head>
       <body className={inter.className}>
         <Providers>
           <PopupProvider>
