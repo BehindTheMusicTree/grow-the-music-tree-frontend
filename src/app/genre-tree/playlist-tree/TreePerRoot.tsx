@@ -61,9 +61,7 @@ export default function GenrePlaylistTreePerRoot({
         <TrackUploadPopup
           files={fileArray}
           genre={selectingFileGenreUuidRef.current}
-          onComplete={(uploadedTracks) => {
-            console.log("Upload completed:", uploadedTracks);
-          }}
+          onComplete={() => {}}
           onClose={() => {
             hidePopup();
           }}

@@ -199,17 +199,9 @@ function TrackUploadContent({
       ))}
 
       {allComplete && (
-        <div className="flex justify-between items-center pt-4 border-t">
+        <div className="flex justify-between items-center">
           <div className="text-sm text-gray-600">
             {successfulCount} successful, {errorCount} failed
-          </div>
-          <div className="flex justify-end">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded text-sm font-medium transition-colors"
-            >
-              OK
-            </button>
           </div>
         </div>
       )}
@@ -230,6 +222,9 @@ export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps> {
       ...rest,
       title: `Upload Tracks (${successfulCount}/${totalCount})`,
       isDismissable: true,
+      showOkButton: true,
+      okButtonText: "OK",
+      onOk: onClose,
       children: <TrackUploadContent files={files} genre={genre} onComplete={onComplete} onClose={onClose} />,
     });
   }

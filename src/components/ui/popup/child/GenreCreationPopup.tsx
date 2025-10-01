@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@components/ui/Button";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
 
@@ -33,6 +32,12 @@ export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProp
       ...rest,
       title: "Create Genre",
       isDismissable: true,
+      showOkButton: true,
+      showCancelButton: true,
+      okButtonText: "Save",
+      cancelButtonText: "Cancel",
+      onOk: () => this.handleSubmit({} as React.FormEvent),
+      onCancel: onClose,
       children: (
         <form onSubmit={this.handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
@@ -67,14 +72,6 @@ export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProp
               ))}
             </div>
           )}
-          <div className="flex justify-end gap-3">
-            <Button onClick={onClose} variant="secondary">
-              Cancel
-            </Button>
-            <Button type="submit" variant="default">
-              Save
-            </Button>
-          </div>
         </form>
       ),
     });
