@@ -9,13 +9,8 @@ interface PlayerProps {
 }
 
 export default function Player({ className }: PlayerProps) {
-  const { playerUploadedTrackObject, isLoading } = usePlayer();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(50);
-
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
-  };
+  const { playerUploadedTrackObject, isLoading, isPlaying, setIsPlaying, volume, setVolume, handlePlayPauseAction } =
+    usePlayer();
 
   const handleNext = () => {
     // Implement next track logic
@@ -27,6 +22,10 @@ export default function Player({ className }: PlayerProps) {
 
   const handleVolumeChange = (newVolume: number) => {
     setVolume(newVolume);
+    // Update audio element volume if it exists
+    if (playerUploadedTrackObject?.audioElement) {
+      playerUploadedTrackObject.audioElement.volume = newVolume / 100;
+    }
   };
 
   if (!playerUploadedTrackObject) {
@@ -55,7 +54,7 @@ export default function Player({ className }: PlayerProps) {
         </div>
         <PlayerControls
           isPlaying={isPlaying}
-          onPlayPause={handlePlayPause}
+          onPlayPause={handlePlayPauseAction}
           onNext={handleNext}
           onPrevious={handlePrevious}
           onVolumeChange={handleVolumeChange}

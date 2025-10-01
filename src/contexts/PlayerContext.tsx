@@ -83,6 +83,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
 
         // Create audio element
         const audio = new Audio(audioUrl);
+        audio.volume = volume / 100; // Set initial volume
         audioElementRef.current = audio;
         console.log("Created audio element");
 
@@ -192,20 +193,29 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
   };
 
   const handlePlayPauseAction = () => {
-    if (!audioElementRef.current || !playerUploadedTrackObject?.isReady) {
+    if (!playerUploadedTrackObject?.isReady) {
+      return;
+    }
+
+    const audioElement = playerUploadedTrackObject.audioElement || audioElementRef.current;
+    if (!audioElement) {
       return;
     }
 
     if (playState === PlayStates.PLAYING) {
-      audioElementRef.current.pause();
+      audioElement.pause();
       setPlayState(PlayStates.PAUSED);
       setIsPlaying(false);
     } else if (playState === PlayStates.PAUSED) {
-      audioElementRef.current.play();
+      audioElement.play().catch((error) => {
+        console.error("Error playing audio:", error);
+      });
       setPlayState(PlayStates.PLAYING);
       setIsPlaying(true);
     } else if (playState === PlayStates.STOPPED) {
-      audioElementRef.current.play();
+      audioElement.play().catch((error) => {
+        console.error("Error playing audio:", error);
+      });
       setPlayState(PlayStates.PLAYING);
       setIsPlaying(true);
     }
