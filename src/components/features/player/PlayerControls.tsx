@@ -12,18 +12,26 @@ interface PlayerControlsProps {
 export default function PlayerControls({ isPlaying, onPlayPause, onNext, onPrevious }: PlayerControlsProps) {
   return (
     <div className="flex items-center space-x-4">
-      <button onClick={onPrevious} className="text-gray-400 hover:text-white" aria-label="Previous track">
-        <FaStepBackward size={20} />
+      <button
+        onClick={onPrevious}
+        className="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+        aria-label="Previous track"
+      >
+        <FaStepBackward size={16} />
       </button>
       <button
         onClick={onPlayPause}
-        className="text-gray-400 hover:text-white"
+        className="w-12 h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
         aria-label={isPlaying ? "Pause" : "Play"}
       >
-        {isPlaying ? <FaPause size={24} /> : <FaPlay size={24} />}
+        {isPlaying ? <FaPause size={20} /> : <FaPlay size={20} />}
       </button>
-      <button onClick={onNext} className="text-gray-400 hover:text-white" aria-label="Next track">
-        <FaStepForward size={20} />
+      <button
+        onClick={onNext}
+        className="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+        aria-label="Next track"
+      >
+        <FaStepForward size={16} />
       </button>
     </div>
   );
