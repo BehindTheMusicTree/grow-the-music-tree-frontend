@@ -13,7 +13,8 @@ interface PlayerProps {
 }
 
 export default function Player({ className }: PlayerProps) {
-  const { playerUploadedTrackObject, isLoading, isPlaying, volume, setVolume, handlePlayPauseAction } = usePlayer();
+  const { playerUploadedTrackObject, isLoading, isPlaying, volume, setVolume, handlePlayPauseAction, currentTime } =
+    usePlayer();
   const { toggleTrackListSidebar } = useTrackListSidebarVisibility();
 
   const handleNext = () => {
@@ -21,7 +22,16 @@ export default function Player({ className }: PlayerProps) {
   };
 
   const handlePrevious = () => {
-    // Implement previous track logic
+    if (!playerUploadedTrackObject?.audioElement) return;
+
+    // If we're at least 1 second into the track, restart the current song
+    if (currentTime >= 1) {
+      playerUploadedTrackObject.audioElement.currentTime = 0;
+      return;
+    }
+
+    // If less than 1 second, restart the current song (no previous track logic needed)
+    playerUploadedTrackObject.audioElement.currentTime = 0;
   };
 
   const handleVolumeChange = (newVolume: number) => {
