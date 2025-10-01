@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import { usePlayer } from "@contexts/PlayerContext";
+import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 import PlayerControls from "./PlayerControls";
 
 interface PlayerProps {
@@ -10,8 +11,8 @@ interface PlayerProps {
 }
 
 export default function Player({ className }: PlayerProps) {
-  const { playerUploadedTrackObject, isLoading, isPlaying, setIsPlaying, volume, setVolume, handlePlayPauseAction } =
-    usePlayer();
+  const { playerUploadedTrackObject, isLoading, isPlaying, volume, setVolume, handlePlayPauseAction } = usePlayer();
+  const { toggleTrackListSidebar } = useTrackListSidebarVisibility();
 
   const handleNext = () => {
     // Implement next track logic
@@ -62,6 +63,7 @@ export default function Player({ className }: PlayerProps) {
           onPrevious={handlePrevious}
           onVolumeChange={handleVolumeChange}
           currentVolume={volume}
+          onToggleTracklist={toggleTrackListSidebar}
         />
       </div>
     </div>

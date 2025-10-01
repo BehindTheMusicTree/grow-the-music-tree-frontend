@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, ReactNode } from "react";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
-import { PopupProvider } from "@contexts/PopupContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
@@ -34,7 +33,7 @@ initSentry();
 
 export default function AppContent({ children }: { children: ReactNode }) {
   const { playerUploadedTrackObject } = usePlayer();
-  const isTrackListSidebarVisible = useTrackListSidebarVisibility();
+  const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, clearConnectivityError } = useConnectivityError();
   const { handleSpotifyOAuth } = useSpotifyAuth();

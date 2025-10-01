@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaVolumeUp } from "react-icons/fa";
+import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaVolumeUp, FaList } from "react-icons/fa";
 
 interface PlayerControlsProps {
   isPlaying: boolean;
@@ -10,6 +10,7 @@ interface PlayerControlsProps {
   onPrevious: () => void;
   onVolumeChange: (volume: number) => void;
   currentVolume: number;
+  onToggleTracklist: () => void;
 }
 
 export default function PlayerControls({
@@ -19,6 +20,7 @@ export default function PlayerControls({
   onPrevious,
   onVolumeChange,
   currentVolume,
+  onToggleTracklist,
 }: PlayerControlsProps) {
   return (
     <div className="flex items-center space-x-4">
@@ -46,6 +48,9 @@ export default function PlayerControls({
           className="w-24"
         />
       </div>
+      <button onClick={onToggleTracklist} className="text-gray-400 hover:text-white" aria-label="Toggle tracklist">
+        <FaList size={20} />
+      </button>
     </div>
   );
 }
