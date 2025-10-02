@@ -17,8 +17,8 @@ export default function Rating({ rating, handleChange }) {
             className="w-6 h-6 opacity-0"
             type="radio"
             name="rating"
-            value={i === 0 ? FORM_RATING_NULL_VALUE : i + 5}
-            checked={rating === (i === 0 ? null : i + 5)}
+            value={i === 0 ? FORM_RATING_NULL_VALUE : i}
+            checked={rating === (i === 0 ? null : i)}
             onChange={handleChange}
           />
           <label htmlFor={`star-${instanceId}-${i}`} className="cursor-pointer">
@@ -32,9 +32,9 @@ export default function Rating({ rating, handleChange }) {
                 <span className="flex-grow w-8"></span>{" "}
               </div>
             ) : (
-              <AiFillStar
-                className={`w-7 h-7 absolute top-0 left-0 ${rating >= i + 5 ? "text-yellow-500" : "text-gray-500"}`}
-              />
+                <AiFillStar
+                  className={`w-7 h-7 absolute top-0 left-0 ${rating >= i ? "text-yellow-500" : "text-gray-500"}`}
+                />
             )}
           </label>
         </div>

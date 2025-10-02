@@ -90,17 +90,23 @@ export function useUpdateUploadedTrack() {
   const { fetch } = useFetchWrapper();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
 
-  const { mutate, formErrors } = useValidatedMutation({
+  const mutation = useValidatedMutation({
     inputSchema: z.object({
       uuid: z.string(),
       data: UploadedTrackUpdateSchema,
     }),
     outputSchema: UploadedTrackDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
-      const response = await fetch(`library/uploaded/${uuid}`, true, true, {
+      const response = await fetch(`library/uploaded/${uuid}/`, true, true, {
         method: "PUT",
         body: JSON.stringify(data),
       });
+
+      // Handle case where API returns null
+      if (response === null) {
+        throw new Error("API returned null response");
+      }
+
       return response;
     },
     onSuccess: (_, { uuid }) => {
@@ -109,7 +115,7 @@ export function useUpdateUploadedTrack() {
       invalidateAllGenrePlaylistQueries();
     },
   });
-  return { mutate, formErrors };
+  return mutation;
 }
 
 export function useDownloadTrack(uuid: string) {
