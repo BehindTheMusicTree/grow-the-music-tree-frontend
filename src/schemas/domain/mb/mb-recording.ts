@@ -5,12 +5,26 @@ import { MbArtistDetailedSchema } from "@schemas/domain/mb/mb-artist";
 export const MbRecordingDetailedSchema = z.object({
   musicbrainzId: z.string().uuid(),
   title: z.string(),
-  score: z.number().min(0).max(1),
+  score: z.union([z.number(), z.string()]).transform((val) => {
+    const num = typeof val === "string" ? parseFloat(val) : val;
+    return isNaN(num) ? 0 : Math.max(0, Math.min(1, num));
+  }),
   musicbrainzArtists: z.array(MbArtistDetailedSchema),
   musicbrainzLink: z.string().url(),
   durationInSec: z.number().min(0),
   durationStrInHourMinSec: z.string(),
-  releaseDate: z.string().datetime(),
+  releaseDate: z.union([z.string().datetime(), z.string()]).transform((val) => {
+    // Try to parse as datetime, if it fails, return a default valid datetime
+    try {
+      const date = new Date(val);
+      if (isNaN(date.getTime())) {
+        return new Date().toISOString();
+      }
+      return date.toISOString();
+    } catch {
+      return new Date().toISOString();
+    }
+  }),
 });
 
 export type MusicbrainzRecordingDetailed = z.infer<typeof MbRecordingDetailedSchema>;

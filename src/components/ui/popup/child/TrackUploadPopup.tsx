@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { MdError, MdCheckCircle, MdUpload, MdClose } from "react-icons/md";
+import { MdError, MdCheckCircle, MdUpload } from "react-icons/md";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 import { useUploadTrack } from "@hooks/useUploadedTrack";
 import { UploadedTrackCreationValues } from "@schemas/domain/uploaded-track/form/creation";
@@ -30,7 +30,7 @@ function TrackUploadContent({
   files,
   genre,
   onComplete,
-  onClose,
+  onClose: _onClose,
 }: Pick<TrackUploadPopupProps, "files" | "genre" | "onComplete" | "onClose">) {
   const [uploadItems, setUploadItems] = useState<TrackUploadItem[]>([]);
   const [currentUploadIndex, setCurrentUploadIndex] = useState(0);
@@ -193,7 +193,13 @@ function TrackUploadContent({
           )}
 
           {item.status === "error" && item.error && (
-            <div className="text-red-500 text-sm mt-2">{item.error.message}</div>
+            <div className="text-red-500 text-sm mt-2">
+              {item.error.name === "InvalidInputError"
+                ? "Upload failed due to invalid file data. Please check your file and try again."
+                : item.error.name === "ZodError"
+                ? "Upload failed due to a server error. Please try again later."
+                : item.error.message}
+            </div>
           )}
         </div>
       ))}
