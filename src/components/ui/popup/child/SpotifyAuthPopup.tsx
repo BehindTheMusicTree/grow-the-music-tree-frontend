@@ -16,7 +16,7 @@ export default class SpotifyAuthPopup extends BasePopup<SpotifyAuthPopupProps> {
     const { handleSpotifyOAuth, ...rest } = this.props;
     return this.renderBase({
       ...rest,
-      title: "Connect to Spotify",
+      title: "Connect with Spotify",
       isDismissable: false,
       icon: User,
       type: "spotify",
