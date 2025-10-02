@@ -1,6 +1,6 @@
 "use client";
 
-import { MdError } from "react-icons/md";
+import { AlertCircle } from "lucide-react";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 
 // Only allow details as a custom prop
@@ -19,11 +19,11 @@ export default class InvalidInputPopup extends BasePopup<InvalidInputPopupProps>
       ...rest,
       title: "Invalid Input",
       isDismissable: true,
-      icon: MdError,
+      icon: AlertCircle,
       children: (
         <div className="space-y-4">
           <div className="flex items-center">
-            <MdError size={20} color="red" />
+            <AlertCircle size={20} color="red" />
             <h3 className="ml-1">{details.message}</h3>
           </div>
           {details.fieldErrors && (

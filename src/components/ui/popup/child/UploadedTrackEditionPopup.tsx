@@ -4,8 +4,8 @@ import { formatTime } from "@utils/formatting";
 import Rating from "@components/features/Rating";
 import { Button } from "@components/ui/Button";
 import { BasePopup, BasePopupProps } from "../BasePopup";
-import { UploadedTrackUpdateValues } from "@domain/uploaded-track/form";
-import { UploadedTrackDetailed } from "@domain/uploaded-track/response";
+import { UploadedTrackUpdateValues } from "@schemas/domain/uploaded-track/form/update";
+import { UploadedTrackDetailed } from "@schemas/domain/uploaded-track/response/detailed";
 
 type UploadedTrackEditionPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   uploadedTrack: UploadedTrackDetailed;
@@ -39,50 +39,20 @@ export default class UploadedTrackEditionPopup extends BasePopup<UploadedTrackEd
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Artists</label>
-                <div className="space-y-2">
-                  {formValues.artistsNames?.map((artist, index) => (
-                    <div key={index} className="flex gap-2">
-                      <input
-                        type="text"
-                        name={`artistsNames.${index}`}
-                        value={artist ?? ""}
-                        onChange={onFormChange}
-                        className="flex-1 px-3 py-2 border rounded-md"
-                      />
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={() => {
-                          const newArtists = [...(formValues.artistsNames ?? [])];
-                          newArtists.splice(index, 1);
-                          onFormChange({
-                            target: { name: "artistsNames", value: newArtists },
-                          } as unknown as React.ChangeEvent<HTMLInputElement>);
-                        }}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => {
-                      const newArtists = [...(formValues.artistsNames ?? []), ""];
-                      onFormChange({
-                        target: { name: "artistsNames", value: newArtists },
-                      } as unknown as React.ChangeEvent<HTMLInputElement>);
-                    }}
-                  >
-                    Add Artist
-                  </Button>
-                </div>
+                <input
+                  type="text"
+                  name="artists_names"
+                  value={formValues.artists_names ?? ""}
+                  onChange={onFormChange}
+                  className="w-full px-3 py-2 border rounded-md"
+                  placeholder="Separate multiple artists with commas"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Genre</label>
                 <input
                   type="text"
-                  name="genreName"
+                  name="genre"
                   value={formValues.genre ?? ""}
                   onChange={onFormChange}
                   className="w-full px-3 py-2 border rounded-md"
@@ -105,8 +75,8 @@ export default class UploadedTrackEditionPopup extends BasePopup<UploadedTrackEd
                 <label className="block text-sm font-medium text-gray-700 mb-1">Album</label>
                 <input
                   type="text"
-                  name="albumName"
-                  value={formValues.albumName ?? ""}
+                  name="album_name"
+                  value={formValues.album_name ?? ""}
                   onChange={onFormChange}
                   className="w-full px-3 py-2 border rounded-md"
                 />

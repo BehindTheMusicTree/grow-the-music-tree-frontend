@@ -109,7 +109,7 @@ export function useUpdateUploadedTrack() {
       invalidateAllGenrePlaylistQueries();
     },
   });
-  return;
+  return { mutate, formErrors };
 }
 
 export function useDownloadTrack(uuid: string) {

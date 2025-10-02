@@ -1,41 +1,42 @@
 "use client";
 
 import { useState } from "react";
-import { UploadedTrackService } from "@/utils/services";
-import { useGenrePlaylist } from "@hooks/useGenrePlaylist";
+import { useUpdateUploadedTrack } from "@hooks/useUploadedTrack";
 import { useTrackList } from "@contexts/TrackListContext";
-import { UploadedTrackEditionPopup } from "@components/ui/popup/UploadedTrackEditionPopup";
+import UploadedTrackEditionPopup from "@components/ui/popup/child/UploadedTrackEditionPopup";
 import { FORM_RATING_NULL_VALUE } from "@constants/rating";
 
 export function useTrackEdition() {
   const [show, setShow] = useState(false);
   const [track, setTrack] = useState(null);
   const { refreshUploadedTrack } = useTrackList();
+  const { mutate: updateTrack } = useUpdateUploadedTrack();
 
   const [formValues, setFormValues] = useState({
     title: "",
-    artistName: "",
-    genreName: "",
-    albumName: "",
+    artists_names: "",
+    genre: "",
+    album_name: "",
     rating: null,
   });
 
   const showEditPopup = (track) => {
     setTrack(track);
     setFormValues({
-      title: track.title,
-      artistName: track.artist?.name || "",
-      genreName: track.genre?.name || "",
-      albumName: track.album?.name || "",
+      title: track.title || "",
+      artists_names: track.artists?.map((artist) => artist.name).join(", ") || "",
+      genre: track.genre?.name || "",
+      album_name: track.album?.name || "",
       rating: track.rating,
     });
     setShow(true);
   };
 
   const handleChange = (event) => {
+    const { name, value } = event.target;
     setFormValues({
       ...formValues,
-      [event.target.name]: event.target.value,
+      [name]: value,
     });
   };
 
@@ -48,14 +49,15 @@ export function useTrackEdition() {
       submittedValues.rating = null;
     }
 
-    const updatedTrack = await UploadedTrackService.putUploadedTrack(track.uuid, submittedValues);
-
-    refreshUploadedTrack(updatedTrack);
-    if (track.genre?.name !== updatedTrack.genre?.name) {
-      invalidateGenrePlaylists();
-    }
-
-    setShow(false);
+    updateTrack(
+      { uuid: track.uuid, data: submittedValues },
+      {
+        onSuccess: (updatedTrack) => {
+          refreshUploadedTrack(updatedTrack);
+          setShow(false);
+        },
+      }
+    );
   };
 
   const TrackEditionComponent = () => {
@@ -64,7 +66,7 @@ export function useTrackEdition() {
     return (
       <UploadedTrackEditionPopup
         onClose={() => setShow(false)}
-        track={track}
+        uploadedTrack={track}
         formValues={formValues}
         onFormChange={handleChange}
         onSubmit={handleSubmit}
