@@ -132,7 +132,8 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
   useEffect(() => {
     if (seek === 0) {
       if (playState === PlayStates.LOADING) {
-        setPlayState(PlayStates.PLAYING);
+        // Don't change state during loading - let the track finish loading first
+        return;
       } else if (playState === PlayStates.PAUSED) {
         playerRef.current.seek(0);
         setPlayState(PlayStates.STOPPED);
@@ -144,7 +145,7 @@ export default function TrackProgress({ volume, handleTrackEnd, seek, setSeek })
   }, [seek]);
 
   return (
-    <div className="flex flex justify-center items-center w-full">
+    <div className="flex justify-center items-center w-full">
       {playState !== PlayStates.LOADING ? (
         <ReactHowler
           ref={playerRef}

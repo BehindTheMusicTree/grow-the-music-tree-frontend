@@ -42,6 +42,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(50);
   const [playState, setPlayState] = useState<PlayStates>(PlayStates.STOPPED);
+
   const [isLoading, setIsLoading] = useState(false);
   const [currentTrackUuid, setCurrentTrackUuid] = useState<string | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
@@ -66,7 +67,6 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
         }
 
         const blob = new Blob([downloadData], { type: "audio/mpeg" });
-
         const audioUrl = URL.createObjectURL(blob);
 
         // Create audio element
@@ -110,10 +110,11 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
             loadError: undefined,
           };
 
+          // Auto-play the track when ready
           setPlayState(PlayStates.PLAYING);
           setIsPlaying(true);
           audio.play().catch((error) => {
-            console.error("Error playing audio:", error);
+            console.error("Error auto-playing audio:", error);
           });
 
           return updatedPlayerObject;
@@ -154,6 +155,20 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
   }, []);
 
   const loadTrackForPlayer = (track: UploadedTrackDetailed) => {
+    // Stop current track if playing and clean up
+    if (audioElementRef.current) {
+      audioElementRef.current.pause();
+      audioElementRef.current.currentTime = 0;
+    }
+
+    // Clean up previous blob URL to prevent memory leaks
+    setPlayerUploadedTrackObject((prev) => {
+      if (prev?.audioUrl) {
+        URL.revokeObjectURL(prev.audioUrl);
+      }
+      return null;
+    });
+
     // Reset processed track UUID for new track
     processedTrackUuidRef.current = null;
 
@@ -167,9 +182,15 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
     // Trigger download by setting UUID
     setCurrentTrackUuid(track.uuid);
     setIsLoading(true);
+    setPlayState(PlayStates.LOADING);
   };
 
   const handlePlayPauseAction = useCallback(() => {
+    // If track is loading, do nothing - user will need to wait for it to finish loading
+    if (playState === PlayStates.LOADING) {
+      return;
+    }
+
     if (!playerUploadedTrackObject?.isReady) {
       return;
     }

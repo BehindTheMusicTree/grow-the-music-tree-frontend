@@ -5,6 +5,7 @@ import { FaPlay, FaPause } from "react-icons/fa";
 
 import { usePlayer } from "@contexts/PlayerContext";
 import { PlayStates } from "@models/PlayStates";
+import RingLoader from "@components/ui/RingLoader";
 
 export default function UploadedTrackPositionPlayPause({ position, uuid, handlePlayPauseClick }) {
   const { playerUploadedTrackObject, playState } = usePlayer();
@@ -46,7 +47,11 @@ export default function UploadedTrackPositionPlayPause({ position, uuid, handleP
       <div className="hidden group-hover:flex items-center justify-center">
         {playerUploadedTrackObject &&
         playerUploadedTrackObject.uploadedTrack.uuid === uuid &&
-        playState === PlayStates.PLAYING ? (
+        playState === PlayStates.LOADING ? (
+          <RingLoader size={16} />
+        ) : playerUploadedTrackObject &&
+          playerUploadedTrackObject.uploadedTrack.uuid === uuid &&
+          playState === PlayStates.PLAYING ? (
           <FaPause />
         ) : (
           <FaPlay />

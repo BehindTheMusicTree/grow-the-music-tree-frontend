@@ -83,7 +83,6 @@ export default function Player({ className }: PlayerProps) {
             <p className="text-gray-400">
               {playerUploadedTrackObject.uploadedTrack.artists.map((artist) => artist.name).join(", ")}
             </p>
-            {isLoading && <p className="text-yellow-400 text-sm">Loading audio...</p>}
             {playerUploadedTrackObject.loadError && (
               <p className="text-red-400 text-sm">{playerUploadedTrackObject.loadError}</p>
             )}
@@ -92,6 +91,7 @@ export default function Player({ className }: PlayerProps) {
         <div className="flex flex-col justify-center items-center flex-1 space-y-3">
           <PlayerControls
             isPlaying={isPlaying}
+            isLoading={isLoading}
             onPlayPause={handlePlayPauseAction}
             onNext={handleNext}
             onPrevious={handlePrevious}
