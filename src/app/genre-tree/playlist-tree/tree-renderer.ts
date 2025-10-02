@@ -243,18 +243,19 @@ export function renderTree(
       }
     });
 
-    group.on("mouseleave", function (event) {
-      // Add a small delay to allow moving to the more container or actions container
+    group.on("mouseleave", function () {
+      // When leaving node: add a small delay to check if we're truly leaving everything
       setTimeout(() => {
-        // Check if mouse is still over any part of the node group (including more/actions containers)
-        const rect = (this as Element).getBoundingClientRect();
-        const mouseX = event.clientX;
-        const mouseY = event.clientY;
+        const moreContainer = d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid);
+        const actionsContainer = d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid);
 
-        // Only remove if mouse is not over the node area
-        if (mouseX < rect.left || mouseX > rect.right || mouseY < rect.top || mouseY > rect.bottom) {
-          d3.select<SVGGElement, unknown>("#more-icon-container-" + d.data.uuid).remove();
-          d3.select<SVGGElement, unknown>("#actions-container-" + d.data.uuid).remove();
+        if (moreContainer.empty() && actionsContainer.empty()) {
+          // No containers exist, so we're leaving everything - hide all
+          d3.select<SVGGElement, unknown>("#select-as-new-parent-group-" + d.data.uuid).remove();
+        } else {
+          // If containers exist but we're leaving the node, remove them
+          moreContainer.remove();
+          actionsContainer.remove();
           d3.select<SVGGElement, unknown>("#select-as-new-parent-group-" + d.data.uuid).remove();
         }
       }, 100);
