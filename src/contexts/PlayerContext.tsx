@@ -28,6 +28,16 @@ interface PlayerContextType {
   handlePlayPauseAction: () => void;
   loadTrackForPlayer: (track: UploadedTrackDetailed) => void;
   isLoading: boolean;
+  handleNextTrack: (
+    trackList: UploadedTrackDetailed[],
+    currentTrack: UploadedTrackDetailed,
+    onTrackChange: (track: UploadedTrackDetailed) => void
+  ) => void;
+  handlePreviousTrack: (
+    trackList: UploadedTrackDetailed[],
+    currentTrack: UploadedTrackDetailed,
+    onTrackChange: (track: UploadedTrackDetailed) => void
+  ) => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -181,7 +191,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
     };
   }, []);
 
-  const loadTrackForPlayer = (track: UploadedTrackDetailed) => {
+  const loadTrackForPlayer = useCallback((track: UploadedTrackDetailed) => {
     // Stop current track if playing and clean up
     if (audioElementRef.current) {
       audioElementRef.current.pause();
@@ -210,7 +220,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
     setCurrentTrackUuid(track.uuid);
     setIsLoading(true);
     setPlayState(PlayStates.LOADING);
-  };
+  }, []);
 
   const handlePlayPauseAction = useCallback(() => {
     // If track is loading, do nothing - user will need to wait for it to finish loading
@@ -246,6 +256,56 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
     }
   }, [playerUploadedTrackObject?.isReady, playerUploadedTrackObject?.audioElement, playState]);
 
+  const handleNextTrack = useCallback(
+    (
+      trackList: UploadedTrackDetailed[],
+      currentTrack: UploadedTrackDetailed,
+      onTrackChange: (track: UploadedTrackDetailed) => void
+    ) => {
+      if (!trackList || !currentTrack) {
+        return;
+      }
+
+      const currentIndex = trackList.findIndex((track) => track.uuid === currentTrack.uuid);
+      if (currentIndex === -1) {
+        return;
+      }
+
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < trackList.length) {
+        const nextTrack = trackList[nextIndex];
+        onTrackChange(nextTrack);
+        loadTrackForPlayer(nextTrack);
+      }
+    },
+    [loadTrackForPlayer]
+  );
+
+  const handlePreviousTrack = useCallback(
+    (
+      trackList: UploadedTrackDetailed[],
+      currentTrack: UploadedTrackDetailed,
+      onTrackChange: (track: UploadedTrackDetailed) => void
+    ) => {
+      if (!trackList || !currentTrack) {
+        return;
+      }
+
+      const currentIndex = trackList.findIndex((track) => track.uuid === currentTrack.uuid);
+      if (currentIndex === -1) {
+        return;
+      }
+
+      const previousIndex = currentIndex - 1;
+      if (previousIndex >= 0) {
+        const previousTrack = trackList[previousIndex];
+        onTrackChange(previousTrack);
+        loadTrackForPlayer(previousTrack);
+      }
+    },
+    [loadTrackForPlayer]
+  );
+
   // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(
     () => ({
@@ -263,6 +323,8 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       handlePlayPauseAction,
       loadTrackForPlayer,
       isLoading,
+      handleNextTrack,
+      handlePreviousTrack,
     }),
     [
       playerUploadedTrackObject,
@@ -272,6 +334,9 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       playState,
       isLoading,
       handlePlayPauseAction,
+      loadTrackForPlayer,
+      handleNextTrack,
+      handlePreviousTrack,
       // Note: currentTimeRef is stable (ref), so it doesn't need to be in dependencies
     ]
   );

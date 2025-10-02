@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { FaVolumeUp, FaVolumeMute, FaList } from "react-icons/fa";
 import { usePlayer, useCurrentTime } from "@contexts/PlayerContext";
+import { useTrackList } from "@contexts/TrackListContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 import PlayerControls from "./PlayerControls";
 import ProgressBar from "./ProgressBar";
@@ -13,14 +14,26 @@ interface PlayerProps {
 }
 
 export default function Player({ className }: PlayerProps) {
-  const { playerUploadedTrackObject, isLoading, isPlaying, volume, setVolume, handlePlayPauseAction } = usePlayer();
+  const {
+    playerUploadedTrackObject,
+    isLoading,
+    isPlaying,
+    volume,
+    setVolume,
+    handlePlayPauseAction,
+    handleNextTrack,
+    handlePreviousTrack,
+  } = usePlayer();
+  const { trackList, selectedTrack, setSelectedTrack } = useTrackList();
   const currentTime = useCurrentTime();
   const { toggleTrackListSidebar } = useTrackListSidebarVisibility();
   const [isMuted, setIsMuted] = useState(false);
   const [previousVolume, setPreviousVolume] = useState(volume);
 
   const handleNext = () => {
-    // Implement next track logic
+    if (trackList && selectedTrack) {
+      handleNextTrack(trackList.uploadedTracks, selectedTrack, setSelectedTrack);
+    }
   };
 
   const handlePrevious = () => {
@@ -32,8 +45,10 @@ export default function Player({ className }: PlayerProps) {
       return;
     }
 
-    // If less than 1 second, restart the current song (no previous track logic needed)
-    playerUploadedTrackObject.audioElement.currentTime = 0;
+    // If less than 1 second, go to previous track
+    if (trackList && selectedTrack) {
+      handlePreviousTrack(trackList.uploadedTracks, selectedTrack, setSelectedTrack);
+    }
   };
 
   const handleVolumeChange = (newVolume: number) => {
