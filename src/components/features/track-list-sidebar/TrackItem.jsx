@@ -70,7 +70,7 @@ export default function TrackItem({ uploadedTrack, position }) {
           <MdMoreVert size={20} />
         </div>
       </div>
-      <TrackEditionComponent />
+      {TrackEditionComponent}
     </>
   );
 }

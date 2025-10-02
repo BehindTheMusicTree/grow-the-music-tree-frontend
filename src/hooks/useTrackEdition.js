@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useUpdateUploadedTrack } from "@hooks/useUploadedTrack";
-import { useTrackList } from "@contexts/TrackListContext";
 import UploadedTrackEditionPopup from "@components/ui/popup/child/UploadedTrackEditionPopup";
 import { FORM_RATING_NULL_VALUE } from "@constants/rating";
 
 export function useTrackEdition() {
   const [show, setShow] = useState(false);
   const [track, setTrack] = useState(null);
-  const { mutate: updateTrack, formErrors, isSuccess, isError, data: updatedTrack, error } = useUpdateUploadedTrack();
+  const { mutate: updateTrack, isSuccess, isError, data: updatedTrack, error } = useUpdateUploadedTrack();
 
   const [formValues, setFormValues] = useState({
     title: "",
@@ -44,37 +43,40 @@ export function useTrackEdition() {
     }
   }, [isError, error]);
 
-  const handleChange = (event) => {
+  const handleChange = useCallback((event) => {
     const { name, value } = event.target;
-    setFormValues({
-      ...formValues,
+    setFormValues((prev) => ({
+      ...prev,
       [name]: value,
-    });
-  };
+    }));
+  }, []);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!track) return;
+  const handleSubmit = useCallback(
+    async (event) => {
+      event.preventDefault();
+      if (!track) return;
 
-    let submittedValues = { ...formValues };
-    // Handle rating values - remove rating field entirely if it's null, undefined, or FORM_RATING_NULL_VALUE (-1)
-    if (
-      submittedValues.rating === null ||
-      submittedValues.rating === undefined ||
-      submittedValues.rating === FORM_RATING_NULL_VALUE ||
-      submittedValues.rating === -1
-    ) {
-      delete submittedValues.rating;
-    }
-    // Ensure rating is within valid range (0-5) or remove it
-    else if (submittedValues.rating < 0 || submittedValues.rating > 5) {
-      delete submittedValues.rating;
-    }
+      let submittedValues = { ...formValues };
+      // Handle rating values - remove rating field entirely if it's null, undefined, or FORM_RATING_NULL_VALUE (-1)
+      if (
+        submittedValues.rating === null ||
+        submittedValues.rating === undefined ||
+        submittedValues.rating === FORM_RATING_NULL_VALUE ||
+        submittedValues.rating === -1
+      ) {
+        delete submittedValues.rating;
+      }
+      // Ensure rating is within valid range (0-5) or remove it
+      else if (submittedValues.rating < 0 || submittedValues.rating > 5) {
+        delete submittedValues.rating;
+      }
 
-    updateTrack({ uuid: track.uuid, data: submittedValues });
-  };
+      updateTrack({ uuid: track.uuid, data: submittedValues });
+    },
+    [track, formValues, updateTrack]
+  );
 
-  const TrackEditionComponent = () => {
+  const TrackEditionComponent = useMemo(() => {
     if (!show || !track) return null;
 
     return (
@@ -86,7 +88,7 @@ export function useTrackEdition() {
         onSubmit={handleSubmit}
       />
     );
-  };
+  }, [show, track, formValues, handleChange, handleSubmit]);
 
   return {
     showEditPopup,
