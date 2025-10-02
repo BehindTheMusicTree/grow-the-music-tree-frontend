@@ -13,6 +13,7 @@ export default function UploadedTrackPositionPlayPause({ position, uuid, handleP
   return (
     <div
       className="track-position-play-pause flex items-center justify-center text-lg w-16 cursor-pointer"
+      style={{ minWidth: "64px", maxWidth: "64px" }}
       onClick={handlePlayPauseClick}
     >
       <div className="group-hover:hidden">

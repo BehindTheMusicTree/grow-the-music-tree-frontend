@@ -51,7 +51,10 @@ export default function UploadedLibrary() {
         <table className="min-w-full divide-y divide-gray-300">
           <thead className="bg-gray-100">
             <tr>
-              <th className="uploaded-library-item px-3 py-2 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">
+              <th
+                className="uploaded-library-item w-16 px-3 py-2 text-center text-xs font-medium text-gray-700 uppercase tracking-wider"
+                style={{ minWidth: "64px", maxWidth: "64px" }}
+              >
                 #
               </th>
               <th className="uploaded-library-item px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
@@ -69,7 +72,10 @@ export default function UploadedLibrary() {
               <th className="uploaded-library-item px-3 py-2 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">
                 Rating
               </th>
-              <th className="uploaded-library-item px-3 py-2 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">
+              <th
+                className="uploaded-library-item w-16 px-3 py-2 text-center text-xs font-medium text-gray-700 uppercase tracking-wider"
+                style={{ minWidth: "64px", maxWidth: "64px" }}
+              >
                 <div className="flex justify-center items-center">
                   <FaRegClock />
                 </div>
@@ -88,7 +94,10 @@ export default function UploadedLibrary() {
           <tbody className="bg-white divide-y divide-gray-200">
             {uploadedTracks.map((uploadedTrack, index) => (
               <tr key={uploadedTrack.uuid} className="hover:bg-gray-50 group">
-                <td className="uploaded-library-item w-10 px-3 py-2 text-center">
+                <td
+                  className="uploaded-library-item w-16 px-3 py-2 text-center"
+                  style={{ minWidth: "64px", maxWidth: "64px" }}
+                >
                   <UploadedTrackPositionPlayPause
                     position={index + 1}
                     uuid={uploadedTrack.uuid}
@@ -113,7 +122,10 @@ export default function UploadedLibrary() {
                     }}
                   />
                 </td>
-                <td className="uploaded-library-item w-20 px-3 py-2 text-sm text-center">
+                <td
+                  className="uploaded-library-item w-16 px-3 py-2 text-sm text-center"
+                  style={{ minWidth: "64px", maxWidth: "64px" }}
+                >
                   {formatTime(uploadedTrack.file.durationInSec)}
                 </td>
                 <td className="uploaded-library-item w-16 px-3 py-2 text-sm text-center">

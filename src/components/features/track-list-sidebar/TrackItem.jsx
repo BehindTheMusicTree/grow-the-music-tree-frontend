@@ -60,7 +60,10 @@ export default function TrackItem({ uploadedTrack, position }) {
             ""
           )}
         </div>
-        <div className="duration flex text-base w-16 items-center justify-center">
+        <div
+          className="duration flex text-base w-16 items-center justify-center"
+          style={{ minWidth: "64px", maxWidth: "64px" }}
+        >
           {formatTime(uploadedTrack.file.durationInSec)}
         </div>
         <div
