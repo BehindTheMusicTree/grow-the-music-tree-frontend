@@ -14,7 +14,7 @@ export default function TrackListSidebar({ className }: { className?: string }) 
     <div
       className={`track-list-sidebar fixed right-0 w-144 rounded-2xl bg-gray-950 pb-1 ${className}`}
       style={{
-        bottom: "82px", // Slightly higher than 80px to account for borders/padding
+        bottom: "79px", // Match player height exactly
       }}
     >
       <div className="header flex h-16 px-4 py-2 text-gray-400">
@@ -40,7 +40,7 @@ export default function TrackListSidebar({ className }: { className?: string }) 
         </div>
       </div>
       {/* Use viewport height minus banner, player, header and padding */}
-      <ul className={"track-list overflow-auto max-h-[calc(100vh-63.5px-80px-56px-3.5px)] list-none p-0 m-0"}>
+      <ul className={"track-list overflow-auto max-h-[calc(100vh-63.5px-79px-56px-3.5px)] list-none p-0 m-0"}>
         {trackList.uploadedTracks.map((track, index) => (
           <li key={track.uuid}>
             <TrackItem uploadedTrack={track} position={index + 1} />
