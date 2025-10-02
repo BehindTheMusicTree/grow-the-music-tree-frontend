@@ -14,6 +14,7 @@ import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 import Banner from "@components/features/banner/Banner";
 import Menu from "@components/features/menu/Menu";
 import Player from "@components/features/player/Player";
+import AutoAdvance from "@components/features/player/AutoAdvance";
 import TrackListSidebar from "@components/features/track-list-sidebar/TrackListSidebar";
 
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
@@ -98,6 +99,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
       </div>
 
       {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />}
+      <AutoAdvance />
       {activePopup}
     </div>
   );
