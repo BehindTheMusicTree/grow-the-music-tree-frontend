@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
+import { calculateNodeDimensions } from "../playlist-tree/constants";
 
 type D3Selection = d3.Selection<SVGGElement, unknown, null, undefined>;
 type D3Node = d3.HierarchyNode<CriteriaPlaylistSimple>;
@@ -15,10 +16,12 @@ export function appendPaths(
   const linkGenerator = d3
     .linkHorizontal<D3Link, D3Node>()
     .x((d: D3Node) => {
-      return d.x! + xOffset;
+      const dimensions = calculateNodeDimensions(d.data.uploadedTracksCount);
+      return d.x! + dimensions.WIDTH / 2;
     })
     .y((d: D3Node) => {
-      return d.y! + yOffset;
+      const dimensions = calculateNodeDimensions(d.data.uploadedTracksCount);
+      return d.y! + dimensions.HEIGHT / 2;
     });
 
   svg

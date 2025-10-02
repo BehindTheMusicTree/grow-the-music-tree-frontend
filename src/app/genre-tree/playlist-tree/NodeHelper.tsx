@@ -14,7 +14,6 @@ import { CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
 
 import {
   RECTANGLE_COLOR,
-  RECT_BASE_DIMENSIONS,
   MORE_ICON_WIDTH,
   ACTIONS_CONTAINER_X_OFFSET,
   ACTIONS_CONTAINER_DIMENSIONS_MAX,
@@ -23,6 +22,7 @@ import {
   ACTION_ICON_CONTAINER_DIMENSIONS,
   ACTION_LABEL_CONTAINER_DIMENSIONS,
   SPINNER_ICON_SIZE,
+  calculateNodeDimensions,
 } from "./constants";
 
 type D3Node = d3.HierarchyNode<CriteriaPlaylistSimple>;
@@ -67,24 +67,25 @@ export function addMoreIconContainer(
   handleMoreActionEnterMouse: (event: MouseEvent, d: D3Node, genrePlaylist: CriteriaPlaylistSimple) => void
 ) {
   const moreIconContainer = group.select("#more-icon-container-" + genrePlaylist.uuid);
+  const dimensions = calculateNodeDimensions(genrePlaylist.uploadedTracksCount);
 
   if (moreIconContainer.empty()) {
     const moreIconContainer = group.append("g").attr("id", "more-icon-container-" + genrePlaylist.uuid);
 
     moreIconContainer
       .append("rect")
-      .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2)
-      .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+      .attr("x", dimensions.WIDTH / 2)
+      .attr("y", -dimensions.HEIGHT / 2)
       .attr("width", MORE_ICON_WIDTH)
-      .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+      .attr("height", dimensions.HEIGHT)
       .attr("fill", RECTANGLE_COLOR);
 
     moreIconContainer
       .append("foreignObject")
-      .attr("x", RECT_BASE_DIMENSIONS.WIDTH / 2)
-      .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+      .attr("x", dimensions.WIDTH / 2)
+      .attr("y", -dimensions.HEIGHT / 2)
       .attr("width", MORE_ICON_WIDTH)
-      .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
+      .attr("height", dimensions.HEIGHT)
       .html(function () {
         return ReactDOMServer.renderToString(
           <div className="w-full h-full flex justify-center items-center cursor-pointer hover:bg-gray-500">
@@ -125,7 +126,8 @@ export function addActionContainer(
   onclick: (event: MouseEvent, d: D3Node) => void,
   iconFunction: (d: D3Node) => React.ReactNode,
   labelFunction: (d: D3Node) => string,
-  enabledFunction: (d: D3Node) => boolean = () => true // new param, default true
+  enabledFunction: (d: D3Node) => boolean = () => true, // new param, default true
+  actionsContainerX: number = ACTIONS_CONTAINER_X_OFFSET // new param for dynamic positioning
 ) {
   const actionContainerGroup = actionsContainerGroup
     .append("g")
@@ -146,7 +148,7 @@ export function addActionContainer(
 
   actionContainerGroup
     .append("foreignObject")
-    .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+    .attr("x", actionsContainerX)
     .attr("y", -actionsContainerHeight / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * (position - 1))
     .attr("width", ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
     .attr("height", ACTION_ICON_CONTAINER_DIMENSIONS.HEIGHT)
@@ -159,7 +161,7 @@ export function addActionContainer(
 
   actionContainerGroup
     .append("foreignObject")
-    .attr("x", ACTIONS_CONTAINER_X_OFFSET + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
+    .attr("x", actionsContainerX + ACTION_ICON_CONTAINER_DIMENSIONS.WIDTH)
     .attr("y", -actionsContainerHeight / 2 + ACTION_CONTAINER_DIMENSIONS.HEIGHT * (position - 1))
     .attr("width", ACTION_LABEL_CONTAINER_DIMENSIONS.WIDTH)
     .attr("height", ACTION_LABEL_CONTAINER_DIMENSIONS.HEIGHT)
@@ -222,6 +224,8 @@ export function addActionsGroup(
   } = callbacks;
 
   const actionsGroup = genrePlaylistGroup.append("g").attr("id", "actions-container-" + genrePlaylist.uuid);
+  const dimensions = calculateNodeDimensions(genrePlaylist.uploadedTracksCount);
+  const actionsContainerX = dimensions.WIDTH / 2 + MORE_ICON_WIDTH;
 
   const isGenreless = !genrePlaylist.criteria;
   const actionsContainerHeight = isGenreless
@@ -232,7 +236,7 @@ export function addActionsGroup(
   actionsGroup
     .append("rect")
     .attr("id", "actions-background")
-    .attr("x", ACTIONS_CONTAINER_X_OFFSET)
+    .attr("x", actionsContainerX)
     .attr("y", actionsContainerY)
     .attr("width", ACTIONS_CONTAINER_DIMENSIONS_MAX.WIDTH)
     .attr("height", actionsContainerHeight)
@@ -244,17 +248,17 @@ export function addActionsGroup(
     .attr(
       "d",
       "M " +
-        RECT_BASE_DIMENSIONS.WIDTH / 2 +
+        dimensions.WIDTH / 2 +
         " -" +
-        RECT_BASE_DIMENSIONS.HEIGHT / 2 +
+        dimensions.HEIGHT / 2 +
         " L " +
-        ACTIONS_CONTAINER_X_OFFSET +
+        actionsContainerX +
         " -" +
         actionsContainerHeight / 2 +
         " L " +
-        ACTIONS_CONTAINER_X_OFFSET +
+        actionsContainerX +
         " -" +
-        RECT_BASE_DIMENSIONS.HEIGHT / 2 +
+        dimensions.HEIGHT / 2 +
         " Z"
     )
     .attr("fill", "RGBA(0, 0, 0, 0)");
@@ -265,17 +269,17 @@ export function addActionsGroup(
     .attr(
       "d",
       "M " +
-        RECT_BASE_DIMENSIONS.WIDTH / 2 +
+        dimensions.WIDTH / 2 +
         " " +
-        RECT_BASE_DIMENSIONS.HEIGHT / 2 +
+        dimensions.HEIGHT / 2 +
         " L " +
-        ACTIONS_CONTAINER_X_OFFSET +
+        actionsContainerX +
         " " +
         actionsContainerHeight / 2 +
         " L " +
-        ACTIONS_CONTAINER_X_OFFSET +
+        actionsContainerX +
         " " +
-        RECT_BASE_DIMENSIONS.HEIGHT / 2 +
+        dimensions.HEIGHT / 2 +
         " Z"
     )
     .attr("fill", "RGBA(0, 0, 0, 0)");
@@ -294,7 +298,9 @@ export function addActionsGroup(
       "add-child-container",
       addChildActionOnclick,
       () => <FaPlus className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
-      () => "Add sub-genre"
+      () => "Add sub-genre",
+      () => true,
+      actionsContainerX
     );
 
     const changeParentActionOnclick = async (event: MouseEvent, d: D3Node) => {
@@ -315,7 +321,9 @@ export function addActionsGroup(
       "change-parent-container",
       changeParentActionOnclick,
       () => <PiGraphFill className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
-      () => "Change parent"
+      () => "Change parent",
+      () => true,
+      actionsContainerX
     );
 
     const renameGenreActionOnclick = async (event: MouseEvent, d: D3Node) => {
@@ -334,7 +342,9 @@ export function addActionsGroup(
       "rename-container",
       renameGenreActionOnclick,
       () => <MdModeEdit className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
-      () => "Rename"
+      () => "Rename",
+      () => true,
+      actionsContainerX
     );
 
     const deleteGenreActionOnclick = (_event: MouseEvent, _d: D3Node) => {
@@ -352,7 +362,9 @@ export function addActionsGroup(
       "delete-container",
       deleteGenreActionOnclick,
       () => <FaTrashAlt className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
-      () => "Delete"
+      () => "Delete",
+      () => true,
+      actionsContainerX
     );
   }
 
@@ -375,7 +387,9 @@ export function addActionsGroup(
         #
       </span>
     ),
-    (d) => `${d.data.uploadedTracksCount ?? 0} tracks`
+    (d) => `${d.data.uploadedTracksCount ?? 0} tracks`,
+    () => true,
+    actionsContainerX
   );
 
   addActionContainer(
@@ -409,7 +423,8 @@ export function addActionsGroup(
       }
       return "Play";
     },
-    (d) => d.data.uploadedTracksCount > 0
+    (d) => d.data.uploadedTracksCount > 0,
+    actionsContainerX
   );
 
   const uploadTrackActionOnclick = (event: MouseEvent, d: D3Node) => {
@@ -427,7 +442,9 @@ export function addActionsGroup(
     "upload-track-container",
     uploadTrackActionOnclick,
     () => <FaFileUpload className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
-    () => "Upload track"
+    () => "Upload track",
+    () => true,
+    actionsContainerX
   );
 
   actionsGroup.on("mouseenter", function () {
@@ -463,6 +480,9 @@ export function addParentSelectionOverlay(
   const { updateGenreParent, genreGettingAssignedNewParent, setGenreGettingAssignedNewParent } = callbacks;
 
   const nodeUuid = (parentNode.datum() as D3Node).data.uuid;
+  const nodeData = (parentNode.datum() as D3Node).data;
+  const dimensions = calculateNodeDimensions(nodeData.uploadedTracksCount);
+
   let selectAsNewParentGroup = parentNode.select<SVGGElement>("#select-as-new-parent-group-" + nodeUuid);
   if (selectAsNewParentGroup.empty()) {
     selectAsNewParentGroup = parentNode
@@ -476,19 +496,19 @@ export function addParentSelectionOverlay(
     selectAsNewParentGroup
       .append("rect")
       .attr("class", "select-as-new-parent-layer")
-      .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
-      .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
-      .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
-      .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+      .attr("width", dimensions.WIDTH)
+      .attr("height", dimensions.HEIGHT)
+      .attr("x", -dimensions.WIDTH / 2)
+      .attr("y", -dimensions.HEIGHT / 2)
       .attr("fill", "green");
 
     selectAsNewParentGroup
       .append("foreignObject")
       .attr("class", "select-as-new-parent-icon-foreign-obj")
-      .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
-      .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
-      .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
-      .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+      .attr("width", dimensions.WIDTH)
+      .attr("height", dimensions.HEIGHT)
+      .attr("x", -dimensions.WIDTH / 2)
+      .attr("y", -dimensions.HEIGHT / 2)
       .attr("fill", "grey")
       .html(function () {
         return ReactDOMServer.renderToString(

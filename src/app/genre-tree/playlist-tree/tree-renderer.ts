@@ -8,12 +8,13 @@ import { PlayStates } from "@models/PlayStates";
 import TrackListOrigin from "@models/track-list/origin/TrackListOrigin";
 
 import {
-  RECT_BASE_DIMENSIONS,
   HORIZONTAL_SEPARATOON_BETWEEN_NODES,
   VERTICAL_SEPARATOON_BETWEEN_NODES,
   MORE_ICON_WIDTH,
   ACTIONS_CONTAINER_DIMENSIONS_MAX,
   RECTANGLE_COLOR,
+  calculateNodeDimensions,
+  getMaxNodeDimensions,
 } from "./constants";
 import { addGrid } from "../d3-helper/d3-grid-helper";
 import { appendPaths } from "../d3-helper/d3-path-helper";
@@ -46,18 +47,21 @@ interface TreeCallbacks {
 }
 
 export function calculateSvgDimensions(d3: typeof import("d3"), treeData: D3Node): SvgDimensions {
-  const highestNodeVerticalCoordinate = d3.min(treeData.descendants(), (d) => d.x)!;
+  const nodes = treeData.descendants();
+  const maxNodeDimensions = getMaxNodeDimensions(nodes.map((d) => d.data));
+
+  const highestNodeVerticalCoordinate = d3.min(nodes, (d) => d.x)!;
   const highestVerticalCoordinate =
-    highestNodeVerticalCoordinate + RECT_BASE_DIMENSIONS.HEIGHT / 2 - ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2;
-  const lowestNodeVerticalCoordinate = d3.max(treeData.descendants(), (d) => d.x)!;
+    highestNodeVerticalCoordinate + maxNodeDimensions.HEIGHT / 2 - ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2;
+  const lowestNodeVerticalCoordinate = d3.max(nodes, (d) => d.x)!;
   const lowestVerticalCoordinate =
-    lowestNodeVerticalCoordinate + RECT_BASE_DIMENSIONS.HEIGHT / 2 + ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2;
+    lowestNodeVerticalCoordinate + maxNodeDimensions.HEIGHT / 2 + ACTIONS_CONTAINER_DIMENSIONS_MAX.HEIGHT / 2;
   const svgHeight = lowestVerticalCoordinate - highestVerticalCoordinate;
 
-  const maximumLevel = d3.max(treeData.descendants(), (d) => d.depth)!;
+  const maximumLevel = d3.max(nodes, (d) => d.depth)!;
   const svgWidth =
     maximumLevel * HORIZONTAL_SEPARATOON_BETWEEN_NODES +
-    RECT_BASE_DIMENSIONS.WIDTH +
+    maxNodeDimensions.WIDTH +
     MORE_ICON_WIDTH +
     ACTIONS_CONTAINER_DIMENSIONS_MAX.WIDTH;
 
@@ -117,7 +121,7 @@ export function renderTree(
 
   addGrid(svg, svgWidth, svgHeight, true);
 
-  appendPaths(d3, svg, treeData, RECT_BASE_DIMENSIONS.WIDTH / 2, RECT_BASE_DIMENSIONS.HEIGHT / 2);
+  appendPaths(d3, svg, treeData, 0, 0);
 
   // Hack to invert the tree so that x is horizontal and y is vertical
   const nodes = svg
@@ -128,18 +132,31 @@ export function renderTree(
     .attr("class", "node")
     .attr("id", (d) => "group-" + d.data.uuid)
     .attr("transform", function (d) {
-      const translateX = d.x! + RECT_BASE_DIMENSIONS.WIDTH / 2;
-      const translateY = d.y! + RECT_BASE_DIMENSIONS.HEIGHT / 2;
+      const dimensions = calculateNodeDimensions(d.data.uploadedTracksCount);
+      const translateX = d.x! + dimensions.WIDTH / 2;
+      const translateY = d.y! + dimensions.HEIGHT / 2;
       return `translate(${translateX}, ${translateY})`;
     });
 
   nodes
     .append("rect")
     .attr("class", "node-base-rect")
-    .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
-    .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
-    .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
-    .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+    .attr("width", (d) => {
+      const dimensions = calculateNodeDimensions(d.data.uploadedTracksCount);
+      return dimensions.WIDTH;
+    })
+    .attr("height", (d) => {
+      const dimensions = calculateNodeDimensions(d.data.uploadedTracksCount);
+      return dimensions.HEIGHT;
+    })
+    .attr("x", (d) => {
+      const dimensions = calculateNodeDimensions(d.data.uploadedTracksCount);
+      return -dimensions.WIDTH / 2;
+    })
+    .attr("y", (d) => {
+      const dimensions = calculateNodeDimensions(d.data.uploadedTracksCount);
+      return -dimensions.HEIGHT / 2;
+    })
     .attr("fill", function (d) {
       // Grey out forbidden nodes (the genre itself and its descendants)
       const isForbidden =
@@ -182,10 +199,22 @@ export function renderTree(
   nodes
     .append("foreignObject")
     .attr("class", "tree-info-container")
-    .attr("width", RECT_BASE_DIMENSIONS.WIDTH)
-    .attr("height", RECT_BASE_DIMENSIONS.HEIGHT)
-    .attr("x", -RECT_BASE_DIMENSIONS.WIDTH / 2)
-    .attr("y", -RECT_BASE_DIMENSIONS.HEIGHT / 2)
+    .attr("width", (d) => {
+      const dimensions = calculateNodeDimensions(d.data.uploadedTracksCount);
+      return dimensions.WIDTH;
+    })
+    .attr("height", (d) => {
+      const dimensions = calculateNodeDimensions(d.data.uploadedTracksCount);
+      return dimensions.HEIGHT;
+    })
+    .attr("x", (d) => {
+      const dimensions = calculateNodeDimensions(d.data.uploadedTracksCount);
+      return -dimensions.WIDTH / 2;
+    })
+    .attr("y", (d) => {
+      const dimensions = calculateNodeDimensions(d.data.uploadedTracksCount);
+      return -dimensions.HEIGHT / 2;
+    })
     .html(function (d) {
       const isForbidden =
         d.data.criteria &&
@@ -193,7 +222,8 @@ export function renderTree(
           (genreGettingAssignedNewParentForbiddenUuids &&
             genreGettingAssignedNewParentForbiddenUuids.includes(d.data.criteria.uuid)));
       const textColor = isForbidden ? "color: #888888;" : "";
-      return `<div class="tree-info" style="${textColor}">${d.data.name}</div>`;
+      const trackCountText = d.data.uploadedTracksCount > 0 ? ` (${d.data.uploadedTracksCount})` : "";
+      return `<div class="tree-info" style="${textColor} display: flex; align-items: center; justify-content: center; height: 100%; font-size: 12px; font-weight: 500;">${d.data.name}${trackCountText}</div>`;
     })
     .on("mouseover", function (event, d) {
       // Don't show more container when assigning new parent or for forbidden nodes
