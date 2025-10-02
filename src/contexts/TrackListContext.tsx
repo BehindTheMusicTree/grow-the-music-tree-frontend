@@ -1,15 +1,17 @@
 "use client";
 
-import { createContext, useState, useContext, ReactNode } from "react";
+import { createContext, useState, useContext, ReactNode, useMemo } from "react";
 import { UploadedTrackDetailed } from "@domain/uploaded-track/response/detailed";
 import TrackList, { TrackListFromUploadedTrack, TrackListFromCriteriaPlaylist } from "@models/track-list/TrackList";
 import {
   TrackListOriginFromUploadedTrack,
   TrackListOriginFromCriteriaPlaylist,
 } from "@models/track-list/origin/TrackListOrigin";
+import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 import { CriteriaPlaylistDetailed } from "@schemas/domain/playlist/criteria-playlist/detailed";
 import { usePlayer } from "./PlayerContext";
 import { useTrackListSidebarVisibility } from "./TrackListSidebarVisibilityContext";
+import { useListUploadedTracks } from "@hooks/useUploadedTrack";
 
 interface TrackListContextType {
   trackList: TrackList | null;
@@ -31,10 +33,50 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
   const [selectedTrack, setSelectedTrack] = useState<UploadedTrackDetailed | null>(null);
   const { loadTrackForPlayer } = usePlayer();
   const { showTrackListSidebar } = useTrackListSidebarVisibility();
+  const { data: uploadedTracksResponse } = useListUploadedTracks();
+
+  // Create a memoized track list that updates when uploadedTracks changes
+  const currentTrackList = useMemo(() => {
+    if (!trackList) return null;
+
+    const uploadedTracks = uploadedTracksResponse?.results || [];
+
+    // If the current track list is from uploaded tracks, update it with fresh data
+    if (trackList.origin.type === TrackListOriginType.UPLOADED_TRACK) {
+      const origin = trackList.origin as TrackListOriginFromUploadedTrack;
+
+      // Find the updated version of the original track in the fresh data
+      const updatedOriginalTrack = uploadedTracks.find((track) => track.uuid === origin.uploadedTrack.uuid);
+
+      if (updatedOriginalTrack) {
+        // Create a new track list with the updated track
+        return new TrackListFromUploadedTrack([updatedOriginalTrack], origin);
+      }
+    }
+    // If the current track list is from a genre playlist, update tracks with fresh data
+    else if (trackList.origin.type === TrackListOriginType.GENRE_PLAYLIST) {
+      const origin = trackList.origin as TrackListOriginFromCriteriaPlaylist;
+
+      // Update all tracks in the playlist with fresh data
+      const updatedTracks = trackList.uploadedTracks.map((originalTrack) => {
+        const updatedTrack = uploadedTracks.find((track) => track.uuid === originalTrack.uuid);
+        return updatedTrack || originalTrack; // Use updated track if found, otherwise keep original
+      });
+
+      // Check if any tracks were actually updated
+      const hasUpdates = updatedTracks.some((updatedTrack, index) => updatedTrack !== trackList.uploadedTracks[index]);
+
+      if (hasUpdates) {
+        return new TrackListFromCriteriaPlaylist(updatedTracks, origin);
+      }
+    }
+
+    return trackList;
+  }, [trackList, uploadedTracksResponse]);
 
   const toTrackAtPosition = (position: number) => {
-    if (trackList && position >= 0 && position < trackList.uploadedTracks.length) {
-      setSelectedTrack(trackList.uploadedTracks[position]);
+    if (currentTrackList && position >= 0 && position < currentTrackList.uploadedTracks.length) {
+      setSelectedTrack(currentTrackList.uploadedTracks[position]);
     }
   };
 
@@ -88,7 +130,7 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
   return (
     <TrackListContext.Provider
       value={{
-        trackList,
+        trackList: currentTrackList,
         selectedTrack,
         setSelectedTrack,
         toTrackAtPosition,
