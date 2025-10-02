@@ -36,11 +36,8 @@ interface TreeCallbacks {
   fetchGenre: (criteriaUuid: string) => Promise<CriteriaDetailed>;
   setForbiddenNewParentsUuids: React.Dispatch<React.SetStateAction<string[]>>;
   updateGenreParent: (genreUuid: string, newParentUuid: string) => Promise<void>;
-  handleRenameGenre: (
-    criteriaUuid: string,
-    newName: string,
-    showPopup: (title: string, message: string) => void
-  ) => Promise<void>;
+  handleRenameGenre: (criteriaUuid: string, newName: string) => Promise<void>;
+  showRenamePopup: (genre: CriteriaMinimum) => void;
   showPopup: (title: string, message: string) => void;
   setVisibleActionsContainerGenrePlaylist: (genrePlaylist: CriteriaPlaylistSimple | null) => void;
 }
@@ -104,6 +101,7 @@ export function renderTree(
     fetchGenre,
     updateGenreParent,
     handleRenameGenre: renameGenre,
+    showRenamePopup,
     showPopup,
   } = callbacks;
 
@@ -190,10 +188,12 @@ export function renderTree(
           setGenreGettingAssignedNewParent,
           fetchGenre,
           renameGenre,
+          showRenamePopup,
           showPopup,
           trackListOrigin: trackListOrigin!,
           playState,
           handleMoreActionEnterMouse,
+          updateGenreParent,
         },
         rootColor
       );

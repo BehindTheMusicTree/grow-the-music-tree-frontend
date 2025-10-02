@@ -31,9 +31,11 @@ interface Callbacks {
   handlePlayPauseIconAction: (genrePlaylist: CriteriaPlaylistSimple) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
   selectingFileGenreUuidRef: React.MutableRefObject<string | null>;
-  handleGenreCreationAction: (parent: string) => void;
+  handleGenreCreationAction: (parent: CriteriaMinimum) => void;
   setGenreGettingAssignedNewParent: (genre: CriteriaDetailed | null) => void;
-  renameGenre: (uuid: string, name: string, showPopup: (title: string, message: string) => void) => Promise<void>;
+  fetchGenre: (criteriaUuid: string) => Promise<CriteriaDetailed>;
+  renameGenre: (uuid: string, name: string) => Promise<void>;
+  showRenamePopup: (genre: CriteriaMinimum) => void;
   showPopup: (title: string, message: string) => void;
   trackListOrigin?: {
     type: TrackListOriginType;
@@ -192,22 +194,7 @@ export function addActionsGroup(
   d3: typeof import("d3"),
   genrePlaylist: CriteriaPlaylistSimple,
   genrePlaylistGroup: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>,
-  callbacks: {
-    handlePlayPauseIconAction: (genrePlaylist: CriteriaPlaylistSimple) => void;
-    fileInputRef: React.RefObject<HTMLInputElement>;
-    selectingFileGenreUuidRef: React.MutableRefObject<string | null>;
-    handleGenreCreationAction: (parent: CriteriaMinimum) => void;
-    setGenreGettingAssignedNewParent: (genre: CriteriaDetailed | null) => void;
-    fetchGenre: (criteriaUuid: string) => Promise<CriteriaDetailed>;
-    renameGenre: (uuid: string, name: string, showPopup: (title: string, message: string) => void) => Promise<void>;
-    showPopup: (title: string, message: string) => void;
-    trackListOrigin: {
-      type: TrackListOriginType;
-      uuid: string;
-    };
-    playState: PlayStates;
-    handleMoreActionEnterMouse: (event: MouseEvent, d: D3Node, genrePlaylist: CriteriaPlaylistSimple) => void;
-  },
+  callbacks: Callbacks,
   rootColor: string
 ) {
   const {
@@ -217,8 +204,7 @@ export function addActionsGroup(
     handleGenreCreationAction,
     setGenreGettingAssignedNewParent,
     fetchGenre,
-    renameGenre,
-    showPopup,
+    showRenamePopup,
     trackListOrigin,
     playState,
     handleMoreActionEnterMouse,
@@ -329,10 +315,7 @@ export function addActionsGroup(
 
     const renameGenreActionOnclick = async (event: MouseEvent, d: D3Node) => {
       genrePlaylistGroup.dispatch("mouseleave");
-      const newName = prompt("Enter new genre name:", d.data.name);
-      if (newName && newName !== d.data.name) {
-        await renameGenre(d.data.criteria.uuid, newName, showPopup);
-      }
+      showRenamePopup(d.data.criteria);
     };
 
     addActionContainer(

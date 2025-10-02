@@ -14,6 +14,7 @@ import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginTy
 
 import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
 import InvalidInputPopup from "@components/ui/popup/child/InvalidInputPopup";
+import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { CriteriaMinimum } from "@domain/criteria/response/minimum";
 import { CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
@@ -160,6 +161,18 @@ export default function GenrePlaylistTreePerRoot({
       }
     };
 
+    const showRenamePopup = (genre: CriteriaMinimum) => {
+      showPopup(
+        <GenreRenamePopup
+          genre={genre}
+          onSubmit={({ name }) => {
+            handleRenameGenre(genre.uuid, name);
+            hidePopup();
+          }}
+        />
+      );
+    };
+
     renderTree(
       d3,
       svgRef,
@@ -183,6 +196,7 @@ export default function GenrePlaylistTreePerRoot({
         fetchGenre,
         updateGenreParent,
         handleRenameGenre,
+        showRenamePopup,
         showPopup,
         setVisibleActionsContainerGenrePlaylist,
       }
