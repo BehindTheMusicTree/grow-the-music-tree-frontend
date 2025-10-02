@@ -1,13 +1,14 @@
 "use client";
 
-import { usePlayer } from "@contexts/PlayerContext";
+import { usePlayer, useCurrentTime } from "@contexts/PlayerContext";
 
 interface ProgressBarProps {
   className?: string;
 }
 
 export default function ProgressBar({ className }: ProgressBarProps) {
-  const { currentTime, duration, playerUploadedTrackObject } = usePlayer();
+  const { duration, playerUploadedTrackObject } = usePlayer();
+  const currentTime = useCurrentTime();
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!playerUploadedTrackObject?.audioElement) return;

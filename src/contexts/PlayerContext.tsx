@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useRef, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode, useRef, useEffect, useCallback, useMemo } from "react";
 import { PlayStates } from "@models/PlayStates";
 import { UploadedTrackDetailed } from "@domain/uploaded-track/response/detailed";
 import { useDownloadTrack } from "@hooks/useUploadedTrack";
@@ -18,8 +18,7 @@ interface PlayerContextType {
   setPlayerUploadedTrackObject: (track: PlayerTrackObject | null) => void;
   isPlaying: boolean;
   setIsPlaying: (isPlaying: boolean) => void;
-  currentTime: number;
-  setCurrentTime: (time: number) => void;
+  currentTimeRef: React.MutableRefObject<number>;
   duration: number;
   setDuration: (duration: number) => void;
   volume: number;
@@ -40,7 +39,6 @@ interface PlayerProviderProps {
 export function PlayerProvider({ children }: PlayerProviderProps) {
   const [playerUploadedTrackObject, setPlayerUploadedTrackObject] = useState<PlayerTrackObject | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(50);
   const [playState, setPlayState] = useState<PlayStates>(PlayStates.STOPPED);
@@ -48,6 +46,9 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
   const [currentTrackUuid, setCurrentTrackUuid] = useState<string | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const processedTrackUuidRef = useRef<string | null>(null);
+
+  // Use refs for high-frequency updates that don't need to trigger re-renders
+  const currentTimeRef = useRef(0);
 
   // Download track data when UUID changes
   const { data: downloadData, isLoading: isDownloading } = useDownloadTrack(currentTrackUuid || "");
@@ -79,7 +80,8 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
         });
 
         audio.addEventListener("timeupdate", () => {
-          setCurrentTime(audio.currentTime);
+          // Only update ref - no state updates to prevent re-renders
+          currentTimeRef.current = audio.currentTime;
         });
 
         audio.addEventListener("ended", () => {
@@ -130,7 +132,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
         setIsLoading(false);
       }
     },
-    [] // Empty dependency array - function is stable
+    [volume] // Include dependencies
   );
 
   // Effect to handle download data and create audio URL
@@ -167,7 +169,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
     setIsLoading(true);
   };
 
-  const handlePlayPauseAction = () => {
+  const handlePlayPauseAction = useCallback(() => {
     if (!playerUploadedTrackObject?.isReady) {
       return;
     }
@@ -194,31 +196,39 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       setPlayState(PlayStates.PLAYING);
       setIsPlaying(true);
     }
-  };
+  }, [playerUploadedTrackObject?.isReady, playerUploadedTrackObject?.audioElement, playState]);
 
-  return (
-    <PlayerContext.Provider
-      value={{
-        playerUploadedTrackObject,
-        setPlayerUploadedTrackObject,
-        isPlaying,
-        setIsPlaying,
-        currentTime,
-        setCurrentTime,
-        duration,
-        setDuration,
-        volume,
-        setVolume,
-        playState,
-        setPlayState,
-        handlePlayPauseAction,
-        loadTrackForPlayer,
-        isLoading,
-      }}
-    >
-      {children}
-    </PlayerContext.Provider>
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(
+    () => ({
+      playerUploadedTrackObject,
+      setPlayerUploadedTrackObject,
+      isPlaying,
+      setIsPlaying,
+      currentTimeRef,
+      duration,
+      setDuration,
+      volume,
+      setVolume,
+      playState,
+      setPlayState,
+      handlePlayPauseAction,
+      loadTrackForPlayer,
+      isLoading,
+    }),
+    [
+      playerUploadedTrackObject,
+      isPlaying,
+      duration,
+      volume,
+      playState,
+      isLoading,
+      handlePlayPauseAction,
+      // Note: currentTimeRef is stable (ref), so it doesn't need to be in dependencies
+    ]
   );
+
+  return <PlayerContext.Provider value={contextValue}>{children}</PlayerContext.Provider>;
 }
 
 export function usePlayer() {
@@ -227,4 +237,20 @@ export function usePlayer() {
     throw new Error("usePlayer must be used within a PlayerProvider");
   }
   return context;
+}
+
+// Custom hook for components that need real-time currentTime updates
+export function useCurrentTime() {
+  const { currentTimeRef } = usePlayer();
+  const [currentTime, setCurrentTime] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(currentTimeRef.current);
+    }, 100); // Update every 100ms for smooth UI
+
+    return () => clearInterval(interval);
+  }, [currentTimeRef]);
+
+  return currentTime;
 }

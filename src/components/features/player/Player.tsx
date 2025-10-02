@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { FaVolumeUp, FaVolumeMute, FaList } from "react-icons/fa";
-import { usePlayer } from "@contexts/PlayerContext";
+import { usePlayer, useCurrentTime } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 import PlayerControls from "./PlayerControls";
 import ProgressBar from "./ProgressBar";
@@ -13,8 +13,8 @@ interface PlayerProps {
 }
 
 export default function Player({ className }: PlayerProps) {
-  const { playerUploadedTrackObject, isLoading, isPlaying, volume, setVolume, handlePlayPauseAction, currentTime } =
-    usePlayer();
+  const { playerUploadedTrackObject, isLoading, isPlaying, volume, setVolume, handlePlayPauseAction } = usePlayer();
+  const currentTime = useCurrentTime();
   const { toggleTrackListSidebar } = useTrackListSidebarVisibility();
   const [isMuted, setIsMuted] = useState(false);
   const [previousVolume, setPreviousVolume] = useState(volume);
