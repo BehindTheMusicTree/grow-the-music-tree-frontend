@@ -11,7 +11,7 @@ import UploadedTrackPositionPlayPause from "@components/features/UploadedTrackPo
 
 export default function TrackItem({ uploadedTrack, position }) {
   const { showPopup } = usePopup();
-  const { handlePlayPauseAction, playerUploadedTrackObject } = usePlayer();
+  const { handlePlayPauseAction, playerUploadedTrackObject, loadTrackForPlayer } = usePlayer();
   const { toTrackAtPosition } = useTrackList();
 
   const handleEditClick = (event) => {
@@ -21,10 +21,12 @@ export default function TrackItem({ uploadedTrack, position }) {
 
   const handlePlayPauseClick = (event) => {
     event.stopPropagation();
-    if (playerUploadedTrackObject.uploadedTrack.uuid == uploadedTrack.uuid) {
+    if (playerUploadedTrackObject && playerUploadedTrackObject.uploadedTrack.uuid === uploadedTrack.uuid) {
       handlePlayPauseAction(event);
     } else {
+      // Load and play the selected track
       toTrackAtPosition(position);
+      loadTrackForPlayer(uploadedTrack);
     }
   };
 
@@ -36,8 +38,14 @@ export default function TrackItem({ uploadedTrack, position }) {
         handlePlayPauseClick={handlePlayPauseClick}
       />
       <div className="title-artist-container flex flex-col items-start justify-center w-1/2">
-        <div className="title text-lg font-bold tnbvmm ext-gray-300 text-overflow">{uploadedTrack.title}</div>
-        {uploadedTrack.artist ? <div className="artist text-base text-overflow">{uploadedTrack.artist.name} </div> : ""}
+        <div className="title text-lg font-bold text-gray-300 text-overflow">{uploadedTrack.title}</div>
+        {uploadedTrack.artists && uploadedTrack.artists.length > 0 ? (
+          <div className="artist text-base text-overflow">
+            {uploadedTrack.artists.map((artist) => artist.name).join(", ")}
+          </div>
+        ) : (
+          ""
+        )}
       </div>
       <div className="album-name items-start justify-center w-1/3 ml-2 text-overflow ">
         {uploadedTrack.album ? uploadedTrack.album.name : ""}

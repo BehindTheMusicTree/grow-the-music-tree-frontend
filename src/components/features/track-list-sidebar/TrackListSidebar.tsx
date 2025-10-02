@@ -43,17 +43,7 @@ export default function TrackListSidebar({ className }: { className?: string }) 
       <ul className={"track-list overflow-auto max-h-[calc(100vh-63.5px-56px-3.5px)] list-none p-0 m-0"}>
         {trackList.uploadedTracks.map((track, index) => (
           <li key={track.uuid}>
-            <TrackItem
-              uploadedTrack={{
-                uuid: track.uuid,
-                title: track.title,
-                artist: { name: track.artists.map((artist) => artist.name).join(", ") },
-                file: {
-                  durationInSec: track.file.durationInSec,
-                },
-              }}
-              position={index + 1}
-            />
+            <TrackItem uploadedTrack={track} position={index + 1} />
           </li>
         ))}
       </ul>
