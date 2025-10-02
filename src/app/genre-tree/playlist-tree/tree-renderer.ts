@@ -12,7 +12,6 @@ import {
   VERTICAL_SEPARATOON_BETWEEN_NODES,
   MORE_ICON_WIDTH,
   ACTIONS_CONTAINER_DIMENSIONS_MAX,
-  RECTANGLE_COLOR,
   calculateNodeDimensions,
   getMaxNodeDimensions,
 } from "./constants";
@@ -95,6 +94,7 @@ export function renderTree(
   playState: PlayStates,
   fileInputRef: React.RefObject<HTMLInputElement>,
   selectingFileGenreUuidRef: React.MutableRefObject<string | null>,
+  rootColor: string,
   callbacks: TreeCallbacks
 ): D3Selection {
   const {
@@ -105,7 +105,6 @@ export function renderTree(
     updateGenreParent,
     handleRenameGenre: renameGenre,
     showPopup,
-    setVisibleActionsContainerGenrePlaylist: _setVisibleActionsContainerGenrePlaylist,
   } = callbacks;
 
   if (!svgRef.current) {
@@ -168,7 +167,7 @@ export function renderTree(
       if (isForbidden) {
         return "#cccccc";
       }
-      return RECTANGLE_COLOR;
+      return rootColor;
     });
 
   const handleMoreActionEnterMouse = (event: MouseEvent, d: D3Node, genrePlaylist: CriteriaPlaylistSimple) => {
@@ -178,20 +177,26 @@ export function renderTree(
     const actionsContainer = group.select<SVGGElement>("#actions-container-" + genrePlaylist.uuid);
 
     if (actionsContainer.empty()) {
-      addMoreIconContainer(d3, genrePlaylist, group, handleMoreActionEnterMouse);
-      addActionsGroup(d3, genrePlaylist, group, {
-        handlePlayPauseIconAction,
-        fileInputRef,
-        selectingFileGenreUuidRef: selectingFileGenreUuidRef,
-        handleGenreCreationAction,
-        setGenreGettingAssignedNewParent,
-        fetchGenre,
-        renameGenre,
-        showPopup,
-        trackListOrigin: trackListOrigin!,
-        playState,
-        handleMoreActionEnterMouse,
-      });
+      addMoreIconContainer(d3, genrePlaylist, group, handleMoreActionEnterMouse, rootColor);
+      addActionsGroup(
+        d3,
+        genrePlaylist,
+        group,
+        {
+          handlePlayPauseIconAction,
+          fileInputRef,
+          selectingFileGenreUuidRef: selectingFileGenreUuidRef,
+          handleGenreCreationAction,
+          setGenreGettingAssignedNewParent,
+          fetchGenre,
+          renameGenre,
+          showPopup,
+          trackListOrigin: trackListOrigin!,
+          playState,
+          handleMoreActionEnterMouse,
+        },
+        rootColor
+      );
       // setVisibleActionsContainerGenrePlaylist(d.data); // REMOVE THIS
     }
   };
@@ -243,7 +248,8 @@ export function renderTree(
             HTMLElement,
             unknown
           >,
-          handleMoreActionEnterMouse
+          handleMoreActionEnterMouse,
+          rootColor
         );
       }
     });

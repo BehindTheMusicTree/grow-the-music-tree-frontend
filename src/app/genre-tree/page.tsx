@@ -103,6 +103,7 @@ export default function GenreTree() {
                   </div>
                   <div className="graph-container relative z-10">
                     <GenrePlaylistTreePerRoot
+                      rootUuid={uuid}
                       genrePlaylistTreePerRoot={genrePlaylistTreePerRoot}
                       genreGettingAssignedNewParent={genreGettingAssignedNewParent}
                       setGenreGettingAssignedNewParent={setGenreGettingAssignedNewParent}

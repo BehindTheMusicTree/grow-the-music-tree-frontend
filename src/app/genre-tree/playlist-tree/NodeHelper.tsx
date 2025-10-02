@@ -13,7 +13,6 @@ import { CriteriaMinimum } from "@domain/criteria/response/minimum";
 import { CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
 
 import {
-  RECTANGLE_COLOR,
   MORE_ICON_WIDTH,
   ACTIONS_CONTAINER_X_OFFSET,
   ACTIONS_CONTAINER_DIMENSIONS_MAX,
@@ -64,7 +63,8 @@ export function addMoreIconContainer(
   d3: typeof import("d3"),
   genrePlaylist: CriteriaPlaylistSimple,
   group: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>,
-  handleMoreActionEnterMouse: (event: MouseEvent, d: D3Node, genrePlaylist: CriteriaPlaylistSimple) => void
+  handleMoreActionEnterMouse: (event: MouseEvent, d: D3Node, genrePlaylist: CriteriaPlaylistSimple) => void,
+  rootColor: string
 ) {
   const moreIconContainer = group.select("#more-icon-container-" + genrePlaylist.uuid);
   const dimensions = calculateNodeDimensions(genrePlaylist.uploadedTracksCount);
@@ -78,7 +78,7 @@ export function addMoreIconContainer(
       .attr("y", -dimensions.HEIGHT / 2)
       .attr("width", MORE_ICON_WIDTH)
       .attr("height", dimensions.HEIGHT)
-      .attr("fill", RECTANGLE_COLOR);
+      .attr("fill", rootColor);
 
     moreIconContainer
       .append("foreignObject")
@@ -207,7 +207,8 @@ export function addActionsGroup(
     };
     playState: PlayStates;
     handleMoreActionEnterMouse: (event: MouseEvent, d: D3Node, genrePlaylist: CriteriaPlaylistSimple) => void;
-  }
+  },
+  rootColor: string
 ) {
   const {
     handlePlayPauseIconAction,
@@ -240,7 +241,7 @@ export function addActionsGroup(
     .attr("y", actionsContainerY)
     .attr("width", ACTIONS_CONTAINER_DIMENSIONS_MAX.WIDTH)
     .attr("height", actionsContainerHeight)
-    .attr("fill", RECTANGLE_COLOR);
+    .attr("fill", rootColor);
 
   actionsGroup
     .append("path")
@@ -449,7 +450,7 @@ export function addActionsGroup(
 
   actionsGroup.on("mouseenter", function () {
     // When hovering actions container: show more + actions (all)
-    addMoreIconContainer(d3, genrePlaylist, genrePlaylistGroup, handleMoreActionEnterMouse);
+    addMoreIconContainer(d3, genrePlaylist, genrePlaylistGroup, handleMoreActionEnterMouse, rootColor);
   });
 
   actionsGroup.on("mouseleave", function () {

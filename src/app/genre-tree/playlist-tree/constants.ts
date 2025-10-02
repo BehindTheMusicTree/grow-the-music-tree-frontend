@@ -2,6 +2,43 @@ import { PRIMARY_COLOR } from "@utils/theme";
 
 export const RECTANGLE_COLOR = PRIMARY_COLOR;
 
+// Color palette for different root trees - slightly more colorful but professional
+export const ROOT_TREE_COLORS = [
+  "#0d3b66", // Primary blue
+  "#2c5530", // Forest green
+  "#6b4c93", // Muted purple
+  "#8b4513", // Saddle brown
+  "#2f4f4f", // Dark slate gray
+  "#556b2f", // Dark olive green
+  "#8b008b", // Dark magenta
+  "#2e8b57", // Sea green
+  "#4682b4", // Steel blue
+  "#cd853f", // Peru
+  "#5f9ea0", // Cadet blue
+  "#8b7355", // Light brown
+  "#708090", // Slate gray
+  "#2f4f4f", // Dark slate
+  "#483d8b", // Dark slate blue
+  "#8b4513", // Saddle brown
+  "#556b2f", // Dark olive
+  "#2e8b57", // Sea green
+  "#4682b4", // Steel blue
+  "#5f9ea0", // Cadet blue
+];
+
+// Function to get a consistent color for a root tree based on its UUID
+export function getRootTreeColor(rootUuid: string): string {
+  // Simple hash function to convert UUID to a consistent index
+  let hash = 0;
+  for (let i = 0; i < rootUuid.length; i++) {
+    const char = rootUuid.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  const index = Math.abs(hash) % ROOT_TREE_COLORS.length;
+  return ROOT_TREE_COLORS[index];
+}
+
 interface Dimensions {
   WIDTH: number;
   HEIGHT: number;

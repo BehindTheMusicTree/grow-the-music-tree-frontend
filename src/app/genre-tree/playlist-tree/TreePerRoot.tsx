@@ -20,9 +20,11 @@ import { CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
 
 import { buildTreeHierarchyStructure } from "./NodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./tree-renderer";
+import { getRootTreeColor } from "./constants";
 
 type GenrePlaylistTreePerRootProps = {
   className?: string;
+  rootUuid: string;
   genrePlaylistTreePerRoot: CriteriaPlaylistSimple[];
   genreGettingAssignedNewParent: CriteriaDetailed | null;
   setGenreGettingAssignedNewParent: (genre: CriteriaDetailed | null) => void;
@@ -31,6 +33,7 @@ type GenrePlaylistTreePerRootProps = {
 
 export default function GenrePlaylistTreePerRoot({
   className,
+  rootUuid,
   genrePlaylistTreePerRoot,
   genreGettingAssignedNewParent,
   setGenreGettingAssignedNewParent,
@@ -101,7 +104,7 @@ export default function GenrePlaylistTreePerRoot({
     [trackList, isPlaying, setIsPlaying, playNewTrackListFromGenrePlaylist, fetchGenrePlaylistDetailed]
   );
 
-  const { treeData } = useMemo(() => {
+  const { treeData, rootColor } = useMemo(() => {
     // Build tree hierarchy
     const root = buildTreeHierarchyStructure(d3, genrePlaylistTreePerRoot);
 
@@ -120,8 +123,11 @@ export default function GenrePlaylistTreePerRoot({
     // Transform coordinates for SVG
     const reshapedTreeData = setupTreeLayout(d3, originalTreeData, highestVerticalCoordinate);
 
-    return { treeData: reshapedTreeData };
-  }, [genrePlaylistTreePerRoot]);
+    // Get root-specific color
+    const rootColor = getRootTreeColor(rootUuid);
+
+    return { treeData: reshapedTreeData, rootColor };
+  }, [genrePlaylistTreePerRoot, rootUuid]);
 
   // Calculate forbidden UUIDs for the genre getting assigned a new parent
   const genreGettingAssignedNewParentForbiddenUuids = useMemo(() => {
@@ -168,6 +174,7 @@ export default function GenrePlaylistTreePerRoot({
       isPlaying ? PlayStates.PLAYING : PlayStates.STOPPED,
       fileInputRef,
       selectingFileGenreUuidRef,
+      rootColor,
       {
         setForbiddenNewParentsUuids,
         handlePlayPauseIconAction,
@@ -192,6 +199,7 @@ export default function GenrePlaylistTreePerRoot({
     svgWidth,
     svgHeight,
     treeData,
+    rootColor,
     createGenre,
     handlePlayPauseIconAction,
     setGenreGettingAssignedNewParent,
