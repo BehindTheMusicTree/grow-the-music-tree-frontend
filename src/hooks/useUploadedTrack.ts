@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useFetchWrapper } from "./useFetchWrapper";
 import { useInvalidateAllGenrePlaylistQueries } from "./useGenrePlaylist";
