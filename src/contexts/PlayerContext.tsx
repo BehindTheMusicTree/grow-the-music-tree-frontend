@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, ReactNode, useRef, useEffect, useCallback, useMemo } from "react";
 import { PlayStates } from "@models/PlayStates";
 import { UploadedTrackDetailed } from "@domain/uploaded-track/response/detailed";
-import { useDownloadTrack } from "@hooks/useUploadedTrack";
+import { useDownloadTrack, useListUploadedTracks } from "@hooks/useUploadedTrack";
 
 interface PlayerTrackObject {
   uploadedTrack: UploadedTrackDetailed;
@@ -50,6 +50,9 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
 
   // Use refs for high-frequency updates that don't need to trigger re-renders
   const currentTimeRef = useRef(0);
+
+  // Get uploaded tracks data to refresh player info when tracks are updated
+  const { data: uploadedTracksResponse } = useListUploadedTracks();
 
   // Download track data when UUID changes
   const { data: downloadData, isLoading: isDownloading } = useDownloadTrack(currentTrackUuid || "");
@@ -143,6 +146,30 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       handleDownloadComplete(downloadData);
     }
   }, [currentTrackUuid, downloadData, isDownloading, handleDownloadComplete]);
+
+  // Effect to refresh player track object when uploaded tracks data changes
+  useEffect(() => {
+    if (!playerUploadedTrackObject || !uploadedTracksResponse?.results) {
+      return;
+    }
+
+    const uploadedTracks = uploadedTracksResponse.results;
+    const currentTrackUuid = playerUploadedTrackObject.uploadedTrack.uuid;
+
+    // Find the updated version of the currently playing track
+    const updatedTrack = uploadedTracks.find((track) => track.uuid === currentTrackUuid);
+
+    if (updatedTrack && updatedTrack !== playerUploadedTrackObject.uploadedTrack) {
+      // Update the player object with the fresh track data
+      setPlayerUploadedTrackObject((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          uploadedTrack: updatedTrack,
+        };
+      });
+    }
+  }, [playerUploadedTrackObject, uploadedTracksResponse?.results]);
 
   // Cleanup audio element on unmount
   useEffect(() => {
