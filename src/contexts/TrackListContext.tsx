@@ -9,10 +9,10 @@ import {
 } from "@models/track-list/origin/TrackListOrigin";
 import { CriteriaPlaylistDetailed } from "@schemas/domain/playlist/criteria-playlist/detailed";
 import { usePlayer } from "./PlayerContext";
+import { useTrackListSidebarVisibility } from "./TrackListSidebarVisibilityContext";
 
 interface TrackListContextType {
   trackList: TrackList | null;
-  setTrackList: (trackList: TrackList) => void;
   selectedTrack: UploadedTrackDetailed | null;
   setSelectedTrack: (track: UploadedTrackDetailed | null) => void;
   toTrackAtPosition: (position: number) => void;
@@ -30,6 +30,7 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
   const [trackList, setTrackList] = useState<TrackList | null>(null);
   const [selectedTrack, setSelectedTrack] = useState<UploadedTrackDetailed | null>(null);
   const { loadTrackForPlayer } = usePlayer();
+  const { showTrackListSidebar } = useTrackListSidebarVisibility();
 
   const toTrackAtPosition = (position: number) => {
     if (trackList && position >= 0 && position < trackList.uploadedTracks.length) {
@@ -47,6 +48,9 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
     // Set the track list and selected track
     setTrackList(newTrackList);
     setSelectedTrack(track);
+
+    // Show the track list sidebar
+    showTrackListSidebar();
 
     // Delegate audio loading to PlayerContext
     loadTrackForPlayer(track);
@@ -73,6 +77,10 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
     setTrackList(newTrackList);
     setSelectedTrack(tracks[0]);
 
+    // Show the track list sidebar
+    showTrackListSidebar();
+    console.log("TrackList instantiated, sidebar should be visible");
+
     // Delegate audio loading to PlayerContext
     loadTrackForPlayer(tracks[0]);
   };
@@ -81,7 +89,6 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
     <TrackListContext.Provider
       value={{
         trackList,
-        setTrackList,
         selectedTrack,
         setSelectedTrack,
         toTrackAtPosition,

@@ -6,6 +6,7 @@ import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
+import { useTrackList } from "@contexts/TrackListContext";
 import { initSentry } from "@lib/sentry";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
@@ -34,6 +35,7 @@ initSentry();
 export default function AppContent({ children }: { children: ReactNode }) {
   const { playerUploadedTrackObject } = usePlayer();
   const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
+  const { trackList } = useTrackList();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, clearConnectivityError } = useConnectivityError();
   const { handleSpotifyOAuth } = useSpotifyAuth();
@@ -92,7 +94,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
       >
         <Menu className="menu left-0 z-40" />
         <main className="flex-grow w-full mx-8">{children}</main>
-        {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
+        {(isTrackListSidebarVisible || trackList) && <TrackListSidebar className="z-40" />}
       </div>
 
       {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />}
