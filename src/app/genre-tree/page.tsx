@@ -40,6 +40,7 @@ export default function GenreTree() {
             createGenre({ name, parent });
             hidePopup();
           }}
+          onClose={hidePopup}
           formErrors={formErrors}
         />
       );

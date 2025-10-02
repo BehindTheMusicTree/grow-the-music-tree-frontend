@@ -169,6 +169,7 @@ export default function GenrePlaylistTreePerRoot({
             handleRenameGenre(genre.uuid, name);
             hidePopup();
           }}
+          onClose={hidePopup}
         />
       );
     };

@@ -62,11 +62,11 @@ export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> ex
         <div className="pt-4 border-t">
           <PopupButtons alignment={buttonAlignment}>
             {showCancelButton && (
-              <Button onClick={onCancel || onClose} variant="secondary">
+              <Button onClick={onCancel || onClose || (() => {})} variant="secondary">
                 {cancelButtonText}
               </Button>
             )}
-            {showOkButton && <Button onClick={onOk || onClose}>{okButtonText}</Button>}
+            {showOkButton && <Button onClick={onOk || onClose || (() => {})}>{okButtonText}</Button>}
           </PopupButtons>
         </div>
       );

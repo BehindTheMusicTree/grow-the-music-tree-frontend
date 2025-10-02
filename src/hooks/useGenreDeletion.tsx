@@ -25,6 +25,7 @@ export function useGenreDeletion(onDelete: (genre: Genre) => void): UseGenreDele
             onDelete(genre);
             hidePopup();
           }}
+          onClose={hidePopup}
         />
       );
     },
