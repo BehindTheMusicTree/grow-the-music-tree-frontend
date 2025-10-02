@@ -68,23 +68,23 @@ export default function Player({ className }: PlayerProps) {
   }
 
   return (
-    <div className={`w-full bg-black text-white p-4 ${className}`}>
-      <div className="flex items-center">
-        <div className="flex items-center flex-1">
+    <div className={`w-full bg-black text-white p-4 h-player ${className}`}>
+      <div className="flex items-center h-full">
+        <div className="flex items-center flex-1 min-w-0">
           <Image
             src="/assets/album-cover-default.png"
             alt={playerUploadedTrackObject.uploadedTrack.title}
             width={64}
             height={64}
-            className="w-16 h-16 rounded"
+            className="w-16 h-16 rounded flex-shrink-0"
           />
-          <div className="ml-4">
-            <h3 className="font-bold">{playerUploadedTrackObject.uploadedTrack.title}</h3>
-            <p className="text-gray-400">
+          <div className="ml-4 min-w-0 flex-1 flex flex-col justify-center">
+            <h3 className="font-bold text-lg text-overflow">{playerUploadedTrackObject.uploadedTrack.title}</h3>
+            <p className="text-gray-400 text-base text-overflow">
               {playerUploadedTrackObject.uploadedTrack.artists.map((artist) => artist.name).join(", ")}
             </p>
             {playerUploadedTrackObject.loadError && (
-              <p className="text-red-400 text-sm">{playerUploadedTrackObject.loadError}</p>
+              <p className="text-red-400 text-sm text-overflow">{playerUploadedTrackObject.loadError}</p>
             )}
           </div>
         </div>

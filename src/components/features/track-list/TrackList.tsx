@@ -18,7 +18,7 @@ interface TrackListProps {
 
 export default function TrackList({ tracks, onTrackClick }: TrackListProps) {
   return (
-    <div className="space-y-2">
+    <div className="overflow-y-auto space-y-2" style={{ maxHeight: "calc(100vh - 143.5px)" }}>
       {tracks.map((track) => (
         <div
           key={track.id}
