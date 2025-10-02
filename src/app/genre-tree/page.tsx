@@ -15,6 +15,7 @@ import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
 import { CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
 import GenrePlaylistTreePerRoot from "./playlist-tree/TreePerRoot";
 import { GenreTreeSkeleton } from "./Skeleton";
+import { getRootTreeColor } from "./playlist-tree/constants";
 
 export default function GenreTree() {
   const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists();
@@ -91,13 +92,14 @@ export default function GenreTree() {
         <>
           <div className="tree-container flex flex-col gap-4 text-gray-800 w-full overflow-x-auto overflow-y-auto relative">
             {Object.entries(groupedGenrePlaylistsByRoot).map(([uuid, genrePlaylistTreePerRoot]) => {
+              const rootColor = getRootTreeColor(uuid);
               return (
                 <div
                   key={`${uuid}`}
                   className="tree-per-root-container relative mt-2 mr-16 p-2 bg-gray-50 rounded-lg inline-block w-fit"
                 >
                   <div className="tree-root-name-container absolute top-0 left-0 z-0">
-                    <div className="text-9xl text-gray-500 font-bold text-left">
+                    <div className="text-9xl font-bold text-left" style={{ color: rootColor }}>
                       {genrePlaylistTreePerRoot[0].root.name}
                     </div>
                   </div>
