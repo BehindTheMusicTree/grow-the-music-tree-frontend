@@ -26,7 +26,7 @@ export default function Player({ className }: PlayerProps) {
   } = usePlayer();
   const { trackList, selectedTrack, setSelectedTrack } = useTrackList();
   const currentTime = useCurrentTime();
-  const { toggleTrackListSidebar } = useTrackListSidebarVisibility();
+  const { toggleTrackListSidebar, isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const [isMuted, setIsMuted] = useState(false);
   const [previousVolume, setPreviousVolume] = useState(volume);
 
@@ -134,7 +134,9 @@ export default function Player({ className }: PlayerProps) {
             </div>
             <button
               onClick={toggleTrackListSidebar}
-              className="text-gray-400 hover:text-white bg-transparent"
+              className={`bg-transparent transition-colors ${
+                isTrackListSidebarVisible ? "text-white" : "text-gray-400 hover:text-white"
+              }`}
               aria-label="Toggle tracklist"
             >
               <FaList size={20} />
