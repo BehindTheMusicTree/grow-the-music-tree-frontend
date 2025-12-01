@@ -107,10 +107,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Ensures use of PR template and iterative refinement before publishing
   - Added `.pr-descriptions/` to .gitignore
 
-- **Auto-labeler**: Added GitHub Actions workflow for automatic PR labeling
-  - Automatically applies labels based on changed file paths
-  - Configured for all major components and technologies
-  - Reduces manual labeling overhead for maintainers
+- **Auto-labeler Workflows**: Added comprehensive automated labeling system
+  - **File-based PR labeler**: Applies component/technology labels based on changed files
+  - **PR size labeler**: Automatically calculates and labels PR size (xs/s/m/l/xl) with line counts
+  - **PR type labeler**: Detects PR type from title/description (feat, fix, docs, etc.) and breaking changes
+  - **Issue labeler**: Auto-labels issues by type, component, browser, platform, priority, and keywords
+  - Reduces manual labeling overhead and ensures consistent label application
 
 ## [v0.1.2] - 2025-03-26
 

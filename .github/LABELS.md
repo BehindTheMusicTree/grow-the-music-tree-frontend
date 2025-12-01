@@ -74,12 +74,48 @@ This file documents the labels used in this repository for issues and pull reque
 - `platform: mobile` - Mobile-specific issue
 - `platform: desktop` - Desktop-specific issue
 
-## Workflow Labels (Auto-labeler)
+## Automatic Labeling
 
-These labels are automatically applied by `.github/workflows/labeler.yml`:
+This repository uses multiple automated workflows to apply labels:
 
-- Auto-applied based on file paths changed in PRs
-- See `.github/labeler.yml` for configuration
+### 1. PR File-based Labeling (`.github/workflows/labeler.yml`)
+
+Automatically labels PRs based on changed files:
+
+- Component labels (player, genre-tree, track-list, etc.)
+- Technology labels (react, nextjs, typescript, etc.)
+- Special labels (documentation, dependencies, infrastructure)
+- Configuration: `.github/labeler.yml`
+
+### 2. PR Size Labeling (`.github/workflows/pr-size-labeler.yml`)
+
+Automatically calculates and labels PRs by size:
+
+- `size: xs` - < 50 lines changed
+- `size: s` - 50-199 lines
+- `size: m` - 200-499 lines
+- `size: l` - 500-999 lines
+- `size: xl` - 1000+ lines
+- Also posts a comment with detailed line counts
+
+### 3. PR Type Labeling (`.github/workflows/pr-type-labeler.yml`)
+
+Automatically detects PR type from title and description:
+
+- Detects conventional commit prefixes (feat, fix, docs, refactor, perf)
+- Identifies breaking changes
+- Detects PR type from template checkboxes
+- Applies appropriate type labels
+
+### 4. Issue Labeling (`.github/workflows/issue-labeler.yml`)
+
+Automatically labels new issues based on:
+
+- Issue template type (bug report vs feature request)
+- Component mentions in description
+- Browser/platform information
+- Priority keywords
+- Security/performance/accessibility keywords
 
 ---
 
