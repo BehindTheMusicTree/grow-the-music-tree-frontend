@@ -4,9 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSession } from "@contexts/SessionContext";
+import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
+import { createAppErrorFromErrorCode } from "@app-types/app-errors/app-error-factory";
+import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
 export default function AccountPage() {
-  const { setSession } = useSession();
+  const { clearSession } = useSession();
+  const { setConnectivityError } = useConnectivityError();
   const router = useRouter();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -111,8 +115,9 @@ export default function AccountPage() {
               <button
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
                 onClick={() => {
+                  clearSession();
+                  setConnectivityError(createAppErrorFromErrorCode(ErrorCode.SESSION_REQUIRED));
                   router.push("/");
-                  setSession(null);
                 }}
               >
                 Disconnect Account
