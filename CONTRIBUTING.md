@@ -725,9 +725,16 @@ See [.github/LABELS.md](.github/LABELS.md)
 bash .github/scripts/create-labels.sh
 ```
 
-### Automatic PR Labeling
+### Automatic Labeling
 
-PRs are automatically labeled based on changed files via the [labeler workflow](.github/workflows/labeler.yml). Configuration is in [.github/labeler.yml](.github/labeler.yml).
+This repository uses automated workflows to apply labels:
+
+1. **File-based PR labeling** ([labeler.yml](.github/workflows/labeler.yml)) - Labels PRs based on changed files (components, technologies, documentation)
+2. **PR size labeling** ([pr-size-labeler.yml](.github/workflows/pr-size-labeler.yml)) - Calculates and labels PR size (xs/s/m/l/xl) with line counts
+3. **PR type labeling** ([pr-type-labeler.yml](.github/workflows/pr-type-labeler.yml)) - Detects type from title/description (feat, fix, docs, breaking changes)
+4. **Issue labeling** ([issue-labeler.yml](.github/workflows/issue-labeler.yml)) - Auto-labels issues by type, component, platform, priority
+
+These workflows reduce manual labeling overhead and ensure consistent label application across all issues and PRs.
 
 ## 🪪 License & Attribution
 
