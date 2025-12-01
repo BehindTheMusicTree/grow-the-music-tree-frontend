@@ -1,10 +1,19 @@
 # Music Tree - Next.js Frontend
 
-This project has been migrated from React + Vite to Next.js to provide server-side rendering capabilities, improved SEO, and better integration with the Django REST API backend.
+## Table of Contents
 
-## License
-
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+- [Features](#features)
+- [Environment Setup](#environment-setup)
+- [Getting Started](#getting-started)
+  - [Installation](#installation)
+  - [Development](#development)
+  - [Production](#production)
+- [API Integration](#api-integration)
+- [Project Structure](#project-structure)
+- [Django Backend Integration](#django-backend-integration)
+- [Contributing](#contributing)
+- [Changelog](#changelog)
+- [License](#license)
 
 ## Features
 
@@ -14,15 +23,6 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - Spotify authentication and library access
 - Music playback and playlist management
 - Genre organization and navigation
-
-## Migration to Next.js
-
-The application has been migrated from a Vite-based React application to Next.js while maintaining all functionality. Key changes include:
-
-- Replaced react-router-dom with Next.js file-based routing
-- Adapted API service for server-side rendering compatibility
-- Environment variable configuration updated for Next.js
-- Added Next.js configuration for API proxying and path aliases
 
 ## Environment Setup
 
@@ -113,3 +113,21 @@ The application integrates with a Django REST API backend. API calls are handled
 The application is designed to work with a Django REST API backend. The connection details are specified in the environment variables. The Next.js server proxies API requests to the Django backend through the rewrites configuration in `next.config.js`.
 
 Ensure your Django backend is properly configured with CORS settings to accept requests from the Next.js application.
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on:
+
+- How to set up your development environment
+- Our Git Flow workflow and branching strategy
+- Code style guidelines and best practices
+- How to submit pull requests
+- Testing requirements
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes to this project.
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.

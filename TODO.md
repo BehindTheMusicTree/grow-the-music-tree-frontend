@@ -71,7 +71,6 @@ This file tracks future work, improvements, and testing tasks for Bodzify Ultima
 - [ ] **Spotify integration UI**
 
   - Add Spotify playlist import interface
-  - Implement Spotify OAuth flow in UI
   - Add Spotify track matching visualization
   - Display Spotify audio features
 
@@ -92,7 +91,6 @@ This file tracks future work, improvements, and testing tasks for Bodzify Ultima
 
 - [ ] **Theme customization**
 
-  - Add multiple color themes
   - Implement dark/light mode toggle
   - Support for custom color schemes
   - Add theme preview and switcher
@@ -243,7 +241,6 @@ This file tracks future work, improvements, and testing tasks for Bodzify Ultima
 
 - [ ] **Docker and containerization**
 
-  - Create optimized production Docker image
   - Add docker-compose for local development
   - Implement multi-stage builds
   - Document containerized deployment
