@@ -2,6 +2,10 @@
 
 This project has been migrated from React + Vite to Next.js to provide server-side rendering capabilities, improved SEO, and better integration with the Django REST API backend.
 
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
 ## Features
 
 - Server-side rendering with Next.js
