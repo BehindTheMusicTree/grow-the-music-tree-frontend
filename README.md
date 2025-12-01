@@ -22,25 +22,22 @@
 - 🌍 **Community-Driven** - Participate in genre classifications through discussions and voting
 - 📊 **Rich Context** - Historical, cultural, and technical information for each genre
 
-## Table of Contents
-
-- [Key Features](#key-features)
-- [Technical Overview](#technical-overview)
-- [Getting Started](#getting-started)
-- [Contributing](#contributing)
-- [Changelog](#changelog)
-- [License](#license)
-
 ## Technical Overview
 
-This Next.js frontend application provides:
+**Frontend Stack:**
 
-- Server-side rendering with Next.js
-- Client-side routing with Next.js Pages Router
-- Integration with Django REST API backend
-- Spotify authentication and library access
-- Music playback and playlist management
-- Interactive genre tree visualization
+- **Framework**: Next.js 15 with App Router
+- **UI**: React 19, Tailwind CSS
+- **State Management**: React Context, TanStack Query (React Query)
+- **Visualization**: D3.js for interactive genre tree
+- **Audio**: React Howler for music playback
+- **Type Safety**: TypeScript
+
+**Backend Integration:**
+
+- Requires [Bodzify API backend](https://github.com/Bodzify/bodzify-api-django)
+- RESTful API integration
+- Spotify OAuth authentication
 
 ## Getting Started
 
