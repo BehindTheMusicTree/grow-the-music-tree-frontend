@@ -92,12 +92,25 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **License**: Added Apache License 2.0 with references across documentation
 
+- **GitHub Labels**: Added comprehensive labeling system for issues and PRs
+  - Created LABELS.md documentation with full label catalog and usage guidelines
+  - Added executable script to create all labels via GitHub CLI
+  - Defined 9 label categories: type, priority, component, technology, status, size, special, platform
+  - Added automatic PR labeling workflow based on file changes
+  - Updated CONTRIBUTING.md with labels section
+
 ### CI
 
 - **PR Description Workflow**: Added cursor rule for PR description management
+
   - PR descriptions must be drafted in `.pr-descriptions/` directory (git-ignored)
   - Ensures use of PR template and iterative refinement before publishing
   - Added `.pr-descriptions/` to .gitignore
+
+- **Auto-labeler**: Added GitHub Actions workflow for automatic PR labeling
+  - Automatically applies labels based on changed file paths
+  - Configured for all major components and technologies
+  - Reduces manual labeling overhead for maintainers
 
 ## [v0.1.2] - 2025-03-26
 

@@ -20,6 +20,7 @@ This project is currently maintained by a solo developer, but contributions, sug
     - [6.1. Pre-PR Checklist](#61-pre-pr-checklist)
     - [6.2. Opening a Pull Request](#62-opening-a-pull-request)
   - [7. Releasing _(For Maintainers)_](#7-releasing-for-maintainers)
+- [🏷️ Issue & PR Labels](#️-issue--pr-labels)
 - [🪪 License & Attribution](#-license--attribution)
 - [📜 Code of Conduct](#-code-of-conduct)
 - [📋 TODO List](#-todo-list)
@@ -693,6 +694,40 @@ For urgent production fixes:
    ```
 
 6. Delete the hotfix branch
+
+## 🏷️ Issue & PR Labels
+
+This repository uses a comprehensive labeling system to categorize issues and pull requests. Labels are automatically applied to PRs based on file changes, and should be manually applied to issues during triage.
+
+### Label Categories
+
+- **Type** - bug, enhancement, feature, documentation, refactor, performance, accessibility, security
+- **Priority** - critical, high, medium, low
+- **Component** - player, genre-tree, track-list, playlist, auth, api, ui
+- **Technology** - react, nextjs, typescript, tailwind, d3
+- **Status** - needs-triage, needs-info, in-progress, blocked, ready, won't-fix
+- **Size** - xs, s, m, l, xl (effort estimation)
+- **Special** - good-first-issue, help-wanted, breaking-change, dependencies
+
+For complete documentation including:
+
+- Full list of labels with descriptions
+- Color scheme and usage guidelines
+- GitHub CLI commands to create all labels
+- Automatic labeling configuration
+
+See [.github/LABELS.md](.github/LABELS.md)
+
+### Creating Labels (Maintainers Only)
+
+```bash
+# Create all labels at once
+bash .github/scripts/create-labels.sh
+```
+
+### Automatic PR Labeling
+
+PRs are automatically labeled based on changed files via the [labeler workflow](.github/workflows/labeler.yml). Configuration is in [.github/labeler.yml](.github/labeler.yml).
 
 ## 🪪 License & Attribution
 
