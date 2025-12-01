@@ -68,10 +68,36 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Documentation
 
-- **Contributing Documentation**: Added comprehensive changelog best practices guide
-  - Clear guidelines for all contributors on updating CHANGELOG.md
-  - Examples of proper changelog entries with test coverage notation
-  - Emphasis on human-readable, user-focused descriptions
+- **Project Documentation Setup**: Comprehensive documentation structure for open-source project
+
+  - Added CONTRIBUTING.md with Git Flow workflow, development guidelines, and PR process
+  - Added VISION.md with project mission, values, roadmap, and target audience
+  - Added TODO.md for tracking future work organized by priority and category
+  - Added CODE_OF_CONDUCT.md based on Contributor Covenant 2.1
+  - Simplified README.md with clear structure: features, tech stack, quick start
+  - Added changelog best practices guide with examples for React/Next.js frontend
+
+- **GitHub Templates**: Added comprehensive issue and PR templates
+
+  - Bug report template with browser, OS, and device information fields
+  - Feature request template with component/area and priority selection
+  - Pull request template with detailed checklist for code quality, testing, and documentation
+  - Issue template config to guide users to appropriate resources
+
+- **GitHub Discussions**: Added discussion welcome template
+
+  - Defined discussion categories (Ideas, Q&A, Music & Genres, Show and Tell, Announcements, Development)
+  - Community guidelines and best practices
+  - Instructions for effective participation
+
+- **License**: Added Apache License 2.0 with references across documentation
+
+### CI
+
+- **PR Description Workflow**: Added cursor rule for PR description management
+  - PR descriptions must be drafted in `.pr-descriptions/` directory (git-ignored)
+  - Ensures use of PR template and iterative refinement before publishing
+  - Added `.pr-descriptions/` to .gitignore
 
 ## [v0.1.2] - 2025-03-26
 
