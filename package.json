@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "verify-env": "node scripts/verify-env.js"
+    "verify-env": "node scripts/verify-env.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
@@ -43,6 +47,8 @@
     "@types/react-dom": "^18.2.22",
     "@typescript-eslint/eslint-plugin": "^8.29.0",
     "@typescript-eslint/parser": "^8.29.0",
+    "@vitejs/plugin-react": "^5.1.1",
+    "@vitest/ui": "^3.2.4",
     "autoprefixer": "^10.4.21",
     "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
@@ -50,9 +56,12 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "git-worktree-scripts": "1.4.1",
+    "happy-dom": "^20.0.11",
     "jsdom": "^26.0.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
-    "git-worktree-scripts": "1.4.1"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4"
   }
 }
