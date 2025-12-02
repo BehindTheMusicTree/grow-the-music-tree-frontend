@@ -1,6 +1,6 @@
 # TODO
 
-This file tracks future work, improvements, and testing tasks for Bodzify Ultimate Music Guide (React Frontend).
+This file tracks future work, improvements, and testing tasks for GrowTheMusicTree.
 
 **Note for Contributors**:
 
