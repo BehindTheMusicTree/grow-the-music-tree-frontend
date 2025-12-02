@@ -9,8 +9,8 @@ check_script_vars_are_set() {
         APP_PORT
         CONTACT_EMAIL
         API_BASE_URL
-        API_MUSIC_TREE_USERNAME
-        API_MUSIC_TREE_USER_PASSWORD
+        MUSIC_TREE_API_USERNAME
+        MUSIC_TREE_API_USER_PASSWORD
         SENTRY_IS_ACTIVE
         SENTRY_AUTH_TOKEN
         BUILD_COMPLETE_FILENAME
@@ -20,7 +20,7 @@ check_script_vars_are_set() {
         log_with_script_prefixe "ERROR: Failed to load environment variables." >&2
         exit 1
     fi
-    export_value_removing_eventual_surrounding_quotes API_MUSIC_TREE_USER_PASSWORD 2>&1
+    export_value_removing_eventual_surrounding_quotes MUSIC_TREE_API_USER_PASSWORD 2>&1
 
     check_bool_vars_are_set "SENTRY_IS_ACTIVE" 2>&1
     if [ $? -ne 0 ]; then
