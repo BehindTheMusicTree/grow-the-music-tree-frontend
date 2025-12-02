@@ -1,22 +1,35 @@
-name: Music Tree CI
+name: CI - Tests & Quality
 
 on:
   push:
     branches:
+      - develop
       - main
-      - dev
-      - fix/rating-id
   pull_request:
-    branches: ["main", "dev"]
-
-env:
-  SSH_DESTINATION: ${{ secrets.TEST_SERVER_BODZIFY_USERNAME }}@${{ vars.DOMAIN_NAME }}
-  DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
-  CONTAINER_ROOT_DIR: /home/app/
-  DOCKERIZED_APP_ENV_FILENAME: .env_umg
-  BUILD_COMPLETE_FILENAME: build-complete.txt
+    branches:
+      - develop
+      - main
 
 jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
   test:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -36,100 +49,22 @@ jobs:
       - name: Run tests
         run: npm test
 
-  build-and-push-to-dockerhub:
-    name: Build / Push to Dockerhub
+  build-check:
+    name: Build Check
     runs-on: ubuntu-latest
-    needs: [test]
+    needs: [lint, test]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Login to Dockerhub
-        run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ vars.DOCKERHUB_USERNAME }}" --password-stdin
-
-      - name: Build and push
-        uses: docker/build-push-action@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          context: .
-          push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.MUSIC_TREE_IMAGE_REPO }}:${{ vars.APP_VERSION }}
-          build-args: |
-            PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
-            APP_PORT=${{ vars.MUSIC_TREE_PORT }}
-            BUILD_COMPLETE_FILENAME=${{ env.BUILD_COMPLETE_FILENAME }}
+          node-version: "20"
+          cache: "npm"
 
-  set-env-variables-on-server:
-    name: Set environment vars on server
-    runs-on: ubuntu-latest
-    needs: [build-and-push-to-dockerhub]
-    environment:
-      name: TEST
-    steps:
-      - uses: actions/checkout@v4
-      - uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.TEST_SERVER_SSH_BODZIFY_PRIVATE_KEY }}
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Add host to known_hosts
-        run: |
-          mkdir -p ~/.ssh &&
-          ssh-keyscan -H ${{ vars.DOMAIN_NAME }} >> ~/.ssh/known_hosts
-
-      - name: SSH Set MUSIC_TREE environment variables on server
-        env:
-          ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKERIZED_APP_ENV_FILENAME }}
-        run: |
-          ssh ${{ env.SSH_DESTINATION }} "
-            rm -f ${{ env.ENV_FILE }} &&
-            echo 'NODE_ENV=test' >> $ENV_FILE &&
-            echo 'NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_BACKEND_BASE_URL=https://${{ vars.DOMAIN_NAME }}/api/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ vars.SENTRY_IS_ACTIVE }}' >> ${{ env.ENV_FILE }}
-          "
-
-  set-partial-docker-compose-on-server:
-    name: Set partial docker-compose on server
-    runs-on: ubuntu-latest
-    needs: [build-and-push-to-dockerhub]
-    environment:
-      name: TEST
-    env:
-      DOCKER_COMPOSE_PARTIAL_FILENAME: umg${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.TEST_SERVER_SSH_BODZIFY_PRIVATE_KEY }}
-
-      - name: Add host to known_hosts
-        run: |
-          mkdir -p ~/.ssh &&
-          ssh-keyscan -H ${{ vars.DOMAIN_NAME }} >> ~/.ssh/known_hosts
-
-      - name: Generate partial docker compose file
-        env:
-          DOCKER_COMPOSE_PARTIAL_FILENAME: ${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }}
-          SERVICE_NAME: ${{ vars.MUSIC_TREE_SERVICE_NAME }}
-          PROJECT_DIR: ${{ env.CONTAINER_ROOT_DIR }}
-          DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
-          IMAGE_REPO: ${{ vars.MUSIC_TREE_IMAGE_REPO }}
-          APP_VERSION: ${{ vars.APP_VERSION }}
-          CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
-          APP_PORT: ${{ vars.MUSIC_TREE_PORT }}
-          ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}
-          BUILD_COMPLETE_FILENAME: ${{ env.BUILD_COMPLETE_FILENAME }}
-        run: bash scripts/generate-partial-docker-compose.sh
-
-      - name: Transfer partial docker-compose on server
-        env:
-          DOCKER_COMPOSE_PARTIAL_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }}
-        run: scp scripts/${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }} ${{ env.SSH_DESTINATION }}:${{ env.DOCKER_COMPOSE_DIR }}
-
-  redeploy-webhook-call:
-    name: Redeploy webhook call
-    needs: [set-env-variables-on-server, set-partial-docker-compose-on-server]
-    uses: Bodzify/bodzify-server-management/.github/workflows/call-redeployment-webhook.yml@main
-    with:
-      env: TEST
-    secrets: inherit
+      - name: Build application
+        run: npm run build
