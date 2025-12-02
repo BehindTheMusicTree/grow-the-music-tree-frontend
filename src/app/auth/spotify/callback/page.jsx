@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
 
-export default function SpotifyOAuthCallback() {
+function SpotifyCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
@@ -75,4 +75,21 @@ export default function SpotifyOAuthCallback() {
   }
 
   return null;
+}
+
+export default function SpotifyOAuthCallback() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Loading...</h1>
+            <p className="text-gray-600">Please wait...</p>
+          </div>
+        </div>
+      }
+    >
+      <SpotifyCallbackContent />
+    </Suspense>
+  );
 }
