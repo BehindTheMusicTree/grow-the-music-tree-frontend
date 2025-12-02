@@ -66,6 +66,17 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Project Rename**: Renamed project from "Bodzify Ultimate Music Guide" to "Grow The Music Tree"
+  - Updated package.json and package-lock.json with new project name
+  - Updated application title and meta description in layout.tsx
+  - Updated all documentation files (README.md, VISION.md, TODO.md, CONTRIBUTING.md)
+  - Updated GitHub templates and discussion templates with new project name
+  - Updated repository URLs from Bodzify organization to BehindTheMusicTree organization
+  - Updated LICENSE copyright to BehindTheMusicTree
+  - Updated CI/CD workflows with new organization references
+
 ### Documentation
 
 - **Project Documentation Setup**: Comprehensive documentation structure for open-source project
