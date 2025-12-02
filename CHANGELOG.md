@@ -116,10 +116,48 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Reduces manual labeling overhead and ensures consistent label application
 
 - **Branch Protection**: Added Git Flow branch protection workflow
+
   - Enforces branch naming conventions for PRs to `main` (hotfix/_, release/_ only)
   - Enforces branch naming conventions for PRs to `develop` (feature/_, chore/_, fix/\*, etc.)
   - Automatically comments on invalid PRs with clear instructions
   - Prevents merging branches that don't follow Git Flow workflow
+
+- **Testing Infrastructure**: Added comprehensive testing setup with Vitest
+
+  - Configured Vitest 3.2.4 with React Testing Library for component testing
+  - Added test scripts: test, test:watch, test:ui, test:coverage
+  - Created 31 passing tests for utilities and UI components
+  - Uses happy-dom for faster test execution (2-4x faster than jsdom)
+  - Includes @vitest/ui for interactive test debugging
+
+- **CI/CD Refactoring**: Split monolithic CI workflow following Git Flow best practices
+
+  - Created separate workflows: ci.yml (validation), deploy-test.yml, deploy-prod.yml
+  - Added reusable deployment workflow (deploy-reusable.yml) to eliminate code duplication
+  - Renamed `dev` branch to `develop` following standard Git Flow naming
+  - CI runs on all PRs; deployments only on direct pushes to develop/main
+  - TEST environment deploys from develop branch
+  - PRODUCTION environment deploys from main branch
+
+- **Node.js Version Management**: Added .nvmrc to specify Node.js 20 LTS requirement
+  - Documents required Node.js version for team consistency
+  - Prevents build issues with experimental Node versions (Node 23 SIGBUS errors)
+  - Matches GitHub Actions CI Node version (20)
+  - Enables automatic version switching with nvm
+
+### Fixed
+
+- **TypeScript Errors**: Resolved multiple type-related build blockers
+
+  - Fixed GenreDeletionPopup type mismatch by adding uuid to Genre interface
+  - Completed all error code mappings in app-error-messages.ts (10 errors resolved)
+  - Excluded vitest.config.ts from tsconfig to fix moduleResolution conflicts
+  - Wrapped useSearchParams in Suspense boundary for Next.js 15 compatibility
+
+- **Build Issues**: Fixed local build failures and image optimization
+  - Added sharp ^0.34.5 with Node 20 compatible binaries for Next.js image optimization
+  - Regenerated package-lock.json with Node 20 compatible dependencies
+  - Updated next-env.d.ts with Next.js 15.5.6 auto-generated routes reference
 
 ## [v0.1.2] - 2025-03-26
 
