@@ -1,0 +1,118 @@
+name: Branch Protection
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch naming for PRs to main
+        if: github.base_ref == 'main'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            const validPrefixes = ['hotfix/', 'release/'];
+            const isValid = validPrefixes.some(prefix => branch.startsWith(prefix));
+
+            if (!isValid) {
+              const comment = `❌ **Branch Protection Error**
+              
+              PRs to \`main\` branch can only come from:
+              - \`hotfix/*\` branches (critical production fixes)
+              - \`release/*\` branches (version releases)
+              
+              Your branch: \`${branch}\`
+              
+              **What to do:**
+              1. Close this PR
+              2. Change your PR target to \`develop\` branch instead
+              3. Only maintainers can merge hotfix and release branches to \`main\`
+              
+              See [CONTRIBUTING.md](../blob/develop/CONTRIBUTING.md) for Git Flow workflow details.`;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+              
+              core.setFailed(`Invalid branch for PR to main. Only hotfix/* and release/* branches are allowed. Got: ${branch}`);
+            }
+
+      - name: Check branch naming for PRs to develop
+        if: github.base_ref == 'develop'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            const validPrefixes = ['feature/', 'chore/', 'fix/', 'refactor/', 'docs/', 'perf/', 'style/', 'test/', 'ci/'];
+            const isValid = validPrefixes.some(prefix => branch.startsWith(prefix));
+
+            if (!isValid) {
+              const comment = `❌ **Branch Protection Error**
+              
+              PRs to \`develop\` branch can only come from:
+              - \`feature/*\` branches (new features)
+              - \`chore/*\` branches (maintenance, dependencies, tooling)
+              - \`fix/*\` branches (bug fixes)
+              - \`refactor/*\` branches (code refactoring)
+              - \`docs/*\` branches (documentation updates)
+              - \`perf/*\` branches (performance improvements)
+              - \`style/*\` branches (formatting, styling)
+              - \`test/*\` branches (testing updates)
+              - \`ci/*\` branches (CI/CD changes)
+              
+              Your branch: \`${branch}\`
+              
+              **What to do:**
+              1. Close this PR
+              2. Create a new branch with proper naming: \`<type>/<description>\`
+              3. Cherry-pick or reapply your changes to the new branch
+              4. Open a new PR from the correctly named branch
+              
+              **Examples:**
+              - \`feature/add-playlist-sorting\`
+              - \`fix/player-crash-on-mobile\`
+              - \`chore/update-dependencies\`
+              
+              See [CONTRIBUTING.md](../blob/develop/CONTRIBUTING.md) for Git Flow workflow details.`;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+              
+              core.setFailed(`Invalid branch for PR to develop. Branch must start with: ${validPrefixes.join(', ')}. Got: ${branch}`);
+            }
+
+      - name: Success message
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            const target = context.payload.pull_request.base.ref;
+
+            const comment = `✅ **Branch Protection Check Passed**
+
+            Branch \`${branch}\` → \`${target}\` follows the Git Flow naming convention.`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });

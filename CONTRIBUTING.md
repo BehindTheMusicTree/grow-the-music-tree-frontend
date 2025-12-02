@@ -21,6 +21,7 @@ This project is currently maintained by a solo developer, but contributions, sug
     - [6.2. Opening a Pull Request](#62-opening-a-pull-request)
   - [7. Releasing _(For Maintainers)_](#7-releasing-for-maintainers)
 - [🏷️ Issue & PR Labels](#️-issue--pr-labels)
+- [🛡️ Branch Protection](#️-branch-protection)
 - [🪪 License & Attribution](#-license--attribution)
 - [📜 Code of Conduct](#-code-of-conduct)
 - [📋 TODO List](#-todo-list)
@@ -735,6 +736,37 @@ This repository uses automated workflows to apply labels:
 4. **Issue labeling** ([issue-labeler.yml](.github/workflows/issue-labeler.yml)) - Auto-labels issues by type, component, platform, priority
 
 These workflows reduce manual labeling overhead and ensure consistent label application across all issues and PRs.
+
+## 🛡️ Branch Protection
+
+This repository enforces Git Flow branch naming via automated CI checks ([branch-protection.yml](.github/workflows/branch-protection.yml)):
+
+### PRs to `main` branch
+
+**Only allowed from:**
+
+- `hotfix/*` - Critical production fixes
+- `release/*` - Version releases
+
+### PRs to `develop` branch
+
+**Only allowed from:**
+
+- `feature/*` - New features
+- `chore/*` - Maintenance, dependencies, tooling
+- `fix/*` - Bug fixes
+- `refactor/*` - Code refactoring
+- `docs/*` - Documentation updates
+- `perf/*` - Performance improvements
+- `style/*` - Formatting, styling
+- `test/*` - Testing updates
+- `ci/*` - CI/CD changes
+
+**Invalid PRs will:**
+
+- Fail the CI check
+- Receive an automated comment with clear instructions
+- Be blocked from merging until the branch is renamed or retargeted
 
 ## 🪪 License & Attribution
 

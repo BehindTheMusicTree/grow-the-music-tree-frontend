@@ -108,11 +108,18 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Added `.pr-descriptions/` to .gitignore
 
 - **Auto-labeler Workflows**: Added comprehensive automated labeling system
+
   - **File-based PR labeler**: Applies component/technology labels based on changed files
   - **PR size labeler**: Automatically calculates and labels PR size (xs/s/m/l/xl) with line counts
   - **PR type labeler**: Detects PR type from title/description (feat, fix, docs, etc.) and breaking changes
   - **Issue labeler**: Auto-labels issues by type, component, browser, platform, priority, and keywords
   - Reduces manual labeling overhead and ensures consistent label application
+
+- **Branch Protection**: Added Git Flow branch protection workflow
+  - Enforces branch naming conventions for PRs to `main` (hotfix/_, release/_ only)
+  - Enforces branch naming conventions for PRs to `develop` (feature/_, chore/_, fix/\*, etc.)
+  - Automatically comments on invalid PRs with clear instructions
+  - Prevents merging branches that don't follow Git Flow workflow
 
 ## [v0.1.2] - 2025-03-26
 
