@@ -36,3 +36,6 @@ tsconfig.tsbuildinfo
 .env.development
 
 .vscode/chrome-debug-profile/*
+
+# PR descriptions (local drafts only)
+.pr-descriptions/

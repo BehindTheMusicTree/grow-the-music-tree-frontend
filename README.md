@@ -1,111 +1,81 @@
-# Music Tree - Next.js Frontend
+# GrowTheMusicTree - Frontend
 
-This project has been migrated from React + Vite to Next.js to provide server-side rendering capabilities, improved SEO, and better integration with the Django REST API backend.
+> A community-driven platform for exploring and understanding musical genres through an interactive, evolving genre tree map.
 
-## Features
+**Learn more about our vision:** [VISION.md](VISION.md)
 
-- Server-side rendering with Next.js
-- Client-side routing with Next.js Pages Router
-- Integration with Django REST API
-- Spotify authentication and library access
-- Music playback and playlist management
-- Genre organization and navigation
+## Table of Contents
 
-## Migration to Next.js
+- [Key Features](#key-features)
+- [Technical Overview](#technical-overview)
+- [Getting Started](#getting-started)
+- [Contributing](#contributing)
+- [Changelog](#changelog)
+- [License](#license)
 
-The application has been migrated from a Vite-based React application to Next.js while maintaining all functionality. Key changes include:
+## Key Features
 
-- Replaced react-router-dom with Next.js file-based routing
-- Adapted API service for server-side rendering compatibility
-- Environment variable configuration updated for Next.js
-- Added Next.js configuration for API proxying and path aliases
+- 🌳 **Interactive Genre Tree** - Explore relationships between genres from roots to microgenres
+- 🎧 **Musical Essence** - Visualize your listening identity by connecting streaming accounts
+- 🤖 **AI Genre Detection** - Automatic genre classification for any track
+- 🎵 **Smart Playlists** - Generate personalized playlists based on your musical journey
+- 🌍 **Community-Driven** - Participate in genre classifications through discussions and voting
+- 📊 **Rich Context** - Historical, cultural, and technical information for each genre
 
-## Environment Setup
+## Technical Overview
 
-Create a `.env.development.api-{local|remote}` file in the root of the project with the following variables:
+**Frontend Stack:**
 
-```
-NODE_ENV=development
+- **Framework**: Next.js 15 with App Router
+- **UI**: React 19, Tailwind CSS
+- **State Management**: React Context, TanStack Query (React Query)
+- **Visualization**: D3.js for interactive genre tree
+- **Audio**: React Howler for music playback
+- **Type Safety**: TypeScript
 
-NEXT_PUBLIC_BASE_URL_WITHOUT_PORT={base-url-without-port}
-NEXT_PUBLIC_BACKEND_BASE_URL={api-base-url}
-NEXT_PUBLIC_CONTACT_EMAIL=garcia.andreas.1991@gmail.com
-NEXT_PUBLIC_SENTRY_IS_ACTIVE=false
+**Backend Integration:**
 
-NEXT_PUBLIC_SPOTIFY_CLIENT_ID={spotify-client-id}
-NEXT_PUBLIC_SPOTIFY_REDIRECT_URI={spotify-redirect-uri}
-NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-collaborative user-library-read user-top-read
-
-```
-
-Adjust the values as needed for your environment.
+- Requires [Bodzify API backend](https://github.com/Bodzify/bodzify-api-django)
+- RESTful API integration
+- Spotify OAuth authentication
 
 ## Getting Started
 
-### Installation
+For detailed setup instructions, please see [CONTRIBUTING.md](CONTRIBUTING.md#1-environment-setup).
+
+### Quick Start
 
 ```bash
 # Install dependencies
 npm install
-```
 
-### Development
+# Set up environment variables
+npm run setup-env-dev-local  # For local API
+# OR
+npm run setup-env-dev-remote # For remote API
 
-```bash
 # Run the development server
 npm run dev
 ```
 
-The application will be available at http://localhost:3000. The dev server will automatically proxy API requests to the Django backend at the URL specified in your environment variables.
+The application will be available at http://localhost:3000.
 
-### Production
+## Contributing
 
-```bash
-# Build for production
-npm run build
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on:
 
-# Start the production server
-npm run start
-```
+- How to set up your development environment
+- Our Git Flow workflow and branching strategy
+- Code style guidelines and best practices
+- How to submit pull requests
+- Testing requirements
 
-## API Integration
+All contributors are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
-The application integrates with a Django REST API backend. API calls are handled through the ApiService utility, which has been updated to support both client-side and server-side environments.
+## Changelog
 
-- In client-side rendering, the service uses XMLHttpRequest or fetch API
-- In server-side rendering, the service falls back to fetch API
-- API requests are proxied through Next.js rewrites configuration
-- Authentication with Django is maintained across server and client environments
+See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes to this project.
 
-## Project Structure
+## License
 
-```
-├── next.config.js         # Next.js configuration
-├── jsconfig.json          # Path aliases configuration
-├── pages/                 # Next.js page components
-│   ├── _app.js            # Application wrapper
-│   ├── index.js           # Homepage (redirects to genre-playlists)
-│   ├── genre-playlists.js # Genre playlists page
-│   ├── spotify-library.js # Spotify library page
-│   ├── uploaded-library.js # Uploaded library page
-│   ├── account.js         # Account page
-│   ├── 404.js             # Custom 404 page
-│   └── auth/              # Authentication related pages
-│       └── spotify/       # Spotify auth pages
-│           └── callback.js # Spotify OAuth callback
-├── src/                   # Source code
-│   ├── components/        # React components
-│   ├── contexts/          # React context providers
-│   ├── utils/             # Utility functions and services
-│   │   ├── api/           # API service and related utilities
-│   │   └── config.js      # Configuration (updated for Next.js)
-│   ├── hooks/             # Custom React hooks
-│   ├── layouts/           # Page layouts
-│   └── models/            # Data models
-```
-
-## Django Backend Integration
-
-The application is designed to work with a Django REST API backend. The connection details are specified in the environment variables. The Next.js server proxies API requests to the Django backend through the rewrites configuration in `next.config.js`.
-
-Ensure your Django backend is properly configured with CORS settings to accept requests from the Next.js application.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.

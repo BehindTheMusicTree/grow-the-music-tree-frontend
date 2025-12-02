@@ -1,0 +1,134 @@
+# Auto-labeler Configuration
+# Automatically labels PRs based on changed file paths
+
+# Component: Player
+"component: player":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/components/features/player/**"
+          - "src/contexts/PlayerContext.tsx"
+          - "src/hooks/useUploadedTrack.ts"
+
+# Component: Genre Tree
+"component: genre-tree":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/app/genre-tree/**"
+          - "src/hooks/useGenre*.ts*"
+          - "src/lib/genre-playlist-helpers.ts"
+
+# Component: Track List
+"component: track-list":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/components/features/track-list/**"
+          - "src/contexts/TrackListContext.tsx"
+          - "src/models/track-list/**"
+          - "src/hooks/useTrackEdition.js"
+
+# Component: Playlist
+"component: playlist":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/app/genre-playlists/**"
+          - "src/app/spotify-library/**"
+          - "src/schemas/domain/playlist/**"
+          - "src/hooks/useGenrePlaylist.tsx"
+
+# Component: Auth
+"component: auth":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/app/auth/**"
+          - "src/hooks/useSpotifyAuth.ts"
+          - "src/models/api-auth-spotify.ts"
+          - "src/contexts/SessionContext.tsx"
+          - "src/middleware.ts"
+
+# Component: API
+"component: api":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/lib/fetch-wrapper.ts"
+          - "src/hooks/useFetchWrapper.ts"
+          - "src/hooks/useValidatedMutation.ts"
+          - "src/schemas/api/**"
+
+# Component: UI
+"component: ui":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/components/ui/**"
+          - "src/app/globals.css"
+          - "tailwind.config.js"
+          - "postcss.config.js"
+
+# Technology: React
+react:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/components/**/*.jsx"
+          - "src/components/**/*.tsx"
+          - "src/app/**/*.jsx"
+          - "src/app/**/*.tsx"
+
+# Technology: Next.js
+nextjs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "next.config.js"
+          - "src/app/**"
+          - "src/middleware.ts"
+
+# Technology: TypeScript
+typescript:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.ts"
+          - "**/*.tsx"
+          - "tsconfig.json"
+
+# Technology: Tailwind
+tailwind:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tailwind.config.js"
+          - "src/app/globals.css"
+          - "components.json"
+
+# Technology: D3
+d3:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/app/genre-tree/d3-helper/**"
+          - "src/app/genre-tree/playlist-tree/**"
+
+# Documentation
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.md"
+          - ".github/ISSUE_TEMPLATE/**"
+          - ".github/DISCUSSION_TEMPLATE/**"
+          - ".github/pull_request_template.md"
+          - ".github/LABELS.md"
+          - "VISION.md"
+          - "CODE_OF_CONDUCT.md"
+
+# Dependencies
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "package.json"
+          - "package-lock.json"
+
+# Infrastructure
+"infrastructure":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "Dockerfile"
+          - ".github/workflows/**"
+          - ".github/scripts/**"
+          - "scripts/**"
+          - ".vscode/**"
+          - ".cursor/**"

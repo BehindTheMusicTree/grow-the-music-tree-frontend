@@ -1,0 +1,89 @@
+---
+description: Guidelines for creating and managing pull request descriptions
+globs:
+  - "**/*"
+alwaysRun: true
+---
+
+# Pull Request Description Workflow
+
+## PR Description File Management
+
+When creating or working on a pull request, **NEVER** write the PR description directly in the GitHub UI or include it inline in responses.
+
+### Required Workflow
+
+1. **Create PR description file in `.pr-descriptions/` directory**
+   - File name format: `<branch-name>.md`
+   - Example: `.pr-descriptions/feature-genre-tree-visualization.md`
+   - This directory is git-ignored for local drafting
+
+2. **Use the PR template structure**
+   - Start from `.github/pull_request_template.md`
+   - Fill in all relevant sections
+   - Remove sections marked as "None" or not applicable
+
+3. **Draft and refine locally**
+   - Keep the description file updated as you make changes
+   - Update the checklist as you complete items
+   - Add screenshots/notes as you progress
+
+4. **Copy to GitHub when ready**
+   - When creating the actual PR, copy the content from `.pr-descriptions/<branch-name>.md`
+   - Paste into the GitHub PR description field
+   - Do NOT commit the `.pr-descriptions/` files
+
+### File Location Rules
+
+- ✅ **PR descriptions**: `.pr-descriptions/` (git-ignored, local only)
+- ✅ **Issue descriptions**: `.github/ISSUE_DESCRIPTIONS/` (version-controlled)
+- ❌ **DO NOT** commit PR description files to the repository
+
+### Benefits
+
+- **Iterative refinement**: Edit and improve PR descriptions locally before publishing
+- **Template compliance**: Easier to follow the full PR template structure
+- **Version control**: Track changes to your PR description during development
+- **Collaboration**: Share draft PR descriptions with team members for review
+- **Separation of concerns**: Keep work-in-progress descriptions separate from the repository
+
+### Example Workflow
+
+```bash
+# 1. Create your feature branch
+git checkout -b feature/new-audio-player
+
+# 2. Create PR description file
+mkdir -p .pr-descriptions
+cp .github/pull_request_template.md .pr-descriptions/feature-new-audio-player.md
+
+# 3. Work on your feature and update the PR description file as you go
+# Edit .pr-descriptions/feature-new-audio-player.md
+
+# 4. When ready to create PR, copy content from the file to GitHub PR UI
+cat .pr-descriptions/feature-new-audio-player.md | pbcopy  # macOS
+# Or manually copy the content
+
+# 5. Create PR on GitHub and paste the description
+```
+
+## When to Update PR Descriptions
+
+Update your local PR description file when:
+
+- Adding new changes to the PR
+- Completing checklist items
+- Adding test results or screenshots
+- Addressing review feedback
+- Making breaking changes
+
+## Enforcement
+
+- AI assistant should always suggest creating/updating files in `.pr-descriptions/`
+- Never provide PR descriptions as plain text responses
+- Always reference the PR template when creating descriptions
+- Remind to copy content to GitHub when the PR is ready
+
+---
+
+**Remember**: PR descriptions are living documents. Keep them updated locally and sync to GitHub as needed.

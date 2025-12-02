@@ -1,0 +1,74 @@
+name: PR Type Labeler
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  label-by-type:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label PR by title and description
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const title = pr.title.toLowerCase();
+            const body = pr.body || '';
+            const labels = [];
+
+            // Detect type from title prefix (conventional commits)
+            if (title.startsWith('feat') || title.startsWith('feature')) {
+              labels.push('feature');
+            } else if (title.startsWith('fix')) {
+              labels.push('bug');
+            } else if (title.startsWith('docs')) {
+              labels.push('documentation');
+            } else if (title.startsWith('refactor')) {
+              labels.push('refactor');
+            } else if (title.startsWith('perf')) {
+              labels.push('performance');
+            } else if (title.startsWith('style')) {
+              labels.push('enhancement');
+            } else if (title.startsWith('chore')) {
+              // Check body for more specific chore types
+              if (body.includes('dependency') || body.includes('dependencies') || body.includes('package')) {
+                labels.push('dependencies');
+              }
+            }
+
+            // Detect breaking changes
+            if (title.includes('!') || body.includes('BREAKING CHANGE') || body.includes('breaking change')) {
+              labels.push('breaking-change');
+            }
+
+            // Detect specific PR types from body
+            if (body.includes('[x] Bug fix') || body.includes('[X] Bug fix')) {
+              if (!labels.includes('bug')) labels.push('bug');
+            }
+            if (body.includes('[x] New feature') || body.includes('[X] New feature')) {
+              if (!labels.includes('feature')) labels.push('feature');
+            }
+            if (body.includes('[x] Code refactoring') || body.includes('[X] Code refactoring')) {
+              if (!labels.includes('refactor')) labels.push('refactor');
+            }
+            if (body.includes('[x] Documentation update') || body.includes('[X] Documentation update')) {
+              if (!labels.includes('documentation')) labels.push('documentation');
+            }
+            if (body.includes('[x] Performance improvement') || body.includes('[X] Performance improvement')) {
+              if (!labels.includes('performance')) labels.push('performance');
+            }
+
+            // Apply labels
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: labels
+              });
+            }
