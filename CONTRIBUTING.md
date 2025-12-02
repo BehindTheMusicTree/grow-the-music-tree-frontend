@@ -110,8 +110,8 @@ We follow a **strict Git Flow** model:
 2. Clone your fork:
 
    ```bash
-   git clone https://github.com/YOUR-USERNAME/bodzify-ultimate-music-guide-react.git
-   cd bodzify-ultimate-music-guide-react
+   git clone https://github.com/YOUR-USERNAME/grow-the-music-tree.git
+   cd grow-the-music-tree
    ```
 
 **For maintainers:**
@@ -119,8 +119,8 @@ We follow a **strict Git Flow** model:
 Clone the main repository directly:
 
 ```bash
-git clone https://github.com/Bodzify/bodzify-ultimate-music-guide-react.git
-cd bodzify-ultimate-music-guide-react
+git clone https://github.com//BehindTheMusicTree/grow-the-music-tree.git
+cd grow-the-music-tree
 ```
 
 ### 1. Environment Setup
@@ -136,8 +136,8 @@ cd bodzify-ultimate-music-guide-react
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/Bodzify/bodzify-ultimate-music-guide-react.git
-   cd bodzify-ultimate-music-guide-react
+   git clone https://github.com/BehindTheMusicTree/grow-the-music-tree.git
+   cd grow-the-music-tree
    ```
 
 2. Install dependencies:
@@ -160,7 +160,7 @@ cd bodzify-ultimate-music-guide-react
 
    This will create `.env.development` with the necessary configuration.
 
-   **Note:** Environment variables are required for connecting to the Bodzify API backend.
+   **Note:** Environment variables are required for connecting to The Music Tree API backend.
 
 4. Verify environment setup:
 
@@ -178,9 +178,9 @@ cd bodzify-ultimate-music-guide-react
 
 #### Environment Variables
 
-The application requires several environment variables to connect to the Bodzify API:
+The application requires several environment variables to connect to The Music Tree API:
 
-- `NEXT_PUBLIC_API_BASE_URL` - The base URL of the Bodzify API
+- `NEXT_PUBLIC_API_BASE_URL` - The base URL of The Music Tree API
 - `NEXT_PUBLIC_SENTRY_DSN` - Sentry DSN for error tracking (optional)
 - Additional environment variables for authentication and features
 
@@ -188,7 +188,7 @@ See `env/dev/template/` for complete environment variable templates.
 
 #### Backend Requirement
 
-This frontend application requires the Bodzify API backend to function. You can find the Bodzify API on GitHub at: [Bodzify API Django](https://github.com/Bodzify/bodzify-api-django)
+This frontend application requires The Music Tree API backend to function. You can find The Music Tree API on GitHub at: [The Music Tree API](https://github.com/BehindTheMusicTree/bodzify-api-django)
 
 For development, you can either:
 

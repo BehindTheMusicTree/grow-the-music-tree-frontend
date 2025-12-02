@@ -35,7 +35,7 @@
 
 **Backend Integration:**
 
-- Requires [Bodzify API backend](https://github.com/Bodzify/bodzify-api-django)
+- Requires [The Music Tree API backend](https://github.com/BehindTheMusicTree/bodzify-api-django)
 - RESTful API integration
 - Spotify OAuth authentication
 

@@ -151,7 +151,7 @@ jobs:
   deploy:
     name: Deploy to ${{ inputs.environment }} Server
     needs: [set-env-variables, set-docker-compose]
-    uses: Bodzify/bodzify-server-management/.github/workflows/call-redeployment-webhook.yml@main
+    uses: BehindTheMusicTree/bodzify-server-management/.github/workflows/call-redeployment-webhook.yml@main
     with:
       env: ${{ inputs.environment }}
     secrets: inherit

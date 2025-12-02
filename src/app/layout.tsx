@@ -6,8 +6,8 @@ import { PopupProvider } from "@contexts/PopupContext";
 import AppContent from "./AppContent";
 
 export const metadata: Metadata = {
-  title: "Music Tree",
-  description: "Your ultimate music guide",
+  title: "GrowTheMusicTree",
+  description: "The ultimate community-driven platform for exploring musical genres",
   icons: {
     icon: "/icons8-tree-16.png",
   },
