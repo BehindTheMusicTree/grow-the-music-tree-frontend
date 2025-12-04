@@ -56,7 +56,7 @@ jobs:
         with:
           script: |
             const branch = context.payload.pull_request.head.ref;
-            const validPrefixes = ['feature/', 'chore/', 'fix/', 'refactor/', 'docs/', 'perf/', 'style/', 'test/', 'ci/'];
+            const validPrefixes = ['feature/', 'chore/', 'dependabot/'];
             const isValid = validPrefixes.some(prefix => branch.startsWith(prefix));
 
             if (!isValid) {
@@ -65,13 +65,7 @@ jobs:
               PRs to \`develop\` branch can only come from:
               - \`feature/*\` branches (new features)
               - \`chore/*\` branches (maintenance, dependencies, tooling)
-              - \`fix/*\` branches (bug fixes)
-              - \`refactor/*\` branches (code refactoring)
-              - \`docs/*\` branches (documentation updates)
-              - \`perf/*\` branches (performance improvements)
-              - \`style/*\` branches (formatting, styling)
-              - \`test/*\` branches (testing updates)
-              - \`ci/*\` branches (CI/CD changes)
+              - \`dependabot/*\` branches (dependency updates)
               
               Your branch: \`${branch}\`
               
@@ -83,8 +77,8 @@ jobs:
               
               **Examples:**
               - \`feature/add-playlist-sorting\`
-              - \`fix/player-crash-on-mobile\`
               - \`chore/update-dependencies\`
+              - \`dependabot/npm_and_yarn/lodash-4.17.21\` (automated)
               
               See [CONTRIBUTING.md](../blob/develop/CONTRIBUTING.md) for Git Flow workflow details.`;
               

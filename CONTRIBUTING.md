@@ -211,10 +211,10 @@ We follow **strict Git Flow** with the following branch structure:
 #### Develop Branch (`develop`)
 
 - The integration branch for ongoing development
-- All feature branches merge into `develop`
+- All feature and chore branches merge into `develop`
 - `develop` is merged into `main` via release branches
 - **No direct commits allowed** - All changes must go through Pull Requests
-- Only receives merges from `feature/*`, `chore/*`, `release/*`, and `hotfix/*` branches
+- Only receives merges from `feature/*`, `chore/*`, and `dependabot/*` branches
 - **Branch protection enforced** - GitHub Actions automatically blocks PRs to `develop` that don't come from allowed branch types (if configured)
 
 #### Feature Branches (`feature/<name>`)
@@ -286,6 +286,15 @@ We follow **strict Git Flow** with the following branch structure:
   ```
 
 - Merge into `develop` via Pull Request when complete
+
+#### Dependabot Branches (`dependabot/*`)
+
+- Automated branches created by GitHub Dependabot for dependency updates
+- Branch from `develop` (automatically handled by Dependabot)
+- Examples: `dependabot/npm_and_yarn/lodash-4.17.21`, `dependabot/github_actions/actions/checkout-4.1.0`
+- Merge into `develop` via automated Pull Request
+- No manual creation required - Dependabot handles the process automatically
+- Includes security updates and version bumps for dependencies
 
 ### 3. Developing
 
@@ -754,13 +763,7 @@ This repository enforces Git Flow branch naming via automated CI checks ([branch
 
 - `feature/*` - New features
 - `chore/*` - Maintenance, dependencies, tooling
-- `fix/*` - Bug fixes
-- `refactor/*` - Code refactoring
-- `docs/*` - Documentation updates
-- `perf/*` - Performance improvements
-- `style/*` - Formatting, styling
-- `test/*` - Testing updates
-- `ci/*` - CI/CD changes
+- `dependabot/*` - Dependency updates
 
 **Invalid PRs will:**
 
