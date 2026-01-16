@@ -35,8 +35,18 @@ jobs:
             } else if (title.startsWith('style')) {
               labels.push('enhancement');
             } else if (title.startsWith('chore')) {
-              // Check body for more specific chore types
-              if (body.includes('dependency') || body.includes('dependencies') || body.includes('package')) {
+              // Check for dependency-related PRs more specifically
+              // Only label as dependencies if title/description explicitly mentions dependency updates
+              // Avoid false positives from template checklist text
+              const titleHasDeps = title.includes('dependenc') || title.includes('package') || title.includes('npm') || title.includes('yarn');
+              const bodyHasDepsUpdate = body.match(/update.*dependenc/i) || 
+                                        body.match(/upgrade.*dependenc/i) ||
+                                        body.match(/bump.*dependenc/i) ||
+                                        body.match(/dependabot/i) ||
+                                        body.match(/package\.json/i) ||
+                                        body.match(/package-lock/i);
+              
+              if (titleHasDeps || bodyHasDepsUpdate) {
                 labels.push('dependencies');
               }
             }

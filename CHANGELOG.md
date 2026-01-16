@@ -125,6 +125,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - **PR type labeler**: Detects PR type from title/description (feat, fix, docs, etc.) and breaking changes
     - Improved breaking change detection to avoid false positives from template text
     - Detects breaking changes via '!' in title, checked checkbox, "BREAKING CHANGE:" note, or content in Breaking Changes section
+    - Improved dependency detection to avoid false positives from template checklist text
+    - Only labels as dependencies when title/description explicitly mentions dependency updates, package.json changes, or dependabot
   - **Issue labeler**: Auto-labels issues by type, component, browser, platform, priority, and keywords
   - Reduces manual labeling overhead and ensures consistent label application
 
