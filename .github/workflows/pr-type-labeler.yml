@@ -42,7 +42,16 @@ jobs:
             }
 
             // Detect breaking changes
-            if (title.includes('!') || body.includes('BREAKING CHANGE') || body.includes('breaking change')) {
+            // Check for '!' in title (Conventional Commits breaking change indicator)
+            // Check for checked breaking change checkbox
+            // Check for "BREAKING CHANGE:" in body (Conventional Commits format)
+            // Check for content in Breaking Changes section (not just the template header)
+            const hasBreakingInTitle = title.includes('!');
+            const hasCheckedBreakingCheckbox = body.includes('[x] 💥 Breaking change') || body.includes('[X] 💥 Breaking change');
+            const hasBreakingChangeNote = body.includes('BREAKING CHANGE:') || body.match(/BREAKING CHANGE\s*:/i);
+            const breakingChangesSection = body.match(/## Breaking Changes\s*\n\s*[^#\n]/i);
+
+            if (hasBreakingInTitle || hasCheckedBreakingCheckbox || hasBreakingChangeNote || breakingChangesSection) {
               labels.push('breaking-change');
             }
 
