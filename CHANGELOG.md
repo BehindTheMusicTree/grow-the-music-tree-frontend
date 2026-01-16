@@ -129,7 +129,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Branch Protection**: Added Git Flow branch protection workflow
 
   - Enforces branch naming conventions for PRs to `main` (hotfix/_, release/_ only)
-  - Enforces branch naming conventions for PRs to `develop` (feature/_, chore/_, fix/\*, etc.)
+  - Enforces branch naming conventions for PRs to `develop` (feature/_, chore/_, dependabot/_ only)
   - Automatically comments on invalid PRs with clear instructions
   - Prevents merging branches that don't follow Git Flow workflow
 
