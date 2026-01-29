@@ -98,7 +98,7 @@ jobs:
           mkdir -p ~/.ssh &&
           ssh-keyscan -H ${{ secrets.DOMAIN_NAME }} >> ~/.ssh/known_hosts
 
-      - name: Set MUSIC_TREE environment variables on server
+      - name: Set GTMT environment variables on server
         env:
           ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKERIZED_APP_ENV_FILENAME }}
         run: |
