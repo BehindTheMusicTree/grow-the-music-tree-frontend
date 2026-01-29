@@ -51,6 +51,12 @@ on:
         required: true
       DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE:
         required: true
+      CPANEL_SERVER:
+        required: false
+      CPANEL_USERNAME:
+        required: false
+      CPANEL_API_TOKEN:
+        required: false
 
 env:
   SSH_DESTINATION: ${{ secrets.SERVER_USERNAME }}@${{ secrets.DOMAIN_NAME }}
@@ -93,6 +99,21 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.TEST_SERVER_DEPLOY_SSH_PRIVATE_KEY }}
 
+      - name: Get runner public IP
+        id: ip
+        if: vars.SSH_WHITELIST_ENABLED == 'true'
+        uses: haythem/public-ip@v1.3
+
+      - name: Whitelist runner IP for SSH
+        if: vars.SSH_WHITELIST_ENABLED == 'true'
+        env:
+          RUNNER_IP: ${{ steps.ip.outputs.ipv4 }}
+          SSH_WHITELIST_PROVIDER: ${{ vars.SSH_WHITELIST_PROVIDER }}
+          CPANEL_SERVER: ${{ secrets.CPANEL_SERVER }}
+          CPANEL_USERNAME: ${{ secrets.CPANEL_USERNAME }}
+          CPANEL_API_TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+        run: bash scripts/whitelist-runner-ssh.sh add
+
       - name: Add host to known_hosts
         run: |
           mkdir -p ~/.ssh &&
@@ -110,6 +131,16 @@ jobs:
             echo 'NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ secrets.SENTRY_IS_ACTIVE }}' >> ${{ env.ENV_FILE }}
           "
 
+      - name: Remove runner IP from SSH whitelist
+        if: always() && vars.SSH_WHITELIST_ENABLED == 'true'
+        env:
+          RUNNER_IP: ${{ steps.ip.outputs.ipv4 }}
+          SSH_WHITELIST_PROVIDER: ${{ vars.SSH_WHITELIST_PROVIDER }}
+          CPANEL_SERVER: ${{ secrets.CPANEL_SERVER }}
+          CPANEL_USERNAME: ${{ secrets.CPANEL_USERNAME }}
+          CPANEL_API_TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+        run: bash scripts/whitelist-runner-ssh.sh remove
+
   set-docker-compose:
     name: Configure Docker Compose
     runs-on: ubuntu-latest
@@ -123,6 +154,21 @@ jobs:
       - uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.TEST_SERVER_DEPLOY_SSH_PRIVATE_KEY }}
+
+      - name: Get runner public IP
+        id: ip
+        if: vars.SSH_WHITELIST_ENABLED == 'true'
+        uses: haythem/public-ip@v1.3
+
+      - name: Whitelist runner IP for SSH
+        if: vars.SSH_WHITELIST_ENABLED == 'true'
+        env:
+          RUNNER_IP: ${{ steps.ip.outputs.ipv4 }}
+          SSH_WHITELIST_PROVIDER: ${{ vars.SSH_WHITELIST_PROVIDER }}
+          CPANEL_SERVER: ${{ secrets.CPANEL_SERVER }}
+          CPANEL_USERNAME: ${{ secrets.CPANEL_USERNAME }}
+          CPANEL_API_TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+        run: bash scripts/whitelist-runner-ssh.sh add
 
       - name: Add host to known_hosts
         run: |
@@ -147,6 +193,16 @@ jobs:
         env:
           DOCKER_COMPOSE_PARTIAL_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }}
         run: scp scripts/${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }} ${{ env.SSH_DESTINATION }}:${{ env.DOCKER_COMPOSE_DIR }}
+
+      - name: Remove runner IP from SSH whitelist
+        if: always() && vars.SSH_WHITELIST_ENABLED == 'true'
+        env:
+          RUNNER_IP: ${{ steps.ip.outputs.ipv4 }}
+          SSH_WHITELIST_PROVIDER: ${{ vars.SSH_WHITELIST_PROVIDER }}
+          CPANEL_SERVER: ${{ secrets.CPANEL_SERVER }}
+          CPANEL_USERNAME: ${{ secrets.CPANEL_USERNAME }}
+          CPANEL_API_TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+        run: bash scripts/whitelist-runner-ssh.sh remove
 
   deploy:
     name: Deploy to ${{ inputs.environment }} Server
