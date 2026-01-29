@@ -16,7 +16,7 @@ jobs:
       docker_tag_suffix: ""
     secrets:
       DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-      SERVER_SSH_PRIVATE_KEY: ${{ secrets.TEST_SERVER_SSH_BODZIFY_PRIVATE_KEY }}
+      TEST_SERVER_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.TEST_SERVER_SSH_BODZIFY_PRIVATE_KEY }}
       SERVER_USERNAME: ${{ secrets.TEST_SERVER_BODZIFY_USERNAME }}
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
       WEBHOOK_DIR: ${{ vars.WEBHOOK_DIR }}

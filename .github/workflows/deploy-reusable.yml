@@ -19,7 +19,7 @@ on:
     secrets:
       DOCKERHUB_ACCESS_TOKEN:
         required: true
-      SERVER_SSH_PRIVATE_KEY:
+      TEST_SERVER_DEPLOY_SSH_PRIVATE_KEY:
         required: true
       SERVER_USERNAME:
         required: true
@@ -91,7 +91,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.TEST_SERVER_DEPLOY_SSH_PRIVATE_KEY }}
 
       - name: Add host to known_hosts
         run: |
@@ -122,7 +122,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.TEST_SERVER_DEPLOY_SSH_PRIVATE_KEY }}
 
       - name: Add host to known_hosts
         run: |

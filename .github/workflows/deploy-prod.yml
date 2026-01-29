@@ -16,7 +16,7 @@ jobs:
       docker_tag_suffix: "-prod"
     secrets:
       DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-      SERVER_SSH_PRIVATE_KEY: ${{ secrets.PROD_SERVER_SSH_PRIVATE_KEY }}
+      TEST_SERVER_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.PROD_TEST_SERVER_DEPLOY_SSH_PRIVATE_KEY }}
       SERVER_USERNAME: ${{ secrets.PROD_SERVER_USERNAME }}
       DOMAIN_NAME: ${{ vars.PROD_DOMAIN_NAME }}
       WEBHOOK_DIR: ${{ vars.PROD_WEBHOOK_DIR }}
