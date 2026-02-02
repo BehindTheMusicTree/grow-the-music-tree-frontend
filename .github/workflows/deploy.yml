@@ -1,0 +1,113 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - chore/adapt-cicd-to-new-server
+    tags:
+      - "*"
+  workflow_dispatch:
+
+env:
+  SSH_DESTINATION: ${{ secrets.SERVER_DEPLOY_USERNAME }}@${{ vars.DOMAIN_NAME }}
+  DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
+  CONTAINER_ROOT_DIR: /home/app/
+  DOCKERIZED_APP_ENV_FILENAME: .env_umg
+  BUILD_COMPLETE_FILENAME: build-complete.txt
+
+jobs:
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Dockerhub
+        run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ vars.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.GTMT_FRONT_IMAGE_REPO }}:${{ vars.APP_VERSION }}
+          build-args: |
+            PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
+            APP_PORT=${{ vars.GTMT_FRONT_PORT }}
+            BUILD_COMPLETE_FILENAME=${{ env.BUILD_COMPLETE_FILENAME }}
+
+  set-env-variables:
+    name: Set Environment Variables
+    runs-on: ubuntu-latest
+    needs: [build-and-push]
+    environment:
+      name: TEST
+    steps:
+      - uses: actions/checkout@v4
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
+
+      - name: Add host to known_hosts
+        run: |
+          mkdir -p ~/.ssh &&
+          ssh-keyscan -H ${{ vars.DOMAIN_NAME }} >> ~/.ssh/known_hosts
+
+      - name: Set GTMT environment variables on server
+        env:
+          ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKERIZED_APP_ENV_FILENAME }}
+        run: |
+          ssh ${{ env.SSH_DESTINATION }} "
+            rm -f ${{ env.ENV_FILE }} &&
+            echo 'NODE_ENV=test' >> $ENV_FILE &&
+            echo 'NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_BACKEND_BASE_URL=https://${{ vars.DOMAIN_NAME }}/api/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ vars.SENTRY_IS_ACTIVE }}' >> ${{ env.ENV_FILE }}
+          "
+
+  set-docker-compose:
+    name: Configure Docker Compose
+    runs-on: ubuntu-latest
+    needs: [build-and-push]
+    environment:
+      name: TEST
+    env:
+      DOCKER_COMPOSE_PARTIAL_FILENAME: umg${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
+
+      - name: Add host to known_hosts
+        run: |
+          mkdir -p ~/.ssh &&
+          ssh-keyscan -H ${{ vars.DOMAIN_NAME }} >> ~/.ssh/known_hosts
+
+      - name: Generate partial docker compose file
+        env:
+          DOCKER_COMPOSE_PARTIAL_FILENAME: ${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }}
+          SERVICE_NAME: ${{ vars.GTMT_FRONT_SERVICE_NAME }}
+          PROJECT_DIR: ${{ env.CONTAINER_ROOT_DIR }}
+          DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+          IMAGE_REPO: ${{ vars.GTMT_FRONT_IMAGE_REPO }}
+          APP_VERSION: ${{ vars.APP_VERSION }}
+          CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
+          APP_PORT: ${{ vars.GTMT_FRONT_PORT }}
+          ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}
+          BUILD_COMPLETE_FILENAME: ${{ env.BUILD_COMPLETE_FILENAME }}
+        run: bash scripts/generate-partial-docker-compose.sh
+
+      - name: Transfer partial docker-compose to server
+        env:
+          DOCKER_COMPOSE_PARTIAL_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }}
+        run: scp scripts/${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }} ${{ env.SSH_DESTINATION }}:${{ env.DOCKER_COMPOSE_DIR }}
+
+  deploy:
+    name: Deploy to Server
+    needs: [set-env-variables, set-docker-compose]
+    uses: BehindTheMusicTree/github-workflows/.github/workflows/call-redeployment-webhook.yml@main
+    with:
+      env: TEST
+    secrets: inherit
