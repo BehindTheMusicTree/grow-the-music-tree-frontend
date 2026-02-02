@@ -145,12 +145,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - TEST environment deploys from develop branch
   - PRODUCTION environment deploys from main branch
 
-- **Deploy Workflows – SSH Whitelist**: Optional whitelist handling for deploy jobs
-  - Get runner public IP, whitelist for SSH, and remove on completion when `SSH_WHITELIST_ENABLED` is true
-  - Applied in deploy-reusable.yml to set-env-variables and set-docker-compose jobs
-  - Optional secrets: CPANEL_SERVER, CPANEL_USERNAME, CPANEL_API_TOKEN; env vars: SSH_WHITELIST_PROVIDER
-  - deploy-test.yml and deploy-prod.yml pass CPANEL secrets into reusable workflow
-
 - **Node.js Version Management**: Added .nvmrc to specify Node.js 20 LTS requirement
   - Documents required Node.js version for team consistency
   - Prevents build issues with experimental Node versions (Node 23 SIGBUS errors)
