@@ -138,12 +138,9 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Includes @vitest/ui for interactive test debugging
 
 - **CI/CD Refactoring**: Split monolithic CI workflow following Git Flow best practices
-  - Created separate workflows: ci.yml (validation), deploy-test.yml, deploy-prod.yml
-  - Added reusable deployment workflow (deploy-reusable.yml) to eliminate code duplication
+  - Created separate workflows: validate.yml (lint, test, build), deploy.yml (single environment)
   - Renamed `dev` branch to `develop` following standard Git Flow naming
-  - CI runs on all PRs; deployments only on direct pushes to develop/main
-  - TEST environment deploys from develop branch
-  - PRODUCTION environment deploys from main branch
+  - Deploy runs on push to develop and workflow_dispatch
 
 - **Node.js Version Management**: Added .nvmrc to specify Node.js 20 LTS requirement
   - Documents required Node.js version for team consistency
