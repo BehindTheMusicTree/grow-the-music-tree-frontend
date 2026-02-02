@@ -12,13 +12,15 @@ env:
   SSH_DESTINATION: ${{ secrets.SERVER_DEPLOY_USERNAME }}@${{ vars.DOMAIN_NAME }}
   DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
   CONTAINER_ROOT_DIR: /home/app/
-  DOCKERIZED_APP_ENV_FILENAME: .env_umg
+  DOCKERIZED_APP_ENV_FILENAME: .env_gtmt_front
   BUILD_COMPLETE_FILENAME: build-complete.txt
 
 jobs:
   build-and-push:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
+    environment:
+      name: TEST
     steps:
       - name: Check required vars and secrets
         env:
