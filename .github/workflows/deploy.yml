@@ -20,6 +20,50 @@ jobs:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
     steps:
+      - name: Check required vars and secrets
+        env:
+          VAR_DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+          VAR_WEBHOOK_DIR: ${{ vars.WEBHOOK_DIR }}
+          VAR_WEBHOOK_REDEPLOYMENT_DIR_NAME: ${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}
+          VAR_DOCKER_COMPOSE_DIR_NAME: ${{ vars.DOCKER_COMPOSE_DIR_NAME }}
+          VAR_DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+          VAR_GTMT_FRONT_IMAGE_REPO: ${{ vars.GTMT_FRONT_IMAGE_REPO }}
+          VAR_APP_VERSION: ${{ vars.APP_VERSION }}
+          VAR_GTMT_FRONT_PORT: ${{ vars.GTMT_FRONT_PORT }}
+          VAR_GTMT_FRONT_SERVICE_NAME: ${{ vars.GTMT_FRONT_SERVICE_NAME }}
+          VAR_CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
+          VAR_API_VERSION: ${{ vars.API_VERSION }}
+          VAR_SENTRY_IS_ACTIVE: ${{ vars.SENTRY_IS_ACTIVE }}
+          VAR_CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
+          VAR_DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE: ${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
+          SECRET_SERVER_DEPLOY_USERNAME: ${{ secrets.SERVER_DEPLOY_USERNAME }}
+          SECRET_SERVER_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
+          SECRET_DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+        run: |
+          missing=""
+          [ -z "$VAR_DOMAIN_NAME" ] && missing="$missing DOMAIN_NAME"
+          [ -z "$VAR_WEBHOOK_DIR" ] && missing="$missing WEBHOOK_DIR"
+          [ -z "$VAR_WEBHOOK_REDEPLOYMENT_DIR_NAME" ] && missing="$missing WEBHOOK_REDEPLOYMENT_DIR_NAME"
+          [ -z "$VAR_DOCKER_COMPOSE_DIR_NAME" ] && missing="$missing DOCKER_COMPOSE_DIR_NAME"
+          [ -z "$VAR_DOCKERHUB_USERNAME" ] && missing="$missing DOCKERHUB_USERNAME"
+          [ -z "$VAR_GTMT_FRONT_IMAGE_REPO" ] && missing="$missing GTMT_FRONT_IMAGE_REPO"
+          [ -z "$VAR_APP_VERSION" ] && missing="$missing APP_VERSION"
+          [ -z "$VAR_GTMT_FRONT_PORT" ] && missing="$missing GTMT_FRONT_PORT"
+          [ -z "$VAR_GTMT_FRONT_SERVICE_NAME" ] && missing="$missing GTMT_FRONT_SERVICE_NAME"
+          [ -z "$VAR_CONTACT_EMAIL" ] && missing="$missing CONTACT_EMAIL"
+          [ -z "$VAR_API_VERSION" ] && missing="$missing API_VERSION"
+          [ -z "$VAR_SENTRY_IS_ACTIVE" ] && missing="$missing SENTRY_IS_ACTIVE"
+          [ -z "$VAR_CONTAINER_NAME" ] && missing="$missing CONTAINER_NAME"
+          [ -z "$VAR_DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE" ] && missing="$missing DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE"
+          [ -z "$SECRET_SERVER_DEPLOY_USERNAME" ] && missing="$missing SERVER_DEPLOY_USERNAME"
+          [ -z "$SECRET_SERVER_DEPLOY_SSH_PRIVATE_KEY" ] && missing="$missing SERVER_DEPLOY_SSH_PRIVATE_KEY"
+          [ -z "$SECRET_DOCKERHUB_ACCESS_TOKEN" ] && missing="$missing DOCKERHUB_ACCESS_TOKEN"
+          if [ -n "$missing" ]; then
+            echo "Missing vars or secrets:$missing"
+            exit 1
+          fi
+          echo "All required vars and secrets are set."
+
       - name: Checkout code
         uses: actions/checkout@v4
 
