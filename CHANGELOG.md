@@ -142,6 +142,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Renamed `dev` branch to `develop` following standard Git Flow naming
   - Deploy runs on push to develop and workflow_dispatch
 
+- **Workflows – Vars and secrets check**: First step in each workflow verifies required vars and secrets
+  - Validate: no vars/secrets required (step passes)
+  - Deploy: checks 14 vars and 3 secrets; fails with list of unset names if any missing
+
 - **Node.js Version Management**: Added .nvmrc to specify Node.js 20 LTS requirement
   - Documents required Node.js version for team consistency
   - Prevents build issues with experimental Node versions (Node 23 SIGBUS errors)
