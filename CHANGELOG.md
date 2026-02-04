@@ -194,6 +194,16 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Added NEXT_PUBLIC_SPOTIFY_AUTH_URL, NEXT_PUBLIC_SPOTIFY_CLIENT_ID, NEXT_PUBLIC_SPOTIFY_REDIRECT_URI, and NEXT_PUBLIC_SPOTIFY_SCOPES to server environment configuration
   - Added SPOTIFY_CLIENT_ID to required vars validation
 
+- **Docker Environment Variables**: Simplified environment variable handling in Docker containers
+  - Updated entrypoint script to require NEXT*PUBLIC* variables directly instead of non-prefixed versions
+  - Removed unnecessary conversion step from non-prefixed to NEXT*PUBLIC* variables
+  - Removed unused MUSIC_TREE_API_USERNAME, MUSIC_TREE_API_USER_PASSWORD, SENTRY_AUTH_TOKEN requirements
+  - Updated workflows to set NEXT*PUBLIC* variables directly in environment files
+  - Fixed "CONTACT_EMAIL must be set" error in dockerized environment
+
+- **CI Configuration**: Fixed Spotify client ID configuration in workflows
+  - Corrected SPOTIFY_CLIENT_ID to use GitHub secret instead of variable in publish.yml workflow
+
 - **Node.js Version Management**: Added .nvmrc to specify Node.js 20 LTS requirement
   - Documents required Node.js version for team consistency
   - Prevents build issues with experimental Node versions (Node 23 SIGBUS errors)
