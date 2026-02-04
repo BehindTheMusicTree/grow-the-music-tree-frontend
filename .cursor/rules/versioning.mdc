@@ -1,0 +1,122 @@
+# Versioning and Tagging
+
+This rule defines how versioning and git tagging should be handled in this project. All versioning follows the strategy documented in `docs/VERSIONING.md`.
+
+## Core Principles
+
+1. **Git tags are the single source of truth** for versioning
+2. **Version is extracted from tags** in CI/CD workflows, not from variables or manual configuration
+3. **Semantic versioning** with `v` prefix: `v<major>.<minor>.<patch>`
+4. **The `v` prefix is stripped** when used in workflows (e.g., `v0.2.0` → `0.2.0`)
+
+## Version Format
+
+- **Release versions**: `v<major>.<minor>.<patch>` (e.g., `v0.2.0`, `v1.0.0`)
+- **Development tags**: `v<version>-dev-<branch-name>` (e.g., `v0.3.6-dev-improve-cicd`)
+  - Use branch name **without** type prefix (`feature/`, `hotfix/`, etc.)
+  - Example: Branch `feature/improve-cicd` → Tag `v0.3.6-dev-improve-cicd`
+- **Pre-release tags**: `v<version>-<identifier><number>` (e.g., `v0.2.0-rc1`, `v0.2.0-beta1`, `v0.2.0-alpha1`)
+
+## Version Extraction in Workflows
+
+When creating or updating GitHub Actions workflows that need version information:
+
+1. **Extract version from git tag ref** (when triggered by tag push):
+
+   ```yaml
+   - name: Extract version from tag
+     id: version
+     run: |
+       if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+         # Extract from tag ref (e.g., refs/tags/v0.3.4 -> 0.3.4)
+         VERSION="${GITHUB_REF#refs/tags/v}"
+         echo "Using version from tag ref: $VERSION"
+       else
+         # Fallback: fetch tags and get the latest one
+         git fetch --tags --force
+         LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+         if [ -z "$LATEST_TAG" ]; then
+           echo "Error: Cannot determine version. No tag provided."
+           exit 1
+         fi
+         # Remove 'v' prefix if present
+         VERSION="${LATEST_TAG#v}"
+         echo "Using latest tag version: $VERSION (from tag: $LATEST_TAG)"
+       fi
+       echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+   ```
+
+2. **Use extracted version** throughout the workflow:
+   - Docker image tags: `${{ steps.version.outputs.version }}`
+   - Job outputs: `outputs: version: ${{ steps.version.outputs.version }}`
+   - Cross-job references: `${{ needs.<job-name>.outputs.version }}`
+
+3. **Never hardcode versions** or use GitHub variables for `APP_VERSION` in workflows
+
+## Tag Naming Guidelines
+
+### Development Tags (`-dev`)
+
+- Used for testing builds from **feature and hotfix branches**
+- Format: `v<version>-dev-<branch-name>`
+- Remove branch type prefix: `feature/improve-cicd` → `v0.3.6-dev-improve-cicd`
+- Version selection:
+  - Feature branches: Typically minor version (e.g., `v0.3.6-dev-*` or `v0.4.0-dev-*`)
+  - Hotfix branches: Typically patch version (e.g., `v0.3.6-dev-*`)
+  - Breaking changes: Major version (e.g., `v1.0.0-dev-*`)
+
+### Pre-Release Tags (`-rc`, `-beta`, `-alpha`)
+
+- Used for testing builds from **release branches** before final release
+- Formats:
+  - Release Candidate: `v0.2.0-rc1`, `v0.2.0-rc2`
+  - Beta: `v0.2.0-beta1`, `v0.2.0-beta2`
+  - Alpha: `v0.2.0-alpha1`, `v0.2.0-alpha2`
+
+### Release Tags
+
+- Final release versions: `v0.2.0`, `v1.0.0`
+- Created after merging release branch to `main`
+- Triggers production deployment
+
+## Workflow Behavior
+
+When a version tag is pushed:
+
+1. Workflow extracts version number from tag
+2. Builds application
+3. Creates Docker image with versioned tag: `username/repo:<version>`
+4. Deploys to test/production server
+5. Creates Docker Compose configuration with versioned image
+
+## Cleanup
+
+- All pre-release version tags (dev, rc, beta, alpha) should be deleted during the release process
+- Cleanup commands:
+  ```bash
+  git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*" | xargs -n 1 git tag -d
+  git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*" | xargs -n 1 git push origin --delete
+  ```
+
+## When Working with Versions
+
+- **Creating workflows**: Always extract version from git tags, never use hardcoded versions or GitHub variables
+- **Updating workflows**: Ensure version extraction logic matches the pattern above
+- **Tagging**: Follow the naming conventions for development, pre-release, and release tags
+- **Documentation**: Reference `docs/VERSIONING.md` for detailed versioning strategy
+
+## Examples
+
+✅ **Correct:**
+
+- Extract version from tag in workflow step
+- Use `steps.version.outputs.version` for Docker tags
+- Create development tag: `v0.3.6-dev-improve-cicd` from branch `feature/improve-cicd`
+- Create release candidate: `v0.2.0-rc1` from release branch
+
+❌ **Incorrect:**
+
+- Using `${{ vars.APP_VERSION }}` in workflows (version should be extracted from tags)
+- Hardcoding version numbers in workflows
+- Including branch type prefix in dev tags: `v0.3.6-dev-feature-improve-cicd` (should be `v0.3.6-dev-improve-cicd`)
+- Creating tags without `v` prefix: `0.2.0` (should be `v0.2.0`)

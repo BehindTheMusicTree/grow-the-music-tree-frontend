@@ -106,12 +106,34 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Added automatic PR labeling workflow based on file changes
   - Updated CONTRIBUTING.md with labels section
 
+- **Versioning Documentation**: Added comprehensive versioning strategy documentation
+  - Created `docs/VERSIONING.md` with complete versioning strategy and tag naming conventions
+  - Documents semantic versioning format, pre-release versions (dev, rc, beta, alpha), and version extraction logic
+  - Includes usage examples for creating releases, development tags, and pre-release tags
+  - Documents cleanup process for pre-release tags
+
+- **Development Workflow**: Enhanced CONTRIBUTING.md with testing builds during development
+  - Added section on testing builds from feature/hotfix branches using development tags
+  - Guidelines for choosing version numbers for dev tags
+  - Instructions for republishing development tags after changes
+  - Added cleanup steps for pre-release tags in release process
+  - Reorganized branch protection section for better clarity
+
 ### CI
 
 - **PR Description Workflow**: Added cursor rule for PR description management
   - PR descriptions must be drafted in `.pr-descriptions/` directory (git-ignored)
   - Ensures use of PR template and iterative refinement before publishing
   - Added `.pr-descriptions/` to .gitignore
+
+- **Versioning Strategy**: Refactored CI/CD workflows to extract version from git tags
+  - Replaced `deploy.yml` with `publish.yml` workflow
+  - Version is now extracted dynamically from git tags instead of GitHub variables
+  - Supports semantic versioning with `v` prefix (e.g., `v0.2.0`)
+  - Supports pre-release versions: development tags (`-dev`), release candidates (`-rc`, `-beta`, `-alpha`)
+  - Version extraction logic: extracts from tag ref when triggered by tag push, falls back to latest tag otherwise
+  - Removed dependency on `APP_VERSION` GitHub variable
+  - Version is passed between jobs via workflow outputs
 
 - **Auto-labeler Workflows**: Added comprehensive automated labeling system
   - **File-based PR labeler**: Applies component/technology labels based on changed files
@@ -155,6 +177,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Prevents build issues with experimental Node versions (Node 23 SIGBUS errors)
   - Matches GitHub Actions CI Node version (20)
   - Enables automatic version switching with nvm
+
+- **Cursor Rules**: Added versioning rule for AI assistance
+  - Created `.cursor/rules/versioning.mdc` to guide AI on versioning and tagging conventions
+  - Ensures workflows extract version from git tags, not from variables
+  - Documents tag naming guidelines for development, pre-release, and release tags
+  - Provides version extraction pattern for GitHub Actions workflows
 
 ### Fixed
 
