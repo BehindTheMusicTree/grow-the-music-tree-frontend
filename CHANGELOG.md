@@ -67,6 +67,21 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Next.js Upgrade**: Upgraded Next.js from 15.5.7 to 16.1.6
+  - Updated eslint-config-next to 16.1.6 to match Next.js version
+  - Next.js 16 includes Turbopack as default stable bundler, React Compiler support, and improved caching APIs
+  - React 19.2 support and enhanced routing capabilities
+
+- **Dependency Management**: Updated dependencies and improved version pinning
+  - Removed caret (^) prefixes from all dependencies for consistent builds
+  - Updated multiple dependencies: @fortawesome/react-fontawesome (0.2.0 → 3.1.1), @sentry/nextjs (9.12.0 → 10.38.0), eslint (8.57.0 → 9.39.2), jsdom (26.0.0 → 28.0.0)
+  - Added package.json overrides section for glob dependency (13.0.1)
+  - Added TypeScript 5.8.3 to devDependencies
+
+- **Environment Templates**: Moved environment templates from `env/dev/template/` to `env/dev/example/`
+  - Updated CONTRIBUTING.md and README.md references to new location
+  - Removed deprecated template files (.env.config-generation-tester, .env.dev.template)
+
 - **Project Rename**: Renamed project from "Bodzify Ultimate Music Guide" to "Grow The Music Tree"
   - Updated package.json and package-lock.json with new project name
   - Updated application title and meta description in layout.tsx
@@ -118,6 +133,13 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Instructions for republishing development tags after changes
   - Added cleanup steps for pre-release tags in release process
   - Reorganized branch protection section for better clarity
+  - Updated installation instructions to use `npm install --legacy-peer-deps` flag
+  - Documented peer dependency conflict handling, particularly with ESLint 9 and its plugins
+
+- **Installation Instructions**: Updated README.md and CONTRIBUTING.md with legacy peer deps flag
+  - Added `--legacy-peer-deps` flag to npm install commands for consistent dependency resolution
+  - Documented reason: handles peer dependency conflicts, especially with ESLint 9 and plugins
+  - Ensures consistency between local development and Docker builds
 
 ### CI
 
@@ -184,13 +206,18 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Documents tag naming guidelines for development, pre-release, and release tags
   - Provides version extraction pattern for GitHub Actions workflows
 
+- **CI/CD Server Adaptation**: Updated deployment workflows for new server configuration
+  - Updated publish.yml workflow with new secret name for Spotify client ID
+  - Added deploy.yml workflow for single environment deployment
+  - Adapted workflows to work with new server infrastructure
+
 ### Fixed
 
 - **TypeScript Errors**: Resolved multiple type-related build blockers
   - Fixed GenreDeletionPopup type mismatch by adding uuid to Genre interface
   - Completed all error code mappings in app-error-messages.ts (10 errors resolved)
   - Excluded vitest.config.ts from tsconfig to fix moduleResolution conflicts
-  - Wrapped useSearchParams in Suspense boundary for Next.js 15 compatibility
+  - Wrapped useSearchParams in Suspense boundary for Next.js compatibility
 
 - **Build Issues**: Fixed local build failures and image optimization
   - Added sharp ^0.34.5 with Node 20 compatible binaries for Next.js image optimization

@@ -1,10 +1,9 @@
-name: Publish
+name: Deploy
 
 on:
   push:
     tags:
-      - "v*"
-  workflow_call:
+      - "*"
 
 env:
   SSH_DESTINATION: ${{ secrets.SERVER_DEPLOY_USERNAME }}@${{ vars.DOMAIN_NAME }}
@@ -19,8 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: TEST
-    outputs:
-      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Check required vars and secrets
         env:
@@ -30,6 +27,7 @@ jobs:
           VAR_DOCKER_COMPOSE_DIR_NAME: ${{ vars.DOCKER_COMPOSE_DIR_NAME }}
           VAR_DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
           VAR_GTMT_FRONT_IMAGE_REPO: ${{ vars.GTMT_FRONT_IMAGE_REPO }}
+          VAR_APP_VERSION: ${{ vars.APP_VERSION }}
           VAR_GTMT_FRONT_PORT: ${{ vars.GTMT_FRONT_PORT }}
           VAR_GTMT_FRONT_SERVICE_NAME: ${{ vars.GTMT_FRONT_SERVICE_NAME }}
           VAR_CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
@@ -37,7 +35,7 @@ jobs:
           VAR_SENTRY_IS_ACTIVE: ${{ vars.SENTRY_IS_ACTIVE }}
           VAR_CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           VAR_DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE: ${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
-          SECRET_SPOTIFY_CLIENT_ID: ${{ secrets.np }}
+          VAR_SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID }}
           SECRET_SERVER_DEPLOY_USERNAME: ${{ secrets.SERVER_DEPLOY_USERNAME }}
           SECRET_SERVER_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
           SECRET_DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
@@ -49,6 +47,7 @@ jobs:
           [ -z "$VAR_DOCKER_COMPOSE_DIR_NAME" ] && missing="$missing DOCKER_COMPOSE_DIR_NAME"
           [ -z "$VAR_DOCKERHUB_USERNAME" ] && missing="$missing DOCKERHUB_USERNAME"
           [ -z "$VAR_GTMT_FRONT_IMAGE_REPO" ] && missing="$missing GTMT_FRONT_IMAGE_REPO"
+          [ -z "$VAR_APP_VERSION" ] && missing="$missing APP_VERSION"
           [ -z "$VAR_GTMT_FRONT_PORT" ] && missing="$missing GTMT_FRONT_PORT"
           [ -z "$VAR_GTMT_FRONT_SERVICE_NAME" ] && missing="$missing GTMT_FRONT_SERVICE_NAME"
           [ -z "$VAR_CONTACT_EMAIL" ] && missing="$missing CONTACT_EMAIL"
@@ -56,7 +55,7 @@ jobs:
           [ -z "$VAR_SENTRY_IS_ACTIVE" ] && missing="$missing SENTRY_IS_ACTIVE"
           [ -z "$VAR_CONTAINER_NAME" ] && missing="$missing CONTAINER_NAME"
           [ -z "$VAR_DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE" ] && missing="$missing DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE"
-          [ -z "$SECRET_SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID"
+          [ -z "$VAR_SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID"
           [ -z "$SECRET_SERVER_DEPLOY_USERNAME" ] && missing="$missing SERVER_DEPLOY_USERNAME"
           [ -z "$SECRET_SERVER_DEPLOY_SSH_PRIVATE_KEY" ] && missing="$missing SERVER_DEPLOY_SSH_PRIVATE_KEY"
           [ -z "$SECRET_DOCKERHUB_ACCESS_TOKEN" ] && missing="$missing DOCKERHUB_ACCESS_TOKEN"
@@ -69,27 +68,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Extract version from tag
-        id: version
-        run: |
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            # Extract from tag ref (e.g., refs/tags/v0.3.4 -> 0.3.4)
-            VERSION="${GITHUB_REF#refs/tags/v}"
-            echo "Using version from tag ref: $VERSION"
-          else
-            # Fallback: fetch tags and get the latest one
-            git fetch --tags --force
-            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-            if [ -z "$LATEST_TAG" ]; then
-              echo "Error: Cannot determine version. No tag provided."
-              exit 1
-            fi
-            # Remove 'v' prefix if present
-            VERSION="${LATEST_TAG#v}"
-            echo "Using latest tag version: $VERSION (from tag: $LATEST_TAG)"
-          fi
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
       - name: Login to Dockerhub
         run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ vars.DOCKERHUB_USERNAME }}" --password-stdin
 
@@ -98,7 +76,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.GTMT_FRONT_IMAGE_REPO }}:${{ steps.version.outputs.version }}
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.GTMT_FRONT_IMAGE_REPO }}:${{ vars.APP_VERSION }}
           build-args: |
             PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
             APP_PORT=${{ vars.GTMT_FRONT_PORT }}
@@ -165,7 +143,7 @@ jobs:
           PROJECT_DIR: ${{ env.CONTAINER_ROOT_DIR }}
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
           IMAGE_REPO: ${{ vars.GTMT_FRONT_IMAGE_REPO }}
-          APP_VERSION: ${{ needs.build-and-push.outputs.version }}
+          APP_VERSION: ${{ vars.APP_VERSION }}
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           APP_PORT: ${{ vars.GTMT_FRONT_PORT }}
           ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}

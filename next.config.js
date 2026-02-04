@@ -3,6 +3,7 @@
 const nextConfig = {
   reactStrictMode: false,
   turbopack: {
+    root: ".",
     resolveAlias: {
       "@app": "./src/app",
       "@actions": "./src/app/actions",

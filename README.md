@@ -47,7 +47,7 @@ For detailed setup instructions, please see [CONTRIBUTING.md](CONTRIBUTING.md#1-
 
 ```bash
 # Install dependencies
-npm install
+npm install --legacy-peer-deps
 
 # Set up environment variables
 npm run setup-env-dev-local  # For local API
@@ -57,6 +57,8 @@ npm run setup-env-dev-remote # For remote API
 # Run the development server
 npm run dev
 ```
+
+**Note:** We use `--legacy-peer-deps` to handle peer dependency conflicts, particularly with ESLint 9 and its plugins. This flag is also used in the Docker build process for consistency.
 
 The application will be available at http://localhost:3000.
 

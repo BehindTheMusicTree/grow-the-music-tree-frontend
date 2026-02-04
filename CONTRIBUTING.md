@@ -143,12 +143,14 @@ cd grow-the-music-tree
 2. Install dependencies:
 
    ```bash
-   npm install
+   npm install --legacy-peer-deps
    ```
+
+   **Note:** We use `--legacy-peer-deps` to handle peer dependency conflicts, particularly with ESLint 9 and its plugins. This ensures consistent dependency resolution across local development and Docker builds.
 
 3. Set up environment variables:
 
-   Create environment files based on the templates in `env/dev/template/`:
+   Create environment files based on the templates in `env/dev/example/`:
 
    ```bash
    # For local development
@@ -184,7 +186,7 @@ The application requires several environment variables to connect to The Music T
 - `NEXT_PUBLIC_SENTRY_DSN` - Sentry DSN for error tracking (optional)
 - Additional environment variables for authentication and features
 
-See `env/dev/template/` for complete environment variable templates.
+See `env/dev/example/` for complete environment variable templates.
 
 #### Backend Requirement
 

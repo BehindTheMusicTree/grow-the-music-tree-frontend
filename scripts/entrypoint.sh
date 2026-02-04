@@ -7,12 +7,9 @@ log_with_script_suffixe() {
 check_script_vars_are_set() {
     REQUIRED_NON_BOOL_VARS=(
         APP_PORT
-        CONTACT_EMAIL
-        API_BASE_URL
-        MUSIC_TREE_API_USERNAME
-        MUSIC_TREE_API_USER_PASSWORD
-        SENTRY_IS_ACTIVE
-        SENTRY_AUTH_TOKEN
+        NEXT_PUBLIC_CONTACT_EMAIL
+        NEXT_PUBLIC_BACKEND_BASE_URL
+        NEXT_PUBLIC_SENTRY_IS_ACTIVE
         BUILD_COMPLETE_FILENAME
     )
     check_vars_are_set ${REQUIRED_NON_BOOL_VARS[@]} 2>&1
@@ -20,9 +17,8 @@ check_script_vars_are_set() {
         log_with_script_prefixe "ERROR: Failed to load environment variables." >&2
         exit 1
     fi
-    export_value_removing_eventual_surrounding_quotes MUSIC_TREE_API_USER_PASSWORD 2>&1
 
-    check_bool_vars_are_set "SENTRY_IS_ACTIVE" 2>&1
+    check_bool_vars_are_set "NEXT_PUBLIC_SENTRY_IS_ACTIVE" 2>&1
     if [ $? -ne 0 ]; then
         log_with_script_prefixe "ERROR: Failed to load boolean environment variables." >&2
         exit 1
@@ -43,9 +39,9 @@ main() {
     log_with_script_suffixe "Generating Next.js env file $NEXT_ENV_FILE ..."
     cat << EOF > $NEXT_ENV_FILE
 NODE_ENV=$ENV
-NEXT_PUBLIC_CONTACT_EMAIL=$CONTACT_EMAIL
-NEXT_PUBLIC_BACKEND_BASE_URL=$API_BASE_URL
-NEXT_PUBLIC_SENTRY_IS_ACTIVE=$SENTRY_IS_ACTIVE
+NEXT_PUBLIC_CONTACT_EMAIL=$NEXT_PUBLIC_CONTACT_EMAIL
+NEXT_PUBLIC_BACKEND_BASE_URL=$NEXT_PUBLIC_BACKEND_BASE_URL
+NEXT_PUBLIC_SENTRY_IS_ACTIVE=$NEXT_PUBLIC_SENTRY_IS_ACTIVE
 EOF
     if [ $? -ne 0 ]; then
         log_with_script_suffixe "ERROR: Failed to generate the Vite env file." >&2
