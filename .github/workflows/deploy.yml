@@ -38,6 +38,7 @@ jobs:
           VAR_SENTRY_IS_ACTIVE: ${{ vars.SENTRY_IS_ACTIVE }}
           VAR_CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           VAR_DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE: ${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
+          VAR_SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID }}
           SECRET_SERVER_DEPLOY_USERNAME: ${{ secrets.SERVER_DEPLOY_USERNAME }}
           SECRET_SERVER_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
           SECRET_DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
@@ -57,6 +58,7 @@ jobs:
           [ -z "$VAR_SENTRY_IS_ACTIVE" ] && missing="$missing SENTRY_IS_ACTIVE"
           [ -z "$VAR_CONTAINER_NAME" ] && missing="$missing CONTAINER_NAME"
           [ -z "$VAR_DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE" ] && missing="$missing DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE"
+          [ -z "$VAR_SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID"
           [ -z "$SECRET_SERVER_DEPLOY_USERNAME" ] && missing="$missing SERVER_DEPLOY_USERNAME"
           [ -z "$SECRET_SERVER_DEPLOY_SSH_PRIVATE_KEY" ] && missing="$missing SERVER_DEPLOY_SSH_PRIVATE_KEY"
           [ -z "$SECRET_DOCKERHUB_ACCESS_TOKEN" ] && missing="$missing DOCKERHUB_ACCESS_TOKEN"
@@ -100,7 +102,7 @@ jobs:
           mkdir -p ~/.ssh &&
           ssh-keyscan -H ${{ vars.DOMAIN_NAME }} >> ~/.ssh/known_hosts
 
-      - name: Set GTMT environment variables on server
+      - name: Set GTMT front environment variables on server
         env:
           ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKERIZED_APP_ENV_FILENAME }}
         run: |
@@ -109,7 +111,11 @@ jobs:
             echo 'NODE_ENV=test' >> $ENV_FILE &&
             echo 'NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_BACKEND_BASE_URL=https://${{ vars.DOMAIN_NAME }}/api/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ vars.SENTRY_IS_ACTIVE }}' >> ${{ env.ENV_FILE }}
+            echo 'NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ vars.SENTRY_IS_ACTIVE }}' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_SPOTIFY_CLIENT_ID=${{ vars.SPOTIFY_CLIENT_ID }}' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/auth/spotify/callback' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-collaborative user-library-read user-top-read' >> ${{ env.ENV_FILE }}
           "
 
   set-docker-compose:

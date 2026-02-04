@@ -144,7 +144,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Workflows – Vars and secrets check**: First step in each workflow verifies required vars and secrets
   - Validate: no vars/secrets required (step passes)
-  - Deploy: checks 14 vars and 3 secrets; fails with list of unset names if any missing
+  - Deploy: checks 15 vars and 3 secrets; fails with list of unset names if any missing
+
+- **Deployment – Spotify Integration**: Added Spotify environment variables to deployment workflow
+  - Added NEXT_PUBLIC_SPOTIFY_AUTH_URL, NEXT_PUBLIC_SPOTIFY_CLIENT_ID, NEXT_PUBLIC_SPOTIFY_REDIRECT_URI, and NEXT_PUBLIC_SPOTIFY_SCOPES to server environment configuration
+  - Added SPOTIFY_CLIENT_ID to required vars validation
 
 - **Node.js Version Management**: Added .nvmrc to specify Node.js 20 LTS requirement
   - Documents required Node.js version for team consistency
