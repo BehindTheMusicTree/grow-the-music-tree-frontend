@@ -167,6 +167,10 @@ jobs:
           mkdir -p ~/.ssh &&
           ssh-keyscan -H ${{ vars.DOMAIN_NAME }} >> ~/.ssh/known_hosts
 
+      - name: Debug version output
+        run: |
+          echo "Version from determine-version job: ${{ needs.determine-version.outputs.version }}"
+
       - name: Generate partial docker compose file
         env:
           DOCKER_COMPOSE_PARTIAL_FILENAME: ${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }}
