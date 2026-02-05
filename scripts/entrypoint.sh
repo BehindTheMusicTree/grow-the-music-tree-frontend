@@ -57,6 +57,21 @@ EOF
     fi
     log_with_script_suffixe "Application built successfully."
 
+    log_with_script_suffixe "Ensuring build/ directory exists..."
+    mkdir -p build/
+    if [ $? -ne 0 ]; then
+        log_with_script_suffixe "ERROR: Failed to create build/ directory." >&2
+        exit 1
+    fi
+
+    log_with_script_suffixe "Copying build output to build/ directory..."
+    cp -r out/* build/
+    if [ $? -ne 0 ]; then
+        log_with_script_suffixe "ERROR: Failed to copy build output to build/ directory." >&2
+        exit 1
+    fi
+    log_with_script_suffixe "Build output copied successfully."
+
     BUILD_COMPLETE_FILE="${PROJECT_DIR}${BUILD_COMPLETE_FILENAME}"
     log_with_script_suffixe "Creating the build complete file $BUILD_COMPLETE_FILE indicating that the build is done..."
     touch $BUILD_COMPLETE_FILE

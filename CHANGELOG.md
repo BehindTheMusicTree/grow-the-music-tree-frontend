@@ -91,6 +91,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Updated LICENSE copyright to BehindTheMusicTree
   - Updated CI/CD workflows with new organization references
 
+- **Build System**: Switched from server-side rendering to static export for improved deployment
+  - Added `output: 'export'` to next.config.js to enable static site generation
+  - Modified entrypoint.sh to copy static build output from `out/` to `build/` directory
+  - Enables serving via static file server (Nginx) instead of Node.js runtime
+  - Reduces container resource requirements and improves deployment flexibility
+
 ### Documentation
 
 - **Project Documentation Setup**: Comprehensive documentation structure for open-source project
