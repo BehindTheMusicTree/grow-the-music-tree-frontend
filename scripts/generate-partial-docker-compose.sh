@@ -31,7 +31,7 @@ cat << EOF > $DOCKER_COMPOSE_PARTIAL_FILE
     image: $DOCKERHUB_USERNAME/$IMAGE_REPO:$APP_VERSION
     container_name: $CONTAINER_NAME
     volumes:
-      - umg-build:${PROJECT_DIR}build/
+      - gtmt-front-build:${PROJECT_DIR}build/
     expose:
       - $APP_PORT
     env_file: $ENV_FILENAME
