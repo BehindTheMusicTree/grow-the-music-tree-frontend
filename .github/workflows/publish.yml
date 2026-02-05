@@ -14,13 +14,42 @@ env:
   BUILD_COMPLETE_FILENAME: build-complete.txt
 
 jobs:
+  determine-version:
+    name: Determine Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            # Extract from tag ref (e.g., refs/tags/v0.3.4 -> 0.3.4)
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            echo "Using version from tag ref: $VERSION"
+          else
+            # Fallback: fetch tags and get the latest one
+            git fetch --tags --force
+            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+            if [ -z "$LATEST_TAG" ]; then
+              echo "Error: Cannot determine version. No tag provided."
+              exit 1
+            fi
+            # Remove 'v' prefix if present
+            VERSION="${LATEST_TAG#v}"
+            echo "Using latest tag version: $VERSION (from tag: $LATEST_TAG)"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
   build-and-push:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
+    needs: [determine-version]
     environment:
       name: TEST
-    outputs:
-      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Check required vars and secrets
         env:
@@ -69,27 +98,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Extract version from tag
-        id: version
-        run: |
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            # Extract from tag ref (e.g., refs/tags/v0.3.4 -> 0.3.4)
-            VERSION="${GITHUB_REF#refs/tags/v}"
-            echo "Using version from tag ref: $VERSION"
-          else
-            # Fallback: fetch tags and get the latest one
-            git fetch --tags --force
-            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-            if [ -z "$LATEST_TAG" ]; then
-              echo "Error: Cannot determine version. No tag provided."
-              exit 1
-            fi
-            # Remove 'v' prefix if present
-            VERSION="${LATEST_TAG#v}"
-            echo "Using latest tag version: $VERSION (from tag: $LATEST_TAG)"
-          fi
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
       - name: Login to Dockerhub
         run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ vars.DOCKERHUB_USERNAME }}" --password-stdin
 
@@ -98,7 +106,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.GTMT_FRONT_IMAGE_REPO }}:${{ steps.version.outputs.version }}
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.GTMT_FRONT_IMAGE_REPO }}:${{ needs.determine-version.outputs.version }}
           build-args: |
             PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
             APP_PORT=${{ vars.GTMT_FRONT_PORT }}
@@ -166,7 +174,7 @@ jobs:
           PROJECT_DIR: ${{ env.CONTAINER_ROOT_DIR }}
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
           IMAGE_REPO: ${{ vars.GTMT_FRONT_IMAGE_REPO }}
-          APP_VERSION: ${{ needs.build-and-push.outputs.version }}
+          APP_VERSION: ${{ needs.determine-version.outputs.version }}
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           APP_PORT: ${{ vars.GTMT_FRONT_PORT }}
           ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}
