@@ -10,7 +10,7 @@ This document describes how application versioning is handled in CI/CD workflows
   - [Development Tags (`-dev`)](#development-tags--dev-)
   - [Release Candidate Tags (`-rc`, `-beta`, `-alpha`)](#release-candidate-tags--rc--beta--alpha-)
 - [How Versioning Works](#how-versioning-works)
-  - [Release Workflow (`deploy.yml`)](#release-workflow-deployyml)
+  - [Release Workflow (`publish.yml`)](#release-workflow-deployyml)
   - [Version Extraction Logic](#version-extraction-logic)
 - [Benefits](#benefits)
 - [Usage Examples](#usage-examples)
@@ -32,7 +32,7 @@ Versions follow semantic versioning with a `v` prefix:
 
 ## Pre-Release Versions
 
-Pre-release version tags are used to test builds and deployments on the test server before final release. They follow semantic versioning conventions and are supported by the workflow system. All pre-release version tags automatically trigger the `deploy.yml` workflow, which builds the application, creates a Docker image, and deploys it to the test server.
+Pre-release version tags are used to test builds and deployments on the test server before final release. They follow semantic versioning conventions and are supported by the workflow system. All pre-release version tags automatically trigger the `publish.yml` workflow, which builds the application, creates a Docker image, and deploys it to the test server.
 
 There are two main categories of pre-release versions, distinguished by **when** they're used and **where** they're created:
 
@@ -129,42 +129,15 @@ All pre-release version tags (dev, rc, beta, alpha) should be deleted during the
 
 ## How Versioning Works
 
-### Release Workflow (`deploy.yml`)
+### Release Workflow (`publish.yml`)
 
-When a version tag is pushed (e.g., `git push origin v0.2.0`), the `deploy.yml` workflow:
+When a version tag is pushed (e.g., `git push origin v0.2.0`), the `publish.yml` workflow:
 
 1. **Extracts version number from tag**: The workflow automatically extracts the version number from the git tag via `github.ref` (e.g., `refs/tags/v0.2.0` → `0.2.0`)
 
 2. **Uses version number throughout pipeline**:
    - Docker image tags: `username/repo:0.2.0`
    - Docker Compose service configurations
-   - Environment variable `APP_VERSION` for deployment
-
-3. **Builds and deploys**:
-   - Builds the Next.js application
-   - Creates Docker image with versioned tag
-   - Configures Docker Compose with versioned image
-   - Deploys to test server
-
-### Version Extraction Logic
-
-The version number is determined using the following priority:
-
-1. **From git tag ref** (when triggered by tag push):
-
-   ```yaml
-   # github.ref = refs/tags/v0.2.0
-   VERSION="${GITHUB_REF#refs/tags/v}" # Result: 0.2.0
-   ```
-
-   Works with pre-release version tags too: `refs/tags/v0.2.0-rc1` → `0.2.0-rc1`
-
-2. **From latest git tag** (fallback when not triggered by tag push):
-   ```bash
-   git fetch --tags --force
-   LATEST_TAG=$(git describe --tags --abbrev=0)
-   VERSION="${LATEST_TAG#v}"  # Remove 'v' prefix to get version number
-   ```
 
 ## Benefits
 
@@ -188,7 +161,7 @@ git merge release/v0.2.0
 
 # 3. Create and push the release version tag
 git tag v0.2.0
-git push origin v0.2.0  # Triggers deploy.yml workflow
+git push origin v0.2.0  # Triggers publish.yml workflow
 
 # 4. Clean up pre-release version tags (dev, rc, beta, alpha)
 git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*" | xargs -n 1 git tag -d
@@ -227,10 +200,3 @@ git tag v0.2.0-alpha1
 git push origin v0.2.0-alpha1
 # Automatically builds and deploys: username/repo:0.2.0-alpha1
 ```
-
-## Workflows Using Versioning
-
-- **deploy.yml**: Extracts version number from git tag and orchestrates build and deployment
-- **build-and-push job**: Uses version number for Docker image tagging
-- **set-docker-compose job**: Uses version number for Docker Compose configuration
-- **deploy job**: Uses version number for deployment to test server
