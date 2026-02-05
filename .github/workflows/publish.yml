@@ -151,11 +151,11 @@ jobs:
   set-docker-compose:
     name: Configure Docker Compose
     runs-on: ubuntu-latest
-    needs: [build-and-push]
+    needs: [determine-version, build-and-push]
     environment:
       name: TEST
     env:
-      DOCKER_COMPOSE_PARTIAL_FILENAME: umg${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
+      DOCKER_COMPOSE_PARTIAL_FILENAME: gtmt-front${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
     steps:
       - uses: actions/checkout@v4
       - uses: webfactory/ssh-agent@v0.9.0
