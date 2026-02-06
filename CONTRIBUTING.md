@@ -15,13 +15,13 @@ This project is currently maintained by a solo developer, but contributions, sug
   - [2. Branching](#2-branching)
   - [3. Developing](#3-developing)
   - [4. Testing](#4-testing)
+    - [4.1. Testing Builds During Development](#41-testing-builds-during-development)
   - [5. Committing](#5-committing)
   - [6. Pull Request Process](#6-pull-request-process)
     - [6.1. Pre-PR Checklist](#61-pre-pr-checklist)
     - [6.2. Opening a Pull Request](#62-opening-a-pull-request)
   - [7. Releasing _(For Maintainers)_](#7-releasing-for-maintainers)
 - [🏷️ Issue & PR Labels](#️-issue--pr-labels)
-- [🛡️ Branch Protection](#️-branch-protection)
 - [🪪 License & Attribution](#-license--attribution)
 - [📜 Code of Conduct](#-code-of-conduct)
 - [📋 TODO List](#-todo-list)
@@ -143,12 +143,14 @@ cd grow-the-music-tree
 2. Install dependencies:
 
    ```bash
-   npm install
+   npm install --legacy-peer-deps
    ```
+
+   **Note:** We use `--legacy-peer-deps` to handle peer dependency conflicts, particularly with ESLint 9 and its plugins. This ensures consistent dependency resolution across local development and Docker builds.
 
 3. Set up environment variables:
 
-   Create environment files based on the templates in `env/dev/template/`:
+   Create environment files based on the templates in `env/dev/example/`:
 
    ```bash
    # For local development
@@ -184,7 +186,7 @@ The application requires several environment variables to connect to The Music T
 - `NEXT_PUBLIC_SENTRY_DSN` - Sentry DSN for error tracking (optional)
 - Additional environment variables for authentication and features
 
-See `env/dev/template/` for complete environment variable templates.
+See `env/dev/example/` for complete environment variable templates.
 
 #### Backend Requirement
 
@@ -206,7 +208,7 @@ We follow **strict Git Flow** with the following branch structure:
 - Releases are tagged from `main`
 - **No direct commits allowed** - All changes must go through Pull Requests, including changes from maintainers
 - Only receives merges from `release/*` and `hotfix/*` branches
-- **Branch protection enforced** - GitHub Actions automatically blocks PRs to `main` that don't come from `hotfix/*` or `release/*` branches (if configured)
+- **Branch protection enforced** - GitHub Actions automatically blocks PRs to `main` that don't come from `hotfix/*` or `release/*` branches (see `.github/workflows/branch-protection.yml`)
 
 #### Develop Branch (`develop`)
 
@@ -215,7 +217,17 @@ We follow **strict Git Flow** with the following branch structure:
 - `develop` is merged into `main` via release branches
 - **No direct commits allowed** - All changes must go through Pull Requests
 - Only receives merges from `feature/*`, `chore/*`, and `dependabot/*` branches
-- **Branch protection enforced** - GitHub Actions automatically blocks PRs to `develop` that don't come from allowed branch types (if configured)
+- **Branch protection enforced** - GitHub Actions automatically blocks PRs to `develop` that don't come from `feature/*`, `chore/*`, or `dependabot/*` branches (see `.github/workflows/branch-protection.yml`)
+
+#### 🛡️ Branch Protection
+
+- **PRs to `main`** must come from `hotfix/*` or `release/*` branches only. This ensures production fixes are traceable and carefully released.
+- **PRs to `develop`** must come from `feature/*`, `chore/*`, or `dependabot/*` branches only. PRs from other branch types (e.g., `fix/*`, `refactor/*`, etc.) will be blocked by the branch protection workflow.
+- Branch protection is enforced by the `branch-protection.yml` GitHub Actions workflow located at `.github/workflows/branch-protection.yml`.
+- **Invalid PRs will:**
+  - Fail the CI check
+  - Receive an automated comment with clear instructions
+  - Be blocked from merging until the branch is renamed or retargeted
 
 #### Feature Branches (`feature/<name>`)
 
@@ -244,7 +256,7 @@ We follow **strict Git Flow** with the following branch structure:
   ```bash
   git checkout develop
   git pull origin develop
-  git checkout -b release/v0.2.0
+  git checkout -b release/v0.2.1
   ```
 
 - Only bug fixes and release-related changes go into release branches
@@ -255,15 +267,15 @@ We follow **strict Git Flow** with the following branch structure:
 
 - For urgent bug fixes on production versions
 - Branch from `main`
-- Include issue numbers when applicable: `hotfix/789-critical-player-crash`
+- Include issue numbers when applicable: `hotfix/789-critical-bug`
 - Examples:
 
   ```bash
   git checkout main
   git pull origin main
-  git checkout -b hotfix/critical-auth-bug
+  git checkout -b hotfix/critical-metadata-bug
 
-  git checkout -b hotfix/789-fix-playlist-loading       # With issue number
+  git checkout -b hotfix/789-critical-security-patch   # With issue number
   ```
 
 - Contributors can submit fixes via feature branches that maintainers may promote to hotfixes if needed
@@ -289,12 +301,11 @@ We follow **strict Git Flow** with the following branch structure:
 
 #### Dependabot Branches (`dependabot/*`)
 
-- Automated branches created by GitHub Dependabot for dependency updates
-- Branch from `develop` (automatically handled by Dependabot)
-- Examples: `dependabot/npm_and_yarn/lodash-4.17.21`, `dependabot/github_actions/actions/checkout-4.1.0`
-- Merge into `develop` via automated Pull Request
-- No manual creation required - Dependabot handles the process automatically
-- Includes security updates and version bumps for dependencies
+- For automated dependency updates created by [Dependabot](https://github.com/dependabot)
+- Typically generated/managed by GitHub and follow a naming convention like `dependabot/<ecosystem>/<package>-<version>` (e.g., `dependabot/npm_and_yarn/lodash-4.17.21`)
+- Branch from `develop`
+- Dependabot opens Pull Requests that should target `develop` for dependency bumps and security updates
+- Merge into `develop` via Pull Request when complete; treat them like `chore/*` changes or dependency maintenance
 
 ### 3. Developing
 
@@ -358,6 +369,70 @@ When testing your changes, verify:
 - ✅ Accessibility features work (keyboard navigation, screen readers)
 - ✅ Loading states and error handling work correctly
 - ✅ API interactions function properly
+
+#### 4.1. Testing Builds During Development
+
+You can test your build and deployment on the test server while working on a feature branch by creating a development tag. This is useful for validating changes before merging to `develop`.
+
+**Choosing a Version Number:**
+
+Since the actual release version (major/minor/patch) isn't known until the release branch is created, use the following guidelines for dev tags:
+
+- **Feature branches** (`feature/`): Typically indicate minor version updates (new features, backward compatible)
+  - Use the next minor version: if latest is `v0.3.5`, use `v0.3.6-dev-<branch-name>` or `v0.4.0-dev-<branch-name>`
+  - Use the branch name **without** the `feature/` prefix: `feature/improve-cicd` → `v0.3.6-dev-improve-cicd`
+- **Hotfix branches** (`hotfix/`): Typically indicate patch version updates (bug fixes)
+  - Use the next patch version: if latest is `v0.3.5`, use `v0.3.6-dev-<branch-name>`
+  - Use the branch name **without** the `hotfix/` prefix: `hotfix/critical-bug` → `v0.3.6-dev-critical-bug`
+- **Breaking changes**: Use the next major version: if latest is `v0.3.5`, use `v1.0.0-dev-<branch-name>`
+
+**Note:** The version number in dev tags is just a placeholder for testing. The actual release version will be determined when creating the release branch based on the changes included. Dev tags are temporary and can use any version number that makes sense for your testing needs.
+
+**Process:**
+
+```bash
+# On your feature branch (e.g., feature/improve-cicd), create a development tag
+# Use the branch name without the type prefix (feature/, hotfix/, etc.)
+git tag v0.3.6-dev-improve-cicd  # branch: feature/improve-cicd
+git push origin v0.3.6-dev-improve-cicd
+```
+
+This automatically triggers the `deploy.yml` workflow which will:
+
+- Build the application
+- Build and push Docker image
+- Deploy to the test server
+- Allow you to validate your changes before creating a PR
+
+**Republishing After Changes:**
+
+Git tags are immutable once pushed. If you make changes and need to republish:
+
+1. **Delete the old tag** (recommended for dev tags):
+
+   ```bash
+   git tag -d v0.3.6-dev-improve-cicd
+   git push origin --delete v0.3.6-dev-improve-cicd
+   # Then create and push a new tag with the same name
+   git tag v0.3.6-dev-improve-cicd
+   git push origin v0.3.6-dev-improve-cicd
+   ```
+
+2. **Or use an incrementing suffix** (if you want to keep history):
+   ```bash
+   git tag v0.3.6-dev-improve-cicd-1  # First iteration
+   git push origin v0.3.6-dev-improve-cicd-1
+   # After changes:
+   git tag v0.3.6-dev-improve-cicd-2  # Second iteration
+   git push origin v0.3.6-dev-improve-cicd-2
+   ```
+
+**Note:** Development tags are for testing purposes only and should not be used for releases. Delete them after testing if desired:
+
+```bash
+git tag -d v0.3.6-dev-improve-cicd
+git push origin --delete v0.3.6-dev-improve-cicd
+```
 
 ### 5. Committing
 
@@ -608,9 +683,7 @@ Quick release process:
    ```
 
 3. **On the release branch, prepare the release:**
-
    - Review and finalize `CHANGELOG.md`:
-
      - Review changes in the `[Unreleased]` section
      - Move content from `[Unreleased]` section to new version entry with date (e.g., `## [v0.2.0] - 2025-12-15`)
      - Review and consolidate entries if needed
@@ -644,7 +717,22 @@ Quick release process:
 
    **Important:** The tag version must match the version in `CHANGELOG.md` and `package.json` (with the `v` prefix).
 
-6. **Merge release branch back into `develop`** (to keep develop up to date)
+6. **Clean up pre-release tags**
+
+   Delete all pre-release tags (dev, rc, beta, alpha) that were used for testing this release:
+
+   ```bash
+   # List all pre-release tags for this version
+   git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*"
+
+   # Delete all pre-release tags locally and remotely
+   git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*" | xargs -n 1 git tag -d
+   git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*" | xargs -n 1 git push origin --delete
+   ```
+
+   **Note:** Pre-release tags (dev, rc, beta, alpha) are temporary and should be cleaned up after the release is published to keep the repository clean.
+
+7. **Merge release branch back into `develop`** (to keep develop up to date)
 
    ```bash
    git checkout develop
@@ -653,18 +741,19 @@ Quick release process:
    git push origin develop
    ```
 
-7. **Delete the release branch** (locally and remotely)
+8. **Delete the release branch** (locally and remotely)
 
    ```bash
    git branch -d release/v0.2.0
    git push origin --delete release/v0.2.0
    ```
 
-8. **CI/CD will automatically:**
+9. **CI/CD will automatically:**
 
+   When you push the version tag (step 5), the `deploy.yml` workflow will automatically:
    - Build the application
-   - Run tests and linting
-   - Deploy if configured
+   - Build and push Docker image
+   - Deploy to the test server
 
 **Hotfix Release Process:**
 
@@ -694,6 +783,8 @@ For urgent production fixes:
    git tag v0.1.3  # Increment patch version
    git push origin main --tags
    ```
+
+   **Important:** The tag version must match the version in `CHANGELOG.md` and `package.json` (with the `v` prefix).
 
 5. Merge hotfix into `develop`:
 
@@ -745,31 +836,6 @@ This repository uses automated workflows to apply labels:
 4. **Issue labeling** ([issue-labeler.yml](.github/workflows/issue-labeler.yml)) - Auto-labels issues by type, component, platform, priority
 
 These workflows reduce manual labeling overhead and ensure consistent label application across all issues and PRs.
-
-## 🛡️ Branch Protection
-
-This repository enforces Git Flow branch naming via automated CI checks ([branch-protection.yml](.github/workflows/branch-protection.yml)):
-
-### PRs to `main` branch
-
-**Only allowed from:**
-
-- `hotfix/*` - Critical production fixes
-- `release/*` - Version releases
-
-### PRs to `develop` branch
-
-**Only allowed from:**
-
-- `feature/*` - New features
-- `chore/*` - Maintenance, dependencies, tooling
-- `dependabot/*` - Dependency updates
-
-**Invalid PRs will:**
-
-- Fail the CI check
-- Receive an automated comment with clear instructions
-- Be blocked from merging until the branch is renamed or retargeted
 
 ## 🪪 License & Attribution
 

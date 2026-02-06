@@ -1,4 +1,4 @@
-name: CI - Tests & Quality
+name: Validate
 
 on:
   push:
@@ -15,6 +15,9 @@ jobs:
     name: Lint Code
     runs-on: ubuntu-latest
     steps:
+      - name: Check required vars and secrets
+        run: echo "No vars or secrets required for this workflow."
+
       - name: Checkout code
         uses: actions/checkout@v4
 

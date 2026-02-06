@@ -1,8 +1,11 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
+  output: "export",
+  images: { unoptimized: true },
   reactStrictMode: false,
   turbopack: {
+    root: ".",
     resolveAlias: {
       "@app": "./src/app",
       "@actions": "./src/app/actions",

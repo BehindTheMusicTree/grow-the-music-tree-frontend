@@ -6,4 +6,4 @@ npm cache clean --force
 npm install is-fullwidth-code-point@3.0.0
 
 # Install dependencies listed in package.json
-npm install
+npm install --legacy-peer-deps

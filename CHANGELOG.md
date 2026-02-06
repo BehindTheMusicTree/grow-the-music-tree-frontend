@@ -69,6 +69,21 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Next.js Upgrade**: Upgraded Next.js from 15.5.7 to 16.1.6
+  - Updated eslint-config-next to 16.1.6 to match Next.js version
+  - Next.js 16 includes Turbopack as default stable bundler, React Compiler support, and improved caching APIs
+  - React 19.2 support and enhanced routing capabilities
+
+- **Dependency Management**: Updated dependencies and improved version pinning
+  - Removed caret (^) prefixes from all dependencies for consistent builds
+  - Updated multiple dependencies: @fortawesome/react-fontawesome (0.2.0 → 3.1.1), @sentry/nextjs (9.12.0 → 10.38.0), eslint (8.57.0 → 9.39.2), jsdom (26.0.0 → 28.0.0)
+  - Added package.json overrides section for glob dependency (13.0.1)
+  - Added TypeScript 5.8.3 to devDependencies
+
+- **Environment Templates**: Moved environment templates from `env/dev/template/` to `env/dev/example/`
+  - Updated CONTRIBUTING.md and README.md references to new location
+  - Removed deprecated template files (.env.config-generation-tester, .env.dev.template)
+
 - **Project Rename**: Renamed project from "Bodzify Ultimate Music Guide" to "Grow The Music Tree"
   - Updated package.json and package-lock.json with new project name
   - Updated application title and meta description in layout.tsx
@@ -77,6 +92,15 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Updated repository URLs from Bodzify organization to BehindTheMusicTree organization
   - Updated LICENSE copyright to BehindTheMusicTree
   - Updated CI/CD workflows with new organization references
+
+- **Build System**: Switched from server-side rendering to static export for improved deployment
+  - Added `output: 'export'` to next.config.js to enable static site generation
+  - Modified entrypoint.sh to copy static build output from `out/` to `build/` directory
+  - Disabled image optimization with `images: { unoptimized: true }` for compatibility with static export
+  - Removed middleware (src/middleware.ts) as it's incompatible with static export
+  - Added root page (src/app/page.tsx) with redirect to `/genre-tree`
+  - Enables serving via static file server (Nginx) instead of Node.js runtime
+  - Reduces container resource requirements and improves deployment flexibility
 
 ### Documentation
 
@@ -108,12 +132,41 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Added automatic PR labeling workflow based on file changes
   - Updated CONTRIBUTING.md with labels section
 
+- **Versioning Documentation**: Added comprehensive versioning strategy documentation
+  - Created `docs/VERSIONING.md` with complete versioning strategy and tag naming conventions
+  - Documents semantic versioning format, pre-release versions (dev, rc, beta, alpha), and version extraction logic
+  - Includes usage examples for creating releases, development tags, and pre-release tags
+  - Documents cleanup process for pre-release tags
+
+- **Development Workflow**: Enhanced CONTRIBUTING.md with testing builds during development
+  - Added section on testing builds from feature/hotfix branches using development tags
+  - Guidelines for choosing version numbers for dev tags
+  - Instructions for republishing development tags after changes
+  - Added cleanup steps for pre-release tags in release process
+  - Reorganized branch protection section for better clarity
+  - Updated installation instructions to use `npm install --legacy-peer-deps` flag
+  - Documented peer dependency conflict handling, particularly with ESLint 9 and its plugins
+
+- **Installation Instructions**: Updated README.md and CONTRIBUTING.md with legacy peer deps flag
+  - Added `--legacy-peer-deps` flag to npm install commands for consistent dependency resolution
+  - Documented reason: handles peer dependency conflicts, especially with ESLint 9 and plugins
+  - Ensures consistency between local development and Docker builds
+
 ### CI
 
 - **PR Description Workflow**: Added cursor rule for PR description management
   - PR descriptions must be drafted in `.pr-descriptions/` directory (git-ignored)
   - Ensures use of PR template and iterative refinement before publishing
   - Added `.pr-descriptions/` to .gitignore
+
+- **Versioning Strategy**: Refactored CI/CD workflows to extract version from git tags
+  - Replaced `deploy.yml` with `publish.yml` workflow
+  - Version is now extracted dynamically from git tags instead of GitHub variables
+  - Supports semantic versioning with `v` prefix (e.g., `v0.2.0`)
+  - Supports pre-release versions: development tags (`-dev`), release candidates (`-rc`, `-beta`, `-alpha`)
+  - Version extraction logic: extracts from tag ref when triggered by tag push, falls back to latest tag otherwise
+  - Removed dependency on `APP_VERSION` GitHub variable
+  - Version is passed between jobs via workflow outputs
 
 - **Auto-labeler Workflows**: Added comprehensive automated labeling system
   - **File-based PR labeler**: Applies component/technology labels based on changed files
@@ -143,9 +196,25 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Created separate workflows: ci.yml (validation), deploy-test.yml, deploy-prod.yml
   - Added reusable deployment workflow (deploy-reusable.yml) to eliminate code duplication
   - Renamed `dev` branch to `develop` following standard Git Flow naming
-  - CI runs on all PRs; deployments only on direct pushes to develop/main
-  - TEST environment deploys from develop branch
-  - PRODUCTION environment deploys from main branch
+  - Deploy runs on push to develop and workflow_dispatch
+
+- **Workflows – Vars and secrets check**: First step in each workflow verifies required vars and secrets
+  - Validate: no vars/secrets required (step passes)
+  - Deploy: checks 15 vars and 3 secrets; fails with list of unset names if any missing
+
+- **Deployment – Spotify Integration**: Added Spotify environment variables to deployment workflow
+  - Added NEXT_PUBLIC_SPOTIFY_AUTH_URL, NEXT_PUBLIC_SPOTIFY_CLIENT_ID, NEXT_PUBLIC_SPOTIFY_REDIRECT_URI, and NEXT_PUBLIC_SPOTIFY_SCOPES to server environment configuration
+  - Added SPOTIFY_CLIENT_ID to required vars validation
+
+- **Docker Environment Variables**: Simplified environment variable handling in Docker containers
+  - Updated entrypoint script to require NEXT*PUBLIC* variables directly instead of non-prefixed versions
+  - Removed unnecessary conversion step from non-prefixed to NEXT*PUBLIC* variables
+  - Removed unused MUSIC_TREE_API_USERNAME, MUSIC_TREE_API_USER_PASSWORD, SENTRY_AUTH_TOKEN requirements
+  - Updated workflows to set NEXT*PUBLIC* variables directly in environment files
+  - Fixed "CONTACT_EMAIL must be set" error in dockerized environment
+
+- **CI Configuration**: Fixed Spotify client ID configuration in workflows
+  - Corrected SPOTIFY_CLIENT_ID to use GitHub secret instead of variable in publish.yml workflow
 
 - **Node.js Version Management**: Added .nvmrc to specify Node.js 20 LTS requirement
   - Documents required Node.js version for team consistency
@@ -153,13 +222,24 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Matches GitHub Actions CI Node version (20)
   - Enables automatic version switching with nvm
 
+- **Cursor Rules**: Added versioning rule for AI assistance
+  - Created `.cursor/rules/versioning.mdc` to guide AI on versioning and tagging conventions
+  - Ensures workflows extract version from git tags, not from variables
+  - Documents tag naming guidelines for development, pre-release, and release tags
+  - Provides version extraction pattern for GitHub Actions workflows
+
+- **CI/CD Server Adaptation**: Updated deployment workflows for new server configuration
+  - Updated publish.yml workflow with new secret name for Spotify client ID
+  - Added deploy.yml workflow for single environment deployment
+  - Adapted workflows to work with new server infrastructure
+
 ### Fixed
 
 - **TypeScript Errors**: Resolved multiple type-related build blockers
   - Fixed GenreDeletionPopup type mismatch by adding uuid to Genre interface
   - Completed all error code mappings in app-error-messages.ts (10 errors resolved)
   - Excluded vitest.config.ts from tsconfig to fix moduleResolution conflicts
-  - Wrapped useSearchParams in Suspense boundary for Next.js 15 compatibility
+  - Wrapped useSearchParams in Suspense boundary for Next.js compatibility
 
 - **Build Issues**: Fixed local build failures and image optimization
   - Added sharp ^0.34.5 with Node 20 compatible binaries for Next.js image optimization

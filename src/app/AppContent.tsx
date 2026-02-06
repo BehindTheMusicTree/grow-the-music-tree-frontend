@@ -31,8 +31,6 @@ import {
   ServiceError,
 } from "@app-types/app-errors/app-error";
 
-initSentry();
-
 export default function AppContent({ children }: { children: ReactNode }) {
   const { playerUploadedTrackObject } = usePlayer();
   const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
@@ -41,6 +39,10 @@ export default function AppContent({ children }: { children: ReactNode }) {
   const { connectivityError, clearConnectivityError } = useConnectivityError();
   const { handleSpotifyOAuth } = useSpotifyAuth();
   const currentConnectivityErrorRef = useRef<typeof ConnectivityError | null>(null);
+
+  useEffect(() => {
+    initSentry();
+  }, []);
 
   useEffect(() => {}, [playerUploadedTrackObject]);
 
