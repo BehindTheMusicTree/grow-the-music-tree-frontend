@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   try {
     // Redirect root to music page
     if (request.nextUrl.pathname === "/") {
@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
 
     return NextResponse.next();
   } catch (error) {
-    console.error("Middleware Error:", error);
+    console.error("Proxy Error:", error);
     // In development, show the error details
     if (process.env.NODE_ENV === "development") {
       return new NextResponse(
