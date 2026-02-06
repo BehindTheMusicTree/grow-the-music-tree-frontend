@@ -45,6 +45,7 @@ Music enthusiasts, researchers, and the general public interested in understandi
 - Spotify Auth Callback (`/auth/spotify/callback`)
 - Genre Playlists (`/genre-playlists`)
 - My Genre Tree (`/my-genre-tree`)
+- Reference Genre Tree (`/reference-genre-tree`)
 - Spotify Library (`/spotify-library`)
 - Uploaded Library (`/uploaded-library`)
 
