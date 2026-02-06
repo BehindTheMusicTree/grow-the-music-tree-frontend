@@ -21,7 +21,7 @@ export function middleware(request: NextRequest) {
         {
           status: 500,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
     // In production, show a generic error
