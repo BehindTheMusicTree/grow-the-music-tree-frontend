@@ -1,6 +1,6 @@
-# Genre Tree
+# My Genre Tree
 
-Route: `/genre-tree`
+Route: `/my-genre-tree`
 Access: authenticated
 
 ## Table of Contents

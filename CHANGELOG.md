@@ -109,7 +109,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Modified entrypoint.sh to copy static build output from `out/` to `build/` directory
   - Disabled image optimization with `images: { unoptimized: true }` for compatibility with static export
   - Removed middleware (src/middleware.ts) as it's incompatible with static export
-  - Added root page (src/app/page.tsx) with redirect to `/genre-tree`
+  - Added root page (src/app/page.tsx) with redirect to `/my-genre-tree`
   - Enables serving via static file server (Nginx) instead of Node.js runtime
   - Reduces container resource requirements and improves deployment flexibility
 
