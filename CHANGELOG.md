@@ -36,7 +36,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Added
 
 - **Genre Tree Visualization**: Added interactive D3.js-based genre tree component
-
   - Includes unit tests for tree layout calculations and node interactions
   - Supports zoom, pan, and node expansion/collapse
 
@@ -66,6 +65,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-02-06
+
 ### Changed
 
 - **Project Rename**: Renamed project from "Bodzify Ultimate Music Guide" to "Grow The Music Tree"
@@ -80,7 +81,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Documentation
 
 - **Project Documentation Setup**: Comprehensive documentation structure for open-source project
-
   - Added CONTRIBUTING.md with Git Flow workflow, development guidelines, and PR process
   - Added VISION.md with project mission, values, roadmap, and target audience
   - Added TODO.md for tracking future work organized by priority and category
@@ -89,14 +89,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Added changelog best practices guide with examples for React/Next.js frontend
 
 - **GitHub Templates**: Added comprehensive issue and PR templates
-
   - Bug report template with browser, OS, and device information fields
   - Feature request template with component/area and priority selection
   - Pull request template with detailed checklist for code quality, testing, and documentation
   - Issue template config to guide users to appropriate resources
 
 - **GitHub Discussions**: Added discussion welcome template
-
   - Defined discussion categories (Ideas, Q&A, Music & Genres, Show and Tell, Announcements, Development)
   - Community guidelines and best practices
   - Instructions for effective participation
@@ -113,13 +111,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### CI
 
 - **PR Description Workflow**: Added cursor rule for PR description management
-
   - PR descriptions must be drafted in `.pr-descriptions/` directory (git-ignored)
   - Ensures use of PR template and iterative refinement before publishing
   - Added `.pr-descriptions/` to .gitignore
 
 - **Auto-labeler Workflows**: Added comprehensive automated labeling system
-
   - **File-based PR labeler**: Applies component/technology labels based on changed files
   - **PR size labeler**: Automatically calculates and labels PR size (xs/s/m/l/xl) with line counts
   - **PR type labeler**: Detects PR type from title/description (feat, fix, docs, etc.) and breaking changes
@@ -131,14 +127,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Reduces manual labeling overhead and ensures consistent label application
 
 - **Branch Protection**: Added Git Flow branch protection workflow
-
   - Enforces branch naming conventions for PRs to `main` (hotfix/_, release/_ only)
   - Enforces branch naming conventions for PRs to `develop` (feature/_, chore/_, dependabot/\_ only)
   - Automatically comments on invalid PRs with clear instructions
   - Prevents merging branches that don't follow Git Flow workflow
 
 - **Testing Infrastructure**: Added comprehensive testing setup with Vitest
-
   - Configured Vitest 3.2.4 with React Testing Library for component testing
   - Added test scripts: test, test:watch, test:ui, test:coverage
   - Created 31 passing tests for utilities and UI components
@@ -146,7 +140,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Includes @vitest/ui for interactive test debugging
 
 - **CI/CD Refactoring**: Split monolithic CI workflow following Git Flow best practices
-
   - Created separate workflows: ci.yml (validation), deploy-test.yml, deploy-prod.yml
   - Added reusable deployment workflow (deploy-reusable.yml) to eliminate code duplication
   - Renamed `dev` branch to `develop` following standard Git Flow naming
@@ -163,7 +156,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Fixed
 
 - **TypeScript Errors**: Resolved multiple type-related build blockers
-
   - Fixed GenreDeletionPopup type mismatch by adding uuid to Genre interface
   - Completed all error code mappings in app-error-messages.ts (10 errors resolved)
   - Excluded vitest.config.ts from tsconfig to fix moduleResolution conflicts
