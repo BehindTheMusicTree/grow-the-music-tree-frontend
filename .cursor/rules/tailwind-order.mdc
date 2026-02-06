@@ -1,0 +1,60 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Rule Configuration
+
+```json
+{
+  "pattern": "className=\\s*[\"'](mdc:[^\"']*)[\"']",
+  "order": [
+    "flex|grid|block|inline|inline-block|hidden",
+    "relative|absolute|fixed|sticky",
+    "w-|h-|p-|m-|space-",
+    "overflow-|overflow-x-|overflow-y-",
+    "font-",
+    "text-",
+    "leading-|tracking-",
+    "bg-",
+    "border-",
+    "rounded-",
+    "shadow-",
+    "opacity-",
+    "cursor-|pointer-events-|select-",
+    "hover:|focus:|active:|disabled:"
+  ],
+  "message": "Tailwind classes should be ordered: Layout > Typography > Visual > Interactive > States"
+}
+```
+
+# Order Categories
+
+1. Layout
+   - Display utilities (flex, grid, block)
+   - Position (relative, absolute)
+   - Box model (w-, h-, p-, m-)
+   - Overflow
+
+2. Typography
+   - Font family and size
+   - Text properties
+   - Line height and spacing
+
+3. Visual
+   - Background
+   - Border
+   - Rounded corners
+   - Shadow
+   - Opacity
+
+4. Interactive
+   - Cursor
+   - Pointer events
+   - User select
+
+5. States
+   - Hover
+   - Focus
+   - Active
+   - Disabled

@@ -1,0 +1,64 @@
+---
+description: Guidelines for commit message format following Conventional Commits
+globs:
+  - "**/*"
+alwaysRun: true
+---
+
+# Commit Message Format
+
+All commit messages must follow the Conventional Commits format as specified in CONTRIBUTING.md.
+
+## Required Format
+
+```
+<type>(<scope>): <summary>
+```
+
+## Commit Types
+
+- `feat` - New feature
+- `fix` - Bug fix
+- `refactor` - Code restructuring
+- `docs` - Documentation update
+- `chore` - Maintenance / infrastructure
+- `test` - Adding or updating tests
+- `style` - Formatting / lint-only changes
+- `perf` - Performance improvement
+- `ci` - CI/CD pipeline changes
+
+## Rules
+
+- **Always prefix with type**: Every commit message must start with one of the allowed types
+- **Use imperative mood**: "Add…", "Fix…", "Update…" (not "Added", "Fixed", "Updates")
+- **Keep summary under ~70 characters**
+- **Scope is optional**: Use parentheses for scope when relevant (e.g., `feat(player):`, `fix(genre-tree):`)
+- **Lowercase**: Use lowercase for type and scope (e.g., `feat(player):`, not `Feat(Player):`)
+- **Include issue IDs when applicable**: `fix(#482): handle null values`
+
+## Examples
+
+✅ **Correct:**
+- `feat(player): add shuffle mode`
+- `fix(genre-tree): handle empty genre nodes`
+- `docs: update setup instructions`
+- `chore: update dependencies`
+- `test(track-list): add unit tests for sorting`
+- `perf(track-list): implement virtualized scrolling`
+- `ci: add branch protection workflow`
+- `fix(#482): handle null search values`
+
+❌ **Incorrect:**
+- `Align changelog with branch changes` (missing type prefix)
+- `Updated changelog` (missing type prefix, past tense)
+- `FEAT: Add shuffle mode` (uppercase type)
+- `feat: Added shuffle mode` (past tense, should be imperative)
+- `fix genre tree bug` (missing colon and parentheses for scope)
+
+## Enforcement
+
+When creating commits:
+- Always use the format: `<type>(<scope>): <summary>`
+- Verify the type matches the change (docs for documentation, fix for bug fixes, etc.)
+- Use imperative mood in the summary
+- Keep it concise and descriptive

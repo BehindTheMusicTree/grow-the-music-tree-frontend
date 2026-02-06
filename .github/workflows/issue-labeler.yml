@@ -1,0 +1,121 @@
+name: Auto Label Issues
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  label-by-template:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label bug reports
+        if: contains(github.event.issue.body, '### Issue Type') && contains(github.event.issue.body, 'Bug Report')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['bug', 'status: needs-triage']
+            })
+
+      - name: Label feature requests
+        if: contains(github.event.issue.body, '### Issue Type') && contains(github.event.issue.body, 'Feature Request')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['enhancement', 'status: needs-triage']
+            })
+
+      - name: Label by component
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            const labels = [];
+
+            // Component detection
+            if (body.includes('Player') || body.includes('audio player')) {
+              labels.push('component: player');
+            }
+            if (body.includes('Genre Tree') || body.includes('genre tree') || body.includes('visualization')) {
+              labels.push('component: genre-tree');
+            }
+            if (body.includes('Track List') || body.includes('track list')) {
+              labels.push('component: track-list');
+            }
+            if (body.includes('Playlist') || body.includes('playlist')) {
+              labels.push('component: playlist');
+            }
+            if (body.includes('Auth') || body.includes('authentication') || body.includes('Spotify login')) {
+              labels.push('component: auth');
+            }
+            if (body.includes('API') || body.includes('backend integration')) {
+              labels.push('component: api');
+            }
+            if (body.includes('UI') || body.includes('styling') || body.includes('design')) {
+              labels.push('component: ui');
+            }
+
+            // Browser detection
+            if (body.includes('Chrome')) {
+              labels.push('browser: chrome');
+            }
+            if (body.includes('Firefox')) {
+              labels.push('browser: firefox');
+            }
+            if (body.includes('Safari')) {
+              labels.push('browser: safari');
+            }
+
+            // Platform detection
+            if (body.includes('Mobile') || body.includes('iOS') || body.includes('Android')) {
+              labels.push('platform: mobile');
+            }
+            if (body.includes('Desktop') || body.includes('Windows') || body.includes('macOS') || body.includes('Linux')) {
+              labels.push('platform: desktop');
+            }
+
+            // Priority detection
+            if (body.includes('Critical') || body.includes('critical')) {
+              labels.push('priority: critical');
+            } else if (body.includes('High') || body.includes('high priority')) {
+              labels.push('priority: high');
+            } else if (body.includes('Low') || body.includes('low priority')) {
+              labels.push('priority: low');
+            } else {
+              labels.push('priority: medium');
+            }
+
+            // Security detection
+            if (body.includes('security') || body.includes('Security') || body.includes('vulnerability')) {
+              labels.push('security');
+            }
+
+            // Performance detection
+            if (body.includes('performance') || body.includes('Performance') || body.includes('slow') || body.includes('lag')) {
+              labels.push('performance');
+            }
+
+            // Accessibility detection
+            if (body.includes('accessibility') || body.includes('Accessibility') || body.includes('a11y') || body.includes('screen reader')) {
+              labels.push('accessibility');
+            }
+
+            if (labels.length > 0) {
+              github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: labels
+              });
+            }

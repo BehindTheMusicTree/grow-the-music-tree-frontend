@@ -1,0 +1,93 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Local",
+      "type": "node",
+      "request": "launch",
+      "preLaunchTask": "setup-and-verify-local",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["./scripts/run-dev-on-env-port.sh"],
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "smartStep": true,
+      "autoAttachChildProcesses": false,
+      "restart": true,
+      "env": {
+        "VSCODE_INSPECTOR_OPTIONS": "{\"autoAttachMode\":\"smart\"}"
+      },
+      "serverReadyAction": {
+        "pattern": "started server on .+, url: (https?://.+)",
+        "uriFormat": "%s",
+        "action": "startDebugging",
+        "name": "Debug in Firefox"
+      }
+    },
+    {
+      "name": "Launch Remote",
+      "type": "node",
+      "request": "launch",
+      "preLaunchTask": "verify-env-dev-remote",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["./scripts/run-dev-on-env-port.sh"],
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "smartStep": true,
+      "autoAttachChildProcesses": false,
+      "restart": true,
+      "env": {
+        "VSCODE_INSPECTOR_OPTIONS": "{\"autoAttachMode\":\"smart\"}"
+      },
+      "serverReadyAction": {
+        "pattern": "started server on .+, url: (https?://.+)",
+        "uriFormat": "%s",
+        "action": "startDebugging",
+        "name": "Debug in Firefox"
+      }
+    },
+    {
+      "type": "firefox",
+      "request": "launch",
+      "name": "Debug in Firefox",
+      "url": "http://localhost:5000",
+      "webRoot": "${workspaceFolder}",
+      "firefoxExecutable": "/Applications/Firefox.app/Contents/MacOS/firefox",
+      "profile": "default",
+      "reAttach": true,
+      "preferences": {
+        "devtools.debugger.remote-enabled": true,
+        "devtools.chrome.enabled": true,
+        "devtools.debugger.prompt-connection": false
+      },
+      "pathMappings": [
+        {
+          "url": "http://localhost:5000/",
+          "path": "${workspaceFolder}/"
+        }
+      ],
+      "log": {
+        "trace": true,
+        "traceResponse": true
+      },
+      "sourceMaps": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug Local",
+      "configurations": ["Launch Local", "Debug in Firefox"],
+      "stopAll": true,
+      "presentation": {
+        "hidden": true
+      }
+    },
+    {
+      "name": "Debug Remote",
+      "configurations": ["Launch Remote", "Debug in Firefox"],
+      "stopAll": true,
+      "presentation": {
+        "hidden": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+import { PlaylistDetailed } from "@schemas/domain/playlist/detailed";
+import { CriteriaPlaylistDetailed } from "@schemas/domain/playlist/criteria-playlist/detailed";
+import { UploadedTrackDetailed } from "@schemas/domain/uploaded-track/response/detailed";
+import { TrackListOriginType } from "./TrackListOriginType";
+
+export default class TrackListOrigin {
+  constructor(public type: TrackListOriginType, public label: string, public uuid: string) {}
+}
+
+export class TrackListOriginFromUploadedTrack extends TrackListOrigin {
+  constructor(public uploadedTrack: UploadedTrackDetailed) {
+    super(
+      TrackListOriginType.UPLOADED_TRACK,
+      `${uploadedTrack.title} by ${
+        uploadedTrack.artists ? uploadedTrack.artists.map((artist) => artist.name).join(", ") : ""
+      }`,
+      uploadedTrack.uuid
+    );
+  }
+}
+
+export class TrackListOriginFromPlaylist extends TrackListOrigin {
+  constructor(public playlist: PlaylistDetailed) {
+    super(TrackListOriginType.PLAYLIST, playlist.name, playlist.uuid);
+  }
+}
+
+export class TrackListOriginFromCriteriaPlaylist extends TrackListOrigin {
+  constructor(public criteriaPlaylist: CriteriaPlaylistDetailed) {
+    super(TrackListOriginType.GENRE_PLAYLIST, criteriaPlaylist.name, criteriaPlaylist.uuid);
+  }
+}

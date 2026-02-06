@@ -1,0 +1,130 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "verify-env-dev",
+      "type": "npm",
+      "script": "verify-env",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "setup-env-dev-local",
+      "type": "shell",
+      "command": "bash scripts/setup-env-dev.sh local",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "verify-env-dev-local",
+      "type": "shell",
+      "command": "node scripts/verify-env.js",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "setup-and-verify-local",
+      "dependsOn": ["setup-env-dev-local", "verify-env-dev-local"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "setup-env-dev-remote",
+      "type": "shell",
+      "command": "bash scripts/setup-env-dev.sh remote",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "verify-env-dev-remote",
+      "type": "shell",
+      "command": "node scripts/verify-env.js",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "start-dev-server",
+      "type": "npm",
+      "script": "dev",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [
+        {
+          "owner": "custom",
+          "pattern": [
+            {
+              "regexp": "ERROR in (.*)",
+              "file": 1
+            },
+            {
+              "regexp": "\\s*(.*):(\\d+):(\\d+)",
+              "line": 2,
+              "column": 3
+            },
+            {
+              "regexp": "\\s*(.*)$",
+              "message": 1
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "^.*starting dev server.*$",
+            "endsPattern": "^.*(?:Compiled successfully|Failed to compile).*$"
+          }
+        }
+      ]
+    },
+    {
+      "label": "build-with-env-local",
+      "type": "npm",
+      "script": "build",
+      "dependsOn": ["setup-env-dev-local"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "build-with-env-remote",
+      "type": "npm",
+      "script": "build",
+      "dependsOn": ["setup-env-dev-remote"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "ensure-debug-dirs",
+      "type": "shell",
+      "command": "mkdir -p .vscode/firefox-debug-profile",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

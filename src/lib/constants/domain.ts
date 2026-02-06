@@ -1,0 +1,5 @@
+export const UPLOADED_TRACK_TITLE_LEN_MAX = 256;
+export const ARTISTS_NAMES_LEN_MAX = 256;
+export const ALBUM_NAME_LEN_MAX = 256;
+export const ALBUM_ARTISTS_NAMES_FIELD_LEN_MAX = 256;
+export const LANGUAGE_LEN_MAX = 3;

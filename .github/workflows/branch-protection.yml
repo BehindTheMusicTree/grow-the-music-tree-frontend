@@ -1,0 +1,55 @@
+name: Branch Protection Check
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  check-branch-name:
+    name: Verify PR source branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check source branch name
+        run: |
+          SOURCE_BRANCH="${{ github.head_ref }}"
+          TARGET_BRANCH="${{ github.base_ref }}"
+
+          validate_branch() {
+            local target="$1"
+            local source="$2"
+            local valid_prefixes=()
+            local error_message=""
+            
+            case "$target" in
+              main)
+                valid_prefixes=("hotfix/" "release/")
+                error_message="Pull requests to main must come from hotfix/* or release/* branches only.\n\nFor features, bug fixes, or chores, please target the 'develop' branch instead."
+                ;;
+              develop)
+                valid_prefixes=("feature/" "chore/" "dependabot/")
+                error_message="Pull requests to develop must come from feature/*, chore/*, or dependabot/* branches only.\n\nDirect PRs from main to develop are not allowed.\nExamples:\n - feature/improve-genre-classification\n - chore/update-dependencies\n - dependabot/pip/requests-2.28.0"
+                ;;
+              *)
+                echo "⚠️  Unknown target branch: $target"
+                exit 0
+                ;;
+            esac
+            
+            for prefix in "${valid_prefixes[@]}"; do
+              if [[ "$source" =~ ^${prefix}.* ]]; then
+                echo "✅ Valid source branch: $source"
+                echo "PRs to $target must come from ${valid_prefixes[*]} branches (Git Flow)"
+                return 0
+              fi
+            done
+            
+            echo "❌ Invalid source branch: $source"
+            echo -e "$error_message"
+            echo ""
+            echo "See CONTRIBUTING.md for Git Flow guidelines."
+            return 1
+          }
+
+          validate_branch "$TARGET_BRANCH" "$SOURCE_BRANCH" || exit 1

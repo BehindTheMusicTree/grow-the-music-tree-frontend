@@ -1,0 +1,206 @@
+"use client";
+
+import Image from "next/image";
+import { useEffect, useMemo } from "react";
+
+import { FaSpinner, FaSync } from "react-icons/fa";
+import { MdSyncProblem } from "react-icons/md";
+import {
+  useListSpotifyLibTracks,
+  useQuickSyncSpotifyLibTracks,
+  useFullSyncSpotifyLibTracks,
+} from "@hooks/useSpotifyLibTracks";
+import type { SpotifyLibTrackSimple } from "@domain/spotify/spotify-lib-track";
+
+function formatDuration(durationStr: string): string {
+  // Remove any leading/trailing whitespace
+  const cleanStr = durationStr.trim();
+
+  // Split by colon to get hours, minutes, seconds
+  const parts = cleanStr.split(":");
+
+  // Handle milliseconds if present
+  const lastPart = parts[parts.length - 1];
+  const [seconds, milliseconds] = lastPart.split(".");
+  parts[parts.length - 1] = seconds; // Replace the last part with just seconds
+
+  // If we have hours (3 parts), format as "H:MM:SS"
+  if (parts.length === 3) {
+    const [hours, minutes, secs] = parts;
+    return `${hours}:${minutes.padStart(2, "0")}:${secs.padStart(2, "0")}`;
+  }
+
+  // If we have minutes and seconds (2 parts), format as "M:SS"
+  if (parts.length === 2) {
+    const [minutes, secs] = parts;
+    return `${minutes}:${secs.padStart(2, "0")}`;
+  }
+
+  // If we only have seconds, format as "0:SS"
+  if (parts.length === 1) {
+    return `0:${parts[0].padStart(2, "0")}`;
+  }
+
+  // Fallback to original string if format is unexpected
+  return durationStr;
+}
+
+export default function SpotifyLibrary() {
+  const {
+    data: spotifyLibTracksResponse,
+    isPending: isListingPending,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useListSpotifyLibTracks();
+  const { mutate: quickSyncSpotifyLibTracks, isPending: isQuickSyncPending } = useQuickSyncSpotifyLibTracks();
+  const { mutate: fullSyncSpotifyLibTracks, isPending: isFullSyncPending } = useFullSyncSpotifyLibTracks();
+
+  const spotifyLibTracks = useMemo(
+    () => spotifyLibTracksResponse?.pages?.flatMap((page) => page.results) || [],
+    [spotifyLibTracksResponse?.pages]
+  );
+
+  console.log("Infinite query data:", spotifyLibTracksResponse);
+  console.log("Pages:", spotifyLibTracksResponse?.pages);
+  console.log("First page results:", spotifyLibTracksResponse?.pages?.[0]?.results);
+
+  const currentPage = spotifyLibTracksResponse?.pages?.[spotifyLibTracksResponse.pages.length - 1]?.page || 1;
+  const totalPages = spotifyLibTracksResponse?.pages?.[0]?.totalPages || 1;
+  const total = spotifyLibTracksResponse?.pages?.[0]?.overallTotal || 0;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 100) {
+        if (hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    if (!isListingPending) {
+      console.log("SpotifyLibrary data", spotifyLibTracksResponse);
+    }
+  }, [spotifyLibTracksResponse, isListingPending]);
+
+  const handleQuickSync = async () => {
+    await quickSyncSpotifyLibTracks();
+  };
+
+  const handleFullSync = async () => {
+    await fullSyncSpotifyLibTracks();
+  };
+
+  if (isListingPending) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <FaSpinner className="text-[#1DB954] text-4xl animate-spin" />
+        <p className="text-[#1DB954] mt-4">Loading Spotify library...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col h-screen w-full">
+      <div className="flex-none p-4">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Your Spotify Library</h1>
+          <div className="text-sm text-gray-500">
+            Showing {spotifyLibTracks.length} of {total} tracks
+          </div>
+        </div>
+
+        <div className="flex space-x-4 mb-6">
+          <button
+            className="flex items-center px-4 py-2 bg-[#1DB954] text-white rounded hover:bg-[#1AA84A] disabled:opacity-50"
+            onClick={handleQuickSync}
+            disabled={isQuickSyncPending || isFullSyncPending}
+          >
+            <FaSync className={isQuickSyncPending ? "animate-spin mr-2" : "mr-2"} />
+            Quick Sync
+          </button>
+          <button
+            className="flex items-center px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 disabled:opacity-50"
+            onClick={handleFullSync}
+            disabled={isQuickSyncPending || isFullSyncPending}
+          >
+            <MdSyncProblem className={isFullSyncPending ? "animate-spin mr-2" : "mr-2"} />
+            Full Sync
+            <span className="ml-1 text-xs">(may take longer)</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="w-full overflow-x-auto">
+          <table className="w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >
+                  Track
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >
+                  Artists
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >
+                  Album
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >
+                  Duration
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+              {spotifyLibTracks.map((spotifyLibTrack) => (
+                <tr key={spotifyLibTrack.spotifyId} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <td className="px-4 py-4">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">{spotifyLibTrack.name}</div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {spotifyLibTrack.spotifyArtists.map((artist) => artist.name).join(", ")}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{spotifyLibTrack.album}</div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {formatDuration(spotifyLibTrack.durationStrInHourMinSec)}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-2 text-center text-sm text-gray-500">
+          Page {currentPage} of {totalPages} • {total} total tracks
+        </div>
+        {isFetchingNextPage && (
+          <div className="flex justify-center mt-4">
+            <FaSpinner className="text-[#1DB954] text-2xl animate-spin" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

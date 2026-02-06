@@ -1,7 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 
 const playerHeight = "80px";
-export default {
+const bannerHeight = "63.5px";
+const config = {
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   theme: {
     extend: {
@@ -38,9 +39,10 @@ export default {
         "play-l-offset": "15px",
         "play-r-offset": "13px",
         player: playerHeight,
+        banner: bannerHeight,
       },
       height: {
-        banner: "100px",
+        banner: bannerHeight,
         player: playerHeight,
         menuitem: "45px",
       },
@@ -70,7 +72,7 @@ export default {
           "@apply scale-120": {},
         },
 
-        ".library-item": {
+        ".uploaded-library-item": {
           "@apply border-b border-gray-500 py-2 text-overflow": {},
         },
         ".action-round-button": {
@@ -146,3 +148,5 @@ export default {
     },
   ],
 };
+
+export default config;

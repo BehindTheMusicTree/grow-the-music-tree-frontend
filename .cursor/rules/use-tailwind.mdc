@@ -1,0 +1,19 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Use Tailwind CSS
+- Always use Tailwind utility classes instead of CSS modules
+- Never import or use .module.css files
+- Use semantic class names with Tailwind's utility-first approach
+- Example mappings:
+  - overlay → fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50
+  - popup → bg-white rounded-lg p-6 min-w-[300px] max-w-[500px] shadow-lg
+  - error → text-red-600
+  - success → text-green-600
+  - confirm → text-blue-600
+  - actions → flex justify-end gap-3 mt-4
+  - button → px-4 py-2 rounded font-medium
+  - button-primary → bg-blue-600 text-white hover:bg-blue-700 transition-colors
+  - button-secondary → bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors
