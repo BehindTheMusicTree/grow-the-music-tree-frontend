@@ -7,6 +7,7 @@ This project is statically generated and intended to be served as static files (
 ## Table of Contents
 
 - [Overview](#overview)
+- [Pages](#pages)
 - [Tech Stack](#tech-stack)
 - [Rendering Strategy](#rendering-strategy)
 - [Project Structure](#project-structure)
@@ -36,6 +37,18 @@ Music enthusiasts, researchers, and the general public interested in understandi
 - Smart playlist generation based on musical journeys
 - Community discussions and voting on genre classifications
 - Rich contextual information for each genre (historical, cultural, technical)
+
+## Pages
+
+- Home (`/`)
+- Account (`/account`)
+- Spotify Auth Callback (`/auth/spotify/callback`)
+- Genre Playlists (`/genre-playlists`)
+- Genre Tree (`/genre-tree`)
+- Spotify Library (`/spotify-library`)
+- Uploaded Library (`/uploaded-library`)
+
+See `docs/pages/` for detailed page documentation.
 
 ## Tech Stack
 
