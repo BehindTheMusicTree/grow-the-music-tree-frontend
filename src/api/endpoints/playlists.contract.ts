@@ -1,9 +1,9 @@
 export const playlistQueryKeys = {
   me: {
-    all: ["genrePlaylists"] as const,
-    list: (page: number) => ["genrePlaylists", "list", page] as const,
-    full: ["genrePlaylists", "full"] as const,
-    detail: (uuid: string) => ["genrePlaylists", uuid] as const,
+    all: ["meGenrePlaylists"] as const,
+    list: (page: number) => ["meGenrePlaylists", "list", page] as const,
+    full: ["meGenrePlaylists", "full"] as const,
+    detail: (uuid: string) => ["meGenrePlaylists", uuid] as const,
   },
   reference: {
     all: ["referenceGenrePlaylists"] as const,
