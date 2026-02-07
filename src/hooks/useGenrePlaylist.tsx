@@ -96,7 +96,7 @@ export const useListReferenceGenrePlaylists = () => {
       const response = await fetch(
         "reference-genre-playlists/",
         false,
-        true,
+        false,
         {},
         { page: 1, pageSize: FULL_LIST_PAGE_SIZE },
       );

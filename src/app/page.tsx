@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function HomePage() {
-  redirect("/my-genre-tree");
+  redirect("/reference-genre-tree");
 }
