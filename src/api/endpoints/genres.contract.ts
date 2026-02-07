@@ -9,9 +9,6 @@ export const genreQueryKeys = {
     list: (page: number) => ["referenceGenres", "list", page] as const,
     detail: (id: string) => ["referenceGenres", "detail", id] as const,
   },
-  myGenres: {
-    all: ["myGenres"] as const,
-  },
 };
 
 export const genreEndpoints = {
