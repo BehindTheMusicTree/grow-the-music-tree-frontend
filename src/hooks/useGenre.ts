@@ -20,9 +20,10 @@ export function useListGenres(
   const { fetch } = useFetchWrapper();
 
   return useQuery({
-    queryKey: isReference ? genreQueryKeys.reference.list(page) : genreQueryKeys.my.list(page),
+    queryKey: isReference ? genreQueryKeys.reference.list(page) : genreQueryKeys.me.list(page),
     queryFn: async () => {
-      const response = await fetch(genreEndpoints.list(isReference), isReference, true, true, {}, { page, pageSize });
+      const endpoint = isReference ? genreEndpoints.reference.list() : genreEndpoints.me.list();
+      const response = await fetch(endpoint, isReference, true, true, {}, { page, pageSize });
       return PaginatedResponseSchema(CriteriaSimpleSchema).parse(response);
     },
   });
@@ -33,7 +34,8 @@ export function useFetchGenre(isReference = false) {
 
   return useCallback(
     async (id: string): Promise<CriteriaDetailed> => {
-      const response = await fetch(genreEndpoints.detail(id, isReference), true);
+      const endpoint = isReference ? genreEndpoints.reference.detail(id) : genreEndpoints.me.detail(id);
+      const response = await fetch(endpoint, true);
       return CriteriaDetailedSchema.parse(response);
     },
     [fetch, isReference],
@@ -49,13 +51,14 @@ export function useLoadReferenceTreeGenre(isReference = false) {
     inputSchema: z.void(),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
-      const response = await fetch(genreEndpoints.loadTree(isReference), true, true, {
+      const endpoint = isReference ? genreEndpoints.reference.loadTree() : genreEndpoints.me.loadTree();
+      const response = await fetch(endpoint, true, true, {
         method: "POST",
       });
       return response;
     },
     onSuccess: () => {
-      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.my.all;
+      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
       queryClient.invalidateQueries({ queryKey });
       invalidateAllGenrePlaylistQueries();
     },
@@ -70,13 +73,14 @@ export function useLoadPublicReferenceTreeGenre(isReference = false) {
     inputSchema: z.void(),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
-      const response = await fetch(genreEndpoints.loadTree(isReference), false, true, {
+      const endpoint = isReference ? genreEndpoints.reference.loadTree() : genreEndpoints.me.loadTree();
+      const response = await fetch(endpoint, false, true, {
         method: "POST",
       });
       return response;
     },
     onSuccess: () => {
-      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.myGenres.all;
+      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
       queryClient.invalidateQueries({ queryKey });
     },
   });
