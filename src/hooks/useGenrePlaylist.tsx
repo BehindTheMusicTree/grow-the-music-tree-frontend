@@ -8,6 +8,8 @@ import { CriteriaPlaylistDetailedSchema, CriteriaPlaylistDetailed } from "@domai
 
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 
+const FULL_LIST_PAGE_SIZE = 1000;
+
 export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBLIC_GENRE_PLAYLISTS_PAGE_SIZE || 50) => {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
@@ -42,7 +44,7 @@ export const useListFullGenrePlaylists = () => {
   const query = useQuery({
     queryKey: ["fullGenrePlaylists"],
     queryFn: async () => {
-      const response = await fetch("genre-playlists/", true, true, {}, { page: 1, pageSize: 1000 });
+      const response = await fetch("genre-playlists/", true, true, {}, { page: 1, pageSize: FULL_LIST_PAGE_SIZE });
       const parseResult = PaginatedResponseSchema(CriteriaPlaylistSimpleSchema).safeParse(response);
       if (!parseResult.success) {
         console.error("Parsing failed:", parseResult.error);
@@ -84,10 +86,44 @@ export const useFetchGenrePlaylistDetailed = () => {
   });
 };
 
+export const useListReferenceGenrePlaylists = () => {
+  const queryClient = useQueryClient();
+  const { fetch } = useFetchWrapper();
+
+  const query = useQuery({
+    queryKey: ["referenceGenrePlaylists"],
+    queryFn: async () => {
+      const response = await fetch(
+        "reference-genre-playlists/",
+        false,
+        true,
+        {},
+        { page: 1, pageSize: FULL_LIST_PAGE_SIZE },
+      );
+      const parseResult = PaginatedResponseSchema(CriteriaPlaylistSimpleSchema).safeParse(response);
+      if (!parseResult.success) {
+        console.error("Parsing failed:", parseResult.error);
+        throw parseResult.error;
+      }
+      return parseResult.data;
+    },
+  });
+
+  const invalidateReferenceGenrePlaylists = () => {
+    queryClient.invalidateQueries({ queryKey: ["referenceGenrePlaylists"] });
+  };
+
+  return {
+    ...query,
+    invalidateReferenceGenrePlaylists,
+  };
+};
+
 export const useInvalidateAllGenrePlaylistQueries = () => {
   const queryClient = useQueryClient();
   return () => {
     queryClient.invalidateQueries({ queryKey: ["genrePlaylists"] });
     queryClient.invalidateQueries({ queryKey: ["fullGenrePlaylists"] });
+    queryClient.invalidateQueries({ queryKey: ["referenceGenrePlaylists"] });
   };
 };

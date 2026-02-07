@@ -31,7 +31,7 @@ export function useFetchGenre() {
       const response = await fetch(`genres/${id}/`, true);
       return CriteriaDetailedSchema.parse(response);
     },
-    [fetch]
+    [fetch],
   );
 }
 
@@ -52,6 +52,25 @@ export function useLoadReferenceTreeGenre() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["genres"] });
       invalidateAllGenrePlaylistQueries();
+    },
+  });
+}
+
+export function useLoadPublicReferenceTreeGenre() {
+  const { fetch } = useFetchWrapper();
+  const queryClient = useQueryClient();
+
+  return useValidatedMutation({
+    inputSchema: z.void(),
+    outputSchema: CriteriaDetailedSchema,
+    mutationFn: async () => {
+      const response = await fetch("reference/genres/tree/load/", false, true, {
+        method: "POST",
+      });
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["referenceGenres"] });
     },
   });
 }

@@ -76,6 +76,15 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Reference Genre Tree Page**: Added public `/reference-genre-tree` page for community-shared taxonomy
+  - No authentication required - accessible to all users
+  - Displays evolving genre tree contributed by the entire community
+  - Read-only interface (no genre creation for public access)
+  - Uses public API endpoints: `reference-genre-playlists/` and `reference/genres/tree/load/`
+  - Includes comprehensive documentation and page-level docs
+
 ## [0.2.0] - 2025-02-06
 
 ### Changed
