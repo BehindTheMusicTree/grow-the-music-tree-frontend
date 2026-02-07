@@ -1,6 +1,16 @@
-export const GENRE_PLAYLISTS_KEY = "genrePlaylists";
-export const FULL_GENRE_PLAYLISTS_KEY = "fullGenrePlaylists";
-export const REFERENCE_GENRE_PLAYLISTS_KEY = "referenceGenrePlaylists";
+export const playlistQueryKeys = {
+  my: {
+    all: ["genrePlaylists"] as const,
+    list: (page: number) => ["genrePlaylists", "list", page] as const,
+    detail: (uuid: string) => ["genrePlaylists", uuid] as const,
+  },
+  full: {
+    all: ["fullGenrePlaylists"] as const,
+  },
+  reference: {
+    all: ["referenceGenrePlaylists"] as const,
+  },
+};
 
 export const playlistEndpoints = {
   list: (isReference = false) => (isReference ? "reference-genre-playlists/" : "genre-playlists/"),

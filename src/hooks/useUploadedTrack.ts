@@ -8,13 +8,13 @@ import { UploadedTrackCreationSchema } from "@domain/uploaded-track/form/creatio
 import { UploadedTrackUpdateSchema } from "@domain/uploaded-track/form/update";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { useValidatedMutation } from "./useValidatedMutation";
-import { libraryEndpoints, UPLOADED_TRACKS_KEY } from "../api/endpoints/library.contract";
+import { libraryEndpoints, libraryQueryKeys } from "../api/endpoints/library.contract";
 
 export function useListUploadedTracks(page = 1, pageSize = process.env.NEXT_PUBLIC_UPLOADED_TRACKS_PAGE_SIZE || 50) {
   const { fetch } = useFetchWrapper();
 
   return useQuery({
-    queryKey: [UPLOADED_TRACKS_KEY, "list", page],
+    queryKey: libraryQueryKeys.uploaded.list(page),
     queryFn: async () => {
       const response = await fetch(libraryEndpoints.uploaded.list(), false, true, true, {}, { page, pageSize });
       const result = PaginatedResponseSchema(UploadedTrackDetailedSchema).safeParse(response);
@@ -80,7 +80,7 @@ export function useUploadTrack() {
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [UPLOADED_TRACKS_KEY] });
+      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.uploaded.all });
       invalidateAllGenrePlaylistQueries();
     },
   });
@@ -111,8 +111,8 @@ export function useUpdateUploadedTrack() {
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      queryClient.invalidateQueries({ queryKey: [UPLOADED_TRACKS_KEY] });
-      queryClient.invalidateQueries({ queryKey: [UPLOADED_TRACKS_KEY, "detail", uuid] });
+      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.uploaded.all });
+      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.uploaded.detail(uuid) });
       invalidateAllGenrePlaylistQueries();
     },
   });
@@ -123,7 +123,7 @@ export function useDownloadTrack(uuid: string) {
   const { fetch } = useFetchWrapper();
 
   return useQuery({
-    queryKey: [UPLOADED_TRACKS_KEY, "download", uuid],
+    queryKey: libraryQueryKeys.uploaded.download(uuid),
     queryFn: async () => {
       const response = await fetch(libraryEndpoints.uploaded.download(uuid), false, true, true, {}, undefined, true);
 

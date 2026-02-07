@@ -10,14 +10,7 @@ import { CriteriaSimpleSchema } from "@schemas/domain/criteria/response/simple";
 import { CriteriaCreationSchema } from "@schemas/domain/criteria/form/creation";
 import { CriteriaUpdateSchema } from "@schemas/domain/criteria/form/update";
 import { useValidatedMutation } from "./useValidatedMutation";
-import {
-  genreEndpoints,
-  GENRES_KEY,
-  REFERENCE_GENRES_KEY,
-  MY_GENRES_KEY,
-  LIST_KEY,
-  DETAIL_KEY,
-} from "../api/endpoints/genres.contract";
+import { genreEndpoints, genreQueryKeys } from "../api/endpoints/genres.contract";
 
 export function useListGenres(
   page = 1,
@@ -27,7 +20,7 @@ export function useListGenres(
   const { fetch } = useFetchWrapper();
 
   return useQuery({
-    queryKey: isReference ? [REFERENCE_GENRES_KEY, LIST_KEY, page] : [GENRES_KEY, LIST_KEY, page],
+    queryKey: isReference ? genreQueryKeys.reference.list(page) : genreQueryKeys.my.list(page),
     queryFn: async () => {
       const response = await fetch(genreEndpoints.list(isReference), isReference, true, true, {}, { page, pageSize });
       return PaginatedResponseSchema(CriteriaSimpleSchema).parse(response);
@@ -62,7 +55,7 @@ export function useLoadReferenceTreeGenre(isReference = false) {
       return response;
     },
     onSuccess: () => {
-      const queryKey = isReference ? [REFERENCE_GENRES_KEY] : [GENRES_KEY];
+      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.my.all;
       queryClient.invalidateQueries({ queryKey });
       invalidateAllGenrePlaylistQueries();
     },
@@ -83,7 +76,7 @@ export function useLoadPublicReferenceTreeGenre(isReference = false) {
       return response;
     },
     onSuccess: () => {
-      const queryKey = isReference ? [REFERENCE_GENRES_KEY] : [MY_GENRES_KEY];
+      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.myGenres.all;
       queryClient.invalidateQueries({ queryKey });
     },
   });
@@ -105,7 +98,7 @@ export function useCreateGenre(isReference = false) {
       return response;
     },
     onSuccess: () => {
-      const queryKey = isReference ? [REFERENCE_GENRES_KEY] : [MY_GENRES_KEY];
+      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.myGenres.all;
       queryClient.invalidateQueries({ queryKey });
       invalidateAllGenrePlaylistQueries();
     },
@@ -131,8 +124,8 @@ export function useUpdateGenre(isReference = false) {
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      const queryKey = isReference ? [REFERENCE_GENRES_KEY] : [GENRES_KEY];
-      const detailKey = isReference ? [REFERENCE_GENRES_KEY, DETAIL_KEY, uuid] : [GENRES_KEY, DETAIL_KEY, uuid];
+      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.my.all;
+      const detailKey = isReference ? genreQueryKeys.reference.detail(uuid) : genreQueryKeys.my.detail(uuid);
       queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries({ queryKey: detailKey });
       invalidateAllGenrePlaylistQueries();
@@ -168,8 +161,8 @@ export function useDeleteGenre(isReference = false) {
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      const queryKey = isReference ? [REFERENCE_GENRES_KEY] : [GENRES_KEY];
-      const detailKey = isReference ? [REFERENCE_GENRES_KEY, DETAIL_KEY, uuid] : [GENRES_KEY, DETAIL_KEY, uuid];
+      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.my.all;
+      const detailKey = isReference ? genreQueryKeys.reference.detail(uuid) : genreQueryKeys.my.detail(uuid);
       queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries({ queryKey: detailKey });
       invalidateAllGenrePlaylistQueries();

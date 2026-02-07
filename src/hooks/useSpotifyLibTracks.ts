@@ -4,13 +4,13 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { SpotifyLibTrackSimpleSchema } from "@domain/spotify/spotify-lib-track";
-import { libraryEndpoints, SPOTIFY_TRACKS_KEY } from "../api/endpoints/library.contract";
+import { libraryEndpoints, libraryQueryKeys } from "../api/endpoints/library.contract";
 
 export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTIFY_LIB_TRACKS_PAGE_SIZE || 50) {
   const { fetch } = useFetchWrapper();
 
   return useInfiniteQuery({
-    queryKey: [SPOTIFY_TRACKS_KEY],
+    queryKey: libraryQueryKeys.spotify.all,
     queryFn: async ({ pageParam = 1 }) => {
       console.log("fetching spotify lib tracks", pageParam, pageSize);
       const response = await fetch(libraryEndpoints.spotify.list(), true, true, {}, { page: pageParam, pageSize });
@@ -46,7 +46,7 @@ export function useQuickSyncSpotifyLibTracks() {
     },
     onSuccess: () => {
       console.log("quick sync success, invalidating queries");
-      queryClient.invalidateQueries({ queryKey: [SPOTIFY_TRACKS_KEY] });
+      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.spotify.all });
     },
   });
 }
@@ -61,7 +61,7 @@ export function useFullSyncSpotifyLibTracks() {
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [SPOTIFY_TRACKS_KEY] });
+      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.spotify.all });
     },
   });
 }

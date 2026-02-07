@@ -1,14 +1,34 @@
-export const GENRES_KEY = "genres";
-export const REFERENCE_GENRES_KEY = "referenceGenres";
-export const MY_GENRES_KEY = "myGenres";
-export const LIST_KEY = "list";
-export const DETAIL_KEY = "detail";
+export const genreQueryKeys = {
+  me: {
+    all: ["genres"] as const,
+    list: (page: number) => ["genres", "list", page] as const,
+    detail: (id: string) => ["genres", "detail", id] as const,
+  },
+  reference: {
+    all: ["referenceGenres"] as const,
+    list: (page: number) => ["referenceGenres", "list", page] as const,
+    detail: (id: string) => ["referenceGenres", "detail", id] as const,
+  },
+  myGenres: {
+    all: ["myGenres"] as const,
+  },
+};
 
 export const genreEndpoints = {
-  list: (isReference = false) => isReference ? "reference/genres/" : "genres/",
-  detail: (id: string, isReference = false) => isReference ? `reference/genres/${id}/` : `genres/${id}/`,
-  loadTree: (isReference = false) => isReference ? "reference/genres/tree/load/" : "genres/tree/load/",
-  create: (isReference = false) => isReference ? "reference/genres" : "genres",
-  update: (id: string, isReference = false) => isReference ? `reference/genres/${id}/` : `genres/${id}/`,
-  delete: (id: string, isReference = false) => isReference ? `reference/genres/${id}` : `genres/${id}`,
+  me: {
+    list: () => "me/genres/",
+    detail: (id: string) => `me/genres/${id}/`,
+    loadTree: () => "me/genres/tree/load/",
+    create: () => "me/genres",
+    update: (id: string) => `me/genres/${id}/`,
+    delete: (id: string) => `me/genres/${id}`,
+  },
+  reference: {
+    list: () => "reference/genres/",
+    detail: (id: string) => `reference/genres/${id}/`,
+    loadTree: () => "reference/genres/tree/load/",
+    create: () => "reference/genres",
+    update: (id: string) => `reference/genres/${id}/`,
+    delete: (id: string) => `reference/genres/${id}`,
+  },
 };

@@ -7,12 +7,7 @@ import { CriteriaPlaylistSimpleSchema } from "@domain/playlist/criteria-playlist
 import { CriteriaPlaylistDetailedSchema, CriteriaPlaylistDetailed } from "@domain/playlist/criteria-playlist/detailed";
 
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
-import {
-  playlistEndpoints,
-  GENRE_PLAYLISTS_KEY,
-  FULL_GENRE_PLAYLISTS_KEY,
-  REFERENCE_GENRE_PLAYLISTS_KEY,
-} from "../api/endpoints/playlists.contract";
+import { playlistEndpoints, playlistQueryKeys } from "../api/endpoints/playlists.contract";
 
 const FULL_LIST_PAGE_SIZE = 1000;
 
@@ -21,7 +16,7 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
   const { fetch } = useFetchWrapper();
 
   const query = useQuery({
-    queryKey: [GENRE_PLAYLISTS_KEY, page],
+    queryKey: playlistQueryKeys.my.list(page),
     queryFn: async () => {
       const response = await fetch(playlistEndpoints.list(false), true, true, {}, { page, pageSize });
       const parseResult = PaginatedResponseSchema(CriteriaPlaylistSimpleSchema).safeParse(response);
@@ -34,7 +29,7 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
   });
 
   const invalidateGenrePlaylists = () => {
-    queryClient.invalidateQueries({ queryKey: [GENRE_PLAYLISTS_KEY] });
+    queryClient.invalidateQueries({ queryKey: playlistQueryKeys.my.all });
   };
 
   return {
@@ -46,7 +41,7 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
 export const useListFullGenrePlaylists = (isReference = false) => {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
-  const queryKey = isReference ? [REFERENCE_GENRE_PLAYLISTS_KEY] : [FULL_GENRE_PLAYLISTS_KEY];
+  const queryKey = isReference ? playlistQueryKeys.reference.all : playlistQueryKeys.full.all;
 
   const query = useQuery({
     queryKey,
@@ -82,7 +77,7 @@ export const useListFullGenrePlaylists = (isReference = false) => {
 export const useRetrieveGenrePlaylist = (uuid: string) => {
   const { fetch } = useFetchWrapper();
   return useQuery<CriteriaPlaylistDetailed>({
-    queryKey: [GENRE_PLAYLISTS_KEY, uuid],
+    queryKey: playlistQueryKeys.my.detail(uuid),
     queryFn: async () => {
       const response = await fetch(playlistEndpoints.detail(uuid, false), true);
       return CriteriaPlaylistDetailedSchema.parse(response);
@@ -104,8 +99,8 @@ export const useFetchGenrePlaylistDetailed = () => {
 export const useInvalidateAllGenrePlaylistQueries = () => {
   const queryClient = useQueryClient();
   return () => {
-    queryClient.invalidateQueries({ queryKey: [GENRE_PLAYLISTS_KEY] });
-    queryClient.invalidateQueries({ queryKey: [FULL_GENRE_PLAYLISTS_KEY] });
-    queryClient.invalidateQueries({ queryKey: [REFERENCE_GENRE_PLAYLISTS_KEY] });
+    queryClient.invalidateQueries({ queryKey: playlistQueryKeys.my.all });
+    queryClient.invalidateQueries({ queryKey: playlistQueryKeys.full.all });
+    queryClient.invalidateQueries({ queryKey: playlistQueryKeys.reference.all });
   };
 };

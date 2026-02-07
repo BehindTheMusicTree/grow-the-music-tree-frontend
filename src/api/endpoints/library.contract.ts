@@ -1,5 +1,14 @@
-export const UPLOADED_TRACKS_KEY = "uploadedTracks";
-export const SPOTIFY_TRACKS_KEY = "spotifyTracks";
+export const libraryQueryKeys = {
+  uploaded: {
+    all: ["uploadedTracks"] as const,
+    list: (page: number) => ["uploadedTracks", "list", page] as const,
+    detail: (uuid: string) => ["uploadedTracks", "detail", uuid] as const,
+    download: (uuid: string) => ["uploadedTracks", "download", uuid] as const,
+  },
+  spotify: {
+    all: ["spotifyTracks"] as const,
+  },
+};
 
 export const libraryEndpoints = {
   uploaded: {
