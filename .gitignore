@@ -33,6 +33,7 @@ tsconfig.tsbuildinfo
 
 # Next.js build artifacts
 .next/
+out/
 .env.development
 
 .vscode/chrome-debug-profile/*
