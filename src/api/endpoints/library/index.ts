@@ -1,5 +1,5 @@
-import { makeUploadedQueryKeys, makeUploadedEndpoints } from "./library/uploaded";
-import { makeSpotifyQueryKeys, makeSpotifyEndpoints } from "./library/spotify";
+import { makeUploadedQueryKeys, makeUploadedEndpoints } from "./uploaded";
+import { makeSpotifyQueryKeys, makeSpotifyEndpoints } from "./spotify";
 
 export const libraryQueryKeys = {
   me: {

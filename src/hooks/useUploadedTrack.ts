@@ -8,7 +8,7 @@ import { UploadedTrackCreationSchema } from "@domain/uploaded-track/form/creatio
 import { UploadedTrackUpdateSchema } from "@domain/uploaded-track/form/update";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { useValidatedMutation } from "./useValidatedMutation";
-import { libraryEndpoints, libraryQueryKeys } from "../api/endpoints/library.contract";
+import { libraryEndpoints, libraryQueryKeys } from "../api/endpoints/library";
 
 export function useListUploadedTracks(page = 1, pageSize = process.env.NEXT_PUBLIC_UPLOADED_TRACKS_PAGE_SIZE || 50) {
   const { fetch } = useFetchWrapper();
