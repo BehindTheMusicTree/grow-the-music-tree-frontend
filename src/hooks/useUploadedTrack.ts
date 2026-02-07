@@ -8,14 +8,15 @@ import { UploadedTrackCreationSchema } from "@domain/uploaded-track/form/creatio
 import { UploadedTrackUpdateSchema } from "@domain/uploaded-track/form/update";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { useValidatedMutation } from "./useValidatedMutation";
+import { libraryEndpoints, UPLOADED_TRACKS_KEY } from "../api/endpoints/library.contract";
 
 export function useListUploadedTracks(page = 1, pageSize = process.env.NEXT_PUBLIC_UPLOADED_TRACKS_PAGE_SIZE || 50) {
   const { fetch } = useFetchWrapper();
 
   return useQuery({
-    queryKey: ["uploadedTracks", "list", page],
+    queryKey: [UPLOADED_TRACKS_KEY, "list", page],
     queryFn: async () => {
-      const response = await fetch("library/uploaded/", false, true, true, {}, { page, pageSize });
+      const response = await fetch(libraryEndpoints.uploaded.list(), false, true, true, {}, { page, pageSize });
       const result = PaginatedResponseSchema(UploadedTrackDetailedSchema).safeParse(response);
       if (!result.success) {
         console.error("Parsing failed:", result.error);
@@ -69,7 +70,7 @@ export function useUploadTrack() {
         formData.append("language", data.language);
       }
 
-      const response = await fetch("library/uploaded/", false, true, true, {
+      const response = await fetch(libraryEndpoints.uploaded.create(), false, true, true, {
         method: "POST",
         body: formData,
         headers: {
@@ -79,7 +80,7 @@ export function useUploadTrack() {
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
+      queryClient.invalidateQueries({ queryKey: [UPLOADED_TRACKS_KEY] });
       invalidateAllGenrePlaylistQueries();
     },
   });
@@ -97,7 +98,7 @@ export function useUpdateUploadedTrack() {
     }),
     outputSchema: UploadedTrackDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
-      const response = await fetch(`library/uploaded/${uuid}/`, false, true, true, {
+      const response = await fetch(libraryEndpoints.uploaded.update(uuid), false, true, true, {
         method: "PUT",
         body: JSON.stringify(data),
       });
@@ -110,8 +111,8 @@ export function useUpdateUploadedTrack() {
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
-      queryClient.invalidateQueries({ queryKey: ["uploadedTracks", "detail", uuid] });
+      queryClient.invalidateQueries({ queryKey: [UPLOADED_TRACKS_KEY] });
+      queryClient.invalidateQueries({ queryKey: [UPLOADED_TRACKS_KEY, "detail", uuid] });
       invalidateAllGenrePlaylistQueries();
     },
   });
@@ -122,9 +123,9 @@ export function useDownloadTrack(uuid: string) {
   const { fetch } = useFetchWrapper();
 
   return useQuery({
-    queryKey: ["uploadedTracks", "download", uuid],
+    queryKey: [UPLOADED_TRACKS_KEY, "download", uuid],
     queryFn: async () => {
-      const response = await fetch(`library/uploaded/${uuid}/download`, false, true, true, {}, undefined, true);
+      const response = await fetch(libraryEndpoints.uploaded.download(uuid), false, true, true, {}, undefined, true);
 
       return response;
     },

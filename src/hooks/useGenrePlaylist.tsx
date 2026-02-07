@@ -7,6 +7,12 @@ import { CriteriaPlaylistSimpleSchema } from "@domain/playlist/criteria-playlist
 import { CriteriaPlaylistDetailedSchema, CriteriaPlaylistDetailed } from "@domain/playlist/criteria-playlist/detailed";
 
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
+import {
+  playlistEndpoints,
+  GENRE_PLAYLISTS_KEY,
+  FULL_GENRE_PLAYLISTS_KEY,
+  REFERENCE_GENRE_PLAYLISTS_KEY,
+} from "../api/endpoints/playlists.contract";
 
 const FULL_LIST_PAGE_SIZE = 1000;
 
@@ -15,9 +21,9 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
   const { fetch } = useFetchWrapper();
 
   const query = useQuery({
-    queryKey: ["genrePlaylists", page],
+    queryKey: [GENRE_PLAYLISTS_KEY, page],
     queryFn: async () => {
-      const response = await fetch("genre-playlists/", true, true, {}, { page, pageSize });
+      const response = await fetch(playlistEndpoints.list(false), true, true, {}, { page, pageSize });
       const parseResult = PaginatedResponseSchema(CriteriaPlaylistSimpleSchema).safeParse(response);
       if (!parseResult.success) {
         console.error("Parsing failed:", parseResult.error);
@@ -28,7 +34,7 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
   });
 
   const invalidateGenrePlaylists = () => {
-    queryClient.invalidateQueries({ queryKey: ["genrePlaylists"] });
+    queryClient.invalidateQueries({ queryKey: [GENRE_PLAYLISTS_KEY] });
   };
 
   return {
@@ -40,13 +46,13 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
 export const useListFullGenrePlaylists = (isReference = false) => {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
-  const queryKey = isReference ? ["referenceGenrePlaylists"] : ["fullGenrePlaylists"];
+  const queryKey = isReference ? [REFERENCE_GENRE_PLAYLISTS_KEY] : [FULL_GENRE_PLAYLISTS_KEY];
 
   const query = useQuery({
     queryKey,
     queryFn: async () => {
       const response = await fetch(
-        "genre-playlists/",
+        playlistEndpoints.list(isReference),
         isReference,
         true,
         true,
@@ -76,9 +82,9 @@ export const useListFullGenrePlaylists = (isReference = false) => {
 export const useRetrieveGenrePlaylist = (uuid: string) => {
   const { fetch } = useFetchWrapper();
   return useQuery<CriteriaPlaylistDetailed>({
-    queryKey: ["genrePlaylists", uuid],
+    queryKey: [GENRE_PLAYLISTS_KEY, uuid],
     queryFn: async () => {
-      const response = await fetch(`genre-playlists/${uuid}`, true);
+      const response = await fetch(playlistEndpoints.detail(uuid, false), true);
       return CriteriaPlaylistDetailedSchema.parse(response);
     },
   });
@@ -89,7 +95,7 @@ export const useFetchGenrePlaylistDetailed = () => {
 
   return useMutation<CriteriaPlaylistDetailed, Error, string>({
     mutationFn: async (uuid: string) => {
-      const response = await fetch(`genre-playlists/${uuid}`, true);
+      const response = await fetch(playlistEndpoints.detail(uuid, false), true);
       return CriteriaPlaylistDetailedSchema.parse(response);
     },
   });
@@ -98,8 +104,8 @@ export const useFetchGenrePlaylistDetailed = () => {
 export const useInvalidateAllGenrePlaylistQueries = () => {
   const queryClient = useQueryClient();
   return () => {
-    queryClient.invalidateQueries({ queryKey: ["genrePlaylists"] });
-    queryClient.invalidateQueries({ queryKey: ["fullGenrePlaylists"] });
-    queryClient.invalidateQueries({ queryKey: ["referenceGenrePlaylists"] });
+    queryClient.invalidateQueries({ queryKey: [GENRE_PLAYLISTS_KEY] });
+    queryClient.invalidateQueries({ queryKey: [FULL_GENRE_PLAYLISTS_KEY] });
+    queryClient.invalidateQueries({ queryKey: [REFERENCE_GENRE_PLAYLISTS_KEY] });
   };
 };
