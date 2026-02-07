@@ -15,7 +15,7 @@ import { genreEndpoints, genreQueryKeys } from "../api/endpoints/genres";
 export function useListGenres(
   page = 1,
   pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50,
-  isReference = false,
+  isReference: boolean,
 ) {
   const { fetch } = useFetchWrapper();
 
@@ -29,7 +29,7 @@ export function useListGenres(
   });
 }
 
-export function useFetchGenre(isReference = false) {
+export function useFetchGenre(isReference: boolean) {
   const { fetch } = useFetchWrapper();
 
   return useCallback(
@@ -42,7 +42,7 @@ export function useFetchGenre(isReference = false) {
   );
 }
 
-export function useLoadReferenceTreeGenre(isReference = false) {
+export function useLoadReferenceTreeGenre(isReference: boolean) {
   const { fetch } = useFetchWrapper();
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
@@ -65,7 +65,7 @@ export function useLoadReferenceTreeGenre(isReference = false) {
   });
 }
 
-export function useLoadPublicReferenceTreeGenre(isReference = false) {
+export function useLoadPublicReferenceTreeGenre(isReference: boolean) {
   const { fetch } = useFetchWrapper();
   const queryClient = useQueryClient();
 
@@ -86,7 +86,7 @@ export function useLoadPublicReferenceTreeGenre(isReference = false) {
   });
 }
 
-export function useCreateGenre(isReference = false) {
+export function useCreateGenre(isReference: boolean) {
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
   const { fetch } = useFetchWrapper();
@@ -110,7 +110,7 @@ export function useCreateGenre(isReference = false) {
   });
 }
 
-export function useUpdateGenre(isReference = false) {
+export function useUpdateGenre(isReference: boolean) {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
@@ -152,7 +152,7 @@ export function useUpdateGenre(isReference = false) {
   return { mutate, renameGenre, updateGenreParent, formErrors };
 }
 
-export function useDeleteGenre(isReference = false) {
+export function useDeleteGenre(isReference: boolean) {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();

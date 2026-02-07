@@ -17,8 +17,8 @@ import { GenreTreeView } from "./GenreTreeView";
 
 export default function GenreTree() {
   const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists();
-  const { mutate: createGenre, formErrors } = useCreateGenre();
-  const { mutate: loadReferenceTreeGenre, isPending: isLoadingReferenceTreeGenre } = useLoadReferenceTreeGenre();
+  const { mutate: createGenre, formErrors } = useCreateGenre(false);
+  const { mutate: loadReferenceTreeGenre, isPending: isLoadingReferenceTreeGenre } = useLoadReferenceTreeGenre(false);
 
   const { showPopup, hidePopup } = usePopup();
 

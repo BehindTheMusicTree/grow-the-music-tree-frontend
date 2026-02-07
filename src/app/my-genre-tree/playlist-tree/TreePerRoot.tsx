@@ -44,9 +44,9 @@ export default function GenrePlaylistTreePerRoot({
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup, hidePopup } = usePopup();
   const { trackList, playNewTrackListFromGenrePlaylist } = useTrackList();
-  const { mutate: createGenre } = useCreateGenre();
-  const { renameGenre, updateGenreParent } = useUpdateGenre();
-  const fetchGenre = useFetchGenre();
+  const { mutate: createGenre } = useCreateGenre(false);
+  const { renameGenre, updateGenreParent } = useUpdateGenre(false);
+  const fetchGenre = useFetchGenre(false);
   const { mutate: fetchGenrePlaylistDetailed } = useFetchGenrePlaylistDetailed();
   const [visibleActionsContainerGenrePlaylist, setVisibleActionsContainerGenrePlaylist] =
     useState<CriteriaPlaylistSimple | null>(null);
@@ -69,7 +69,7 @@ export default function GenrePlaylistTreePerRoot({
           onClose={() => {
             hidePopup();
           }}
-        />
+        />,
       );
     }
     event.target.value = "";
@@ -102,7 +102,7 @@ export default function GenrePlaylistTreePerRoot({
         },
       });
     },
-    [trackList, isPlaying, setIsPlaying, playNewTrackListFromGenrePlaylist, fetchGenrePlaylistDetailed]
+    [trackList, isPlaying, setIsPlaying, playNewTrackListFromGenrePlaylist, fetchGenrePlaylistDetailed],
   );
 
   const { treeData, rootColor } = useMemo(() => {
@@ -155,7 +155,7 @@ export default function GenrePlaylistTreePerRoot({
                 message: "Invalid genre name",
                 fieldErrors: { name: [{ message: "This name is already taken", code: "2001" }] },
               }}
-            />
+            />,
           );
         }
       }
@@ -170,7 +170,7 @@ export default function GenrePlaylistTreePerRoot({
             hidePopup();
           }}
           onClose={hidePopup}
-        />
+        />,
       );
     };
 
@@ -200,7 +200,7 @@ export default function GenrePlaylistTreePerRoot({
         showRenamePopup,
         showPopup,
         setVisibleActionsContainerGenrePlaylist,
-      }
+      },
     );
   }, [
     genrePlaylistTreePerRoot,
