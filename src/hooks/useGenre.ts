@@ -23,7 +23,7 @@ export function useListGenres(
     queryKey: isReference ? genreQueryKeys.reference.list(page) : genreQueryKeys.me.list(page),
     queryFn: async () => {
       const endpoint = isReference ? genreEndpoints.reference.list() : genreEndpoints.me.list();
-      const response = await fetch(endpoint, isReference, true, true, {}, { page, pageSize });
+      const response = await fetch(endpoint, true, !isReference, {}, { page, pageSize });
       return PaginatedResponseSchema(CriteriaSimpleSchema).parse(response);
     },
   });
@@ -35,7 +35,7 @@ export function useFetchGenre(isReference = false) {
   return useCallback(
     async (id: string): Promise<CriteriaDetailed> => {
       const endpoint = isReference ? genreEndpoints.reference.detail(id) : genreEndpoints.me.detail(id);
-      const response = await fetch(endpoint, true);
+      const response = await fetch(endpoint, true, !isReference);
       return CriteriaDetailedSchema.parse(response);
     },
     [fetch, isReference],
@@ -52,7 +52,7 @@ export function useLoadReferenceTreeGenre(isReference = false) {
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
       const endpoint = isReference ? genreEndpoints.reference.loadTree() : genreEndpoints.me.loadTree();
-      const response = await fetch(endpoint, isReference, true, true, {
+      const response = await fetch(endpoint, true, !isReference, {
         method: "POST",
       });
       return response;
@@ -74,7 +74,7 @@ export function useLoadPublicReferenceTreeGenre(isReference = false) {
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
       const endpoint = isReference ? genreEndpoints.reference.loadTree() : genreEndpoints.me.loadTree();
-      const response = await fetch(endpoint, true, true, {
+      const response = await fetch(endpoint, true, !isReference, {
         method: "POST",
       });
       return response;
@@ -96,7 +96,7 @@ export function useCreateGenre(isReference = false) {
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async (data) => {
       const endpoint = isReference ? genreEndpoints.reference.create() : genreEndpoints.me.create();
-      const response = await fetch(endpoint, true, true, {
+      const response = await fetch(endpoint, true, !isReference, {
         method: "POST",
         body: JSON.stringify(data),
       });
@@ -123,7 +123,7 @@ export function useUpdateGenre(isReference = false) {
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
       const endpoint = isReference ? genreEndpoints.reference.update(uuid) : genreEndpoints.me.update(uuid);
-      const response = await fetch(endpoint, true, true, {
+      const response = await fetch(endpoint, true, !isReference, {
         method: "PUT",
         body: JSON.stringify(data),
       });
@@ -162,7 +162,7 @@ export function useDeleteGenre(isReference = false) {
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid }) => {
       const endpoint = isReference ? genreEndpoints.reference.delete(uuid) : genreEndpoints.me.delete(uuid);
-      const response = await fetch(endpoint, true, true, {
+      const response = await fetch(endpoint, true, !isReference, {
         method: "DELETE",
       });
       return response;
