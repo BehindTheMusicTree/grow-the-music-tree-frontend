@@ -26,19 +26,18 @@ export const useFetchWrapper = () => {
 
   const fetch = <T>(
     backendEndpointOrUrl: string,
-    isReference: boolean = false,
     fromBackend: boolean = true,
     requiresAuth: boolean = true,
     options: RequestInit = {},
     queryParams?: Record<string, string | number | boolean>,
     expectBinary: boolean = false,
   ) => {
-    const path = fromBackend && isReference ? `reference-${backendEndpointOrUrl}` : `my-${backendEndpointOrUrl}`;
-    const auth = isReference ? false : requiresAuth;
-    const url = fromBackend ? `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${path}` : backendEndpointOrUrl;
+    const url = fromBackend
+      ? `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${backendEndpointOrUrl}`
+      : backendEndpointOrUrl;
     return rawFetch<T>(
       url,
-      auth,
+      requiresAuth,
       options,
       session?.accessToken || undefined,
       queryParams,
