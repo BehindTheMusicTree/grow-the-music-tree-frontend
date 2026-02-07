@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { FaTree } from "react-icons/fa";
 import { IconTextButton } from "@components/ui/IconTextButton";
 
-import { useListReferenceGenrePlaylists } from "@hooks/useGenrePlaylist";
+import { useListFullGenrePlaylists } from "@hooks/useGenrePlaylist";
 import { useLoadPublicReferenceTreeGenre } from "@hooks/useGenre";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
@@ -12,7 +12,7 @@ import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
 import { GenreTreeView } from "../my-genre-tree/GenreTreeView";
 
 export default function ReferenceGenreTree() {
-  const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListReferenceGenrePlaylists();
+  const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists(true);
   const { mutate: loadReferenceTreeGenre, isPending: isLoadingReferenceTreeGenre } = useLoadPublicReferenceTreeGenre();
 
   const groupedGenrePlaylistsByRoot = useMemo(

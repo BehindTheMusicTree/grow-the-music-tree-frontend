@@ -31,12 +31,12 @@ interface PlayerContextType {
   handleNextTrack: (
     trackList: UploadedTrackDetailed[],
     currentTrack: UploadedTrackDetailed,
-    onTrackChange: (track: UploadedTrackDetailed) => void
+    onTrackChange: (track: UploadedTrackDetailed) => void,
   ) => void;
   handlePreviousTrack: (
     trackList: UploadedTrackDetailed[],
     currentTrack: UploadedTrackDetailed,
-    onTrackChange: (track: UploadedTrackDetailed) => void
+    onTrackChange: (track: UploadedTrackDetailed) => void,
   ) => void;
   onTrackEnd: (() => void) | null;
   setOnTrackEnd: (callback: (() => void) | null) => void;
@@ -69,8 +69,6 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
 
   // Download track data when UUID changes
   const { data: downloadData, isLoading: isDownloading } = useDownloadTrack(currentTrackUuid || "");
-
-  // Debug logging removed to prevent console spam
 
   const loadTrackForPlayer = useCallback((track: UploadedTrackDetailed) => {
     // Stop current track if playing and clean up
@@ -107,7 +105,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
     (
       trackList: UploadedTrackDetailed[],
       currentTrack: UploadedTrackDetailed,
-      onTrackChange: (track: UploadedTrackDetailed) => void
+      onTrackChange: (track: UploadedTrackDetailed) => void,
     ) => {
       if (!trackList || !currentTrack) {
         return;
@@ -125,14 +123,14 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
         loadTrackForPlayer(nextTrack);
       }
     },
-    [loadTrackForPlayer]
+    [loadTrackForPlayer],
   );
 
   const handlePreviousTrack = useCallback(
     (
       trackList: UploadedTrackDetailed[],
       currentTrack: UploadedTrackDetailed,
-      onTrackChange: (track: UploadedTrackDetailed) => void
+      onTrackChange: (track: UploadedTrackDetailed) => void,
     ) => {
       if (!trackList || !currentTrack) {
         return;
@@ -150,7 +148,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
         loadTrackForPlayer(previousTrack);
       }
     },
-    [loadTrackForPlayer]
+    [loadTrackForPlayer],
   );
 
   const handleDownloadComplete = useCallback(
@@ -235,7 +233,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
         setIsLoading(false);
       }
     },
-    [volume, onTrackEnd] // Include dependencies
+    [volume, onTrackEnd], // Include dependencies
   );
 
   // Effect to handle download data and create audio URL
@@ -350,7 +348,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       onTrackEnd,
       setOnTrackEnd,
       // Note: currentTimeRef is stable (ref), so it doesn't need to be in dependencies
-    ]
+    ],
   );
 
   return <PlayerContext.Provider value={contextValue}>{children}</PlayerContext.Provider>;

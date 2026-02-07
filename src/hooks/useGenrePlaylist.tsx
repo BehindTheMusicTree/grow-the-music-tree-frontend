@@ -37,14 +37,23 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
   };
 };
 
-export const useListFullGenrePlaylists = () => {
+export const useListFullGenrePlaylists = (isReference = false) => {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
+  const queryKey = isReference ? ["referenceGenrePlaylists"] : ["fullGenrePlaylists"];
 
   const query = useQuery({
-    queryKey: ["fullGenrePlaylists"],
+    queryKey,
     queryFn: async () => {
-      const response = await fetch("genre-playlists/", true, true, {}, { page: 1, pageSize: FULL_LIST_PAGE_SIZE });
+      const response = await fetch(
+        "genre-playlists/",
+        isReference,
+        true,
+        true,
+        {},
+        { page: 1, pageSize: FULL_LIST_PAGE_SIZE },
+        false,
+      );
       const parseResult = PaginatedResponseSchema(CriteriaPlaylistSimpleSchema).safeParse(response);
       if (!parseResult.success) {
         console.error("Parsing failed:", parseResult.error);
@@ -54,13 +63,13 @@ export const useListFullGenrePlaylists = () => {
     },
   });
 
-  const invalidatefullGenrePlaylists = () => {
-    queryClient.invalidateQueries({ queryKey: ["fullGenrePlaylists"] });
+  const invalidateFullGenrePlaylists = () => {
+    queryClient.invalidateQueries({ queryKey });
   };
 
   return {
     ...query,
-    invalidatefullGenrePlaylists,
+    invalidateFullGenrePlaylists,
   };
 };
 
@@ -84,39 +93,6 @@ export const useFetchGenrePlaylistDetailed = () => {
       return CriteriaPlaylistDetailedSchema.parse(response);
     },
   });
-};
-
-export const useListReferenceGenrePlaylists = () => {
-  const queryClient = useQueryClient();
-  const { fetch } = useFetchWrapper();
-
-  const query = useQuery({
-    queryKey: ["referenceGenrePlaylists"],
-    queryFn: async () => {
-      const response = await fetch(
-        "reference-genre-playlists/",
-        false,
-        false,
-        {},
-        { page: 1, pageSize: FULL_LIST_PAGE_SIZE },
-      );
-      const parseResult = PaginatedResponseSchema(CriteriaPlaylistSimpleSchema).safeParse(response);
-      if (!parseResult.success) {
-        console.error("Parsing failed:", parseResult.error);
-        throw parseResult.error;
-      }
-      return parseResult.data;
-    },
-  });
-
-  const invalidateReferenceGenrePlaylists = () => {
-    queryClient.invalidateQueries({ queryKey: ["referenceGenrePlaylists"] });
-  };
-
-  return {
-    ...query,
-    invalidateReferenceGenrePlaylists,
-  };
 };
 
 export const useInvalidateAllGenrePlaylistQueries = () => {
