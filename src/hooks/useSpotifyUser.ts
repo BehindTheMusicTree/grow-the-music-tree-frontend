@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { SpotifyUserDetailedSchema, SpotifyUserDetailed } from "@domain/spotify-user";
 import { useFetchWrapper } from "./useFetchWrapper";
-import { userEndpoints, userQueryKeys } from "../api/endpoints/user.contract";
+import { userEndpoints, userQueryKeys } from "../api/endpoints/user";
 
 export function useSpotifyUser() {
   const { fetch } = useFetchWrapper();
