@@ -10,7 +10,7 @@ import { CriteriaSimpleSchema } from "@schemas/domain/criteria/response/simple";
 import { CriteriaCreationSchema } from "@schemas/domain/criteria/form/creation";
 import { CriteriaUpdateSchema } from "@schemas/domain/criteria/form/update";
 import { useValidatedMutation } from "./useValidatedMutation";
-import { genreEndpoints, genreQueryKeys } from "../api/endpoints/genres.contract";
+import { genreEndpoints, genreQueryKeys } from "../api/endpoints/genres";
 
 export function useListGenres(
   page = 1,
