@@ -41,7 +41,7 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
 export const useListFullGenrePlaylists = (isReference = false) => {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
-  const queryKey = isReference ? ["referenceGenrePlaylists", "full"] : ["genrePlaylists", "full"];
+  const queryKey = isReference ? playlistQueryKeys.reference.full : playlistQueryKeys.me.full;
 
   const query = useQuery({
     queryKey,
@@ -98,8 +98,8 @@ export const useInvalidateAllGenrePlaylistQueries = () => {
   const queryClient = useQueryClient();
   return () => {
     queryClient.invalidateQueries({ queryKey: playlistQueryKeys.me.all });
-    queryClient.invalidateQueries({ queryKey: ["genrePlaylists", "full"] });
+    queryClient.invalidateQueries({ queryKey: playlistQueryKeys.me.full });
     queryClient.invalidateQueries({ queryKey: playlistQueryKeys.reference.all });
-    queryClient.invalidateQueries({ queryKey: ["referenceGenrePlaylists", "full"] });
+    queryClient.invalidateQueries({ queryKey: playlistQueryKeys.reference.full });
   };
 };

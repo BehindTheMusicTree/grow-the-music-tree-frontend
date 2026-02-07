@@ -2,17 +2,13 @@ export const playlistQueryKeys = {
   me: {
     all: ["genrePlaylists"] as const,
     list: (page: number) => ["genrePlaylists", "list", page] as const,
-    full: {
-      all: ["genrePlaylists", "full"] as const,
-    },
+    full: ["genrePlaylists", "full"] as const,
     detail: (uuid: string) => ["genrePlaylists", uuid] as const,
   },
   reference: {
     all: ["referenceGenrePlaylists"] as const,
     list: (page: number) => ["referenceGenrePlaylists", "list", page] as const,
-    full: {
-      all: ["referenceGenrePlaylists", "full"] as const,
-    },
+    full: ["referenceGenrePlaylists", "full"] as const,
     detail: (uuid: string) => ["referenceGenrePlaylists", uuid] as const,
   },
 };
@@ -20,9 +16,6 @@ export const playlistQueryKeys = {
 export const playlistEndpoints = {
   me: {
     list: () => "me/genre-playlists/",
-    full: {
-      list: () => "me/genre-playlists/",
-    },
     detail: (uuid: string) => `me/genre-playlists/${uuid}`,
     create: () => "me/genre-playlists",
     update: (uuid: string) => `me/genre-playlists/${uuid}`,
@@ -30,9 +23,6 @@ export const playlistEndpoints = {
   },
   reference: {
     list: () => "reference/genre-playlists/",
-    full: {
-      list: () => "reference/genre-playlists/",
-    },
     detail: (uuid: string) => `reference/genre-playlists/${uuid}`,
     create: () => "reference/genre-playlists",
     update: (uuid: string) => `reference/genre-playlists/${uuid}`,
