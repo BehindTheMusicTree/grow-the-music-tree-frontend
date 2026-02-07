@@ -14,9 +14,9 @@ export function useListUploadedTracks(page = 1, pageSize = process.env.NEXT_PUBL
   const { fetch } = useFetchWrapper();
 
   return useQuery({
-    queryKey: libraryQueryKeys.uploaded.list(page),
+    queryKey: libraryQueryKeys.me.uploaded.list(page),
     queryFn: async () => {
-      const response = await fetch(libraryEndpoints.uploaded.list(), false, true, true, {}, { page, pageSize });
+      const response = await fetch(libraryEndpoints.me.uploaded.list(), false, true, {}, { page, pageSize });
       const result = PaginatedResponseSchema(UploadedTrackDetailedSchema).safeParse(response);
       if (!result.success) {
         console.error("Parsing failed:", result.error);
@@ -70,7 +70,7 @@ export function useUploadTrack() {
         formData.append("language", data.language);
       }
 
-      const response = await fetch(libraryEndpoints.uploaded.create(), false, true, true, {
+      const response = await fetch(libraryEndpoints.me.uploaded.create(), false, true, {
         method: "POST",
         body: formData,
         headers: {
@@ -80,7 +80,7 @@ export function useUploadTrack() {
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.uploaded.all });
+      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.me.uploaded.all });
       invalidateAllGenrePlaylistQueries();
     },
   });
@@ -98,7 +98,7 @@ export function useUpdateUploadedTrack() {
     }),
     outputSchema: UploadedTrackDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
-      const response = await fetch(libraryEndpoints.uploaded.update(uuid), false, true, true, {
+      const response = await fetch(libraryEndpoints.me.uploaded.update(uuid), false, true, {
         method: "PUT",
         body: JSON.stringify(data),
       });
@@ -111,8 +111,8 @@ export function useUpdateUploadedTrack() {
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.uploaded.all });
-      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.uploaded.detail(uuid) });
+      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.me.uploaded.all });
+      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.me.uploaded.detail(uuid) });
       invalidateAllGenrePlaylistQueries();
     },
   });
@@ -123,9 +123,9 @@ export function useDownloadTrack(uuid: string) {
   const { fetch } = useFetchWrapper();
 
   return useQuery({
-    queryKey: libraryQueryKeys.uploaded.download(uuid),
+    queryKey: libraryQueryKeys.me.uploaded.download(uuid),
     queryFn: async () => {
-      const response = await fetch(libraryEndpoints.uploaded.download(uuid), false, true, true, {}, undefined, true);
+      const response = await fetch(libraryEndpoints.me.uploaded.download(uuid), false, true, {}, {});
 
       return response;
     },
