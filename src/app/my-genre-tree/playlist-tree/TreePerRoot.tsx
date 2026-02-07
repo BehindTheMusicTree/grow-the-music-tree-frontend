@@ -44,9 +44,9 @@ export default function GenrePlaylistTreePerRoot({
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup, hidePopup } = usePopup();
   const { trackList, playNewTrackListFromGenrePlaylist } = useTrackList();
-  const { mutate: createGenre } = useCreateGenre(false);
-  const { renameGenre, updateGenreParent } = useUpdateGenre(false);
-  const fetchGenre = useFetchGenre(false);
+  const { mutate: createGenre } = useCreateGenre("me");
+  const { renameGenre, updateGenreParent } = useUpdateGenre("me");
+  const fetchGenre = useFetchGenre("me");
   const { mutate: fetchGenrePlaylistDetailed } = useFetchGenrePlaylistDetailed();
   const [visibleActionsContainerGenrePlaylist, setVisibleActionsContainerGenrePlaylist] =
     useState<CriteriaPlaylistSimple | null>(null);

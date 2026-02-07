@@ -8,6 +8,7 @@ import { CriteriaPlaylistDetailedSchema, CriteriaPlaylistDetailed } from "@domai
 
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { playlistEndpoints, playlistQueryKeys } from "../api/endpoints/playlists";
+import { Scope } from "../api/types/scope";
 
 const FULL_LIST_PAGE_SIZE = 1000;
 
@@ -38,9 +39,10 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
   };
 };
 
-export const useListFullGenrePlaylists = (isReference = false) => {
+export const useListFullGenrePlaylists = (scope: Scope) => {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
+  const isReference = scope === "reference";
   const queryKey = isReference ? playlistQueryKeys.reference.full : playlistQueryKeys.me.full;
 
   const query = useQuery({

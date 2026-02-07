@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { usePopup } from "@contexts/PopupContext";
 import GenreDeletionPopup from "@components/ui/popup/child/GenreDeletionPopup";
 import { useDeleteGenre } from "./useGenre";
+import { Scope } from "../api/types/scope";
 
 interface Genre {
   name: string;
@@ -14,9 +15,9 @@ interface UseGenreDeletionReturn {
   showDeletePopup: (genre: Genre) => void;
 }
 
-export function useGenreDeletion(isReference: boolean, onDelete?: (genre: Genre) => void): UseGenreDeletionReturn {
+export function useGenreDeletion(scope: Scope, onDelete?: (genre: Genre) => void): UseGenreDeletionReturn {
   const { showPopup, hidePopup } = usePopup();
-  const deleteGenre = useDeleteGenre(isReference);
+  const deleteGenre = useDeleteGenre(scope);
 
   const showDeletePopup = useCallback(
     (genre: Genre) => {

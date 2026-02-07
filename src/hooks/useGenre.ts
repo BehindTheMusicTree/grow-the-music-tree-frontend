@@ -11,13 +11,11 @@ import { CriteriaCreationSchema } from "@schemas/domain/criteria/form/creation";
 import { CriteriaUpdateSchema } from "@schemas/domain/criteria/form/update";
 import { useValidatedMutation } from "./useValidatedMutation";
 import { genreEndpoints, genreQueryKeys } from "../api/endpoints/genres";
+import { Scope } from "../api/types/scope";
 
-export function useListGenres(
-  page = 1,
-  pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50,
-  isReference: boolean,
-) {
+export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50, scope: Scope) {
   const { fetch } = useFetchWrapper();
+  const isReference = scope === "reference";
 
   return useQuery({
     queryKey: isReference ? genreQueryKeys.reference.list(page) : genreQueryKeys.me.list(page),
@@ -29,8 +27,9 @@ export function useListGenres(
   });
 }
 
-export function useFetchGenre(isReference: boolean) {
+export function useFetchGenre(scope: Scope) {
   const { fetch } = useFetchWrapper();
+  const isReference = scope === "reference";
 
   return useCallback(
     async (id: string): Promise<CriteriaDetailed> => {
@@ -42,10 +41,11 @@ export function useFetchGenre(isReference: boolean) {
   );
 }
 
-export function useLoadReferenceTreeGenre(isReference: boolean) {
+export function useLoadReferenceTreeGenre(scope: Scope) {
   const { fetch } = useFetchWrapper();
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
+  const isReference = scope === "reference";
 
   return useValidatedMutation({
     inputSchema: z.void(),
@@ -65,9 +65,10 @@ export function useLoadReferenceTreeGenre(isReference: boolean) {
   });
 }
 
-export function useLoadPublicReferenceTreeGenre(isReference: boolean) {
+export function useLoadPublicReferenceTreeGenre(scope: Scope) {
   const { fetch } = useFetchWrapper();
   const queryClient = useQueryClient();
+  const isReference = scope === "reference";
 
   return useValidatedMutation({
     inputSchema: z.void(),
@@ -86,10 +87,11 @@ export function useLoadPublicReferenceTreeGenre(isReference: boolean) {
   });
 }
 
-export function useCreateGenre(isReference: boolean) {
+export function useCreateGenre(scope: Scope) {
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
   const { fetch } = useFetchWrapper();
+  const isReference = scope === "reference";
 
   return useValidatedMutation({
     inputSchema: CriteriaCreationSchema,
@@ -110,10 +112,11 @@ export function useCreateGenre(isReference: boolean) {
   });
 }
 
-export function useUpdateGenre(isReference: boolean) {
+export function useUpdateGenre(scope: Scope) {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
+  const isReference = scope === "reference";
 
   const { mutate, formErrors } = useValidatedMutation({
     inputSchema: z.object({
@@ -152,10 +155,11 @@ export function useUpdateGenre(isReference: boolean) {
   return { mutate, renameGenre, updateGenreParent, formErrors };
 }
 
-export function useDeleteGenre(isReference: boolean) {
+export function useDeleteGenre(scope: Scope) {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
+  const isReference = scope === "reference";
 
   return useValidatedMutation({
     inputSchema: z.object({ uuid: z.string() }),

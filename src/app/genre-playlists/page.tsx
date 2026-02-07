@@ -7,7 +7,7 @@ import { Input } from "@components/ui/input";
 import { useState, useMemo, ChangeEvent } from "react";
 
 export default function GenrePlaylistsPage() {
-  const { data, isPending, error } = useListFullGenrePlaylists();
+  const { data, isPending, error } = useListFullGenrePlaylists("me");
   const [nameFilter, setNameFilter] = useState("");
   const [parentFilter, setParentFilter] = useState("");
   const [rootFilter, setRootFilter] = useState("");

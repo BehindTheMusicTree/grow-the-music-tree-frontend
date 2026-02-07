@@ -12,9 +12,9 @@ import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
 import { GenreTreeView } from "../my-genre-tree/GenreTreeView";
 
 export default function ReferenceGenreTree() {
-  const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists(true);
+  const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists("reference");
   const { mutate: loadReferenceTreeGenre, isPending: isLoadingReferenceTreeGenre } =
-    useLoadPublicReferenceTreeGenre(true);
+    useLoadPublicReferenceTreeGenre("reference");
 
   const groupedGenrePlaylistsByRoot = useMemo(
     () =>

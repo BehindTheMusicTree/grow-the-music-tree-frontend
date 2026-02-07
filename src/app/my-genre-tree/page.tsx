@@ -16,9 +16,9 @@ import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
 import { GenreTreeView } from "./GenreTreeView";
 
 export default function GenreTree() {
-  const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists();
-  const { mutate: createGenre, formErrors } = useCreateGenre(false);
-  const { mutate: loadReferenceTreeGenre, isPending: isLoadingReferenceTreeGenre } = useLoadReferenceTreeGenre(false);
+  const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists("me");
+  const { mutate: createGenre, formErrors } = useCreateGenre("me");
+  const { mutate: loadReferenceTreeGenre, isPending: isLoadingReferenceTreeGenre } = useLoadReferenceTreeGenre("me");
 
   const { showPopup, hidePopup } = usePopup();
 
