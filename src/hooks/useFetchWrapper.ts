@@ -33,7 +33,7 @@ export const useFetchWrapper = () => {
     queryParams?: Record<string, string | number | boolean>,
     expectBinary: boolean = false,
   ) => {
-    const path = fromBackend && isReference ? `reference-${backendEndpointOrUrl}` : backendEndpointOrUrl;
+    const path = fromBackend && isReference ? `reference-${backendEndpointOrUrl}` : `my-${backendEndpointOrUrl}`;
     const auth = isReference ? false : requiresAuth;
     const url = fromBackend ? `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${path}` : backendEndpointOrUrl;
     return rawFetch<T>(

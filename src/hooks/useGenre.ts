@@ -11,31 +11,41 @@ import { CriteriaCreationSchema } from "@schemas/domain/criteria/form/creation";
 import { CriteriaUpdateSchema } from "@schemas/domain/criteria/form/update";
 import { useValidatedMutation } from "./useValidatedMutation";
 
-export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50) {
+const GENRES_KEY = "genres";
+const REFERENCE_GENRES_KEY = "referenceGenres";
+const MY_GENRES_KEY = "myGenres";
+const LIST_KEY = "list";
+const DETAIL_KEY = "detail";
+
+export function useListGenres(
+  page = 1,
+  pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50,
+  isReference = false,
+) {
   const { fetch } = useFetchWrapper();
 
   return useQuery({
-    queryKey: ["genres", "list", page],
+    queryKey: isReference ? [REFERENCE_GENRES_KEY, LIST_KEY, page] : [GENRES_KEY, LIST_KEY, page],
     queryFn: async () => {
-      const response = await fetch("genres/", true, true, {}, { page, pageSize });
+      const response = await fetch("genres/", isReference, true, true, {}, { page, pageSize });
       return PaginatedResponseSchema(CriteriaSimpleSchema).parse(response);
     },
   });
 }
 
-export function useFetchGenre() {
+export function useFetchGenre(isReference = false) {
   const { fetch } = useFetchWrapper();
 
   return useCallback(
     async (id: string): Promise<CriteriaDetailed> => {
-      const response = await fetch(`genres/${id}/`, true);
+      const response = await fetch(`genres/${id}/`, isReference, true);
       return CriteriaDetailedSchema.parse(response);
     },
-    [fetch],
+    [fetch, isReference],
   );
 }
 
-export function useLoadReferenceTreeGenre() {
+export function useLoadReferenceTreeGenre(isReference = false) {
   const { fetch } = useFetchWrapper();
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
@@ -44,19 +54,20 @@ export function useLoadReferenceTreeGenre() {
     inputSchema: z.void(),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
-      const response = await fetch("genres/tree/load-reference/", true, true, {
+      const response = await fetch(`genres/tree/load/`, isReference, true, true, {
         method: "POST",
       });
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["genres"] });
+      const queryKey = isReference ? [REFERENCE_GENRES_KEY] : [GENRES_KEY];
+      queryClient.invalidateQueries({ queryKey });
       invalidateAllGenrePlaylistQueries();
     },
   });
 }
 
-export function useLoadPublicReferenceTreeGenre() {
+export function useLoadPublicReferenceTreeGenre(isReference = false) {
   const { fetch } = useFetchWrapper();
   const queryClient = useQueryClient();
 
@@ -64,18 +75,19 @@ export function useLoadPublicReferenceTreeGenre() {
     inputSchema: z.void(),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
-      const response = await fetch("reference/genres/tree/load/", false, true, {
+      const response = await fetch(`genres/tree/load/`, isReference, false, true, {
         method: "POST",
       });
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["referenceGenres"] });
+      const queryKey = isReference ? [REFERENCE_GENRES_KEY] : [MY_GENRES_KEY];
+      queryClient.invalidateQueries({ queryKey });
     },
   });
 }
 
-export function useCreateGenre() {
+export function useCreateGenre(isReference = false) {
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
   const { fetch } = useFetchWrapper();
@@ -84,20 +96,21 @@ export function useCreateGenre() {
     inputSchema: CriteriaCreationSchema,
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async (data) => {
-      const response = await fetch("genres/", true, true, {
+      const response = await fetch(`genres`, isReference, true, true, {
         method: "POST",
         body: JSON.stringify(data),
       });
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["genres"] });
+      const queryKey = isReference ? [REFERENCE_GENRES_KEY] : [MY_GENRES_KEY];
+      queryClient.invalidateQueries({ queryKey });
       invalidateAllGenrePlaylistQueries();
     },
   });
 }
 
-export function useUpdateGenre() {
+export function useUpdateGenre(isReference = false) {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
@@ -109,15 +122,17 @@ export function useUpdateGenre() {
     }),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
-      const response = await fetch(`genres/${uuid}/`, true, true, {
+      const response = await fetch(`genres/${uuid}/`, isReference, true, true, {
         method: "PUT",
         body: JSON.stringify(data),
       });
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      queryClient.invalidateQueries({ queryKey: ["genres"] });
-      queryClient.invalidateQueries({ queryKey: ["genres", "detail", uuid] });
+      const queryKey = isReference ? [REFERENCE_GENRES_KEY] : [GENRES_KEY];
+      const detailKey = isReference ? [REFERENCE_GENRES_KEY, DETAIL_KEY, uuid] : [GENRES_KEY, DETAIL_KEY, uuid];
+      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: detailKey });
       invalidateAllGenrePlaylistQueries();
     },
   });
@@ -136,7 +151,7 @@ export function useUpdateGenre() {
   return { mutate, renameGenre, updateGenreParent, formErrors };
 }
 
-export function useDeleteGenre() {
+export function useDeleteGenre(isReference = false) {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
@@ -145,14 +160,16 @@ export function useDeleteGenre() {
     inputSchema: z.object({ uuid: z.string() }),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid }) => {
-      const response = await fetch(`genres/${uuid}`, true, true, {
+      const response = await fetch(`genres/${uuid}`, isReference, true, true, {
         method: "DELETE",
       });
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      queryClient.invalidateQueries({ queryKey: ["genres"] });
-      queryClient.invalidateQueries({ queryKey: ["genres", "detail", uuid] });
+      const queryKey = isReference ? [REFERENCE_GENRES_KEY] : [GENRES_KEY];
+      const detailKey = isReference ? [REFERENCE_GENRES_KEY, DETAIL_KEY, uuid] : [GENRES_KEY, DETAIL_KEY, uuid];
+      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: detailKey });
       invalidateAllGenrePlaylistQueries();
     },
   });
