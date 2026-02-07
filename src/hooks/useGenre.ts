@@ -52,7 +52,7 @@ export function useLoadReferenceTreeGenre(isReference = false) {
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
       const endpoint = isReference ? genreEndpoints.reference.loadTree() : genreEndpoints.me.loadTree();
-      const response = await fetch(endpoint, true, true, {
+      const response = await fetch(endpoint, isReference, true, true, {
         method: "POST",
       });
       return response;
@@ -74,7 +74,7 @@ export function useLoadPublicReferenceTreeGenre(isReference = false) {
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
       const endpoint = isReference ? genreEndpoints.reference.loadTree() : genreEndpoints.me.loadTree();
-      const response = await fetch(endpoint, false, true, {
+      const response = await fetch(endpoint, true, true, {
         method: "POST",
       });
       return response;
@@ -95,14 +95,15 @@ export function useCreateGenre(isReference = false) {
     inputSchema: CriteriaCreationSchema,
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async (data) => {
-      const response = await fetch(genreEndpoints.create(isReference), true, true, {
+      const endpoint = isReference ? genreEndpoints.reference.create() : genreEndpoints.me.create();
+      const response = await fetch(endpoint, true, true, {
         method: "POST",
         body: JSON.stringify(data),
       });
       return response;
     },
     onSuccess: () => {
-      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.myGenres.all;
+      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
       queryClient.invalidateQueries({ queryKey });
       invalidateAllGenrePlaylistQueries();
     },
@@ -121,15 +122,16 @@ export function useUpdateGenre(isReference = false) {
     }),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
-      const response = await fetch(genreEndpoints.update(uuid, isReference), true, true, {
+      const endpoint = isReference ? genreEndpoints.reference.update(uuid) : genreEndpoints.me.update(uuid);
+      const response = await fetch(endpoint, true, true, {
         method: "PUT",
         body: JSON.stringify(data),
       });
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.my.all;
-      const detailKey = isReference ? genreQueryKeys.reference.detail(uuid) : genreQueryKeys.my.detail(uuid);
+      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
+      const detailKey = isReference ? genreQueryKeys.reference.detail(uuid) : genreQueryKeys.me.detail(uuid);
       queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries({ queryKey: detailKey });
       invalidateAllGenrePlaylistQueries();
@@ -159,14 +161,15 @@ export function useDeleteGenre(isReference = false) {
     inputSchema: z.object({ uuid: z.string() }),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid }) => {
-      const response = await fetch(genreEndpoints.delete(uuid, isReference), true, true, {
+      const endpoint = isReference ? genreEndpoints.reference.delete(uuid) : genreEndpoints.me.delete(uuid);
+      const response = await fetch(endpoint, true, true, {
         method: "DELETE",
       });
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.my.all;
-      const detailKey = isReference ? genreQueryKeys.reference.detail(uuid) : genreQueryKeys.my.detail(uuid);
+      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
+      const detailKey = isReference ? genreQueryKeys.reference.detail(uuid) : genreQueryKeys.me.detail(uuid);
       queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries({ queryKey: detailKey });
       invalidateAllGenrePlaylistQueries();
