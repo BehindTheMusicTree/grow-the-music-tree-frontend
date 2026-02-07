@@ -10,12 +10,14 @@ import { CriteriaSimpleSchema } from "@schemas/domain/criteria/response/simple";
 import { CriteriaCreationSchema } from "@schemas/domain/criteria/form/creation";
 import { CriteriaUpdateSchema } from "@schemas/domain/criteria/form/update";
 import { useValidatedMutation } from "./useValidatedMutation";
-
-const GENRES_KEY = "genres";
-const REFERENCE_GENRES_KEY = "referenceGenres";
-const MY_GENRES_KEY = "myGenres";
-const LIST_KEY = "list";
-const DETAIL_KEY = "detail";
+import {
+  genreEndpoints,
+  GENRES_KEY,
+  REFERENCE_GENRES_KEY,
+  MY_GENRES_KEY,
+  LIST_KEY,
+  DETAIL_KEY,
+} from "../api/endpoints/genres.contract";
 
 export function useListGenres(
   page = 1,
@@ -27,7 +29,7 @@ export function useListGenres(
   return useQuery({
     queryKey: isReference ? [REFERENCE_GENRES_KEY, LIST_KEY, page] : [GENRES_KEY, LIST_KEY, page],
     queryFn: async () => {
-      const response = await fetch("genres/", isReference, true, true, {}, { page, pageSize });
+      const response = await fetch(genreEndpoints.list(isReference), isReference, true, true, {}, { page, pageSize });
       return PaginatedResponseSchema(CriteriaSimpleSchema).parse(response);
     },
   });
@@ -38,7 +40,7 @@ export function useFetchGenre(isReference = false) {
 
   return useCallback(
     async (id: string): Promise<CriteriaDetailed> => {
-      const response = await fetch(`genres/${id}/`, isReference, true);
+      const response = await fetch(genreEndpoints.detail(id, isReference), true);
       return CriteriaDetailedSchema.parse(response);
     },
     [fetch, isReference],
@@ -54,7 +56,7 @@ export function useLoadReferenceTreeGenre(isReference = false) {
     inputSchema: z.void(),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
-      const response = await fetch(`genres/tree/load/`, isReference, true, true, {
+      const response = await fetch(genreEndpoints.loadTree(isReference), true, true, {
         method: "POST",
       });
       return response;
@@ -75,7 +77,7 @@ export function useLoadPublicReferenceTreeGenre(isReference = false) {
     inputSchema: z.void(),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
-      const response = await fetch(`genres/tree/load/`, isReference, false, true, {
+      const response = await fetch(genreEndpoints.loadTree(isReference), false, true, {
         method: "POST",
       });
       return response;
@@ -96,7 +98,7 @@ export function useCreateGenre(isReference = false) {
     inputSchema: CriteriaCreationSchema,
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async (data) => {
-      const response = await fetch(`genres`, isReference, true, true, {
+      const response = await fetch(genreEndpoints.create(isReference), true, true, {
         method: "POST",
         body: JSON.stringify(data),
       });
@@ -122,7 +124,7 @@ export function useUpdateGenre(isReference = false) {
     }),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
-      const response = await fetch(`genres/${uuid}/`, isReference, true, true, {
+      const response = await fetch(genreEndpoints.update(uuid, isReference), true, true, {
         method: "PUT",
         body: JSON.stringify(data),
       });
@@ -160,7 +162,7 @@ export function useDeleteGenre(isReference = false) {
     inputSchema: z.object({ uuid: z.string() }),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid }) => {
-      const response = await fetch(`genres/${uuid}`, isReference, true, true, {
+      const response = await fetch(genreEndpoints.delete(uuid, isReference), true, true, {
         method: "DELETE",
       });
       return response;
