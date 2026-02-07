@@ -99,6 +99,15 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Updated `useListGenres`, `useFetchGenre`, `useCreateGenre`, `useUpdateGenre`, `useDeleteGenre` with reference support
   - Modified endpoint functions to conditionally return reference or regular API paths
 
+- **Endpoint Structure Refinement**: Restructured endpoint objects to use nested sub-objects instead of parameterized functions
+  - Updated genre endpoints to use `genreEndpoints.me.*` and `genreEndpoints.reference.*` for better type safety
+  - Updated playlist endpoints to use `playlistEndpoints.my.*`, `playlistEndpoints.full.*`, and `playlistEndpoints.reference.*`
+  - Updated query keys to use `genreQueryKeys.me.*` and `genreQueryKeys.reference.*` instead of 'my' and 'myGenres'
+  - Fixed all fetch wrapper calls to use correct parameter signatures across `useGenre.ts`, `useGenrePlaylist.tsx`, `useSpotifyAuth.ts`, and `useSpotifyLibTracks.ts`
+  - Added complete CRUD operations to playlist and library contracts for consistency with genre contracts
+  - Added missing query keys (list, detail) to playlist and library contracts to match genre contract structure
+  - Restructured library contract to use factory function pattern with `me` and `reference` sections for consistency
+
 ## [0.2.0] - 2025-02-06
 
 ### Changed
