@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { usePopup } from "@contexts/PopupContext";
 import GenreDeletionPopup from "@components/ui/popup/child/GenreDeletionPopup";
+import { useDeleteGenre } from "./useGenre";
 
 interface Genre {
   name: string;
@@ -13,8 +14,9 @@ interface UseGenreDeletionReturn {
   showDeletePopup: (genre: Genre) => void;
 }
 
-export function useGenreDeletion(onDelete: (genre: Genre) => void): UseGenreDeletionReturn {
+export function useGenreDeletion(isReference: boolean, onDelete?: (genre: Genre) => void): UseGenreDeletionReturn {
   const { showPopup, hidePopup } = usePopup();
+  const deleteGenre = useDeleteGenre(isReference);
 
   const showDeletePopup = useCallback(
     (genre: Genre) => {
@@ -22,14 +24,15 @@ export function useGenreDeletion(onDelete: (genre: Genre) => void): UseGenreDele
         <GenreDeletionPopup
           genre={genre}
           onConfirm={(genre: Genre) => {
-            onDelete(genre);
+            deleteGenre.mutate({ uuid: genre.uuid });
             hidePopup();
+            onDelete?.(genre);
           }}
           onClose={hidePopup}
-        />
+        />,
       );
     },
-    [showPopup, hidePopup, onDelete]
+    [showPopup, hidePopup, deleteGenre, onDelete],
   );
 
   return {
