@@ -15,7 +15,7 @@ export function useListUploadedTracks(page = 1, pageSize = process.env.NEXT_PUBL
   return useQuery({
     queryKey: ["uploadedTracks", "list", page],
     queryFn: async () => {
-      const response = await fetch("library/uploaded/", true, true, {}, { page, pageSize });
+      const response = await fetch("library/uploaded/", false, true, true, {}, { page, pageSize });
       const result = PaginatedResponseSchema(UploadedTrackDetailedSchema).safeParse(response);
       if (!result.success) {
         console.error("Parsing failed:", result.error);
@@ -69,7 +69,7 @@ export function useUploadTrack() {
         formData.append("language", data.language);
       }
 
-      const response = await fetch("library/uploaded/", true, true, {
+      const response = await fetch("library/uploaded/", false, true, true, {
         method: "POST",
         body: formData,
         headers: {
@@ -97,7 +97,7 @@ export function useUpdateUploadedTrack() {
     }),
     outputSchema: UploadedTrackDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
-      const response = await fetch(`library/uploaded/${uuid}/`, true, true, {
+      const response = await fetch(`library/uploaded/${uuid}/`, false, true, true, {
         method: "PUT",
         body: JSON.stringify(data),
       });
@@ -124,7 +124,7 @@ export function useDownloadTrack(uuid: string) {
   return useQuery({
     queryKey: ["uploadedTracks", "download", uuid],
     queryFn: async () => {
-      const response = await fetch(`library/uploaded/${uuid}/download`, true, true, {}, undefined, true);
+      const response = await fetch(`library/uploaded/${uuid}/download`, false, true, true, {}, undefined, true);
 
       return response;
     },
