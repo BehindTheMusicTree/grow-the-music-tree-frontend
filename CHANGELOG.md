@@ -85,6 +85,20 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Uses public API endpoints: `reference-genre-playlists/` and `reference/genres/tree/load/`
   - Includes comprehensive documentation and page-level docs
 
+### Changed
+
+- **API Endpoint Centralization**: Centralized all API endpoint definitions into domain-specific contract files
+  - Created `src/api/endpoints/genres.contract.ts`, `playlists.contract.ts`, `library.contract.ts`, and `user.contract.ts`
+  - Replaced hardcoded endpoint strings with centralized functions across all hooks
+  - Co-located query key constants with endpoint definitions for better maintainability
+
+- **Build Configuration**:
+  - Renamed `src/proxy.ts` to `src/middleware.ts` for proper Next.js middleware handling
+
+- **Genre Hooks Enhancement**: Added `isReference` parameter to all genre-related hooks for distinguishing regular and reference resources
+  - Updated `useListGenres`, `useFetchGenre`, `useCreateGenre`, `useUpdateGenre`, `useDeleteGenre` with reference support
+  - Modified endpoint functions to conditionally return reference or regular API paths
+
 ## [0.2.0] - 2025-02-06
 
 ### Changed
