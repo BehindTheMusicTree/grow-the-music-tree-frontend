@@ -29,6 +29,6 @@ This page can be statically generated as it contains no dynamic content.
 
 ## Notes
 
-- Automatically redirects to `/my-genre-tree` on load
+- Automatically redirects to `/reference-genre-tree` on load
 - No user interaction required
 - Serves as a landing page that immediately takes users to the main feature
