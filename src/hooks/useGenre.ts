@@ -63,28 +63,6 @@ export function useLoadExampleTreeGenre(scope: Scope) {
   });
 }
 
-export function useLoadPublicReferenceTreeGenre(scope: Scope) {
-  const { fetch } = useFetchWrapper();
-  const queryClient = useQueryClient();
-
-  return useValidatedMutation({
-    inputSchema: z.void(),
-    outputSchema: CriteriaDetailedSchema,
-    mutationFn: async () => {
-      const endpoint =
-        scope === "reference" ? genreEndpoints.reference.loadExampleTree() : genreEndpoints.me.loadExampleTree();
-      const response = await fetch(endpoint, true, scope !== "reference", {
-        method: "POST",
-      });
-      return response;
-    },
-    onSuccess: () => {
-      const queryKey = scope === "reference" ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
-      queryClient.invalidateQueries({ queryKey });
-    },
-  });
-}
-
 export function useCreateGenre(scope: Scope) {
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
