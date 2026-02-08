@@ -5,6 +5,7 @@ import { MdError, MdCheckCircle, MdUpload } from "react-icons/md";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 import { useUploadTrack } from "@hooks/useUploadedTrack";
 import { UploadedTrackCreationValues } from "@schemas/domain/uploaded-track/form/creation";
+import { Scope } from "@app-types/Scope";
 
 type UploadStatus = "pending" | "uploading" | "success" | "error";
 
@@ -21,6 +22,7 @@ type TrackUploadItem = {
 type TrackUploadPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   files: File[];
   genre?: string | null;
+  scope: Scope;
   onComplete?: (uploadedTracks: unknown[]) => void;
   onClose?: () => void;
 };
@@ -29,15 +31,16 @@ type TrackUploadPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" 
 function TrackUploadContent({
   files,
   genre,
+  scope,
   onComplete,
   onClose: _onClose,
-}: Pick<TrackUploadPopupProps, "files" | "genre" | "onComplete" | "onClose">) {
+}: Pick<TrackUploadPopupProps, "files" | "genre" | "scope" | "onComplete" | "onClose">) {
   const [uploadItems, setUploadItems] = useState<TrackUploadItem[]>([]);
   const [currentUploadIndex, setCurrentUploadIndex] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [allComplete, setAllComplete] = useState(false);
 
-  const { mutate: uploadTrack } = useUploadTrack();
+  const { mutate: uploadTrack } = useUploadTrack(scope);
 
   // Initialize upload items when files change
   useEffect(() => {
@@ -76,7 +79,7 @@ function TrackUploadContent({
 
     // Update status to uploading
     setUploadItems((prev) =>
-      prev.map((item, index) => (index === currentUploadIndex ? { ...item, status: "uploading", progress: 0 } : item))
+      prev.map((item, index) => (index === currentUploadIndex ? { ...item, status: "uploading", progress: 0 } : item)),
     );
 
     // Create upload data
@@ -91,8 +94,8 @@ function TrackUploadContent({
         prev.map((item, index) =>
           index === currentUploadIndex && item.status === "uploading"
             ? { ...item, progress: Math.min(item.progress + Math.random() * 20, 90) }
-            : item
-        )
+            : item,
+        ),
       );
     }, 200);
 
@@ -102,8 +105,8 @@ function TrackUploadContent({
         clearInterval(progressInterval);
         setUploadItems((prev) =>
           prev.map((item, index) =>
-            index === currentUploadIndex ? { ...item, status: "success", progress: 100, uploadedTrack: data } : item
-          )
+            index === currentUploadIndex ? { ...item, status: "success", progress: 100, uploadedTrack: data } : item,
+          ),
         );
         setIsUploading(false);
         setCurrentUploadIndex((prev) => prev + 1);
@@ -111,7 +114,7 @@ function TrackUploadContent({
       onError: (error) => {
         clearInterval(progressInterval);
         setUploadItems((prev) =>
-          prev.map((item, index) => (index === currentUploadIndex ? { ...item, status: "error", error } : item))
+          prev.map((item, index) => (index === currentUploadIndex ? { ...item, status: "error", error } : item)),
         );
         setIsUploading(false);
         setCurrentUploadIndex((prev) => prev + 1);
@@ -197,8 +200,8 @@ function TrackUploadContent({
               {item.error.name === "InvalidInputError"
                 ? "Upload failed due to invalid file data. Please check your file and try again."
                 : item.error.name === "ZodError"
-                ? "Upload failed due to a server error. Please try again later."
-                : item.error.message}
+                  ? "Upload failed due to a server error. Please try again later."
+                  : item.error.message}
             </div>
           )}
         </div>
@@ -219,7 +222,7 @@ function TrackUploadContent({
 // @ts-expect-error: omitted props are set internally by the popup
 export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps> {
   render() {
-    const { files, genre, onComplete, onClose, ...rest } = this.props;
+    const { files, genre, scope, onComplete, onClose, ...rest } = this.props;
 
     const successfulCount = 0; // This will be calculated in the content component
     const totalCount = files.length;
@@ -231,7 +234,9 @@ export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps> {
       showOkButton: true,
       okButtonText: "OK",
       onOk: onClose,
-      children: <TrackUploadContent files={files} genre={genre} onComplete={onComplete} onClose={onClose} />,
+      children: (
+        <TrackUploadContent files={files} genre={genre} scope={scope} onComplete={onComplete} onClose={onClose} />
+      ),
     });
   }
 }

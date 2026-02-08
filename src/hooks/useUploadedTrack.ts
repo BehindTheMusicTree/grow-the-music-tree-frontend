@@ -34,7 +34,7 @@ export function useListUploadedTracks(
   });
 }
 
-export function useUploadTrack() {
+export function useUploadTrack(scope: Scope | null) {
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
   const { fetch } = useFetchWrapper();
@@ -43,6 +43,8 @@ export function useUploadTrack() {
     inputSchema: UploadedTrackCreationSchema,
     outputSchema: UploadedTrackDetailedSchema,
     mutationFn: async (data) => {
+      if (scope == null) throw new Error("Scope is required for uploading tracks");
+
       const formData = new FormData();
       formData.append("file", data.file);
 
@@ -77,7 +79,7 @@ export function useUploadTrack() {
         formData.append("language", data.language);
       }
 
-      const response = await fetch(libraryEndpoints.me.uploaded.create(), false, true, {
+      const response = await fetch(libraryEndpoints[scope].uploaded.create(), false, true, {
         method: "POST",
         body: formData,
         headers: {
@@ -87,7 +89,9 @@ export function useUploadTrack() {
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.me.uploaded.all });
+      if (scope != null) {
+        queryClient.invalidateQueries({ queryKey: libraryQueryKeys[scope].uploaded.all });
+      }
       invalidateAllGenrePlaylistQueries();
     },
   });
