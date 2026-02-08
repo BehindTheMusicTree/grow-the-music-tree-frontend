@@ -27,6 +27,7 @@ export default function UploadedLibrary() {
         <TrackUploadPopup
           files={Array.from(files)}
           genre={null}
+          scope="me"
           onComplete={() => {}}
           onClose={() => {
             hidePopup();

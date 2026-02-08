@@ -68,6 +68,7 @@ export default function GenrePlaylistTreePerRoot({
         <TrackUploadPopup
           files={fileArray}
           genre={selectingFileGenreUuidRef.current}
+          scope={scope}
           onComplete={() => {}}
           onClose={() => {
             hidePopup();
