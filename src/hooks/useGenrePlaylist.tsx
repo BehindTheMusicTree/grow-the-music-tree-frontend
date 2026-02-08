@@ -50,7 +50,7 @@ export const useListFullGenrePlaylists = (scope: Scope) => {
       const response = await fetch(
         scope === "reference" ? playlistEndpoints.reference.list() : playlistEndpoints.me.list(),
         true,
-        scope !== "reference",
+        scope === "me",
         {},
         { page: 1, pageSize: FULL_LIST_PAGE_SIZE },
       );
@@ -91,7 +91,7 @@ export const useFetchGenrePlaylistDetailed = (scope: Scope) => {
     mutationFn: async (uuid: string) => {
       const endpoint =
         scope === "reference" ? playlistEndpoints.reference.detail(uuid) : playlistEndpoints.me.detail(uuid);
-      const response = await fetch(endpoint, true, scope !== "reference");
+      const response = await fetch(endpoint, true, scope === "me");
       return CriteriaPlaylistDetailedSchema.parse(response);
     },
   });

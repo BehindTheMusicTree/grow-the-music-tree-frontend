@@ -20,7 +20,7 @@ export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRE
     queryKey: scope === "reference" ? genreQueryKeys.reference.list(page) : genreQueryKeys.me.list(page),
     queryFn: async () => {
       const endpoint = scope === "reference" ? genreEndpoints.reference.list() : genreEndpoints.me.list();
-      const response = await fetch(endpoint, true, scope !== "reference", {}, { page, pageSize });
+      const response = await fetch(endpoint, true, scope === "me", {}, { page, pageSize });
       return PaginatedResponseSchema(CriteriaSimpleSchema).parse(response);
     },
   });
@@ -32,7 +32,7 @@ export function useFetchGenre(scope: Scope) {
   return useCallback(
     async (id: string): Promise<CriteriaDetailed> => {
       const endpoint = scope === "reference" ? genreEndpoints.reference.detail(id) : genreEndpoints.me.detail(id);
-      const response = await fetch(endpoint, true, scope !== "reference");
+      const response = await fetch(endpoint, true, scope === "me");
       return CriteriaDetailedSchema.parse(response);
     },
     [fetch, scope],
@@ -50,7 +50,7 @@ export function useLoadExampleTreeGenre(scope: Scope) {
     mutationFn: async () => {
       const endpoint =
         scope === "reference" ? genreEndpoints.reference.loadExampleTree() : genreEndpoints.me.loadExampleTree();
-      const response = await fetch(endpoint, true, scope !== "reference", {
+      const response = await fetch(endpoint, true, scope === "me", {
         method: "POST",
       });
       return response;
@@ -73,7 +73,7 @@ export function useCreateGenre(scope: Scope) {
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async (data) => {
       const endpoint = scope === "reference" ? genreEndpoints.reference.create() : genreEndpoints.me.create();
-      const response = await fetch(endpoint, true, scope !== "reference", {
+      const response = await fetch(endpoint, true, scope === "me", {
         method: "POST",
         body: JSON.stringify(data),
       });
@@ -100,7 +100,7 @@ export function useUpdateGenre(scope: Scope) {
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
       const endpoint = scope === "reference" ? genreEndpoints.reference.update(uuid) : genreEndpoints.me.update(uuid);
-      const response = await fetch(endpoint, true, scope !== "reference", {
+      const response = await fetch(endpoint, true, scope === "me", {
         method: "PUT",
         body: JSON.stringify(data),
       });
@@ -139,7 +139,7 @@ export function useDeleteGenre(scope: Scope) {
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid }) => {
       const endpoint = scope === "reference" ? genreEndpoints.reference.delete(uuid) : genreEndpoints.me.delete(uuid);
-      const response = await fetch(endpoint, true, scope !== "reference", {
+      const response = await fetch(endpoint, true, scope === "me", {
         method: "DELETE",
       });
       return response;
