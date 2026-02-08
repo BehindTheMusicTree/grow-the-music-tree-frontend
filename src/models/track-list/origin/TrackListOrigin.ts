@@ -9,7 +9,7 @@ export default class TrackListOrigin {
     public type: TrackListOriginType,
     public label: string,
     public uuid: string,
-    public scope: Scope = "me",
+    public scope: Scope,
   ) {}
 }
 
