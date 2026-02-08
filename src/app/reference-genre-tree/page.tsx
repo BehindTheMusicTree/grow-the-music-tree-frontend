@@ -9,7 +9,7 @@ import { useLoadPublicReferenceTreeGenre } from "@hooks/useGenre";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
 
-import { GenreTreeView } from "../my-genre-tree/GenreTreeView";
+import { GenreTreeView } from "../me-genre-tree/GenreTreeView";
 
 export default function ReferenceGenreTree() {
   const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists("reference");
