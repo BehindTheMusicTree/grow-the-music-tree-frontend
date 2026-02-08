@@ -1,20 +1,30 @@
 import { PlaylistDetailed } from "@schemas/domain/playlist/detailed";
 import { CriteriaPlaylistDetailed } from "@schemas/domain/playlist/criteria-playlist/detailed";
 import { UploadedTrackDetailed } from "@schemas/domain/uploaded-track/response/detailed";
+import { Scope } from "../../../api/types/scope";
 import { TrackListOriginType } from "./TrackListOriginType";
 
 export default class TrackListOrigin {
-  constructor(public type: TrackListOriginType, public label: string, public uuid: string) {}
+  constructor(
+    public type: TrackListOriginType,
+    public label: string,
+    public uuid: string,
+    public scope: Scope = "me",
+  ) {}
 }
 
 export class TrackListOriginFromUploadedTrack extends TrackListOrigin {
-  constructor(public uploadedTrack: UploadedTrackDetailed) {
+  constructor(
+    public uploadedTrack: UploadedTrackDetailed,
+    scope: Scope = "me",
+  ) {
     super(
       TrackListOriginType.UPLOADED_TRACK,
       `${uploadedTrack.title} by ${
         uploadedTrack.artists ? uploadedTrack.artists.map((artist) => artist.name).join(", ") : ""
       }`,
-      uploadedTrack.uuid
+      uploadedTrack.uuid,
+      scope,
     );
   }
 }
@@ -26,7 +36,10 @@ export class TrackListOriginFromPlaylist extends TrackListOrigin {
 }
 
 export class TrackListOriginFromCriteriaPlaylist extends TrackListOrigin {
-  constructor(public criteriaPlaylist: CriteriaPlaylistDetailed) {
-    super(TrackListOriginType.GENRE_PLAYLIST, criteriaPlaylist.name, criteriaPlaylist.uuid);
+  constructor(
+    public criteriaPlaylist: CriteriaPlaylistDetailed,
+    scope: Scope = "me",
+  ) {
+    super(TrackListOriginType.GENRE_PLAYLIST, criteriaPlaylist.name, criteriaPlaylist.uuid, scope);
   }
 }

@@ -9,14 +9,20 @@ import { UploadedTrackUpdateSchema } from "@domain/uploaded-track/form/update";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { useValidatedMutation } from "./useValidatedMutation";
 import { libraryEndpoints, libraryQueryKeys } from "../api/endpoints/library";
+import { Scope } from "../api/types/scope";
 
-export function useListUploadedTracks(page = 1, pageSize = process.env.NEXT_PUBLIC_UPLOADED_TRACKS_PAGE_SIZE || 50) {
+export function useListUploadedTracks(
+  scope: Scope | null,
+  page = 1,
+  pageSize = process.env.NEXT_PUBLIC_UPLOADED_TRACKS_PAGE_SIZE || 50,
+) {
   const { fetch } = useFetchWrapper();
 
   return useQuery({
-    queryKey: libraryQueryKeys.me.uploaded.list(page),
+    queryKey: scope != null ? libraryQueryKeys[scope].uploaded.list(page) : ["uploadedTracks", "none", page],
     queryFn: async () => {
-      const response = await fetch(libraryEndpoints.me.uploaded.list(), false, true, {}, { page, pageSize });
+      if (scope == null) return null;
+      const response = await fetch(libraryEndpoints[scope].uploaded.list(), false, true, {}, { page, pageSize });
       const result = PaginatedResponseSchema(UploadedTrackDetailedSchema).safeParse(response);
       if (!result.success) {
         console.error("Parsing failed:", result.error);
@@ -24,6 +30,7 @@ export function useListUploadedTracks(page = 1, pageSize = process.env.NEXT_PUBL
       }
       return result.data;
     },
+    enabled: scope != null,
   });
 }
 
@@ -119,16 +126,18 @@ export function useUpdateUploadedTrack() {
   return mutation;
 }
 
-export function useDownloadTrack(uuid: string) {
+export function useDownloadTrack(uuid: string, scope: Scope | null) {
   const { fetch } = useFetchWrapper();
 
   return useQuery({
-    queryKey: libraryQueryKeys.me.uploaded.download(uuid),
+    queryKey:
+      scope != null ? libraryQueryKeys[scope].uploaded.download(uuid) : ["uploadedTrack", "download", "none", uuid],
     queryFn: async () => {
-      const response = await fetch(libraryEndpoints.me.uploaded.download(uuid), false, true, {}, {});
+      if (scope == null) return null;
+      const response = await fetch(libraryEndpoints[scope].uploaded.download(uuid), false, true, {}, {});
 
       return response;
     },
-    enabled: !!uuid,
+    enabled: !!uuid && scope != null,
   });
 }

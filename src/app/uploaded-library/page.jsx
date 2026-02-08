@@ -14,7 +14,7 @@ import { useListUploadedTracks } from "@hooks/useUploadedTrack";
 import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
 
 export default function UploadedLibrary() {
-  const { data: uploadedTracksResponse } = useListUploadedTracks();
+  const { data: uploadedTracksResponse } = useListUploadedTracks("me");
   const uploadedTracks = uploadedTracksResponse?.results || [];
   const { playerUploadedTrackObject, handlePlayPauseAction } = usePlayer();
   const { showPopup, hidePopup } = usePopup();
@@ -31,7 +31,7 @@ export default function UploadedLibrary() {
           onClose={() => {
             hidePopup();
           }}
-        />
+        />,
       );
     }
     event.target.value = null;

@@ -4,6 +4,7 @@ import { createContext, useContext, useState, ReactNode, useRef, useEffect, useC
 import { PlayStates } from "@models/PlayStates";
 import { UploadedTrackDetailed } from "@domain/uploaded-track/response/detailed";
 import { useDownloadTrack, useListUploadedTracks } from "@hooks/useUploadedTrack";
+import { Scope } from "../api/types/scope";
 
 interface PlayerTrackObject {
   uploadedTrack: UploadedTrackDetailed;
@@ -26,8 +27,9 @@ interface PlayerContextType {
   playState: PlayStates;
   setPlayState: (state: PlayStates) => void;
   handlePlayPauseAction: () => void;
-  loadTrackForPlayer: (track: UploadedTrackDetailed) => void;
+  loadTrackForPlayer: (track: UploadedTrackDetailed, scope?: Scope) => void;
   isLoading: boolean;
+  currentTrackScope: Scope | null;
   handleNextTrack: (
     trackList: UploadedTrackDetailed[],
     currentTrack: UploadedTrackDetailed,
@@ -57,6 +59,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [currentTrackUuid, setCurrentTrackUuid] = useState<string | null>(null);
+  const [currentTrackScope, setCurrentTrackScope] = useState<Scope | null>(null);
   const [onTrackEnd, setOnTrackEnd] = useState<(() => void) | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const processedTrackUuidRef = useRef<string | null>(null);
@@ -64,13 +67,13 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
   // Use refs for high-frequency updates that don't need to trigger re-renders
   const currentTimeRef = useRef(0);
 
-  // Get uploaded tracks data to refresh player info when tracks are updated
-  const { data: uploadedTracksResponse } = useListUploadedTracks();
+  const { data: uploadedTracksResponse } = useListUploadedTracks(currentTrackScope);
+  const { data: downloadData, isLoading: isDownloading } = useDownloadTrack(
+    currentTrackUuid || "",
+    currentTrackScope
+  );
 
-  // Download track data when UUID changes
-  const { data: downloadData, isLoading: isDownloading } = useDownloadTrack(currentTrackUuid || "");
-
-  const loadTrackForPlayer = useCallback((track: UploadedTrackDetailed) => {
+  const loadTrackForPlayer = useCallback((track: UploadedTrackDetailed, scope: Scope = "me") => {
     // Stop current track if playing and clean up
     if (audioElementRef.current) {
       audioElementRef.current.pause();
@@ -95,7 +98,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
     };
     setPlayerUploadedTrackObject(playerObject);
 
-    // Trigger download by setting UUID
+    setCurrentTrackScope(scope);
     setCurrentTrackUuid(track.uuid);
     setIsLoading(true);
     setPlayState(PlayStates.LOADING);
@@ -120,10 +123,10 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       if (nextIndex < trackList.length) {
         const nextTrack = trackList[nextIndex];
         onTrackChange(nextTrack);
-        loadTrackForPlayer(nextTrack);
+        loadTrackForPlayer(nextTrack, currentTrackScope ?? "me");
       }
     },
-    [loadTrackForPlayer],
+    [loadTrackForPlayer, currentTrackScope],
   );
 
   const handlePreviousTrack = useCallback(
@@ -145,10 +148,10 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       if (previousIndex >= 0) {
         const previousTrack = trackList[previousIndex];
         onTrackChange(previousTrack);
-        loadTrackForPlayer(previousTrack);
+        loadTrackForPlayer(previousTrack, currentTrackScope ?? "me");
       }
     },
-    [loadTrackForPlayer],
+    [loadTrackForPlayer, currentTrackScope],
   );
 
   const handleDownloadComplete = useCallback(
@@ -329,6 +332,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       handlePlayPauseAction,
       loadTrackForPlayer,
       isLoading,
+      currentTrackScope,
       handleNextTrack,
       handlePreviousTrack,
       onTrackEnd,
@@ -341,13 +345,13 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       volume,
       playState,
       isLoading,
+      currentTrackScope,
       handlePlayPauseAction,
       loadTrackForPlayer,
       handleNextTrack,
       handlePreviousTrack,
       onTrackEnd,
       setOnTrackEnd,
-      // Note: currentTimeRef is stable (ref), so it doesn't need to be in dependencies
     ],
   );
 
