@@ -4,7 +4,7 @@ import { createContext, useContext, useState, ReactNode, useRef, useEffect, useC
 import { PlayStates } from "@models/PlayStates";
 import { UploadedTrackDetailed } from "@domain/uploaded-track/response/detailed";
 import { useDownloadTrack, useListUploadedTracks } from "@hooks/useUploadedTrack";
-import { Scope } from "../api/types/scope";
+import { Scope } from "@app-types/Scope";
 
 interface PlayerTrackObject {
   uploadedTrack: UploadedTrackDetailed;
@@ -68,10 +68,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
   const currentTimeRef = useRef(0);
 
   const { data: uploadedTracksResponse } = useListUploadedTracks(currentTrackScope);
-  const { data: downloadData, isLoading: isDownloading } = useDownloadTrack(
-    currentTrackUuid || "",
-    currentTrackScope
-  );
+  const { data: downloadData, isLoading: isDownloading } = useDownloadTrack(currentTrackUuid || "", currentTrackScope);
 
   const loadTrackForPlayer = useCallback((track: UploadedTrackDetailed, scope: Scope = "me") => {
     // Stop current track if playing and clean up
