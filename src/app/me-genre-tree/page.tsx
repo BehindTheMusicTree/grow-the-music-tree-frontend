@@ -69,7 +69,7 @@ export default function GenreTree() {
           <IconTextButton icon={Plus} text="Add root" onClick={() => showCriteriaCreationPopup()} />
           <IconTextButton
             icon={FaTree}
-            text="Load the reference tree genre"
+            text="Load the example tree genre"
             className="ml-2"
             onClick={() => loadReferenceTreeGenre()}
             disabled={isLoadingReferenceTreeGenre || isListingGenrePlaylists}

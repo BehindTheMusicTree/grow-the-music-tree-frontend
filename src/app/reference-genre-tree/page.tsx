@@ -30,7 +30,7 @@ export default function ReferenceGenreTree() {
       actions={
         <IconTextButton
           icon={FaTree}
-          text="Load the reference tree genre"
+          text="Load the example tree genre"
           onClick={() => loadReferenceTreeGenre()}
           disabled={isLoadingReferenceTreeGenre || isListingGenrePlaylists}
         />
