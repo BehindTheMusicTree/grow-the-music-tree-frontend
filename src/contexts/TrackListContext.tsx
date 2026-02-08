@@ -9,7 +9,7 @@ import {
 } from "@models/track-list/origin/TrackListOrigin";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 import { CriteriaPlaylistDetailed } from "@schemas/domain/playlist/criteria-playlist/detailed";
-import { Scope } from "../api/types/scope";
+import { Scope } from "@app-types/Scope";
 import { usePlayer } from "./PlayerContext";
 import { useTrackListSidebarVisibility } from "./TrackListSidebarVisibilityContext";
 import { useListUploadedTracks } from "@hooks/useUploadedTrack";

@@ -8,7 +8,7 @@ import { CriteriaPlaylistDetailedSchema, CriteriaPlaylistDetailed } from "@domai
 
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { playlistEndpoints, playlistQueryKeys } from "../api/endpoints/playlists";
-import { Scope } from "../api/types/scope";
+import { Scope } from "@app-types/Scope";
 
 const FULL_LIST_PAGE_SIZE = 1000;
 

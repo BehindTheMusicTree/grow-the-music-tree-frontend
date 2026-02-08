@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { usePopup } from "@contexts/PopupContext";
 import GenreDeletionPopup from "@components/ui/popup/child/GenreDeletionPopup";
 import { useDeleteGenre } from "./useGenre";
-import { Scope } from "../api/types/scope";
+import { Scope } from "@app-types/Scope";
 
 interface Genre {
   name: string;

@@ -1,7 +1,7 @@
 import { PlaylistDetailed } from "@schemas/domain/playlist/detailed";
 import { CriteriaPlaylistDetailed } from "@schemas/domain/playlist/criteria-playlist/detailed";
 import { UploadedTrackDetailed } from "@schemas/domain/uploaded-track/response/detailed";
-import { Scope } from "../../../api/types/scope";
+import { Scope } from "@app-types/Scope";
 import { TrackListOriginType } from "./TrackListOriginType";
 
 export default class TrackListOrigin {

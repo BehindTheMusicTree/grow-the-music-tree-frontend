@@ -11,7 +11,7 @@ import { CriteriaCreationSchema } from "@schemas/domain/criteria/form/creation";
 import { CriteriaUpdateSchema } from "@schemas/domain/criteria/form/update";
 import { useValidatedMutation } from "./useValidatedMutation";
 import { genreEndpoints, genreQueryKeys } from "../api/endpoints/genres";
-import { Scope } from "../api/types/scope";
+import { Scope } from "@app-types/Scope";
 
 export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50, scope: Scope) {
   const { fetch } = useFetchWrapper();

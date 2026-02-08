@@ -9,7 +9,7 @@ import { UploadedTrackUpdateSchema } from "@domain/uploaded-track/form/update";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { useValidatedMutation } from "./useValidatedMutation";
 import { libraryEndpoints, libraryQueryKeys } from "../api/endpoints/library";
-import { Scope } from "../api/types/scope";
+import { Scope } from "@app-types/Scope";
 
 export function useListUploadedTracks(
   scope: Scope | null,
