@@ -7,25 +7,30 @@ import { MenuGroup } from "./MenuGroup";
 const menuGroups = {
   genreTree: [
     {
-      href: "/genre-tree",
-      label: "Genre Tree",
+      href: "/reference-genre-tree",
+      label: "Reference Genre Tree",
+      icon: <PiGraphLight className="text-xl" />,
+    },
+    {
+      href: "/me-genre-tree",
+      label: "My Genre Tree",
       icon: <PiGraphLight className="text-xl" />,
     },
   ],
   library: [
     {
-      href: "/genre-playlists",
-      label: "Genre Playlists",
+      href: "/me-genre-playlists",
+      label: "My Genre Playlists",
       icon: <FaList className="text-xl" />,
     },
     {
-      href: "/uploaded-library",
-      label: "Uploaded Library",
+      href: "/me-uploaded-library",
+      label: "My Uploaded Library",
       icon: <FaCloudUploadAlt className="text-xl" />,
     },
     {
-      href: "/spotify-library",
-      label: "Spotify Library",
+      href: "/me-spotify-library",
+      label: "My Spotify Library",
       icon: <FaSpotify className="text-xl" />,
     },
   ],
