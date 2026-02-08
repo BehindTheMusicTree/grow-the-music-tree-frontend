@@ -79,7 +79,7 @@ export function useUploadTrack(scope: Scope | null) {
         formData.append("language", data.language);
       }
 
-      const response = await fetch(libraryEndpoints[scope].uploaded.create(), false, true, {
+      const response = await fetch(libraryEndpoints[scope].uploaded.create(), true, scope === "me", {
         method: "POST",
         body: formData,
         headers: {
