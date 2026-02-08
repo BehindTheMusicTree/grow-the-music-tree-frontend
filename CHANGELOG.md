@@ -95,7 +95,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Build Configuration**:
   - Renamed `src/proxy.ts` to `src/middleware.ts` for proper Next.js middleware handling
 
-- **Genre Hooks Enhancement**: Added `isReference` parameter to all genre-related hooks for distinguishing regular and reference resources
+- **Genre Hooks Enhancement**: Added `scope === "reference"` parameter to all genre-related hooks for distinguishing regular and reference resources
   - Updated `useListGenres`, `useFetchGenre`, `useCreateGenre`, `useUpdateGenre`, `useDeleteGenre` with reference support
   - Modified endpoint functions to conditionally return reference or regular API paths
 

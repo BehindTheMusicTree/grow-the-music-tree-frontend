@@ -27,7 +27,7 @@ interface PlayerContextType {
   playState: PlayStates;
   setPlayState: (state: PlayStates) => void;
   handlePlayPauseAction: () => void;
-  loadTrackForPlayer: (track: UploadedTrackDetailed, scope?: Scope) => void;
+  loadTrackForPlayer: (track: UploadedTrackDetailed, scope: Scope) => void;
   isLoading: boolean;
   currentTrackScope: Scope | null;
   handleNextTrack: (
@@ -70,7 +70,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
   const { data: uploadedTracksResponse } = useListUploadedTracks(currentTrackScope);
   const { data: downloadData, isLoading: isDownloading } = useDownloadTrack(currentTrackUuid || "", currentTrackScope);
 
-  const loadTrackForPlayer = useCallback((track: UploadedTrackDetailed, scope: Scope = "me") => {
+  const loadTrackForPlayer = useCallback((track: UploadedTrackDetailed, scope: Scope) => {
     // Stop current track if playing and clean up
     if (audioElementRef.current) {
       audioElementRef.current.pause();
@@ -107,7 +107,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       currentTrack: UploadedTrackDetailed,
       onTrackChange: (track: UploadedTrackDetailed) => void,
     ) => {
-      if (!trackList || !currentTrack) {
+      if (!trackList || !currentTrack || currentTrackScope == null) {
         return;
       }
 
@@ -120,7 +120,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       if (nextIndex < trackList.length) {
         const nextTrack = trackList[nextIndex];
         onTrackChange(nextTrack);
-        loadTrackForPlayer(nextTrack, currentTrackScope ?? "me");
+        loadTrackForPlayer(nextTrack, currentTrackScope);
       }
     },
     [loadTrackForPlayer, currentTrackScope],
@@ -132,7 +132,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       currentTrack: UploadedTrackDetailed,
       onTrackChange: (track: UploadedTrackDetailed) => void,
     ) => {
-      if (!trackList || !currentTrack) {
+      if (!trackList || !currentTrack || currentTrackScope == null) {
         return;
       }
 
@@ -145,7 +145,7 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
       if (previousIndex >= 0) {
         const previousTrack = trackList[previousIndex];
         onTrackChange(previousTrack);
-        loadTrackForPlayer(previousTrack, currentTrackScope ?? "me");
+        loadTrackForPlayer(previousTrack, currentTrackScope);
       }
     },
     [loadTrackForPlayer, currentTrackScope],

@@ -15,13 +15,12 @@ import { Scope } from "@app-types/Scope";
 
 export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50, scope: Scope) {
   const { fetch } = useFetchWrapper();
-  const isReference = scope === "reference";
 
   return useQuery({
-    queryKey: isReference ? genreQueryKeys.reference.list(page) : genreQueryKeys.me.list(page),
+    queryKey: scope === "reference" ? genreQueryKeys.reference.list(page) : genreQueryKeys.me.list(page),
     queryFn: async () => {
-      const endpoint = isReference ? genreEndpoints.reference.list() : genreEndpoints.me.list();
-      const response = await fetch(endpoint, true, !isReference, {}, { page, pageSize });
+      const endpoint = scope === "reference" ? genreEndpoints.reference.list() : genreEndpoints.me.list();
+      const response = await fetch(endpoint, true, scope !== "reference", {}, { page, pageSize });
       return PaginatedResponseSchema(CriteriaSimpleSchema).parse(response);
     },
   });
@@ -29,15 +28,14 @@ export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRE
 
 export function useFetchGenre(scope: Scope) {
   const { fetch } = useFetchWrapper();
-  const isReference = scope === "reference";
 
   return useCallback(
     async (id: string): Promise<CriteriaDetailed> => {
-      const endpoint = isReference ? genreEndpoints.reference.detail(id) : genreEndpoints.me.detail(id);
-      const response = await fetch(endpoint, true, !isReference);
+      const endpoint = scope === "reference" ? genreEndpoints.reference.detail(id) : genreEndpoints.me.detail(id);
+      const response = await fetch(endpoint, true, scope !== "reference");
       return CriteriaDetailedSchema.parse(response);
     },
-    [fetch, isReference],
+    [fetch, scope],
   );
 }
 
@@ -45,20 +43,19 @@ export function useLoadReferenceTreeGenre(scope: Scope) {
   const { fetch } = useFetchWrapper();
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
-  const isReference = scope === "reference";
 
   return useValidatedMutation({
     inputSchema: z.void(),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
-      const endpoint = isReference ? genreEndpoints.reference.loadTree() : genreEndpoints.me.loadTree();
-      const response = await fetch(endpoint, true, !isReference, {
+      const endpoint = scope === "reference" ? genreEndpoints.reference.loadTree() : genreEndpoints.me.loadTree();
+      const response = await fetch(endpoint, true, scope !== "reference", {
         method: "POST",
       });
       return response;
     },
     onSuccess: () => {
-      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
+      const queryKey = scope === "reference" ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
       queryClient.invalidateQueries({ queryKey });
       invalidateAllGenrePlaylistQueries();
     },
@@ -68,20 +65,19 @@ export function useLoadReferenceTreeGenre(scope: Scope) {
 export function useLoadPublicReferenceTreeGenre(scope: Scope) {
   const { fetch } = useFetchWrapper();
   const queryClient = useQueryClient();
-  const isReference = scope === "reference";
 
   return useValidatedMutation({
     inputSchema: z.void(),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
-      const endpoint = isReference ? genreEndpoints.reference.loadTree() : genreEndpoints.me.loadTree();
-      const response = await fetch(endpoint, true, !isReference, {
+      const endpoint = scope === "reference" ? genreEndpoints.reference.loadTree() : genreEndpoints.me.loadTree();
+      const response = await fetch(endpoint, true, scope !== "reference", {
         method: "POST",
       });
       return response;
     },
     onSuccess: () => {
-      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
+      const queryKey = scope === "reference" ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
       queryClient.invalidateQueries({ queryKey });
     },
   });
@@ -91,21 +87,20 @@ export function useCreateGenre(scope: Scope) {
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
   const { fetch } = useFetchWrapper();
-  const isReference = scope === "reference";
 
   return useValidatedMutation({
     inputSchema: CriteriaCreationSchema,
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async (data) => {
-      const endpoint = isReference ? genreEndpoints.reference.create() : genreEndpoints.me.create();
-      const response = await fetch(endpoint, true, !isReference, {
+      const endpoint = scope === "reference" ? genreEndpoints.reference.create() : genreEndpoints.me.create();
+      const response = await fetch(endpoint, true, scope !== "reference", {
         method: "POST",
         body: JSON.stringify(data),
       });
       return response;
     },
     onSuccess: () => {
-      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
+      const queryKey = scope === "reference" ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
       queryClient.invalidateQueries({ queryKey });
       invalidateAllGenrePlaylistQueries();
     },
@@ -116,7 +111,6 @@ export function useUpdateGenre(scope: Scope) {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
-  const isReference = scope === "reference";
 
   const { mutate, formErrors } = useValidatedMutation({
     inputSchema: z.object({
@@ -125,16 +119,16 @@ export function useUpdateGenre(scope: Scope) {
     }),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
-      const endpoint = isReference ? genreEndpoints.reference.update(uuid) : genreEndpoints.me.update(uuid);
-      const response = await fetch(endpoint, true, !isReference, {
+      const endpoint = scope === "reference" ? genreEndpoints.reference.update(uuid) : genreEndpoints.me.update(uuid);
+      const response = await fetch(endpoint, true, scope !== "reference", {
         method: "PUT",
         body: JSON.stringify(data),
       });
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
-      const detailKey = isReference ? genreQueryKeys.reference.detail(uuid) : genreQueryKeys.me.detail(uuid);
+      const queryKey = scope === "reference" ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
+      const detailKey = scope === "reference" ? genreQueryKeys.reference.detail(uuid) : genreQueryKeys.me.detail(uuid);
       queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries({ queryKey: detailKey });
       invalidateAllGenrePlaylistQueries();
@@ -159,21 +153,20 @@ export function useDeleteGenre(scope: Scope) {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
-  const isReference = scope === "reference";
 
   return useValidatedMutation({
     inputSchema: z.object({ uuid: z.string() }),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid }) => {
-      const endpoint = isReference ? genreEndpoints.reference.delete(uuid) : genreEndpoints.me.delete(uuid);
-      const response = await fetch(endpoint, true, !isReference, {
+      const endpoint = scope === "reference" ? genreEndpoints.reference.delete(uuid) : genreEndpoints.me.delete(uuid);
+      const response = await fetch(endpoint, true, scope !== "reference", {
         method: "DELETE",
       });
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      const queryKey = isReference ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
-      const detailKey = isReference ? genreQueryKeys.reference.detail(uuid) : genreQueryKeys.me.detail(uuid);
+      const queryKey = scope === "reference" ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
+      const detailKey = scope === "reference" ? genreQueryKeys.reference.detail(uuid) : genreQueryKeys.me.detail(uuid);
       queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries({ queryKey: detailKey });
       invalidateAllGenrePlaylistQueries();

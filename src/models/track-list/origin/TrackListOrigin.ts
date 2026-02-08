@@ -14,10 +14,7 @@ export default class TrackListOrigin {
 }
 
 export class TrackListOriginFromUploadedTrack extends TrackListOrigin {
-  constructor(
-    public uploadedTrack: UploadedTrackDetailed,
-    scope: Scope = "me",
-  ) {
+  constructor(public uploadedTrack: UploadedTrackDetailed, scope: Scope) {
     super(
       TrackListOriginType.UPLOADED_TRACK,
       `${uploadedTrack.title} by ${
@@ -30,16 +27,13 @@ export class TrackListOriginFromUploadedTrack extends TrackListOrigin {
 }
 
 export class TrackListOriginFromPlaylist extends TrackListOrigin {
-  constructor(public playlist: PlaylistDetailed) {
-    super(TrackListOriginType.PLAYLIST, playlist.name, playlist.uuid);
+  constructor(public playlist: PlaylistDetailed, scope: Scope) {
+    super(TrackListOriginType.PLAYLIST, playlist.name, playlist.uuid, scope);
   }
 }
 
 export class TrackListOriginFromCriteriaPlaylist extends TrackListOrigin {
-  constructor(
-    public criteriaPlaylist: CriteriaPlaylistDetailed,
-    scope: Scope = "me",
-  ) {
+  constructor(public criteriaPlaylist: CriteriaPlaylistDetailed, scope: Scope) {
     super(TrackListOriginType.GENRE_PLAYLIST, criteriaPlaylist.name, criteriaPlaylist.uuid, scope);
   }
 }

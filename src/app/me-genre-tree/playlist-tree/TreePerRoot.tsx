@@ -95,7 +95,7 @@ export default function GenrePlaylistTreePerRoot({
       // Fetch detailed genre playlist and play it
       fetchGenrePlaylistDetailed(genrePlaylist.uuid, {
         onSuccess: (detailedPlaylist) => {
-          playNewTrackListFromGenrePlaylist(detailedPlaylist);
+          playNewTrackListFromGenrePlaylist(detailedPlaylist, "me");
         },
         onError: (error) => {
           console.error("Failed to fetch detailed genre playlist:", error);

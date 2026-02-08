@@ -19,8 +19,8 @@ interface TrackListContextType {
   selectedTrack: UploadedTrackDetailed | null;
   setSelectedTrack: (track: UploadedTrackDetailed | null) => void;
   toTrackAtPosition: (position: number) => void;
-  playNewTrackListFromUploadedTrackUuid: (track: UploadedTrackDetailed, scope?: Scope) => void;
-  playNewTrackListFromGenrePlaylist: (genrePlaylist: CriteriaPlaylistDetailed, scope?: Scope) => void;
+  playNewTrackListFromUploadedTrackUuid: (track: UploadedTrackDetailed, scope: Scope) => void;
+  playNewTrackListFromGenrePlaylist: (genrePlaylist: CriteriaPlaylistDetailed, scope: Scope) => void;
 }
 
 const TrackListContext = createContext<TrackListContextType | undefined>(undefined);
@@ -34,7 +34,7 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
   const [selectedTrack, setSelectedTrack] = useState<UploadedTrackDetailed | null>(null);
   const { loadTrackForPlayer } = usePlayer();
   const { showTrackListSidebar } = useTrackListSidebarVisibility();
-  const scope = trackList?.origin?.scope ?? "me";
+  const scope = trackList?.origin?.scope ?? null;
   const { data: uploadedTracksResponse } = useListUploadedTracks(scope);
 
   // Create a memoized track list that updates when uploadedTracks changes
@@ -82,7 +82,7 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
     }
   };
 
-  const playNewTrackListFromUploadedTrackUuid = (track: UploadedTrackDetailed, scope: Scope = "me") => {
+  const playNewTrackListFromUploadedTrackUuid = (track: UploadedTrackDetailed, scope: Scope) => {
     const origin = new TrackListOriginFromUploadedTrack(track, scope);
     const newTrackList = new TrackListFromUploadedTrack([track], origin);
 
@@ -92,7 +92,7 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
     loadTrackForPlayer(track, scope);
   };
 
-  const playNewTrackListFromGenrePlaylist = (genrePlaylist: CriteriaPlaylistDetailed, scope: Scope = "me") => {
+  const playNewTrackListFromGenrePlaylist = (genrePlaylist: CriteriaPlaylistDetailed, scope: Scope) => {
     const tracks = genrePlaylist.uploadedTrackPlaylistRelations
       .sort((a, b) => a.position - b.position)
       .map((rel) => rel.uploadedTrack);

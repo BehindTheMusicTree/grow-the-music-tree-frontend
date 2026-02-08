@@ -42,16 +42,15 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
 export const useListFullGenrePlaylists = (scope: Scope) => {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
-  const isReference = scope === "reference";
-  const queryKey = isReference ? playlistQueryKeys.reference.full : playlistQueryKeys.me.full;
+  const queryKey = scope === "reference" ? playlistQueryKeys.reference.full : playlistQueryKeys.me.full;
 
   const query = useQuery({
     queryKey,
     queryFn: async () => {
       const response = await fetch(
-        isReference ? playlistEndpoints.reference.list() : playlistEndpoints.me.list(),
+        scope === "reference" ? playlistEndpoints.reference.list() : playlistEndpoints.me.list(),
         true,
-        !isReference,
+        scope !== "reference",
         {},
         { page: 1, pageSize: FULL_LIST_PAGE_SIZE },
       );
