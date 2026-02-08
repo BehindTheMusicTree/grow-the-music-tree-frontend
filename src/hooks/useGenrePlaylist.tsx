@@ -84,12 +84,14 @@ export const useRetrieveGenrePlaylist = (uuid: string) => {
   });
 };
 
-export const useFetchGenrePlaylistDetailed = () => {
+export const useFetchGenrePlaylistDetailed = (scope: Scope) => {
   const { fetch } = useFetchWrapper();
 
   return useMutation<CriteriaPlaylistDetailed, Error, string>({
     mutationFn: async (uuid: string) => {
-      const response = await fetch(playlistEndpoints.me.detail(uuid), true, true);
+      const endpoint =
+        scope === "reference" ? playlistEndpoints.reference.detail(uuid) : playlistEndpoints.me.detail(uuid);
+      const response = await fetch(endpoint, true, scope !== "reference");
       return CriteriaPlaylistDetailedSchema.parse(response);
     },
   });

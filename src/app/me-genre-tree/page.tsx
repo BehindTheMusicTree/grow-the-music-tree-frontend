@@ -1,32 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useMemo } from "react";
-import { FaTree } from "react-icons/fa";
-import { Plus } from "lucide-react";
-import { IconTextButton } from "@components/ui/IconTextButton";
+import { useCallback, useEffect, useRef } from "react";
 
 import { usePopup } from "@contexts/PopupContext";
-import { useListFullGenrePlaylists } from "@hooks/useGenrePlaylist";
-import { useCreateGenre, useLoadExampleTreeGenre } from "@hooks/useGenre";
+import { useCreateGenre } from "@hooks/useGenre";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
-import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
-import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
 import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
 
 import { GenreTreeView } from "./GenreTreeView";
 
 export default function GenreTree() {
-  const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists("me");
   const { mutate: createGenre, formErrors } = useCreateGenre("me");
-  const { mutate: loadReferenceTreeGenre, isPending: isLoadingReferenceTreeGenre } = useLoadExampleTreeGenre("me");
-
   const { showPopup, hidePopup } = usePopup();
-
-  const groupedGenrePlaylistsByRoot = useMemo(
-    () =>
-      genrePlaylists?.results ? getGenrePlaylistsGroupedByRoot(genrePlaylists.results as CriteriaPlaylistSimple[]) : {},
-    [genrePlaylists?.results],
-  );
 
   const showCriteriaCreationPopup = useCallback(
     (parent: CriteriaMinimum | null = null) => {
@@ -59,23 +44,5 @@ export default function GenreTree() {
     previousErrorsRef.current = formErrors || [];
   }, [formErrors, showCriteriaCreationPopup]);
 
-  return (
-    <GenreTreeView
-      groupedGenrePlaylistsByRoot={groupedGenrePlaylistsByRoot}
-      isLoading={isLoadingReferenceTreeGenre || isListingGenrePlaylists}
-      handleGenreCreationAction={showCriteriaCreationPopup}
-      actions={
-        <>
-          <IconTextButton icon={Plus} text="Add root" onClick={() => showCriteriaCreationPopup()} />
-          <IconTextButton
-            icon={FaTree}
-            text="Load the example tree genre"
-            className="ml-2"
-            onClick={() => loadReferenceTreeGenre()}
-            disabled={isLoadingReferenceTreeGenre || isListingGenrePlaylists}
-          />
-        </>
-      }
-    />
-  );
+  return <GenreTreeView scope="me" handleGenreCreationAction={showCriteriaCreationPopup} />;
 }

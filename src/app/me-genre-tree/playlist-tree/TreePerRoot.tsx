@@ -18,12 +18,14 @@ import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { CriteriaMinimum } from "@domain/criteria/response/minimum";
 import { CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
+import { Scope } from "@app-types/Scope";
 
 import { buildTreeHierarchyStructure } from "./NodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./tree-renderer";
 import { getRootTreeColor } from "./constants";
 
 type GenrePlaylistTreePerRootProps = {
+  scope: Scope;
   className?: string;
   rootUuid: string;
   genrePlaylistTreePerRoot: CriteriaPlaylistSimple[];
@@ -33,6 +35,7 @@ type GenrePlaylistTreePerRootProps = {
 };
 
 export default function GenrePlaylistTreePerRoot({
+  scope,
   className,
   rootUuid,
   genrePlaylistTreePerRoot,
@@ -44,10 +47,10 @@ export default function GenrePlaylistTreePerRoot({
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup, hidePopup } = usePopup();
   const { trackList, playNewTrackListFromGenrePlaylist } = useTrackList();
-  const { mutate: createGenre } = useCreateGenre("me");
-  const { renameGenre, updateGenreParent } = useUpdateGenre("me");
-  const fetchGenre = useFetchGenre("me");
-  const { mutate: fetchGenrePlaylistDetailed } = useFetchGenrePlaylistDetailed();
+  const { mutate: createGenre } = useCreateGenre(scope);
+  const { renameGenre, updateGenreParent } = useUpdateGenre(scope);
+  const fetchGenre = useFetchGenre(scope);
+  const { mutate: fetchGenrePlaylistDetailed } = useFetchGenrePlaylistDetailed(scope);
   const [visibleActionsContainerGenrePlaylist, setVisibleActionsContainerGenrePlaylist] =
     useState<CriteriaPlaylistSimple | null>(null);
   const [svgWidth, setSvgWidth] = useState(0);
@@ -80,7 +83,8 @@ export default function GenrePlaylistTreePerRoot({
       // If already playing this playlist, toggle play/pause
       if (
         trackList &&
-        trackList.origin.type === TrackListOriginType.PLAYLIST &&
+        (trackList.origin.type === TrackListOriginType.PLAYLIST ||
+          trackList.origin.type === TrackListOriginType.GENRE_PLAYLIST) &&
         trackList.origin.uuid === genrePlaylist.uuid
       ) {
         setIsPlaying(!isPlaying);
@@ -95,14 +99,14 @@ export default function GenrePlaylistTreePerRoot({
       // Fetch detailed genre playlist and play it
       fetchGenrePlaylistDetailed(genrePlaylist.uuid, {
         onSuccess: (detailedPlaylist) => {
-          playNewTrackListFromGenrePlaylist(detailedPlaylist, "me");
+          playNewTrackListFromGenrePlaylist(detailedPlaylist, scope);
         },
         onError: (error) => {
           console.error("Failed to fetch detailed genre playlist:", error);
         },
       });
     },
-    [trackList, isPlaying, setIsPlaying, playNewTrackListFromGenrePlaylist, fetchGenrePlaylistDetailed],
+    [trackList, isPlaying, setIsPlaying, playNewTrackListFromGenrePlaylist, fetchGenrePlaylistDetailed, scope],
   );
 
   const { treeData, rootColor } = useMemo(() => {
