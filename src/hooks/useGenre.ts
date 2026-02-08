@@ -39,7 +39,7 @@ export function useFetchGenre(scope: Scope) {
   );
 }
 
-export function useLoadReferenceTreeGenre(scope: Scope) {
+export function useLoadExampleTreeGenre(scope: Scope) {
   const { fetch } = useFetchWrapper();
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
@@ -48,7 +48,8 @@ export function useLoadReferenceTreeGenre(scope: Scope) {
     inputSchema: z.void(),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
-      const endpoint = scope === "reference" ? genreEndpoints.reference.loadTree() : genreEndpoints.me.loadTree();
+      const endpoint =
+        scope === "reference" ? genreEndpoints.reference.loadExampleTree() : genreEndpoints.me.loadExampleTree();
       const response = await fetch(endpoint, true, scope !== "reference", {
         method: "POST",
       });
@@ -70,7 +71,8 @@ export function useLoadPublicReferenceTreeGenre(scope: Scope) {
     inputSchema: z.void(),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
-      const endpoint = scope === "reference" ? genreEndpoints.reference.loadTree() : genreEndpoints.me.loadTree();
+      const endpoint =
+        scope === "reference" ? genreEndpoints.reference.loadExampleTree() : genreEndpoints.me.loadExampleTree();
       const response = await fetch(endpoint, true, scope !== "reference", {
         method: "POST",
       });

@@ -7,7 +7,7 @@ import { IconTextButton } from "@components/ui/IconTextButton";
 
 import { usePopup } from "@contexts/PopupContext";
 import { useListFullGenrePlaylists } from "@hooks/useGenrePlaylist";
-import { useCreateGenre, useLoadReferenceTreeGenre } from "@hooks/useGenre";
+import { useCreateGenre, useLoadExampleTreeGenre } from "@hooks/useGenre";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
@@ -18,7 +18,7 @@ import { GenreTreeView } from "./GenreTreeView";
 export default function GenreTree() {
   const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists("me");
   const { mutate: createGenre, formErrors } = useCreateGenre("me");
-  const { mutate: loadReferenceTreeGenre, isPending: isLoadingReferenceTreeGenre } = useLoadReferenceTreeGenre("me");
+  const { mutate: loadReferenceTreeGenre, isPending: isLoadingReferenceTreeGenre } = useLoadExampleTreeGenre("me");
 
   const { showPopup, hidePopup } = usePopup();
 

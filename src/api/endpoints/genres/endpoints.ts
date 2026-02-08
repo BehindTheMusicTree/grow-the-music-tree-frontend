@@ -2,7 +2,7 @@ export const genreEndpoints = {
   me: {
     list: () => "me/genres/",
     detail: (id: string) => `me/genres/${id}/`,
-    loadTree: () => "me/genres/tree/load/",
+    loadExampleTree: () => "me/genres/tree/load-example/",
     create: () => "me/genres",
     update: (id: string) => `me/genres/${id}/`,
     delete: (id: string) => `me/genres/${id}`,
@@ -10,7 +10,7 @@ export const genreEndpoints = {
   reference: {
     list: () => "reference/genres/",
     detail: (id: string) => `reference/genres/${id}/`,
-    loadTree: () => "reference/genres/tree/load/",
+    loadExampleTree: () => "reference/genres/tree/load-example/",
     create: () => "reference/genres",
     update: (id: string) => `reference/genres/${id}/`,
     delete: (id: string) => `reference/genres/${id}`,
