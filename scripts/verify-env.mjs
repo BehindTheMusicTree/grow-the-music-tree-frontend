@@ -1,11 +1,18 @@
 // Simple script to verify environment variables are properly loaded
-// Using CommonJS for simplicity in a Node script
-/* eslint-disable @typescript-eslint/no-var-requires */
-const dotenv = require("dotenv");
-/* eslint-enable @typescript-eslint/no-var-requires */
-dotenv.config({ path: "./.env.development.local" });
+import dotenv from "dotenv";
+import { existsSync } from "node:fs";
 
+const envFilePath = "./.env.development.local";
 console.log("=== ENVIRONMENT VARIABLE VERIFICATION ===");
+
+if (existsSync(envFilePath)) {
+  console.log(`✅ Found environment file: ${envFilePath}`);
+  dotenv.config({ path: envFilePath });
+} else {
+  console.log(`❌ Environment file not found: ${envFilePath}`);
+  console.log("Note: Environment variables may be loaded from other sources (system env, .env, etc.)");
+}
+
 console.log("Checking required NEXT_PUBLIC_ variables:");
 
 const requiredVars = [
