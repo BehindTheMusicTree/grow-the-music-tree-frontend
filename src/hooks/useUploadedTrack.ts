@@ -97,7 +97,7 @@ export function useUploadTrack(scope: Scope | null) {
   });
 }
 
-export function useUpdateUploadedTrack() {
+export function useUpdateUploadedTrack(scope: Scope | null) {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
@@ -109,7 +109,9 @@ export function useUpdateUploadedTrack() {
     }),
     outputSchema: UploadedTrackDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
-      const response = await fetch(libraryEndpoints.me.uploaded.update(uuid), false, true, {
+      if (scope == null) throw new Error("Scope is required for updating tracks");
+
+      const response = await fetch(libraryEndpoints[scope].uploaded.update(uuid), false, scope === "me", {
         method: "PUT",
         body: JSON.stringify(data),
       });
@@ -122,8 +124,10 @@ export function useUpdateUploadedTrack() {
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.me.uploaded.all });
-      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.me.uploaded.detail(uuid) });
+      if (scope != null) {
+        queryClient.invalidateQueries({ queryKey: libraryQueryKeys[scope].uploaded.all });
+        queryClient.invalidateQueries({ queryKey: libraryQueryKeys[scope].uploaded.detail(uuid) });
+      }
       invalidateAllGenrePlaylistQueries();
     },
   });
