@@ -53,8 +53,6 @@ function TrackUploadContent({
   const lastFilesKeyRef = useRef<string | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const DEBUG = true;
-
   useEffect(() => {
     const successfulCount = uploadItems.filter((item) => item.status === "success").length;
     const totalCount = uploadItems.length;
@@ -62,7 +60,6 @@ function TrackUploadContent({
     if (last?.successful === successfulCount && last?.total === totalCount) return;
     lastReportedRef.current = { successful: successfulCount, total: totalCount };
     onProgressRef.current?.(successfulCount, totalCount);
-    if (DEBUG) console.log("[TrackUpload] onProgress", { successfulCount, totalCount });
   }, [uploadItems]);
 
   useEffect(() => {
@@ -101,7 +98,6 @@ function TrackUploadContent({
       return;
     }
 
-    if (DEBUG) console.log("[TrackUpload] starting upload", { index: currentUploadIndex, file: currentItem.file.name });
     setIsUploading(true);
 
     // Update status to uploading
