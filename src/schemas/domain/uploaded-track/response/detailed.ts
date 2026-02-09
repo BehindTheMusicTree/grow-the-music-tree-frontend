@@ -11,7 +11,7 @@ export const UploadedTrackDetailedSchema = UuidResourceSchema.extend({
   relativeUrl: z.string(),
   title: z.string(),
   file: FileDetailedSchema,
-  artists: z.array(ArtistMinimumSchema),
+  artists: z.array(ArtistMinimumSchema).nullable().optional(),
   album: AlbumMinimumSchema.nullable().optional(),
   trackNumber: z.number().nullable().optional(),
   genre: CriteriaMinimumSchema,
