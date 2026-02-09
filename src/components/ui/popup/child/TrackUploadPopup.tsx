@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { MdError, MdCheckCircle, MdUpload } from "react-icons/md";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 import { useUploadTrack } from "@hooks/useUploadedTrack";
@@ -27,6 +27,10 @@ type TrackUploadPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" 
   onClose?: () => void;
 };
 
+type TrackUploadContentProps = Pick<TrackUploadPopupProps, "files" | "genre" | "scope" | "onComplete" | "onClose"> & {
+  onProgress?: (successfulCount: number, totalCount: number) => void;
+};
+
 // Functional component that handles the upload logic
 function TrackUploadContent({
   files,
@@ -34,16 +38,38 @@ function TrackUploadContent({
   scope,
   onComplete,
   onClose: _onClose,
-}: Pick<TrackUploadPopupProps, "files" | "genre" | "scope" | "onComplete" | "onClose">) {
+  onProgress,
+}: TrackUploadContentProps) {
   const [uploadItems, setUploadItems] = useState<TrackUploadItem[]>([]);
   const [currentUploadIndex, setCurrentUploadIndex] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [allComplete, setAllComplete] = useState(false);
 
-  const { mutate: uploadTrack } = useUploadTrack(scope);
+  const { mutateAsync: uploadTrackAsync } = useUploadTrack(scope);
 
-  // Initialize upload items when files change
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
+  const lastReportedRef = useRef<{ successful: number; total: number } | null>(null);
+  const lastFilesKeyRef = useRef<string | null>(null);
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const DEBUG = true;
+
   useEffect(() => {
+    const successfulCount = uploadItems.filter((item) => item.status === "success").length;
+    const totalCount = uploadItems.length;
+    const last = lastReportedRef.current;
+    if (last?.successful === successfulCount && last?.total === totalCount) return;
+    lastReportedRef.current = { successful: successfulCount, total: totalCount };
+    onProgressRef.current?.(successfulCount, totalCount);
+    if (DEBUG) console.log("[TrackUpload] onProgress", { successfulCount, totalCount });
+  }, [uploadItems]);
+
+  useEffect(() => {
+    const filesKey = `${files.length}-${files.map((f) => `${f.name}:${f.size}`).join("|")}-${genre ?? ""}`;
+    if (lastFilesKeyRef.current === filesKey) return;
+    lastFilesKeyRef.current = filesKey;
+
     const items: TrackUploadItem[] = files.map((file, index) => ({
       id: `upload-${index}-${file.name}`,
       file,
@@ -75,6 +101,7 @@ function TrackUploadContent({
       return;
     }
 
+    if (DEBUG) console.log("[TrackUpload] starting upload", { index: currentUploadIndex, file: currentItem.file.name });
     setIsUploading(true);
 
     // Update status to uploading
@@ -88,43 +115,68 @@ function TrackUploadContent({
       genre: currentItem.genre,
     };
 
-    // Simulate progress updates (since we don't have real progress from the API)
-    const progressInterval = setInterval(() => {
+    const UPLOAD_RESPONSE_TIMEOUT_MS = 120_000;
+
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    progressIntervalRef.current = setInterval(() => {
       setUploadItems((prev) =>
         prev.map((item, index) =>
           index === currentUploadIndex && item.status === "uploading"
-            ? { ...item, progress: Math.min(item.progress + Math.random() * 20, 90) }
+            ? { ...item, progress: Math.min(item.progress + Math.random() * 8, 99) }
             : item,
         ),
       );
-    }, 200);
+    }, 800);
 
-    // Perform upload
-    uploadTrack(uploadData, {
-      onSuccess: (data) => {
-        clearInterval(progressInterval);
+    const uploadingIndex = currentUploadIndex;
+
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(
+        () => reject(new Error("Upload timed out. The server took too long to respond.")),
+        UPLOAD_RESPONSE_TIMEOUT_MS,
+      );
+    });
+
+    Promise.race([uploadTrackAsync(uploadData), timeoutPromise])
+      .then((data) => {
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+          progressIntervalRef.current = null;
+        }
         setUploadItems((prev) =>
           prev.map((item, index) =>
-            index === currentUploadIndex ? { ...item, status: "success", progress: 100, uploadedTrack: data } : item,
+            index === uploadingIndex ? { ...item, status: "success", progress: 100, uploadedTrack: data } : item,
           ),
         );
         setIsUploading(false);
         setCurrentUploadIndex((prev) => prev + 1);
-      },
-      onError: (error) => {
-        clearInterval(progressInterval);
+      })
+      .catch((error) => {
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+          progressIntervalRef.current = null;
+        }
         setUploadItems((prev) =>
-          prev.map((item, index) => (index === currentUploadIndex ? { ...item, status: "error", error } : item)),
+          prev.map((item, index) => (index === uploadingIndex ? { ...item, status: "error", error } : item)),
         );
         setIsUploading(false);
         setCurrentUploadIndex((prev) => prev + 1);
-      },
-    });
-  }, [uploadItems, currentUploadIndex, uploadTrack, onComplete]);
+      });
+  }, [uploadItems, currentUploadIndex, uploadTrackAsync, onComplete]);
+
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+    };
+  }, []);
 
   // Start upload process
   useEffect(() => {
-    if (uploadItems.length > 0 && !isUploading && currentUploadIndex < uploadItems.length) {
+    const shouldStart = uploadItems.length > 0 && !isUploading && currentUploadIndex < uploadItems.length;
+    if (shouldStart) {
       startNextUpload();
     }
   }, [uploadItems, currentUploadIndex, isUploading, startNextUpload]);
@@ -218,24 +270,38 @@ function TrackUploadContent({
   );
 }
 
+type TrackUploadPopupState = { successfulCount: number; totalCount: number };
+
 // Class component wrapper that extends BasePopup
 // @ts-expect-error: omitted props are set internally by the popup
-export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps> {
+export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps, TrackUploadPopupState> {
+  state: TrackUploadPopupState = { successfulCount: 0, totalCount: 0 };
+
+  handleProgress = (successfulCount: number, totalCount: number) => {
+    this.setState({ successfulCount, totalCount });
+  };
+
   render() {
     const { files, genre, scope, onComplete, onClose, ...rest } = this.props;
-
-    const successfulCount = 0; // This will be calculated in the content component
-    const totalCount = files.length;
+    const { successfulCount, totalCount } = this.state;
+    const displayTotal = totalCount > 0 ? totalCount : files.length;
 
     return this.renderBase({
       ...rest,
-      title: `Upload Tracks (${successfulCount}/${totalCount})`,
+      title: `Upload Tracks (${successfulCount}/${displayTotal})`,
       isDismissable: true,
       showOkButton: true,
       okButtonText: "OK",
       onOk: onClose,
       children: (
-        <TrackUploadContent files={files} genre={genre} scope={scope} onComplete={onComplete} onClose={onClose} />
+        <TrackUploadContent
+          files={files}
+          genre={genre}
+          scope={scope}
+          onComplete={onComplete}
+          onClose={onClose}
+          onProgress={this.handleProgress}
+        />
       ),
     });
   }
