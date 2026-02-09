@@ -22,7 +22,13 @@ export function useListUploadedTracks(
     queryKey: scope != null ? libraryQueryKeys[scope].uploaded.list(page) : ["uploadedTracks", "none", page],
     queryFn: async () => {
       if (scope == null) return null;
-      const response = await fetch(libraryEndpoints[scope].uploaded.list(), false, true, {}, { page, pageSize });
+      const response = await fetch(
+        libraryEndpoints[scope].uploaded.list(),
+        scope === "me",
+        true,
+        {},
+        { page, pageSize },
+      );
       const result = PaginatedResponseSchema(UploadedTrackDetailedSchema).safeParse(response);
       if (!result.success) {
         console.error("Parsing failed:", result.error);
