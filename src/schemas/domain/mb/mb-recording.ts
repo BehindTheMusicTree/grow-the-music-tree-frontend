@@ -11,7 +11,7 @@ export const MbRecordingDetailedSchema = z.object({
   }),
   musicbrainzArtists: z.array(MbArtistDetailedSchema),
   musicbrainzLink: z.string().url(),
-  durationInSec: z.number().min(0),
+  durationInSec: z.number().min(0).nullable().optional(),
   durationStrInHourMinSec: z.string().nullable().optional(),
   releaseDate: z.union([z.string().datetime(), z.string()]).transform((val) => {
     // Try to parse as datetime, if it fails, return a default valid datetime
