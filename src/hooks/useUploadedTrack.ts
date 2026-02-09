@@ -111,7 +111,7 @@ export function useUpdateUploadedTrack(scope: Scope | null) {
     mutationFn: async ({ uuid, data }) => {
       if (scope == null) throw new Error("Scope is required for updating tracks");
 
-      const response = await fetch(libraryEndpoints[scope].uploaded.update(uuid), false, scope === "me", {
+      const response = await fetch(libraryEndpoints[scope].uploaded.update(uuid), true, scope === "me", {
         method: "PUT",
         body: JSON.stringify(data),
       });
@@ -142,7 +142,7 @@ export function useDownloadTrack(uuid: string, scope: Scope | null) {
       scope != null ? libraryQueryKeys[scope].uploaded.download(uuid) : ["uploadedTrack", "download", "none", uuid],
     queryFn: async () => {
       if (scope == null) return null;
-      const response = await fetch(libraryEndpoints[scope].uploaded.download(uuid), false, true, {}, {});
+      const response = await fetch(libraryEndpoints[scope].uploaded.download(uuid), true, scope === "me", {}, {});
 
       return response;
     },
