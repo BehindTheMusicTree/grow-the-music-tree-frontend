@@ -21,6 +21,7 @@ export function MenuGroup({ items, className = "" }: MenuGroupProps) {
         <Link
           key={item.href}
           href={item.href}
+          prefetch={false}
           className="flex items-center space-x-3 px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors duration-200"
         >
           {item.icon}
