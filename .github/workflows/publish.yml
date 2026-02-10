@@ -140,7 +140,7 @@ jobs:
             echo 'APP_PORT=${{ vars.GTMT_FRONT_PORT }}' >> ${{ env.ENV_FILE }} &&
             echo 'BUILD_COMPLETE_FILENAME=${{ env.BUILD_COMPLETE_FILENAME }}' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_BACKEND_BASE_URL=https://${{ vars.DOMAIN_NAME }}/api/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_BACKEND_BASE_URL=https://${{ vars.DOMAIN_NAME }}/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ vars.SENTRY_IS_ACTIVE }}' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_SPOTIFY_CLIENT_ID=$SPOTIFY_CLIENT_ID' >> ${{ env.ENV_FILE }} &&
