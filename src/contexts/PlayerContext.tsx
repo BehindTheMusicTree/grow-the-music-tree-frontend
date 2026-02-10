@@ -62,31 +62,23 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
   const [currentTrackScope, setCurrentTrackScope] = useState<Scope | null>(null);
   const [onTrackEnd, setOnTrackEnd] = useState<(() => void) | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
-  const processedTrackUuidRef = useRef<string | null>(null);
 
-  // Use refs for high-frequency updates that don't need to trigger re-renders
   const currentTimeRef = useRef(0);
 
   const { data: uploadedTracksResponse } = useListUploadedTracks(currentTrackScope);
-  const { data: downloadData, isLoading: isDownloading } = useDownloadTrack(currentTrackUuid || "", currentTrackScope);
 
   const loadTrackForPlayer = useCallback((track: UploadedTrackDetailed, scope: Scope) => {
-    // Stop current track if playing and clean up
     if (audioElementRef.current) {
       audioElementRef.current.pause();
       audioElementRef.current.currentTime = 0;
     }
 
-    // Clean up previous blob URL to prevent memory leaks
     setPlayerUploadedTrackObject((prev) => {
       if (prev?.audioUrl) {
         URL.revokeObjectURL(prev.audioUrl);
       }
       return null;
     });
-
-    // Reset processed track UUID for new track
-    processedTrackUuidRef.current = null;
 
     // Create initial player object
     const playerObject: PlayerTrackObject = {
@@ -233,16 +225,26 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
         setIsLoading(false);
       }
     },
-    [volume, onTrackEnd], // Include dependencies
+    [volume, onTrackEnd],
   );
 
-  // Effect to handle download data and create audio URL
-  useEffect(() => {
-    if (currentTrackUuid && downloadData && !isDownloading && processedTrackUuidRef.current !== currentTrackUuid) {
-      processedTrackUuidRef.current = currentTrackUuid;
-      handleDownloadComplete(downloadData);
-    }
-  }, [currentTrackUuid, downloadData, isDownloading, handleDownloadComplete]);
+  const handleDownloadError = useCallback((error: Error) => {
+    setIsLoading(false);
+    setPlayState(PlayStates.STOPPED);
+    setPlayerUploadedTrackObject((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        isReady: false,
+        loadError: error?.message ?? "Failed to load track",
+      };
+    });
+  }, []);
+
+  useDownloadTrack(currentTrackUuid || "", currentTrackScope, {
+    onSuccess: handleDownloadComplete,
+    onError: handleDownloadError,
+  });
 
   // Effect to refresh player track object when uploaded tracks data changes
   useEffect(() => {

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useFetchWrapper } from "./useFetchWrapper";
@@ -140,10 +141,18 @@ export function useUpdateUploadedTrack(scope: Scope | null) {
   return mutation;
 }
 
-export function useDownloadTrack(uuid: string, scope: Scope | null) {
-  const { fetch } = useFetchWrapper();
+export interface UseDownloadTrackOptions {
+  onSuccess?: (data: unknown) => void;
+  onError?: (error: Error) => void;
+}
 
-  return useQuery({
+export function useDownloadTrack(uuid: string, scope: Scope | null, options?: UseDownloadTrackOptions) {
+  const { fetch } = useFetchWrapper();
+  const { onSuccess, onError } = options ?? {};
+  const lastDataRef = useRef<unknown>(undefined);
+  const lastErrorRef = useRef<Error | null>(null);
+
+  const result = useQuery({
     queryKey:
       scope != null ? libraryQueryKeys[scope].uploaded.download(uuid) : ["uploadedTrack", "download", "none", uuid],
     queryFn: async () => {
@@ -154,4 +163,25 @@ export function useDownloadTrack(uuid: string, scope: Scope | null) {
     },
     enabled: !!uuid && scope != null,
   });
+
+  useEffect(() => {
+    lastDataRef.current = undefined;
+    lastErrorRef.current = null;
+  }, [uuid, scope]);
+
+  useEffect(() => {
+    if (result.data !== undefined && result.data !== lastDataRef.current && !result.isLoading) {
+      lastDataRef.current = result.data;
+      onSuccess?.(result.data);
+    }
+  }, [result.data, result.isLoading, onSuccess]);
+
+  useEffect(() => {
+    if (result.error != null && result.error !== lastErrorRef.current) {
+      lastErrorRef.current = result.error as Error;
+      onError?.(result.error as Error);
+    }
+  }, [result.error, onError]);
+
+  return result;
 }
