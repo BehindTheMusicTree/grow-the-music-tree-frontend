@@ -146,7 +146,7 @@ jobs:
   set-env-variables:
     name: Set Environment Variables
     runs-on: ubuntu-latest
-    needs: [build-image-and-push]
+    needs: [determine-version, test-build-app]
     environment:
       name: TEST
     steps:
@@ -182,7 +182,7 @@ jobs:
   set-docker-compose:
     name: Configure Docker Compose
     runs-on: ubuntu-latest
-    needs: [determine-version]
+    needs: [determine-version, test-build-app]
     environment:
       name: TEST
     env:
@@ -223,7 +223,7 @@ jobs:
 
   deploy:
     name: Deploy to Server
-    needs: [set-env-variables, set-docker-compose]
+    needs: [set-env-variables, set-docker-compose, build-image-and-push]
     uses: BehindTheMusicTree/github-workflows/.github/workflows/call-redeployment-webhook.yml@main
     with:
       env: TEST
