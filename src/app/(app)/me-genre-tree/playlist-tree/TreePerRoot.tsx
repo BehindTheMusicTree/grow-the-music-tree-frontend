@@ -108,7 +108,7 @@ export default function GenrePlaylistTreePerRoot({
     [trackList, isPlaying, setIsPlaying, playNewTrackListFromGenrePlaylist, fetchGenrePlaylistDetailed, scope],
   );
 
-  const { treeData, rootColor } = useMemo(() => {
+  const { treeData, rootColor, svgWidth, svgHeight } = useMemo(() => {
     // Build tree hierarchy
     const root = buildTreeHierarchyStructure(d3, genrePlaylistTreePerRoot);
 
