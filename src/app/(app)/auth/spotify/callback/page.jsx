@@ -18,7 +18,7 @@ function getParamsFromUrl() {
 export default function SpotifyOAuthCallbackPage() {
   const router = useRouter();
   const { authToBackendFromSpotifyCode } = useSpotifyAuth();
-  const [isPending, setisPending] = useState(true);
+  const [isPending, setIsPending] = useState(true);
   const [error, setError] = useState(null);
   const authAttempted = useRef(false);
 
@@ -31,19 +31,21 @@ export default function SpotifyOAuthCallbackPage() {
 
       if (errorParam) {
         setError(new Error(`Spotify authentication failed: ${errorParam}`));
-        setisPending(false);
+        setIsPending(false);
         return;
       }
 
       if (!code) {
         setError(new Error("No authorization code received from Spotify"));
-        setisPending(false);
+        setIsPending(false);
         return;
       }
 
       try {
-        await authToBackendFromSpotifyCode(code);
-        router.push("/");
+        const redirectUrl = await authToBackendFromSpotifyCode(code);
+        if (redirectUrl) {
+          router.push(redirectUrl);
+        }
       } catch (err) {
         if (err instanceof BackendError && err.code === ErrorCode.BACKEND_AUTH_ERROR) {
           setError(new Error("Failed to authenticate with the backend server. Please try again later."));
@@ -51,7 +53,7 @@ export default function SpotifyOAuthCallbackPage() {
           setError(new Error("An unexpected error occurred. Please try again later."));
         }
       } finally {
-        setisPending(false);
+        setIsPending(false);
       }
     };
 

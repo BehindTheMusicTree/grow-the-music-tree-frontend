@@ -39,7 +39,7 @@ export function useSpotifyAuth() {
   };
 
   const authToBackendFromSpotifyCode = useCallback(
-    async (code: string) => {
+    async (code: string): Promise<string | null> => {
       const setCreateBackendAuthConnectivityError = () => {
         return setConnectivityError(createAppErrorFromErrorCode(ErrorCode.BACKEND_AUTH_ERROR));
       };
@@ -55,24 +55,28 @@ export function useSpotifyAuth() {
         });
         if (!backEndSporifyAuthResponse) {
           setCreateBackendAuthConnectivityError();
-        } else {
-          setSession({
-            accessToken: backEndSporifyAuthResponse.accessToken,
-            refreshToken: backEndSporifyAuthResponse.refreshToken,
-            expiresAt: backEndSporifyAuthResponse.expiresAt,
-          });
+          return null;
         }
-
+        setSession({
+          accessToken: backEndSporifyAuthResponse.accessToken,
+          refreshToken: backEndSporifyAuthResponse.refreshToken,
+          expiresAt: backEndSporifyAuthResponse.expiresAt,
+        });
         const originalUrl = localStorage.getItem("spotifyAuthRedirect");
         if (originalUrl) {
           localStorage.removeItem("spotifyAuthRedirect");
-          // router.push(originalUrl);
-        } else {
-          // router.push("/");
+          try {
+            const url = new URL(originalUrl);
+            return url.pathname + url.search;
+          } catch {
+            return "/";
+          }
         }
+        return "/";
       } catch (e) {
         console.log("authToBackendFromSpotifyCode error", e);
         setCreateBackendAuthConnectivityError();
+        return null;
       }
     },
     [fetch, setSession, setConnectivityError],
