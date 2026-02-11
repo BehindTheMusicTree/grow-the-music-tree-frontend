@@ -117,7 +117,7 @@ jobs:
           NEXT_PUBLIC_CONTACT_EMAIL: ci@example.com
           NEXT_PUBLIC_BACKEND_BASE_URL: https://api.example.com/
           NEXT_PUBLIC_SENTRY_IS_ACTIVE: false
-        run: npm run build:debug
+        run: npm run build
 
   build-image-and-push:
     name: Build & Push Docker Image
