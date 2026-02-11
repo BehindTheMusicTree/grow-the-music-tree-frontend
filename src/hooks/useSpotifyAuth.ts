@@ -18,12 +18,17 @@ export function useSpotifyAuth() {
       throw new Error("Spotify configuration is missing. Please check your environment variables.");
     }
 
+    const redirectPath = process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI;
+    const redirectUri = redirectPath.startsWith("http")
+      ? redirectPath
+      : `${window.location.origin}${redirectPath.startsWith("/") ? "" : "/"}${redirectPath}`;
+
     localStorage.setItem("spotifyAuthRedirect", window.location.href);
 
     const params = new URLSearchParams({
       client_id: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
       response_type: "code",
-      redirect_uri: process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI,
+      redirect_uri: redirectUri,
       scope: process.env.NEXT_PUBLIC_SPOTIFY_SCOPES ?? "",
     });
 
@@ -67,7 +72,7 @@ export function useSpotifyAuth() {
         setCreateBackendAuthConnectivityError();
       }
     },
-    [fetch, setSession, setConnectivityError]
+    [fetch, setSession, setConnectivityError],
   );
 
   const logout = useCallback(() => {

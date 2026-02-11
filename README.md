@@ -130,6 +130,8 @@ NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/auth/spotify/callback
 NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-collaborative user-library-read user-top-read
 ```
 
+In the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) → your app → **Settings** → **Redirect URIs**, add the **full** callback URL(s), e.g. `http://localhost:3000/auth/spotify/callback` for local dev and your production URL for deploy. The app builds the redirect URI from your origin when you use a path like `/auth/spotify/callback`.
+
 **Notes:**
 
 - Only variables prefixed with `NEXT_PUBLIC_` are available in the browser
