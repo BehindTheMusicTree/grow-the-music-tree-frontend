@@ -49,8 +49,9 @@ EOF
     fi
     log_with_script_suffixe "Next.js env file generated successfully."
 
-    log_with_script_suffixe "Removing previous build/ and .next/ directories so NEXT_PUBLIC_* are re-inlined..."
-    rm -rf build/ .next/
+    log_with_script_suffixe "Removing .next/ cache and build/ contents so NEXT_PUBLIC_* are re-inlined..."
+    rm -rf .next/
+    [ -d build ] && find build -mindepth 1 -delete
 
     log_with_script_suffixe "Building the application..."
     npm run build
