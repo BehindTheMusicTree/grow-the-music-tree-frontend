@@ -18,9 +18,9 @@ export default function Banner({ className }: BannerProps) {
           </div>
           <h1 className="text-2xl font-bold">GrowTheMusicTree</h1>
         </div>
-        <div className="search w-64 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        {/* <div className="search w-64 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <SearchForm />
-        </div>
+        </div> */}
       </div>
     </div>
   );
