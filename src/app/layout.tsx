@@ -1,8 +1,7 @@
 import { Inter } from "next/font/google";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Providers from "@app/providers";
-import { PopupProvider } from "@contexts/PopupContext";
 import AppContent from "./AppContent";
 
 export const metadata: Metadata = {
@@ -11,6 +10,11 @@ export const metadata: Metadata = {
   icons: {
     icon: "/icons8-tree-16.png",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 const inter = Inter({
@@ -25,9 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          <PopupProvider>
-            <AppContent>{children}</AppContent>
-          </PopupProvider>
+          <AppContent>{children}</AppContent>
         </Providers>
       </body>
     </html>
