@@ -1,14 +1,17 @@
 "use client";
 
 import { useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 import { useSession } from "@contexts/SessionContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { createAppErrorFromErrorCode } from "@app-types/app-errors/app-error-factory";
+import { LOGOUT_REDIRECT_PATH } from "@lib/constants/routes";
 
 export function useSpotifyAuth() {
+  const router = useRouter();
   const { clearSession, setSession } = useSession();
   const { setConnectivityError } = useConnectivityError();
   const { fetch } = useFetchWrapper();
@@ -77,7 +80,8 @@ export function useSpotifyAuth() {
 
   const logout = useCallback(() => {
     clearSession();
-  }, [clearSession]);
+    router.push(LOGOUT_REDIRECT_PATH);
+  }, [clearSession, setConnectivityError, router]);
 
   return {
     handleSpotifyOAuth,

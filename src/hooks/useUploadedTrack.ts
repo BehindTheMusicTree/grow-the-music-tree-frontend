@@ -25,8 +25,8 @@ export function useListUploadedTracks(
       if (scope == null) return null;
       const response = await fetch(
         libraryEndpoints[scope].uploaded.list(),
-        scope === "me",
         true,
+        scope === "me",
         {},
         { page, pageSize },
       );
@@ -157,14 +157,7 @@ export function useDownloadTrack(uuid: string, scope: Scope | null, options?: Us
       scope != null ? libraryQueryKeys[scope].uploaded.download(uuid) : ["uploadedTrack", "download", "none", uuid],
     queryFn: async () => {
       if (scope == null) return null;
-      const response = await fetch(
-        libraryEndpoints[scope].uploaded.download(uuid),
-        true,
-        scope === "me",
-        {},
-        {},
-        true,
-      );
+      const response = await fetch(libraryEndpoints[scope].uploaded.download(uuid), true, scope === "me", {}, {}, true);
 
       return response;
     },
