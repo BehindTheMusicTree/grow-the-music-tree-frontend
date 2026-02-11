@@ -174,9 +174,9 @@ jobs:
             echo 'NEXT_PUBLIC_BACKEND_BASE_URL=https://${{ vars.HTMT_API_SUBDOMAIN_NAME }}.${{ vars.DOMAIN_NAME }}/${{ vars.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ vars.SENTRY_IS_ACTIVE }}' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_SPOTIFY_CLIENT_ID=$SPOTIFY_CLIENT_ID' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/auth/spotify/callback' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-collaborative user-library-read user-top-read' >> ${{ env.ENV_FILE }}
+            echo 'NEXT_PUBLIC_SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID_PROD }}' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/${{ secrets.SPOTIFY_REDIRECT_RELATIVE_URI }}' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_SPOTIFY_SCOPES=${{ secrets.SPOTIFY_SCOPES }}' >> ${{ env.ENV_FILE }}
           "
 
   set-docker-compose:
