@@ -1,23 +1,30 @@
 "use client";
 
-import React, { useEffect, useState, useRef, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import React, { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
 
-function SpotifyCallbackContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const code = searchParams.get("code");
-  const errorParam = searchParams.get("error");
+function getParamsFromUrl() {
+  if (typeof window === "undefined") return { code: null, errorParam: null };
+  const params = new URLSearchParams(window.location.search);
+  return {
+    code: params.get("code"),
+    errorParam: params.get("error"),
+  };
+}
 
+export default function SpotifyOAuthCallbackPage() {
+  const router = useRouter();
   const { authToBackendFromSpotifyCode } = useSpotifyAuth();
   const [isPending, setisPending] = useState(true);
   const [error, setError] = useState(null);
   const authAttempted = useRef(false);
 
   useEffect(() => {
+    const { code, errorParam } = getParamsFromUrl();
+
     const handleAuth = async () => {
       if (authAttempted.current) return;
       authAttempted.current = true;
@@ -36,7 +43,6 @@ function SpotifyCallbackContent() {
 
       try {
         await authToBackendFromSpotifyCode(code);
-        // Redirect to home page on success
         router.push("/");
       } catch (err) {
         if (err instanceof BackendError && err.code === ErrorCode.BACKEND_AUTH_ERROR) {
@@ -50,7 +56,7 @@ function SpotifyCallbackContent() {
     };
 
     handleAuth();
-  }, [authToBackendFromSpotifyCode, router, code, errorParam]);
+  }, [authToBackendFromSpotifyCode, router]);
 
   if (isPending) {
     return (
@@ -75,21 +81,4 @@ function SpotifyCallbackContent() {
   }
 
   return null;
-}
-
-export default function SpotifyOAuthCallback() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Loading...</h1>
-            <p className="text-gray-600">Please wait...</p>
-          </div>
-        </div>
-      }
-    >
-      <SpotifyCallbackContent />
-    </Suspense>
-  );
 }
