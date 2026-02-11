@@ -54,7 +54,7 @@ EOF
     [ -d build ] && find build -mindepth 1 -delete
 
     log_with_script_suffixe "Building the application..."
-    npm run build
+    npm run build:debug
     if [ $? -ne 0 ]; then
         log_with_script_suffixe "ERROR: Failed to build the application." >&2
         exit 1
