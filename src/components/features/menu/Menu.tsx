@@ -3,6 +3,7 @@
 import { PiGraphLight } from "react-icons/pi";
 import { FaSpotify, FaCloudUploadAlt, FaUser, FaList } from "react-icons/fa";
 import { MenuGroup } from "./MenuGroup";
+import { MENU_WIDTH } from "@lib/constants/layout";
 
 const menuGroups = {
   genreTree: [
@@ -45,7 +46,10 @@ const menuGroups = {
 
 export default function Menu({ className }: { className?: string }) {
   return (
-    <nav className={`menu bg-black flex flex-col justify-start items-start p-2 h-full w-fit ${className}`}>
+    <nav
+      className={`menu bg-black flex flex-col justify-start items-start p-2 h-full ${className}`}
+      style={{ width: MENU_WIDTH }}
+    >
       <MenuGroup items={menuGroups.genreTree} />
       <MenuGroup items={menuGroups.library} />
       <MenuGroup items={menuGroups.account} />

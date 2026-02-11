@@ -96,11 +96,33 @@ export default function AppContent({ children }: { children: ReactNode }) {
         }}
       >
         <Menu className="menu left-0 z-40" />
-        <main className="flex-grow w-full mx-8">{children}</main>
-        {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
+        <div className="relative flex-grow w-full flex">
+          <div
+            className="flex-grow w-full flex"
+            style={activePopup ? { filter: "blur(4px)" } : undefined}
+          >
+            <main className="flex-grow w-full mx-8">{children}</main>
+            {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
+          </div>
+          {activePopup && (
+            <div
+              className="absolute top-0 right-0 bottom-0 left-0 z-40 pointer-events-none bg-black/10"
+              aria-hidden
+            />
+          )}
+        </div>
       </div>
 
-      {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />}
+      {playerUploadedTrackObject && (
+        <div className="fixed bottom-0 left-0 right-0 z-50">
+          <div style={activePopup ? { filter: "blur(4px)" } : undefined}>
+            <Player className="relative z-0" />
+          </div>
+          {activePopup && (
+            <div className="absolute inset-0 z-10 pointer-events-none bg-black/10" aria-hidden />
+          )}
+        </div>
+      )}
       <AutoAdvance />
       {activePopup}
     </div>
