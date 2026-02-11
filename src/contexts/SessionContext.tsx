@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { Session } from "@app-types/Session";
+import { queryClient } from "@lib/query-client";
 
 interface SessionContextType {
   session: Session;
@@ -45,6 +46,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
   const clearSession = () => {
     setSessionState(defaultSession);
     localStorage.removeItem(SESSION_STORAGE_KEY);
+    queryClient.clear();
   };
 
   return <SessionContext.Provider value={{ session, setSession, clearSession }}>{children}</SessionContext.Provider>;

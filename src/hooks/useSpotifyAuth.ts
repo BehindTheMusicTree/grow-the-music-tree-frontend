@@ -81,7 +81,7 @@ export function useSpotifyAuth() {
   const logout = useCallback(() => {
     clearSession();
     router.push(LOGOUT_REDIRECT_PATH);
-  }, [clearSession, setConnectivityError, router]);
+  }, [clearSession, router]);
 
   return {
     handleSpotifyOAuth,
