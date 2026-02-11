@@ -24,13 +24,18 @@ interface SessionProviderProps {
 }
 
 export function SessionProvider({ children }: SessionProviderProps) {
-  const [session, setSessionState] = useState<Session>(() => {
-    if (typeof window !== "undefined") {
-      const storedSession = localStorage.getItem(SESSION_STORAGE_KEY);
-      return storedSession ? JSON.parse(storedSession) : defaultSession;
+  const [session, setSessionState] = useState<Session>(defaultSession);
+
+  useEffect(() => {
+    const storedSession = localStorage.getItem(SESSION_STORAGE_KEY);
+    if (storedSession) {
+      try {
+        setSessionState(JSON.parse(storedSession));
+      } catch {
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+      }
     }
-    return defaultSession;
-  });
+  }, []);
 
   const setSession = (newSession: Session) => {
     setSessionState(newSession);
