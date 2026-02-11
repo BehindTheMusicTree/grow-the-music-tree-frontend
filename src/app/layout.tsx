@@ -1,8 +1,6 @@
 import { Inter } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import Providers from "@app/providers";
-import AppContent from "./AppContent";
 
 export const metadata: Metadata = {
   title: "GrowTheMusicTree",
@@ -27,11 +25,7 @@ const inter = Inter({
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <Providers>
-          <AppContent>{children}</AppContent>
-        </Providers>
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }

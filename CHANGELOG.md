@@ -78,6 +78,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **global-error.tsx**: Added minimal global error boundary for static export so `/_global-error` prerenders without context (fixes "useContext of null" build failure)
+
 - **Reference Genre Tree Page**: Added public `/reference-genre-tree` page for community-shared taxonomy
   - No authentication required - accessible to all users
   - Displays evolving genre tree contributed by the entire community
@@ -86,6 +88,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Includes comprehensive documentation and page-level docs
 
 ### Changed
+
+- **Static export and layout**: Route group `(app)` so app shell (Providers, AppContent) only wraps main routes; root layout is minimal (html, body). Ensures `/_not-found` prerenders without client hooks (fixes "useEffect of null" on not-found). Removed duplicate PopupProvider from root layout. Added explicit viewport export and productionBrowserSourceMaps in next.config; turbopack.root set to absolute path.
 
 - **API Endpoint Centralization**: Centralized all API endpoint definitions into domain-specific contract files
   - Created `src/api/endpoints/genres.contract.ts`, `playlists.contract.ts`, `library.contract.ts`, and `user.contract.ts`
@@ -107,6 +111,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Added complete CRUD operations to playlist and library contracts for consistency with genre contracts
   - Added missing query keys (list, detail) to playlist and library contracts to match genre contract structure
   - Restructured library contract to use factory function pattern with `me` and `reference` sections for consistency
+
+### CI
+
+- **Publish workflow**: Added `build` job that runs `npm ci` and `npm run build` before Docker build-and-push so app build failures are caught in CI
 
 ## [0.2.0] - 2025-02-06
 
