@@ -53,8 +53,6 @@ export default function GenrePlaylistTreePerRoot({
   const { mutate: fetchGenrePlaylistDetailed } = useFetchGenrePlaylistDetailed(scope);
   const [visibleActionsContainerGenrePlaylist, setVisibleActionsContainerGenrePlaylist] =
     useState<CriteriaPlaylistSimple | null>(null);
-  const [svgWidth, setSvgWidth] = useState(0);
-  const [svgHeight, setSvgHeight] = useState(0);
 
   const svgRef = useRef<SVGSVGElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -123,8 +121,6 @@ export default function GenrePlaylistTreePerRoot({
       svgHeight: height,
       highestVerticalCoordinate,
     } = calculateSvgDimensions(d3, originalTreeData);
-    setSvgWidth(width);
-    setSvgHeight(height);
 
     // Transform coordinates for SVG
     const reshapedTreeData = setupTreeLayout(d3, originalTreeData, highestVerticalCoordinate);
@@ -132,7 +128,7 @@ export default function GenrePlaylistTreePerRoot({
     // Get root-specific color
     const rootColor = getRootTreeColor(rootUuid);
 
-    return { treeData: reshapedTreeData, rootColor };
+    return { treeData: reshapedTreeData, rootColor, svgWidth: width, svgHeight: height };
   }, [genrePlaylistTreePerRoot, rootUuid]);
 
   // Calculate forbidden UUIDs for the genre getting assigned a new parent
