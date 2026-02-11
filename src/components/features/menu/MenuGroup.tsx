@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
-import { ChevronRight } from "lucide-react";
+import { Play } from "lucide-react";
 
 interface MenuItem {
   href: string;
@@ -38,7 +38,7 @@ export function MenuGroup({ items, className = "" }: MenuGroupProps) {
           >
             {item.icon}
             <span className="flex-grow">{item.label}</span>
-            {isCurrentPage && <ChevronRight className="shrink-0 w-4 h-4" />}
+            {isCurrentPage && <Play className="shrink-0 w-4 h-4 fill-current" />}
           </Link>
         );
       })}
