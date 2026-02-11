@@ -17,6 +17,8 @@ jobs:
   check-required-vars:
     name: Check Required Variables and Secrets
     runs-on: ubuntu-latest
+    environment:
+      name: TEST
     steps:
       - name: Check required vars and secrets
         env:
