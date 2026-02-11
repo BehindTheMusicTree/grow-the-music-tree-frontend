@@ -222,7 +222,7 @@ on:
   workflow_call:
 
 jobs:
-  build-and-push:
+  build-image-and-push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
