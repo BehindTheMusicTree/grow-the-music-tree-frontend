@@ -1,12 +1,14 @@
 /** @type {import('next').NextConfig} */
 
+const path = require("path");
+
 const nextConfig = {
   output: "export",
   images: { unoptimized: true },
   reactStrictMode: false,
   productionBrowserSourceMaps: true,
   turbopack: {
-    root: ".",
+    root: path.resolve(__dirname),
     resolveAlias: {
       "@app": "./src/app",
       "@actions": "./src/app/actions",
