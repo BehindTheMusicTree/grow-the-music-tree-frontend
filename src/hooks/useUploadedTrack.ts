@@ -157,7 +157,14 @@ export function useDownloadTrack(uuid: string, scope: Scope | null, options?: Us
       scope != null ? libraryQueryKeys[scope].uploaded.download(uuid) : ["uploadedTrack", "download", "none", uuid],
     queryFn: async () => {
       if (scope == null) return null;
-      const response = await fetch(libraryEndpoints[scope].uploaded.download(uuid), true, scope === "me", {}, {});
+      const response = await fetch(
+        libraryEndpoints[scope].uploaded.download(uuid),
+        true,
+        scope === "me",
+        {},
+        {},
+        true,
+      );
 
       return response;
     },
