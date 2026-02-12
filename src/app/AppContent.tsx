@@ -41,6 +41,9 @@ export default function AppContent({ children }: { children: ReactNode }) {
   const currentConnectivityErrorRef = useRef<typeof ConnectivityError | null>(null);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      console.log("[AppContent] mounted on route", window.location.pathname);
+    }
     initSentry();
   }, []);
 
