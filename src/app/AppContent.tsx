@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
@@ -32,13 +33,15 @@ import {
 } from "@app-types/app-errors/app-error";
 
 export default function AppContent({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const { playerUploadedTrackObject } = usePlayer();
   const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const { trackList } = useTrackList();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, clearConnectivityError } = useConnectivityError();
-  const { handleSpotifyOAuth } = useSpotifyAuth();
+  const { handleSpotifyOAuth, authToBackendFromSpotifyCode } = useSpotifyAuth();
   const currentConnectivityErrorRef = useRef<typeof ConnectivityError | null>(null);
+  const spotifyAuthHandledRef = useRef(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -46,6 +49,46 @@ export default function AppContent({ children }: { children: ReactNode }) {
     }
     initSentry();
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (spotifyAuthHandledRef.current) return;
+    if (!window.location.pathname.startsWith("/auth/spotify/callback")) return;
+
+    spotifyAuthHandledRef.current = true;
+
+    console.log("[SpotifyCallback][AppContent] handling callback");
+
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const errorParam = params.get("error");
+
+    (async () => {
+      if (errorParam) {
+        console.log("[SpotifyCallback][AppContent] error param present", errorParam);
+        return;
+      }
+
+      if (!code) {
+        console.log("[SpotifyCallback][AppContent] no code in URL");
+        return;
+      }
+
+      try {
+        console.log("[SpotifyCallback][AppContent] calling authToBackendFromSpotifyCode");
+        const redirectUrl = await authToBackendFromSpotifyCode(code);
+        console.log("[SpotifyCallback][AppContent] authToBackendFromSpotifyCode returned", redirectUrl);
+        if (redirectUrl) {
+          console.log("[SpotifyCallback][AppContent] redirecting to", redirectUrl);
+          router.push(redirectUrl);
+        }
+      } catch (e) {
+        console.error("[SpotifyCallback][AppContent] error during auth", e);
+      }
+    })().catch((e) => {
+      console.error("[SpotifyCallback][AppContent] unhandled error", e);
+    });
+  }, [authToBackendFromSpotifyCode, router]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
