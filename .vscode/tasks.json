@@ -24,7 +24,7 @@
     {
       "label": "verify-env-dev-local",
       "type": "shell",
-      "command": "node scripts/verify-env.js",
+      "command": "node scripts/verify-env.mjs",
       "presentation": {
         "reveal": "always",
         "panel": "shared"
@@ -52,7 +52,7 @@
     {
       "label": "verify-env-dev-remote",
       "type": "shell",
-      "command": "node scripts/verify-env.js",
+      "command": "node scripts/verify-env.mjs",
       "presentation": {
         "reveal": "always",
         "panel": "shared"

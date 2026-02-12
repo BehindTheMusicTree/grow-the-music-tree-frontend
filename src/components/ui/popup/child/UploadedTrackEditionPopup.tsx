@@ -68,7 +68,12 @@ export default class UploadedTrackEditionPopup extends BasePopup<UploadedTrackEd
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Added on</label>
                 <div className="px-3 py-2 bg-gray-50 rounded-md">
-                  {new Date(uploadedTrack.createdOn).toLocaleDateString()}
+                  {new Date(uploadedTrack.createdOn).toLocaleDateString("en-CA", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  timeZone: "UTC",
+                })}
                 </div>
               </div>
               <div>

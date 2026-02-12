@@ -7,9 +7,16 @@ log_with_script_suffixe() {
 check_script_vars_are_set() {
     REQUIRED_NON_BOOL_VARS=(
         APP_PORT
+        APP_VERSION
         NEXT_PUBLIC_CONTACT_EMAIL
         NEXT_PUBLIC_BACKEND_BASE_URL
         NEXT_PUBLIC_SENTRY_IS_ACTIVE
+
+        NEXT_PUBLIC_SPOTIFY_AUTH_URL
+        NEXT_PUBLIC_SPOTIFY_CLIENT_ID
+        NEXT_PUBLIC_SPOTIFY_REDIRECT_URI
+        NEXT_PUBLIC_SPOTIFY_SCOPES
+
         BUILD_COMPLETE_FILENAME
     )
     check_vars_are_set ${REQUIRED_NON_BOOL_VARS[@]} 2>&1
@@ -39,15 +46,25 @@ main() {
     log_with_script_suffixe "Generating Next.js env file $NEXT_ENV_FILE ..."
     cat << EOF > $NEXT_ENV_FILE
 NODE_ENV=$ENV
+APP_VERSION=$APP_VERSION
+NEXT_PUBLIC_APP_VERSION=$APP_VERSION
 NEXT_PUBLIC_CONTACT_EMAIL=$NEXT_PUBLIC_CONTACT_EMAIL
 NEXT_PUBLIC_BACKEND_BASE_URL=$NEXT_PUBLIC_BACKEND_BASE_URL
 NEXT_PUBLIC_SENTRY_IS_ACTIVE=$NEXT_PUBLIC_SENTRY_IS_ACTIVE
+NEXT_PUBLIC_SPOTIFY_AUTH_URL=$NEXT_PUBLIC_SPOTIFY_AUTH_URL
+NEXT_PUBLIC_SPOTIFY_CLIENT_ID=$NEXT_PUBLIC_SPOTIFY_CLIENT_ID
+NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=$NEXT_PUBLIC_SPOTIFY_REDIRECT_URI
+NEXT_PUBLIC_SPOTIFY_SCOPES=$NEXT_PUBLIC_SPOTIFY_SCOPES
 EOF
     if [ $? -ne 0 ]; then
         log_with_script_suffixe "ERROR: Failed to generate the Vite env file." >&2
         exit 1
     fi
     log_with_script_suffixe "Next.js env file generated successfully."
+
+    log_with_script_suffixe "Removing .next/ cache and build/ contents so NEXT_PUBLIC_* are re-inlined..."
+    rm -rf .next/
+    [ -d build ] && find build -mindepth 1 -delete
 
     log_with_script_suffixe "Building the application..."
     npm run build

@@ -9,6 +9,7 @@ import {
 } from "@models/track-list/origin/TrackListOrigin";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 import { CriteriaPlaylistDetailed } from "@schemas/domain/playlist/criteria-playlist/detailed";
+import { Scope } from "@app-types/Scope";
 import { usePlayer } from "./PlayerContext";
 import { useTrackListSidebarVisibility } from "./TrackListSidebarVisibilityContext";
 import { useListUploadedTracks } from "@hooks/useUploadedTrack";
@@ -18,8 +19,8 @@ interface TrackListContextType {
   selectedTrack: UploadedTrackDetailed | null;
   setSelectedTrack: (track: UploadedTrackDetailed | null) => void;
   toTrackAtPosition: (position: number) => void;
-  playNewTrackListFromUploadedTrackUuid: (track: UploadedTrackDetailed) => void;
-  playNewTrackListFromGenrePlaylist: (genrePlaylist: CriteriaPlaylistDetailed) => void;
+  playNewTrackListFromUploadedTrackUuid: (track: UploadedTrackDetailed, scope: Scope) => void;
+  playNewTrackListFromGenrePlaylist: (genrePlaylist: CriteriaPlaylistDetailed, scope: Scope) => void;
 }
 
 const TrackListContext = createContext<TrackListContextType | undefined>(undefined);
@@ -33,7 +34,8 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
   const [selectedTrack, setSelectedTrack] = useState<UploadedTrackDetailed | null>(null);
   const { loadTrackForPlayer } = usePlayer();
   const { showTrackListSidebar } = useTrackListSidebarVisibility();
-  const { data: uploadedTracksResponse } = useListUploadedTracks();
+  const scope = trackList?.origin?.scope ?? null;
+  const { data: uploadedTracksResponse } = useListUploadedTracks(scope);
 
   // Create a memoized track list that updates when uploadedTracks changes
   const currentTrackList = useMemo(() => {
@@ -80,26 +82,17 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
     }
   };
 
-  const playNewTrackListFromUploadedTrackUuid = (track: UploadedTrackDetailed) => {
-    // Create track list origin
-    const origin = new TrackListOriginFromUploadedTrack(track);
-
-    // Create new track list with only the selected track
+  const playNewTrackListFromUploadedTrackUuid = (track: UploadedTrackDetailed, scope: Scope) => {
+    const origin = new TrackListOriginFromUploadedTrack(track, scope);
     const newTrackList = new TrackListFromUploadedTrack([track], origin);
 
-    // Set the track list and selected track
     setTrackList(newTrackList);
     setSelectedTrack(track);
-
-    // Show the track list sidebar
     showTrackListSidebar();
-
-    // Delegate audio loading to PlayerContext
-    loadTrackForPlayer(track);
+    loadTrackForPlayer(track, scope);
   };
 
-  const playNewTrackListFromGenrePlaylist = (genrePlaylist: CriteriaPlaylistDetailed) => {
-    // Extract tracks from playlist relationships and sort by position
+  const playNewTrackListFromGenrePlaylist = (genrePlaylist: CriteriaPlaylistDetailed, scope: Scope) => {
     const tracks = genrePlaylist.uploadedTrackPlaylistRelations
       .sort((a, b) => a.position - b.position)
       .map((rel) => rel.uploadedTrack);
@@ -109,22 +102,13 @@ export function TrackListProvider({ children }: TrackListProviderProps) {
       return;
     }
 
-    // Create track list origin
-    const origin = new TrackListOriginFromCriteriaPlaylist(genrePlaylist);
-
-    // Create new track list with all tracks from the playlist
+    const origin = new TrackListOriginFromCriteriaPlaylist(genrePlaylist, scope);
     const newTrackList = new TrackListFromCriteriaPlaylist(tracks, origin);
 
-    // Set the track list and selected track (first track)
     setTrackList(newTrackList);
     setSelectedTrack(tracks[0]);
-
-    // Show the track list sidebar
     showTrackListSidebar();
-    console.log("TrackList instantiated, sidebar should be visible");
-
-    // Delegate audio loading to PlayerContext
-    loadTrackForPlayer(tracks[0]);
+    loadTrackForPlayer(tracks[0], scope);
   };
 
   return (

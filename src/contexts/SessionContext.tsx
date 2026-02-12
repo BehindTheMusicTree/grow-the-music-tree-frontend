@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { Session } from "@app-types/Session";
+import { queryClient } from "@lib/query-client";
 
 interface SessionContextType {
   session: Session;
@@ -24,13 +25,18 @@ interface SessionProviderProps {
 }
 
 export function SessionProvider({ children }: SessionProviderProps) {
-  const [session, setSessionState] = useState<Session>(() => {
-    if (typeof window !== "undefined") {
-      const storedSession = localStorage.getItem(SESSION_STORAGE_KEY);
-      return storedSession ? JSON.parse(storedSession) : defaultSession;
+  const [session, setSessionState] = useState<Session>(defaultSession);
+
+  useEffect(() => {
+    const storedSession = localStorage.getItem(SESSION_STORAGE_KEY);
+    if (storedSession) {
+      try {
+        setSessionState(JSON.parse(storedSession));
+      } catch {
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+      }
     }
-    return defaultSession;
-  });
+  }, []);
 
   const setSession = (newSession: Session) => {
     setSessionState(newSession);
@@ -40,6 +46,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
   const clearSession = () => {
     setSessionState(defaultSession);
     localStorage.removeItem(SESSION_STORAGE_KEY);
+    queryClient.clear();
   };
 
   return <SessionContext.Provider value={{ session, setSession, clearSession }}>{children}</SessionContext.Provider>;

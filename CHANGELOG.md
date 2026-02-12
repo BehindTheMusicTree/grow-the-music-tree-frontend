@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Table of Contents
+
+- [Changelog Best Practices](#changelog-best-practices)
+  - [General Principles](#general-principles)
+  - [Guidelines for Contributors](#guidelines-for-contributors)
+- [Unreleased](#unreleased)
+- [0.2.0 - 2025-02-06](#020---2025-02-06)
+- [v0.1.2 - 2025-03-26](#v012---2025-03-26)
+- [v0.1.1 - 2024-09-29](#v011---2024-09-29)
+- [v0.1.0 - 2024-09-23](#v010---2024-09-23)
+
 ## Changelog Best Practices
 
 ### General Principles
@@ -65,6 +76,48 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.0.0] - 2025-02-12
+
+### Added
+
+- **global-error.tsx**: Added minimal global error boundary for static export so `/_global-error` prerenders without context (fixes "useContext of null" build failure)
+
+- **Reference Genre Tree Page**: Added public `/reference-genre-tree` page for community-shared taxonomy
+  - No authentication required - accessible to all users
+  - Displays evolving genre tree contributed by the entire community
+  - Read-only interface (no genre creation for public access)
+  - Uses public API endpoints: `reference-genre-playlists/` and `reference/genres/tree/load/`
+  - Includes comprehensive documentation and page-level docs
+
+### Changed
+
+- **Static export and layout**: Route group `(app)` so app shell (Providers, AppContent) only wraps main routes; root layout is minimal (html, body). Ensures `/_not-found` prerenders without client hooks (fixes "useEffect of null" on not-found). Removed duplicate PopupProvider from root layout. Added explicit viewport export and productionBrowserSourceMaps in next.config; turbopack.root set to absolute path.
+
+- **API Endpoint Centralization**: Centralized all API endpoint definitions into domain-specific contract files
+  - Created `src/api/endpoints/genres.contract.ts`, `playlists.contract.ts`, `library.contract.ts`, and `user.contract.ts`
+  - Replaced hardcoded endpoint strings with centralized functions across all hooks
+  - Co-located query key constants with endpoint definitions for better maintainability
+
+- **Build Configuration**:
+  - Renamed `src/proxy.ts` to `src/middleware.ts` for proper Next.js middleware handling
+
+- **Genre Hooks Enhancement**: Added `scope === "reference"` parameter to all genre-related hooks for distinguishing regular and reference resources
+  - Updated `useListGenres`, `useFetchGenre`, `useCreateGenre`, `useUpdateGenre`, `useDeleteGenre` with reference support
+  - Modified endpoint functions to conditionally return reference or regular API paths
+
+- **Endpoint Structure Refinement**: Restructured endpoint objects to use nested sub-objects instead of parameterized functions
+  - Updated genre endpoints to use `genreEndpoints.me.*` and `genreEndpoints.reference.*` for better type safety
+  - Updated playlist endpoints to use `playlistEndpoints.my.*`, `playlistEndpoints.full.*`, and `playlistEndpoints.reference.*`
+  - Updated query keys to use `genreQueryKeys.me.*` and `genreQueryKeys.reference.*` instead of 'my' and 'myGenres'
+  - Fixed all fetch wrapper calls to use correct parameter signatures across `useGenre.ts`, `useGenrePlaylist.tsx`, `useSpotifyAuth.ts`, and `useSpotifyLibTracks.ts`
+  - Added complete CRUD operations to playlist and library contracts for consistency with genre contracts
+  - Added missing query keys (list, detail) to playlist and library contracts to match genre contract structure
+  - Restructured library contract to use factory function pattern with `me` and `reference` sections for consistency
+
+### CI
+
+- **Publish workflow**: Added `build` job that runs `npm ci` and `npm run build` before Docker build-and-push so app build failures are caught in CI
+
 ## [0.2.0] - 2025-02-06
 
 ### Changed
@@ -98,7 +151,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Modified entrypoint.sh to copy static build output from `out/` to `build/` directory
   - Disabled image optimization with `images: { unoptimized: true }` for compatibility with static export
   - Removed middleware (src/middleware.ts) as it's incompatible with static export
-  - Added root page (src/app/page.tsx) with redirect to `/genre-tree`
+  - Added root page (src/app/page.tsx) with redirect to `/my-genre-tree`
   - Enables serving via static file server (Nginx) instead of Node.js runtime
   - Reduces container resource requirements and improves deployment flexibility
 

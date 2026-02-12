@@ -9,18 +9,23 @@ interface BannerProps {
 }
 
 export default function Banner({ className }: BannerProps) {
+  const appVersion = process.env.NEXT_PUBLIC_APP_VERSION;
+
   return (
     <div className={`banner py-2 px-3 bg-black text-gray-100 ${className}`}>
-      <div className="w-full mx-auto relative">
+      <div className="w-full mx-auto relative flex items-center justify-between">
         <div className="flex items-center">
           <div className="mr-3">
             <Image src={logo} alt="logo" width={48} style={{ height: "auto" }} />
           </div>
-          <h1 className="text-2xl font-bold">Music Tree</h1>
+          <h1 className="text-2xl font-bold">GrowTheMusicTree</h1>
         </div>
-        <div className="search w-64 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div className="text-xs text-gray-400">
+          {appVersion ? `v${appVersion}` : null}
+        </div>
+        {/* <div className="search w-64 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <SearchForm />
-        </div>
+        </div> */}
       </div>
     </div>
   );

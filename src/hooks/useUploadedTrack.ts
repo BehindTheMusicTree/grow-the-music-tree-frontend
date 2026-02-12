@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useFetchWrapper } from "./useFetchWrapper";
@@ -8,14 +9,27 @@ import { UploadedTrackCreationSchema } from "@domain/uploaded-track/form/creatio
 import { UploadedTrackUpdateSchema } from "@domain/uploaded-track/form/update";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { useValidatedMutation } from "./useValidatedMutation";
+import { libraryEndpoints, libraryQueryKeys } from "../api/endpoints/library";
+import { Scope } from "@app-types/Scope";
 
-export function useListUploadedTracks(page = 1, pageSize = process.env.NEXT_PUBLIC_UPLOADED_TRACKS_PAGE_SIZE || 50) {
+export function useListUploadedTracks(
+  scope: Scope | null,
+  page = 1,
+  pageSize = process.env.NEXT_PUBLIC_UPLOADED_TRACKS_PAGE_SIZE || 50,
+) {
   const { fetch } = useFetchWrapper();
 
   return useQuery({
-    queryKey: ["uploadedTracks", "list", page],
+    queryKey: scope != null ? libraryQueryKeys[scope].uploaded.list(page) : ["uploadedTracks", "none", page],
     queryFn: async () => {
-      const response = await fetch("library/uploaded/", true, true, {}, { page, pageSize });
+      if (scope == null) return null;
+      const response = await fetch(
+        libraryEndpoints[scope].uploaded.list(),
+        true,
+        scope === "me",
+        {},
+        { page, pageSize },
+      );
       const result = PaginatedResponseSchema(UploadedTrackDetailedSchema).safeParse(response);
       if (!result.success) {
         console.error("Parsing failed:", result.error);
@@ -23,10 +37,11 @@ export function useListUploadedTracks(page = 1, pageSize = process.env.NEXT_PUBL
       }
       return result.data;
     },
+    enabled: scope != null,
   });
 }
 
-export function useUploadTrack() {
+export function useUploadTrack(scope: Scope | null) {
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
   const { fetch } = useFetchWrapper();
@@ -35,6 +50,8 @@ export function useUploadTrack() {
     inputSchema: UploadedTrackCreationSchema,
     outputSchema: UploadedTrackDetailedSchema,
     mutationFn: async (data) => {
+      if (scope == null) throw new Error("Scope is required for uploading tracks");
+
       const formData = new FormData();
       formData.append("file", data.file);
 
@@ -69,7 +86,7 @@ export function useUploadTrack() {
         formData.append("language", data.language);
       }
 
-      const response = await fetch("library/uploaded/", true, true, {
+      const response = await fetch(libraryEndpoints[scope].uploaded.create(), true, scope === "me", {
         method: "POST",
         body: formData,
         headers: {
@@ -79,13 +96,15 @@ export function useUploadTrack() {
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
+      if (scope != null) {
+        queryClient.invalidateQueries({ queryKey: libraryQueryKeys[scope].uploaded.all });
+      }
       invalidateAllGenrePlaylistQueries();
     },
   });
 }
 
-export function useUpdateUploadedTrack() {
+export function useUpdateUploadedTrack(scope: Scope | null) {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
@@ -97,7 +116,9 @@ export function useUpdateUploadedTrack() {
     }),
     outputSchema: UploadedTrackDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
-      const response = await fetch(`library/uploaded/${uuid}/`, true, true, {
+      if (scope == null) throw new Error("Scope is required for updating tracks");
+
+      const response = await fetch(libraryEndpoints[scope].uploaded.update(uuid), true, scope === "me", {
         method: "PUT",
         body: JSON.stringify(data),
       });
@@ -110,24 +131,57 @@ export function useUpdateUploadedTrack() {
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      queryClient.invalidateQueries({ queryKey: ["uploadedTracks"] });
-      queryClient.invalidateQueries({ queryKey: ["uploadedTracks", "detail", uuid] });
+      if (scope != null) {
+        queryClient.invalidateQueries({ queryKey: libraryQueryKeys[scope].uploaded.all });
+        queryClient.invalidateQueries({ queryKey: libraryQueryKeys[scope].uploaded.detail(uuid) });
+      }
       invalidateAllGenrePlaylistQueries();
     },
   });
   return mutation;
 }
 
-export function useDownloadTrack(uuid: string) {
-  const { fetch } = useFetchWrapper();
+export interface UseDownloadTrackOptions {
+  onSuccess?: (data: unknown) => void;
+  onError?: (error: Error) => void;
+}
 
-  return useQuery({
-    queryKey: ["uploadedTracks", "download", uuid],
+export function useDownloadTrack(uuid: string, scope: Scope | null, options?: UseDownloadTrackOptions) {
+  const { fetch } = useFetchWrapper();
+  const { onSuccess, onError } = options ?? {};
+  const lastDataRef = useRef<unknown>(undefined);
+  const lastErrorRef = useRef<Error | null>(null);
+
+  const result = useQuery({
+    queryKey:
+      scope != null ? libraryQueryKeys[scope].uploaded.download(uuid) : ["uploadedTrack", "download", "none", uuid],
     queryFn: async () => {
-      const response = await fetch(`library/uploaded/${uuid}/download`, true, true, {}, undefined, true);
+      if (scope == null) return null;
+      const response = await fetch(libraryEndpoints[scope].uploaded.download(uuid), true, scope === "me", {}, {}, true);
 
       return response;
     },
-    enabled: !!uuid,
+    enabled: !!uuid && scope != null,
   });
+
+  useEffect(() => {
+    lastDataRef.current = undefined;
+    lastErrorRef.current = null;
+  }, [uuid, scope]);
+
+  useEffect(() => {
+    if (result.data !== undefined && result.data !== lastDataRef.current && !result.isLoading) {
+      lastDataRef.current = result.data;
+      onSuccess?.(result.data);
+    }
+  }, [result.data, result.isLoading, onSuccess]);
+
+  useEffect(() => {
+    if (result.error != null && result.error !== lastErrorRef.current) {
+      lastErrorRef.current = result.error as Error;
+      onError?.(result.error as Error);
+    }
+  }, [result.error, onError]);
+
+  return result;
 }

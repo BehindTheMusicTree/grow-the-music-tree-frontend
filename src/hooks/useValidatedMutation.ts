@@ -39,7 +39,13 @@ export function useValidatedMutation<TData, TError = Error, TVariables = unknown
 
       try {
         const response = await mutationFn(parsedInput.data);
-        return outputSchema.parse(response);
+        const parsedOutput = outputSchema.safeParse(response);
+        if (!parsedOutput.success) {
+          console.error("Output validation failed:", parsedOutput.error);
+          setFormErrors([{ field: "form", message: "Invalid response from server" }]);
+          throw new Error("Invalid response from server");
+        }
+        return parsedOutput.data;
       } catch (error) {
         if (error instanceof Error && "json" in error) {
           try {
@@ -56,8 +62,8 @@ export function useValidatedMutation<TData, TError = Error, TVariables = unknown
                 errors.map((err) => ({
                   field,
                   message: err.message,
-                }))
-              )
+                })),
+              ),
             );
           } catch (parseError) {
             console.error("Failed to parse error response:", parseError);

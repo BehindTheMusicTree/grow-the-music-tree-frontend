@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { FaVolumeUp, FaVolumeMute, FaList } from "react-icons/fa";
 import { usePlayer, useCurrentTime } from "@contexts/PlayerContext";
@@ -96,7 +96,7 @@ export default function Player({ className }: PlayerProps) {
           <div className="ml-4 min-w-0 flex-1 flex flex-col justify-center">
             <h3 className="font-bold text-lg text-overflow">{playerUploadedTrackObject.uploadedTrack.title}</h3>
             <p className="text-gray-400 text-base text-overflow">
-              {playerUploadedTrackObject.uploadedTrack.artists.map((artist) => artist.name).join(", ")}
+              {playerUploadedTrackObject.uploadedTrack.artists?.map((artist) => artist.name).join(", ") ?? ""}
             </p>
             {playerUploadedTrackObject.loadError && (
               <p className="text-red-400 text-sm text-overflow">{playerUploadedTrackObject.loadError}</p>

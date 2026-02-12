@@ -4,15 +4,16 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { SpotifyLibTrackSimpleSchema } from "@domain/spotify/spotify-lib-track";
+import { libraryEndpoints, libraryQueryKeys } from "../api/endpoints/library";
 
 export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTIFY_LIB_TRACKS_PAGE_SIZE || 50) {
   const { fetch } = useFetchWrapper();
 
   return useInfiniteQuery({
-    queryKey: ["spotifyLibTracks"],
+    queryKey: libraryQueryKeys.me.spotify.all,
     queryFn: async ({ pageParam = 1 }) => {
       console.log("fetching spotify lib tracks", pageParam, pageSize);
-      const response = await fetch(`library/spotify`, true, true, {}, { page: pageParam, pageSize });
+      const response = await fetch(libraryEndpoints.me.spotify.list(), false, true, {}, { page: pageParam, pageSize });
       console.log("spotify lib tracks response", response);
       const parseResult = PaginatedResponseSchema(SpotifyLibTrackSimpleSchema).safeParse(response);
       if (!parseResult.success) {
@@ -39,13 +40,13 @@ export function useQuickSyncSpotifyLibTracks() {
 
   return useMutation({
     mutationFn: async () => {
-      const response = await fetch("library/spotify/sync/quick/", true, true, { method: "POST" });
+      const response = await fetch(libraryEndpoints.me.spotify.syncQuick(), false, true, { method: "POST" });
       console.log("quick sync response", response);
       return response;
     },
     onSuccess: () => {
       console.log("quick sync success, invalidating queries");
-      queryClient.invalidateQueries({ queryKey: ["spotifyLibTracks"] });
+      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.me.spotify.all });
     },
   });
 }
@@ -56,11 +57,11 @@ export function useFullSyncSpotifyLibTracks() {
 
   return useMutation({
     mutationFn: async () => {
-      const response = await fetch("library/spotify/sync/full/", true, true, { method: "POST" });
+      const response = await fetch(libraryEndpoints.me.spotify.syncFull(), false, true, { method: "POST" });
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["spotifyLibTracks"] });
+      queryClient.invalidateQueries({ queryKey: libraryQueryKeys.me.spotify.all });
     },
   });
 }
