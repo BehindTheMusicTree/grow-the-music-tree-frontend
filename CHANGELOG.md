@@ -65,6 +65,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-02-06
+
 ### Changed
 
 - **Next.js Upgrade**: Upgraded Next.js from 15.5.7 to 16.1.6
@@ -191,7 +193,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Includes @vitest/ui for interactive test debugging
 
 - **CI/CD Refactoring**: Split monolithic CI workflow following Git Flow best practices
-  - Created separate workflows: validate.yml (lint, test, build), deploy.yml (single environment)
+  - Created separate workflows: ci.yml (validation), deploy-test.yml, deploy-prod.yml
+  - Added reusable deployment workflow (deploy-reusable.yml) to eliminate code duplication
   - Renamed `dev` branch to `develop` following standard Git Flow naming
   - Deploy runs on push to develop and workflow_dispatch
 
