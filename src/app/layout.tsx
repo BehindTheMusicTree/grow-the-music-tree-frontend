@@ -18,7 +18,7 @@ export const viewport: Viewport = {
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  preload: true,
+  preload: false,
   fallback: ["system-ui", "sans-serif"],
 });
 
