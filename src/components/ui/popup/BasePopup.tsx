@@ -21,6 +21,7 @@ export interface BasePopupProps {
   showOkButton?: boolean;
   showCancelButton?: boolean;
   okButtonText?: string;
+  okButtonDisabled?: boolean;
   cancelButtonText?: string;
   onOk?: () => void;
   onCancel?: () => void;
@@ -42,6 +43,7 @@ export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> ex
       okButtonText = "OK",
       cancelButtonText = "Cancel",
       onOk,
+      okButtonDisabled = false,
       onCancel,
       buttonAlignment = "center",
     } = props;
@@ -67,7 +69,11 @@ export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> ex
                 {cancelButtonText}
               </Button>
             )}
-            {showOkButton && <Button onClick={onOk || onClose || (() => {})}>{okButtonText}</Button>}
+            {showOkButton && (
+              <Button onClick={onOk || onClose || (() => {})} disabled={okButtonDisabled}>
+                {okButtonText}
+              </Button>
+            )}
           </PopupButtons>
         </div>
       );

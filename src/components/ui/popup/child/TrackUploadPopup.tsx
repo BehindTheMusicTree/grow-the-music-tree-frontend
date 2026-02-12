@@ -266,20 +266,26 @@ function TrackUploadContent({
   );
 }
 
-type TrackUploadPopupState = { successfulCount: number; totalCount: number };
+type TrackUploadPopupState = { successfulCount: number; totalCount: number; isComplete: boolean };
 
 // Class component wrapper that extends BasePopup
 // @ts-expect-error: omitted props are set internally by the popup
 export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps, TrackUploadPopupState> {
-  state: TrackUploadPopupState = { successfulCount: 0, totalCount: 0 };
+  state: TrackUploadPopupState = { successfulCount: 0, totalCount: 0, isComplete: false };
 
   handleProgress = (successfulCount: number, totalCount: number) => {
     this.setState({ successfulCount, totalCount });
   };
 
+  handleComplete = (uploadedTracks: unknown[]) => {
+    const { onComplete } = this.props;
+    this.setState({ isComplete: true });
+    onComplete?.(uploadedTracks);
+  };
+
   render() {
-    const { files, genre, scope, onComplete, onClose, ...rest } = this.props;
-    const { successfulCount, totalCount } = this.state;
+    const { files, genre, scope, onComplete: _onComplete, onClose, ...rest } = this.props;
+    const { successfulCount, totalCount, isComplete } = this.state;
     const displayTotal = totalCount > 0 ? totalCount : files.length;
 
     return this.renderBase({
@@ -288,13 +294,14 @@ export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps, T
       isDismissable: true,
       showOkButton: true,
       okButtonText: "OK",
+      okButtonDisabled: !isComplete,
       onOk: onClose,
       children: (
         <TrackUploadContent
           files={files}
           genre={genre}
           scope={scope}
-          onComplete={onComplete}
+          onComplete={this.handleComplete}
           onClose={onClose}
           onProgress={this.handleProgress}
         />
@@ -302,3 +309,4 @@ export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps, T
     });
   }
 }
+
