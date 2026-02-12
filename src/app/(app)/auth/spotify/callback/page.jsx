@@ -23,30 +23,40 @@ export default function SpotifyOAuthCallbackPage() {
   const authAttempted = useRef(false);
 
   useEffect(() => {
+    console.log("[SpotifyCallback] effect start");
     const { code, errorParam } = getParamsFromUrl();
+    console.log("[SpotifyCallback] params", { code, errorParam });
 
     const handleAuth = async () => {
       if (authAttempted.current) return;
       authAttempted.current = true;
 
+      console.log("[SpotifyCallback] handleAuth start");
+
       if (errorParam) {
+        console.log("[SpotifyCallback] error param present", errorParam);
         setError(new Error(`Spotify authentication failed: ${errorParam}`));
         setIsPending(false);
         return;
       }
 
       if (!code) {
+        console.log("[SpotifyCallback] no code in URL");
         setError(new Error("No authorization code received from Spotify"));
         setIsPending(false);
         return;
       }
 
       try {
+        console.log("[SpotifyCallback] calling authToBackendFromSpotifyCode");
         const redirectUrl = await authToBackendFromSpotifyCode(code);
+        console.log("[SpotifyCallback] authToBackendFromSpotifyCode returned", redirectUrl);
         if (redirectUrl) {
+          console.log("[SpotifyCallback] redirecting to", redirectUrl);
           router.push(redirectUrl);
         }
       } catch (err) {
+        console.error("[SpotifyCallback] error during auth", err);
         if (err instanceof BackendError && err.code === ErrorCode.BACKEND_AUTH_ERROR) {
           setError(new Error("Failed to authenticate with the backend server. Please try again later."));
         } else {
@@ -57,7 +67,9 @@ export default function SpotifyOAuthCallbackPage() {
       }
     };
 
-    handleAuth();
+    handleAuth().catch((e) => {
+      console.error("[SpotifyCallback] unhandled error in handleAuth", e);
+    });
   }, [authToBackendFromSpotifyCode, router]);
 
   if (isPending) {

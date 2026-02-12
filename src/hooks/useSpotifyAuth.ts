@@ -18,6 +18,10 @@ export function useSpotifyAuth() {
 
   const handleSpotifyOAuth = () => {
     if (!process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || !process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI) {
+      console.error("[SpotifyAuth] Missing Spotify env vars", {
+        NEXT_PUBLIC_SPOTIFY_CLIENT_ID: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
+        NEXT_PUBLIC_SPOTIFY_REDIRECT_URI: process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI,
+      });
       throw new Error("Spotify configuration is missing. Please check your environment variables.");
     }
 
@@ -29,7 +33,7 @@ export function useSpotifyAuth() {
     localStorage.setItem("spotifyAuthRedirect", window.location.href);
 
     const params = new URLSearchParams({
-      client_id: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
+      client_id: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID!,
       response_type: "code",
       redirect_uri: redirectUri,
       scope: process.env.NEXT_PUBLIC_SPOTIFY_SCOPES ?? "",
@@ -48,7 +52,11 @@ export function useSpotifyAuth() {
         refreshToken: string;
         expiresAt: number;
       };
+
       try {
+        console.log("[SpotifyAuth] calling backend with Spotify code", {
+          backendBaseUrl: process.env.NEXT_PUBLIC_BACKEND_BASE_URL,
+        });
         const backEndSporifyAuthResponse = await fetch<BackendSpotifyAuthResponse>("auth/spotify/", true, false, {
           method: "POST",
           body: JSON.stringify({ code }),

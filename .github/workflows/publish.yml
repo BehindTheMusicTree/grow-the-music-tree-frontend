@@ -168,6 +168,8 @@ jobs:
           ssh ${{ env.SSH_DESTINATION }} "
             rm -f ${{ env.ENV_FILE }} &&
             echo 'NODE_ENV=test' >> $ENV_FILE &&
+            echo 'APP_VERSION=${{ needs.determine-version.outputs.version }}' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_APP_VERSION=${{ needs.determine-version.outputs.version }}' >> ${{ env.ENV_FILE }} &&
             echo 'APP_PORT=${{ env.GTMT_FRONT_PORT }}' >> ${{ env.ENV_FILE }} &&
             echo 'BUILD_COMPLETE_FILENAME=${{ env.BUILD_COMPLETE_FILENAME }}' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_CONTACT_EMAIL=${{ env.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
