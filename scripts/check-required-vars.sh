@@ -2,11 +2,14 @@
 
 missing=""
 
-# Check each provided environment variable name
-for var in "$@"; do
-    if [ -z "${!var}" ]; then
-        missing="$missing $var"
+# Arguments should be pairs: name value name value ...
+while [ $# -gt 0 ]; do
+    name="$1"
+    value="$2"
+    if [ -z "$value" ]; then
+        missing="$missing $name"
     fi
+    shift 2
 done
 
 if [ -n "$missing" ]; then
