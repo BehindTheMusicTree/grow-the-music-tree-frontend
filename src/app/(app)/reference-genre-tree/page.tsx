@@ -9,7 +9,7 @@ import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
 
 import { GenreTreeView } from "../me-genre-tree/GenreTreeView";
 
-export default function ReferenceGenreTree() {
+export default function ReferenceGenreTreePage() {
   const { mutate: createGenre, formErrors } = useCreateGenre("reference");
   const { showPopup, hidePopup } = usePopup();
 
