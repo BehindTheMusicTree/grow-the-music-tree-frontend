@@ -6,6 +6,10 @@ import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
 
+if (typeof window !== "undefined") {
+  console.log("[SpotifyCallback] module loaded");
+}
+
 function getParamsFromUrl() {
   if (typeof window === "undefined") return { code: null, errorParam: null };
   const params = new URLSearchParams(window.location.search);
