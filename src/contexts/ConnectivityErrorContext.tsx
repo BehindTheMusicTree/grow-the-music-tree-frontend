@@ -23,7 +23,6 @@ export function ConnectivityErrorProvider({ children }: ConnectivityErrorProvide
   };
 
   const handleSetConnectivityError = (error: ConnectivityError | null) => {
-    console.log("Connectivity error changed:", error?.toString() || error);
     setConnectivityError(error);
   };
 

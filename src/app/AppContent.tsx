@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
@@ -32,17 +33,75 @@ import {
 } from "@app-types/app-errors/app-error";
 
 export default function AppContent({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const { playerUploadedTrackObject } = usePlayer();
   const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const { trackList } = useTrackList();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, clearConnectivityError } = useConnectivityError();
-  const { handleSpotifyOAuth } = useSpotifyAuth();
+  const { handleSpotifyOAuth, authToBackendFromSpotifyCode } = useSpotifyAuth();
   const currentConnectivityErrorRef = useRef<typeof ConnectivityError | null>(null);
+  const spotifyAuthHandledRef = useRef(false);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      console.log("[AppContent] mounted on route", window.location.pathname);
+    }
     initSentry();
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (spotifyAuthHandledRef.current) return;
+    if (!window.location.pathname.startsWith("/auth/spotify/callback")) return;
+
+    spotifyAuthHandledRef.current = true;
+
+    console.log("[SpotifyCallback][AppContent] handling callback");
+
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const errorParam = params.get("error");
+
+    (async () => {
+      if (errorParam) {
+        console.log("[SpotifyCallback][AppContent] error param present", errorParam);
+        return;
+      }
+
+      if (!code) {
+        console.log("[SpotifyCallback][AppContent] no code in URL");
+        return;
+      }
+
+      try {
+        console.log("[SpotifyCallback][AppContent] calling authToBackendFromSpotifyCode");
+        const redirectUrl = await authToBackendFromSpotifyCode(code);
+        console.log("[SpotifyCallback][AppContent] authToBackendFromSpotifyCode returned", redirectUrl);
+        if (redirectUrl) {
+          console.log("[SpotifyCallback][AppContent] redirecting to", redirectUrl);
+          router.push(redirectUrl);
+        }
+      } catch (e) {
+        console.error("[SpotifyCallback][AppContent] error during auth", e);
+      }
+    })().catch((e) => {
+      console.error("[SpotifyCallback][AppContent] unhandled error", e);
+    });
+  }, [authToBackendFromSpotifyCode, router]);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const anchor = target.closest("a[href]");
+      if (!anchor) return;
+      const href = (anchor as HTMLAnchorElement).getAttribute("href");
+      if (!href || href.startsWith("http") || href.startsWith("#")) return;
+      clearConnectivityError();
+    };
+    document.addEventListener("click", handleClick, true);
+    return () => document.removeEventListener("click", handleClick, true);
+  }, [clearConnectivityError]);
 
   useEffect(() => {}, [playerUploadedTrackObject]);
 
@@ -96,11 +155,33 @@ export default function AppContent({ children }: { children: ReactNode }) {
         }}
       >
         <Menu className="menu left-0 z-40" />
-        <main className="flex-grow w-full mx-8">{children}</main>
-        {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
+        <div className="relative flex-grow w-full flex">
+          <div
+            className="flex-grow w-full flex"
+            style={activePopup ? { filter: "blur(4px)" } : undefined}
+          >
+            <main className="flex-grow w-full mx-8">{children}</main>
+            {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
+          </div>
+          {activePopup && (
+            <div
+              className="absolute top-0 right-0 bottom-0 left-0 z-40 pointer-events-none bg-black/10"
+              aria-hidden
+            />
+          )}
+        </div>
       </div>
 
-      {playerUploadedTrackObject && <Player className="fixed bottom-0 z-50" />}
+      {playerUploadedTrackObject && (
+        <div className="fixed bottom-0 left-0 right-0 z-50">
+          <div style={activePopup ? { filter: "blur(4px)" } : undefined}>
+            <Player className="relative z-0" />
+          </div>
+          {activePopup && (
+            <div className="absolute inset-0 z-10 pointer-events-none bg-black/10" aria-hidden />
+          )}
+        </div>
+      )}
       <AutoAdvance />
       {activePopup}
     </div>

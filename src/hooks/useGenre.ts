@@ -10,32 +10,36 @@ import { CriteriaSimpleSchema } from "@schemas/domain/criteria/response/simple";
 import { CriteriaCreationSchema } from "@schemas/domain/criteria/form/creation";
 import { CriteriaUpdateSchema } from "@schemas/domain/criteria/form/update";
 import { useValidatedMutation } from "./useValidatedMutation";
+import { genreEndpoints, genreQueryKeys } from "../api/endpoints/genres";
+import { Scope } from "@app-types/Scope";
 
-export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50) {
+export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50, scope: Scope) {
   const { fetch } = useFetchWrapper();
 
   return useQuery({
-    queryKey: ["genres", "list", page],
+    queryKey: scope === "reference" ? genreQueryKeys.reference.list(page) : genreQueryKeys.me.list(page),
     queryFn: async () => {
-      const response = await fetch("genres/", true, true, {}, { page, pageSize });
+      const endpoint = scope === "reference" ? genreEndpoints.reference.list() : genreEndpoints.me.list();
+      const response = await fetch(endpoint, true, scope === "me", {}, { page, pageSize });
       return PaginatedResponseSchema(CriteriaSimpleSchema).parse(response);
     },
   });
 }
 
-export function useFetchGenre() {
+export function useFetchGenre(scope: Scope) {
   const { fetch } = useFetchWrapper();
 
   return useCallback(
     async (id: string): Promise<CriteriaDetailed> => {
-      const response = await fetch(`genres/${id}/`, true);
+      const endpoint = scope === "reference" ? genreEndpoints.reference.detail(id) : genreEndpoints.me.detail(id);
+      const response = await fetch(endpoint, true, scope === "me");
       return CriteriaDetailedSchema.parse(response);
     },
-    [fetch]
+    [fetch, scope],
   );
 }
 
-export function useLoadReferenceTreeGenre() {
+export function useLoadExampleTreeGenre(scope: Scope) {
   const { fetch } = useFetchWrapper();
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
@@ -44,19 +48,22 @@ export function useLoadReferenceTreeGenre() {
     inputSchema: z.void(),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async () => {
-      const response = await fetch("genres/tree/load-reference/", true, true, {
+      const endpoint =
+        scope === "reference" ? genreEndpoints.reference.loadExampleTree() : genreEndpoints.me.loadExampleTree();
+      const response = await fetch(endpoint, true, scope === "me", {
         method: "POST",
       });
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["genres"] });
+      const queryKey = scope === "reference" ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
+      queryClient.invalidateQueries({ queryKey });
       invalidateAllGenrePlaylistQueries();
     },
   });
 }
 
-export function useCreateGenre() {
+export function useCreateGenre(scope: Scope) {
   const queryClient = useQueryClient();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
   const { fetch } = useFetchWrapper();
@@ -65,20 +72,22 @@ export function useCreateGenre() {
     inputSchema: CriteriaCreationSchema,
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async (data) => {
-      const response = await fetch("genres/", true, true, {
+      const endpoint = scope === "reference" ? genreEndpoints.reference.create() : genreEndpoints.me.create();
+      const response = await fetch(endpoint, true, scope === "me", {
         method: "POST",
         body: JSON.stringify(data),
       });
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["genres"] });
+      const queryKey = scope === "reference" ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
+      queryClient.invalidateQueries({ queryKey });
       invalidateAllGenrePlaylistQueries();
     },
   });
 }
 
-export function useUpdateGenre() {
+export function useUpdateGenre(scope: Scope) {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
@@ -90,15 +99,18 @@ export function useUpdateGenre() {
     }),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid, data }) => {
-      const response = await fetch(`genres/${uuid}/`, true, true, {
+      const endpoint = scope === "reference" ? genreEndpoints.reference.update(uuid) : genreEndpoints.me.update(uuid);
+      const response = await fetch(endpoint, true, scope === "me", {
         method: "PUT",
         body: JSON.stringify(data),
       });
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      queryClient.invalidateQueries({ queryKey: ["genres"] });
-      queryClient.invalidateQueries({ queryKey: ["genres", "detail", uuid] });
+      const queryKey = scope === "reference" ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
+      const detailKey = scope === "reference" ? genreQueryKeys.reference.detail(uuid) : genreQueryKeys.me.detail(uuid);
+      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: detailKey });
       invalidateAllGenrePlaylistQueries();
     },
   });
@@ -117,7 +129,7 @@ export function useUpdateGenre() {
   return { mutate, renameGenre, updateGenreParent, formErrors };
 }
 
-export function useDeleteGenre() {
+export function useDeleteGenre(scope: Scope) {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
   const invalidateAllGenrePlaylistQueries = useInvalidateAllGenrePlaylistQueries();
@@ -126,14 +138,17 @@ export function useDeleteGenre() {
     inputSchema: z.object({ uuid: z.string() }),
     outputSchema: CriteriaDetailedSchema,
     mutationFn: async ({ uuid }) => {
-      const response = await fetch(`genres/${uuid}`, true, true, {
+      const endpoint = scope === "reference" ? genreEndpoints.reference.delete(uuid) : genreEndpoints.me.delete(uuid);
+      const response = await fetch(endpoint, true, scope === "me", {
         method: "DELETE",
       });
       return response;
     },
     onSuccess: (_, { uuid }) => {
-      queryClient.invalidateQueries({ queryKey: ["genres"] });
-      queryClient.invalidateQueries({ queryKey: ["genres", "detail", uuid] });
+      const queryKey = scope === "reference" ? genreQueryKeys.reference.all : genreQueryKeys.me.all;
+      const detailKey = scope === "reference" ? genreQueryKeys.reference.detail(uuid) : genreQueryKeys.me.detail(uuid);
+      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: detailKey });
       invalidateAllGenrePlaylistQueries();
     },
   });

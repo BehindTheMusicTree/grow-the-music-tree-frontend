@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
+    "build:debug": "NODE_ENV=development next build",
     "start": "next start",
     "lint": "next lint",
-    "verify-env": "node scripts/verify-env.js",
+    "verify-env": "node scripts/verify-env.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",

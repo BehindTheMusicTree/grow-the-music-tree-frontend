@@ -1,5 +1,28 @@
 # Vision
 
+## Table of Contents
+
+- [🌳 The Genre Map: A Living, Evolving Tree](#-the-genre-map-a-living-evolving-tree)
+- [🎧 Find Your True Musical Essence](#-find-your-true-musical-essence)
+- [🤖 AI-Powered Track Genre Detection](#-ai-powered-track-genre-detection)
+- [🌍 A Community-Driven Platform for Global Music Culture](#-a-community-driven-platform-for-global-music-culture)
+- [Our Mission](#our-mission)
+- [Our Values](#our-values)
+  - [🤝 Community-Driven](#-community-driven)
+  - [🔍 Accuracy & Credibility](#-accuracy--credibility)
+  - [🌐 Inclusivity](#-inclusivity)
+  - [🚀 Innovation](#-innovation)
+  - [📖 Transparency](#-transparency)
+- [The Problem We're Solving](#the-problem-were-solving)
+  - [Current Challenges in Music Genre Classification](#current-challenges-in-music-genre-classification)
+  - [Our Solution](#our-solution)
+- [Target Audience](#target-audience)
+  - [Music Enthusiasts](#music-enthusiasts)
+  - [Artists & Producers](#artists--producers)
+  - [Music Educators](#music-educators)
+  - [Industry Professionals](#industry-professionals)
+  - [Streaming Platforms & Apps](#streaming-platforms--apps)
+
 ### 🎶 **GrowTheMusicTree: The Ultimate Music Genre Reference**
 
 GrowTheMusicTree is a web and mobile platform created to address a major gap in the music world: the lack of a shared, structured, and credible reference for musical genres. While music continues to diversify across cultures and platforms, no clear guide exists to navigate its complex ecosystem. GrowTheMusicTree aims to become the **ultimate, community-driven reference** for understanding and exploring musical genres.

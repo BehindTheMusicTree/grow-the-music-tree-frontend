@@ -3,6 +3,7 @@
 import { createPortal } from "react-dom";
 import { Component, ReactNode } from "react";
 import { PopupTitle } from "@components/ui/popup/PopupTitle";
+import { BANNER_HEIGHT, MENU_WIDTH } from "@lib/constants/layout";
 import { PopupButtons } from "@components/ui/popup/PopupButtons";
 import { Button } from "@components/ui/Button";
 import { LucideIcon } from "lucide-react";
@@ -20,6 +21,7 @@ export interface BasePopupProps {
   showOkButton?: boolean;
   showCancelButton?: boolean;
   okButtonText?: string;
+  okButtonDisabled?: boolean;
   cancelButtonText?: string;
   onOk?: () => void;
   onCancel?: () => void;
@@ -41,6 +43,7 @@ export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> ex
       okButtonText = "OK",
       cancelButtonText = "Cancel",
       onOk,
+      okButtonDisabled = false,
       onCancel,
       buttonAlignment = "center",
     } = props;
@@ -66,7 +69,11 @@ export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> ex
                 {cancelButtonText}
               </Button>
             )}
-            {showOkButton && <Button onClick={onOk || onClose || (() => {})}>{okButtonText}</Button>}
+            {showOkButton && (
+              <Button onClick={onOk || onClose || (() => {})} disabled={okButtonDisabled}>
+                {okButtonText}
+              </Button>
+            )}
           </PopupButtons>
         </div>
       );
@@ -74,7 +81,13 @@ export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> ex
 
     const popupComponent = (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+        className="fixed z-50 flex items-center justify-center bg-transparent"
+        style={{
+          top: BANNER_HEIGHT,
+          left: MENU_WIDTH,
+          right: 0,
+          bottom: 0,
+        }}
         role="dialog"
         aria-modal="true"
         aria-labelledby="popup-title"

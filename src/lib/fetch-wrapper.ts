@@ -9,11 +9,11 @@ export const fetchWrapper = async <T>(
   queryParams?: Record<string, string | number | boolean>,
   handleMissingRequiredSession?: () => void,
   handleError?: (error: Error) => void,
-  expectBinary: boolean = false
+  expectBinary: boolean = false,
 ): Promise<T | null> => {
   const urlWithParams = queryParams
     ? `${url}${url.includes("?") ? "&" : "?"}${new URLSearchParams(
-        Object.entries(queryParams).map(([key, value]) => [key, String(value)])
+        Object.entries(queryParams).map(([key, value]) => [key, String(value)]),
       ).toString()}`
     : url;
 
@@ -56,7 +56,6 @@ export const fetchWrapper = async <T>(
     } else {
       appError = createNetworkOrBackendError(caughtError, finalUrl);
     }
-    console.log("appError", appError.toString());
 
     if (handleError && appError) {
       handleError(appError);

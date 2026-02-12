@@ -2,6 +2,25 @@
 
 This file documents the labels used in this repository for issues and pull requests.
 
+## Table of Contents
+
+- [Type Labels (Issue/PR Classification)](#type-labels-issuepr-classification)
+- [Priority Labels](#priority-labels)
+- [Component Labels (Frontend Areas)](#component-labels-frontend-areas)
+- [Technology Labels](#technology-labels)
+- [Status Labels](#status-labels)
+- [Size Labels (Effort Estimation)](#size-labels-effort-estimation)
+- [Special Labels](#special-labels)
+- [Platform Labels](#platform-labels)
+- [Automatic Labeling](#automatic-labeling)
+  - [1. PR File-based Labeling (`.github/workflows/labeler.yml`)](#1-pr-file-based-labeling-githubworkflowslabeleryml)
+  - [2. PR Size Labeling (`.github/workflows/pr-size-labeler.yml`)](#2-pr-size-labeling-githubworkflowspr-size-labeleryml)
+  - [3. PR Type Labeling (`.github/workflows/pr-type-labeler.yml`)](#3-pr-type-labeling-githubworkflowspr-type-labeleryml)
+  - [4. Issue Labeling (`.github/workflows/issue-labeler.yml`)](#4-issue-labeling-githubworkflowsissue-labeleryml)
+- [Label Color Scheme](#label-color-scheme)
+- [Creating Labels via GitHub CLI](#creating-labels-via-github-cli)
+- [Creating All Labels at Once](#creating-all-labels-at-once)
+
 ## Type Labels (Issue/PR Classification)
 
 - `bug` - Something isn't working correctly

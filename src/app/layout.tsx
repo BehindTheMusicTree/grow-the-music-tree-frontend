@@ -1,9 +1,6 @@
 import { Inter } from "next/font/google";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import Providers from "@app/providers";
-import { PopupProvider } from "@contexts/PopupContext";
-import AppContent from "./AppContent";
 
 export const metadata: Metadata = {
   title: "GrowTheMusicTree",
@@ -13,23 +10,22 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  preload: true,
+  preload: false,
   fallback: ["system-ui", "sans-serif"],
 });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <Providers>
-          <PopupProvider>
-            <AppContent>{children}</AppContent>
-          </PopupProvider>
-        </Providers>
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }

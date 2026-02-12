@@ -11,8 +11,9 @@ import UploadedTrackPositionPlayPause from "@components/features/UploadedTrackPo
 
 export default function TrackItem({ uploadedTrack, position }) {
   const { handlePlayPauseAction, playerUploadedTrackObject, loadTrackForPlayer } = usePlayer();
-  const { toTrackAtPosition } = useTrackList();
+  const { trackList, toTrackAtPosition } = useTrackList();
   const { showEditPopup, TrackEditionComponent } = useTrackEdition();
+  const scope = trackList?.origin?.scope;
 
   const handleEditClick = (event) => {
     event.stopPropagation();
@@ -23,10 +24,9 @@ export default function TrackItem({ uploadedTrack, position }) {
     event.stopPropagation();
     if (playerUploadedTrackObject && playerUploadedTrackObject.uploadedTrack.uuid === uploadedTrack.uuid) {
       handlePlayPauseAction(event);
-    } else {
-      // Load and play the selected track
+    } else if (scope != null) {
       toTrackAtPosition(position);
-      loadTrackForPlayer(uploadedTrack);
+      loadTrackForPlayer(uploadedTrack, scope);
     }
   };
 
