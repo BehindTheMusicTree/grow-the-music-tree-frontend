@@ -50,7 +50,7 @@ interface Callbacks {
  */
 export function buildTreeHierarchyStructure(
   d3: typeof import("d3"),
-  GenrePlaylistTreePerRoot: CriteriaPlaylistSimple[]
+  GenrePlaylistTreePerRoot: CriteriaPlaylistSimple[],
 ) {
   return d3
     .stratify<CriteriaPlaylistSimple>()
@@ -66,7 +66,7 @@ export function addMoreIconContainer(
   genrePlaylist: CriteriaPlaylistSimple,
   group: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>,
   handleMoreActionEnterMouse: (event: MouseEvent, d: D3Node, genrePlaylist: CriteriaPlaylistSimple) => void,
-  rootColor: string
+  rootColor: string,
 ) {
   const moreIconContainer = group.select("#more-icon-container-" + genrePlaylist.uuid);
   const dimensions = calculateNodeDimensions(genrePlaylist.uploadedTracksCount);
@@ -92,7 +92,7 @@ export function addMoreIconContainer(
         return ReactDOMServer.renderToString(
           <div className="w-full h-full flex justify-center items-center cursor-pointer hover:bg-gray-500">
             <MdMoreVert size={20} color="white" />
-          </div>
+          </div>,
         );
       })
       .on("mouseenter", function (this: SVGForeignObjectElement, event: MouseEvent, d: unknown) {
@@ -129,7 +129,7 @@ export function addActionContainer(
   iconFunction: (d: D3Node) => React.ReactNode,
   labelFunction: (d: D3Node) => string,
   enabledFunction: (d: D3Node) => boolean = () => true, // new param, default true
-  actionsContainerX: number = ACTIONS_CONTAINER_X_OFFSET // new param for dynamic positioning
+  actionsContainerX: number = ACTIONS_CONTAINER_X_OFFSET, // new param for dynamic positioning
 ) {
   const actionContainerGroup = actionsContainerGroup
     .append("g")
@@ -157,7 +157,7 @@ export function addActionContainer(
     .html(function (this: SVGForeignObjectElement, d: unknown) {
       const enabled = enabledFunction(d as D3Node);
       return ReactDOMServer.renderToString(
-        <div className={`tree-action-icon-container${!enabled ? " opacity-50" : ""}`}>{iconFunction(d as D3Node)}</div>
+        <div className={`tree-action-icon-container${!enabled ? " opacity-50" : ""}`}>{iconFunction(d as D3Node)}</div>,
       );
     });
 
@@ -172,7 +172,7 @@ export function addActionContainer(
       return ReactDOMServer.renderToString(
         <div className={`change-parent-label-container tree-action-label-container${!enabled ? " opacity-50" : ""}`}>
           {labelFunction(d as D3Node)}
-        </div>
+        </div>,
       );
     });
 
@@ -195,7 +195,7 @@ export function addActionsGroup(
   genrePlaylist: CriteriaPlaylistSimple,
   genrePlaylistGroup: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>,
   callbacks: Callbacks,
-  rootColor: string
+  rootColor: string,
 ) {
   const {
     handlePlayPauseIconAction,
@@ -246,7 +246,7 @@ export function addActionsGroup(
         actionsContainerX +
         " -" +
         dimensions.HEIGHT / 2 +
-        " Z"
+        " Z",
     )
     .attr("fill", "RGBA(0, 0, 0, 0)");
 
@@ -267,7 +267,7 @@ export function addActionsGroup(
         actionsContainerX +
         " " +
         dimensions.HEIGHT / 2 +
-        " Z"
+        " Z",
     )
     .attr("fill", "RGBA(0, 0, 0, 0)");
 
@@ -287,7 +287,7 @@ export function addActionsGroup(
       () => <FaPlus className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
       () => "Add sub-genre",
       () => true,
-      actionsContainerX
+      actionsContainerX,
     );
 
     const changeParentActionOnclick = async (event: MouseEvent, d: D3Node) => {
@@ -310,7 +310,7 @@ export function addActionsGroup(
       () => <PiGraphFill className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
       () => "Change parent",
       () => true,
-      actionsContainerX
+      actionsContainerX,
     );
 
     const renameGenreActionOnclick = async (event: MouseEvent, d: D3Node) => {
@@ -328,7 +328,7 @@ export function addActionsGroup(
       () => <MdModeEdit className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
       () => "Rename",
       () => true,
-      actionsContainerX
+      actionsContainerX,
     );
 
     const deleteGenreActionOnclick = (_event: MouseEvent, _d: D3Node) => {
@@ -348,7 +348,7 @@ export function addActionsGroup(
       () => <FaTrashAlt className="tree-icon" size={ACTION_ICON_SIZE} color="white" />, // changed
       () => "Delete",
       () => true,
-      actionsContainerX
+      actionsContainerX,
     );
   }
 
@@ -373,7 +373,7 @@ export function addActionsGroup(
     ),
     (d) => `${d.data.uploadedTracksCount ?? 0} tracks`,
     () => true,
-    actionsContainerX
+    actionsContainerX,
   );
 
   addActionContainer(
@@ -408,7 +408,7 @@ export function addActionsGroup(
       return "Play";
     },
     (d) => d.data.uploadedTracksCount > 0,
-    actionsContainerX
+    actionsContainerX,
   );
 
   const uploadTrackActionOnclick = (event: MouseEvent, d: D3Node) => {
@@ -428,7 +428,7 @@ export function addActionsGroup(
     () => <FaFileUpload className="tree-icon" size={ACTION_ICON_SIZE} color="white" />,
     () => "Upload track",
     () => true,
-    actionsContainerX
+    actionsContainerX,
   );
 
   actionsGroup.on("mouseenter", function () {
@@ -459,7 +459,7 @@ export function addParentSelectionOverlay(
   parentNode: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>,
   callbacks: Pick<Callbacks, "updateGenreParent" | "setGenreGettingAssignedNewParent"> & {
     genreGettingAssignedNewParent: CriteriaDetailed | null;
-  }
+  },
 ) {
   const { updateGenreParent, genreGettingAssignedNewParent, setGenreGettingAssignedNewParent } = callbacks;
 
@@ -499,7 +499,7 @@ export function addParentSelectionOverlay(
           <div className="select-as-new-parent-layer-icon-container h-full w-full flex items-center justify-center">
             <PiGraphFill size={20} color="white" />
             <div className="select-as-new-parent-layer-icon-label text-white text-xs ml-2">Select as new parent</div>
-          </div>
+          </div>,
         );
       })
       .on("click", function (this: SVGForeignObjectElement, event: MouseEvent, d: unknown) {
