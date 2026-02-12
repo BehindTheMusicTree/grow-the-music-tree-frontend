@@ -76,6 +76,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.0.0] - 2025-02-12
+
 ### Added
 
 - **global-error.tsx**: Added minimal global error boundary for static export so `/_global-error` prerenders without context (fixes "useContext of null" build failure)
