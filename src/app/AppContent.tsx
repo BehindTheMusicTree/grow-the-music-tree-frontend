@@ -31,6 +31,7 @@ import {
   ClientError,
   ServiceError,
 } from "@app-types/app-errors/app-error";
+import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
 export default function AppContent({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -104,7 +105,10 @@ export default function AppContent({ children }: { children: ReactNode }) {
     ) {
       let popup: ReactNode | null = null;
       const error = connectivityError as ConnectivityError;
-      if (error instanceof AuthRequired) {
+      if (
+        error instanceof AuthRequired ||
+        (error instanceof BackendError && error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED)
+      ) {
         popup = <SpotifyAuthPopup handleSpotifyOAuth={handleSpotifyOAuth} />;
       } else if (error instanceof BadRequestError || error instanceof BackendError || error instanceof ServiceError) {
         popup = <InternalErrorPopup errorCode={error.code} />;
