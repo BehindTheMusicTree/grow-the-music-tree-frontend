@@ -76,6 +76,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- **Player**: Disabled **Next** button when no next track in track list
+- **Account**: Fixed Spotify endpoint path to use 'users' instead of 'user'
+- **Spotify**: Streamlined account page by integrating useSpotifyUser hook and improving loading/error handling
+
 ## [1.0.0] - 2025-02-12
 
 ### Added
