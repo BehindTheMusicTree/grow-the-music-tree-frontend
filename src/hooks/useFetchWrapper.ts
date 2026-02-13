@@ -1,6 +1,10 @@
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { useSession } from "@contexts/SessionContext";
-import { ConnectivityError, AuthRequired } from "@app-types/app-errors/app-error";
+import {
+  BackendError,
+  AuthRequired,
+  ConnectivityError,
+} from "@app-types/app-errors/app-error";
 import { fetchWrapper as rawFetch } from "@lib/fetch-wrapper";
 import { createAppErrorFromErrorCode } from "@app-types/app-errors/app-error-factory";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
@@ -15,6 +19,12 @@ export const useFetchWrapper = () => {
         clearSession();
       }
       setConnectivityError(error);
+      if (
+        error instanceof BackendError &&
+        error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED
+      ) {
+        throw error;
+      }
     } else {
       throw error;
     }
