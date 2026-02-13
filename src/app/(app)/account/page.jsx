@@ -1,13 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useSpotifyUser } from "@hooks/useSpotifyUser";
 
 export default function AccountPage() {
-  const { logout } = useSpotifyAuth();
+  const { handleSpotifyOAuth, logout } = useSpotifyAuth();
   const { data: profile, isLoading, isError, error } = useSpotifyUser();
   const spotifyProfileUrl = profile?.id ? `https://open.spotify.com/user/${profile.id}` : null;
+  const spotifyRequired =
+    isError && error?.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED;
 
   if (isLoading) {
     return (
@@ -15,6 +18,24 @@ export default function AccountPage() {
         <h1 className="mb-6 text-2xl font-bold">Account</h1>
         <div className="flex h-64 items-center justify-center">
           <p>Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (spotifyRequired) {
+    return (
+      <div className="p-8">
+        <h1 className="mb-6 text-2xl font-bold">Account</h1>
+        <div className="flex flex-col h-64 items-center justify-center gap-4">
+          <p className="text-gray-700">{error?.message ?? "Connect Spotify to continue."}</p>
+          <button
+            type="button"
+            className="rounded bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
+            onClick={handleSpotifyOAuth}
+          >
+            Connect Spotify
+          </button>
         </div>
       </div>
     );
