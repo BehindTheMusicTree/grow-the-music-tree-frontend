@@ -1,15 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
-import { useRetrieveSpotifyUser } from "@hooks/useSpotifyUser";
+import { useFetchSpotifyUser } from "@hooks/useSpotifyUser";
 
 export default function AccountPage() {
   const { handleSpotifyOAuth, logout } = useSpotifyAuth();
-  const { data: profile, isLoading, isError, error } = useRetrieveSpotifyUser();
+  const { data: profile, isLoading, isError, error } = useFetchSpotifyUser();
   const spotifyProfileUrl = profile?.id ? spotifyUserProfileUrl(profile.id) : null;
   const spotifyRequired = isError && error?.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED;
+
+  useEffect(() => {
+    console.error(`Error loading account: ${error}`);
+  }, [isError, error]);
 
   if (isLoading) {
     return (

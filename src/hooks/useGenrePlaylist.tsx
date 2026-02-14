@@ -73,12 +73,12 @@ export const useListFullGenrePlaylists = (scope: Scope) => {
   };
 };
 
-export const useRetrieveGenrePlaylist = (uuid: string) => {
+export const useFetchGenrePlaylist = (uuid: string) => {
   const { fetch } = useFetchWrapper();
   return useQuery<CriteriaPlaylistDetailed>({
     queryKey: playlistQueryKeys.me.detail(uuid),
     queryFn: async () => {
-      const response = await fetch(playlistEndpoints.me.detail(uuid), true, true);
+      const response = await fetch(playlistEndpoints.me.detail(uuid));
       return CriteriaPlaylistDetailedSchema.parse(response);
     },
   });
