@@ -12,10 +12,6 @@ export default function AccountPage() {
   const spotifyProfileUrl = profile?.id ? spotifyUserProfileUrl(profile.id) : null;
   const spotifyRequired = isError && error?.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED;
 
-  useEffect(() => {
-    console.error(`Error loading account: ${error}`);
-  }, [isError, error]);
-
   if (isLoading) {
     return (
       <div className="p-8">
