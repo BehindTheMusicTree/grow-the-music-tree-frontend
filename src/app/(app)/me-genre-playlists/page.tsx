@@ -1,7 +1,7 @@
 "use client";
 
 import { useListFullGenrePlaylists } from "@hooks/useGenrePlaylist";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@components/ui/Table";
 import { Skeleton } from "@components/ui/Skeleton";
 import { Input } from "@components/ui/Input";
 import { useState, useMemo, ChangeEvent } from "react";
