@@ -7,7 +7,6 @@ import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
-import { useTrackList } from "@contexts/TrackListContext";
 import { initSentry } from "@lib/sentry";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
