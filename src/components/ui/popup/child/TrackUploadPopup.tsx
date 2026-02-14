@@ -284,7 +284,7 @@ export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps, T
       successfulCount,
       totalCount,
       isUploading: uploading,
-      ...(uploading ? { isComplete: false } : {}),
+      isComplete: uploading ? false : prev.isComplete,
     }));
   };
 
