@@ -76,11 +76,25 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Parse and log for API responses**: `parseWithLog()` helper and `useQueryWithParse` hook so endpoint hooks validate responses with Zod and log schema errors with context
+- **Spotify profile URL**: `spotifyUserProfileUrl(spotifyUserId)` in routes constants for account page "Open in Spotify" link
+- **Session restore gate**: `sessionRestored` flag in SessionContext so auth-dependent queries wait for localStorage session before running (avoids reconnect on refresh)
+
+### Changed
+
+- **Menu and auth popup**: Clicking a menu item with `authRequired: false` closes the auth popup; clicking with `authRequired: true` when not authenticated shows the auth popup and prevents navigation
+- **Account page**: Profile card only when `profile.id` is set; otherwise show "Connect Spotify". Removed Country and Subscription from Profile Details (not in API). Error messages only in popups, not on page
+- **Spotify user schema**: Support paginated camelCase API response (`results[0]`) via `SpotifyUserFromApiResponseSchema`; removed `country` and `product` from type and UI (not in response)
+- **Invalid input errors**: Use InternalErrorPopup with dedicated code and `console.error` of error details instead of a separate InvalidInputErrorPopup
+
 ### Fixed
 
 - **Player**: Disabled **Next** button when no next track in track list
 - **Account**: Fixed Spotify endpoint path to use 'users' instead of 'user'
 - **Spotify**: Streamlined account page by integrating useSpotifyUser hook and improving loading/error handling
+- **Session on refresh**: Spotify user query runs only after session is restored from localStorage so users no longer need to reconnect on every page refresh
 
 ## [1.0.0] - 2025-02-12
 
