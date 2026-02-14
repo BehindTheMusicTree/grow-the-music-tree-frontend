@@ -29,6 +29,7 @@ import {
   BadRequestError,
   ClientError,
   ServiceError,
+  InvalidInputError,
 } from "@app-types/app-errors/app-error";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
@@ -85,8 +86,9 @@ export default function AppContent({ children }: { children: ReactNode }) {
       }
     } else if (
       currentConnectivityErrorRef.current == null ||
-      (![NetworkError, BackendError, ClientError, ServiceError].includes(currentConnectivityErrorRef.current) &&
-        !(connectivityError instanceof currentConnectivityErrorRef.current))
+      (![NetworkError, BackendError, ClientError, ServiceError, InvalidInputError].includes(
+        currentConnectivityErrorRef.current,
+      ) && !(connectivityError instanceof currentConnectivityErrorRef.current))
     ) {
       let popup: ReactNode | null = null;
       const error = connectivityError as ConnectivityError;
@@ -95,6 +97,9 @@ export default function AppContent({ children }: { children: ReactNode }) {
         (error instanceof BackendError && error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED)
       ) {
         popup = <SpotifyAuthPopup handleSpotifyOAuth={handleSpotifyOAuth} />;
+      } else if (error instanceof InvalidInputError) {
+        console.error("[InvalidInputError]", error.code, error.json);
+        popup = <InternalErrorPopup errorCode={error.code} />;
       } else if (error instanceof BadRequestError || error instanceof BackendError || error instanceof ServiceError) {
         popup = <InternalErrorPopup errorCode={error.code} />;
       } else if (error instanceof NetworkError) {
