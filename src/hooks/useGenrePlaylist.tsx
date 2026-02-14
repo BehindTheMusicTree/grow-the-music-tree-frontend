@@ -1,7 +1,10 @@
 "use client";
 
+import { z } from "zod";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
+import { parseWithLog } from "@lib/parse-with-log";
+import { useQueryWithParse } from "@hooks/useQueryWithParse";
 
 import { CriteriaPlaylistSimpleSchema } from "@domain/playlist/criteria-playlist/simple";
 import { CriteriaPlaylistDetailedSchema, CriteriaPlaylistDetailed } from "@domain/playlist/criteria-playlist/detailed";
@@ -16,17 +19,11 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
 
-  const query = useQuery({
+  const query = useQueryWithParse({
     queryKey: playlistQueryKeys.me.list(page),
-    queryFn: async () => {
-      const response = await fetch(playlistEndpoints.me.list(), true, true, {}, { page, pageSize });
-      const parseResult = PaginatedResponseSchema(CriteriaPlaylistSimpleSchema).safeParse(response);
-      if (!parseResult.success) {
-        console.error("Parsing failed:", parseResult.error);
-        throw parseResult.error;
-      }
-      return parseResult.data;
-    },
+    queryFn: () => fetch(playlistEndpoints.me.list(), true, true, {}, { page, pageSize }),
+    schema: PaginatedResponseSchema(CriteriaPlaylistSimpleSchema),
+    context: "useListGenrePlaylists",
   });
 
   const invalidateGenrePlaylists = () => {
@@ -44,23 +41,18 @@ export const useListFullGenrePlaylists = (scope: Scope) => {
   const { fetch } = useFetchWrapper();
   const queryKey = scope === "reference" ? playlistQueryKeys.reference.full : playlistQueryKeys.me.full;
 
-  const query = useQuery({
+  const query = useQueryWithParse({
     queryKey,
-    queryFn: async () => {
-      const response = await fetch(
+    queryFn: () =>
+      fetch(
         scope === "reference" ? playlistEndpoints.reference.list() : playlistEndpoints.me.list(),
         true,
         scope === "me",
         {},
         { page: 1, pageSize: FULL_LIST_PAGE_SIZE },
-      );
-      const parseResult = PaginatedResponseSchema(CriteriaPlaylistSimpleSchema).safeParse(response);
-      if (!parseResult.success) {
-        console.error("Parsing failed:", parseResult.error);
-        throw parseResult.error;
-      }
-      return parseResult.data;
-    },
+      ),
+    schema: PaginatedResponseSchema(CriteriaPlaylistSimpleSchema),
+    context: "useListFullGenrePlaylists",
   });
 
   const invalidateFullGenrePlaylists = () => {
@@ -73,14 +65,13 @@ export const useListFullGenrePlaylists = (scope: Scope) => {
   };
 };
 
-export const useRetrieveGenrePlaylist = (uuid: string) => {
+export const useFetchGenrePlaylist = (uuid: string) => {
   const { fetch } = useFetchWrapper();
-  return useQuery<CriteriaPlaylistDetailed>({
+  return useQueryWithParse<CriteriaPlaylistDetailed>({
     queryKey: playlistQueryKeys.me.detail(uuid),
-    queryFn: async () => {
-      const response = await fetch(playlistEndpoints.me.detail(uuid), true, true);
-      return CriteriaPlaylistDetailedSchema.parse(response);
-    },
+    queryFn: () => fetch(playlistEndpoints.me.detail(uuid)),
+    schema: CriteriaPlaylistDetailedSchema as z.ZodType<CriteriaPlaylistDetailed>,
+    context: "useFetchGenrePlaylist",
   });
 };
 
@@ -92,7 +83,11 @@ export const useFetchGenrePlaylistDetailed = (scope: Scope) => {
       const endpoint =
         scope === "reference" ? playlistEndpoints.reference.detail(uuid) : playlistEndpoints.me.detail(uuid);
       const response = await fetch(endpoint, true, scope === "me");
-      return CriteriaPlaylistDetailedSchema.parse(response);
+      return parseWithLog(
+        CriteriaPlaylistDetailedSchema,
+        response,
+        "useFetchGenrePlaylistDetailed",
+      ) as CriteriaPlaylistDetailed;
     },
   });
 };

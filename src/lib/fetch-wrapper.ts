@@ -43,9 +43,8 @@ export const fetchWrapper = async <T>(
       throw appError;
     }
 
-    // Return binary data or JSON based on expectBinary flag
     if (expectBinary) {
-      return result.arrayBuffer() as T;
+      return (await result.arrayBuffer()) as T;
     } else {
       return result.json();
     }

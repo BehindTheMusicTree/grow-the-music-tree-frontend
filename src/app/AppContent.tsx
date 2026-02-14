@@ -7,7 +7,6 @@ import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
-import { useTrackList } from "@contexts/TrackListContext";
 import { initSentry } from "@lib/sentry";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
@@ -30,13 +29,14 @@ import {
   BadRequestError,
   ClientError,
   ServiceError,
+  InvalidInputError,
 } from "@app-types/app-errors/app-error";
+import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
 export default function AppContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { playerUploadedTrackObject } = usePlayer();
   const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
-  const { trackList } = useTrackList();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, clearConnectivityError } = useConnectivityError();
   const { handleSpotifyOAuth, authToBackendFromSpotifyCode } = useSpotifyAuth();
@@ -44,9 +44,6 @@ export default function AppContent({ children }: { children: ReactNode }) {
   const spotifyAuthHandledRef = useRef(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      console.log("[AppContent] mounted on route", window.location.pathname);
-    }
     initSentry();
   }, []);
 
@@ -57,51 +54,27 @@ export default function AppContent({ children }: { children: ReactNode }) {
 
     spotifyAuthHandledRef.current = true;
 
-    console.log("[SpotifyCallback][AppContent] handling callback");
-
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     const errorParam = params.get("error");
 
     (async () => {
       if (errorParam) {
-        console.log("[SpotifyCallback][AppContent] error param present", errorParam);
         return;
       }
 
       if (!code) {
-        console.log("[SpotifyCallback][AppContent] no code in URL");
         return;
       }
 
       try {
-        console.log("[SpotifyCallback][AppContent] calling authToBackendFromSpotifyCode");
         const redirectUrl = await authToBackendFromSpotifyCode(code);
-        console.log("[SpotifyCallback][AppContent] authToBackendFromSpotifyCode returned", redirectUrl);
         if (redirectUrl) {
-          console.log("[SpotifyCallback][AppContent] redirecting to", redirectUrl);
           router.push(redirectUrl);
         }
-      } catch (e) {
-        console.error("[SpotifyCallback][AppContent] error during auth", e);
-      }
-    })().catch((e) => {
-      console.error("[SpotifyCallback][AppContent] unhandled error", e);
-    });
+      } catch (e) {}
+    })().catch((e) => {});
   }, [authToBackendFromSpotifyCode, router]);
-
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const anchor = target.closest("a[href]");
-      if (!anchor) return;
-      const href = (anchor as HTMLAnchorElement).getAttribute("href");
-      if (!href || href.startsWith("http") || href.startsWith("#")) return;
-      clearConnectivityError();
-    };
-    document.addEventListener("click", handleClick, true);
-    return () => document.removeEventListener("click", handleClick, true);
-  }, [clearConnectivityError]);
 
   useEffect(() => {}, [playerUploadedTrackObject]);
 
@@ -113,13 +86,20 @@ export default function AppContent({ children }: { children: ReactNode }) {
       }
     } else if (
       currentConnectivityErrorRef.current == null ||
-      (![NetworkError, BackendError, ClientError, ServiceError].includes(currentConnectivityErrorRef.current) &&
-        !(connectivityError instanceof currentConnectivityErrorRef.current))
+      (![NetworkError, BackendError, ClientError, ServiceError, InvalidInputError].includes(
+        currentConnectivityErrorRef.current,
+      ) && !(connectivityError instanceof currentConnectivityErrorRef.current))
     ) {
       let popup: ReactNode | null = null;
       const error = connectivityError as ConnectivityError;
-      if (error instanceof AuthRequired) {
+      if (
+        error instanceof AuthRequired ||
+        (error instanceof BackendError && error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED)
+      ) {
         popup = <SpotifyAuthPopup handleSpotifyOAuth={handleSpotifyOAuth} />;
+      } else if (error instanceof InvalidInputError) {
+        console.error("[InvalidInputError]", error.code, error.json);
+        popup = <InternalErrorPopup errorCode={error.code} />;
       } else if (error instanceof BadRequestError || error instanceof BackendError || error instanceof ServiceError) {
         popup = <InternalErrorPopup errorCode={error.code} />;
       } else if (error instanceof NetworkError) {
@@ -156,18 +136,12 @@ export default function AppContent({ children }: { children: ReactNode }) {
       >
         <Menu className="menu left-0 z-40" />
         <div className="relative flex-grow w-full flex">
-          <div
-            className="flex-grow w-full flex"
-            style={activePopup ? { filter: "blur(4px)" } : undefined}
-          >
+          <div className="flex-grow w-full flex" style={activePopup ? { filter: "blur(4px)" } : undefined}>
             <main className="flex-grow w-full mx-8">{children}</main>
             {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
           </div>
           {activePopup && (
-            <div
-              className="absolute top-0 right-0 bottom-0 left-0 z-40 pointer-events-none bg-black/10"
-              aria-hidden
-            />
+            <div className="absolute top-0 right-0 bottom-0 left-0 z-40 pointer-events-none bg-black/10" aria-hidden />
           )}
         </div>
       </div>
@@ -177,9 +151,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
           <div style={activePopup ? { filter: "blur(4px)" } : undefined}>
             <Player className="relative z-0" />
           </div>
-          {activePopup && (
-            <div className="absolute inset-0 z-10 pointer-events-none bg-black/10" aria-hidden />
-          )}
+          {activePopup && <div className="absolute inset-0 z-10 pointer-events-none bg-black/10" aria-hidden />}
         </div>
       )}
       <AutoAdvance />

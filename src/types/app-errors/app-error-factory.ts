@@ -53,12 +53,43 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
     }
   } else if (result.status === 401) {
     if (isBackendError) {
+      try {
+        const body = (await result.json()) as { code?: number; details?: { code?: string } };
+        const apiCode = body?.code;
+        const detailsCode = body?.details?.code;
+        if (
+          apiCode === 1006 ||
+          detailsCode === "authentication_required" ||
+          apiCode === 1001
+        ) {
+          return createAppErrorFromErrorCode(ErrorCode.BACKEND_UNAUTHORIZED);
+        }
+      } catch {
+        // ignore parse failure, fallback below
+      }
       return createAppErrorFromErrorCode(ErrorCode.BACKEND_UNAUTHORIZED);
     } else {
       return createAppErrorFromErrorCode(ErrorCode.SERVICE_UNAUTHORIZED);
     }
   } else if (result.status === 403) {
     if (isBackendError) {
+      try {
+        const body = (await result.json()) as { code?: number; details?: { code?: string } };
+        const apiCode = body?.code;
+        const detailsCode = body?.details?.code;
+        console.log("[createAppErrorFromResult] 403 response", {
+          url: result.url,
+          body,
+          apiCode,
+          detailsCode,
+          match: apiCode === 1005 || detailsCode === "spotify_authorization_required",
+        });
+        if (apiCode === 1005 || detailsCode === "spotify_authorization_required") {
+          return createAppErrorFromErrorCode(ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED);
+        }
+      } catch (e) {
+        console.log("[createAppErrorFromResult] 403 parse failed", { url: result.url, error: e });
+      }
       return createAppErrorFromErrorCode(ErrorCode.BACKEND_FORBIDDEN);
     } else {
       return createAppErrorFromErrorCode(ErrorCode.SERVICE_FORBIDDEN);

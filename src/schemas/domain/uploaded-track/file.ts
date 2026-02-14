@@ -8,7 +8,7 @@ export const FileDetailedSchema = z.object({
   durationInSec: z.number(),
   durationStrInHourMinSec: z.string(),
   fingerprintMissingCause: z.string().nullable().optional(),
-  sizeInBytes: z.union([z.number(), z.string()]).transform((val) => (typeof val === "string" ? parseFloat(val) : val)),
+  sizeInBytes: z.number(),
   sizeInKo: z.number(),
   sizeInMo: z.number(),
   bitrateInKbps: z.number(),
