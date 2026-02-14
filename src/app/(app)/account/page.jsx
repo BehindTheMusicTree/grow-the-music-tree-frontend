@@ -50,8 +50,22 @@ export default function AccountPage() {
     );
   }
 
-  if (!profile) {
-    return null;
+  if (!profile || !profile.id) {
+    return (
+      <div className="p-8">
+        <h1 className="mb-6 text-2xl font-bold">Account</h1>
+        <div className="flex flex-col h-64 items-center justify-center gap-4">
+          <p className="text-gray-700">Connect Spotify to view your profile.</p>
+          <button
+            type="button"
+            className="rounded bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
+            onClick={handleSpotifyOAuth}
+          >
+            Connect Spotify
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -86,14 +100,6 @@ export default function AccountPage() {
             <div>
               <h3 className="mb-3 text-lg font-medium">Profile Details</h3>
               <ul className="space-y-2">
-                <li className="flex justify-between">
-                  <span className="text-gray-600">Country:</span>
-                  <span>{profile.country ?? "Not specified"}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span className="text-gray-600">Subscription:</span>
-                  <span className="capitalize">{profile.product ?? "Free"}</span>
-                </li>
                 <li className="flex justify-between">
                   <span className="text-gray-600">Followers:</span>
                   <span>{profile.followers?.total ?? 0}</span>
