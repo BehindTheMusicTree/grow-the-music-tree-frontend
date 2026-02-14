@@ -3,14 +3,14 @@
 import Image from "next/image";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
-import { useSpotifyUser } from "@hooks/useSpotifyUser";
+import { useRetrieveSpotifyUser } from "@hooks/useSpotifyUser";
+import { spotifyUserProfileUrl } from "@lib/spotify/urls";
 
 export default function AccountPage() {
   const { handleSpotifyOAuth, logout } = useSpotifyAuth();
-  const { data: profile, isLoading, isError, error } = useSpotifyUser();
-  const spotifyProfileUrl = profile?.id ? `https://open.spotify.com/user/${profile.id}` : null;
-  const spotifyRequired =
-    isError && error?.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED;
+  const { data: profile, isLoading, isError, error } = useRetrieveSpotifyUser();
+  const spotifyProfileUrl = profile?.id ? spotifyUserProfileUrl(profile.id) : null;
+  const spotifyRequired = isError && error?.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED;
 
   if (isLoading) {
     return (
@@ -42,11 +42,12 @@ export default function AccountPage() {
   }
 
   if (isError) {
+    const message = error?.code != null ? error?.message : "Failed to load profile.";
     return (
       <div className="p-8">
         <h1 className="mb-6 text-2xl font-bold">Account</h1>
         <div className="flex h-64 items-center justify-center">
-          <p className="text-red-600">{error?.message ?? "Failed to load profile."}</p>
+          <p className="text-red-600">{message}</p>
         </div>
       </div>
     );

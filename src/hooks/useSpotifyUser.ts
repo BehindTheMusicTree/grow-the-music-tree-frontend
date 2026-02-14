@@ -3,7 +3,7 @@ import { SpotifyUserDetailedSchema, SpotifyUserDetailed } from "@domain/spotify-
 import { useFetchWrapper } from "./useFetchWrapper";
 import { userEndpoints, userQueryKeys } from "../api/endpoints/user";
 
-export function useSpotifyUser() {
+export function useRetrieveSpotifyUser() {
   const { fetch } = useFetchWrapper();
 
   return useQuery<SpotifyUserDetailed>({
