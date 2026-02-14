@@ -1,3 +1,3 @@
 export const userEndpoints = {
-  spotify: () => "users/spotify/",
+  spotify: () => "me/spotify/",
 };

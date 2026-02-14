@@ -4,7 +4,6 @@ import Image from "next/image";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useRetrieveSpotifyUser } from "@hooks/useSpotifyUser";
-import { spotifyUserProfileUrl } from "@lib/spotify/urls";
 
 export default function AccountPage() {
   const { handleSpotifyOAuth, logout } = useSpotifyAuth();
