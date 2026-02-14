@@ -2,8 +2,8 @@
 
 import { useListFullGenrePlaylists } from "@hooks/useGenrePlaylist";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@components/ui/table";
-import { Skeleton } from "@components/ui/skeleton";
-import { Input } from "@components/ui/input";
+import { Skeleton } from "@components/ui/Skeleton";
+import { Input } from "@components/ui/Input";
 import { useState, useMemo, ChangeEvent } from "react";
 
 export default function GenrePlaylistsPage() {
