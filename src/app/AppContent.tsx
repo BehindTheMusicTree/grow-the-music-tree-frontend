@@ -37,7 +37,6 @@ export default function AppContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { playerUploadedTrackObject } = usePlayer();
   const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
-  const { trackList } = useTrackList();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, clearConnectivityError } = useConnectivityError();
   const { handleSpotifyOAuth, authToBackendFromSpotifyCode } = useSpotifyAuth();
