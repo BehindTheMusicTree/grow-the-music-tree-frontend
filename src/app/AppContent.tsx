@@ -75,19 +75,6 @@ export default function AppContent({ children }: { children: ReactNode }) {
     })().catch((e) => {});
   }, [authToBackendFromSpotifyCode, router]);
 
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const anchor = target.closest("a[href]");
-      if (!anchor) return;
-      const href = (anchor as HTMLAnchorElement).getAttribute("href");
-      if (!href || href.startsWith("http") || href.startsWith("#")) return;
-      clearConnectivityError();
-    };
-    document.addEventListener("click", handleClick, true);
-    return () => document.removeEventListener("click", handleClick, true);
-  }, [clearConnectivityError]);
-
   useEffect(() => {}, [playerUploadedTrackObject]);
 
   useEffect(() => {
