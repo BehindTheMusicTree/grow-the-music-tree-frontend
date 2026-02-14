@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
 import Image from "next/image";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useFetchSpotifyUser } from "@hooks/useSpotifyUser";
+import { spotifyUserProfileUrl } from "@lib/constants/routes";
 
 export default function AccountPage() {
   const { handleSpotifyOAuth, logout } = useSpotifyAuth();
   const { data: profile, isLoading, isError, error } = useFetchSpotifyUser();
-  const spotifyProfileUrl = profile?.id ? spotifyUserProfileUrl(profile.id) : null;
+  const spotifyProfileUrl = profile?.id ? spotifyUserProfileUrl(profile.id) : undefined;
   const spotifyRequired = isError && error?.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED;
 
   if (isLoading) {
@@ -41,14 +41,11 @@ export default function AccountPage() {
     );
   }
 
-  if (isError) {
-    const message = error?.code != null ? error?.message : "Failed to load profile.";
+  if (isError && !spotifyRequired) {
     return (
       <div className="p-8">
         <h1 className="mb-6 text-2xl font-bold">Account</h1>
-        <div className="flex h-64 items-center justify-center">
-          <p className="text-red-600">{message}</p>
-        </div>
+        <div className="flex h-64 items-center justify-center" />
       </div>
     );
   }
