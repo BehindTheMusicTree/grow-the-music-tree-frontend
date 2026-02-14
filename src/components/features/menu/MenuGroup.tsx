@@ -35,7 +35,7 @@ export function MenuGroup({ items, className = "" }: MenuGroupProps) {
     }
     if (item.authRequired && !isAuthenticated) {
       e.preventDefault();
-      showPopup(<SpotifyAuthPopup handleSpotifyOAuth={handleSpotifyOAuth} />);
+      showPopup(<SpotifyAuthPopup handleSpotifyOAuth={handleSpotifyOAuth} redirectAfterAuthPath={item.href} />);
     }
   };
 
