@@ -13,12 +13,8 @@ export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTI
   return useInfiniteQuery({
     queryKey: libraryQueryKeys.me.spotify.all,
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await fetch(libraryEndpoints.me.spotify.list(), false, true, {}, { page: pageParam, pageSize });
-      return parseWithLog(
-        PaginatedResponseSchema(SpotifyLibTrackSimpleSchema),
-        response,
-        "useListSpotifyLibTracks",
-      );
+      const response = await fetch(libraryEndpoints.me.spotify.list(), true, true, {}, { page: pageParam, pageSize });
+      return parseWithLog(PaginatedResponseSchema(SpotifyLibTrackSimpleSchema), response, "useListSpotifyLibTracks");
     },
     getNextPageParam: (lastPage) => {
       if (lastPage.next) {
