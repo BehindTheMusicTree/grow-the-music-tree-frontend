@@ -33,7 +33,7 @@ export function useQuickSyncSpotifyLibTracks() {
 
   return useMutation({
     mutationFn: async () => {
-      const response = await fetch(libraryEndpoints.me.spotify.syncQuick(), false, true, { method: "POST" });
+      const response = await fetch(libraryEndpoints.me.spotify.syncQuick(), true, true, { method: "POST" });
       console.log("quick sync response", response);
       return response;
     },
@@ -50,7 +50,7 @@ export function useFullSyncSpotifyLibTracks() {
 
   return useMutation({
     mutationFn: async () => {
-      const response = await fetch(libraryEndpoints.me.spotify.syncFull(), false, true, { method: "POST" });
+      const response = await fetch(libraryEndpoints.me.spotify.syncFull(), true, true, { method: "POST" });
       return response;
     },
     onSuccess: () => {
