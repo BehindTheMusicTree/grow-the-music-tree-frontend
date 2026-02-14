@@ -8,6 +8,7 @@ interface SessionContextType {
   session: Session;
   setSession: (session: Session) => void;
   clearSession: () => void;
+  sessionRestored: boolean;
 }
 
 const defaultSession: Session = {
@@ -26,6 +27,7 @@ interface SessionProviderProps {
 
 export function SessionProvider({ children }: SessionProviderProps) {
   const [session, setSessionState] = useState<Session>(defaultSession);
+  const [sessionRestored, setSessionRestored] = useState(false);
 
   useEffect(() => {
     const storedSession = localStorage.getItem(SESSION_STORAGE_KEY);
@@ -36,6 +38,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
         localStorage.removeItem(SESSION_STORAGE_KEY);
       }
     }
+    setSessionRestored(true);
   }, []);
 
   const setSession = (newSession: Session) => {
@@ -49,7 +52,11 @@ export function SessionProvider({ children }: SessionProviderProps) {
     queryClient.clear();
   };
 
-  return <SessionContext.Provider value={{ session, setSession, clearSession }}>{children}</SessionContext.Provider>;
+  return (
+    <SessionContext.Provider value={{ session, setSession, clearSession, sessionRestored }}>
+      {children}
+    </SessionContext.Provider>
+  );
 }
 
 export function useSession() {

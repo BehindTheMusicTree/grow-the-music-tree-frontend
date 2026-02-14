@@ -1,10 +1,12 @@
 import { z } from "zod";
 import { SpotifyUserFromApiResponseSchema, SpotifyUserDetailed } from "@domain/spotify-user";
+import { useSession } from "@contexts/SessionContext";
 import { useFetchWrapper } from "./useFetchWrapper";
 import { userEndpoints, userQueryKeys } from "../api/endpoints/user";
 import { useQueryWithParse } from "./useQueryWithParse";
 
 export function useFetchSpotifyUser() {
+  const { sessionRestored } = useSession();
   const { fetch } = useFetchWrapper();
 
   return useQueryWithParse<SpotifyUserDetailed>({
@@ -12,5 +14,6 @@ export function useFetchSpotifyUser() {
     queryFn: () => fetch(userEndpoints.spotify()),
     schema: SpotifyUserFromApiResponseSchema as z.ZodType<SpotifyUserDetailed>,
     context: "useFetchSpotifyUser",
+    enabled: sessionRestored,
   });
 }
