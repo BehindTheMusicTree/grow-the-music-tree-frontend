@@ -43,9 +43,14 @@ export const useFetchWrapper = () => {
     expectBinary: boolean = false,
     skipGlobalError: boolean = false,
   ) => {
-    const url = fromBackend
-      ? `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${backendEndpointOrUrl}`
-      : backendEndpointOrUrl;
+    const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_BASE_URL ?? "").replace(/\/+$/, "");
+    const endpointPath = String(backendEndpointOrUrl);
+    if (fromBackend && endpointPath.startsWith("/")) {
+      throw new Error(
+        `Endpoint path must be relative (no leading slash). Got: "${endpointPath}". See src/api/endpoints/README.md.`,
+      );
+    }
+    const url = fromBackend ? (endpointPath ? `${baseUrl}/${endpointPath}` : baseUrl) : backendEndpointOrUrl;
     return rawFetch<T>(
       url,
       requiresAuth,
