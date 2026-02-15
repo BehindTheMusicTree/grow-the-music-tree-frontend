@@ -2,6 +2,8 @@
 
 This document describes how application versioning is handled in CI/CD workflows.
 
+**When to bump MAJOR, MINOR, or PATCH:** See [Semantic Versioning Guide](SEMVER_GUIDE.md) for how SemVer applies to this Next.js application.
+
 ## Table of Contents
 
 - [Overview](#overview)

@@ -103,7 +103,7 @@ When a version tag is pushed:
 - **Creating workflows**: Always extract version from git tags, never use hardcoded versions or GitHub variables
 - **Updating workflows**: Ensure version extraction logic matches the pattern above
 - **Tagging**: Follow the naming conventions for development, pre-release, and release tags
-- **Documentation**: Reference `docs/VERSIONING.md` for detailed versioning strategy
+- **Documentation**: Reference `docs/VERSIONING.md` for tag/CI strategy; reference `docs/SEMVER_GUIDE.md` for when to bump MAJOR, MINOR, or PATCH
 
 ## Examples
 
