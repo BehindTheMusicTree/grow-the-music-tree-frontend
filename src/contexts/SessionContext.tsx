@@ -18,7 +18,7 @@ const defaultSession: Session = {
   expiresAt: null,
 };
 
-const SESSION_STORAGE_KEY = "session";
+const SESSION_STORAGE_KEY = "session"; // Persists session across refresh (localStorage)
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
@@ -34,7 +34,11 @@ export function SessionProvider({ children }: SessionProviderProps) {
     const storedSession = localStorage.getItem(SESSION_STORAGE_KEY);
     if (storedSession) {
       try {
-        setSessionState(JSON.parse(storedSession));
+        const parsed = JSON.parse(storedSession);
+        setSessionState(parsed);
+        if (parsed?.accessToken) {
+          queryClient.invalidateQueries();
+        }
       } catch {
         localStorage.removeItem(SESSION_STORAGE_KEY);
       }

@@ -3,15 +3,17 @@
 import Image from "next/image";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
+import { useLogout } from "@hooks/useLogout";
 import { useSession } from "@contexts/SessionContext";
 import { useFetchSpotifyUser } from "@hooks/useSpotifyUser";
 import { spotifyUserProfileUrl } from "@lib/constants/routes";
 
 export default function AccountPage() {
   const { session } = useSession();
-  const { handleSpotifyOAuth, logout } = useSpotifyAuth();
+  const { handleSpotifyOAuth } = useSpotifyAuth();
   const { handleGoogleOAuth } = useGoogleAuth();
-  const { data: profile, isLoading } = useFetchSpotifyUser();
+  const { logout } = useLogout();
+  const { data: profile, isLoading } = useFetchSpotifyUser({ skipGlobalError: true });
   const spotifyProfileUrl = profile?.id ? spotifyUserProfileUrl(profile.id) : undefined;
   const hasSession = Boolean(session?.accessToken);
   const hasSpotifyProfile = Boolean(profile?.id);

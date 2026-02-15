@@ -47,8 +47,14 @@ export default function SpotifyOAuthCallbackPage() {
           router.push(redirectUrl);
         }
       } catch (err) {
-        if (err instanceof BackendError && err.code === ErrorCode.BACKEND_AUTH_ERROR) {
-          setError(new Error("Failed to authenticate with the backend server. Please try again later."));
+        if (err instanceof BackendError) {
+          if (err.code === ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST) {
+            setError(new Error(err.message));
+          } else if (err.code === ErrorCode.BACKEND_AUTH_ERROR) {
+            setError(new Error("Failed to authenticate with the backend server. Please try again later."));
+          } else {
+            setError(new Error(err.message));
+          }
         } else {
           setError(new Error("An unexpected error occurred. Please try again later."));
         }
@@ -56,6 +62,8 @@ export default function SpotifyOAuthCallbackPage() {
         setIsPending(false);
       }
     };
+
+    handleAuth();
   }, [authToBackendFromSpotifyCode, router]);
 
   if (isPending) {

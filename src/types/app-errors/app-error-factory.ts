@@ -66,6 +66,33 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
             body.details?.message,
           );
         }
+        if (detailsCode === "spotify_user_not_in_allowlist") {
+          return new BackendError(
+            ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
+            body.details?.message,
+          );
+        }
+        if (detailsCode === "spotify_authentication_error") {
+          return new BackendError(
+            ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR,
+            body.details?.message,
+          );
+        }
+        if (detailsCode === "google_authentication_error") {
+          return new BackendError(
+            ErrorCode.BACKEND_GOOGLE_AUTHENTICATION_ERROR,
+            body.details?.message,
+          );
+        }
+        if (
+          detailsCode === "google_oauth_redirect_uri_mismatch" ||
+          detailsCode === "google_oauth_invalid_client"
+        ) {
+          return new BackendError(
+            ErrorCode.BACKEND_GOOGLE_OAUTH_MISCONFIGURED,
+            body.details?.message,
+          );
+        }
         if (
           apiCode === 1006 ||
           detailsCode === "authentication_required" ||

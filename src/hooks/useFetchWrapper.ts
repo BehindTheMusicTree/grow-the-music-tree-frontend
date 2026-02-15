@@ -11,13 +11,20 @@ import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
 export const useFetchWrapper = () => {
   const { setConnectivityError } = useConnectivityError();
-  const { clearSession, session } = useSession();
+  const { clearSession, session, sessionRestored } = useSession();
 
   const handleError = (error: Error) => {
     if (error instanceof ConnectivityError) {
+      const authDetailErrors = [
+        ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED,
+        ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
+        ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR,
+        ErrorCode.BACKEND_GOOGLE_AUTHENTICATION_ERROR,
+        ErrorCode.BACKEND_GOOGLE_OAUTH_MISCONFIGURED,
+      ];
       if (
         error instanceof BackendError &&
-        error.code === ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED
+        authDetailErrors.includes(error.code)
       ) {
         throw error;
       }
@@ -37,6 +44,7 @@ export const useFetchWrapper = () => {
   };
 
   const handleMissingRequiredSession = () => {
+    if (!sessionRestored) return;
     setConnectivityError(createAppErrorFromErrorCode(ErrorCode.SESSION_REQUIRED));
   };
 
