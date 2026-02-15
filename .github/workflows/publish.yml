@@ -38,6 +38,7 @@ jobs:
   check-required-vars:
     name: Check Required Variables and Secrets
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     environment:
       name: TEST
     steps:
@@ -65,7 +66,7 @@ jobs:
             VAR_SPOTIFY_REDIRECT_URI "${{ env.SPOTIFY_REDIRECT_URI }}" \
             VAR_SPOTIFY_SCOPES "${{ env.SPOTIFY_SCOPES }}" \
             VAR_GOOGLE_REDIRECT_URI "${{ env.GOOGLE_REDIRECT_URI }}" \
-            SECRET_GOOGLE_CLIENT_ID_PROD: ${{ secrets.GOOGLE_CLIENT_ID_PROD }}
+            SECRET_GOOGLE_CLIENT_ID "${{ env.GOOGLE_CLIENT_ID_PROD }}" \
             SECRET_SERVER_DEPLOY_USERNAME "${{ env.SERVER_DEPLOY_USERNAME }}" \
             SECRET_SERVER_DEPLOY_SSH_PRIVATE_KEY "${{ env.SERVER_DEPLOY_SSH_PRIVATE_KEY }}" \
             SECRET_DOCKERHUB_ACCESS_TOKEN "${{ env.DOCKERHUB_ACCESS_TOKEN }}"
