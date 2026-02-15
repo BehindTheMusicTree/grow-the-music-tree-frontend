@@ -5,6 +5,10 @@ import { useCallback } from "react";
 import { useSession } from "@contexts/SessionContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
+import {
+  BackendSpotifyUserNotAllowlistedError,
+  BackendError,
+} from "@app-types/app-errors/app-error";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { createAppErrorFromErrorCode } from "@app-types/app-errors/app-error-factory";
 
@@ -82,6 +86,13 @@ export function useSpotifyAuth() {
         }
         return "/";
       } catch (e) {
+        if (
+          e instanceof BackendSpotifyUserNotAllowlistedError ||
+          (e instanceof BackendError &&
+            e.code === ErrorCode.BACKEND_SPOTIFY_USER_NOT_ALLOWLISTED)
+        ) {
+          throw e;
+        }
         console.log("authToBackendFromSpotifyCode error", e);
         setCreateBackendAuthConnectivityError();
         return null;

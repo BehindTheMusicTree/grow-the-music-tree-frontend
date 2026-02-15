@@ -4,7 +4,11 @@ import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
-import { BackendError } from "@app-types/app-errors/app-error";
+import {
+  BackendError,
+  BackendSpotifyUserNotAllowlistedError,
+} from "@app-types/app-errors/app-error";
+import SpotifyAllowlistPopup from "@components/ui/popup/child/SpotifyAllowlistPopup";
 
 function getParamsFromUrl() {
   if (typeof window === "undefined") return { code: null, errorParam: null };
@@ -20,6 +24,7 @@ export default function SpotifyOAuthCallbackPage() {
   const { authToBackendFromSpotifyCode } = useSpotifyAuth();
   const [isPending, setIsPending] = useState(true);
   const [error, setError] = useState(null);
+  const [allowlistError, setAllowlistError] = useState(null);
   const authAttempted = useRef(false);
 
   useEffect(() => {
@@ -47,7 +52,17 @@ export default function SpotifyOAuthCallbackPage() {
           router.push(redirectUrl);
         }
       } catch (err) {
-        if (err instanceof BackendError && err.code === ErrorCode.BACKEND_AUTH_ERROR) {
+        if (
+          err instanceof BackendSpotifyUserNotAllowlistedError ||
+          (err instanceof BackendError &&
+            err.code === ErrorCode.BACKEND_SPOTIFY_USER_NOT_ALLOWLISTED)
+        ) {
+          setAllowlistError(
+            err instanceof BackendSpotifyUserNotAllowlistedError
+              ? err.detailsMessage
+              : "",
+          );
+        } else if (err instanceof BackendError && err.code === ErrorCode.BACKEND_AUTH_ERROR) {
           setError(new Error("Failed to authenticate with the backend server. Please try again later."));
         } else {
           setError(new Error("An unexpected error occurred. Please try again later."));
@@ -56,6 +71,7 @@ export default function SpotifyOAuthCallbackPage() {
         setIsPending(false);
       }
     };
+    handleAuth();
   }, [authToBackendFromSpotifyCode, router]);
 
   if (isPending) {
@@ -66,6 +82,15 @@ export default function SpotifyOAuthCallbackPage() {
           <p className="text-gray-600">Please wait while we complete the authentication process.</p>
         </div>
       </div>
+    );
+  }
+
+  if (allowlistError !== null) {
+    return (
+      <SpotifyAllowlistPopup
+        backendMessage={allowlistError}
+        onClose={() => router.push("/")}
+      />
     );
   }
 

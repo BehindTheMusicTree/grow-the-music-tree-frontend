@@ -3,6 +3,7 @@ import {
   AppError,
   NetworkError,
   BackendError,
+  BackendSpotifyUserNotAllowlistedError,
   AuthRequired,
   ClientError,
   ServiceError,
@@ -54,9 +55,21 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
   } else if (result.status === 401) {
     if (isBackendError) {
       try {
-        const body = (await result.json()) as { code?: number; details?: { code?: string } };
+        const body = (await result.json()) as {
+          code?: number;
+          details?: { code?: string; message?: string };
+          message?: string;
+        };
         const apiCode = body?.code;
         const detailsCode = body?.details?.code;
+        if (apiCode === 1007 || detailsCode === "spotify_user_not_allowlisted") {
+          const detailsMessage =
+            body?.details?.message ?? body?.message ?? "";
+          return new BackendSpotifyUserNotAllowlistedError(
+            ErrorCode.BACKEND_SPOTIFY_USER_NOT_ALLOWLISTED,
+            detailsMessage,
+          );
+        }
         if (
           apiCode === 1006 ||
           detailsCode === "authentication_required" ||

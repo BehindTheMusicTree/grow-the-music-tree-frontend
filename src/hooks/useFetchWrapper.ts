@@ -18,13 +18,14 @@ export const useFetchWrapper = () => {
       if (error instanceof AuthRequired) {
         clearSession();
       }
-      setConnectivityError(error);
       if (
         error instanceof BackendError &&
-        error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED
+        (error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED ||
+          error.code === ErrorCode.BACKEND_SPOTIFY_USER_NOT_ALLOWLISTED)
       ) {
         throw error;
       }
+      setConnectivityError(error);
     } else {
       throw error;
     }

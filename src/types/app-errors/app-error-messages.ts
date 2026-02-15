@@ -22,6 +22,7 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCode.BACKEND_UNAUTHORIZED]: "Unauthorized",
   [ErrorCode.BACKEND_FORBIDDEN]: "Forbidden",
   [ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED]: "Connect Spotify to continue",
+  [ErrorCode.BACKEND_SPOTIFY_USER_NOT_ALLOWLISTED]: "Spotify account not in allowlist",
   [ErrorCode.BACKEND_NOT_FOUND]: "Not found",
   [ErrorCode.BACKEND_METHOD_NOT_ALLOWED]: "Method not allowed",
   [ErrorCode.BACKEND_REQUEST_TIMEOUT]: "Request timeout",
