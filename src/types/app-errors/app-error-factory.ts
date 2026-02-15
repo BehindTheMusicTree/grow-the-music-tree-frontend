@@ -70,6 +70,9 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
             detailsMessage,
           );
         }
+        if (apiCode === 1008 || detailsCode === "spotify_code_expired_or_used") {
+          return createAppErrorFromErrorCode(ErrorCode.BACKEND_SPOTIFY_CODE_EXPIRED_OR_USED);
+        }
         if (
           apiCode === 1006 ||
           detailsCode === "authentication_required" ||

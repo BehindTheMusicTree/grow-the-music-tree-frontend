@@ -22,7 +22,8 @@ export const useFetchWrapper = () => {
       if (
         error instanceof BackendError &&
         (error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED ||
-          error.code === ErrorCode.BACKEND_SPOTIFY_USER_NOT_ALLOWLISTED)
+          error.code === ErrorCode.BACKEND_SPOTIFY_USER_NOT_ALLOWLISTED ||
+          error.code === ErrorCode.BACKEND_SPOTIFY_CODE_EXPIRED_OR_USED)
       ) {
         throw error;
       }

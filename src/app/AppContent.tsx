@@ -62,7 +62,9 @@ export default function AppContent({ children }: { children: ReactNode }) {
       const error = connectivityError as ConnectivityError;
       if (
         error instanceof AuthRequired ||
-        (error instanceof BackendError && error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED)
+        (error instanceof BackendError &&
+          (error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED ||
+            error.code === ErrorCode.BACKEND_SPOTIFY_CODE_EXPIRED_OR_USED))
       ) {
         popup = <SpotifyAuthPopup handleSpotifyOAuth={handleSpotifyOAuth} />;
       } else if (error instanceof InvalidInputError) {

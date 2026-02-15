@@ -65,6 +65,11 @@ export default function SpotifyOAuthCallbackPage() {
               ? err.detailsMessage
               : "",
           );
+        } else if (
+          err instanceof BackendError &&
+          err.code === ErrorCode.BACKEND_SPOTIFY_CODE_EXPIRED_OR_USED
+        ) {
+          router.push("/");
         } else if (err instanceof BackendError && err.code === ErrorCode.BACKEND_AUTH_ERROR) {
           setError(new Error("Failed to authenticate with the backend server. Please try again later."));
         } else {

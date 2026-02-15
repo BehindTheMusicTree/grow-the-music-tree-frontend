@@ -93,6 +93,13 @@ export function useSpotifyAuth() {
         ) {
           throw e;
         }
+        if (
+          e instanceof BackendError &&
+          e.code === ErrorCode.BACKEND_SPOTIFY_CODE_EXPIRED_OR_USED
+        ) {
+          setConnectivityError(e);
+          throw e;
+        }
         console.log("authToBackendFromSpotifyCode error", e);
         setCreateBackendAuthConnectivityError();
         return null;
