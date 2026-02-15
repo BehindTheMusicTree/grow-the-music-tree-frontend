@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, ReactNode } from "react";
-import { useRouter } from "next/navigation";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
@@ -34,47 +33,16 @@ import {
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
 export default function AppContent({ children }: { children: ReactNode }) {
-  const router = useRouter();
   const { playerUploadedTrackObject } = usePlayer();
   const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, clearConnectivityError } = useConnectivityError();
-  const { handleSpotifyOAuth, authToBackendFromSpotifyCode } = useSpotifyAuth();
+  const { handleSpotifyOAuth } = useSpotifyAuth();
   const currentConnectivityErrorRef = useRef<typeof ConnectivityError | null>(null);
-  const spotifyAuthHandledRef = useRef(false);
 
   useEffect(() => {
     initSentry();
   }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (spotifyAuthHandledRef.current) return;
-    if (!window.location.pathname.startsWith("/auth/spotify/callback")) return;
-
-    spotifyAuthHandledRef.current = true;
-
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    const errorParam = params.get("error");
-
-    (async () => {
-      if (errorParam) {
-        return;
-      }
-
-      if (!code) {
-        return;
-      }
-
-      try {
-        const redirectUrl = await authToBackendFromSpotifyCode(code);
-        if (redirectUrl) {
-          router.push(redirectUrl);
-        }
-      } catch (e) {}
-    })().catch((e) => {});
-  }, [authToBackendFromSpotifyCode, router]);
 
   useEffect(() => {}, [playerUploadedTrackObject]);
 
