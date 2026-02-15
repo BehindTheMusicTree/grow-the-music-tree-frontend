@@ -12,7 +12,7 @@ export interface BasePopupProps {
   title: string;
   children: ReactNode;
   onClose?: () => void;
-  type?: "default" | "success" | "error" | "warning" | "info" | "spotify";
+  type?: "default" | "success" | "error" | "warning" | "info" | "spotify" | "auth";
   icon?: LucideIcon;
   isDismissable?: boolean;
   className?: string;
@@ -56,6 +56,12 @@ export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> ex
       warning: "w-full max-w-lg",
       info: "w-full max-w-lg",
       spotify: "w-full max-w-md",
+      auth: "w-full max-w-md",
+    };
+
+    const contentBgClasses: Record<string, string> = {
+      spotify: "bg-green-500",
+      auth: "bg-gray-800",
     };
 
     const renderButtons = () => {
@@ -94,7 +100,7 @@ export class BasePopup<P extends BasePopupProps = BasePopupProps, S = object> ex
       >
         <div className={`${baseClasses} ${typeClasses[type]} ${className || ""}`} onClick={(e) => e.stopPropagation()}>
           <PopupTitle title={title} onClose={onClose ?? (() => {})} isDismissable={isDismissable} icon={icon} />
-          <div className={`popup-content p-4 rounded-b-lg ${type === "spotify" ? "bg-green-500" : ""}`}>
+          <div className={`popup-content rounded-b-lg p-4 ${contentBgClasses[type] ?? ""}`}>
             {children}
             {renderButtons()}
           </div>

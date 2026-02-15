@@ -3,7 +3,11 @@
 import { PiGraphLight } from "react-icons/pi";
 import { FaSpotify, FaCloudUploadAlt, FaUser, FaList } from "react-icons/fa";
 import { MenuGroup } from "./MenuGroup";
-import { MENU_WIDTH, PRIVATE_MENU_ITEM_BG_COLOR } from "@lib/constants/layout";
+import {
+  MENU_WIDTH,
+  PRIVATE_MENU_ITEM_BG_COLOR,
+  SPOTIFY_MENU_ITEM_BG_COLOR,
+} from "@lib/constants/layout";
 
 const menuGroup = [
   {
@@ -16,31 +20,31 @@ const menuGroup = [
     href: "/me-genre-tree",
     label: "My Genre Tree",
     icon: <PiGraphLight className="text-xl" />,
-    authRequired: true,
+    authRequired: "any",
   },
   {
     href: "/me-genre-playlists",
     label: "My Genre Playlists",
     icon: <FaList className="text-xl" />,
-    authRequired: true,
+    authRequired: "any",
   },
   {
     href: "/me-uploaded-library",
     label: "My Uploaded Library",
     icon: <FaCloudUploadAlt className="text-xl" />,
-    authRequired: true,
+    authRequired: "any",
   },
   {
     href: "/me-spotify-library",
     label: "My Spotify Library",
     icon: <FaSpotify className="text-xl" />,
-    authRequired: true,
+    authRequired: "spotify",
   },
   {
     href: "/account",
     label: "Account",
     icon: <FaUser className="text-xl" />,
-    authRequired: true,
+    authRequired: "any",
   },
 ];
 
@@ -53,6 +57,7 @@ export default function Menu({ className }: { className?: string }) {
         minWidth: MENU_WIDTH,
         maxWidth: MENU_WIDTH,
         ["--private-menu-item-bg" as string]: PRIVATE_MENU_ITEM_BG_COLOR,
+        ["--spotify-menu-item-bg" as string]: SPOTIFY_MENU_ITEM_BG_COLOR,
       }}
     >
       <MenuGroup items={menuGroup} />

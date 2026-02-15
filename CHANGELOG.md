@@ -76,6 +76,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Google sign-in**: Google OAuth 2.0 flow alongside Spotify. Auth popup and account page offer "Sign in with Google". Requires `NEXT_PUBLIC_GOOGLE_CLIENT_ID` and `NEXT_PUBLIC_GOOGLE_REDIRECT_URI`. Backend must expose `POST auth/google/` accepting `{ code }` and returning `{ accessToken, refreshToken, expiresAt }`.
+
 ## [1.1.0] - 2025-02-15
 
 ### Added

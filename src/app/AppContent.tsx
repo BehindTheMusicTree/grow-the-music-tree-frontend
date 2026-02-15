@@ -3,6 +3,7 @@
 import { useEffect, useRef, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
+import { useGoogleAuth } from "@hooks/useGoogleAuth";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
@@ -18,7 +19,7 @@ import AutoAdvance from "@components/features/player/AutoAdvance";
 import TrackListSidebar from "@components/features/track-list-sidebar/TrackListSidebar";
 
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
-import SpotifyAuthPopup from "@components/ui/popup/child/SpotifyAuthPopup";
+import AuthPopup from "@components/ui/popup/child/AuthPopup";
 
 import { BANNER_HEIGHT, PLAYER_HEIGHT } from "@constants/layout";
 import {
@@ -40,8 +41,10 @@ export default function AppContent({ children }: { children: ReactNode }) {
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, clearConnectivityError } = useConnectivityError();
   const { handleSpotifyOAuth, authToBackendFromSpotifyCode } = useSpotifyAuth();
+  const { handleGoogleOAuth, authToBackendFromGoogleCode } = useGoogleAuth();
   const currentConnectivityErrorRef = useRef<typeof ConnectivityError | null>(null);
   const spotifyAuthHandledRef = useRef(false);
+  const googleAuthHandledRef = useRef(false);
 
   useEffect(() => {
     initSentry();
@@ -73,8 +76,29 @@ export default function AppContent({ children }: { children: ReactNode }) {
           router.push(redirectUrl);
         }
       } catch (e) {}
-    })().catch((e) => {});
+    })().catch(() => {});
   }, [authToBackendFromSpotifyCode, router]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (googleAuthHandledRef.current) return;
+    if (!window.location.pathname.startsWith("/auth/google/callback")) return;
+
+    googleAuthHandledRef.current = true;
+
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const errorParam = params.get("error");
+
+    (async () => {
+      if (errorParam) return;
+      if (!code) return;
+      try {
+        const redirectUrl = await authToBackendFromGoogleCode(code);
+        if (redirectUrl) router.push(redirectUrl);
+      } catch (e) {}
+    })().catch(() => {});
+  }, [authToBackendFromGoogleCode, router]);
 
   useEffect(() => {}, [playerUploadedTrackObject]);
 
@@ -92,11 +116,18 @@ export default function AppContent({ children }: { children: ReactNode }) {
     ) {
       let popup: ReactNode | null = null;
       const error = connectivityError as ConnectivityError;
-      if (
-        error instanceof AuthRequired ||
-        (error instanceof BackendError && error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED)
+      if (error instanceof AuthRequired) {
+        popup = (
+          <AuthPopup
+            handleSpotifyOAuth={handleSpotifyOAuth}
+            handleGoogleOAuth={handleGoogleOAuth}
+          />
+        );
+      } else if (
+        error instanceof BackendError &&
+        error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED
       ) {
-        popup = <SpotifyAuthPopup handleSpotifyOAuth={handleSpotifyOAuth} />;
+        popup = <AuthPopup handleSpotifyOAuth={handleSpotifyOAuth} spotifyOnly />;
       } else if (error instanceof InvalidInputError) {
         console.error("[InvalidInputError]", error.code, error.json);
         popup = <InternalErrorPopup errorCode={error.code} />;
@@ -116,7 +147,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
 
       currentConnectivityErrorRef.current = error.constructor as typeof ConnectivityError;
     }
-  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, handleSpotifyOAuth]);
+  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, handleSpotifyOAuth, handleGoogleOAuth]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {

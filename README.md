@@ -128,9 +128,14 @@ NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize
 NEXT_PUBLIC_SPOTIFY_CLIENT_ID=your-spotify-client-id
 NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/auth/spotify/callback
 NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-collaborative user-library-read user-top-read
+
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback
 ```
 
 In the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) → your app → **Settings** → **Redirect URIs**, add the **full** callback URL(s), e.g. `http://localhost:3000/auth/spotify/callback` for local dev and your production URL for deploy. The app builds the redirect URI from your origin when you use a path like `/auth/spotify/callback`.
+
+For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials, create an OAuth 2.0 Client ID (Web application) and add the **full** redirect URI(s) under "Authorized redirect URIs", e.g. `http://localhost:3000/auth/google/callback`.
 
 **Notes:**
 

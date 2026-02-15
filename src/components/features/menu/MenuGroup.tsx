@@ -7,13 +7,14 @@ import { Play } from "lucide-react";
 import { usePopup } from "@contexts/PopupContext";
 import { useSession } from "@contexts/SessionContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
-import SpotifyAuthPopup from "@components/ui/popup/child/SpotifyAuthPopup";
+import { useGoogleAuth } from "@hooks/useGoogleAuth";
+import AuthPopup from "@components/ui/popup/child/AuthPopup";
 
 interface MenuItem {
   href: string;
   label: string;
   icon: ReactNode;
-  authRequired?: boolean;
+  authRequired?: false | "any" | "spotify";
 }
 
 interface MenuGroupProps {
@@ -26,6 +27,7 @@ export function MenuGroup({ items, className = "" }: MenuGroupProps) {
   const { showPopup, hidePopup } = usePopup();
   const { session } = useSession();
   const { handleSpotifyOAuth } = useSpotifyAuth();
+  const { handleGoogleOAuth } = useGoogleAuth();
   const isAuthenticated = Boolean(session?.accessToken);
 
   const handleItemClick = (item: MenuItem) => (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -33,9 +35,26 @@ export function MenuGroup({ items, className = "" }: MenuGroupProps) {
       hidePopup();
       return;
     }
-    if (item.authRequired && !isAuthenticated) {
+    if (item.authRequired === "spotify" && !isAuthenticated) {
       e.preventDefault();
-      showPopup(<SpotifyAuthPopup handleSpotifyOAuth={handleSpotifyOAuth} redirectAfterAuthPath={item.href} />);
+      showPopup(
+        <AuthPopup
+          handleSpotifyOAuth={handleSpotifyOAuth}
+          redirectAfterAuthPath={item.href}
+          spotifyOnly
+        />,
+      );
+      return;
+    }
+    if (item.authRequired === "any" && !isAuthenticated) {
+      e.preventDefault();
+      showPopup(
+        <AuthPopup
+          handleSpotifyOAuth={handleSpotifyOAuth}
+          handleGoogleOAuth={handleGoogleOAuth}
+          redirectAfterAuthPath={item.href}
+        />,
+      );
     }
   };
 
@@ -51,9 +70,11 @@ export function MenuGroup({ items, className = "" }: MenuGroupProps) {
             prefetch={false}
             onClick={handleItemClick(item)}
             className={`flex items-center gap-3 mx-1 mt-1 px-4 py-2 rounded-sm transition-colors duration-200 ${
-              item.authRequired
-                ? "bg-[var(--private-menu-item-bg)] text-white hover:bg-[var(--private-menu-item-bg)] hover:opacity-90"
-                : "text-gray-300 hover:text-white hover:bg-gray-800"
+              item.authRequired === "any"
+                ? "bg-[var(--private-menu-item-bg)] text-black hover:opacity-90"
+                : item.authRequired === "spotify"
+                  ? "bg-[var(--spotify-menu-item-bg)] text-white hover:opacity-90"
+                  : "text-gray-300 hover:text-white hover:bg-gray-800"
             }`}
           >
             {item.icon}
