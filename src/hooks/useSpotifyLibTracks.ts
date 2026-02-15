@@ -2,6 +2,7 @@
 
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
+import { parseWithLog } from "@lib/parse-with-log";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { SpotifyLibTrackSimpleSchema } from "@domain/spotify/spotify-lib-track";
 import { libraryEndpoints, libraryQueryKeys } from "../api/endpoints/library";
@@ -12,16 +13,8 @@ export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTI
   return useInfiniteQuery({
     queryKey: libraryQueryKeys.me.spotify.all,
     queryFn: async ({ pageParam = 1 }) => {
-      console.log("fetching spotify lib tracks", pageParam, pageSize);
-      const response = await fetch(libraryEndpoints.me.spotify.list(), false, true, {}, { page: pageParam, pageSize });
-      console.log("spotify lib tracks response", response);
-      const parseResult = PaginatedResponseSchema(SpotifyLibTrackSimpleSchema).safeParse(response);
-      if (!parseResult.success) {
-        console.error("Parsing failed:", parseResult.error);
-        throw parseResult.error;
-      }
-      console.log("paginated", parseResult.data);
-      return parseResult.data;
+      const response = await fetch(libraryEndpoints.me.spotify.list(), true, true, {}, { page: pageParam, pageSize });
+      return parseWithLog(PaginatedResponseSchema(SpotifyLibTrackSimpleSchema), response, "useListSpotifyLibTracks");
     },
     getNextPageParam: (lastPage) => {
       if (lastPage.next) {
@@ -40,7 +33,7 @@ export function useQuickSyncSpotifyLibTracks() {
 
   return useMutation({
     mutationFn: async () => {
-      const response = await fetch(libraryEndpoints.me.spotify.syncQuick(), false, true, { method: "POST" });
+      const response = await fetch(libraryEndpoints.me.spotify.syncQuick(), true, true, { method: "POST" });
       console.log("quick sync response", response);
       return response;
     },
@@ -57,7 +50,7 @@ export function useFullSyncSpotifyLibTracks() {
 
   return useMutation({
     mutationFn: async () => {
-      const response = await fetch(libraryEndpoints.me.spotify.syncFull(), false, true, { method: "POST" });
+      const response = await fetch(libraryEndpoints.me.spotify.syncFull(), true, true, { method: "POST" });
       return response;
     },
     onSuccess: () => {

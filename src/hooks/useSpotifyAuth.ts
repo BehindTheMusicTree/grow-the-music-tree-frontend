@@ -1,22 +1,19 @@
 "use client";
 
 import { useCallback } from "react";
-import { useRouter } from "next/navigation";
 
 import { useSession } from "@contexts/SessionContext";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { createAppErrorFromErrorCode } from "@app-types/app-errors/app-error-factory";
-import { LOGOUT_REDIRECT_PATH } from "@lib/constants/routes";
 
 export function useSpotifyAuth() {
-  const router = useRouter();
   const { clearSession, setSession } = useSession();
-  const { setConnectivityError } = useConnectivityError();
+  const { setConnectivityError, clearConnectivityError } = useConnectivityError();
   const { fetch } = useFetchWrapper();
 
-  const handleSpotifyOAuth = () => {
+  const handleSpotifyOAuth = (redirectAfterAuthPath?: string) => {
     if (!process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || !process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI) {
       console.error("[SpotifyAuth] Missing Spotify env vars", {
         NEXT_PUBLIC_SPOTIFY_CLIENT_ID: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
@@ -30,7 +27,10 @@ export function useSpotifyAuth() {
       ? redirectPath
       : `${window.location.origin}${redirectPath.startsWith("/") ? "" : "/"}${redirectPath}`;
 
-    localStorage.setItem("spotifyAuthRedirect", window.location.href);
+    const urlToStore = redirectAfterAuthPath
+      ? `${window.location.origin}${redirectAfterAuthPath.startsWith("/") ? "" : "/"}${redirectAfterAuthPath}`
+      : window.location.href;
+    localStorage.setItem("spotifyAuthRedirect", urlToStore);
 
     const params = new URLSearchParams({
       client_id: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID!,
@@ -91,9 +91,9 @@ export function useSpotifyAuth() {
   );
 
   const logout = useCallback(() => {
+    clearConnectivityError();
     clearSession();
-    router.push(LOGOUT_REDIRECT_PATH);
-  }, [clearSession, router]);
+  }, [clearConnectivityError, clearSession]);
 
   return {
     handleSpotifyOAuth,

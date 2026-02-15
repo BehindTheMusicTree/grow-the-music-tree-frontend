@@ -1,121 +1,142 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Image from "next/image";
+import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
+import { useFetchSpotifyUser } from "@hooks/useSpotifyUser";
+import { spotifyUserProfileUrl } from "@lib/constants/routes";
 
 export default function AccountPage() {
-  const { logout } = useSpotifyAuth();
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const { handleSpotifyOAuth, logout } = useSpotifyAuth();
+  const { data: profile, isLoading, isError, error } = useFetchSpotifyUser();
+  const spotifyProfileUrl = profile?.id ? spotifyUserProfileUrl(profile.id) : undefined;
+  const spotifyRequired = isError && error?.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED;
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      setLoading(true);
-      // This is a placeholder - implement actual profile fetching using SpotifyOAuthService
-      // const profileData = await SpotifyOAuthService.getProfile();
-      // For now, simulating profile data
-      const profileData = {
-        display_name: "Spotify User",
-        email: "user@example.com",
-        images: [{ url: "" }],
-        country: "US",
-        product: "premium",
-        followers: { total: 0 },
-        external_urls: { spotify: "https://open.spotify.com/user/example" },
-      };
-      setProfile(profileData);
-      setLoading(false);
-    };
-
-    fetchProfile();
-  }, []); // Add empty dependency array to run only once on mount
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="account-page p-8">
-        <h1 className="text-2xl font-bold mb-6">Account</h1>
-        <div className="flex justify-center items-center h-64">
+      <div className="p-8">
+        <h1 className="mb-6 text-2xl font-bold">Account</h1>
+        <div className="flex h-64 items-center justify-center">
           <p>Loading profile...</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="account-page p-8">
-      <h1 className="text-2xl font-bold mb-6">Account</h1>
+  if (spotifyRequired) {
+    return (
+      <div className="p-8">
+        <h1 className="mb-6 text-2xl font-bold">Account</h1>
+        <div className="flex flex-col h-64 items-center justify-center gap-4">
+          <p className="text-gray-700">{error?.message ?? "Connect Spotify to continue."}</p>
+          <button
+            type="button"
+            className="rounded bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
+            onClick={handleSpotifyOAuth}
+          >
+            Connect Spotify
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-      {profile && (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="bg-green-600 p-6 text-white">
-            <div className="flex items-center">
-              {profile.images?.[0]?.url ? (
-                <Image
-                  src={profile.images[0].url}
-                  alt={profile.display_name}
-                  className="w-20 h-20 rounded-full border-2 border-white mr-4"
-                />
-              ) : (
-                <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mr-4">
-                  <span className="text-2xl text-gray-500">{profile.display_name?.charAt(0) || "U"}</span>
-                </div>
-              )}
-              <div>
-                <h2 className="text-xl font-semibold">{profile.display_name}</h2>
-                <p className="text-green-100">{profile.email}</p>
+  if (isError && !spotifyRequired) {
+    return (
+      <div className="p-8">
+        <h1 className="mb-6 text-2xl font-bold">Account</h1>
+        <div className="flex h-64 items-center justify-center" />
+      </div>
+    );
+  }
+
+  if (!profile || !profile.id) {
+    return (
+      <div className="p-8">
+        <h1 className="mb-6 text-2xl font-bold">Account</h1>
+        <div className="flex flex-col h-64 items-center justify-center gap-4">
+          <p className="text-gray-700">Connect Spotify to view your profile.</p>
+          <button
+            type="button"
+            className="rounded bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
+            onClick={handleSpotifyOAuth}
+          >
+            Connect Spotify
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-8">
+      <h1 className="mb-6 text-2xl font-bold">Account</h1>
+
+      <div className="overflow-hidden rounded-lg bg-white shadow-md">
+        <div className="bg-green-600 p-6 text-white">
+          <div className="flex items-center">
+            {profile.images?.[0]?.url ? (
+              <Image
+                src={profile.images[0].url}
+                alt={profile.display_name}
+                width={80}
+                height={80}
+                className="mr-4 h-20 w-20 rounded-full border-2 border-white"
+              />
+            ) : (
+              <div className="mr-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-200">
+                <span className="text-2xl text-gray-500">{profile.display_name?.charAt(0) ?? "U"}</span>
               </div>
+            )}
+            <div>
+              <h2 className="text-xl font-semibold">{profile.display_name}</h2>
+              <p className="text-green-100">{profile.email}</p>
             </div>
           </div>
+        </div>
 
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-medium mb-3">Profile Details</h3>
-                <ul className="space-y-2">
-                  <li className="flex justify-between">
-                    <span className="text-gray-600">Country:</span>
-                    <span>{profile.country || "Not specified"}</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span className="text-gray-600">Subscription:</span>
-                    <span className="capitalize">{profile.product || "Free"}</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span className="text-gray-600">Followers:</span>
-                    <span>{profile.followers?.total || 0}</span>
-                  </li>
-                </ul>
-              </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div>
+              <h3 className="mb-3 text-lg font-medium">Profile Details</h3>
+              <ul className="space-y-2">
+                <li className="flex justify-between">
+                  <span className="text-gray-600">Followers:</span>
+                  <span>{profile.followers?.total ?? 0}</span>
+                </li>
+              </ul>
+            </div>
 
-              <div>
-                <h3 className="text-lg font-medium mb-3">Links</h3>
-                <ul className="space-y-2">
+            <div>
+              <h3 className="mb-3 text-lg font-medium">Links</h3>
+              <ul className="space-y-2">
+                {spotifyProfileUrl && (
                   <li>
                     <a
-                      href={profile.external_urls?.spotify}
+                      href={spotifyProfileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-green-600 hover:text-green-800 transition-colors"
+                      className="text-green-600 transition-colors hover:text-green-800"
                     >
                       Open in Spotify
                     </a>
                   </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="mt-8 pt-4 border-t border-gray-200">
-              <button
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-                onClick={logout}
-              >
-                Disconnect Account
-              </button>
+                )}
+              </ul>
             </div>
           </div>
+
+          <div className="mt-8 border-t border-gray-200 pt-4">
+            <button
+              type="button"
+              className="rounded bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700"
+              onClick={logout}
+            >
+              Disconnect Account
+            </button>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

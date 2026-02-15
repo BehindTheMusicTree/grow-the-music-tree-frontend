@@ -4,6 +4,7 @@ import { useCallback } from "react";
 
 import { useFetchWrapper } from "./useFetchWrapper";
 import { useInvalidateAllGenrePlaylistQueries } from "@hooks/useGenrePlaylist";
+import { parseWithLog } from "@lib/parse-with-log";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { CriteriaDetailedSchema, CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
 import { CriteriaSimpleSchema } from "@schemas/domain/criteria/response/simple";
@@ -12,17 +13,17 @@ import { CriteriaUpdateSchema } from "@schemas/domain/criteria/form/update";
 import { useValidatedMutation } from "./useValidatedMutation";
 import { genreEndpoints, genreQueryKeys } from "../api/endpoints/genres";
 import { Scope } from "@app-types/Scope";
+import { useQueryWithParse } from "./useQueryWithParse";
 
 export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50, scope: Scope) {
   const { fetch } = useFetchWrapper();
+  const endpoint = scope === "reference" ? genreEndpoints.reference.list() : genreEndpoints.me.list();
 
-  return useQuery({
+  return useQueryWithParse({
     queryKey: scope === "reference" ? genreQueryKeys.reference.list(page) : genreQueryKeys.me.list(page),
-    queryFn: async () => {
-      const endpoint = scope === "reference" ? genreEndpoints.reference.list() : genreEndpoints.me.list();
-      const response = await fetch(endpoint, true, scope === "me", {}, { page, pageSize });
-      return PaginatedResponseSchema(CriteriaSimpleSchema).parse(response);
-    },
+    queryFn: () => fetch(endpoint, true, scope === "me", {}, { page, pageSize }),
+    schema: PaginatedResponseSchema(CriteriaSimpleSchema),
+    context: "useListGenres",
   });
 }
 
@@ -33,7 +34,7 @@ export function useFetchGenre(scope: Scope) {
     async (id: string): Promise<CriteriaDetailed> => {
       const endpoint = scope === "reference" ? genreEndpoints.reference.detail(id) : genreEndpoints.me.detail(id);
       const response = await fetch(endpoint, true, scope === "me");
-      return CriteriaDetailedSchema.parse(response);
+      return parseWithLog(CriteriaDetailedSchema, response, "useFetchGenre");
     },
     [fetch, scope],
   );

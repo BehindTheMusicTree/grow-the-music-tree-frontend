@@ -309,40 +309,9 @@ We follow **strict Git Flow** with the following branch structure:
 
 ### 3. Developing
 
-#### Code Style Guidelines
+#### Code & styling guidelines
 
-- **TypeScript**: Use TypeScript for all new components and utilities
-- **React**: Follow React best practices and hooks conventions
-- **Next.js**: Leverage Next.js App Router features (Server Components, Client Components, Server Actions)
-- **Styling**: Use Tailwind CSS for styling (see `.cursor/rules/use-tailwind.mdc`)
-- **Component Structure**: Keep components focused and reusable
-- **State Management**: Use React Context for global state, React Query for server state
-- **File Organization**: Follow the existing project structure in `src/`
-
-#### Key Directories
-
-- `src/app/` - Next.js App Router pages and layouts
-- `src/components/` - Reusable React components
-  - `src/components/features/` - Feature-specific components
-  - `src/components/ui/` - Generic UI components
-- `src/contexts/` - React Context providers
-- `src/hooks/` - Custom React hooks
-- `src/lib/` - Utility functions and helpers
-- `src/schemas/` - Zod validation schemas
-- `src/models/` - TypeScript types and interfaces
-- `src/utils/` - General utility functions
-
-#### Best Practices
-
-- Write semantic, accessible HTML
-- Use TypeScript types/interfaces for props and data structures
-- Follow the existing naming conventions
-- Keep components small and focused
-- Use custom hooks to extract reusable logic
-- Implement error boundaries for error handling
-- Use React Query for API data fetching
-- Follow the Tailwind CSS class ordering convention (see `.cursor/rules/tailwind-order.mdc`)
-- Avoid useless comments (see `.cursor/rules/no-useless-comments.mdc`)
+See [docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md) for code conventions (TypeScript, React, file naming, directories) and UI styling (Tailwind, class order, common patterns).
 
 ### 4. Testing
 

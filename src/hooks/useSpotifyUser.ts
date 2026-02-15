@@ -1,16 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
-import { SpotifyUserDetailedSchema, SpotifyUserDetailed } from "@domain/spotify-user";
+import { z } from "zod";
+import { SpotifyUserFromApiResponseSchema, SpotifyUserDetailed } from "@domain/spotify-user";
+import { useSession } from "@contexts/SessionContext";
 import { useFetchWrapper } from "./useFetchWrapper";
 import { userEndpoints, userQueryKeys } from "../api/endpoints/user";
+import { useQueryWithParse } from "./useQueryWithParse";
 
-export function useSpotifyUser() {
+export function useFetchSpotifyUser() {
+  const { sessionRestored } = useSession();
   const { fetch } = useFetchWrapper();
 
-  return useQuery<SpotifyUserDetailed>({
+  return useQueryWithParse<SpotifyUserDetailed>({
     queryKey: userQueryKeys.spotify,
-    queryFn: async () => {
-      const response = await fetch(userEndpoints.spotify());
-      return SpotifyUserDetailedSchema.parse(response);
-    },
+    queryFn: () => fetch(userEndpoints.spotify()),
+    schema: SpotifyUserFromApiResponseSchema as z.ZodType<SpotifyUserDetailed>,
+    context: "useFetchSpotifyUser",
+    enabled: sessionRestored,
   });
 }

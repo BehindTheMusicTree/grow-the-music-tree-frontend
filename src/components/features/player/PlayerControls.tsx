@@ -9,6 +9,7 @@ interface PlayerControlsProps {
   onPlayPause: () => void;
   onNext: () => void;
   onPrevious: () => void;
+  isNextDisabled?: boolean;
 }
 
 export default function PlayerControls({
@@ -17,6 +18,7 @@ export default function PlayerControls({
   onPlayPause,
   onNext,
   onPrevious,
+  isNextDisabled = false,
 }: PlayerControlsProps) {
   return (
     <div className="flex items-center space-x-4">
@@ -43,7 +45,8 @@ export default function PlayerControls({
       </button>
       <button
         onClick={onNext}
-        className="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-200 hover:text-white transition-colors"
+        disabled={isNextDisabled}
+        className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-800 text-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none hover:bg-gray-700 hover:text-white"
         aria-label="Next track"
       >
         <FaStepForward size={16} />

@@ -1,0 +1,14 @@
+---
+description: Use the project SemVer guide when deciding version bumps or discussing releases
+globs:
+alwaysApply: true
+---
+# Semantic Versioning Guide
+
+Follow **docs/SEMVER_GUIDE.md** for when to bump MAJOR, MINOR, or PATCH in this Next.js application.
+
+- **MAJOR**: Breaking or high-impact changes (removed features, incompatible API/config, required env changes, major dependency upgrades).
+- **MINOR**: New backward-compatible features, new endpoints or options, new optional config.
+- **PATCH**: Bug fixes, error-handling improvements, performance fixes, UX polish, doc-only changes.
+
+When suggesting a release version, updating CHANGELOG version headings, or discussing impact of changes, use the guide to choose the appropriate bump. For tag format and CI/CD (e.g. `v0.2.0`, `-dev`, `-rc`), see the versioning rule and **docs/VERSIONING.md**.

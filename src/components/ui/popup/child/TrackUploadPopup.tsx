@@ -28,7 +28,7 @@ type TrackUploadPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" 
 };
 
 type TrackUploadContentProps = Pick<TrackUploadPopupProps, "files" | "genre" | "scope" | "onComplete" | "onClose"> & {
-  onProgress?: (successfulCount: number, totalCount: number) => void;
+  onProgress?: (successfulCount: number, totalCount: number, isUploading?: boolean) => void;
 };
 
 // Functional component that handles the upload logic
@@ -49,7 +49,7 @@ function TrackUploadContent({
 
   const onProgressRef = useRef(onProgress);
   onProgressRef.current = onProgress;
-  const lastReportedRef = useRef<{ successful: number; total: number } | null>(null);
+  const lastReportedRef = useRef<{ successful: number; total: number; isUploading: boolean } | null>(null);
   const lastFilesKeyRef = useRef<string | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -57,10 +57,10 @@ function TrackUploadContent({
     const successfulCount = uploadItems.filter((item) => item.status === "success").length;
     const totalCount = uploadItems.length;
     const last = lastReportedRef.current;
-    if (last?.successful === successfulCount && last?.total === totalCount) return;
-    lastReportedRef.current = { successful: successfulCount, total: totalCount };
-    onProgressRef.current?.(successfulCount, totalCount);
-  }, [uploadItems]);
+    if (last?.successful === successfulCount && last?.total === totalCount && last?.isUploading === isUploading) return;
+    lastReportedRef.current = { successful: successfulCount, total: totalCount, isUploading };
+    onProgressRef.current?.(successfulCount, totalCount, isUploading);
+  }, [uploadItems, isUploading]);
 
   useEffect(() => {
     const filesKey = `${files.length}-${files.map((f) => `${f.name}:${f.size}`).join("|")}-${genre ?? ""}`;
@@ -266,26 +266,37 @@ function TrackUploadContent({
   );
 }
 
-type TrackUploadPopupState = { successfulCount: number; totalCount: number; isComplete: boolean };
+type TrackUploadPopupState = {
+  successfulCount: number;
+  totalCount: number;
+  isComplete: boolean;
+  isUploading: boolean;
+};
 
 // Class component wrapper that extends BasePopup
 // @ts-expect-error: omitted props are set internally by the popup
 export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps, TrackUploadPopupState> {
-  state: TrackUploadPopupState = { successfulCount: 0, totalCount: 0, isComplete: false };
+  state: TrackUploadPopupState = { successfulCount: 0, totalCount: 0, isComplete: false, isUploading: false };
 
-  handleProgress = (successfulCount: number, totalCount: number) => {
-    this.setState({ successfulCount, totalCount });
+  handleProgress = (successfulCount: number, totalCount: number, isUploading?: boolean) => {
+    const uploading = isUploading ?? false;
+    this.setState((prev) => ({
+      successfulCount,
+      totalCount,
+      isUploading: uploading,
+      isComplete: uploading ? false : prev.isComplete,
+    }));
   };
 
   handleComplete = (uploadedTracks: unknown[]) => {
     const { onComplete } = this.props;
-    this.setState({ isComplete: true });
+    this.setState({ isComplete: true, isUploading: false });
     onComplete?.(uploadedTracks);
   };
 
   render() {
     const { files, genre, scope, onComplete: _onComplete, onClose, ...rest } = this.props;
-    const { successfulCount, totalCount, isComplete } = this.state;
+    const { successfulCount, totalCount, isComplete, isUploading } = this.state;
     const displayTotal = totalCount > 0 ? totalCount : files.length;
 
     return this.renderBase({
@@ -294,7 +305,7 @@ export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps, T
       isDismissable: true,
       showOkButton: true,
       okButtonText: "OK",
-      okButtonDisabled: !isComplete,
+      okButtonDisabled: isUploading || !isComplete,
       onOk: onClose,
       children: (
         <TrackUploadContent

@@ -5,10 +5,7 @@ import { MbArtistDetailedSchema } from "@schemas/domain/mb/mb-artist";
 export const MbRecordingDetailedSchema = z.object({
   musicbrainzId: z.string().uuid(),
   title: z.string(),
-  score: z.union([z.number(), z.string()]).transform((val) => {
-    const num = typeof val === "string" ? parseFloat(val) : val;
-    return isNaN(num) ? 0 : Math.max(0, Math.min(1, num));
-  }),
+  score: z.number(),
   musicbrainzArtists: z.array(MbArtistDetailedSchema),
   musicbrainzLink: z.string().url(),
   durationInSec: z.number().min(0).nullable().optional(),

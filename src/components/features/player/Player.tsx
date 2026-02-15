@@ -30,6 +30,15 @@ export default function Player({ className }: PlayerProps) {
   const [isMuted, setIsMuted] = useState(false);
   const [previousVolume, setPreviousVolume] = useState(volume);
 
+  const hasNextTrack =
+    !!trackList &&
+    !!selectedTrack &&
+    (() => {
+      const tracks = trackList.uploadedTracks;
+      const currentIndex = tracks.findIndex((t) => t.uuid === selectedTrack.uuid);
+      return currentIndex !== -1 && currentIndex + 1 < tracks.length;
+    })();
+
   const handleNext = () => {
     if (trackList && selectedTrack) {
       handleNextTrack(trackList.uploadedTracks, selectedTrack, setSelectedTrack);
@@ -110,6 +119,7 @@ export default function Player({ className }: PlayerProps) {
             onPlayPause={handlePlayPauseAction}
             onNext={handleNext}
             onPrevious={handlePrevious}
+            isNextDisabled={!hasNextTrack}
           />
           <ProgressBar />
         </div>

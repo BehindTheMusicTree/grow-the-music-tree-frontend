@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useFetchWrapper } from "./useFetchWrapper";
 import { useInvalidateAllGenrePlaylistQueries } from "./useGenrePlaylist";
+import { useQueryWithParse } from "./useQueryWithParse";
 import { UploadedTrackDetailedSchema } from "@domain/uploaded-track/response/detailed";
 import { UploadedTrackCreationSchema } from "@domain/uploaded-track/form/creation";
 import { UploadedTrackUpdateSchema } from "@domain/uploaded-track/form/update";
@@ -19,24 +20,20 @@ export function useListUploadedTracks(
 ) {
   const { fetch } = useFetchWrapper();
 
-  return useQuery({
+  return useQueryWithParse({
     queryKey: scope != null ? libraryQueryKeys[scope].uploaded.list(page) : ["uploadedTracks", "none", page],
     queryFn: async () => {
       if (scope == null) return null;
-      const response = await fetch(
+      return fetch(
         libraryEndpoints[scope].uploaded.list(),
         true,
         scope === "me",
         {},
         { page, pageSize },
       );
-      const result = PaginatedResponseSchema(UploadedTrackDetailedSchema).safeParse(response);
-      if (!result.success) {
-        console.error("Parsing failed:", result.error);
-        throw result.error;
-      }
-      return result.data;
     },
+    schema: PaginatedResponseSchema(UploadedTrackDetailedSchema),
+    context: "useListUploadedTracks",
     enabled: scope != null,
   });
 }

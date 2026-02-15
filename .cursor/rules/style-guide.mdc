@@ -1,0 +1,11 @@
+---
+description: Follow the project style guide for code conventions and Tailwind styling
+globs:
+alwaysApply: true
+---
+# Style Guide
+
+Follow **docs/STYLE_GUIDE.md** for code and UI conventions.
+
+- **Code**: TypeScript, React, file naming (PascalCase components, camelCase hooks), directories, best practices.
+- **Styling**: Tailwind only (no .module.css). Class order: Layout → Typography → Visual → Interactive → States. Use the doc’s common patterns (overlay, popup, buttons, etc.).

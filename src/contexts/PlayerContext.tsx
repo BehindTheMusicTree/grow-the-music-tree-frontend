@@ -259,7 +259,6 @@ export function PlayerProvider({ children }: PlayerProviderProps) {
     const updatedTrack = uploadedTracks.find((track) => track.uuid === currentTrackUuid);
 
     if (updatedTrack && updatedTrack !== playerUploadedTrackObject.uploadedTrack) {
-      // Update the player object with the fresh track data
       setPlayerUploadedTrackObject((prev) => {
         if (!prev) return prev;
         return {
