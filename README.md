@@ -140,8 +140,9 @@ For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/)
 **Notes:**
 
 - Only variables prefixed with `NEXT_PUBLIC_` are available in the browser
-- Changing env values requires a new build
+- Changing env values requires a new build (restart `npm run dev` after env changes)
 - Do not commit `.env.local`
+- If you use env from `env/dev/available/` (e.g. `.env.development.api-local`), run `./scripts/setup-env-dev.sh local` (or `remote`) to copy it to `.env.development.local`; Next.js only loads env files from the project root
 
 ## Getting Started
 

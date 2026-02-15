@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
@@ -35,70 +35,19 @@ import {
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
 export default function AppContent({ children }: { children: ReactNode }) {
-  const router = useRouter();
+  const pathname = usePathname();
   const { playerUploadedTrackObject } = usePlayer();
   const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, clearConnectivityError } = useConnectivityError();
-  const { handleSpotifyOAuth, authToBackendFromSpotifyCode } = useSpotifyAuth();
-  const { handleGoogleOAuth, authToBackendFromGoogleCode } = useGoogleAuth();
+  const { handleSpotifyOAuth } = useSpotifyAuth();
+  const { handleGoogleOAuth } = useGoogleAuth();
   const currentConnectivityErrorRef = useRef<typeof ConnectivityError | null>(null);
-  const spotifyAuthHandledRef = useRef(false);
-  const googleAuthHandledRef = useRef(false);
+  const isAccountPage = pathname === "/account";
 
   useEffect(() => {
     initSentry();
   }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (spotifyAuthHandledRef.current) return;
-    if (!window.location.pathname.startsWith("/auth/spotify/callback")) return;
-
-    spotifyAuthHandledRef.current = true;
-
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    const errorParam = params.get("error");
-
-    (async () => {
-      if (errorParam) {
-        return;
-      }
-
-      if (!code) {
-        return;
-      }
-
-      try {
-        const redirectUrl = await authToBackendFromSpotifyCode(code);
-        if (redirectUrl) {
-          router.push(redirectUrl);
-        }
-      } catch (e) {}
-    })().catch(() => {});
-  }, [authToBackendFromSpotifyCode, router]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (googleAuthHandledRef.current) return;
-    if (!window.location.pathname.startsWith("/auth/google/callback")) return;
-
-    googleAuthHandledRef.current = true;
-
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    const errorParam = params.get("error");
-
-    (async () => {
-      if (errorParam) return;
-      if (!code) return;
-      try {
-        const redirectUrl = await authToBackendFromGoogleCode(code);
-        if (redirectUrl) router.push(redirectUrl);
-      } catch (e) {}
-    })().catch(() => {});
-  }, [authToBackendFromGoogleCode, router]);
 
   useEffect(() => {}, [playerUploadedTrackObject]);
 
@@ -116,7 +65,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
     ) {
       let popup: ReactNode | null = null;
       const error = connectivityError as ConnectivityError;
-      if (error instanceof AuthRequired) {
+      if (!isAccountPage && error instanceof AuthRequired) {
         popup = (
           <AuthPopup
             handleSpotifyOAuth={handleSpotifyOAuth}
@@ -124,6 +73,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
           />
         );
       } else if (
+        !isAccountPage &&
         error instanceof BackendError &&
         error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED
       ) {
@@ -147,7 +97,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
 
       currentConnectivityErrorRef.current = error.constructor as typeof ConnectivityError;
     }
-  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, handleSpotifyOAuth, handleGoogleOAuth]);
+  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, handleSpotifyOAuth, handleGoogleOAuth, isAccountPage]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {

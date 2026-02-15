@@ -54,9 +54,18 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
   } else if (result.status === 401) {
     if (isBackendError) {
       try {
-        const body = (await result.json()) as { code?: number; details?: { code?: string } };
+        const body = (await result.json()) as {
+          code?: number;
+          details?: { code?: string; message?: string };
+        };
         const apiCode = body?.code;
         const detailsCode = body?.details?.code;
+        if (detailsCode === "google_oauth_code_invalid_or_expired") {
+          return new BackendError(
+            ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED,
+            body.details?.message,
+          );
+        }
         if (
           apiCode === 1006 ||
           detailsCode === "authentication_required" ||

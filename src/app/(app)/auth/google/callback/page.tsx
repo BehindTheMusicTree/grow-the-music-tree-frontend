@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { usePopup } from "@contexts/PopupContext";
+import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
+import AuthPopup from "@components/ui/popup/child/AuthPopup";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
 
@@ -17,7 +20,9 @@ function getParamsFromUrl() {
 
 export default function GoogleOAuthCallbackPage() {
   const router = useRouter();
-  const { authToBackendFromGoogleCode } = useGoogleAuth();
+  const { showPopup } = usePopup();
+  const { handleSpotifyOAuth } = useSpotifyAuth();
+  const { authToBackendFromGoogleCode, handleGoogleOAuth } = useGoogleAuth();
   const [isPending, setIsPending] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const authAttempted = useRef(false);
@@ -47,8 +52,20 @@ export default function GoogleOAuthCallbackPage() {
           router.push(redirectUrl);
         }
       } catch (err) {
-        if (err instanceof BackendError && err.code === ErrorCode.BACKEND_AUTH_ERROR) {
-          setError(new Error("Failed to authenticate with the backend server. Please try again later."));
+        if (err instanceof BackendError) {
+          if (err.code === ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED) {
+            showPopup(
+              <AuthPopup
+                handleSpotifyOAuth={handleSpotifyOAuth}
+                handleGoogleOAuth={handleGoogleOAuth}
+              />,
+            );
+            router.push("/");
+          } else if (err.code === ErrorCode.BACKEND_AUTH_ERROR) {
+            setError(new Error("Failed to authenticate with the backend server. Please try again later."));
+          } else {
+            setError(new Error(err.message));
+          }
         } else {
           setError(new Error("An unexpected error occurred. Please try again later."));
         }
@@ -58,7 +75,7 @@ export default function GoogleOAuthCallbackPage() {
     };
 
     handleAuth();
-  }, [authToBackendFromGoogleCode, router]);
+  }, [authToBackendFromGoogleCode, handleSpotifyOAuth, handleGoogleOAuth, showPopup, router]);
 
   if (isPending) {
     return (

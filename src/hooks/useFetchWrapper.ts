@@ -15,6 +15,12 @@ export const useFetchWrapper = () => {
 
   const handleError = (error: Error) => {
     if (error instanceof ConnectivityError) {
+      if (
+        error instanceof BackendError &&
+        error.code === ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED
+      ) {
+        throw error;
+      }
       if (error instanceof AuthRequired) {
         clearSession();
       }

@@ -7,6 +7,7 @@ import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { createAppErrorFromErrorCode } from "@app-types/app-errors/app-error-factory";
+import { BackendError } from "@app-types/app-errors/app-error";
 
 const DEFAULT_GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const DEFAULT_GOOGLE_SCOPES = "openid email profile";
@@ -88,6 +89,12 @@ export function useGoogleAuth() {
         }
         return "/";
       } catch (e) {
+        if (
+          e instanceof BackendError &&
+          e.code === ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED
+        ) {
+          throw e;
+        }
         console.log("authToBackendFromGoogleCode error", e);
         setCreateBackendAuthConnectivityError();
         return null;

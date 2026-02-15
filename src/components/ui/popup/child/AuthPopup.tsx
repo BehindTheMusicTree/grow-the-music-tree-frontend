@@ -12,12 +12,14 @@ type AuthPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDi
   handleGoogleOAuth?: (redirectAfterAuthPath?: string) => void;
   redirectAfterAuthPath?: string;
   spotifyOnly?: boolean;
+  message?: string;
 };
 
 // @ts-expect-error: ommitted props are set internally by the popup
 export default class AuthPopup extends BasePopup<AuthPopupProps> {
   render() {
-    const { handleSpotifyOAuth, handleGoogleOAuth, redirectAfterAuthPath, spotifyOnly, ...rest } = this.props;
+    const { handleSpotifyOAuth, handleGoogleOAuth, redirectAfterAuthPath, spotifyOnly, message, ...rest } =
+      this.props;
     const showGoogle = !spotifyOnly && handleGoogleOAuth;
     return this.renderBase({
       ...rest,
@@ -28,6 +30,9 @@ export default class AuthPopup extends BasePopup<AuthPopupProps> {
       children: (
         <div className="flex flex-col items-center space-y-7">
           <div className="px-2 text-center">
+            {message && (
+              <p className="mb-3 text-base font-medium leading-relaxed text-amber-200">{message}</p>
+            )}
             <p className="text-lg font-medium leading-relaxed text-white">
               {spotifyOnly ? (
                 <>

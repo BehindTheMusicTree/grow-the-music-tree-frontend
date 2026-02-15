@@ -22,6 +22,8 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCode.BACKEND_UNAUTHORIZED]: "Unauthorized",
   [ErrorCode.BACKEND_FORBIDDEN]: "Forbidden",
   [ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED]: "Connect Spotify to continue",
+  [ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED]:
+    "Authorization code already used, expired, or invalid. Please try signing in again from the login page.",
   [ErrorCode.BACKEND_NOT_FOUND]: "Not found",
   [ErrorCode.BACKEND_METHOD_NOT_ALLOWED]: "Method not allowed",
   [ErrorCode.BACKEND_REQUEST_TIMEOUT]: "Request timeout",
