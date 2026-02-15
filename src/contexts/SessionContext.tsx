@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { Session } from "@app-types/Session";
 import { queryClient } from "@lib/query-client";
+import { clearSpotifyRequiredCached } from "@lib/spotify-required-cache";
 
 interface SessionContextType {
   session: Session;
@@ -49,6 +50,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
   const clearSession = () => {
     setSessionState(defaultSession);
     localStorage.removeItem(SESSION_STORAGE_KEY);
+    clearSpotifyRequiredCached();
     queryClient.clear();
   };
 
