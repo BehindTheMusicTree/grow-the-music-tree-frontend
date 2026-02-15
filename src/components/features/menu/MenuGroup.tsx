@@ -8,6 +8,7 @@ import { usePopup } from "@contexts/PopupContext";
 import { useSession } from "@contexts/SessionContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
+import { useFetchSpotifyUser } from "@hooks/useSpotifyUser";
 import AuthPopup from "@components/ui/popup/child/AuthPopup";
 
 interface MenuItem {
@@ -28,14 +29,16 @@ export function MenuGroup({ items, className = "" }: MenuGroupProps) {
   const { session } = useSession();
   const { handleSpotifyOAuth } = useSpotifyAuth();
   const { handleGoogleOAuth } = useGoogleAuth();
+  const { data: spotifyProfile } = useFetchSpotifyUser({ skipGlobalError: true });
   const isAuthenticated = Boolean(session?.accessToken);
+  const hasSpotifyAuth = Boolean(spotifyProfile?.id);
 
   const handleItemClick = (item: MenuItem) => (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (item.authRequired === false) {
       hidePopup();
       return;
     }
-    if (item.authRequired === "spotify" && !isAuthenticated) {
+    if (item.authRequired === "spotify" && (!isAuthenticated || !hasSpotifyAuth)) {
       e.preventDefault();
       showPopup(
         <AuthPopup

@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
 import { useSession } from "@contexts/SessionContext";
@@ -12,12 +11,10 @@ export default function AccountPage() {
   const { session } = useSession();
   const { handleSpotifyOAuth, logout } = useSpotifyAuth();
   const { handleGoogleOAuth } = useGoogleAuth();
-  const { data: profile, isLoading, isError, error } = useFetchSpotifyUser();
+  const { data: profile, isLoading } = useFetchSpotifyUser();
   const spotifyProfileUrl = profile?.id ? spotifyUserProfileUrl(profile.id) : undefined;
   const hasSession = Boolean(session?.accessToken);
   const hasSpotifyProfile = Boolean(profile?.id);
-  const spotifyRequiredError =
-    isError && error?.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED;
 
   if (isLoading) {
     return (
@@ -82,11 +79,9 @@ export default function AccountPage() {
               </>
             ) : (
               <div className="flex flex-col gap-3">
-                {spotifyRequiredError && (
-                  <p className="text-sm text-amber-700">
-                    {error?.message ?? "Connect Spotify to access library features."}
-                  </p>
-                )}
+                <p className="text-sm text-gray-600">
+                  Connect your Spotify account to use My Spotify Library and related features.
+                </p>
                 <button
                   type="button"
                   className="rounded bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
