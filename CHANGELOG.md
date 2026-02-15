@@ -76,6 +76,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-02-15
+
 ### Added
 
 - **Parse and log for API responses**: `parseWithLog()` helper and `useQueryWithParse` hook so endpoint hooks validate responses with Zod and log schema errors with context
