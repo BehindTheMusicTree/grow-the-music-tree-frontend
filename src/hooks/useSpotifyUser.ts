@@ -12,10 +12,11 @@ import {
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
 
-export function useFetchSpotifyUser(options?: { skipGlobalError?: boolean }) {
+export function useFetchSpotifyUser(options?: { skipGlobalError?: boolean; enabled?: boolean }) {
   const { sessionRestored } = useSession();
   const { fetch } = useFetchWrapper();
   const skipGlobalError = options?.skipGlobalError ?? false;
+  const enabledOverride = options?.enabled ?? true;
   const spotifyRequiredCached = getSpotifyRequiredCached();
 
   return useQueryWithParse<SpotifyUserDetailed>({
@@ -31,9 +32,10 @@ export function useFetchSpotifyUser(options?: { skipGlobalError?: boolean }) {
           false,
           skipGlobalError,
         );
-        if (result != null) {
-          clearSpotifyRequiredCached();
+        if (result == null) {
+          throw new Error("Spotify profile unavailable");
         }
+        clearSpotifyRequiredCached();
         return result as SpotifyUserDetailed;
       } catch (e) {
         if (
@@ -47,6 +49,6 @@ export function useFetchSpotifyUser(options?: { skipGlobalError?: boolean }) {
     },
     schema: SpotifyUserFromApiResponseSchema as z.ZodType<SpotifyUserDetailed>,
     context: "useFetchSpotifyUser",
-    enabled: sessionRestored && !spotifyRequiredCached,
+    enabled: sessionRestored && !spotifyRequiredCached && enabledOverride,
   });
 }

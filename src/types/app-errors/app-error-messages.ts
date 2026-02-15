@@ -1,5 +1,13 @@
 import { ErrorCode } from "./app-error-codes";
 
+export function getSpotifyAllowlistMessage(): string {
+  const contact = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
+  if (contact) {
+    return `Your Spotify account is not yet authorized for this app. To request access, send an email to ${contact}.`;
+  }
+  return "Your Spotify account is not yet authorized for this app. To request access, contact the app owner.";
+}
+
 export const ErrorMessages: Record<ErrorCode, string> = {
   // Network Errors
   [ErrorCode.NETWORK_OFFLINE]: "Network connection unavailable",
@@ -24,8 +32,8 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED]: "Connect Spotify to continue",
   [ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED]:
     "Authorization code already used, expired, or invalid. Please try signing in again from the login page.",
-  [ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST]:
-    "Your Spotify account is not authorized for this app. The app owner must add you in the Spotify Developer Dashboard (User Management).",
+  [ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST]: getSpotifyAllowlistMessage(),
+
   [ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR]: "Spotify authentication failed",
   [ErrorCode.BACKEND_GOOGLE_AUTHENTICATION_ERROR]: "Google authentication failed",
   [ErrorCode.BACKEND_GOOGLE_OAUTH_MISCONFIGURED]:

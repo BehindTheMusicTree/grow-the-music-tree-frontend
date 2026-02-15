@@ -2,9 +2,20 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 
+export const AUTH_POPUP_TYPE = "auth";
+
+interface PopupState {
+  content: ReactNode;
+  type: string | null;
+}
+
+interface HidePopupOptions {
+  onlyIfType?: string;
+}
+
 interface PopupContextType {
-  showPopup: (popup: ReactNode) => void;
-  hidePopup: () => void;
+  showPopup: (popup: ReactNode, type?: string | null) => void;
+  hidePopup: (options?: HidePopupOptions) => void;
   activePopup: ReactNode | null;
 }
 
@@ -15,14 +26,21 @@ interface PopupProviderProps {
 }
 
 export function PopupProvider({ children }: PopupProviderProps) {
-  const [activePopup, setActivePopup] = useState<ReactNode | null>(null);
+  const [state, setState] = useState<PopupState>({ content: null, type: null });
+  const activePopup = state.content;
 
-  const showPopup = (popup: ReactNode) => {
-    setActivePopup(popup);
+  const showPopup = (popup: ReactNode, type?: string | null) => {
+    setState({ content: popup, type: type ?? null });
   };
 
-  const hidePopup = () => {
-    setActivePopup(null);
+  const hidePopup = (options?: HidePopupOptions) => {
+    if (options?.onlyIfType !== undefined) {
+      setState((prev) =>
+        prev.type === options.onlyIfType ? { content: null, type: null } : prev,
+      );
+    } else {
+      setState({ content: null, type: null });
+    }
   };
 
   return <PopupContext.Provider value={{ showPopup, hidePopup, activePopup }}>{children}</PopupContext.Provider>;

@@ -8,45 +8,23 @@ import {
   PRIVATE_MENU_ITEM_BG_COLOR,
   SPOTIFY_MENU_ITEM_BG_COLOR,
 } from "@lib/constants/layout";
+import { ROUTE_AUTH_CONFIG } from "@lib/constants/routes";
 
-const menuGroup = [
-  {
-    href: "/reference-genre-tree",
-    label: "Reference Genre Tree",
-    icon: <PiGraphLight className="text-xl" />,
-    authRequired: false,
-  },
-  {
-    href: "/me-genre-tree",
-    label: "My Genre Tree",
-    icon: <PiGraphLight className="text-xl" />,
-    authRequired: "any",
-  },
-  {
-    href: "/me-genre-playlists",
-    label: "My Genre Playlists",
-    icon: <FaList className="text-xl" />,
-    authRequired: "any",
-  },
-  {
-    href: "/me-uploaded-library",
-    label: "My Uploaded Library",
-    icon: <FaCloudUploadAlt className="text-xl" />,
-    authRequired: "any",
-  },
-  {
-    href: "/me-spotify-library",
-    label: "My Spotify Library",
-    icon: <FaSpotify className="text-xl" />,
-    authRequired: "spotify",
-  },
-  {
-    href: "/account",
-    label: "Account",
-    icon: <FaUser className="text-xl" />,
-    authRequired: "any",
-  },
-];
+const MENU_ICONS: Record<string, React.ReactNode> = {
+  "/reference-genre-tree": <PiGraphLight className="text-xl" />,
+  "/me-genre-tree": <PiGraphLight className="text-xl" />,
+  "/me-genre-playlists": <FaList className="text-xl" />,
+  "/me-uploaded-library": <FaCloudUploadAlt className="text-xl" />,
+  "/me-spotify-library": <FaSpotify className="text-xl" />,
+  "/account": <FaUser className="text-xl" />,
+};
+
+const menuGroup = ROUTE_AUTH_CONFIG.map((route) => ({
+  href: route.path,
+  label: route.label,
+  icon: MENU_ICONS[route.path],
+  authRequired: route.authRequired,
+}));
 
 export default function Menu({ className }: { className?: string }) {
   return (

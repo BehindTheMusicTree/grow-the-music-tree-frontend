@@ -5,10 +5,12 @@ import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import { Play } from "lucide-react";
 import { usePopup } from "@contexts/PopupContext";
+import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
 import { useSession } from "@contexts/SessionContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
 import { useFetchSpotifyUser } from "@hooks/useSpotifyUser";
+import { getRouteAuthRequirement } from "@lib/constants/routes";
 import AuthPopup from "@components/ui/popup/child/AuthPopup";
 
 interface MenuItem {
@@ -29,13 +31,18 @@ export function MenuGroup({ items, className = "" }: MenuGroupProps) {
   const { session } = useSession();
   const { handleSpotifyOAuth } = useSpotifyAuth();
   const { handleGoogleOAuth } = useGoogleAuth();
-  const { data: spotifyProfile } = useFetchSpotifyUser({ skipGlobalError: true });
+  const routeAuthRequirement = getRouteAuthRequirement(pathname);
+  const fetchSpotifyUserEnabled = routeAuthRequirement === "spotify" || pathname === "/account";
+  const { data: spotifyProfile } = useFetchSpotifyUser({
+    skipGlobalError: true,
+    enabled: fetchSpotifyUserEnabled,
+  });
   const isAuthenticated = Boolean(session?.accessToken);
   const hasSpotifyAuth = Boolean(spotifyProfile?.id);
 
   const handleItemClick = (item: MenuItem) => (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (item.authRequired === false) {
-      hidePopup();
+      hidePopup({ onlyIfType: AUTH_POPUP_TYPE });
       return;
     }
     if (item.authRequired === "spotify" && (!isAuthenticated || !hasSpotifyAuth)) {
@@ -46,6 +53,7 @@ export function MenuGroup({ items, className = "" }: MenuGroupProps) {
           redirectAfterAuthPath={item.href}
           spotifyOnly
         />,
+        AUTH_POPUP_TYPE,
       );
       return;
     }
@@ -57,8 +65,11 @@ export function MenuGroup({ items, className = "" }: MenuGroupProps) {
           handleGoogleOAuth={handleGoogleOAuth}
           redirectAfterAuthPath={item.href}
         />,
+        AUTH_POPUP_TYPE,
       );
+      return;
     }
+    hidePopup({ onlyIfType: AUTH_POPUP_TYPE });
   };
 
   return (

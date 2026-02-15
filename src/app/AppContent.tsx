@@ -6,11 +6,13 @@ import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { usePopup } from "@contexts/PopupContext";
+import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
 import { usePlayer } from "@contexts/PlayerContext";
 import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
 import { initSentry } from "@lib/sentry";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
+import SpotifyAuthErrorPopup from "@components/ui/popup/child/SpotifyAuthErrorPopup";
 
 import Banner from "@components/features/banner/Banner";
 import Menu from "@components/features/menu/Menu";
@@ -33,6 +35,7 @@ import {
   InvalidInputError,
 } from "@app-types/app-errors/app-error";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
+import { getRouteAuthRequirement } from "@lib/constants/routes";
 
 export default function AppContent({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -44,6 +47,9 @@ export default function AppContent({ children }: { children: ReactNode }) {
   const { handleGoogleOAuth } = useGoogleAuth();
   const currentConnectivityErrorRef = useRef<typeof ConnectivityError | null>(null);
   const isAccountPage = pathname === "/account";
+  const routeAuthRequirement = getRouteAuthRequirement(pathname);
+  const routeRequiresAuth = routeAuthRequirement === "any" || routeAuthRequirement === "spotify";
+  const routeRequiresSpotify = routeAuthRequirement === "spotify";
 
   useEffect(() => {
     initSentry();
@@ -64,23 +70,49 @@ export default function AppContent({ children }: { children: ReactNode }) {
       ) && !(connectivityError instanceof currentConnectivityErrorRef.current))
     ) {
       let popup: ReactNode | null = null;
+      let popupType: string | null = null;
       const error = connectivityError as ConnectivityError;
-      if (!isAccountPage && error instanceof AuthRequired) {
+      if (
+        !isAccountPage &&
+        routeRequiresAuth &&
+        error instanceof AuthRequired
+      ) {
         popup = (
           <AuthPopup
             handleSpotifyOAuth={handleSpotifyOAuth}
             handleGoogleOAuth={handleGoogleOAuth}
           />
         );
+        popupType = AUTH_POPUP_TYPE;
       } else if (
         !isAccountPage &&
+        routeRequiresSpotify &&
         error instanceof BackendError &&
         error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED
       ) {
         popup = <AuthPopup handleSpotifyOAuth={handleSpotifyOAuth} spotifyOnly />;
+        popupType = AUTH_POPUP_TYPE;
       } else if (error instanceof InvalidInputError) {
         console.error("[InvalidInputError]", error.code, error.json);
         popup = <InternalErrorPopup errorCode={error.code} />;
+      } else if (
+        error instanceof BackendError &&
+        [
+          ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
+          ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR,
+          ErrorCode.BACKEND_GOOGLE_AUTHENTICATION_ERROR,
+          ErrorCode.BACKEND_GOOGLE_OAUTH_MISCONFIGURED,
+          ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED,
+        ].includes(error.code)
+      ) {
+        popup = (
+          <SpotifyAuthErrorPopup
+            message={error.message}
+            onClose={() => {
+              hidePopup();
+            }}
+          />
+        );
       } else if (error instanceof BadRequestError || error instanceof BackendError || error instanceof ServiceError) {
         popup = <InternalErrorPopup errorCode={error.code} />;
       } else if (error instanceof NetworkError) {
@@ -92,12 +124,12 @@ export default function AppContent({ children }: { children: ReactNode }) {
       }
 
       if (popup) {
-        showPopup(popup);
+        showPopup(popup, popupType);
       }
 
       currentConnectivityErrorRef.current = error.constructor as typeof ConnectivityError;
     }
-  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, handleSpotifyOAuth, handleGoogleOAuth, isAccountPage]);
+  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, handleSpotifyOAuth, handleGoogleOAuth, isAccountPage, routeRequiresAuth, routeRequiresSpotify]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {

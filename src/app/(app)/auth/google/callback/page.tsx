@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePopup } from "@contexts/PopupContext";
+import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
 import AuthPopup from "@components/ui/popup/child/AuthPopup";
@@ -59,6 +60,7 @@ export default function GoogleOAuthCallbackPage() {
                 handleSpotifyOAuth={handleSpotifyOAuth}
                 handleGoogleOAuth={handleGoogleOAuth}
               />,
+              AUTH_POPUP_TYPE,
             );
             router.push("/");
           } else if (err.code === ErrorCode.BACKEND_AUTH_ERROR) {

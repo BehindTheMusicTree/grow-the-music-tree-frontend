@@ -1,4 +1,5 @@
 import { ErrorCode } from "./app-error-codes";
+import { getSpotifyAllowlistMessage } from "./app-error-messages";
 import {
   AppError,
   NetworkError,
@@ -69,7 +70,7 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
         if (detailsCode === "spotify_user_not_in_allowlist") {
           return new BackendError(
             ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
-            body.details?.message,
+            getSpotifyAllowlistMessage(),
           );
         }
         if (detailsCode === "spotify_authentication_error") {
