@@ -19,34 +19,37 @@ function getParamsFromUrl() {
   };
 }
 
+let spotifyAuthInProgress = false;
+
 export default function SpotifyOAuthCallbackPage() {
   const router = useRouter();
   const { authToBackendFromSpotifyCode } = useSpotifyAuth();
   const [isPending, setIsPending] = useState(true);
   const [error, setError] = useState(null);
   const [allowlistError, setAllowlistError] = useState(null);
-  const authAttempted = useRef(false);
 
   useEffect(() => {
     const { code, errorParam } = getParamsFromUrl();
 
     const handleAuth = async () => {
-      if (authAttempted.current) return;
-      authAttempted.current = true;
-
-      if (errorParam) {
-        setError(new Error(`Spotify authentication failed: ${errorParam}`));
-        setIsPending(false);
-        return;
-      }
-
-      if (!code) {
-        setError(new Error("No authorization code received from Spotify"));
-        setIsPending(false);
-        return;
-      }
+      if (spotifyAuthInProgress) return;
+      spotifyAuthInProgress = true;
 
       try {
+        if (errorParam) {
+          setError(new Error(`Spotify authentication failed: ${errorParam}`));
+          setIsPending(false);
+          spotifyAuthInProgress = false;
+          return;
+        }
+
+        if (!code) {
+          setError(new Error("No authorization code received from Spotify"));
+          setIsPending(false);
+          spotifyAuthInProgress = false;
+          return;
+        }
+
         const redirectUrl = await authToBackendFromSpotifyCode(code);
         if (redirectUrl) {
           router.push(redirectUrl);
@@ -71,6 +74,7 @@ export default function SpotifyOAuthCallbackPage() {
         setIsPending(false);
       }
     };
+
     handleAuth();
   }, [authToBackendFromSpotifyCode, router]);
 

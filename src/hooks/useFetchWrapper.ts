@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { useSession } from "@contexts/SessionContext";
 import {
@@ -13,7 +14,7 @@ export const useFetchWrapper = () => {
   const { setConnectivityError } = useConnectivityError();
   const { clearSession, session } = useSession();
 
-  const handleError = (error: Error) => {
+  const handleError = useCallback((error: Error) => {
     if (error instanceof ConnectivityError) {
       if (error instanceof AuthRequired) {
         clearSession();
@@ -29,13 +30,13 @@ export const useFetchWrapper = () => {
     } else {
       throw error;
     }
-  };
+  }, [clearSession, setConnectivityError]);
 
-  const handleMissingRequiredSession = () => {
+  const handleMissingRequiredSession = useCallback(() => {
     setConnectivityError(createAppErrorFromErrorCode(ErrorCode.SESSION_REQUIRED));
-  };
+  }, [setConnectivityError]);
 
-  const fetch = <T>(
+  const fetch = useCallback(<T>(
     backendEndpointOrUrl: string,
     fromBackend: boolean = true,
     requiresAuth: boolean = true,
@@ -62,7 +63,7 @@ export const useFetchWrapper = () => {
       skipGlobalError ? undefined : handleError,
       expectBinary,
     );
-  };
+  }, [session?.accessToken, handleError, handleMissingRequiredSession]);
 
   return { fetch };
 };
