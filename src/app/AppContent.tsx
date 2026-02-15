@@ -13,6 +13,7 @@ import { initSentry } from "@lib/sentry";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 import SpotifyAuthErrorPopup from "@components/ui/popup/child/SpotifyAuthErrorPopup";
+import AuthErrorPopup from "@components/ui/popup/child/AuthErrorPopup";
 
 import Banner from "@components/features/banner/Banner";
 import Menu from "@components/features/menu/Menu";
@@ -100,13 +101,26 @@ export default function AppContent({ children }: { children: ReactNode }) {
         [
           ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
           ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR,
+        ].includes(error.code)
+      ) {
+        popup = (
+          <SpotifyAuthErrorPopup
+            message={error.message}
+            onClose={() => {
+              hidePopup();
+            }}
+          />
+        );
+      } else if (
+        error instanceof BackendError &&
+        [
           ErrorCode.BACKEND_GOOGLE_AUTHENTICATION_ERROR,
           ErrorCode.BACKEND_GOOGLE_OAUTH_MISCONFIGURED,
           ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED,
         ].includes(error.code)
       ) {
         popup = (
-          <SpotifyAuthErrorPopup
+          <AuthErrorPopup
             message={error.message}
             onClose={() => {
               hidePopup();
