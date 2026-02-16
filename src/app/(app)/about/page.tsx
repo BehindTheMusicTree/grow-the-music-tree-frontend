@@ -8,15 +8,15 @@ export default function AboutPage() {
   return (
     <div className="flex flex-col gap-8 max-w-2xl py-8">
       <header>
-        <h1 className="text-2xl font-semibold text-gray-900">About Grow the Music Tree</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">About GrowTheMusicTree</h1>
       </header>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-medium text-gray-800">Overview</h2>
         <p className="text-base leading-relaxed text-gray-700">
-          Grow the Music Tree helps you explore how music genres connect. Browse a map of genres that
-          grows with the community, link your Spotify or Google account to see where your taste fits
-          in, and discover new music along the way.
+          GrowTheMusicTree helps you explore how music genres connect. Browse a map of genres that grows with the
+          community, link your Spotify or Google account to see where your taste fits in, and discover new music along
+          the way.
         </p>
         <ul className="list-disc list-inside space-y-1 text-base text-gray-700">
           <li>Browse and explore the genre tree</li>
@@ -42,10 +42,7 @@ export default function AboutPage() {
       {contactEmail && (
         <section className="flex flex-col gap-3">
           <h2 className="text-lg font-medium text-gray-800">Contact</h2>
-          <a
-            href={`mailto:${contactEmail}`}
-            className="text-base text-blue-600 hover:text-blue-800 transition-colors"
-          >
+          <a href={`mailto:${contactEmail}`} className="text-base text-blue-600 hover:text-blue-800 transition-colors">
             {contactEmail}
           </a>
         </section>

@@ -1,4 +1,4 @@
-# Grow the Music Tree Frontend
+# GrowTheMusicTree Frontend
 
 A community-driven platform for exploring and understanding musical genres through an interactive, evolving genre tree map.
 
