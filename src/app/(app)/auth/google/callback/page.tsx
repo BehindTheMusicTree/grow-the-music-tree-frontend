@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { usePopup } from "@contexts/PopupContext";
 import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
@@ -20,6 +20,7 @@ function getParamsFromUrl() {
 }
 
 export default function GoogleOAuthCallbackPage() {
+  const pathname = usePathname();
   const router = useRouter();
   const { showPopup } = usePopup();
   const { handleSpotifyOAuth } = useSpotifyAuth();
@@ -27,6 +28,11 @@ export default function GoogleOAuthCallbackPage() {
   const [isPending, setIsPending] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const authAttempted = useRef(false);
+
+  if (typeof window !== "undefined") {
+    const { code } = getParamsFromUrl();
+    console.log("[GoogleCallback] Page render", { pathname, hasCode: !!code, search: window.location.search.slice(0, 50) });
+  }
 
   useEffect(() => {
     const { code, errorParam } = getParamsFromUrl();

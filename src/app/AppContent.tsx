@@ -163,9 +163,12 @@ export default function AppContent({ children }: { children: ReactNode }) {
         }}
       >
         <Menu className="menu left-0 z-40" />
-        <div className="relative flex-grow w-full flex">
-          <div className="flex-grow w-full flex" style={activePopup ? { filter: "blur(4px)" } : undefined}>
-            <main className="flex-grow w-full mx-8">{children}</main>
+        <div className="relative min-h-0 flex-grow w-full flex">
+          <div
+            className="min-h-0 flex-grow w-full flex"
+            style={activePopup ? { filter: "blur(4px)" } : undefined}
+          >
+            <main className="min-h-0 flex-grow w-full mx-8 overflow-y-auto">{children}</main>
             {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
           </div>
           {activePopup && (
