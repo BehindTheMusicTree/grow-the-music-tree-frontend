@@ -16,26 +16,14 @@ function Section({
   className?: string;
 }) {
   return (
-    <section
-      className={`flex flex-col gap-4 p-6 bg-white rounded-lg border border-gray-100 shadow-sm ${className}`}
-    >
-      <h2 className="text-lg font-medium text-gray-900 border-b border-gray-100 pb-2 text-center">
-        {title}
-      </h2>
+    <section className={`flex flex-col gap-4 p-6 bg-white rounded-lg border border-gray-100 shadow-sm ${className}`}>
+      <h2 className="text-lg font-medium text-gray-900 border-b border-gray-100 pb-2 text-center">{title}</h2>
       <div className="flex flex-col gap-3 text-base leading-relaxed text-gray-700">{children}</div>
     </section>
   );
 }
 
-function EcosystemLink({
-  href,
-  label,
-  description,
-}: {
-  href: string;
-  label: string;
-  description: string;
-}) {
+function EcosystemLink({ href, label, description }: { href: string; label: string; description: string }) {
   return (
     <a
       href={href}
@@ -53,24 +41,22 @@ export default function AboutPage() {
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
 
   return (
-    <div className="flex flex-col gap-6 max-w-2xl py-8">
+    <div className="flex flex-col gap-6 max-w-2xl mx-auto py-8 w-full">
       <header className="flex flex-col gap-2 pb-2 text-center">
         <h1 className="text-2xl font-semibold text-gray-900">
           About{" "}
           <Link href="/" className="text-gray-900 hover:text-gray-600 transition-colors">
-            Grow the Music Tree 🌳
+            GrowTheMusicTree 🌳
           </Link>
         </h1>
-        <p className="text-base text-gray-600">
-          Explore how music genres connect and where your taste fits in.
-        </p>
+        <p className="text-base text-gray-600">Explore how music genres connect and where your taste fits in.</p>
       </header>
 
       <Section title="🎵 Overview">
         <p>
-          Grow the Music Tree helps you explore how music genres connect. Browse a map of genres that
-          grows with the community, link your Spotify or Google account to see where your taste
-          fits in, and discover new music along the way.
+          GrowTheMusicTree helps you explore how music genres connect. Browse a map of genres that grows with the
+          community, link your Spotify or Google account to see where your taste fits in, and discover new music along
+          the way.
         </p>
         <ul className="list-disc list-inside space-y-1.5 pl-1">
           <li>Browse and explore the genre tree</li>
@@ -91,9 +77,9 @@ export default function AboutPage() {
           >
             BehindTheMusicTree
           </a>{" "}
-          ecosystem—a set of open-source projects aimed at building a shared reference for how we
-          explore, understand, and organize music. The goal is a global map of music culture where
-          your listening journey, your collection, and the community all fit together.
+          ecosystem—a set of open-source projects aimed at building a shared reference for how we explore, understand,
+          and organize music. The goal is a global map of music culture where your listening journey, your collection,
+          and the community all fit together.
         </p>
         <p className="font-medium text-gray-800">Other projects in the ecosystem:</p>
         <div className="flex flex-col gap-2">
