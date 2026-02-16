@@ -25,17 +25,20 @@ env:
   API_VERSION: ${{ vars.API_VERSION }}
   CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
   DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIX: ${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
-  SPOTIFY_REDIRECT_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
+  SPOTIFY_CLIENT_ID_PROD: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
+  SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
   SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
+  GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID_PROD }}
+  GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
   SERVER_DEPLOY_USERNAME: ${{ secrets.SERVER_DEPLOY_USERNAME }}
   SERVER_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
   DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-  SPOTIFY_CLIENT_ID_PROD: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
 
 jobs:
   check-required-vars:
     name: Check Required Variables and Secrets
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     environment:
       name: TEST
     steps:
@@ -60,8 +63,10 @@ jobs:
             VAR_CONTAINER_NAME "${{ env.CONTAINER_NAME }}" \
             VAR_DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIX "${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIX }}" \
             SECRET_SPOTIFY_CLIENT_ID "${{ env.SPOTIFY_CLIENT_ID_PROD }}" \
-            VAR_SPOTIFY_REDIRECT_URI "${{ env.SPOTIFY_REDIRECT_URI }}" \
+            VAR_SPOTIFY_REDIRECT_RELATIVE_URI "${{ env.SPOTIFY_REDIRECT_RELATIVE_URI }}" \
             VAR_SPOTIFY_SCOPES "${{ env.SPOTIFY_SCOPES }}" \
+            VAR_GOOGLE_REDIRECT_RELATIVE_URI "${{ env.GOOGLE_REDIRECT_RELATIVE_URI }}" \
+            SECRET_GOOGLE_CLIENT_ID "${{ secrets.GOOGLE_CLIENT_ID_PROD }}" \
             SECRET_SERVER_DEPLOY_USERNAME "${{ env.SERVER_DEPLOY_USERNAME }}" \
             SECRET_SERVER_DEPLOY_SSH_PRIVATE_KEY "${{ env.SERVER_DEPLOY_SSH_PRIVATE_KEY }}" \
             SECRET_DOCKERHUB_ACCESS_TOKEN "${{ env.DOCKERHUB_ACCESS_TOKEN }}"
@@ -114,8 +119,13 @@ jobs:
 
       - name: Build
         env:
-          NEXT_PUBLIC_CONTACT_EMAIL: ci@example.com
           NEXT_PUBLIC_BACKEND_BASE_URL: https://api.example.com/
+          NEXT_PUBLIC_CONTACT_EMAIL: ci@example.com
+          NEXT_PUBLIC_SPOTIFY_CLIENT_ID: ci-placeholder
+          NEXT_PUBLIC_SPOTIFY_SCOPES: ci-placeholder
+          NEXT_PUBLIC_SPOTIFY_REDIRECT_URI: https://ci.example.com/auth/spotify/callback
+          NEXT_PUBLIC_GOOGLE_CLIENT_ID: ci-placeholder.apps.googleusercontent.com
+          NEXT_PUBLIC_GOOGLE_REDIRECT_URI: https://ci.example.com/auth/google/callback
           NEXT_PUBLIC_SENTRY_IS_ACTIVE: false
         run: npm run build
 
@@ -177,8 +187,10 @@ jobs:
             echo 'NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ vars.SENTRY_IS_ACTIVE }}' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_SPOTIFY_CLIENT_ID=${{ env.SPOTIFY_CLIENT_ID_PROD }}' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/${{ env.SPOTIFY_REDIRECT_URI }}' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_SPOTIFY_SCOPES=${{ env.SPOTIFY_SCOPES }}' >> ${{ env.ENV_FILE }}
+            echo 'NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/${{ env.SPOTIFY_REDIRECT_RELATIVE_URI }}' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_SPOTIFY_SCOPES=${{ env.SPOTIFY_SCOPES }}' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}' >> ${{ env.ENV_FILE }} &&
+            echo 'NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/${{ env.GOOGLE_REDIRECT_RELATIVE_URI }}' >> ${{ env.ENV_FILE }}
           "
 
   set-docker-compose:

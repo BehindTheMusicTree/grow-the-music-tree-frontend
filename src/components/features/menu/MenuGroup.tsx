@@ -5,38 +5,72 @@ import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import { Play } from "lucide-react";
 import { usePopup } from "@contexts/PopupContext";
+import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
 import { useSession } from "@contexts/SessionContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
-import SpotifyAuthPopup from "@components/ui/popup/child/SpotifyAuthPopup";
+import { useGoogleAuth } from "@hooks/useGoogleAuth";
+import { useFetchSpotifyUser } from "@hooks/useSpotifyUser";
+import { getRouteAuthRequirement } from "@lib/constants/routes";
+import AuthPopup from "@components/ui/popup/child/AuthPopup";
 
 interface MenuItem {
   href: string;
   label: string;
   icon: ReactNode;
-  authRequired?: boolean;
+  authRequired?: false | "any" | "spotify";
 }
 
 interface MenuGroupProps {
   items: MenuItem[];
   className?: string;
+  collapsed?: boolean;
 }
 
-export function MenuGroup({ items, className = "" }: MenuGroupProps) {
+export function MenuGroup({ items, className = "", collapsed = false }: MenuGroupProps) {
   const pathname = usePathname();
   const { showPopup, hidePopup } = usePopup();
   const { session } = useSession();
   const { handleSpotifyOAuth } = useSpotifyAuth();
+  const { handleGoogleOAuth } = useGoogleAuth();
+  const routeAuthRequirement = getRouteAuthRequirement(pathname);
+  const fetchSpotifyUserEnabled = routeAuthRequirement === "spotify" || pathname === "/account";
+  const { data: spotifyProfile } = useFetchSpotifyUser({
+    skipGlobalError: true,
+    enabled: fetchSpotifyUserEnabled,
+  });
   const isAuthenticated = Boolean(session?.accessToken);
+  const hasSpotifyAuth = Boolean(spotifyProfile?.id);
 
   const handleItemClick = (item: MenuItem) => (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (item.authRequired === false) {
-      hidePopup();
+      hidePopup({ onlyIfType: AUTH_POPUP_TYPE });
       return;
     }
-    if (item.authRequired && !isAuthenticated) {
+    if (item.authRequired === "spotify" && (!isAuthenticated || !hasSpotifyAuth)) {
       e.preventDefault();
-      showPopup(<SpotifyAuthPopup handleSpotifyOAuth={handleSpotifyOAuth} redirectAfterAuthPath={item.href} />);
+      showPopup(
+        <AuthPopup
+          handleSpotifyOAuth={handleSpotifyOAuth}
+          redirectAfterAuthPath={item.href}
+          spotifyOnly
+        />,
+        AUTH_POPUP_TYPE,
+      );
+      return;
     }
+    if (item.authRequired === "any" && !isAuthenticated) {
+      e.preventDefault();
+      showPopup(
+        <AuthPopup
+          handleSpotifyOAuth={handleSpotifyOAuth}
+          handleGoogleOAuth={handleGoogleOAuth}
+          redirectAfterAuthPath={item.href}
+        />,
+        AUTH_POPUP_TYPE,
+      );
+      return;
+    }
+    hidePopup({ onlyIfType: AUTH_POPUP_TYPE });
   };
 
   return (
@@ -50,15 +84,24 @@ export function MenuGroup({ items, className = "" }: MenuGroupProps) {
             href={item.href}
             prefetch={false}
             onClick={handleItemClick(item)}
-            className={`flex items-center gap-3 mx-1 mt-1 px-4 py-2 rounded-sm transition-colors duration-200 ${
-              item.authRequired
-                ? "bg-[var(--private-menu-item-bg)] text-white hover:bg-[var(--private-menu-item-bg)] hover:opacity-90"
-                : "text-gray-300 hover:text-white hover:bg-gray-800"
+            title={collapsed ? item.label : undefined}
+            className={`flex items-center mx-1 mt-1 py-2 rounded-sm transition-colors duration-200 ${
+              collapsed ? "justify-center px-2" : "gap-3 px-4"
+            } ${
+              item.authRequired === "any"
+                ? "bg-[var(--private-menu-item-bg)] text-black hover:opacity-90"
+                : item.authRequired === "spotify"
+                  ? "bg-[var(--spotify-menu-item-bg)] text-white hover:opacity-90"
+                  : "text-gray-300 hover:text-white hover:bg-gray-800"
             }`}
           >
             {item.icon}
-            <span className="flex-grow">{item.label}</span>
-            {isCurrentPage && <Play className="shrink-0 w-4 h-4 fill-current" />}
+            {!collapsed && (
+              <>
+                <span className="flex-grow">{item.label}</span>
+                {isCurrentPage && <Play className="shrink-0 w-4 h-4 fill-current" />}
+              </>
+            )}
           </Link>
         );
       })}

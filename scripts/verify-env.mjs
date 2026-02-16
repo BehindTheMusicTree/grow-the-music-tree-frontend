@@ -17,9 +17,12 @@ console.log("Checking required NEXT_PUBLIC_ variables:");
 
 const requiredVars = [
   "NEXT_PUBLIC_BACKEND_BASE_URL",
+  "NEXT_PUBLIC_CONTACT_EMAIL",
   "NEXT_PUBLIC_SPOTIFY_CLIENT_ID",
   "NEXT_PUBLIC_SPOTIFY_SCOPES",
   "NEXT_PUBLIC_SPOTIFY_REDIRECT_URI",
+  "NEXT_PUBLIC_GOOGLE_CLIENT_ID",
+  "NEXT_PUBLIC_GOOGLE_REDIRECT_URI",
 ];
 
 let allPresent = true;
@@ -37,4 +40,5 @@ if (allPresent) {
   console.log("\n✅ SUCCESS: All required environment variables are present!");
 } else {
   console.log("\n❌ ERROR: Some environment variables are missing!");
+  process.exit(1);
 }

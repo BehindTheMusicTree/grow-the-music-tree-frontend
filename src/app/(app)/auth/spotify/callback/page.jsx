@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { usePopup } from "@contexts/PopupContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
+import SpotifyAuthErrorPopup from "@components/ui/popup/child/SpotifyAuthErrorPopup";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
 
@@ -17,64 +19,88 @@ function getParamsFromUrl() {
 
 export default function SpotifyOAuthCallbackPage() {
   const router = useRouter();
+  const { showPopup, hidePopup } = usePopup();
   const { authToBackendFromSpotifyCode } = useSpotifyAuth();
   const [isPending, setIsPending] = useState(true);
-  const [error, setError] = useState(null);
   const authAttempted = useRef(false);
 
   useEffect(() => {
     const { code, errorParam } = getParamsFromUrl();
 
     const handleAuth = async () => {
-      if (authAttempted.current) return;
-      authAttempted.current = true;
-
       if (errorParam) {
-        setError(new Error(`Spotify authentication failed: ${errorParam}`));
+        if (authAttempted.current) return;
+        authAttempted.current = true;
+        showPopup(
+          <SpotifyAuthErrorPopup
+            message={`Spotify authentication failed: ${errorParam}`}
+            onClose={() => {
+              hidePopup();
+              // router.push("/");
+            }}
+          />,
+        );
+        // router.push("/");
         setIsPending(false);
         return;
       }
 
       if (!code) {
-        setError(new Error("No authorization code received from Spotify"));
+        if (authAttempted.current) return;
+        authAttempted.current = true;
+        showPopup(
+          <SpotifyAuthErrorPopup
+            message="No authorization code received from Spotify"
+            onClose={() => {
+              hidePopup();
+              // router.push("/");
+            }}
+          />,
+        );
+        // router.push("/");
         setIsPending(false);
         return;
       }
 
+      if (authAttempted.current) return;
+      authAttempted.current = true;
+
       try {
         const redirectUrl = await authToBackendFromSpotifyCode(code);
         if (redirectUrl) {
-          router.push(redirectUrl);
+          // router.push(redirectUrl);
         }
       } catch (err) {
-        if (err instanceof BackendError && err.code === ErrorCode.BACKEND_AUTH_ERROR) {
-          setError(new Error("Failed to authenticate with the backend server. Please try again later."));
-        } else {
-          setError(new Error("An unexpected error occurred. Please try again later."));
-        }
+        const message =
+          err instanceof BackendError
+            ? err.code === ErrorCode.BACKEND_AUTH_ERROR
+              ? "Failed to authenticate with the backend server. Please try again later."
+              : err.message
+            : "An unexpected error occurred. Please try again later.";
+        showPopup(
+          <SpotifyAuthErrorPopup
+            message={message}
+            onClose={() => {
+              hidePopup();
+              // router.push("/");
+            }}
+          />,
+        );
+        // router.push("/");
       } finally {
         setIsPending(false);
       }
     };
-  }, [authToBackendFromSpotifyCode, router]);
+
+    handleAuth();
+  }, [authToBackendFromSpotifyCode, router, showPopup, hidePopup]);
 
   if (isPending) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Connecting to Spotify...</h1>
+          <h1 className="mb-4 text-2xl font-bold">Connecting to Spotify...</h1>
           <p className="text-gray-600">Please wait while we complete the authentication process.</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 max-w-md w-full">
-          <h2 className="text-red-500 font-semibold mb-2">Authentication Error</h2>
-          <p className="text-red-500/80">{error.message}</p>
         </div>
       </div>
     );

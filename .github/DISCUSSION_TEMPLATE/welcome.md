@@ -128,7 +128,7 @@ GrowTheMusicTree is built on:
 
 ---
 
-**Let's grow the music tree together! 🌳🎵**
+**Let's GrowTheMusicTree together! 🌳🎵**
 
 Welcome to the community, and thank you for being part of this journey.
 

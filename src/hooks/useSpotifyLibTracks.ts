@@ -2,6 +2,7 @@
 
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
+import { useSession } from "@contexts/SessionContext";
 import { parseWithLog } from "@lib/parse-with-log";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { SpotifyLibTrackSimpleSchema } from "@domain/spotify/spotify-lib-track";
@@ -9,6 +10,7 @@ import { libraryEndpoints, libraryQueryKeys } from "../api/endpoints/library";
 
 export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTIFY_LIB_TRACKS_PAGE_SIZE || 50) {
   const { fetch } = useFetchWrapper();
+  const { session, sessionRestored } = useSession();
 
   return useInfiniteQuery({
     queryKey: libraryQueryKeys.me.spotify.all,
@@ -23,7 +25,7 @@ export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTI
       return undefined;
     },
     initialPageParam: 1,
-    enabled: true,
+    enabled: sessionRestored && !!session?.accessToken,
   });
 }
 
