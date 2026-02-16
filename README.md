@@ -268,6 +268,16 @@ Output directory: `out/` (static export)
 
 ## Troubleshooting
 
+- **Auth callback shows no "Connecting with Google/Spotify...", no network request:** With the standard SPA fallback (`try_files $uri @spa`), the server serves `index.html` for `/auth/.../callback`; the client router then renders the callback page from the URL. If the backend exchange never runs: (1) **Cache** — A 304 on the callback document means the browser may be using a cached page; do a hard refresh (Ctrl+Shift+R / Cmd+Shift+R) or open the callback URL in an incognito window, or in DevTools → Network enable "Disable cache" and retry the auth flow. (2) **Prevent caching for callback** — In nginx, add a location for auth callbacks that serves the SPA with `Cache-Control: no-store` so returning from OAuth always gets a fresh document:
+  ```nginx
+  location ~ ^/auth/(google|spotify)/callback {
+    root /var/www/gtmt-front/;
+    add_header Cache-Control "no-store, no-cache";
+    try_files /index.html =404;
+  }
+  ```
+  (Place this **before** the general `location /` block.) (3) Check the browser console for errors. **Do not add** `$uri.html` or `$uri/` to the main `try_files` for this app—that can cause ERR_TOO_MANY_REDIRECTS.
+
 - **Environment variables not applied:** Rebuild required after env changes
 - **Clear local cache:**
   ```bash

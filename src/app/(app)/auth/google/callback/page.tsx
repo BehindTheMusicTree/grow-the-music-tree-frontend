@@ -32,22 +32,27 @@ export default function GoogleOAuthCallbackPage() {
     const { code, errorParam } = getParamsFromUrl();
 
     const handleAuth = async () => {
-      if (authAttempted.current) return;
-      authAttempted.current = true;
-
       if (errorParam) {
+        if (authAttempted.current) return;
+        authAttempted.current = true;
         setError(new Error(`Google authentication failed: ${errorParam}`));
         setIsPending(false);
         return;
       }
 
       if (!code) {
+        if (authAttempted.current) return;
+        authAttempted.current = true;
         setError(new Error("No authorization code received from Google"));
         setIsPending(false);
         return;
       }
 
+      if (authAttempted.current) return;
+      authAttempted.current = true;
+
       try {
+        console.log("[GoogleCallback] Exchanging code with backend…");
         const redirectUrl = await authToBackendFromGoogleCode(code);
         if (redirectUrl) {
           // router.push(redirectUrl);
@@ -81,7 +86,10 @@ export default function GoogleOAuthCallbackPage() {
 
   if (isPending) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div
+        className="flex min-h-screen items-center justify-center"
+        data-page="google-oauth-callback"
+      >
         <div className="text-center">
           <h1 className="mb-4 text-2xl font-bold">Connecting with Google...</h1>
           <p className="text-gray-600">Please wait while we complete the authentication process.</p>

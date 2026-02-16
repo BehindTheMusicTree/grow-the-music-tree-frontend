@@ -28,10 +28,9 @@ export default function SpotifyOAuthCallbackPage() {
     const { code, errorParam } = getParamsFromUrl();
 
     const handleAuth = async () => {
-      if (authAttempted.current) return;
-      authAttempted.current = true;
-
       if (errorParam) {
+        if (authAttempted.current) return;
+        authAttempted.current = true;
         showPopup(
           <SpotifyAuthErrorPopup
             message={`Spotify authentication failed: ${errorParam}`}
@@ -47,6 +46,8 @@ export default function SpotifyOAuthCallbackPage() {
       }
 
       if (!code) {
+        if (authAttempted.current) return;
+        authAttempted.current = true;
         showPopup(
           <SpotifyAuthErrorPopup
             message="No authorization code received from Spotify"
@@ -60,6 +61,9 @@ export default function SpotifyOAuthCallbackPage() {
         setIsPending(false);
         return;
       }
+
+      if (authAttempted.current) return;
+      authAttempted.current = true;
 
       try {
         const redirectUrl = await authToBackendFromSpotifyCode(code);
