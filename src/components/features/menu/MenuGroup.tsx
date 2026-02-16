@@ -23,9 +23,10 @@ interface MenuItem {
 interface MenuGroupProps {
   items: MenuItem[];
   className?: string;
+  collapsed?: boolean;
 }
 
-export function MenuGroup({ items, className = "" }: MenuGroupProps) {
+export function MenuGroup({ items, className = "", collapsed = false }: MenuGroupProps) {
   const pathname = usePathname();
   const { showPopup, hidePopup } = usePopup();
   const { session } = useSession();
@@ -83,7 +84,10 @@ export function MenuGroup({ items, className = "" }: MenuGroupProps) {
             href={item.href}
             prefetch={false}
             onClick={handleItemClick(item)}
-            className={`flex items-center gap-3 mx-1 mt-1 px-4 py-2 rounded-sm transition-colors duration-200 ${
+            title={collapsed ? item.label : undefined}
+            className={`flex items-center mx-1 mt-1 py-2 rounded-sm transition-colors duration-200 ${
+              collapsed ? "justify-center px-2" : "gap-3 px-4"
+            } ${
               item.authRequired === "any"
                 ? "bg-[var(--private-menu-item-bg)] text-black hover:opacity-90"
                 : item.authRequired === "spotify"
@@ -92,8 +96,12 @@ export function MenuGroup({ items, className = "" }: MenuGroupProps) {
             }`}
           >
             {item.icon}
-            <span className="flex-grow">{item.label}</span>
-            {isCurrentPage && <Play className="shrink-0 w-4 h-4 fill-current" />}
+            {!collapsed && (
+              <>
+                <span className="flex-grow">{item.label}</span>
+                {isCurrentPage && <Play className="shrink-0 w-4 h-4 fill-current" />}
+              </>
+            )}
           </Link>
         );
       })}

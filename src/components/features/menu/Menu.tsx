@@ -1,10 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { PiGraphLight } from "react-icons/pi";
 import { FaSpotify, FaCloudUploadAlt, FaUser, FaList, FaInfoCircle } from "react-icons/fa";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { MenuGroup } from "./MenuGroup";
+import { useMediaQuery } from "@hooks/useMediaQuery";
 import {
   MENU_WIDTH,
+  MENU_WIDTH_COLLAPSED,
+  MENU_COLLAPSE_BREAKPOINT_PX,
   PRIVATE_MENU_ITEM_BG_COLOR,
   SPOTIFY_MENU_ITEM_BG_COLOR,
 } from "@lib/constants/layout";
@@ -27,19 +32,40 @@ const menuGroup = ROUTE_AUTH_CONFIG.map((route) => ({
   authRequired: route.authRequired,
 }));
 
+const smallScreenQuery = `(max-width: ${MENU_COLLAPSE_BREAKPOINT_PX - 1}px)`;
+
 export default function Menu({ className }: { className?: string }) {
+  const isSmallScreen = useMediaQuery(smallScreenQuery);
+  const [isCollapsed, setIsCollapsed] = useState(true);
+  const collapsed = isSmallScreen && isCollapsed;
+  const width = collapsed ? MENU_WIDTH_COLLAPSED : MENU_WIDTH;
+
   return (
     <nav
-      className={`menu bg-black flex flex-col justify-start items-start m-0 p-0 h-full shrink-0 ${className}`}
+      className={`menu bg-black flex flex-col justify-start items-stretch m-0 p-0 h-full shrink-0 ${className}`}
       style={{
-        width: MENU_WIDTH,
-        minWidth: MENU_WIDTH,
-        maxWidth: MENU_WIDTH,
+        width,
+        minWidth: width,
+        maxWidth: width,
         ["--private-menu-item-bg" as string]: PRIVATE_MENU_ITEM_BG_COLOR,
         ["--spotify-menu-item-bg" as string]: SPOTIFY_MENU_ITEM_BG_COLOR,
       }}
     >
-      <MenuGroup items={menuGroup} />
+      {isSmallScreen && (
+        <button
+          type="button"
+          onClick={() => setIsCollapsed((c) => !c)}
+          className="flex items-center justify-center w-full py-2 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+          aria-label={collapsed ? "Expand menu" : "Collapse menu"}
+        >
+          {collapsed ? (
+            <ChevronRight className="w-6 h-6" />
+          ) : (
+            <ChevronLeft className="w-6 h-6" />
+          )}
+        </button>
+      )}
+      <MenuGroup items={menuGroup} collapsed={collapsed} />
     </nav>
   );
 }
