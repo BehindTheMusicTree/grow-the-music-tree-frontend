@@ -17,6 +17,7 @@ export const ROUTE_AUTH_CONFIG: readonly RouteAuthConfigItem[] = [
   { path: "/me-uploaded-library", authRequired: "any", label: "My Uploaded Library" },
   { path: "/me-spotify-library", authRequired: "spotify", label: "My Spotify Library" },
   { path: "/account", authRequired: "any", label: "Account" },
+  { path: "/about", authRequired: false, label: "About" },
 ];
 
 export function getRouteAuthRequirement(pathname: string): RouteAuthRequirement {

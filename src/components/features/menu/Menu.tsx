@@ -1,7 +1,7 @@
 "use client";
 
 import { PiGraphLight } from "react-icons/pi";
-import { FaSpotify, FaCloudUploadAlt, FaUser, FaList } from "react-icons/fa";
+import { FaSpotify, FaCloudUploadAlt, FaUser, FaList, FaInfoCircle } from "react-icons/fa";
 import { MenuGroup } from "./MenuGroup";
 import {
   MENU_WIDTH,
@@ -17,6 +17,7 @@ const MENU_ICONS: Record<string, React.ReactNode> = {
   "/me-uploaded-library": <FaCloudUploadAlt className="text-xl" />,
   "/me-spotify-library": <FaSpotify className="text-xl" />,
   "/account": <FaUser className="text-xl" />,
+  "/about": <FaInfoCircle className="text-xl" />,
 };
 
 const menuGroup = ROUTE_AUTH_CONFIG.map((route) => ({

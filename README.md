@@ -41,6 +41,7 @@ Music enthusiasts, researchers, and the general public interested in understandi
 ## Pages
 
 - Home (`/`)
+- About (`/about`)
 - Account (`/account`)
 - Spotify Auth Callback (`/auth/spotify/callback`)
 - Genre Playlists (`/genre-playlists`)
