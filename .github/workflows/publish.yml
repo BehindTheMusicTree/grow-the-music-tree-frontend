@@ -11,7 +11,6 @@ env:
   DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
   CONTAINER_ROOT_DIR: /home/app/
   DOCKERIZED_APP_ENV_FILENAME: .env_gtmt_front
-  BUILD_COMPLETE_FILENAME: build-complete.txt
   DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
   WEBHOOK_DIR: ${{ vars.WEBHOOK_DIR }}
   WEBHOOK_REDEPLOYMENT_DIR_NAME: ${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}
@@ -151,7 +150,6 @@ jobs:
           build-args: |
             PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
             APP_PORT=${{ env.GTMT_FRONT_PORT }}
-            BUILD_COMPLETE_FILENAME=${{ env.BUILD_COMPLETE_FILENAME }}
 
   set-env-variables:
     name: Set Environment Variables
@@ -181,7 +179,6 @@ jobs:
             echo 'APP_VERSION=${{ needs.determine-version.outputs.version }}' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_APP_VERSION=${{ needs.determine-version.outputs.version }}' >> ${{ env.ENV_FILE }} &&
             echo 'APP_PORT=${{ env.GTMT_FRONT_PORT }}' >> ${{ env.ENV_FILE }} &&
-            echo 'BUILD_COMPLETE_FILENAME=${{ env.BUILD_COMPLETE_FILENAME }}' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_CONTACT_EMAIL=${{ env.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_BACKEND_BASE_URL=https://${{ env.HTMT_API_SUBDOMAIN_NAME }}.${{ env.DOMAIN_NAME }}/${{ env.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ vars.SENTRY_IS_ACTIVE }}' >> ${{ env.ENV_FILE }} &&
@@ -227,7 +224,6 @@ jobs:
           CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
           APP_PORT: ${{ env.GTMT_FRONT_PORT }}
           ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}
-          BUILD_COMPLETE_FILENAME: ${{ env.BUILD_COMPLETE_FILENAME }}
         run: bash scripts/generate-partial-docker-compose.sh
 
       - name: Transfer partial docker-compose to server

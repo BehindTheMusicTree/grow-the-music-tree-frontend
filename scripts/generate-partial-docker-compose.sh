@@ -17,7 +17,6 @@ REQUIRED_SCRIPT_VAR=(
 	CONTAINER_NAME
 	APP_PORT
 	ENV_FILENAME
-	BUILD_COMPLETE_FILENAME
 )
 for var in ${REQUIRED_SCRIPT_VAR[@]}; do
   	check_vars_are_set $var
@@ -30,15 +29,13 @@ cat << EOF > $DOCKER_COMPOSE_PARTIAL_FILE
     working_dir: $PROJECT_DIR
     image: $DOCKERHUB_USERNAME/$IMAGE_REPO:$APP_VERSION
     container_name: $CONTAINER_NAME
-    volumes:
-      - gtmt-front-build:${PROJECT_DIR}build/
     expose:
       - $APP_PORT
     env_file: $ENV_FILENAME
     healthcheck:
-      test: ["CMD-SHELL", "test -f ${PROJECT_DIR}${BUILD_COMPLETE_FILENAME} || exit 1"]
-      interval: 7s
-      timeout: 10s
-      retries: 5
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:$APP_PORT/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 EOF
 log_with_script_suffixe "Partial docker-compose file generated successfully."
