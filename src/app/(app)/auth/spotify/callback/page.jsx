@@ -37,11 +37,11 @@ export default function SpotifyOAuthCallbackPage() {
             message={`Spotify authentication failed: ${errorParam}`}
             onClose={() => {
               hidePopup();
-              router.push("/");
+              // router.push("/");
             }}
           />,
         );
-        router.push("/");
+        // router.push("/");
         setIsPending(false);
         return;
       }
@@ -52,11 +52,11 @@ export default function SpotifyOAuthCallbackPage() {
             message="No authorization code received from Spotify"
             onClose={() => {
               hidePopup();
-              router.push("/");
+              // router.push("/");
             }}
           />,
         );
-        router.push("/");
+        // router.push("/");
         setIsPending(false);
         return;
       }
@@ -64,7 +64,7 @@ export default function SpotifyOAuthCallbackPage() {
       try {
         const redirectUrl = await authToBackendFromSpotifyCode(code);
         if (redirectUrl) {
-          router.push(redirectUrl);
+          // router.push(redirectUrl);
         }
       } catch (err) {
         const message =
@@ -78,11 +78,11 @@ export default function SpotifyOAuthCallbackPage() {
             message={message}
             onClose={() => {
               hidePopup();
-              router.push("/");
+              // router.push("/");
             }}
           />,
         );
-        router.push("/");
+        // router.push("/");
       } finally {
         setIsPending(false);
       }

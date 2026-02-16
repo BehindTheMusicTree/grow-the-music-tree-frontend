@@ -50,7 +50,7 @@ export default function GoogleOAuthCallbackPage() {
       try {
         const redirectUrl = await authToBackendFromGoogleCode(code);
         if (redirectUrl) {
-          router.push(redirectUrl);
+          // router.push(redirectUrl);
         }
       } catch (err) {
         if (err instanceof BackendError) {
@@ -62,7 +62,7 @@ export default function GoogleOAuthCallbackPage() {
               />,
               AUTH_POPUP_TYPE,
             );
-            router.push("/");
+            // router.push("/");
           } else if (err.code === ErrorCode.BACKEND_AUTH_ERROR) {
             setError(new Error("Failed to authenticate with the backend server. Please try again later."));
           } else {
