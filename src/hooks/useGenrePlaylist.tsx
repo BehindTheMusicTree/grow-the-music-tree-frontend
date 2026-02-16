@@ -5,6 +5,7 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useFetchWrapper } from "@hooks/useFetchWrapper";
 import { parseWithLog } from "@lib/parse-with-log";
 import { useQueryWithParse } from "@hooks/useQueryWithParse";
+import { useSession } from "@contexts/SessionContext";
 
 import { CriteriaPlaylistSimpleSchema } from "@domain/playlist/criteria-playlist/simple";
 import { CriteriaPlaylistDetailedSchema, CriteriaPlaylistDetailed } from "@domain/playlist/criteria-playlist/detailed";
@@ -18,12 +19,14 @@ const FULL_LIST_PAGE_SIZE = 1000;
 export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBLIC_GENRE_PLAYLISTS_PAGE_SIZE || 50) => {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
+  const { session, sessionRestored } = useSession();
 
   const query = useQueryWithParse({
     queryKey: playlistQueryKeys.me.list(page),
     queryFn: () => fetch(playlistEndpoints.me.list(), true, true, {}, { page, pageSize }),
     schema: PaginatedResponseSchema(CriteriaPlaylistSimpleSchema),
     context: "useListGenrePlaylists",
+    enabled: sessionRestored && !!session?.accessToken,
   });
 
   const invalidateGenrePlaylists = () => {
@@ -39,6 +42,7 @@ export const useListGenrePlaylists = (page = 1, pageSize = process.env.NEXT_PUBL
 export const useListFullGenrePlaylists = (scope: Scope) => {
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper();
+  const { session, sessionRestored } = useSession();
   const queryKey = scope === "reference" ? playlistQueryKeys.reference.full : playlistQueryKeys.me.full;
 
   const query = useQueryWithParse({
@@ -53,6 +57,7 @@ export const useListFullGenrePlaylists = (scope: Scope) => {
       ),
     schema: PaginatedResponseSchema(CriteriaPlaylistSimpleSchema),
     context: "useListFullGenrePlaylists",
+    enabled: scope === "reference" || (sessionRestored && !!session?.accessToken),
   });
 
   const invalidateFullGenrePlaylists = () => {
@@ -67,11 +72,13 @@ export const useListFullGenrePlaylists = (scope: Scope) => {
 
 export const useFetchGenrePlaylist = (uuid: string) => {
   const { fetch } = useFetchWrapper();
+  const { session, sessionRestored } = useSession();
   return useQueryWithParse<CriteriaPlaylistDetailed>({
     queryKey: playlistQueryKeys.me.detail(uuid),
     queryFn: () => fetch(playlistEndpoints.me.detail(uuid)),
     schema: CriteriaPlaylistDetailedSchema as z.ZodType<CriteriaPlaylistDetailed>,
     context: "useFetchGenrePlaylist",
+    enabled: !!uuid && sessionRestored && !!session?.accessToken,
   });
 };
 
