@@ -50,10 +50,10 @@ export default class AuthPopup extends BasePopup<AuthPopupProps> {
               onClick={() => handleSpotifyOAuth(redirectAfterAuthPath)}
               className="relative mb-2 w-fit transform bg-green-600 px-8 py-3 text-white shadow-lg transition-all duration-200 hover:scale-[1.02] hover:bg-green-700 hover:shadow-xl"
             >
-              <div className="flex items-center justify-center">
+              <span className="flex items-center justify-center">
                 <FaSpotify className="absolute left-6 text-3xl" />
-                <p className="w-full pl-14 pr-8 text-center text-lg font-medium">Sign in with Spotify</p>
-              </div>
+                <span className="w-full pl-14 pr-8 text-center text-lg font-medium">Sign in with Spotify</span>
+              </span>
             </Button>
             {showGoogle && (
               <Button
@@ -61,10 +61,10 @@ export default class AuthPopup extends BasePopup<AuthPopupProps> {
                 onClick={() => handleGoogleOAuth!(redirectAfterAuthPath)}
                 className="relative w-fit transform border-white bg-white px-8 py-3 text-black shadow-lg transition-all duration-200 hover:scale-[1.02] hover:bg-gray-100 hover:shadow-xl"
               >
-                <div className="flex items-center justify-center">
+                <span className="flex items-center justify-center">
                   <FcGoogle className="absolute left-6 text-2xl" />
-                  <p className="w-full pl-14 pr-8 text-center text-lg font-medium text-black">Sign in with Google</p>
-                </div>
+                  <span className="w-full pl-14 pr-8 text-center text-lg font-medium text-black">Sign in with Google</span>
+                </span>
               </Button>
             )}
           </div>
