@@ -106,6 +106,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
         popup = (
           <SpotifyAuthErrorPopup
             message={error.message}
+            errorCode={error.code}
             onClose={() => {
               hidePopup();
             }}

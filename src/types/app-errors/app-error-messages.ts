@@ -1,11 +1,27 @@
 import { ErrorCode } from "./app-error-codes";
 
+const SPOTIFY_ACCESS_REQUEST_SUBJECT = "Spotify access request";
+const SPOTIFY_ACCESS_REQUEST_BODY = `I would like to request access to the app.
+
+Spotify full name:
+Spotify email address:`;
+
 export function getSpotifyAllowlistMessage(): string {
-  const contact = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
-  if (contact) {
-    return `Your Spotify account is not yet authorized for this app. To request access, send an email to ${contact}.`;
-  }
-  return "Your Spotify account is not yet authorized for this app. To request access, contact the app owner.";
+  return "Your Spotify account is not yet authorized for this app.";
+}
+
+export function getSpotifyAllowlistContactEmail(): string | null {
+  return process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? null;
+}
+
+export function getSpotifyAllowlistMailtoHref(): string | null {
+  const contact = getSpotifyAllowlistContactEmail();
+  if (!contact) return null;
+  const params = new URLSearchParams({
+    subject: SPOTIFY_ACCESS_REQUEST_SUBJECT,
+    body: SPOTIFY_ACCESS_REQUEST_BODY,
+  });
+  return `mailto:${contact}?${params.toString()}`;
 }
 
 export const ErrorMessages: Record<ErrorCode, string> = {
