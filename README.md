@@ -10,6 +10,7 @@ This project is statically generated and intended to be served as static files (
 - [Pages](#pages)
 - [Tech Stack](#tech-stack)
 - [Rendering Strategy](#rendering-strategy)
+- [Auth callbacks](#auth-callbacks)
 - [Project Structure](#project-structure)
 - [Environment Variables](#environment-variables)
 - [Getting Started](#getting-started)
@@ -43,6 +44,7 @@ Music enthusiasts, researchers, and the general public interested in understandi
 - Home (`/`)
 - About (`/about`)
 - Account (`/account`)
+- Google Auth Callback (`/auth/google/callback`)
 - Spotify Auth Callback (`/auth/spotify/callback`)
 - Genre Playlists (`/genre-playlists`)
 - My Genre Tree (`/my-genre-tree`)
@@ -77,6 +79,12 @@ Typical hosting targets:
 - Nginx
 - Cloud storage (S3, GCS, etc.)
 - Docker static server
+
+## Auth callbacks
+
+Google and Spotify OAuth redirect the user to `/auth/google/callback` or `/auth/spotify/callback`. With static export the app is a SPA: a full load of that URL still serves `index.html`. The **layout-level** component `AuthCallbackHandler` (`src/components/auth/AuthCallbackHandler.tsx`) runs in the app shell on every load, reads `window.location` to detect these paths, exchanges the `code` with the backend, shows "Connecting…" or an error popup, then redirects. This ensures the backend exchange runs even when the client router does not mount the route’s page component on first load.
+
+**Known issue (source maps):** In production, stack traces and the DevTools Sources panel may not show the callback route or its page file; the logic runs in the layout component, so code and breakpoints for the callback flow live in `AuthCallbackHandler.tsx`, not in the route’s page component. This is specific to static export; with a Next.js server (no `output: 'export'`), the callback page would be served and mounted normally. Related: [vercel/next.js#59986](https://github.com/vercel/next.js/issues/59986) (static export + App Router RSC payload / route metadata behavior).
 
 ## Project Structure
 
@@ -268,7 +276,7 @@ Output directory: `out/` (static export)
 
 ## Troubleshooting
 
-- **Auth callback shows no "Connecting with Google/Spotify...", no network request:** With the standard SPA fallback (`try_files $uri @spa`), the server serves `index.html` for `/auth/.../callback`; the client router then renders the callback page from the URL. If the backend exchange never runs: (1) **Cache** — A 304 on the callback document means the browser may be using a cached page; do a hard refresh (Ctrl+Shift+R / Cmd+Shift+R) or open the callback URL in an incognito window, or in DevTools → Network enable "Disable cache" and retry the auth flow. (2) **Prevent caching for callback** — In nginx, add a location for auth callbacks that serves the SPA with `Cache-Control: no-store` so returning from OAuth always gets a fresh document:
+- **Auth callback shows no "Connecting with Google/Spotify...", no network request:** Callbacks are handled by `AuthCallbackHandler` in the app shell (see [Auth callbacks](#auth-callbacks)). The server must serve `index.html` for `/auth/.../callback` (standard SPA fallback: `try_files $uri @spa`). If the backend exchange never runs: (1) **Cache** — A 304 on the callback document means the browser may be using a cached page; do a hard refresh (Ctrl+Shift+R / Cmd+Shift+R) or open the callback URL in an incognito window, or in DevTools → Network enable "Disable cache" and retry the auth flow. (2) **Prevent caching for callback** — In nginx, add a location for auth callbacks that serves the SPA with `Cache-Control: no-store` so returning from OAuth always gets a fresh document:
   ```nginx
   location ~ ^/auth/(google|spotify)/callback {
     root /var/www/gtmt-front/;

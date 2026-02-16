@@ -1,5 +1,17 @@
 "use client";
 
+/**
+ * Handles OAuth callbacks at layout level. With static export, a full load of
+ * /auth/google/callback or /auth/spotify/callback serves index.html; the client
+ * router may not mount the route's page, so the exchange runs here via
+ * window.location. Rendered in the app shell (AppContent) so it runs on every load.
+ *
+ * Known issue: With static export, stack traces and Sources may not point at the
+ * callback route's page file; callback logic and breakpoints are in this file.
+ * This does not apply when running with a Next.js server (no output: 'export').
+ * See https://github.com/vercel/next.js/issues/59986 (static export + App Router).
+ */
+
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePopup } from "@contexts/PopupContext";
