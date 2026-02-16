@@ -23,6 +23,7 @@ import TrackListSidebar from "@components/features/track-list-sidebar/TrackListS
 
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
 import AuthPopup from "@components/ui/popup/child/AuthPopup";
+import AuthCallbackHandler from "@components/auth/AuthCallbackHandler";
 
 import { BANNER_HEIGHT, PLAYER_HEIGHT } from "@constants/layout";
 import {
@@ -154,6 +155,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
 
   return (
     <div className="app col h-screen">
+      <AuthCallbackHandler />
       <Banner className="banner fixed w-full top-0 z-50 h-banner" />
 
       <div
