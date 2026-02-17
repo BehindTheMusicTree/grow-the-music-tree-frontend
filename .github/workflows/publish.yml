@@ -1,6 +1,5 @@
-# Flow: determine-version (+ env) → check-required-vars → [test-build-app | set-env-variables | set-docker-compose] → build-image-and-push → deploy
-# Requires GitHub vars: WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE, DOCKER_COMPOSE_DIR_NAME, DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE, etc.
-# See docs/github-vars-dual-env.md in server-management for var names.
+# Same flow as API publish: determine-version → check-required-vars → [test-build-app | deploy-env-and-docker-compose] → build-image-and-push → redeploy-webhook-call
+# Requires GitHub vars: WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE, DOCKER_COMPOSE_DIR_NAME, DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE, APP_NAME, etc.
 name: Publish
 
 on:
@@ -40,7 +39,7 @@ jobs:
     name: Determine version
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version.outputs.version }}
+      app_version: ${{ steps.version.outputs.version }}
       env: ${{ steps.version.outputs.env }}
     steps:
       - name: Checkout code
@@ -89,6 +88,7 @@ jobs:
             VAR_DOMAIN_NAME "${{ env.DOMAIN_NAME }}" \
             VAR_WEBHOOK_DIR "${{ env.WEBHOOK_DIR }}" \
             VAR_WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE "${{ env.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}" \
+            VAR_APP_NAME "${{ vars.APP_NAME }}" \
             VAR_DOCKER_COMPOSE_DIR_NAME "${{ env.DOCKER_COMPOSE_DIR_NAME }}" \
             VAR_DOCKERHUB_USERNAME "${{ env.DOCKERHUB_USERNAME }}" \
             VAR_GTMT_FRONT_IMAGE_REPO "${{ env.GTMT_FRONT_IMAGE_REPO }}" \
@@ -138,86 +138,17 @@ jobs:
           NEXT_PUBLIC_SENTRY_IS_ACTIVE: false
         run: npm run build
 
-  set-env-variables:
-    name: Set environment variables
-    runs-on: ubuntu-latest
+  deploy-env-and-docker-compose:
+    name: Deploy
     needs: [check-required-vars, determine-version]
-    environment:
-      name: TEST
-    env:
-      DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}-${{ needs.determine-version.outputs.env }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
-    steps:
-      - uses: actions/checkout@v4
-      - uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ env.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
-
-      - name: Add host to known_hosts
-        run: |
-          mkdir -p ~/.ssh &&
-          ssh-keyscan -H ${{ env.DOMAIN_NAME }} >> ~/.ssh/known_hosts
-
-      - name: Set GTMT front environment variables on server
-        env:
-          ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKERIZED_APP_ENV_FILENAME }}
-        run: |
-          ssh ${{ env.SSH_DESTINATION }} "
-            rm -f ${{ env.ENV_FILE }} &&
-            echo 'NODE_ENV=${{ needs.determine-version.outputs.env }}' >> ${{ env.ENV_FILE }} &&
-            echo 'APP_VERSION=${{ needs.determine-version.outputs.version }}' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_APP_VERSION=${{ needs.determine-version.outputs.version }}' >> ${{ env.ENV_FILE }} &&
-            echo 'APP_PORT=${{ env.GTMT_FRONT_PORT }}' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_CONTACT_EMAIL=${{ env.CONTACT_EMAIL }}' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_BACKEND_BASE_URL=https://${{ env.HTMT_API_SUBDOMAIN_NAME }}.${{ env.DOMAIN_NAME }}/${{ env.API_VERSION }}/' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ vars.SENTRY_IS_ACTIVE }}' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_SPOTIFY_CLIENT_ID=${{ env.SPOTIFY_CLIENT_ID_PROD }}' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/${{ env.SPOTIFY_REDIRECT_RELATIVE_URI }}' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_SPOTIFY_SCOPES=${{ env.SPOTIFY_SCOPES }}' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}' >> ${{ env.ENV_FILE }} &&
-            echo 'NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/${{ env.GOOGLE_REDIRECT_RELATIVE_URI }}' >> ${{ env.ENV_FILE }}
-          "
-
-  set-docker-compose:
-    name: Configure Docker Compose
-    runs-on: ubuntu-latest
-    needs: [check-required-vars, determine-version]
-    environment:
-      name: TEST
-    env:
-      DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}-${{ needs.determine-version.outputs.env }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
-      DOCKER_COMPOSE_PARTIAL_FILENAME: gtmt-front${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ env.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
-
-      - name: Add host to known_hosts
-        run: |
-          mkdir -p ~/.ssh &&
-          ssh-keyscan -H ${{ env.DOMAIN_NAME }} >> ~/.ssh/known_hosts
-
-      - name: Generate partial docker compose file
-        env:
-          DOCKER_COMPOSE_PARTIAL_FILENAME: ${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }}
-          SERVICE_NAME: ${{ env.GTMT_FRONT_SERVICE_NAME }}
-          PROJECT_DIR: ${{ env.CONTAINER_ROOT_DIR }}
-          DOCKERHUB_USERNAME: ${{ env.DOCKERHUB_USERNAME }}
-          IMAGE_REPO: ${{ env.GTMT_FRONT_IMAGE_REPO }}
-          APP_VERSION: ${{ needs.determine-version.outputs.version }}
-          CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
-          APP_PORT: ${{ env.GTMT_FRONT_PORT }}
-          ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}
-        run: bash scripts/generate-partial-docker-compose.sh
-
-      - name: Transfer partial docker-compose to server
-        env:
-          DOCKER_COMPOSE_PARTIAL_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }}
-        run: scp scripts/${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }} ${{ env.SSH_DESTINATION }}:${{ env.DOCKER_COMPOSE_DIR }}
+    uses: ./.github/workflows/deploy-env-and-docker-compose.yml
+    with:
+      app_version: ${{ needs.determine-version.outputs.app_version }}
+      env: ${{ needs.determine-version.outputs.env }}
+    secrets: inherit
 
   build-image-and-push:
-    name: Build & push Docker image
+    name: Docker image
     runs-on: ubuntu-latest
     needs: [check-required-vars, determine-version, test-build-app]
     environment:
@@ -234,14 +165,14 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.GTMT_FRONT_IMAGE_REPO }}:${{ needs.determine-version.outputs.version }}
+          tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.GTMT_FRONT_IMAGE_REPO }}:${{ needs.determine-version.outputs.app_version }}
           build-args: |
             PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
             APP_PORT=${{ env.GTMT_FRONT_PORT }}
 
-  call-redeployment-webhook:
-    name: Deploy to server
-    needs: [set-env-variables, set-docker-compose, build-image-and-push, determine-version]
+  redeploy-webhook-call:
+    name: Redeploy webhook
+    needs: [build-image-and-push, deploy-env-and-docker-compose, determine-version]
     uses: BehindTheMusicTree/github-workflows/.github/workflows/call-redeployment-webhook.yml@main
     with:
       env: ${{ needs.determine-version.outputs.env }}
