@@ -239,7 +239,7 @@ jobs:
             PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
             APP_PORT=${{ env.GTMT_FRONT_PORT }}
 
-  deploy:
+  call-redeployment-webhook:
     name: Deploy to server
     needs: [set-env-variables, set-docker-compose, build-image-and-push, determine-version]
     uses: BehindTheMusicTree/github-workflows/.github/workflows/call-redeployment-webhook.yml@main
