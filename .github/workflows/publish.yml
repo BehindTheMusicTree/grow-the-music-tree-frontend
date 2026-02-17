@@ -1,19 +1,21 @@
+# Flow: determine-version (+ env) → check-required-vars → [test-build-app | set-env-variables | set-docker-compose] → build-image-and-push → deploy
+# Requires GitHub vars: WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE, DOCKER_COMPOSE_DIR_NAME, DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE, etc.
+# See docs/github-vars-dual-env.md in server-management for var names.
 name: Publish
 
 on:
   push:
     tags:
-      - "*"
+      - "v*"
   workflow_call:
 
 env:
   SSH_DESTINATION: ${{ secrets.SERVER_DEPLOY_USERNAME }}@${{ vars.DOMAIN_NAME }}
-  DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
   CONTAINER_ROOT_DIR: /home/app/
   DOCKERIZED_APP_ENV_FILENAME: .env_gtmt_front
   DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
   WEBHOOK_DIR: ${{ vars.WEBHOOK_DIR }}
-  WEBHOOK_REDEPLOYMENT_DIR_NAME: ${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME }}
+  WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE: ${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}
   DOCKER_COMPOSE_DIR_NAME: ${{ vars.DOCKER_COMPOSE_DIR_NAME }}
   DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
   GTMT_FRONT_IMAGE_REPO: ${{ vars.GTMT_FRONT_IMAGE_REPO }}
@@ -23,7 +25,7 @@ env:
   HTMT_API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
   API_VERSION: ${{ vars.API_VERSION }}
   CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
-  DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIX: ${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
+  DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE: ${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
   SPOTIFY_CLIENT_ID_PROD: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
   SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
   SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
@@ -34,8 +36,45 @@ env:
   DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
 jobs:
+  determine-version:
+    name: Determine version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      env: ${{ steps.version.outputs.env }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            echo "Using version from tag ref: $VERSION"
+          else
+            git fetch --tags --force
+            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+            if [ -z "$LATEST_TAG" ]; then
+              echo "Error: Cannot determine version. No tag provided."
+              exit 1
+            fi
+            VERSION="${LATEST_TAG#v}"
+            echo "Using latest tag version: $VERSION (from tag: $LATEST_TAG)"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [[ "$VERSION" == *-* ]]; then
+            echo "env=test" >> "$GITHUB_OUTPUT"
+            echo "Prerelease version -> env test"
+          else
+            echo "env=prod" >> "$GITHUB_OUTPUT"
+            echo "Release version -> env prod"
+          fi
+
   check-required-vars:
-    name: Check Required Variables and Secrets
+    name: Check required variables and secrets
     runs-on: ubuntu-latest
     timeout-minutes: 1
     environment:
@@ -49,7 +88,7 @@ jobs:
           bash scripts/check-required-vars.sh \
             VAR_DOMAIN_NAME "${{ env.DOMAIN_NAME }}" \
             VAR_WEBHOOK_DIR "${{ env.WEBHOOK_DIR }}" \
-            VAR_WEBHOOK_REDEPLOYMENT_DIR_NAME "${{ env.WEBHOOK_REDEPLOYMENT_DIR_NAME }}" \
+            VAR_WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE "${{ env.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}" \
             VAR_DOCKER_COMPOSE_DIR_NAME "${{ env.DOCKER_COMPOSE_DIR_NAME }}" \
             VAR_DOCKERHUB_USERNAME "${{ env.DOCKERHUB_USERNAME }}" \
             VAR_GTMT_FRONT_IMAGE_REPO "${{ env.GTMT_FRONT_IMAGE_REPO }}" \
@@ -60,49 +99,20 @@ jobs:
             VAR_API_VERSION "${{ env.API_VERSION }}" \
             VAR_SENTRY_IS_ACTIVE "${{ vars.SENTRY_IS_ACTIVE }}" \
             VAR_CONTAINER_NAME "${{ env.CONTAINER_NAME }}" \
-            VAR_DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIX "${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIX }}" \
+            VAR_DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE "${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}" \
             SECRET_SPOTIFY_CLIENT_ID "${{ env.SPOTIFY_CLIENT_ID_PROD }}" \
             VAR_SPOTIFY_REDIRECT_RELATIVE_URI "${{ env.SPOTIFY_REDIRECT_RELATIVE_URI }}" \
             VAR_SPOTIFY_SCOPES "${{ env.SPOTIFY_SCOPES }}" \
             VAR_GOOGLE_REDIRECT_RELATIVE_URI "${{ env.GOOGLE_REDIRECT_RELATIVE_URI }}" \
-            SECRET_GOOGLE_CLIENT_ID "${{ secrets.GOOGLE_CLIENT_ID_PROD }}" \
+            SECRET_GOOGLE_CLIENT_ID "${{ env.GOOGLE_CLIENT_ID }}" \
             SECRET_SERVER_DEPLOY_USERNAME "${{ env.SERVER_DEPLOY_USERNAME }}" \
             SECRET_SERVER_DEPLOY_SSH_PRIVATE_KEY "${{ env.SERVER_DEPLOY_SSH_PRIVATE_KEY }}" \
             SECRET_DOCKERHUB_ACCESS_TOKEN "${{ env.DOCKERHUB_ACCESS_TOKEN }}"
 
-  determine-version:
-    name: Determine Version
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Extract version from tag
-        id: version
-        run: |
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            # Extract from tag ref (e.g., refs/tags/v0.3.4 -> 0.3.4)
-            VERSION="${GITHUB_REF#refs/tags/v}"
-            echo "Using version from tag ref: $VERSION"
-          else
-            # Fallback: fetch tags and get the latest one
-            git fetch --tags --force
-            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-            if [ -z "$LATEST_TAG" ]; then
-              echo "Error: Cannot determine version. No tag provided."
-              exit 1
-            fi
-            # Remove 'v' prefix if present
-            VERSION="${LATEST_TAG#v}"
-            echo "Using latest tag version: $VERSION (from tag: $LATEST_TAG)"
-          fi
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
   test-build-app:
-    name: Test Build App
+    name: Test build app
     runs-on: ubuntu-latest
+    needs: [determine-version]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -128,35 +138,14 @@ jobs:
           NEXT_PUBLIC_SENTRY_IS_ACTIVE: false
         run: npm run build
 
-  build-image-and-push:
-    name: Build & Push Docker Image
-    runs-on: ubuntu-latest
-    needs: [check-required-vars, determine-version, test-build-app]
-    environment:
-      name: TEST
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Login to Dockerhub
-        run: echo "${{ env.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
-
-      - name: Build Image and push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.GTMT_FRONT_IMAGE_REPO }}:${{ needs.determine-version.outputs.version }}
-          build-args: |
-            PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
-            APP_PORT=${{ env.GTMT_FRONT_PORT }}
-
   set-env-variables:
-    name: Set Environment Variables
+    name: Set environment variables
     runs-on: ubuntu-latest
-    needs: [check-required-vars, determine-version, test-build-app]
+    needs: [check-required-vars, determine-version]
     environment:
       name: TEST
+    env:
+      DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}-${{ needs.determine-version.outputs.env }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
     steps:
       - uses: actions/checkout@v4
       - uses: webfactory/ssh-agent@v0.9.0
@@ -171,11 +160,10 @@ jobs:
       - name: Set GTMT front environment variables on server
         env:
           ENV_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKERIZED_APP_ENV_FILENAME }}
-          SPOTIFY_CLIENT_ID: ${{ env.SPOTIFY_CLIENT_ID }}
         run: |
           ssh ${{ env.SSH_DESTINATION }} "
             rm -f ${{ env.ENV_FILE }} &&
-            echo 'NODE_ENV=test' >> $ENV_FILE &&
+            echo 'NODE_ENV=${{ needs.determine-version.outputs.env }}' >> ${{ env.ENV_FILE }} &&
             echo 'APP_VERSION=${{ needs.determine-version.outputs.version }}' >> ${{ env.ENV_FILE }} &&
             echo 'NEXT_PUBLIC_APP_VERSION=${{ needs.determine-version.outputs.version }}' >> ${{ env.ENV_FILE }} &&
             echo 'APP_PORT=${{ env.GTMT_FRONT_PORT }}' >> ${{ env.ENV_FILE }} &&
@@ -193,10 +181,11 @@ jobs:
   set-docker-compose:
     name: Configure Docker Compose
     runs-on: ubuntu-latest
-    needs: [check-required-vars, determine-version, test-build-app]
+    needs: [check-required-vars, determine-version]
     environment:
       name: TEST
     env:
+      DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}-${{ needs.determine-version.outputs.env }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
       DOCKER_COMPOSE_PARTIAL_FILENAME: gtmt-front${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
     steps:
       - uses: actions/checkout@v4
@@ -208,10 +197,6 @@ jobs:
         run: |
           mkdir -p ~/.ssh &&
           ssh-keyscan -H ${{ env.DOMAIN_NAME }} >> ~/.ssh/known_hosts
-
-      - name: Debug version output
-        run: |
-          echo "Version from determine-version job: ${{ needs.determine-version.outputs.version }}"
 
       - name: Generate partial docker compose file
         env:
@@ -231,10 +216,33 @@ jobs:
           DOCKER_COMPOSE_PARTIAL_FILE: ${{ env.DOCKER_COMPOSE_DIR }}${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }}
         run: scp scripts/${{ env.DOCKER_COMPOSE_PARTIAL_FILENAME }} ${{ env.SSH_DESTINATION }}:${{ env.DOCKER_COMPOSE_DIR }}
 
+  build-image-and-push:
+    name: Build & push Docker image
+    runs-on: ubuntu-latest
+    needs: [check-required-vars, determine-version, test-build-app]
+    environment:
+      name: TEST
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Dockerhub
+        run: echo "${{ env.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build image and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.GTMT_FRONT_IMAGE_REPO }}:${{ needs.determine-version.outputs.version }}
+          build-args: |
+            PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
+            APP_PORT=${{ env.GTMT_FRONT_PORT }}
+
   deploy:
-    name: Deploy to Server
-    needs: [set-env-variables, set-docker-compose, build-image-and-push]
+    name: Deploy to server
+    needs: [set-env-variables, set-docker-compose, build-image-and-push, determine-version]
     uses: BehindTheMusicTree/github-workflows/.github/workflows/call-redeployment-webhook.yml@main
     with:
-      env: TEST
+      env: ${{ needs.determine-version.outputs.env }}
     secrets: inherit
