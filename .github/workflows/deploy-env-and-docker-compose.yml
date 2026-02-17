@@ -1,7 +1,6 @@
 # Reusable deploy workflow for GTMT front. Deploys app env file to pool/compose/<APP_NAME>/
 # and partial docker-compose to the compose dir. Same pattern as API deploy-env-and-docker-compose.
-# Copy to front repo as .github/workflows/deploy-env-and-docker-compose.yml
-# Requires: scripts/check-workflow-env.sh, scripts/generate-partial-docker-compose.sh (see API repo).
+# Requires: scripts/generate-partial-docker-compose.sh
 # Requires GitHub var: APP_NAME (e.g. gtmt-front) for pool path.
 name: Deploy env variables and partial Docker Compose
 
@@ -58,12 +57,20 @@ jobs:
           SPOTIFY_CLIENT_ID_PROD: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
           GOOGLE_CLIENT_ID_PROD: ${{ secrets.GOOGLE_CLIENT_ID_PROD }}
         run: |
-          bash scripts/check-workflow-env.sh \
-            DOMAIN_NAME WEBHOOK_DIR WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE DOCKER_COMPOSE_DIR_NAME \
+          MISSING=()
+          for name in DOMAIN_NAME WEBHOOK_DIR WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE DOCKER_COMPOSE_DIR_NAME \
             APP_NAME GTMT_FRONT_SERVICE_NAME GTMT_FRONT_PORT CONTACT_EMAIL HTMT_API_SUBDOMAIN_NAME \
             API_VERSION CONTAINER_NAME DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE DOCKERHUB_USERNAME \
             GTMT_FRONT_IMAGE_REPO SPOTIFY_REDIRECT_RELATIVE_URI SPOTIFY_SCOPES GOOGLE_REDIRECT_RELATIVE_URI \
-            SERVER_DEPLOY_USERNAME SERVER_DEPLOY_SSH_PRIVATE_KEY SPOTIFY_CLIENT_ID_PROD GOOGLE_CLIENT_ID_PROD
+            SERVER_DEPLOY_USERNAME SERVER_DEPLOY_SSH_PRIVATE_KEY SPOTIFY_CLIENT_ID_PROD GOOGLE_CLIENT_ID_PROD; do
+            eval "val=\$$name"
+            if [ -z "$val" ]; then MISSING+=("$name"); fi
+          done
+          if [ ${#MISSING[@]} -gt 0 ]; then
+            echo "Missing required vars or secrets: ${MISSING[*]}"
+            exit 1
+          fi
+          echo "All required vars and secrets are set."
 
       - name: Build compose env file
         run: |
