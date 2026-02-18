@@ -1,7 +1,7 @@
-# Reusable deploy workflow for GTMT front. Deploys app env file to pool/compose/<APP_NAME>/
-# and partial docker-compose to the compose dir. Same pattern as API deploy-env-and-docker-compose.
-# Copy to your GTMT front app repo's .github/workflows/. Requires scripts/generate-partial-docker-compose.sh.
-# Requires GitHub var: APP_NAME (e.g. gtmt-front) for pool path.
+# Reference caller workflow for GTMT front. Prepares env file and partial docker-compose,
+# then calls reusable workflows from BehindTheMusicTree/github-workflows (deploy-app-env-file,
+# deploy-partial-docker-compose). Copy to your GTMT front app repo's .github/workflows/.
+# Requires: scripts/generate-partial-docker-compose.sh. GitHub var: APP_NAME (e.g. gtmt-front).
 name: Deploy env variables and partial Docker Compose
 
 on:
@@ -17,7 +17,6 @@ on:
         type: string
 
 env:
-  SSH_DESTINATION: ${{ secrets.SERVER_DEPLOY_USERNAME }}@${{ vars.DOMAIN_NAME }}
   CONTAINER_ROOT_DIR: /home/app/
   DOCKERIZED_APP_ENV_FILENAME: .env_gtmt_front
 
@@ -109,24 +108,33 @@ jobs:
           mkdir -p compose_parts
           cp scripts/gtmt-front${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }} compose_parts/
 
-      - uses: webfactory/ssh-agent@v0.9.0
+      - name: Upload app-env-files artifact
+        uses: actions/upload-artifact@v4
         with:
-          ssh-private-key: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
+          name: app-env-files
+          path: pool_compose/
 
-      - name: Add host to known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ vars.DOMAIN_NAME }} >> ~/.ssh/known_hosts
+      - name: Upload compose-parts artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compose-parts
+          path: compose_parts/
 
-      - name: Deploy app env file
-        env:
-          POOL_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}-${{ inputs.env }}/pool
-        run: |
-          ssh ${{ env.SSH_DESTINATION }} "mkdir -p $POOL_DIR/compose/${{ vars.APP_NAME }}"
-          shopt -s dotglob && scp -r pool_compose/* ${{ env.SSH_DESTINATION }}:$POOL_DIR/compose/${{ vars.APP_NAME }}/
+  deploy-app-env-files:
+    name: Deploy app env file
+    needs: [prepare]
+    uses: BehindTheMusicTree/github-workflows/.github/workflows/deploy-app-env-file.yml@main
+    with:
+      env: ${{ inputs.env }}
+      app_name: ${{ vars.APP_NAME }}
+      artifact_name: app-env-files
+    secrets: inherit
 
-      - name: Deploy partial docker compose
-        env:
-          SERVER_DOCKER_COMPOSE_DIR: ${{ vars.WEBHOOK_DIR }}${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}-${{ inputs.env }}/${{ vars.DOCKER_COMPOSE_DIR_NAME }}/
-        run: |
-          shopt -s dotglob && scp -r compose_parts/* ${{ env.SSH_DESTINATION }}:$SERVER_DOCKER_COMPOSE_DIR
+  deploy-compose:
+    name: Deploy partial docker compose
+    needs: [prepare]
+    uses: BehindTheMusicTree/github-workflows/.github/workflows/deploy-partial-docker-compose.yml@main
+    with:
+      env: ${{ inputs.env }}
+      app_version: ${{ inputs.app_version }}
+    secrets: inherit
