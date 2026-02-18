@@ -1,6 +1,6 @@
 # Reusable deploy workflow for GTMT front. Deploys app env file to pool/compose/<APP_NAME>/
 # and partial docker-compose to the compose dir. Same pattern as API deploy-env-and-docker-compose.
-# Requires: scripts/generate-partial-docker-compose.sh
+# Copy to your GTMT front app repo's .github/workflows/. Requires scripts/generate-partial-docker-compose.sh.
 # Requires GitHub var: APP_NAME (e.g. gtmt-front) for pool path.
 name: Deploy env variables and partial Docker Compose
 
@@ -12,7 +12,7 @@ on:
         required: true
         type: string
       env:
-        description: "Environment to deploy to (test or prod)"
+        description: "Environment to deploy to (test or prod, lowercase)"
         required: true
         type: string
 
@@ -26,7 +26,7 @@ jobs:
     name: Prepare artifacts
     runs-on: ubuntu-latest
     environment:
-      name: TEST
+      name: ${{ inputs.env }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
