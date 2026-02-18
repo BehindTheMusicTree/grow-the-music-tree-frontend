@@ -1,7 +1,7 @@
 # Reference caller workflow for GTMT front. Prepares env file and partial docker-compose,
 # then calls reusable workflows from BehindTheMusicTree/github-workflows (deploy-app-env-file,
 # deploy-partial-docker-compose). Copy to your GTMT front app repo's .github/workflows/.
-# Requires: scripts/generate-partial-docker-compose.sh. GitHub var: APP_NAME (e.g. gtmt-front).
+# Requires: scripts/generate-docker-compose-part.sh. GitHub var: APP_NAME (e.g. gtmt-front).
 #
 # Set vars.DOCKERIZED_APP_ENV_FILENAME (e.g. env_gtmt_front) so the same name is used in docker-compose and the env artifact.
 name: Deploy env variables and partial Docker Compose
@@ -96,7 +96,7 @@ jobs:
 
       - name: Generate partial docker compose file
         env:
-          DOCKER_COMPOSE_PARTIAL_FILENAME: ${{ vars.APP_NAME }}
+          DOCKER_COMPOSE_PART_FILENAME: ${{ vars.APP_NAME }}.yml
           SERVICE_NAME: ${{ vars.GTMT_FRONT_SERVICE_NAME }}
           PROJECT_DIR: ${{ env.CONTAINER_ROOT_DIR }}
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
@@ -105,7 +105,7 @@ jobs:
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           APP_PORT: ${{ vars.GTMT_FRONT_PORT }}
           ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}
-        run: bash scripts/generate-partial-docker-compose.sh
+        run: bash scripts/generate-docker-compose-part.sh
 
       - name: Prepare compose-parts
         run: |
