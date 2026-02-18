@@ -110,7 +110,7 @@ jobs:
       - name: Prepare compose-parts
         run: |
           mkdir -p compose_parts
-          cp scripts/${{ vars.APP_NAME }} compose_parts/
+          cp scripts/${{ vars.APP_NAME }}.yml compose_parts/
 
       - name: Upload app-env-files artifact
         uses: actions/upload-artifact@v4
