@@ -1,5 +1,5 @@
 # Same flow as API publish: determine-version → check-required-vars → [test-build-app | deploy-env-and-docker-compose] → build-image-and-push → redeploy-webhook-call
-# Requires GitHub vars: WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE, DOCKER_COMPOSE_DIR_NAME, DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE, APP_NAME, etc.
+# Requires GitHub vars: WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE, DOCKER_COMPOSE_DIR_NAME, APP_NAME, etc.
 name: Publish
 
 on:
@@ -24,7 +24,6 @@ env:
   HTMT_API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
   API_VERSION: ${{ vars.API_VERSION }}
   CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
-  DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE: ${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
   SPOTIFY_CLIENT_ID_PROD: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
   SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
   SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}

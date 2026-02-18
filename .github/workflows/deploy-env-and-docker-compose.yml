@@ -47,7 +47,6 @@ jobs:
           HTMT_API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
           API_VERSION: ${{ vars.API_VERSION }}
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
-          DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE: ${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
           GTMT_FRONT_IMAGE_REPO: ${{ vars.GTMT_FRONT_IMAGE_REPO }}
           SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
@@ -62,7 +61,7 @@ jobs:
           MISSING=()
           for name in DOMAIN_NAME WEBHOOK_DIR WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE DOCKER_COMPOSE_DIR_NAME \
             APP_NAME GTMT_FRONT_SERVICE_NAME GTMT_FRONT_PORT CONTACT_EMAIL HTMT_API_SUBDOMAIN_NAME \
-            API_VERSION CONTAINER_NAME DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE DOCKERHUB_USERNAME \
+            API_VERSION CONTAINER_NAME DOCKERHUB_USERNAME \
             GTMT_FRONT_IMAGE_REPO SPOTIFY_REDIRECT_RELATIVE_URI SPOTIFY_SCOPES GOOGLE_REDIRECT_RELATIVE_URI \
             DOCKERIZED_APP_ENV_FILENAME SERVER_DEPLOY_USERNAME SERVER_DEPLOY_SSH_PRIVATE_KEY SPOTIFY_CLIENT_ID_PROD GOOGLE_CLIENT_ID_PROD; do
             eval "val=\$$name"
@@ -97,7 +96,7 @@ jobs:
 
       - name: Generate partial docker compose file
         env:
-          DOCKER_COMPOSE_PARTIAL_FILENAME: gtmt-front${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }}
+          DOCKER_COMPOSE_PARTIAL_FILENAME: ${{ vars.APP_NAME }}
           SERVICE_NAME: ${{ vars.GTMT_FRONT_SERVICE_NAME }}
           PROJECT_DIR: ${{ env.CONTAINER_ROOT_DIR }}
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
@@ -111,7 +110,7 @@ jobs:
       - name: Prepare compose-parts
         run: |
           mkdir -p compose_parts
-          cp scripts/gtmt-front${{ vars.DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE }} compose_parts/
+          cp scripts/${{ vars.APP_NAME }} compose_parts/
 
       - name: Upload app-env-files artifact
         uses: actions/upload-artifact@v4
