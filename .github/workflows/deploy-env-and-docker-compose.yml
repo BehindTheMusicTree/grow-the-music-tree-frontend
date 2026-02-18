@@ -2,6 +2,8 @@
 # then calls reusable workflows from BehindTheMusicTree/github-workflows (deploy-app-env-file,
 # deploy-partial-docker-compose). Copy to your GTMT front app repo's .github/workflows/.
 # Requires: scripts/generate-partial-docker-compose.sh. GitHub var: APP_NAME (e.g. gtmt-front).
+#
+# Set vars.DOCKERIZED_APP_ENV_FILENAME (e.g. env_gtmt_front) so the same name is used in docker-compose and the env artifact.
 name: Deploy env variables and partial Docker Compose
 
 on:
@@ -18,7 +20,7 @@ on:
 
 env:
   CONTAINER_ROOT_DIR: /home/app/
-  DOCKERIZED_APP_ENV_FILENAME: .env_gtmt_front
+  DOCKERIZED_APP_ENV_FILENAME: ${{ vars.DOCKERIZED_APP_ENV_FILENAME }}
 
 jobs:
   prepare:
@@ -51,6 +53,7 @@ jobs:
           SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
           SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
           GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
+          DOCKERIZED_APP_ENV_FILENAME: ${{ vars.DOCKERIZED_APP_ENV_FILENAME }}
           SERVER_DEPLOY_USERNAME: ${{ secrets.SERVER_DEPLOY_USERNAME }}
           SERVER_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
           SPOTIFY_CLIENT_ID_PROD: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
@@ -61,7 +64,7 @@ jobs:
             APP_NAME GTMT_FRONT_SERVICE_NAME GTMT_FRONT_PORT CONTACT_EMAIL HTMT_API_SUBDOMAIN_NAME \
             API_VERSION CONTAINER_NAME DOCKER_COMPOSE_PARTIAL_FILENAME_SUFFIXE DOCKERHUB_USERNAME \
             GTMT_FRONT_IMAGE_REPO SPOTIFY_REDIRECT_RELATIVE_URI SPOTIFY_SCOPES GOOGLE_REDIRECT_RELATIVE_URI \
-            SERVER_DEPLOY_USERNAME SERVER_DEPLOY_SSH_PRIVATE_KEY SPOTIFY_CLIENT_ID_PROD GOOGLE_CLIENT_ID_PROD; do
+            DOCKERIZED_APP_ENV_FILENAME SERVER_DEPLOY_USERNAME SERVER_DEPLOY_SSH_PRIVATE_KEY SPOTIFY_CLIENT_ID_PROD GOOGLE_CLIENT_ID_PROD; do
             eval "val=\$$name"
             if [ -z "$val" ]; then MISSING+=("$name"); fi
           done
@@ -74,6 +77,8 @@ jobs:
       - name: Build compose env file
         run: |
           mkdir -p pool_compose
+          ENV_FILENAME="${{ vars.DOCKERIZED_APP_ENV_FILENAME }}"
+          ARTIFACT_FILENAME="${ENV_FILENAME#.}"
           {
             echo "NODE_ENV=${{ inputs.env }}"
             echo "APP_VERSION=${{ inputs.app_version }}"
@@ -88,7 +93,7 @@ jobs:
             echo "NEXT_PUBLIC_SPOTIFY_SCOPES=${{ vars.SPOTIFY_SCOPES }}"
             echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID_PROD }}"
             echo "NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}"
-          } > pool_compose/${{ env.DOCKERIZED_APP_ENV_FILENAME }}
+          } > "pool_compose/${ARTIFACT_FILENAME}"
 
       - name: Generate partial docker compose file
         env:
