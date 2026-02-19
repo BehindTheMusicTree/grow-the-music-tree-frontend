@@ -94,7 +94,7 @@ jobs:
             VAR_GTMT_FRONT_PORT "${{ env.GTMT_FRONT_PORT }}" \
             VAR_CONTACT_EMAIL "${{ env.CONTACT_EMAIL }}" \
             VAR_HTMT_API_SUBDOMAIN_NAME "${{ env.HTMT_API_SUBDOMAIN_NAME }}" \
-            VAR_API_VERSION "${{ env.API_VERSION }}" \
+            VAR_API_VERSION "${{ vars.API_VERSION }}" \
             VAR_SENTRY_IS_ACTIVE "${{ vars.SENTRY_IS_ACTIVE }}" \
             VAR_SECRET_SPOTIFY_CLIENT_ID "${{ env.SPOTIFY_CLIENT_ID_PROD }}" \
             VAR_SPOTIFY_REDIRECT_RELATIVE_URI "${{ env.SPOTIFY_REDIRECT_RELATIVE_URI }}" \
