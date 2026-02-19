@@ -1,5 +1,5 @@
 # Same flow as API publish: determine-version → check-required-vars → [test-build-app | deploy-env-and-docker-compose] → build-image-and-push → redeploy-webhook-call
-# Requires GitHub vars: WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE, DOCKER_COMPOSE_DIR_NAME, APP_NAME, etc.
+# Requires GitHub vars: WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE, DOCKER_COMPOSE_DIR_NAME, GTMT_FRONT_APP_NAME, etc.
 name: Publish
 
 on:
@@ -17,7 +17,7 @@ env:
   WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE: ${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}
   DOCKER_COMPOSE_DIR_NAME: ${{ vars.DOCKER_COMPOSE_DIR_NAME }}
   DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
-  GTMT_FRONT_IMAGE_REPO: ${{ vars.GTMT_FRONT_IMAGE_REPO }}
+  APP_IMAGE_REPO: ${{ vars.APP_IMAGE_REPO }}
   GTMT_FRONT_PORT: ${{ vars.GTMT_FRONT_PORT }}
   GTMT_FRONT_SERVICE_NAME: ${{ vars.GTMT_FRONT_SERVICE_NAME }}
   CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
@@ -87,10 +87,10 @@ jobs:
             VAR_DOMAIN_NAME "${{ env.DOMAIN_NAME }}" \
             VAR_WEBHOOK_DIR "${{ env.WEBHOOK_DIR }}" \
             VAR_WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE "${{ env.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}" \
-            VAR_APP_NAME "${{ vars.APP_NAME }}" \
+            VAR_APP_NAME "${{ vars.GTMT_FRONT_APP_NAME }}" \
             VAR_DOCKER_COMPOSE_DIR_NAME "${{ env.DOCKER_COMPOSE_DIR_NAME }}" \
             VAR_DOCKERHUB_USERNAME "${{ env.DOCKERHUB_USERNAME }}" \
-            VAR_GTMT_FRONT_IMAGE_REPO "${{ env.GTMT_FRONT_IMAGE_REPO }}" \
+            VAR_GTMT_FRONT_IMAGE_REPO "${{ env.APP_IMAGE_REPO }}" \
             VAR_GTMT_FRONT_PORT "${{ env.GTMT_FRONT_PORT }}" \
             VAR_GTMT_FRONT_SERVICE_NAME "${{ env.GTMT_FRONT_SERVICE_NAME }}" \
             VAR_CONTACT_EMAIL "${{ env.CONTACT_EMAIL }}" \
@@ -164,7 +164,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.GTMT_FRONT_IMAGE_REPO }}:${{ needs.determine-version.outputs.app_version }}
+          tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.APP_IMAGE_REPO }}:${{ needs.determine-version.outputs.app_version }}
           build-args: |
             PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
             APP_PORT=${{ env.GTMT_FRONT_PORT }}
