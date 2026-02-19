@@ -9,20 +9,17 @@ on:
   workflow_call:
 
 env:
+  APP_IMAGE_REPO: ${{ vars.APP_IMAGE_REPO }}
   SSH_DESTINATION: ${{ secrets.SERVER_DEPLOY_USERNAME }}@${{ vars.DOMAIN_NAME }}
   CONTAINER_ROOT_DIR: /home/app/
   DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
   WEBHOOK_DIR: ${{ vars.WEBHOOK_DIR }}
   WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE: ${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}
   DOCKER_COMPOSE_DIR_NAME: ${{ vars.DOCKER_COMPOSE_DIR_NAME }}
-  DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
-  APP_IMAGE_REPO: ${{ vars.APP_IMAGE_REPO }}
   GTMT_FRONT_PORT: ${{ vars.GTMT_FRONT_PORT }}
-  GTMT_FRONT_SERVICE_NAME: ${{ vars.GTMT_FRONT_SERVICE_NAME }}
   CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
   HTMT_API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
   API_VERSION: ${{ vars.API_VERSION }}
-  CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
   SPOTIFY_CLIENT_ID_PROD: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
   SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
   SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
@@ -30,6 +27,7 @@ env:
   GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
   SERVER_DEPLOY_USERNAME: ${{ secrets.SERVER_DEPLOY_USERNAME }}
   SERVER_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
+  DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
   DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
 jobs:
@@ -74,8 +72,6 @@ jobs:
     name: Check required variables and secrets
     runs-on: ubuntu-latest
     timeout-minutes: 1
-    environment:
-      name: TEST
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -91,13 +87,11 @@ jobs:
             VAR_DOCKERHUB_USERNAME "${{ env.DOCKERHUB_USERNAME }}" \
             VAR_GTMT_FRONT_IMAGE_REPO "${{ env.APP_IMAGE_REPO }}" \
             VAR_GTMT_FRONT_PORT "${{ env.GTMT_FRONT_PORT }}" \
-            VAR_GTMT_FRONT_SERVICE_NAME "${{ env.GTMT_FRONT_SERVICE_NAME }}" \
             VAR_CONTACT_EMAIL "${{ env.CONTACT_EMAIL }}" \
             VAR_HTMT_API_SUBDOMAIN_NAME "${{ env.HTMT_API_SUBDOMAIN_NAME }}" \
             VAR_API_VERSION "${{ env.API_VERSION }}" \
             VAR_SENTRY_IS_ACTIVE "${{ vars.SENTRY_IS_ACTIVE }}" \
-            VAR_CONTAINER_NAME "${{ env.CONTAINER_NAME }}" \
-            SECRET_SPOTIFY_CLIENT_ID "${{ env.SPOTIFY_CLIENT_ID_PROD }}" \
+            VAR_SECRET_SPOTIFY_CLIENT_ID "${{ env.SPOTIFY_CLIENT_ID_PROD }}" \
             VAR_SPOTIFY_REDIRECT_RELATIVE_URI "${{ env.SPOTIFY_REDIRECT_RELATIVE_URI }}" \
             VAR_SPOTIFY_SCOPES "${{ env.SPOTIFY_SCOPES }}" \
             VAR_GOOGLE_REDIRECT_RELATIVE_URI "${{ env.GOOGLE_REDIRECT_RELATIVE_URI }}" \
@@ -148,8 +142,6 @@ jobs:
     name: Docker image
     runs-on: ubuntu-latest
     needs: [check-required-vars, determine-version, test-build-app]
-    environment:
-      name: TEST
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
