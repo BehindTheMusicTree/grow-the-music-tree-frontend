@@ -83,6 +83,7 @@ jobs:
       - name: Check required vars and secrets
         run: |
           bash scripts/check-required-vars.sh \
+            VAR_ENV ${{ needs.determine-version.outputs.env }} \
             VAR_DOMAIN_NAME "${{ env.DOMAIN_NAME }}" \
             VAR_WEBHOOK_DIR "${{ env.WEBHOOK_DIR }}" \
             VAR_WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE "${{ env.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}" \
