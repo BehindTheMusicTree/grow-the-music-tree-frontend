@@ -2,9 +2,7 @@
 # then calls reusable workflows from BehindTheMusicTree/github-workflows (deploy-app-env-file,
 # deploy-partial-docker-compose). Copy to your GTMT front app repo's .github/workflows/.
 # Requires: scripts/generate-docker-compose-part.sh. GitHub var: GTMT_FRONT_APP_NAME (e.g. gtmt-front).
-#
-# Set vars.DOCKERIZED_APP_ENV_FILENAME (e.g. env_gtmt_front) so the same name is used in docker-compose and the env artifact.
-name: Deploy env variables and partial Docker Compose
+#name: Deploy env variables and partial Docker Compose
 
 on:
   workflow_call:
@@ -20,7 +18,7 @@ on:
 
 env:
   CONTAINER_ROOT_DIR: /home/app/
-  DOCKERIZED_APP_ENV_FILENAME: ${{ vars.DOCKERIZED_APP_ENV_FILENAME }}
+  ENV_FILENAME: ${{ vars.APP_NAME }}.env
 
 jobs:
   prepare:
@@ -46,13 +44,11 @@ jobs:
           CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
           HTMT_API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
           API_VERSION: ${{ vars.API_VERSION }}
-          CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
           APP_IMAGE_REPO: ${{ vars.APP_IMAGE_REPO }}
           SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
           SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
           GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
-          DOCKERIZED_APP_ENV_FILENAME: ${{ vars.DOCKERIZED_APP_ENV_FILENAME }}
           SERVER_DEPLOY_USERNAME: ${{ secrets.SERVER_DEPLOY_USERNAME }}
           SERVER_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
           SPOTIFY_CLIENT_ID_PROD: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
@@ -61,9 +57,9 @@ jobs:
           MISSING=()
           for name in DOMAIN_NAME WEBHOOK_DIR WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE DOCKER_COMPOSE_DIR_NAME \
             APP_NAME GTMT_FRONT_SERVICE_NAME GTMT_FRONT_PORT CONTACT_EMAIL HTMT_API_SUBDOMAIN_NAME \
-            API_VERSION CONTAINER_NAME DOCKERHUB_USERNAME \
+            API_VERSION DOCKERHUB_USERNAME \
             APP_IMAGE_REPO SPOTIFY_REDIRECT_RELATIVE_URI SPOTIFY_SCOPES GOOGLE_REDIRECT_RELATIVE_URI \
-            DOCKERIZED_APP_ENV_FILENAME SERVER_DEPLOY_USERNAME SERVER_DEPLOY_SSH_PRIVATE_KEY SPOTIFY_CLIENT_ID_PROD GOOGLE_CLIENT_ID_PROD; do
+            SERVER_DEPLOY_USERNAME SERVER_DEPLOY_SSH_PRIVATE_KEY SPOTIFY_CLIENT_ID_PROD GOOGLE_CLIENT_ID_PROD; do
             eval "val=\$$name"
             if [ -z "$val" ]; then MISSING+=("$name"); fi
           done
@@ -76,7 +72,7 @@ jobs:
       - name: Build compose env file
         run: |
           mkdir -p pool_compose
-          ENV_FILENAME="${{ vars.DOCKERIZED_APP_ENV_FILENAME }}"
+          ENV_FILENAME="${{ vars.ENV_FILENAME }}"
           ARTIFACT_FILENAME="${ENV_FILENAME#.}"
           {
             echo "NODE_ENV=${{ inputs.env }}"
@@ -94,7 +90,7 @@ jobs:
             echo "NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}"
           } > "pool_compose/${ARTIFACT_FILENAME}"
 
-      - name: Generate partial docker compose file
+      - name: Generate docker compose part file
         env:
           DOCKER_COMPOSE_PART_FILENAME: ${{ vars.GTMT_FRONT_APP_NAME }}.yml
           SERVICE_NAME: ${{ vars.GTMT_FRONT_SERVICE_NAME }}
@@ -102,9 +98,9 @@ jobs:
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
           IMAGE_REPO: ${{ vars.APP_IMAGE_REPO }}
           APP_VERSION: ${{ inputs.app_version }}
-          CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
+          CONTAINER_NAME: ${{ vars.GTMT_FRONT_APP_NAME }}-${{ inputs.env }}
           APP_PORT: ${{ vars.GTMT_FRONT_PORT }}
-          ENV_FILENAME: ${{ env.DOCKERIZED_APP_ENV_FILENAME }}
+          ENV_FILENAME: ${{ env.ENV_FILENAME }}
         run: bash scripts/generate-docker-compose-part.sh
 
       - name: Prepare compose-parts
