@@ -88,6 +88,10 @@ jobs:
             echo "NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}"
           } > "pool_compose/${ARTIFACT_FILENAME}"
 
+      - name: Set env lowercase
+        id: env-lower
+        run: echo "env_lower=$(echo "${{ inputs.env }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       - name: Generate docker compose part file
         env:
           DOCKER_COMPOSE_PART_FILENAME: ${{ vars.GTMT_FRONT_APP_NAME }}.yml
@@ -96,7 +100,7 @@ jobs:
           DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
           IMAGE_REPO: ${{ vars.APP_IMAGE_REPO }}
           APP_VERSION: ${{ inputs.app_version }}
-          CONTAINER_NAME: ${{ vars.GTMT_FRONT_APP_NAME }}-${{ inputs.env }}
+          CONTAINER_NAME: ${{ vars.GTMT_FRONT_APP_NAME }}-${{ steps.env-lower.outputs.env_lower }}
           APP_PORT: ${{ vars.GTMT_FRONT_PORT }}
           ENV_FILENAME: ${{ env.ENV_FILENAME }}
         run: bash scripts/generate-docker-compose-part.sh
