@@ -4,21 +4,13 @@ FROM node:20-alpine
 RUN apk add --no-cache bash wget
 
 ARG PROJECT_DIR
-ARG APP_PORT
 
-RUN for var in \
-        PROJECT_DIR \
-        APP_PORT; do \
-    if [ -z "$(eval echo \$$var)" ]; then \
-        echo "ERROR: The $var argument is not provided" >&2; \
+RUN if [ -z "$PROJECT_DIR" ]; then \
+        echo "ERROR: The PROJECT_DIR argument is not provided" >&2; \
         exit 1; \
-    fi; \
-done
+    fi
 
-ENV PROJECT_DIR=$PROJECT_DIR \
-    NODE_ENV=test \
-    APP_PORT=$APP_PORT \
-    SENTRY_IS_ACTIVE=true
+ENV PROJECT_DIR=$PROJECT_DIR
 
 WORKDIR $PROJECT_DIR
 

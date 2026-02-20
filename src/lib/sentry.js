@@ -36,8 +36,7 @@ export function initSentry() {
       ],
       replaysSessionSampleRate,
       replaysOnErrorSampleRate,
-      environment: process.env.NODE_ENV,
-      enabled: process.env.NODE_ENV === "development" ? false : process.env.NEXT_PUBLIC_SENTRY_IS_ACTIVE === "true",
+      enabled: process.env.NEXT_PUBLIC_SENTRY_IS_ACTIVE === "true",
     });
   } catch (error) {
     console.error("Failed to initialize Sentry:", error);
