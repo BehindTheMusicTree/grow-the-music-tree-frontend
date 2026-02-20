@@ -29,6 +29,7 @@ export const GOOGLE_EXCHANGE_CONFIG: ExchangeCodeConfig = {
   redirectStorageKey: "googleAuthRedirect",
   rethrowErrorCodes: [
     ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED,
+    ErrorCode.BACKEND_GOOGLE_OAUTH_UNAUTHORIZED_CLIENT,
     ErrorCode.BACKEND_GOOGLE_AUTHENTICATION_ERROR,
     ErrorCode.BACKEND_GOOGLE_OAUTH_MISCONFIGURED,
   ],

@@ -1,15 +1,10 @@
 "use client";
 
 /**
- * Handles OAuth callbacks at layout level. With static export, a full load of
- * /auth/google/callback or /auth/spotify/callback serves index.html; the client
- * router may not mount the route's page, so the exchange runs here via
- * window.location. Rendered in the app shell (AppContent) so it runs on every load.
- *
- * Known issue: With static export, stack traces and Sources may not point at the
- * callback route's page file; callback logic and breakpoints are in this file.
- * This does not apply when running with a Next.js server (no output: 'export').
- * See https://github.com/vercel/next.js/issues/59986 (static export + App Router).
+ * Handles OAuth callbacks at layout level. Rendered in the app shell (AppContent)
+ * so it runs on every load. With the Next.js server, the callback route is served
+ * and mounted normally; this handler still runs for consistency (e.g. reading
+ * window.location and coordinating the code exchange with the backend).
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -19,6 +14,7 @@ import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
 import AuthPopup from "@components/ui/popup/child/AuthPopup";
+import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 import SpotifyAuthErrorPopup from "@components/ui/popup/child/SpotifyAuthErrorPopup";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
@@ -71,6 +67,9 @@ export default function AuthCallbackHandler() {
             <AuthPopup handleSpotifyOAuth={handleSpotifyOAuth} handleGoogleOAuth={handleGoogleOAuth} />,
             AUTH_POPUP_TYPE,
           );
+          router.replace("/");
+        } else if (err instanceof BackendError && err.code === ErrorCode.BACKEND_GOOGLE_OAUTH_UNAUTHORIZED_CLIENT) {
+          showPopup(<InternalErrorPopup errorCode={err.code} />);
           router.replace("/");
         } else {
           setErrorMessage(err instanceof Error ? err.message : "Authentication failed");

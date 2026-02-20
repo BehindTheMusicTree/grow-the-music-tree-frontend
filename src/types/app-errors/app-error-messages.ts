@@ -54,6 +54,8 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCode.BACKEND_GOOGLE_AUTHENTICATION_ERROR]: "Google authentication failed",
   [ErrorCode.BACKEND_GOOGLE_OAUTH_MISCONFIGURED]:
     "Sign-in is temporarily misconfigured. Please try again later or contact support.",
+  [ErrorCode.BACKEND_GOOGLE_OAUTH_UNAUTHORIZED_CLIENT]:
+    "Google sign-in is temporarily unavailable. Please try again later or contact support.",
   [ErrorCode.BACKEND_NOT_FOUND]: "Not found",
   [ErrorCode.BACKEND_METHOD_NOT_ALLOWED]: "Method not allowed",
   [ErrorCode.BACKEND_REQUEST_TIMEOUT]: "Request timeout",
