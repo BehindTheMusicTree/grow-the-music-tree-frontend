@@ -51,8 +51,8 @@ jobs:
           SERVER_DEPLOY_USERNAME: ${{ secrets.SERVER_DEPLOY_USERNAME }}
           SERVER_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
           SPOTIFY_CLIENT_ID_PROD: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
-          GOOGLE_CLIENT_ID_PROD: ${{ secrets.GOOGLE_CLIENT_ID_PROD }}
-          GOOGLE_CLIENT_ID_TEST: ${{ secrets.GOOGLE_CLIENT_ID_TEST }}
+          GOOGLE_CLIENT_ID_PROD: ${{ vars.GOOGLE_CLIENT_ID_PROD }}
+          GOOGLE_CLIENT_ID_TEST: ${{ vars.GOOGLE_CLIENT_ID_TEST }}
         run: |
           MISSING=()
           for name in DOMAIN_NAME WEBHOOK_DIR WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE DOCKER_COMPOSE_DIR_NAME \
@@ -89,7 +89,7 @@ jobs:
             echo "NEXT_PUBLIC_SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID_PROD }}"
             echo "NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}"
             echo "NEXT_PUBLIC_SPOTIFY_SCOPES=${{ vars.SPOTIFY_SCOPES }}"
-            echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ steps.env-lower.outputs.env_lower == 'test' && secrets.GOOGLE_CLIENT_ID_TEST || secrets.GOOGLE_CLIENT_ID_PROD }}"
+            echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ steps.env-lower.outputs.env_lower == 'test' && vars.GOOGLE_CLIENT_ID_TEST || vars.GOOGLE_CLIENT_ID_PROD }}"
             echo "NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}"
           } > "pool_compose/${ARTIFACT_FILENAME}"
 
