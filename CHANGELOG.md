@@ -11,10 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [1.2.0 - 2025-02-20](#120---2025-02-20)
+- [0.1.2 - 2025-03-26](#v012---2025-03-26)
+- [0.1.1 - 2024-09-29](#v011---2024-09-29)
+- [0.1.0 - 2024-09-23](#v010---2024-09-23)
 - [0.2.0 - 2025-02-06](#020---2025-02-06)
-- [v0.1.2 - 2025-03-26](#v012---2025-03-26)
-- [v0.1.1 - 2024-09-29](#v011---2024-09-29)
-- [v0.1.0 - 2024-09-23](#v010---2024-09-23)
 
 ## Changelog Best Practices
 
@@ -75,6 +76,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers will move entries from `[Unreleased]` to a versioned section (e.g., `## [0.2.0] - 2025-01-XX`).
 
 ## [Unreleased]
+
+## [1.2.0] - 2025-02-20
 
 ### Added
 
