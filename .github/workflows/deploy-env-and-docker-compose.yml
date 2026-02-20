@@ -80,7 +80,7 @@ jobs:
           mkdir -p nginx_fragment
           {
             echo "GTMT_FRONT_PORT=${{ vars.APP_PORT }}"
-          } > nginx_fragment/gtmt-front.env
+          } > nginx_fragment/${{ vars.APP_PORT }}.env
 
       - name: Upload nginx-env-fragment artifact
         uses: actions/upload-artifact@v4
