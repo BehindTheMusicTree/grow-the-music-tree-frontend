@@ -1,5 +1,5 @@
 # Same flow as API publish: determine-version → check-required-vars → [test-build-app | deploy-env-and-docker-compose] → build-image-and-push → redeploy-webhook-call
-# Requires GitHub vars: WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE, DOCKER_COMPOSE_DIR_NAME, GTMT_FRONT_APP_NAME, etc.
+# Requires GitHub vars: GTMT_FRONT_APP_NAME, DOMAIN_NAME, etc.
 name: Publish
 
 on:
@@ -13,10 +13,6 @@ env:
   SSH_DESTINATION: ${{ secrets.SERVER_DEPLOY_USERNAME }}@${{ vars.DOMAIN_NAME }}
   CONTAINER_ROOT_DIR: /home/app/
   DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
-  WEBHOOK_DIR: ${{ vars.WEBHOOK_DIR }}
-  WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE: ${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}
-  DOCKER_COMPOSE_DIR_NAME: ${{ vars.DOCKER_COMPOSE_DIR_NAME }}
-  GTMT_FRONT_PORT: ${{ vars.GTMT_FRONT_PORT }}
   CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
   HTMT_API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
   SPOTIFY_CLIENT_ID_PROD: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
@@ -61,10 +57,10 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           if [[ "$VERSION" == *-* ]]; then
             echo "env=TEST" >> "$GITHUB_OUTPUT"
-            echo "Prerelease version -> env test"
+            echo "Prerelease version -> env TEST"
           elif [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "env=PROD" >> "$GITHUB_OUTPUT"
-            echo "Release version -> env prod"
+            echo "Release version -> env PROD"
           else
             echo "Unsupported version format: must be release (x.y.z) or prerelease (x.y.z-suffix). Got: $VERSION"
             exit 1
@@ -84,13 +80,9 @@ jobs:
         run: |
           bash scripts/check-required-vars.sh \
             VAR_DOMAIN_NAME "${{ env.DOMAIN_NAME }}" \
-            VAR_WEBHOOK_DIR "${{ env.WEBHOOK_DIR }}" \
-            VAR_WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE "${{ env.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}" \
             VAR_APP_NAME "${{ vars.GTMT_FRONT_APP_NAME }}" \
-            VAR_DOCKER_COMPOSE_DIR_NAME "${{ env.DOCKER_COMPOSE_DIR_NAME }}" \
             VAR_DOCKERHUB_USERNAME "${{ env.DOCKERHUB_USERNAME }}" \
             VAR_GTMT_FRONT_IMAGE_REPO "${{ env.APP_IMAGE_REPO }}" \
-            VAR_GTMT_FRONT_PORT "${{ env.GTMT_FRONT_PORT }}" \
             VAR_CONTACT_EMAIL "${{ env.CONTACT_EMAIL }}" \
             VAR_HTMT_API_SUBDOMAIN_NAME "${{ env.HTMT_API_SUBDOMAIN_NAME }}" \
             VAR_API_VERSION "${{ vars.API_VERSION }}" \
