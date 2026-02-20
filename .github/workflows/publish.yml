@@ -162,7 +162,6 @@ jobs:
           tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.APP_IMAGE_REPO }}:${{ needs.determine-version.outputs.app_version }}
           build-args: |
             PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
-            APP_PORT=${{ env.GTMT_FRONT_PORT }}
 
   redeploy-webhook-call:
     name: Redeploy webhook

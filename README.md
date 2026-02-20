@@ -181,7 +181,7 @@ Docker builds the app and runs the Next.js server inside the container. The entr
 **Build image:**
 
 ```bash
-docker build -t grow-the-music-tree-frontend --build-arg PROJECT_DIR=/home/app/ --build-arg APP_PORT=3000 .
+docker build -t grow-the-music-tree-frontend --build-arg PROJECT_DIR=/home/app/ .
 ```
 
 **Run container:**

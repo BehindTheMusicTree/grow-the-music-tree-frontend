@@ -78,7 +78,6 @@ jobs:
           mkdir -p pool_compose
           ARTIFACT_FILENAME="${ENV_FILENAME#.}"
           {
-            echo "NODE_ENV=${{ inputs.env }}"
             echo "APP_VERSION=${{ inputs.app_version }}"
             echo "NEXT_PUBLIC_APP_VERSION=${{ inputs.app_version }}"
             echo "APP_PORT=${{ vars.GTMT_FRONT_PORT }}"
