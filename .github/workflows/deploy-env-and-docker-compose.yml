@@ -50,6 +50,7 @@ jobs:
           GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
           SERVER_DEPLOY_USERNAME: ${{ secrets.SERVER_DEPLOY_USERNAME }}
           SERVER_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
+          SPOTIFY_CLIENT_ID_TEST: ${{ secrets.SPOTIFY_CLIENT_ID_TEST }}
           SPOTIFY_CLIENT_ID_PROD: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
           GOOGLE_CLIENT_ID_TEST: ${{ vars.GOOGLE_CLIENT_ID_TEST }}
           GOOGLE_CLIENT_ID_PROD: ${{ vars.GOOGLE_CLIENT_ID_PROD }}
@@ -59,7 +60,7 @@ jobs:
             APP_NAME GTMT_FRONT_PORT CONTACT_EMAIL HTMT_API_SUBDOMAIN_NAME \
             API_VERSION DOCKERHUB_USERNAME \
             APP_IMAGE_REPO SPOTIFY_REDIRECT_RELATIVE_URI SPOTIFY_SCOPES GOOGLE_REDIRECT_RELATIVE_URI \
-            SERVER_DEPLOY_USERNAME SERVER_DEPLOY_SSH_PRIVATE_KEY SPOTIFY_CLIENT_ID_PROD GOOGLE_CLIENT_ID_TEST GOOGLE_CLIENT_ID_PROD; do
+            SERVER_DEPLOY_USERNAME SERVER_DEPLOY_SSH_PRIVATE_KEY SPOTIFY_CLIENT_ID_TEST SPOTIFY_CLIENT_ID_PROD GOOGLE_CLIENT_ID_TEST GOOGLE_CLIENT_ID_PROD; do
             eval "val=\$$name"
             if [ -z "$val" ]; then MISSING+=("$name"); fi
           done
@@ -85,7 +86,7 @@ jobs:
             echo "NEXT_PUBLIC_BACKEND_BASE_URL=https://${{ steps.env-lower.outputs.env_lower == 'prod' && vars.HTMT_API_SUBDOMAIN_NAME || format('{0}-{1}', vars.HTMT_API_SUBDOMAIN_NAME, steps.env-lower.outputs.env_lower) }}.${{ vars.DOMAIN_NAME }}/${{ vars.API_VERSION }}/"
             echo "NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ vars.SENTRY_IS_ACTIVE }}"
             echo "NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize"
-            echo "NEXT_PUBLIC_SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID_PROD }}"
+            echo "NEXT_PUBLIC_SPOTIFY_CLIENT_ID=${{ steps.env-lower.outputs.env_lower == 'test' && secrets.SPOTIFY_CLIENT_ID_TEST || secrets.SPOTIFY_CLIENT_ID_PROD }}"
             echo "NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}"
             echo "NEXT_PUBLIC_SPOTIFY_SCOPES=${{ vars.SPOTIFY_SCOPES }}"
             echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ steps.env-lower.outputs.env_lower == 'test' && vars.GOOGLE_CLIENT_ID_TEST || vars.GOOGLE_CLIENT_ID_PROD }}"
