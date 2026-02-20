@@ -11,10 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [1.2.0 - 2025-02-20](#120---2025-02-20)
+- [0.1.2 - 2025-03-26](#v012---2025-03-26)
+- [0.1.1 - 2024-09-29](#v011---2024-09-29)
+- [0.1.0 - 2024-09-23](#v010---2024-09-23)
 - [0.2.0 - 2025-02-06](#020---2025-02-06)
-- [v0.1.2 - 2025-03-26](#v012---2025-03-26)
-- [v0.1.1 - 2024-09-29](#v011---2024-09-29)
-- [v0.1.0 - 2024-09-23](#v010---2024-09-23)
 
 ## Changelog Best Practices
 
@@ -75,6 +76,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers will move entries from `[Unreleased]` to a versioned section (e.g., `## [0.2.0] - 2025-01-XX`).
 
 ## [Unreleased]
+
+## [1.2.0] - 2025-02-20
+
+### Added
+
+- **Google sign-in**: Google OAuth 2.0 flow alongside Spotify. Auth popup and account page offer "Sign in with Google". Requires `NEXT_PUBLIC_GOOGLE_CLIENT_ID` and `NEXT_PUBLIC_GOOGLE_REDIRECT_URI`. Backend must expose `POST auth/google/` accepting `{ code }` and returning `{ accessToken, refreshToken, expiresAt }`.
 
 ## [1.1.0] - 2025-02-15
 
@@ -163,7 +170,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Updated CONTRIBUTING.md and README.md references to new location
   - Removed deprecated template files (.env.config-generation-tester, .env.dev.template)
 
-- **Project Rename**: Renamed project from "Bodzify Ultimate Music Guide" to "Grow The Music Tree"
+- **Project Rename**: Renamed project from "Bodzify Ultimate Music Guide" to "GrowTheMusicTree"
   - Updated package.json and package-lock.json with new project name
   - Updated application title and meta description in layout.tsx
   - Updated all documentation files (README.md, VISION.md, TODO.md, CONTRIBUTING.md)

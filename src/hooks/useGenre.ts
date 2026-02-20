@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
 import { useFetchWrapper } from "./useFetchWrapper";
+import { useSession } from "@contexts/SessionContext";
 import { useInvalidateAllGenrePlaylistQueries } from "@hooks/useGenrePlaylist";
 import { parseWithLog } from "@lib/parse-with-log";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
@@ -17,6 +18,7 @@ import { useQueryWithParse } from "./useQueryWithParse";
 
 export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRES_PAGE_SIZE || 50, scope: Scope) {
   const { fetch } = useFetchWrapper();
+  const { session, sessionRestored } = useSession();
   const endpoint = scope === "reference" ? genreEndpoints.reference.list() : genreEndpoints.me.list();
 
   return useQueryWithParse({
@@ -24,6 +26,7 @@ export function useListGenres(page = 1, pageSize = process.env.NEXT_PUBLIC_GENRE
     queryFn: () => fetch(endpoint, true, scope === "me", {}, { page, pageSize }),
     schema: PaginatedResponseSchema(CriteriaSimpleSchema),
     context: "useListGenres",
+    enabled: scope === "reference" || (sessionRestored && !!session?.accessToken),
   });
 }
 

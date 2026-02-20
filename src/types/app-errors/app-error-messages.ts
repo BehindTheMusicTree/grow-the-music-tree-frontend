@@ -1,5 +1,29 @@
 import { ErrorCode } from "./app-error-codes";
 
+const SPOTIFY_ACCESS_REQUEST_SUBJECT = "Spotify access request";
+const SPOTIFY_ACCESS_REQUEST_BODY = `I would like to request access to the app.
+
+Spotify full name:
+Spotify email address:`;
+
+export function getSpotifyAllowlistMessage(): string {
+  return "Your Spotify account is not yet authorized for this app.";
+}
+
+export function getSpotifyAllowlistContactEmail(): string | null {
+  return process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? null;
+}
+
+export function getSpotifyAllowlistMailtoHref(): string | null {
+  const contact = getSpotifyAllowlistContactEmail();
+  if (!contact) return null;
+  const params = new URLSearchParams({
+    subject: SPOTIFY_ACCESS_REQUEST_SUBJECT,
+    body: SPOTIFY_ACCESS_REQUEST_BODY,
+  });
+  return `mailto:${contact}?${params.toString()}`;
+}
+
 export const ErrorMessages: Record<ErrorCode, string> = {
   // Network Errors
   [ErrorCode.NETWORK_OFFLINE]: "Network connection unavailable",
@@ -22,6 +46,16 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCode.BACKEND_UNAUTHORIZED]: "Unauthorized",
   [ErrorCode.BACKEND_FORBIDDEN]: "Forbidden",
   [ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED]: "Connect Spotify to continue",
+  [ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED]:
+    "Authorization code already used, expired, or invalid. Please try signing in again from the login page.",
+  [ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST]: getSpotifyAllowlistMessage(),
+
+  [ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR]: "Spotify authentication failed",
+  [ErrorCode.BACKEND_GOOGLE_AUTHENTICATION_ERROR]: "Google authentication failed",
+  [ErrorCode.BACKEND_GOOGLE_OAUTH_MISCONFIGURED]:
+    "Sign-in is temporarily misconfigured. Please try again later or contact support.",
+  [ErrorCode.BACKEND_GOOGLE_OAUTH_UNAUTHORIZED_CLIENT]:
+    "Google sign-in is temporarily unavailable. Please try again later or contact support.",
   [ErrorCode.BACKEND_NOT_FOUND]: "Not found",
   [ErrorCode.BACKEND_METHOD_NOT_ALLOWED]: "Method not allowed",
   [ErrorCode.BACKEND_REQUEST_TIMEOUT]: "Request timeout",

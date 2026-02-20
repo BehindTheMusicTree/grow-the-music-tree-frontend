@@ -17,7 +17,8 @@ check_script_vars_are_set() {
         NEXT_PUBLIC_SPOTIFY_REDIRECT_URI
         NEXT_PUBLIC_SPOTIFY_SCOPES
 
-        BUILD_COMPLETE_FILENAME
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID
+        NEXT_PUBLIC_GOOGLE_REDIRECT_URI
     )
     check_vars_are_set ${REQUIRED_NON_BOOL_VARS[@]} 2>&1
     if [ $? -ne 0 ]; then
@@ -55,6 +56,8 @@ NEXT_PUBLIC_SPOTIFY_AUTH_URL=$NEXT_PUBLIC_SPOTIFY_AUTH_URL
 NEXT_PUBLIC_SPOTIFY_CLIENT_ID=$NEXT_PUBLIC_SPOTIFY_CLIENT_ID
 NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=$NEXT_PUBLIC_SPOTIFY_REDIRECT_URI
 NEXT_PUBLIC_SPOTIFY_SCOPES=$NEXT_PUBLIC_SPOTIFY_SCOPES
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
+NEXT_PUBLIC_GOOGLE_REDIRECT_URI=$NEXT_PUBLIC_GOOGLE_REDIRECT_URI
 EOF
     if [ $? -ne 0 ]; then
         log_with_script_suffixe "ERROR: Failed to generate the Vite env file." >&2
@@ -62,9 +65,8 @@ EOF
     fi
     log_with_script_suffixe "Next.js env file generated successfully."
 
-    log_with_script_suffixe "Removing .next/ cache and build/ contents so NEXT_PUBLIC_* are re-inlined..."
+    log_with_script_suffixe "Removing .next/ cache so NEXT_PUBLIC_* are re-inlined..."
     rm -rf .next/
-    [ -d build ] && find build -mindepth 1 -delete
 
     log_with_script_suffixe "Building the application..."
     npm run build
@@ -74,32 +76,8 @@ EOF
     fi
     log_with_script_suffixe "Application built successfully."
 
-    log_with_script_suffixe "Ensuring build/ directory exists..."
-    mkdir -p build/
-    if [ $? -ne 0 ]; then
-        log_with_script_suffixe "ERROR: Failed to create build/ directory." >&2
-        exit 1
-    fi
-
-    log_with_script_suffixe "Copying build output to build/ directory..."
-    cp -r out/* build/
-    if [ $? -ne 0 ]; then
-        log_with_script_suffixe "ERROR: Failed to copy build output to build/ directory." >&2
-        exit 1
-    fi
-    log_with_script_suffixe "Build output copied successfully."
-
-    BUILD_COMPLETE_FILE="${PROJECT_DIR}${BUILD_COMPLETE_FILENAME}"
-    log_with_script_suffixe "Creating the build complete file $BUILD_COMPLETE_FILE indicating that the build is done..."
-    touch $BUILD_COMPLETE_FILE
-    if [ $? -ne 0 ]; then
-        log_with_script_suffixe "ERROR: Failed to create the build complete file." >&2
-        exit 1
-    fi
-    log_with_script_suffixe "Build complete file created successfully."
-
-    log_with_script_suffixe "Keeping the container running..."
-    tail -f /dev/null
+    log_with_script_suffixe "Starting Next.js server on port $APP_PORT..."
+    exec env PORT=$APP_PORT npm run start
 } 
 
 main "$@" 2>&1

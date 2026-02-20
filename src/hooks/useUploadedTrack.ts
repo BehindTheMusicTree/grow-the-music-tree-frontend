@@ -3,6 +3,7 @@ import { useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useFetchWrapper } from "./useFetchWrapper";
+import { useSession } from "@contexts/SessionContext";
 import { useInvalidateAllGenrePlaylistQueries } from "./useGenrePlaylist";
 import { useQueryWithParse } from "./useQueryWithParse";
 import { UploadedTrackDetailedSchema } from "@domain/uploaded-track/response/detailed";
@@ -19,6 +20,7 @@ export function useListUploadedTracks(
   pageSize = process.env.NEXT_PUBLIC_UPLOADED_TRACKS_PAGE_SIZE || 50,
 ) {
   const { fetch } = useFetchWrapper();
+  const { session, sessionRestored } = useSession();
 
   return useQueryWithParse({
     queryKey: scope != null ? libraryQueryKeys[scope].uploaded.list(page) : ["uploadedTracks", "none", page],
@@ -34,7 +36,8 @@ export function useListUploadedTracks(
     },
     schema: PaginatedResponseSchema(UploadedTrackDetailedSchema),
     context: "useListUploadedTracks",
-    enabled: scope != null,
+    enabled:
+      scope != null && (scope === "reference" || (sessionRestored && !!session?.accessToken)),
   });
 }
 
@@ -145,6 +148,7 @@ export interface UseDownloadTrackOptions {
 
 export function useDownloadTrack(uuid: string, scope: Scope | null, options?: UseDownloadTrackOptions) {
   const { fetch } = useFetchWrapper();
+  const { session, sessionRestored } = useSession();
   const { onSuccess, onError } = options ?? {};
   const lastDataRef = useRef<unknown>(undefined);
   const lastErrorRef = useRef<Error | null>(null);
@@ -158,7 +162,10 @@ export function useDownloadTrack(uuid: string, scope: Scope | null, options?: Us
 
       return response;
     },
-    enabled: !!uuid && scope != null,
+    enabled:
+      !!uuid &&
+      scope != null &&
+      (scope === "reference" || (sessionRestored && !!session?.accessToken)),
   });
 
   useEffect(() => {
