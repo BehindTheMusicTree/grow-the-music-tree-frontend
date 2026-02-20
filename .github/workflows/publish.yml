@@ -83,7 +83,6 @@ jobs:
       - name: Check required vars and secrets
         run: |
           bash scripts/check-required-vars.sh \
-            VAR_ENV ${{ needs.determine-version.outputs.env }} \
             VAR_DOMAIN_NAME "${{ env.DOMAIN_NAME }}" \
             VAR_WEBHOOK_DIR "${{ env.WEBHOOK_DIR }}" \
             VAR_WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE "${{ env.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}" \
@@ -100,7 +99,8 @@ jobs:
             VAR_SPOTIFY_REDIRECT_RELATIVE_URI "${{ env.SPOTIFY_REDIRECT_RELATIVE_URI }}" \
             VAR_SPOTIFY_SCOPES "${{ env.SPOTIFY_SCOPES }}" \
             VAR_GOOGLE_REDIRECT_RELATIVE_URI "${{ env.GOOGLE_REDIRECT_RELATIVE_URI }}" \
-            SECRET_GOOGLE_CLIENT_ID "${{ env.GOOGLE_CLIENT_ID }}" \
+            SECRET_GOOGLE_CLIENT_ID_TEST "${{ vars.GOOGLE_CLIENT_ID_TEST }}" \
+            SECRET_GOOGLE_CLIENT_ID_PROD "${{ vars.GOOGLE_CLIENT_ID_PROD }}" \
             SECRET_SERVER_DEPLOY_USERNAME "${{ env.SERVER_DEPLOY_USERNAME }}" \
             SECRET_SERVER_DEPLOY_SSH_PRIVATE_KEY "${{ env.SERVER_DEPLOY_SSH_PRIVATE_KEY }}" \
             SECRET_DOCKERHUB_ACCESS_TOKEN "${{ env.DOCKERHUB_ACCESS_TOKEN }}"
