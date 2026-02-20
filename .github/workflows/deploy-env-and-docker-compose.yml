@@ -18,7 +18,7 @@ on:
 
 env:
   CONTAINER_ROOT_DIR: /home/app/
-  ENV_FILENAME: ${{ vars.APP_NAME }}.env
+  ENV_FILENAME: ${{ vars.GTMT_FRONT_APP_NAME }}.env
 
 jobs:
   prepare:
@@ -71,7 +71,6 @@ jobs:
       - name: Build compose env file
         run: |
           mkdir -p pool_compose
-          ENV_FILENAME="${{ vars.ENV_FILENAME }}"
           ARTIFACT_FILENAME="${ENV_FILENAME#.}"
           {
             echo "NODE_ENV=${{ inputs.env }}"
