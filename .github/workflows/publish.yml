@@ -60,10 +60,10 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           if [[ "$VERSION" == *-* ]]; then
             echo "env=TEST" >> "$GITHUB_OUTPUT"
-            echo "Prerelease version -> env test"
+            echo "Prerelease version -> env TEST"
           elif [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "env=PROD" >> "$GITHUB_OUTPUT"
-            echo "Release version -> env prod"
+            echo "Release version -> env PROD"
           else
             echo "Unsupported version format: must be release (x.y.z) or prerelease (x.y.z-suffix). Got: $VERSION"
             exit 1
