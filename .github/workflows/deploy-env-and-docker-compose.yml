@@ -34,11 +34,12 @@ jobs:
 
       - name: Check required vars and secrets
         env:
+          APP_NAME: ${{ vars.GTMT_FRONT_APP_NAME }}
+          APP_PORT: ${{ vars.APP_PORT }}
           DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
           WEBHOOK_DIR: ${{ vars.WEBHOOK_DIR }}
           WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE: ${{ vars.WEBHOOK_REDEPLOYMENT_DIR_NAME_BASE }}
           DOCKER_COMPOSE_DIR_NAME: ${{ vars.DOCKER_COMPOSE_DIR_NAME }}
-          APP_NAME: ${{ vars.GTMT_FRONT_APP_NAME }}
           GTMT_FRONT_PORT: ${{ vars.GTMT_FRONT_PORT }}
           CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
           HTMT_API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
@@ -73,6 +74,18 @@ jobs:
       - name: Set env lowercase
         id: env-lower
         run: echo "env_lower=$(echo "${{ inputs.env }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+      - name: Build nginx env fragment
+        run: |
+          mkdir -p nginx_fragment
+          {
+            echo "GTMT_FRONT_PORT=${{ vars.APP_PORT }}"
+          } > nginx_fragment/fragment.env
+
+      - name: Upload nginx-env-fragment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nginx-env-fragment
+          path: nginx_fragment/
 
       - name: Build compose env file
         run: |
@@ -122,6 +135,15 @@ jobs:
         with:
           name: compose-parts
           path: compose_parts/
+
+  deploy-nginx-env:
+    name: Deploy nginx env fragment
+    needs: [prepare]
+    uses: BehindTheMusicTree/github-workflows/.github/workflows/deploy-nginx-env-fragment.yml@main
+    with:
+      env: ${{ inputs.env }}
+      app_name: ${{ vars.GTMT_FRONT_APP_NAME }}
+    secrets: inherit
 
   deploy-app-env-files:
     name: Deploy app env file
