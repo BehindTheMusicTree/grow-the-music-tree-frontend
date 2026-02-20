@@ -37,7 +37,6 @@ jobs:
           APP_NAME: ${{ vars.GTMT_FRONT_APP_NAME }}
           APP_PORT: ${{ vars.APP_PORT }}
           DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
-          APP_PORT: ${{ vars.APP_PORT }}
           CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
           HTMT_API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
           API_VERSION: ${{ vars.API_VERSION }}
