@@ -94,6 +94,12 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
             body.details?.message,
           );
         }
+        if (detailsCode === "google_oauth_unauthorized_client") {
+          return new BackendError(
+            ErrorCode.BACKEND_GOOGLE_OAUTH_UNAUTHORIZED_CLIENT,
+            body.details?.message,
+          );
+        }
         if (
           apiCode === 1006 ||
           detailsCode === "authentication_required" ||

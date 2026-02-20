@@ -13,6 +13,7 @@ export const useFetchWrapper = () => {
     if (error instanceof ConnectivityError) {
       const authDetailErrors = [
         ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED,
+        ErrorCode.BACKEND_GOOGLE_OAUTH_UNAUTHORIZED_CLIENT,
         ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
         ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR,
         ErrorCode.BACKEND_GOOGLE_AUTHENTICATION_ERROR,

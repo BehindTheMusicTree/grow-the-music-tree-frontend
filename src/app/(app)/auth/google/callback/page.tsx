@@ -7,6 +7,7 @@ import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
 import AuthPopup from "@components/ui/popup/child/AuthPopup";
+import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
 
@@ -67,6 +68,8 @@ export default function GoogleOAuthCallbackPage() {
               AUTH_POPUP_TYPE,
             );
             // router.push("/");
+          } else if (err.code === ErrorCode.BACKEND_GOOGLE_OAUTH_UNAUTHORIZED_CLIENT) {
+            showPopup(<InternalErrorPopup errorCode={err.code} />);
           } else if (err.code === ErrorCode.BACKEND_AUTH_ERROR) {
             setError(new Error("Failed to authenticate with the backend server. Please try again later."));
           } else {

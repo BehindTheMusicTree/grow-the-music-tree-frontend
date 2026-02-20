@@ -14,6 +14,7 @@ import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
 import AuthPopup from "@components/ui/popup/child/AuthPopup";
+import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 import SpotifyAuthErrorPopup from "@components/ui/popup/child/SpotifyAuthErrorPopup";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
@@ -66,6 +67,9 @@ export default function AuthCallbackHandler() {
             <AuthPopup handleSpotifyOAuth={handleSpotifyOAuth} handleGoogleOAuth={handleGoogleOAuth} />,
             AUTH_POPUP_TYPE,
           );
+          router.replace("/");
+        } else if (err instanceof BackendError && err.code === ErrorCode.BACKEND_GOOGLE_OAUTH_UNAUTHORIZED_CLIENT) {
+          showPopup(<InternalErrorPopup errorCode={err.code} />);
           router.replace("/");
         } else {
           setErrorMessage(err instanceof Error ? err.message : "Authentication failed");
