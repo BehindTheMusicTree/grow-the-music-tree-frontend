@@ -77,6 +77,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.2.1] - 2025-02-20
+
 ### CI
 
 - **Deployment workflow**: Generate nginx environment fragment (port) as artifact for reuse by reusable workflows
