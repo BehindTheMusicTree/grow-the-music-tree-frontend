@@ -79,8 +79,8 @@ jobs:
           ARTIFACT_FILENAME="${ENV_FILENAME#.}"
           {
             echo "APP_VERSION=${{ inputs.app_version }}"
-            echo "NEXT_PUBLIC_APP_VERSION=${{ inputs.app_version }}"
             echo "APP_PORT=${{ vars.GTMT_FRONT_PORT }}"
+            echo "NEXT_PUBLIC_APP_VERSION=${{ inputs.app_version }}"
             echo "NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}"
             echo "NEXT_PUBLIC_BACKEND_BASE_URL=https://${{ steps.env-lower.outputs.env_lower == 'prod' && vars.HTMT_API_SUBDOMAIN_NAME || format('{0}-{1}', vars.HTMT_API_SUBDOMAIN_NAME, steps.env-lower.outputs.env_lower) }}.${{ vars.DOMAIN_NAME }}/${{ vars.API_VERSION }}/"
             echo "NEXT_PUBLIC_SENTRY_IS_ACTIVE=${{ vars.SENTRY_IS_ACTIVE }}"
