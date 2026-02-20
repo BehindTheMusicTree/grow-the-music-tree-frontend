@@ -37,7 +37,7 @@ jobs:
           APP_NAME: ${{ vars.GTMT_FRONT_APP_NAME }}
           APP_PORT: ${{ vars.APP_PORT }}
           DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
-          GTMT_FRONT_PORT: ${{ vars.GTMT_FRONT_PORT }}
+          APP_PORT: ${{ vars.APP_PORT }}
           CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
           HTMT_API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
           API_VERSION: ${{ vars.API_VERSION }}
@@ -54,7 +54,7 @@ jobs:
           GOOGLE_CLIENT_ID_PROD: ${{ vars.GOOGLE_CLIENT_ID_PROD }}
         run: |
           MISSING=()
-          for name in DOMAIN_NAME APP_NAME APP_PORT GTMT_FRONT_PORT CONTACT_EMAIL HTMT_API_SUBDOMAIN_NAME \
+          for name in DOMAIN_NAME APP_NAME APP_PORT CONTACT_EMAIL HTMT_API_SUBDOMAIN_NAME \
             API_VERSION DOCKERHUB_USERNAME \
             APP_IMAGE_REPO SPOTIFY_REDIRECT_RELATIVE_URI SPOTIFY_SCOPES GOOGLE_REDIRECT_RELATIVE_URI \
             SERVER_DEPLOY_USERNAME SERVER_DEPLOY_SSH_PRIVATE_KEY SPOTIFY_CLIENT_ID_TEST SPOTIFY_CLIENT_ID_PROD GOOGLE_CLIENT_ID_TEST GOOGLE_CLIENT_ID_PROD; do
@@ -90,7 +90,7 @@ jobs:
           ARTIFACT_FILENAME="${ENV_FILENAME#.}"
           {
             echo "APP_VERSION=${{ inputs.app_version }}"
-            echo "APP_PORT=${{ vars.GTMT_FRONT_PORT }}"
+            echo "APP_PORT=${{ vars.APP_PORT }}"
             echo "NEXT_PUBLIC_APP_VERSION=${{ inputs.app_version }}"
             echo "NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}"
             echo "NEXT_PUBLIC_BACKEND_BASE_URL=https://${{ steps.env-lower.outputs.env_lower == 'prod' && vars.HTMT_API_SUBDOMAIN_NAME || format('{0}-{1}', vars.HTMT_API_SUBDOMAIN_NAME, steps.env-lower.outputs.env_lower) }}.${{ vars.DOMAIN_NAME }}/${{ vars.API_VERSION }}/"
@@ -112,7 +112,7 @@ jobs:
           IMAGE_REPO: ${{ vars.APP_IMAGE_REPO }}
           APP_VERSION: ${{ inputs.app_version }}
           CONTAINER_NAME: ${{ vars.GTMT_FRONT_APP_NAME }}-${{ steps.env-lower.outputs.env_lower }}
-          APP_PORT: ${{ vars.GTMT_FRONT_PORT }}
+          APP_PORT: ${{ vars.APP_PORT }}
           ENV_FILENAME: ${{ env.ENV_FILENAME }}
         run: bash scripts/generate-docker-compose-part.sh
 
