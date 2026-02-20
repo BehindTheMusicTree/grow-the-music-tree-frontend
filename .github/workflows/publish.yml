@@ -90,7 +90,6 @@ jobs:
             VAR_DOCKER_COMPOSE_DIR_NAME "${{ env.DOCKER_COMPOSE_DIR_NAME }}" \
             VAR_DOCKERHUB_USERNAME "${{ env.DOCKERHUB_USERNAME }}" \
             VAR_GTMT_FRONT_IMAGE_REPO "${{ env.APP_IMAGE_REPO }}" \
-            VAR_GTMT_FRONT_PORT "${{ env.GTMT_FRONT_PORT }}" \
             VAR_CONTACT_EMAIL "${{ env.CONTACT_EMAIL }}" \
             VAR_HTMT_API_SUBDOMAIN_NAME "${{ env.HTMT_API_SUBDOMAIN_NAME }}" \
             VAR_API_VERSION "${{ vars.API_VERSION }}" \
