@@ -77,6 +77,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.2.2] - 2025-02-21
+
 ### Fixed
 
 - **OAuth code invalid or expired**: When the backend returns that the authorization code was already used, expired, or invalid (Google or Spotify), the app now shows the auth popup again and redirects to `/`. Stored redirect URL for that provider is cleared so the next successful sign-in does not use a stale redirect.
