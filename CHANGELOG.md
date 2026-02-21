@@ -77,6 +77,15 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.2.1] - 2025-02-20
+
+### CI
+
+- **Deployment workflow**: Generate nginx environment fragment (port) as artifact for reuse by reusable workflows
+- **Deployment workflow**: Use `APP_PORT` consistently; remove `GTMT_FRONT_PORT`. Nginx fragment filename is now `APP_PORT.env`
+- **Deployment workflow**: Include `APP_PORT` in required vars/secrets checks and standardize env var validation output
+- **Publish workflow**: Add Spotify Client ID for test environment in deployment inputs
+
 ## [1.2.0] - 2025-02-20
 
 ### Added

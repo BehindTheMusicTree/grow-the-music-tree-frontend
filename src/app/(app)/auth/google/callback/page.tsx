@@ -8,6 +8,7 @@ import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
 import AuthPopup from "@components/ui/popup/child/AuthPopup";
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
+import { clearStoredRedirectUrl, GOOGLE_EXCHANGE_CONFIG } from "@lib/auth/code-exchange";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
 
@@ -60,6 +61,7 @@ export default function GoogleOAuthCallbackPage() {
       } catch (err) {
         if (err instanceof BackendError) {
           if (err.code === ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED) {
+            clearStoredRedirectUrl(GOOGLE_EXCHANGE_CONFIG.redirectStorageKey);
             showPopup(
               <AuthPopup
                 handleSpotifyOAuth={handleSpotifyOAuth}
@@ -67,7 +69,7 @@ export default function GoogleOAuthCallbackPage() {
               />,
               AUTH_POPUP_TYPE,
             );
-            // router.push("/");
+            router.replace("/");
           } else if (err.code === ErrorCode.BACKEND_GOOGLE_OAUTH_UNAUTHORIZED_CLIENT) {
             showPopup(<InternalErrorPopup errorCode={err.code} />);
           } else if (err.code === ErrorCode.BACKEND_AUTH_ERROR) {

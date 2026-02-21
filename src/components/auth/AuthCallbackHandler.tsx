@@ -13,6 +13,11 @@ import { usePopup } from "@contexts/PopupContext";
 import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
+import {
+  clearStoredRedirectUrl,
+  GOOGLE_EXCHANGE_CONFIG,
+  SPOTIFY_EXCHANGE_CONFIG,
+} from "@lib/auth/code-exchange";
 import AuthPopup from "@components/ui/popup/child/AuthPopup";
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 import SpotifyAuthErrorPopup from "@components/ui/popup/child/SpotifyAuthErrorPopup";
@@ -63,6 +68,7 @@ export default function AuthCallbackHandler() {
         router.replace(redirectUrl || "/");
       } catch (err) {
         if (err instanceof BackendError && err.code === ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED) {
+          clearStoredRedirectUrl(GOOGLE_EXCHANGE_CONFIG.redirectStorageKey);
           showPopup(
             <AuthPopup handleSpotifyOAuth={handleSpotifyOAuth} handleGoogleOAuth={handleGoogleOAuth} />,
             AUTH_POPUP_TYPE,
@@ -104,15 +110,31 @@ export default function AuthCallbackHandler() {
         setState("done");
         router.replace(redirectUrl || "/");
       } catch (err) {
-        const message =
-          err instanceof BackendError
-            ? err.code === ErrorCode.BACKEND_AUTH_ERROR
-              ? "Failed to authenticate with the backend server."
-              : err.message
-            : "An unexpected error occurred.";
-        showPopup(
-          <SpotifyAuthErrorPopup message={message} onClose={() => router.replace("/")} />,
-        );
+        if (
+          err instanceof BackendError &&
+          (err.code === ErrorCode.BACKEND_SPOTIFY_OAUTH_CODE_INVALID_OR_EXPIRED ||
+            err.code === ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR)
+        ) {
+          clearStoredRedirectUrl(SPOTIFY_EXCHANGE_CONFIG.redirectStorageKey);
+          showPopup(
+            <AuthPopup handleSpotifyOAuth={handleSpotifyOAuth} handleGoogleOAuth={handleGoogleOAuth} />,
+            AUTH_POPUP_TYPE,
+          );
+          router.replace("/");
+        } else if (err instanceof BackendError && err.code === ErrorCode.BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT) {
+          showPopup(<InternalErrorPopup errorCode={err.code} />);
+          router.replace("/");
+        } else {
+          const message =
+            err instanceof BackendError
+              ? err.code === ErrorCode.BACKEND_AUTH_ERROR
+                ? "Failed to authenticate with the backend server."
+                : err.message
+              : "An unexpected error occurred.";
+          showPopup(
+            <SpotifyAuthErrorPopup message={message} onClose={() => router.replace("/")} />,
+          );
+        }
         setState("done");
       }
     };

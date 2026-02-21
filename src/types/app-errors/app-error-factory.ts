@@ -67,6 +67,12 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
             body.details?.message,
           );
         }
+        if (detailsCode === "spotify_oauth_code_invalid_or_expired") {
+          return new BackendError(
+            ErrorCode.BACKEND_SPOTIFY_OAUTH_CODE_INVALID_OR_EXPIRED,
+            body.details?.message,
+          );
+        }
         if (detailsCode === "spotify_user_not_in_allowlist") {
           return new BackendError(
             ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
@@ -157,6 +163,18 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
     }
   } else if (result.status === 500) {
     if (isBackendError) {
+      try {
+        const body = (await result.json()) as { details?: { code?: string; message?: string } };
+        const detailsCode = body?.details?.code;
+        if (detailsCode === "spotify_invalid_client") {
+          return new BackendError(
+            ErrorCode.BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT,
+            body.details?.message,
+          );
+        }
+      } catch {
+        // ignore parse failure
+      }
       return createAppErrorFromErrorCode(ErrorCode.BACKEND_INTERNAL_ERROR);
     } else {
       return createAppErrorFromErrorCode(ErrorCode.SERVICE_INTERNAL_ERROR);

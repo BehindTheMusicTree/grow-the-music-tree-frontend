@@ -21,6 +21,7 @@ export const SPOTIFY_EXCHANGE_CONFIG: ExchangeCodeConfig = {
   rethrowErrorCodes: [
     ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
     ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR,
+    ErrorCode.BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT,
   ],
 };
 
@@ -101,6 +102,10 @@ export function storeRedirectUrl(redirectStorageKey: string, redirectAfterAuthPa
     ? `${window.location.origin}${path.startsWith("/") ? "" : "/"}${path}`
     : window.location.href;
   localStorage.setItem(redirectStorageKey, urlToStore);
+}
+
+export function clearStoredRedirectUrl(redirectStorageKey: string): void {
+  localStorage.removeItem(redirectStorageKey);
 }
 
 export function createLogout(
