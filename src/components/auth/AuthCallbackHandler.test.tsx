@@ -102,3 +102,40 @@ describe("AuthCallbackHandler when API returns code invalid or expired", () => {
     expect(mockReplace).toHaveBeenCalledWith("/");
   });
 });
+
+describe("AuthCallbackHandler when API returns Spotify invalid client (500)", () => {
+  const originalLocation = window.location;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+    mockAuthToBackendFromGoogleCode.mockResolvedValue("/");
+    mockAuthToBackendFromSpotifyCode.mockResolvedValue("/");
+  });
+
+  it("shows internal error popup with BAC4018 and redirects to / for Spotify callback", async () => {
+    Object.defineProperty(window, "location", {
+      value: {
+        ...originalLocation,
+        pathname: "/auth/spotify/callback",
+        search: "?code=spotify-code",
+        href: "http://localhost/auth/spotify/callback?code=spotify-code",
+      },
+      writable: true,
+    });
+    mockAuthToBackendFromSpotifyCode.mockRejectedValue(
+      new BackendError(ErrorCode.BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT, "Invalid client"),
+    );
+
+    render(<AuthCallbackHandler />);
+
+    await waitFor(() => {
+      expect(showPopupSpy).toHaveBeenCalled();
+    });
+
+    expect(showPopupSpy).toHaveBeenCalledTimes(1);
+    const popupElement = showPopupSpy.mock.calls[0][0];
+    expect(popupElement.props.errorCode).toBe(ErrorCode.BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT);
+    expect(mockReplace).toHaveBeenCalledWith("/");
+  });
+});
