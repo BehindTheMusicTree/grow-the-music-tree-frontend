@@ -65,85 +65,102 @@ export default function AppContent({ children }: { children: ReactNode }) {
         currentConnectivityErrorRef.current = null;
         hidePopup();
       }
-    } else if (
-      currentConnectivityErrorRef.current == null ||
-      (![NetworkError, BackendError, ClientError, ServiceError, InvalidInputError].includes(
-        currentConnectivityErrorRef.current,
-      ) && !(connectivityError instanceof currentConnectivityErrorRef.current))
-    ) {
-      let popup: ReactNode | null = null;
-      let popupType: string | null = null;
+    } else {
       const error = connectivityError as ConnectivityError;
-      if (
-        !isAccountPage &&
-        routeRequiresAuth &&
-        error instanceof AuthRequired
-      ) {
-        popup = (
-          <AuthPopup
-            handleSpotifyOAuth={handleSpotifyOAuth}
-            handleGoogleOAuth={handleGoogleOAuth}
-          />
-        );
-        popupType = AUTH_POPUP_TYPE;
-      } else if (
-        !isAccountPage &&
-        routeRequiresSpotify &&
-        error instanceof BackendError &&
-        error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED
-      ) {
-        popup = <AuthPopup handleSpotifyOAuth={handleSpotifyOAuth} spotifyOnly />;
-        popupType = AUTH_POPUP_TYPE;
-      } else if (error instanceof InvalidInputError) {
-        console.error("[InvalidInputError]", error.code, error.json);
-        popup = <InternalErrorPopup errorCode={error.code} />;
-      } else if (
+      const isSpotifyAllowlistOrAuthError =
         error instanceof BackendError &&
         [
           ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
           ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR,
-        ].includes(error.code)
-      ) {
-        popup = (
-          <SpotifyAuthErrorPopup
-            message={error.message}
-            errorCode={error.code}
-            onClose={() => {
-              hidePopup();
-            }}
-          />
-        );
-      } else if (
-        error instanceof BackendError &&
-        [
-          ErrorCode.BACKEND_GOOGLE_AUTHENTICATION_ERROR,
-          ErrorCode.BACKEND_GOOGLE_OAUTH_MISCONFIGURED,
-          ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED,
-        ].includes(error.code)
-      ) {
-        popup = (
-          <AuthErrorPopup
-            message={error.message}
-            onClose={() => {
-              hidePopup();
-            }}
-          />
-        );
-      } else if (error instanceof BadRequestError || error instanceof BackendError || error instanceof ServiceError) {
-        popup = <InternalErrorPopup errorCode={error.code} />;
-      } else if (error instanceof NetworkError) {
-        popup = (
-          <NetworkErrorPopup title="Network Error">
-            Please check your internet connection and try again.
-          </NetworkErrorPopup>
-        );
+        ].includes(error.code);
+
+      if (isSpotifyAllowlistOrAuthError && !routeRequiresSpotify) {
+        hidePopup();
+        clearConnectivityError();
+        currentConnectivityErrorRef.current = null;
+        return;
       }
 
-      if (popup) {
-        showPopup(popup, popupType);
-      }
+      if (
+        currentConnectivityErrorRef.current == null ||
+        (![NetworkError, BackendError, ClientError, ServiceError, InvalidInputError].includes(
+          currentConnectivityErrorRef.current,
+        ) && !(connectivityError instanceof currentConnectivityErrorRef.current))
+      ) {
+        let popup: ReactNode | null = null;
+        let popupType: string | null = null;
+        if (
+          !isAccountPage &&
+          routeRequiresAuth &&
+          error instanceof AuthRequired
+        ) {
+          popup = (
+            <AuthPopup
+              handleSpotifyOAuth={handleSpotifyOAuth}
+              handleGoogleOAuth={handleGoogleOAuth}
+            />
+          );
+          popupType = AUTH_POPUP_TYPE;
+        } else if (
+          !isAccountPage &&
+          routeRequiresSpotify &&
+          error instanceof BackendError &&
+          error.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED
+        ) {
+          popup = <AuthPopup handleSpotifyOAuth={handleSpotifyOAuth} spotifyOnly />;
+          popupType = AUTH_POPUP_TYPE;
+        } else if (error instanceof InvalidInputError) {
+          console.error("[InvalidInputError]", error.code, error.json);
+          popup = <InternalErrorPopup errorCode={error.code} />;
+        } else if (
+          routeRequiresSpotify &&
+          error instanceof BackendError &&
+          [
+            ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
+            ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR,
+          ].includes(error.code)
+        ) {
+          popup = (
+            <SpotifyAuthErrorPopup
+              message={error.message}
+              errorCode={error.code}
+              onClose={() => {
+                hidePopup();
+              }}
+            />
+          );
+        } else if (
+          error instanceof BackendError &&
+          [
+            ErrorCode.BACKEND_GOOGLE_AUTHENTICATION_ERROR,
+            ErrorCode.BACKEND_GOOGLE_OAUTH_MISCONFIGURED,
+            ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED,
+          ].includes(error.code)
+        ) {
+          popup = (
+            <AuthErrorPopup
+              message={error.message}
+              onClose={() => {
+                hidePopup();
+              }}
+            />
+          );
+        } else if (error instanceof BadRequestError || error instanceof BackendError || error instanceof ServiceError) {
+          popup = <InternalErrorPopup errorCode={error.code} />;
+        } else if (error instanceof NetworkError) {
+          popup = (
+            <NetworkErrorPopup title="Network Error">
+              Please check your internet connection and try again.
+            </NetworkErrorPopup>
+          );
+        }
 
-      currentConnectivityErrorRef.current = error.constructor as typeof ConnectivityError;
+        if (popup) {
+          showPopup(popup, popupType);
+        }
+
+        currentConnectivityErrorRef.current = error.constructor as typeof ConnectivityError;
+      }
     }
   }, [connectivityError, showPopup, hidePopup, clearConnectivityError, handleSpotifyOAuth, handleGoogleOAuth, isAccountPage, routeRequiresAuth, routeRequiresSpotify]);
 
