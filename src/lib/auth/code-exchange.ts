@@ -21,6 +21,7 @@ export const SPOTIFY_EXCHANGE_CONFIG: ExchangeCodeConfig = {
   rethrowErrorCodes: [
     ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
     ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR,
+    ErrorCode.BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT,
   ],
 };
 

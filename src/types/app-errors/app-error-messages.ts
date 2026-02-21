@@ -50,6 +50,8 @@ export const ErrorMessages: Record<ErrorCode, string> = {
     "Authorization code already used, expired, or invalid. Please try signing in again from the login page.",
   [ErrorCode.BACKEND_SPOTIFY_OAUTH_CODE_INVALID_OR_EXPIRED]:
     "Authorization code already used, expired, or invalid. Please try signing in again from the login page.",
+  [ErrorCode.BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT]:
+    "Spotify sign-in is temporarily misconfigured. Please try again later or contact support.",
   [ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST]: getSpotifyAllowlistMessage(),
 
   [ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR]: "Spotify authentication failed",

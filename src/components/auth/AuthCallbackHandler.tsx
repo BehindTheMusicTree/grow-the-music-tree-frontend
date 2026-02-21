@@ -121,6 +121,9 @@ export default function AuthCallbackHandler() {
             AUTH_POPUP_TYPE,
           );
           router.replace("/");
+        } else if (err instanceof BackendError && err.code === ErrorCode.BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT) {
+          showPopup(<InternalErrorPopup errorCode={err.code} />);
+          router.replace("/");
         } else {
           const message =
             err instanceof BackendError

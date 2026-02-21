@@ -7,6 +7,7 @@ import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
 import AuthPopup from "@components/ui/popup/child/AuthPopup";
+import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 import SpotifyAuthErrorPopup from "@components/ui/popup/child/SpotifyAuthErrorPopup";
 import { clearStoredRedirectUrl, SPOTIFY_EXCHANGE_CONFIG } from "@lib/auth/code-exchange";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
@@ -89,6 +90,12 @@ export default function SpotifyOAuthCallbackPage() {
             />,
             AUTH_POPUP_TYPE,
           );
+          router.replace("/");
+        } else if (
+          err instanceof BackendError &&
+          err.code === ErrorCode.BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT
+        ) {
+          showPopup(<InternalErrorPopup errorCode={err.code} />);
           router.replace("/");
         } else {
           const message =

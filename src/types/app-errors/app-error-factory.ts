@@ -163,6 +163,18 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
     }
   } else if (result.status === 500) {
     if (isBackendError) {
+      try {
+        const body = (await result.json()) as { details?: { code?: string; message?: string } };
+        const detailsCode = body?.details?.code;
+        if (detailsCode === "spotify_invalid_client") {
+          return new BackendError(
+            ErrorCode.BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT,
+            body.details?.message,
+          );
+        }
+      } catch {
+        // ignore parse failure
+      }
       return createAppErrorFromErrorCode(ErrorCode.BACKEND_INTERNAL_ERROR);
     } else {
       return createAppErrorFromErrorCode(ErrorCode.SERVICE_INTERNAL_ERROR);
