@@ -103,6 +103,10 @@ export function storeRedirectUrl(redirectStorageKey: string, redirectAfterAuthPa
   localStorage.setItem(redirectStorageKey, urlToStore);
 }
 
+export function clearStoredRedirectUrl(redirectStorageKey: string): void {
+  localStorage.removeItem(redirectStorageKey);
+}
+
 export function createLogout(
   clearConnectivityError: () => void,
   clearSession: () => void,

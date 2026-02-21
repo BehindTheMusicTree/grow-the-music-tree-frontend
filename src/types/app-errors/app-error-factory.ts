@@ -67,6 +67,12 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
             body.details?.message,
           );
         }
+        if (detailsCode === "spotify_oauth_code_invalid_or_expired") {
+          return new BackendError(
+            ErrorCode.BACKEND_SPOTIFY_OAUTH_CODE_INVALID_OR_EXPIRED,
+            body.details?.message,
+          );
+        }
         if (detailsCode === "spotify_user_not_in_allowlist") {
           return new BackendError(
             ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,

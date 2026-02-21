@@ -3,8 +3,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { usePopup } from "@contexts/PopupContext";
+import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
+import { useGoogleAuth } from "@hooks/useGoogleAuth";
+import AuthPopup from "@components/ui/popup/child/AuthPopup";
 import SpotifyAuthErrorPopup from "@components/ui/popup/child/SpotifyAuthErrorPopup";
+import { clearStoredRedirectUrl, SPOTIFY_EXCHANGE_CONFIG } from "@lib/auth/code-exchange";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 import { BackendError } from "@app-types/app-errors/app-error";
 
@@ -20,7 +24,8 @@ function getParamsFromUrl() {
 export default function SpotifyOAuthCallbackPage() {
   const router = useRouter();
   const { showPopup, hidePopup } = usePopup();
-  const { authToBackendFromSpotifyCode } = useSpotifyAuth();
+  const { authToBackendFromSpotifyCode, handleSpotifyOAuth } = useSpotifyAuth();
+  const { handleGoogleOAuth } = useGoogleAuth();
   const [isPending, setIsPending] = useState(true);
   const authAttempted = useRef(false);
 
@@ -71,29 +76,44 @@ export default function SpotifyOAuthCallbackPage() {
           // router.push(redirectUrl);
         }
       } catch (err) {
-        const message =
-          err instanceof BackendError
-            ? err.code === ErrorCode.BACKEND_AUTH_ERROR
-              ? "Failed to authenticate with the backend server. Please try again later."
-              : err.message
-            : "An unexpected error occurred. Please try again later.";
-        showPopup(
-          <SpotifyAuthErrorPopup
-            message={message}
-            onClose={() => {
-              hidePopup();
-              // router.push("/");
-            }}
-          />,
-        );
-        // router.push("/");
+        if (
+          err instanceof BackendError &&
+          (err.code === ErrorCode.BACKEND_SPOTIFY_OAUTH_CODE_INVALID_OR_EXPIRED ||
+            err.code === ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR)
+        ) {
+          clearStoredRedirectUrl(SPOTIFY_EXCHANGE_CONFIG.redirectStorageKey);
+          showPopup(
+            <AuthPopup
+              handleSpotifyOAuth={handleSpotifyOAuth}
+              handleGoogleOAuth={handleGoogleOAuth}
+            />,
+            AUTH_POPUP_TYPE,
+          );
+          router.replace("/");
+        } else {
+          const message =
+            err instanceof BackendError
+              ? err.code === ErrorCode.BACKEND_AUTH_ERROR
+                ? "Failed to authenticate with the backend server. Please try again later."
+                : err.message
+              : "An unexpected error occurred. Please try again later.";
+          showPopup(
+            <SpotifyAuthErrorPopup
+              message={message}
+              onClose={() => {
+                hidePopup();
+                router.replace("/");
+              }}
+            />,
+          );
+        }
       } finally {
         setIsPending(false);
       }
     };
 
     handleAuth();
-  }, [authToBackendFromSpotifyCode, router, showPopup, hidePopup]);
+  }, [authToBackendFromSpotifyCode, handleSpotifyOAuth, handleGoogleOAuth, router, showPopup, hidePopup]);
 
   if (isPending) {
     return (
