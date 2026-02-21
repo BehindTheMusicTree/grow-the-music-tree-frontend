@@ -77,6 +77,20 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.2.2] - 2025-02-21
+
+### Fixed
+
+- **OAuth code invalid or expired**: When the backend returns that the authorization code was already used, expired, or invalid (Google or Spotify), the app now shows the auth popup again and redirects to `/`. Stored redirect URL for that provider is cleared so the next successful sign-in does not use a stale redirect.
+
+### Added
+
+- **Spotify invalid client (500)**: Backend 500 responses with `details.code === "spotify_invalid_client"` are mapped to `BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT` (BAC4018). The Spotify callback and AuthCallbackHandler show the internal-error popup with that code and redirect to `/`.
+
+### Changed
+
+- **Allowlist popup**: The “Your Spotify account is not yet authorized for this app” popup (and the Spotify authentication error popup) now dismiss automatically when the user navigates to a page that does not require Spotify auth (e.g. About, Reference Genre Tree). The connectivity error is cleared so the popup does not reappear until a Spotify-required action triggers it again.
+
 ## [1.2.1] - 2025-02-20
 
 ### CI
