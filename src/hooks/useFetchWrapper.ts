@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { useSession } from "@contexts/SessionContext";
 import { BackendError, AuthRequired, ConnectivityError } from "@app-types/app-errors/app-error";
@@ -9,7 +10,7 @@ export const useFetchWrapper = () => {
   const { setConnectivityError } = useConnectivityError();
   const { clearSession, session, sessionRestored } = useSession();
 
-  const handleError = (error: Error) => {
+  const handleError = useCallback((error: Error) => {
     if (error instanceof ConnectivityError) {
       const authDetailErrors = [
         ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED,
@@ -32,14 +33,14 @@ export const useFetchWrapper = () => {
     } else {
       throw error;
     }
-  };
+  }, [clearSession, setConnectivityError]);
 
   const handleMissingRequiredSession = () => {
     if (!sessionRestored) return;
     setConnectivityError(createAppErrorFromErrorCode(ErrorCode.SESSION_REQUIRED));
   };
 
-  const fetch = <T>(
+  const fetch = useCallback(<T>(
     backendEndpointOrUrl: string,
     fromBackend: boolean = true,
     requiresAuth: boolean = true,
@@ -66,7 +67,7 @@ export const useFetchWrapper = () => {
       skipGlobalError ? undefined : handleError,
       expectBinary,
     );
-  };
+  }, [session?.accessToken, handleError, handleMissingRequiredSession]);
 
   return { fetch };
 };

@@ -100,6 +100,7 @@ jobs:
             echo "NEXT_PUBLIC_SPOTIFY_SCOPES=${{ vars.SPOTIFY_SCOPES }}"
             echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ steps.env-lower.outputs.env_lower == 'test' && env.GOOGLE_CLIENT_ID_TEST || env.GOOGLE_CLIENT_ID_PROD }}"
             echo "NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}"
+            echo "NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS=${{ vars.TRACK_UPLOAD_TIMEOUT_MS }}"
           } > "pool_compose/${ARTIFACT_FILENAME}"
 
       - name: Generate docker compose part file
