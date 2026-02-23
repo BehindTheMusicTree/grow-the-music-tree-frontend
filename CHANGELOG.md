@@ -77,6 +77,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Track upload timeout**: Timeout for track upload requests is configurable via required env var `NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS` (no fallback). Deploy workflow sets it from GitHub variable `TRACK_UPLOAD_TIMEOUT_MS`. Default recommendation 300000 ms (5 min) for large files (e.g. 80 MB).
+
+- **Spotify allowlist tests**: Unit tests for SpotifyAllowlistPopup (title, message, Back button, mailto link) and for the Spotify OAuth callback page when the backend returns user-not-in-allowlist. Vitest `resolve.alias` added so `.jsx` files resolve path aliases in tests.
+
 ## [1.2.2] - 2025-02-21
 
 ### Fixed
