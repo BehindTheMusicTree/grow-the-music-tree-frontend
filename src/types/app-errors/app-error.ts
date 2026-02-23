@@ -48,9 +48,15 @@ export class NetworkError extends ConnectivityError {
 }
 
 export class BackendError extends ConnectivityError {
-  constructor(code: ErrorCode) {
+  constructor(
+    code: ErrorCode,
+    public readonly backendMessage?: string,
+  ) {
     super(code);
     this.name = "BackendError";
+    if (backendMessage) {
+      this.message = backendMessage;
+    }
   }
 }
 

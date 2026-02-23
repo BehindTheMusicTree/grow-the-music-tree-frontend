@@ -162,7 +162,7 @@ cd grow-the-music-tree
 
    This will create `.env.development` with the necessary configuration.
 
-   **Note:** Environment variables are required for connecting to The Music Tree API backend.
+   **Note:** Environment variables are required for connecting to TheMusicTreeAPI backend.
 
 4. Verify environment setup:
 
@@ -180,9 +180,9 @@ cd grow-the-music-tree
 
 #### Environment Variables
 
-The application requires several environment variables to connect to The Music Tree API:
+The application requires several environment variables to connect to TheMusicTreeAPI:
 
-- `NEXT_PUBLIC_API_BASE_URL` - The base URL of The Music Tree API
+- `NEXT_PUBLIC_API_BASE_URL` - The base URL of TheMusicTreeAPI
 - `NEXT_PUBLIC_SENTRY_DSN` - Sentry DSN for error tracking (optional)
 - Additional environment variables for authentication and features
 
@@ -190,7 +190,7 @@ See `env/dev/example/` for complete environment variable templates.
 
 #### Backend Requirement
 
-This frontend application requires The Music Tree API backend to function. You can find The Music Tree API on GitHub at: [The Music Tree API](https://github.com/BehindTheMusicTree/bodzify-api-django)
+This frontend application requires TheMusicTreeAPI backend to function. You can find TheMusicTreeAPI on GitHub at: [TheMusicTreeAPI](https://github.com/BehindTheMusicTree/bodzify-api-django)
 
 For development, you can either:
 

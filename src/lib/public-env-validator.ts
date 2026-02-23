@@ -10,6 +10,9 @@ interface EnvVars {
   NEXT_PUBLIC_SPOTIFY_CLIENT_ID: string | undefined;
   NEXT_PUBLIC_SPOTIFY_SCOPES: string | undefined;
   NEXT_PUBLIC_SPOTIFY_REDIRECT_URI: string | undefined;
+  NEXT_PUBLIC_GOOGLE_CLIENT_ID: string | undefined;
+  NEXT_PUBLIC_GOOGLE_REDIRECT_URI: string | undefined;
+  NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS: string | undefined;
 }
 
 export function validateEnv(): void {
@@ -24,6 +27,9 @@ export function validateEnv(): void {
       NEXT_PUBLIC_SPOTIFY_CLIENT_ID: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
       NEXT_PUBLIC_SPOTIFY_SCOPES: process.env.NEXT_PUBLIC_SPOTIFY_SCOPES,
       NEXT_PUBLIC_SPOTIFY_REDIRECT_URI: process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI,
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+      NEXT_PUBLIC_GOOGLE_REDIRECT_URI: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI,
+      NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS: process.env.NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS,
     };
 
     let hasMissingEnvVars = false;

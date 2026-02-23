@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [1.2.0 - 2025-02-20](#120---2025-02-20)
 - [0.2.0 - 2025-02-06](#020---2025-02-06)
 - [v0.1.2 - 2025-03-26](#v012---2025-03-26)
 - [v0.1.1 - 2024-09-29](#v011---2024-09-29)
@@ -75,6 +76,35 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers will move entries from `[Unreleased]` to a versioned section (e.g., `## [0.2.0] - 2025-01-XX`).
 
 ## [Unreleased]
+
+## [1.2.2] - 2025-02-21
+
+### Fixed
+
+- **OAuth code invalid or expired**: When the backend returns that the authorization code was already used, expired, or invalid (Google or Spotify), the app now shows the auth popup again and redirects to `/`. Stored redirect URL for that provider is cleared so the next successful sign-in does not use a stale redirect.
+
+### Added
+
+- **Spotify invalid client (500)**: Backend 500 responses with `details.code === "spotify_invalid_client"` are mapped to `BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT` (BAC4018). The Spotify callback and AuthCallbackHandler show the internal-error popup with that code and redirect to `/`.
+
+### Changed
+
+- **Allowlist popup**: The “Your Spotify account is not yet authorized for this app” popup (and the Spotify authentication error popup) now dismiss automatically when the user navigates to a page that does not require Spotify auth (e.g. About, Reference Genre Tree). The connectivity error is cleared so the popup does not reappear until a Spotify-required action triggers it again.
+
+## [1.2.1] - 2025-02-20
+
+### CI
+
+- **Deployment workflow**: Generate nginx environment fragment (port) as artifact for reuse by reusable workflows
+- **Deployment workflow**: Use `APP_PORT` consistently; remove `GTMT_FRONT_PORT`. Nginx fragment filename is now `APP_PORT.env`
+- **Deployment workflow**: Include `APP_PORT` in required vars/secrets checks and standardize env var validation output
+- **Publish workflow**: Add Spotify Client ID for test environment in deployment inputs
+
+## [1.2.0] - 2025-02-20
+
+### Added
+
+- **Google sign-in**: Google OAuth 2.0 flow alongside Spotify. Auth popup and account page offer "Sign in with Google". Requires `NEXT_PUBLIC_GOOGLE_CLIENT_ID` and `NEXT_PUBLIC_GOOGLE_REDIRECT_URI`. Backend must expose `POST auth/google/` accepting `{ code }` and returning `{ accessToken, refreshToken, expiresAt }`.
 
 ## [1.1.0] - 2025-02-15
 
@@ -163,7 +193,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Updated CONTRIBUTING.md and README.md references to new location
   - Removed deprecated template files (.env.config-generation-tester, .env.dev.template)
 
-- **Project Rename**: Renamed project from "Bodzify Ultimate Music Guide" to "Grow The Music Tree"
+- **Project Rename**: Renamed project from "Bodzify Ultimate Music Guide" to "GrowTheMusicTree"
   - Updated package.json and package-lock.json with new project name
   - Updated application title and meta description in layout.tsx
   - Updated all documentation files (README.md, VISION.md, TODO.md, CONTRIBUTING.md)

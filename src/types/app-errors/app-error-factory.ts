@@ -1,9 +1,9 @@
 import { ErrorCode } from "./app-error-codes";
+import { getSpotifyAllowlistMessage } from "./app-error-messages";
 import {
   AppError,
   NetworkError,
   BackendError,
-  BackendSpotifyUserNotAllowlistedError,
   AuthRequired,
   ClientError,
   ServiceError,
@@ -55,23 +55,53 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
   } else if (result.status === 401) {
     if (isBackendError) {
       try {
-        const body = (await result.json()) as {
-          code?: number;
-          details?: { code?: string; message?: string };
-          message?: string;
         };
         const apiCode = body?.code;
         const detailsCode = body?.details?.code;
-        if (apiCode === 1007 || detailsCode === "spotify_user_not_allowlisted") {
-          const detailsMessage =
-            body?.details?.message ?? body?.message ?? "";
-          return new BackendSpotifyUserNotAllowlistedError(
-            ErrorCode.BACKEND_SPOTIFY_USER_NOT_ALLOWLISTED,
-            detailsMessage,
+        if (detailsCode === "google_oauth_code_invalid_or_expired") {
+          return new BackendError(
+            ErrorCode.BACKEND_GOOGLE_OAUTH_CODE_INVALID_OR_EXPIRED,
+            body.details?.message,
           );
         }
-        if (apiCode === 1008 || detailsCode === "spotify_code_expired_or_used") {
-          return createAppErrorFromErrorCode(ErrorCode.BACKEND_SPOTIFY_CODE_EXPIRED_OR_USED);
+        if (detailsCode === "spotify_oauth_code_invalid_or_expired") {
+          return new BackendError(
+            ErrorCode.BACKEND_SPOTIFY_OAUTH_CODE_INVALID_OR_EXPIRED,
+            body.details?.message,
+          );
+        }
+        if (detailsCode === "spotify_user_not_in_allowlist") {
+          return new BackendError(
+            ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
+            getSpotifyAllowlistMessage(),
+          );
+        }
+        if (detailsCode === "spotify_authentication_error") {
+          return new BackendError(
+            ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR,
+            body.details?.message,
+          );
+        }
+        if (detailsCode === "google_authentication_error") {
+          return new BackendError(
+            ErrorCode.BACKEND_GOOGLE_AUTHENTICATION_ERROR,
+            body.details?.message,
+          );
+        }
+        if (
+          detailsCode === "google_oauth_redirect_uri_mismatch" ||
+          detailsCode === "google_oauth_invalid_client"
+        ) {
+          return new BackendError(
+            ErrorCode.BACKEND_GOOGLE_OAUTH_MISCONFIGURED,
+            body.details?.message,
+          );
+        }
+        if (detailsCode === "google_oauth_unauthorized_client") {
+          return new BackendError(
+            ErrorCode.BACKEND_GOOGLE_OAUTH_UNAUTHORIZED_CLIENT,
+            body.details?.message,
+          );
         }
         if (
           apiCode === 1006 ||
@@ -130,6 +160,18 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
     }
   } else if (result.status === 500) {
     if (isBackendError) {
+      try {
+        const body = (await result.json()) as { details?: { code?: string; message?: string } };
+        const detailsCode = body?.details?.code;
+        if (detailsCode === "spotify_invalid_client") {
+          return new BackendError(
+            ErrorCode.BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT,
+            body.details?.message,
+          );
+        }
+      } catch {
+        // ignore parse failure
+      }
       return createAppErrorFromErrorCode(ErrorCode.BACKEND_INTERNAL_ERROR);
     } else {
       return createAppErrorFromErrorCode(ErrorCode.SERVICE_INTERNAL_ERROR);

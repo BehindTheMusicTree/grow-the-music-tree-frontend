@@ -2,13 +2,16 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { usePopup } from "@contexts/PopupContext";
+import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
+import { useGoogleAuth } from "@hooks/useGoogleAuth";
+import AuthPopup from "@components/ui/popup/child/AuthPopup";
+import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
+import SpotifyAuthErrorPopup from "@components/ui/popup/child/SpotifyAuthErrorPopup";
+import { clearStoredRedirectUrl, SPOTIFY_EXCHANGE_CONFIG } from "@lib/auth/code-exchange";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
-import {
-  BackendError,
-  BackendSpotifyUserNotAllowlistedError,
-} from "@app-types/app-errors/app-error";
-import SpotifyAllowlistPopup from "@components/ui/popup/child/SpotifyAllowlistPopup";
+import { BackendError } from "@app-types/app-errors/app-error";
 
 function getParamsFromUrl() {
   if (typeof window === "undefined") return { code: null, errorParam: null };
@@ -19,61 +22,93 @@ function getParamsFromUrl() {
   };
 }
 
-let spotifyAuthInProgress = false;
-
 export default function SpotifyOAuthCallbackPage() {
   const router = useRouter();
-  const { authToBackendFromSpotifyCode } = useSpotifyAuth();
+  const { showPopup, hidePopup } = usePopup();
+  const { authToBackendFromSpotifyCode, handleSpotifyOAuth } = useSpotifyAuth();
+  const { handleGoogleOAuth } = useGoogleAuth();
   const [isPending, setIsPending] = useState(true);
-  const [error, setError] = useState(null);
-  const [allowlistError, setAllowlistError] = useState(null);
+  const authAttempted = useRef(false);
 
   useEffect(() => {
     const { code, errorParam } = getParamsFromUrl();
 
     const handleAuth = async () => {
-      if (spotifyAuthInProgress) return;
-      spotifyAuthInProgress = true;
+      if (errorParam) {
+        if (authAttempted.current) return;
+        authAttempted.current = true;
+        showPopup(
+          <SpotifyAuthErrorPopup
+            message={`Spotify authentication failed: ${errorParam}`}
+            onClose={() => {
+              hidePopup();
+            }}
+          />,
+        );
+        setIsPending(false);
+        return;
+      }
+
+      if (!code) {
+        if (authAttempted.current) return;
+        authAttempted.current = true;
+        showPopup(
+          <SpotifyAuthErrorPopup
+            message="No authorization code received from Spotify"
+            onClose={() => {
+              hidePopup();
+            }}
+          />,
+        );
+        setIsPending(false);
+        return;
+      }
+
+      if (authAttempted.current) return;
+      authAttempted.current = true;
 
       try {
-        if (errorParam) {
-          setError(new Error(`Spotify authentication failed: ${errorParam}`));
-          setIsPending(false);
-          spotifyAuthInProgress = false;
-          return;
-        }
-
-        if (!code) {
-          setError(new Error("No authorization code received from Spotify"));
-          setIsPending(false);
-          spotifyAuthInProgress = false;
-          return;
-        }
-
         const redirectUrl = await authToBackendFromSpotifyCode(code);
         if (redirectUrl) {
-          router.push(redirectUrl);
+          router.replace(redirectUrl);
         }
       } catch (err) {
         if (
-          err instanceof BackendSpotifyUserNotAllowlistedError ||
-          (err instanceof BackendError &&
-            err.code === ErrorCode.BACKEND_SPOTIFY_USER_NOT_ALLOWLISTED)
+          err instanceof BackendError &&
+          (err.code === ErrorCode.BACKEND_SPOTIFY_OAUTH_CODE_INVALID_OR_EXPIRED ||
+            err.code === ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR)
         ) {
-          setAllowlistError(
-            err instanceof BackendSpotifyUserNotAllowlistedError
-              ? err.detailsMessage
-              : "",
+          clearStoredRedirectUrl(SPOTIFY_EXCHANGE_CONFIG.redirectStorageKey);
+          showPopup(
+            <AuthPopup
+              handleSpotifyOAuth={handleSpotifyOAuth}
+              handleGoogleOAuth={handleGoogleOAuth}
+            />,
+            AUTH_POPUP_TYPE,
           );
+          router.replace("/");
         } else if (
           err instanceof BackendError &&
-          err.code === ErrorCode.BACKEND_SPOTIFY_CODE_EXPIRED_OR_USED
+          err.code === ErrorCode.BACKEND_SPOTIFY_OAUTH_INVALID_CLIENT
         ) {
-          router.push("/");
-        } else if (err instanceof BackendError && err.code === ErrorCode.BACKEND_AUTH_ERROR) {
-          setError(new Error("Failed to authenticate with the backend server. Please try again later."));
+          showPopup(<InternalErrorPopup errorCode={err.code} />);
+          router.replace("/");
         } else {
-          setError(new Error("An unexpected error occurred. Please try again later."));
+          const message =
+            err instanceof BackendError
+              ? err.code === ErrorCode.BACKEND_AUTH_ERROR
+                ? "Failed to authenticate with the backend server. Please try again later."
+                : err.message
+              : "An unexpected error occurred. Please try again later.";
+          showPopup(
+            <SpotifyAuthErrorPopup
+              message={message}
+              onClose={() => {
+                hidePopup();
+                router.replace("/");
+              }}
+            />,
+          );
         }
       } finally {
         setIsPending(false);
@@ -81,34 +116,14 @@ export default function SpotifyOAuthCallbackPage() {
     };
 
     handleAuth();
-  }, [authToBackendFromSpotifyCode, router]);
+  }, [authToBackendFromSpotifyCode, handleSpotifyOAuth, handleGoogleOAuth, router, showPopup, hidePopup]);
 
   if (isPending) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Connecting to Spotify...</h1>
+          <h1 className="mb-4 text-2xl font-bold">Connecting to Spotify...</h1>
           <p className="text-gray-600">Please wait while we complete the authentication process.</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (allowlistError !== null) {
-    return (
-      <SpotifyAllowlistPopup
-        backendMessage={allowlistError}
-        onClose={() => router.push("/")}
-      />
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 max-w-md w-full">
-          <h2 className="text-red-500 font-semibold mb-2">Authentication Error</h2>
-          <p className="text-red-500/80">{error.message}</p>
         </div>
       </div>
     );

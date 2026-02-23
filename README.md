@@ -1,8 +1,8 @@
-# Grow the Music Tree Frontend
+# GrowTheMusicTree Frontend
 
 A community-driven platform for exploring and understanding musical genres through an interactive, evolving genre tree map.
 
-This project is statically generated and intended to be served as static files (CDN / Nginx / object storage).
+This project is built with Next.js and served by the Next.js Node server in production (e.g. in Docker). The reverse proxy (e.g. Nginx, Traefik) should route traffic to the container’s app port.
 
 ## Table of Contents
 
@@ -10,6 +10,7 @@ This project is statically generated and intended to be served as static files (
 - [Pages](#pages)
 - [Tech Stack](#tech-stack)
 - [Rendering Strategy](#rendering-strategy)
+- [Auth callbacks](#auth-callbacks)
 - [Project Structure](#project-structure)
 - [Environment Variables](#environment-variables)
 - [Getting Started](#getting-started)
@@ -41,7 +42,9 @@ Music enthusiasts, researchers, and the general public interested in understandi
 ## Pages
 
 - Home (`/`)
+- About (`/about`)
 - Account (`/account`)
+- Google Auth Callback (`/auth/google/callback`)
 - Spotify Auth Callback (`/auth/spotify/callback`)
 - Genre Playlists (`/genre-playlists`)
 - My Genre Tree (`/my-genre-tree`)
@@ -55,27 +58,24 @@ See `docs/pages/` for detailed page documentation.
 
 - **Framework:** Next.js 15 with App Router
 - **Language:** TypeScript
-- **Rendering:** Static Site Generation (SSG)
+- **Rendering:** Next.js (Node server in production)
 - **Styling:** Tailwind CSS
 - **Testing:** Vitest
 - **CI:** GitHub Actions
-- **Containerization:** Docker (build-only)
+- **Containerization:** Docker (build and serve with Node)
 - **Additional libraries:** React 19, D3.js, TanStack Query, React Howler, Sentry
 
 ## Rendering Strategy
 
-This project uses static generation only:
+The app is built with Next.js and served by the Node runtime in production:
 
-- `next build` generates static assets
-- Output is served as plain HTML/CSS/JS
-- No Node.js runtime is required in production
+- `next build` produces the `.next/` output
+- The container runs `next start` and serves the app on `APP_PORT`
+- The reverse proxy (Nginx, Traefik, etc.) must proxy to the container’s port rather than to a static file root
 
-Typical hosting targets:
+## Auth callbacks
 
-- CDN
-- Nginx
-- Cloud storage (S3, GCS, etc.)
-- Docker static server
+Google and Spotify OAuth redirect the user to `/auth/google/callback` or `/auth/spotify/callback`. The **layout-level** component `AuthCallbackHandler` (`src/components/auth/AuthCallbackHandler.tsx`) runs in the app shell on every load, reads `window.location` to detect these paths, exchanges the `code` with the backend, shows "Connecting…" or an error popup, then redirects. With the Next.js server, the callback route is served and mounted normally.
 
 ## Project Structure
 
@@ -128,15 +128,21 @@ NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize
 NEXT_PUBLIC_SPOTIFY_CLIENT_ID=your-spotify-client-id
 NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/auth/spotify/callback
 NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-collaborative user-library-read user-top-read
+
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback
 ```
 
 In the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) → your app → **Settings** → **Redirect URIs**, add the **full** callback URL(s), e.g. `http://localhost:3000/auth/spotify/callback` for local dev and your production URL for deploy. The app builds the redirect URI from your origin when you use a path like `/auth/spotify/callback`.
 
+For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials, create an OAuth 2.0 Client ID (Web application) and add the **full** redirect URI(s) under "Authorized redirect URIs", e.g. `http://localhost:3000/auth/google/callback`.
+
 **Notes:**
 
 - Only variables prefixed with `NEXT_PUBLIC_` are available in the browser
-- Changing env values requires a new build
+- Changing env values requires a new build (restart `npm run dev` after env changes)
 - Do not commit `.env.local`
+- If you use env from `env/dev/available/` (e.g. `.env.development.api-local`), run `./scripts/setup-env-dev.sh local` (or `remote`) to copy it to `.env.development.local`; Next.js only loads env files from the project root
 
 ## Getting Started
 
@@ -159,8 +165,8 @@ npm install --legacy-peer-deps
 | Command                 | Description                                          |
 | ----------------------- | ---------------------------------------------------- |
 | `npm run dev`           | Start local development server                       |
-| `npm run build`         | Generate static production build                     |
-| `npm run start`         | Start production server (not used for static builds) |
+| `npm run build`         | Build for production                                 |
+| `npm run start`         | Start production server (Node)                       |
 | `npm run lint`          | Run ESLint                                           |
 | `npm run verify-env`    | Verify environment configuration                     |
 | `npm run test`          | Run unit tests                                       |
@@ -170,35 +176,22 @@ npm install --legacy-peer-deps
 
 ## Docker
 
-Docker is used only for building and serving static files.
-
-**Dockerfile (excerpt):**
-
-```dockerfile
-FROM node:18-alpine AS build
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci --legacy-peer-deps
-
-COPY . .
-RUN npm run build
-
-FROM nginx:alpine
-COPY --from=build /app/out /usr/share/nginx/html
-```
+Docker builds the app and runs the Next.js server inside the container. The entrypoint builds at startup, then runs `next start` on `APP_PORT`. No static file server or volume is used; the reverse proxy should proxy to the container’s port.
 
 **Build image:**
 
 ```bash
-docker build -t grow-the-music-tree-frontend .
+docker build -t grow-the-music-tree-frontend --build-arg PROJECT_DIR=/home/app/ .
 ```
 
 **Run container:**
 
 ```bash
-docker run -p 8080:80 grow-the-music-tree-frontend
+docker run -p 3000:3000 -e APP_PORT=3000 -e APP_VERSION=0.1.0 \
+  -e NEXT_PUBLIC_*="..." grow-the-music-tree-frontend
 ```
+
+See the repo scripts and `.github/workflows/publish.yml` for the full env and deploy flow.
 
 ## CI
 
@@ -242,29 +235,23 @@ jobs:
 
 ## Build & Hosting
 
-### Build output
-
-Static files are generated via:
+### Build and serve
 
 ```bash
 npm run build
+npm run start
 ```
 
-Output directory: `out/` (static export)
-
-### Hosting options
-
-- **CDN:** Serve static files directly from a CDN
-- **Nginx:** Configure Nginx to serve the `out/` directory
-- **Docker + Nginx:** Use the provided Dockerfile
-- **Cloud object storage:** Upload `out/` contents to S3, GCS, etc.
+Build output: `.next/`. The app is served by the Next.js Node server. In production, the Docker container builds once at startup then runs `next start`; the reverse proxy (Nginx, Traefik, etc.) should proxy to the container’s `APP_PORT`.
 
 ## Troubleshooting
+
+- **Auth callback shows no "Connecting with Google/Spotify...", no network request:** Callbacks are handled by `AuthCallbackHandler` in the app shell (see [Auth callbacks](#auth-callbacks)). With the Next.js server, the callback URL is served by the app; ensure the reverse proxy forwards `/auth/.../callback` to the container. If the backend exchange never runs: (1) **Cache** — Do a hard refresh (Ctrl+Shift+R / Cmd+Shift+R) or open the callback URL in an incognito window. (2) Check the browser console for errors.
 
 - **Environment variables not applied:** Rebuild required after env changes
 - **Clear local cache:**
   ```bash
-  rm -rf .next out node_modules
+  rm -rf .next node_modules
   npm install --legacy-peer-deps
   ```
 - **Ensure Node.js version compatibility:** Requires Node.js >= 18
@@ -280,6 +267,7 @@ For additional information about this project, please refer to:
 - **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community code of conduct
 - **[TODO.md](TODO.md)** - Current development tasks and roadmap
 - **[docs/VERSIONING.md](docs/VERSIONING.md)** - Versioning strategy and guidelines
+- **[docs/REVERSE_PROXY_CONFIG.md](docs/REVERSE_PROXY_CONFIG.md)** - Nginx/reverse-proxy configuration for deployment
 
 ## License
 
