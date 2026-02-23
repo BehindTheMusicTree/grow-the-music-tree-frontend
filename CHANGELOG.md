@@ -77,6 +77,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.2.3] - 2025-02-23
+
 ### Added
 
 - **Track upload timeout**: Timeout for track upload requests is configurable via required env var `NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS` (no fallback). Deploy workflow sets it from GitHub variable `TRACK_UPLOAD_TIMEOUT_MS`. Default recommendation 300000 ms (5 min) for large files (e.g. 80 MB).
