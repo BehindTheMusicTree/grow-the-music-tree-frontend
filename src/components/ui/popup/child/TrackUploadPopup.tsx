@@ -111,8 +111,7 @@ function TrackUploadContent({
       genre: currentItem.genre,
     };
 
-    const UPLOAD_RESPONSE_TIMEOUT_MS =
-      Number(process.env.NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS) || 300_000;
+    const UPLOAD_RESPONSE_TIMEOUT_MS = Number(process.env.NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS);
 
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     progressIntervalRef.current = setInterval(() => {
