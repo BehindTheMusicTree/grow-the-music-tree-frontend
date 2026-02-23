@@ -60,6 +60,16 @@ export class BackendError extends ConnectivityError {
   }
 }
 
+export class BackendSpotifyUserNotAllowlistedError extends BackendError {
+  constructor(
+    code: ErrorCode,
+    public readonly detailsMessage: string,
+  ) {
+    super(code);
+    this.name = "BackendSpotifyUserNotAllowlistedError";
+  }
+}
+
 export class AuthRequired extends ConnectivityError {
   constructor(code: ErrorCode) {
     super(code);
@@ -86,5 +96,6 @@ export type AppErrorType =
   | BadRequestError
   | NetworkError
   | BackendError
+  | BackendSpotifyUserNotAllowlistedError
   | AuthRequired
   | ServiceError;
