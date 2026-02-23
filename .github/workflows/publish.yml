@@ -126,6 +126,7 @@ jobs:
           NEXT_PUBLIC_GOOGLE_CLIENT_ID: ci-placeholder.apps.googleusercontent.com
           NEXT_PUBLIC_GOOGLE_REDIRECT_URI: https://ci.example.com/auth/google/callback
           NEXT_PUBLIC_SENTRY_IS_ACTIVE: false
+          NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS: "300000"
         run: npm run build
 
   deploy-env-and-docker-compose:
