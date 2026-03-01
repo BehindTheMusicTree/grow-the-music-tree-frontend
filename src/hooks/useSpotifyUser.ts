@@ -2,7 +2,7 @@ import { z } from "zod";
 import { SpotifyUserFromApiResponseSchema, SpotifyUserDetailed } from "@domain/spotify-user";
 import { useSession } from "@contexts/SessionContext";
 import { useFetchWrapper } from "./useFetchWrapper";
-import { userEndpoints, userQueryKeys } from "../api/endpoints/user";
+import { userEndpoints, userQueryKeys } from "../api/domains/user";
 import { useQueryWithParse } from "./useQueryWithParse";
 import {
   getSpotifyRequiredCached,
@@ -23,25 +23,14 @@ export function useFetchSpotifyUser(options?: { skipGlobalError?: boolean; enabl
     queryKey: userQueryKeys.spotify,
     queryFn: async () => {
       try {
-        const result = await fetch(
-          userEndpoints.spotify(),
-          true,
-          true,
-          {},
-          undefined,
-          false,
-          skipGlobalError,
-        );
+        const result = await fetch(userEndpoints.spotify(), true, true, {}, undefined, false, skipGlobalError);
         if (result == null) {
           throw new Error("Spotify profile unavailable");
         }
         clearSpotifyRequiredCached();
         return result as SpotifyUserDetailed;
       } catch (e) {
-        if (
-          e instanceof BackendError &&
-          e.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED
-        ) {
+        if (e instanceof BackendError && e.code === ErrorCode.BACKEND_SPOTIFY_AUTHORIZATION_REQUIRED) {
           setSpotifyRequiredCached();
         }
         throw e;

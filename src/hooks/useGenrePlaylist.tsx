@@ -11,7 +11,7 @@ import { CriteriaPlaylistSimpleSchema } from "@domain/playlist/criteria-playlist
 import { CriteriaPlaylistDetailedSchema, CriteriaPlaylistDetailed } from "@domain/playlist/criteria-playlist/detailed";
 
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
-import { playlistEndpoints, playlistQueryKeys } from "../api/endpoints/playlists";
+import { playlistEndpoints, playlistQueryKeys } from "../api/domains/playlists";
 import { Scope } from "@app-types/Scope";
 
 const FULL_LIST_PAGE_SIZE = 1000;

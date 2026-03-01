@@ -6,7 +6,7 @@ import { useSession } from "@contexts/SessionContext";
 import { parseWithLog } from "@lib/parse-with-log";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { SpotifyLibTrackSimpleSchema } from "@domain/spotify/spotify-lib-track";
-import { libraryEndpoints, libraryQueryKeys } from "../api/endpoints/library";
+import { libraryEndpoints, libraryQueryKeys } from "../api/domains/library";
 
 export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTIFY_LIB_TRACKS_PAGE_SIZE || 50) {
   const { fetch } = useFetchWrapper();

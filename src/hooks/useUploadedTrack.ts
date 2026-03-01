@@ -11,7 +11,7 @@ import { UploadedTrackCreationSchema } from "@domain/uploaded-track/form/creatio
 import { UploadedTrackUpdateSchema } from "@domain/uploaded-track/form/update";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { useValidatedMutation } from "./useValidatedMutation";
-import { libraryEndpoints, libraryQueryKeys } from "../api/endpoints/library";
+import { libraryEndpoints, libraryQueryKeys } from "../api/domains/library";
 import { Scope } from "@app-types/Scope";
 
 export function useListUploadedTracks(
@@ -26,18 +26,11 @@ export function useListUploadedTracks(
     queryKey: scope != null ? libraryQueryKeys[scope].uploaded.list(page) : ["uploadedTracks", "none", page],
     queryFn: async () => {
       if (scope == null) return null;
-      return fetch(
-        libraryEndpoints[scope].uploaded.list(),
-        true,
-        scope === "me",
-        {},
-        { page, pageSize },
-      );
+      return fetch(libraryEndpoints[scope].uploaded.list(), true, scope === "me", {}, { page, pageSize });
     },
     schema: PaginatedResponseSchema(UploadedTrackDetailedSchema),
     context: "useListUploadedTracks",
-    enabled:
-      scope != null && (scope === "reference" || (sessionRestored && !!session?.accessToken)),
+    enabled: scope != null && (scope === "reference" || (sessionRestored && !!session?.accessToken)),
   });
 }
 
@@ -162,10 +155,7 @@ export function useDownloadTrack(uuid: string, scope: Scope | null, options?: Us
 
       return response;
     },
-    enabled:
-      !!uuid &&
-      scope != null &&
-      (scope === "reference" || (sessionRestored && !!session?.accessToken)),
+    enabled: !!uuid && scope != null && (scope === "reference" || (sessionRestored && !!session?.accessToken)),
   });
 
   useEffect(() => {
