@@ -6,6 +6,7 @@ import { usePopup } from "@contexts/PopupContext";
 import { useCreateGenre } from "@hooks/useGenre";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
+import Page from "@components/ui/Page";
 
 import { GenreTreeView } from "../me-genre-tree/GenreTreeView";
 
@@ -44,5 +45,9 @@ export default function ReferenceGenreTreePage() {
     previousErrorsRef.current = formErrors || [];
   }, [formErrors, showCriteriaCreationPopup]);
 
-  return <GenreTreeView scope="reference" handleGenreCreationAction={showCriteriaCreationPopup} />;
+  return (
+    <Page title="The Music Tree">
+      <GenreTreeView scope="reference" handleGenreCreationAction={showCriteriaCreationPopup} />
+    </Page>
+  );
 }
