@@ -25,11 +25,14 @@ Code and UI styling conventions for this project.
 | File type          | Style                 | Example                 |
 | ------------------ | --------------------- | ----------------------- |
 | React components   | PascalCase            | `UserCard.tsx`          |
+| Page components    | PascalCase + `Page`   | `UserProfilePage` in `page.tsx` |
 | Next.js routes     | lowercase-with-dashes | `user-profile/page.tsx` |
 | Hooks              | camelCase             | `useAuth.ts`            |
 | Utils              | camelCase             | `formatDate.ts`         |
 | Context providers  | PascalCase            | `AuthProvider.tsx`      |
 | API route handlers | lowercase             | `route.ts`              |
+
+The default export of every route file (`page.tsx` / `page.jsx`) must be a component named with the **`Page`** suffix (e.g. `MetadataManagerPage`, `GenreTreePage`).
 
 ## Key directories
 

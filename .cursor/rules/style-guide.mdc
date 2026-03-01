@@ -7,5 +7,5 @@ alwaysApply: true
 
 Follow **docs/STYLE_GUIDE.md** for code and UI conventions.
 
-- **Code**: TypeScript, React, file naming (PascalCase components, camelCase hooks), directories, best practices.
+- **Code**: TypeScript, React, file naming (PascalCase components, camelCase hooks), directories, best practices. **Page components**: default export of every `page.tsx`/`page.jsx` must be named with the `Page` suffix (e.g. `GenreTreePage`).
 - **Styling**: Tailwind only (no .module.css). Class order: Layout → Typography → Visual → Interactive → States. Use the doc’s common patterns (overlay, popup, buttons, etc.).

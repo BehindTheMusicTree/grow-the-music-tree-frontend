@@ -13,7 +13,7 @@ import { useTrackList } from "@contexts/TrackListContext";
 import { useListUploadedTracks } from "@hooks/useUploadedTrack";
 import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
 
-export default function UploadedLibrary() {
+export default function UploadedLibraryPage() {
   const { data: uploadedTracksResponse } = useListUploadedTracks("me");
   const uploadedTracks = uploadedTracksResponse?.results || [];
   const { playerUploadedTrackObject, handlePlayPauseAction } = usePlayer();

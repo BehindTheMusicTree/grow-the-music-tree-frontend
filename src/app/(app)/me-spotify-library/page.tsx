@@ -45,7 +45,7 @@ function formatDuration(durationStr: string): string {
   return durationStr;
 }
 
-export default function SpotifyLibrary() {
+export default function SpotifyLibraryPage() {
   const {
     data: spotifyLibTracksResponse,
     isPending: isListingPending,
