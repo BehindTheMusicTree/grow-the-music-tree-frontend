@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { PiGraphLight } from "react-icons/pi";
-import { FaSpotify, FaCloudUploadAlt, FaUser, FaList, FaInfoCircle } from "react-icons/fa";
+import { FaSpotify, FaCloudUploadAlt, FaUser, FaList, FaInfoCircle, FaTags } from "react-icons/fa";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { MenuGroup } from "./MenuGroup";
 import { useMediaQuery } from "@hooks/useMediaQuery";
@@ -22,6 +22,7 @@ const MENU_ICONS: Record<string, React.ReactNode> = {
   "/me-uploaded-library": <FaCloudUploadAlt className="text-xl" />,
   "/me-spotify-library": <FaSpotify className="text-xl" />,
   "/account": <FaUser className="text-xl" />,
+  "/metadata-manager": <FaTags className="text-xl" />,
   "/about": <FaInfoCircle className="text-xl" />,
 };
 
@@ -58,11 +59,7 @@ export default function Menu({ className }: { className?: string }) {
           className="flex items-center justify-center w-full py-2 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
           aria-label={collapsed ? "Expand menu" : "Collapse menu"}
         >
-          {collapsed ? (
-            <ChevronRight className="w-6 h-6" />
-          ) : (
-            <ChevronLeft className="w-6 h-6" />
-          )}
+          {collapsed ? <ChevronRight className="w-6 h-6" /> : <ChevronLeft className="w-6 h-6" />}
         </button>
       )}
       <MenuGroup items={menuGroup} collapsed={collapsed} />
