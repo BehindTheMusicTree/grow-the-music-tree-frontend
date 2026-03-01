@@ -11,7 +11,7 @@ import { UploadedTrackCreationSchema } from "@domain/uploaded-track/form/creatio
 import { UploadedTrackUpdateSchema } from "@domain/uploaded-track/form/update";
 import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
 import { useValidatedMutation } from "./useValidatedMutation";
-import { libraryEndpoints, libraryQueryKeys } from "../api/domains/library";
+import { libraryEndpoints, libraryQueryKeys } from "@api/domains/library";
 import { Scope } from "@app-types/Scope";
 
 export function useListUploadedTracks(

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { SpotifyUserFromApiResponseSchema, SpotifyUserDetailed } from "@domain/spotify-user";
 import { useSession } from "@contexts/SessionContext";
 import { useFetchWrapper } from "./useFetchWrapper";
-import { userEndpoints, userQueryKeys } from "../api/domains/user";
+import { userEndpoints, userQueryKeys } from "@api/domains/user";
 import { useQueryWithParse } from "./useQueryWithParse";
 import {
   getSpotifyRequiredCached,
