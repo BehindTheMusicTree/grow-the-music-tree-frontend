@@ -12,6 +12,7 @@ import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
 import { useListUploadedTracks } from "@hooks/useUploadedTrack";
 import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
+import Page from "@components/ui/Page";
 
 export default function UploadedLibraryPage() {
   const { data: uploadedTracksResponse } = useListUploadedTracks("me");
@@ -47,7 +48,8 @@ export default function UploadedLibraryPage() {
   };
 
   return (
-    <div className="uploaded-library">
+    <Page title="Uploaded Library">
+      <div className="uploaded-library">
       <UploadButtons onFileChange={handleFileChange} />
       <div className="overflow-x-auto rounded-lg border border-gray-300 shadow-sm">
         <table className="w-full divide-y divide-gray-300" style={{ tableLayout: "fixed" }}>
@@ -197,6 +199,7 @@ export default function UploadedLibraryPage() {
           </tbody>
         </table>
       </div>
-    </div>
+      </div>
+    </Page>
   );
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FaGithub } from "react-icons/fa";
+import Page from "@components/ui/Page";
 
 const GITHUB_REPO_URL = "https://github.com/BehindTheMusicTree/grow-the-music-tree";
 const GITHUB_ORG_URL = "https://github.com/BehindTheMusicTree";
@@ -41,16 +42,14 @@ export default function AboutPage() {
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
 
   return (
-    <div className="flex flex-col gap-6 max-w-2xl mx-auto py-8 w-full">
-      <header className="flex flex-col gap-2 pb-2 text-center">
-        <h1 className="text-2xl font-semibold text-gray-900">
-          About{" "}
-          <Link href="/" className="text-gray-900 hover:text-gray-600 transition-colors">
+    <Page title="About">
+      <div className="flex flex-col gap-6 max-w-2xl mx-auto py-8 w-full">
+        <p className="text-center text-base text-gray-600">
+          <Link href="/" className="font-medium text-gray-900 hover:text-gray-600 transition-colors">
             GrowTheMusicTree 🌳
-          </Link>
-        </h1>
-        <p className="text-base text-gray-600">Explore how music genres connect and where your taste fits in.</p>
-      </header>
+          </Link>{" "}
+          — Explore how music genres connect and where your taste fits in.
+        </p>
 
       <Section title="🎵 Overview">
         <p>
@@ -136,6 +135,7 @@ export default function AboutPage() {
           </a>
         </Section>
       )}
-    </div>
+      </div>
+    </Page>
   );
 }

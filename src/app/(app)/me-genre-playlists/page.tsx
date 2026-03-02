@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Skeleton } from "@components/ui/Skeleton";
 import { Input } from "@components/ui/Input";
 import { useState, useMemo, ChangeEvent } from "react";
+import Page from "@components/ui/Page";
 
 export default function GenrePlaylistsPage() {
   const { data, isPending, error } = useListFullGenrePlaylists("me");
@@ -24,13 +25,17 @@ export default function GenrePlaylistsPage() {
   }, [data?.results, nameFilter, parentFilter, rootFilter, uuidFilter]);
 
   if (error) {
-    return <div>Error loading genre playlists</div>;
+    return (
+      <Page title="Genre Playlists">
+        <div>Error loading genre playlists</div>
+      </Page>
+    );
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">Genre Playlists</h1>
-      <div className="rounded-md border max-h-[calc(100vh-200px)] overflow-auto">
+    <Page title="Genre Playlists">
+      <div className="container mx-auto py-8">
+      <div className="rounded-md border overflow-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -114,6 +119,7 @@ export default function GenrePlaylistsPage() {
           </TableBody>
         </Table>
       </div>
-    </div>
+      </div>
+    </Page>
   );
 }

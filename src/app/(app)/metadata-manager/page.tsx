@@ -20,7 +20,7 @@ export default function MetadataManagerPage() {
   return (
     <Page title="Metadata Manager">
       <input type="file" onChange={handleChange} />
-      <div className="mt-4 max-h-[70vh] overflow-auto p-4 rounded-lg border border-gray-200 bg-gray-50">
+      <div className="p-4 rounded-lg border border-gray-200 bg-gray-50">
         {metadata != null ? (
           <pre className="overflow-x-auto whitespace-pre-wrap break-words font-mono text-sm leading-relaxed text-gray-800">
             {JSON.stringify(metadata, null, 2)}
