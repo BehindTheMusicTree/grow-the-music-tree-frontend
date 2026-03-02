@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
 import { useFetchWrapper } from "./useFetchWrapper";
