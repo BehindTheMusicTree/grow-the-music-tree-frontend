@@ -1,12 +1,9 @@
 #!/bin/bash
 
-# Source port configuration
-source ./env/development/available/.env.port
-if [ -z "$PORT" ]; then
-    echo "Error: PORT is not set in .env.port"
-    exit 1
+# Use PORT from .env.development.local (set by setup-env-dev.sh), default 3000
+if [ -f .env.development.local ]; then
+  PORT=$(grep -E '^PORT=' .env.development.local | cut -d= -f2-)
 fi
-echo "Sourced port configuration from .env.port: $PORT"
-
-# Run the development server
-npm run dev -- --port $PORT
+PORT=${PORT:-3000}
+echo "Starting dev server on port $PORT"
+npm run dev -- --port "$PORT"

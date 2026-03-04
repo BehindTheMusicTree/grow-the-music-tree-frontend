@@ -32,15 +32,4 @@ else
     echo "Using remote API configuration"
 fi
 
-# Source port configuration
-PORT_FILE="./env/development/available/.env.port"
-if [ ! -f "$PORT_FILE" ]; then
-    echo "Error: Port configuration file not found: $PORT_FILE"
-    exit 1
-fi
-
-source "$PORT_FILE"
-
-echo "Environment setup completed:"
-echo "- Copied .env.development.api-$API_TYPE to .env.development.local"
-echo "- Sourced port configuration from .env.port" 
+echo "Environment setup completed: .env.development.api-$API_TYPE copied to .env.development.local" 

@@ -142,7 +142,7 @@ For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/)
 - Only variables prefixed with `NEXT_PUBLIC_` are available in the browser
 - Changing env values requires a new build (restart `npm run dev` after env changes)
 - Do not commit `.env.local`
-- If you use env from `env/development/available/` (e.g. `.env.development.api-local`), run `./scripts/setup-env-dev.sh local` (or `remote`) to copy it to `.env.development.local`; Next.js only loads env files from the project root. To bootstrap: copy `env/development/example/.env.development.example` into `env/development/available/` as `.env.development.api-local` and `.env.development.api-remote` (edit `NEXT_PUBLIC_BACKEND_BASE_URL` in the remote copy), copy `.env.port.example` as `.env.port`, then fill in your values.
+- If you use env from `env/development/available/` (e.g. `.env.development.api-local`), run `./scripts/setup-env-dev.sh local` (or `remote`) to copy it to `.env.development.local`; Next.js only loads env files from the project root. To bootstrap: copy `env/development/example/.env.development.example` into `env/development/available/` as `.env.development.api-local` and `.env.development.api-remote` (edit `NEXT_PUBLIC_BACKEND_BASE_URL` in the remote copy), then fill in your values.
 
 ## Getting Started
 
