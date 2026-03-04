@@ -123,7 +123,7 @@ function TrackUploadContent({
       );
     });
 
-    Promise.race([onProcessFile, timeoutPromise])
+    Promise.race([onProcessFile(currentItem.file, currentItem.genre), timeoutPromise])
       .then((data) => {
         if (progressIntervalRef.current) {
           clearInterval(progressIntervalRef.current);
