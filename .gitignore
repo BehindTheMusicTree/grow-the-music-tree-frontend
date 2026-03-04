@@ -2,7 +2,8 @@
 logs
 *.logsc
 
-env/dev/available/*
+env/development/available/*
+!env/development/available/.gitkeep
 env/to-load/*
 .env.sentry-build-plugin
 

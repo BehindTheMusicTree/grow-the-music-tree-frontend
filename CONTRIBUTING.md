@@ -150,7 +150,7 @@ cd grow-the-music-tree
 
 3. Set up environment variables:
 
-   Create environment files based on the templates in `env/dev/example/`:
+   Create environment files based on the templates in `env/development/example/`:
 
    ```bash
    # For local development
@@ -186,7 +186,7 @@ The application requires several environment variables to connect to TheMusicTre
 - `NEXT_PUBLIC_SENTRY_DSN` - Sentry DSN for error tracking (optional)
 - Additional environment variables for authentication and features
 
-See `env/dev/example/` for complete environment variable templates.
+See `env/development/example/` for complete environment variable templates.
 
 #### Backend Requirement
 

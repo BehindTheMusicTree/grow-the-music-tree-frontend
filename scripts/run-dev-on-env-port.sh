@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Source port configuration
-source ./env/dev/available/.env.port
+source ./env/development/available/.env.port
 if [ -z "$PORT" ]; then
     echo "Error: PORT is not set in .env.port"
     exit 1

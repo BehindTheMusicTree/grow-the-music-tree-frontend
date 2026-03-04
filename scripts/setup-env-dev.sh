@@ -17,10 +17,10 @@ if [ "$API_TYPE" != "local" ] && [ "$API_TYPE" != "remote" ]; then
 fi
 
 # Copy appropriate environment file
-ENV_FILE="./env/dev/available/.env.development.api-$API_TYPE"
+ENV_FILE="./env/development/available/.env.development.api-$API_TYPE"
 if [ ! -f "$ENV_FILE" ]; then
     echo "Error: Required environment file not found: $ENV_FILE"
-    echo "Please ensure the environment files are properly set up in env/dev/available/"
+    echo "Please ensure the environment files are properly set up in env/development/available/"
     exit 1
 fi
 
@@ -33,7 +33,7 @@ else
 fi
 
 # Source port configuration
-PORT_FILE="./env/dev/available/.env.port"
+PORT_FILE="./env/development/available/.env.port"
 if [ ! -f "$PORT_FILE" ]; then
     echo "Error: Port configuration file not found: $PORT_FILE"
     exit 1
