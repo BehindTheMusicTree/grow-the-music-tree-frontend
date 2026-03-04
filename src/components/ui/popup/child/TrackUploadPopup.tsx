@@ -3,10 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { MdError, MdCheckCircle, MdUpload } from "react-icons/md";
 import { BasePopup, BasePopupProps } from "../BasePopup";
-import { useUploadTrack } from "@hooks/useUploadedTrack";
-import { UploadedTrackCreationValues } from "@schemas/domain/uploaded-track/form/creation";
-import { Scope } from "@app-types/Scope";
-
 type UploadStatus = "pending" | "uploading" | "success" | "error";
 
 type TrackUploadItem = {
@@ -22,20 +18,22 @@ type TrackUploadItem = {
 type TrackUploadPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   files: File[];
   genre?: string | null;
-  scope: Scope;
+  onProcessFile: (file: File, genre?: string | null) => Promise<unknown>;
   onComplete?: (uploadedTracks: unknown[]) => void;
   onClose?: () => void;
 };
 
-type TrackUploadContentProps = Pick<TrackUploadPopupProps, "files" | "genre" | "scope" | "onComplete" | "onClose"> & {
+type TrackUploadContentProps = Pick<
+  TrackUploadPopupProps,
+  "files" | "genre" | "onProcessFile" | "onComplete" | "onClose"
+> & {
   onProgress?: (successfulCount: number, totalCount: number, isUploading?: boolean) => void;
 };
 
-// Functional component that handles the upload logic
 function TrackUploadContent({
   files,
   genre,
-  scope,
+  onProcessFile,
   onComplete,
   onClose: _onClose,
   onProgress,
@@ -44,8 +42,6 @@ function TrackUploadContent({
   const [currentUploadIndex, setCurrentUploadIndex] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [allComplete, setAllComplete] = useState(false);
-
-  const { mutateAsync: uploadTrackAsync } = useUploadTrack(scope);
 
   const onProgressRef = useRef(onProgress);
   onProgressRef.current = onProgress;
@@ -105,12 +101,6 @@ function TrackUploadContent({
       prev.map((item, index) => (index === currentUploadIndex ? { ...item, status: "uploading", progress: 0 } : item)),
     );
 
-    // Create upload data
-    const uploadData: UploadedTrackCreationValues = {
-      file: currentItem.file,
-      genre: currentItem.genre,
-    };
-
     const UPLOAD_RESPONSE_TIMEOUT_MS = Number(process.env.NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS);
 
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
@@ -133,7 +123,7 @@ function TrackUploadContent({
       );
     });
 
-    Promise.race([uploadTrackAsync(uploadData), timeoutPromise])
+    Promise.race([onProcessFile, timeoutPromise])
       .then((data) => {
         if (progressIntervalRef.current) {
           clearInterval(progressIntervalRef.current);
@@ -158,7 +148,7 @@ function TrackUploadContent({
         setIsUploading(false);
         setCurrentUploadIndex((prev) => prev + 1);
       });
-  }, [uploadItems, currentUploadIndex, uploadTrackAsync, onComplete]);
+  }, [uploadItems, currentUploadIndex, onProcessFile, onComplete]);
 
   useEffect(() => {
     return () => {
@@ -295,7 +285,7 @@ export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps, T
   };
 
   render() {
-    const { files, genre, scope, onComplete: _onComplete, onClose, ...rest } = this.props;
+    const { files, genre, onProcessFile, onComplete: _onComplete, onClose, ...rest } = this.props;
     const { successfulCount, totalCount, isComplete, isUploading } = this.state;
     const displayTotal = totalCount > 0 ? totalCount : files.length;
 
@@ -311,7 +301,7 @@ export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps, T
         <TrackUploadContent
           files={files}
           genre={genre}
-          scope={scope}
+          onProcessFile={onProcessFile}
           onComplete={this.handleComplete}
           onClose={onClose}
           onProgress={this.handleProgress}
@@ -320,4 +310,3 @@ export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps, T
     });
   }
 }
-
