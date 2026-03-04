@@ -4,7 +4,7 @@ import { useState } from "react";
 import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
 import Page from "@components/ui/Page";
 import { usePopup } from "@contexts/PopupContext";
-import useGetFullMetadata from "@hooks/useAudioMetadata";
+import { useGetFullMetadata } from "@hooks/useAudioMetadata";
 
 export default function MetadataManagerPage() {
   const [metadata, setMetadata] = useState<JSON | null>();

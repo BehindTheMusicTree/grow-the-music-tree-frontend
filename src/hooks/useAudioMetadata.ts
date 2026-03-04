@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useFetchWrapper } from "./useFetchWrapper";
 import { audioMetadataEndpoints } from "@api/domains/audio-metadata/";
 
-export default function useGetFullMetadata() {
+export function useGetFullMetadata() {
   const { fetch } = useFetchWrapper();
 
   return useMutation<JSON | null, Error, File>({
