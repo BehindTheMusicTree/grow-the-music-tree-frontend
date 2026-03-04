@@ -3,9 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "next dev --turbo",
-    "dev:local": "bash scripts/setup-env-dev.sh local && next dev --turbo",
-    "dev:remote": "bash scripts/setup-env-dev.sh remote && next dev --turbo",
+    "dev": "next dev --turbo --hostname 127.0.0.1",
+    "dev:local": "bash scripts/setup-env-dev.sh local && next dev --turbo --hostname 127.0.0.1",
+    "dev:remote": "bash scripts/setup-env-dev.sh remote && next dev --turbo --hostname 127.0.0.1",
     "build": "next build",
     "build:debug": "NODE_ENV=development next build",
     "start": "next start",
