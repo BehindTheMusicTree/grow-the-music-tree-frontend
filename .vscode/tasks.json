@@ -79,6 +79,20 @@
       "command": "mkdir -p .vscode/firefox-debug-profile",
       "presentation": { "reveal": "silent", "panel": "shared" },
       "problemMatcher": []
+    },
+    {
+      "label": "setup-and-verify-local",
+      "type": "shell",
+      "command": "bash scripts/setup-env-dev.sh local && npm run verify-env",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "verify-env-dev-remote",
+      "type": "shell",
+      "command": "bash scripts/setup-env-dev.sh remote && npm run verify-env",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
     }
   ]
 }
