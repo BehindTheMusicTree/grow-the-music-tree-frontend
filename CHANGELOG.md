@@ -77,6 +77,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Documentation
+
+- **Versioning**: Documented `npm version` as the standard way to bump versions in `docs/VERSIONING.md` (patch/minor/major and exact version with `--no-git-tag-version`). Aligns with CONTRIBUTING and avoids extra tooling.
+
 ## [1.3.0] - 2025-03-08
 
 ### Added
