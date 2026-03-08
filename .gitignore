@@ -4,7 +4,7 @@ logs
 
 env/development/available/*
 !env/development/available/.gitkeep
-env/to-load/*
+env/to-load/
 .env.sentry-build-plugin
 
 npm-debug.log*

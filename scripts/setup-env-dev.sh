@@ -32,4 +32,4 @@ else
     echo "Using remote API configuration"
 fi
 
-echo "Environment setup completed: .env.development.api-$API_TYPE copied to .env.development.local" 
+echo "Environment setup completed: .env.development.api-$API_TYPE → .env.development.local"

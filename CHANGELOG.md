@@ -77,6 +77,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Health endpoint**: `GET /health` returns `200` with JSON `{ "status": "ok" }` for uptime checks, load balancers, or readiness probes. Includes unit tests.
+
+### Changed
+
+- **Development environment layout**: Renamed `env/dev/` to `env/development/`. Templates live in `env/development/example/` (e.g. `.env.development.example`, `.env.development.api-local.example`, `.env.development.api-remote.example`). Presets go in `env/development/available/` (gitignored). Run `./scripts/setup-env-dev.sh local` or `remote` to copy a preset to `.env.development.local`. PORT is read from that file; the separate `.env.port` file is no longer used. README and CONTRIBUTING updated with new paths and instructions.
+
 ## [1.2.3] - 2025-02-23
 
 ### Added
@@ -197,7 +205,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Added package.json overrides section for glob dependency (13.0.1)
   - Added TypeScript 5.8.3 to devDependencies
 
-- **Environment Templates**: Moved environment templates from `env/dev/template/` to `env/dev/example/`
+- **Environment Templates**: Environment templates in `env/development/example/`, presets in `env/development/available/`
   - Updated CONTRIBUTING.md and README.md references to new location
   - Removed deprecated template files (.env.config-generation-tester, .env.dev.template)
 
