@@ -111,7 +111,7 @@ Environment variables are resolved at build time.
 Create a local environment file:
 
 ```bash
-cp env/dev/example/.env.dev.example .env.local
+cp env/development/example/.env.development.example .env.local
 ```
 
 **Example variables:**
@@ -142,7 +142,7 @@ For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/)
 - Only variables prefixed with `NEXT_PUBLIC_` are available in the browser
 - Changing env values requires a new build (restart `npm run dev` after env changes)
 - Do not commit `.env.local`
-- If you use env from `env/dev/available/` (e.g. `.env.development.api-local`), run `./scripts/setup-env-dev.sh local` (or `remote`) to copy it to `.env.development.local`; Next.js only loads env files from the project root
+- **Preset configs**: Put `.env.development.api-local` and `.env.development.api-remote` in `env/development/available/` (see `env/development/example/.env.development.api-*.example`). Then run `./scripts/setup-env-dev.sh local` or `./scripts/setup-env-dev.sh remote` to copy one to `.env.development.local`; Next.js only loads env files from the project root. Contents of `env/development/available/` are gitignored.
 
 ## Getting Started
 

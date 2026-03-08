@@ -1,12 +1,16 @@
 #!/bin/bash
 
-# Source port configuration
-source ./env/dev/available/.env.port
-if [ -z "$PORT" ]; then
-    echo "Error: PORT is not set in .env.port"
+# Use PORT from .env.development.local (set by setup-env-dev.sh from your preset)
+if [ ! -f ./.env.development.local ]; then
+    echo "Error: .env.development.local not found. Run ./scripts/setup-env-dev.sh local (or remote) first."
     exit 1
 fi
-echo "Sourced port configuration from .env.port: $PORT"
-
-# Run the development server
-npm run dev -- --port $PORT
+set -a
+source ./.env.development.local
+set +a
+if [ -z "$PORT" ]; then
+    echo "Error: PORT is not set in .env.development.local"
+    exit 1
+fi
+echo "Using PORT=$PORT from .env.development.local"
+npm run dev -- --port "$PORT"
