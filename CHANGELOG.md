@@ -197,7 +197,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Added package.json overrides section for glob dependency (13.0.1)
   - Added TypeScript 5.8.3 to devDependencies
 
-- **Environment Templates**: Moved environment templates from `env/dev/template/` to `env/dev/example/`
+- **Environment Templates**: Environment templates in `env/development/example/`, presets in `env/development/available/`
   - Updated CONTRIBUTING.md and README.md references to new location
   - Removed deprecated template files (.env.config-generation-tester, .env.dev.template)
 
