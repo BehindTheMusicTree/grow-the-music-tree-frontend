@@ -150,17 +150,15 @@ cd grow-the-music-tree
 
 3. Set up environment variables:
 
-   Create environment files based on the templates in `env/dev/example/`:
+   Copy templates from `env/development/example/` into `env/development/available/` (e.g. `.env.development.api-local.example` → `.env.development.api-local`), then run:
 
    ```bash
-   # For local development
-   npm run setup-env-dev-local
-
-   # OR for remote API
-   npm run setup-env-dev-remote
+   ./scripts/setup-env-dev.sh local   # local API
+   # OR
+   ./scripts/setup-env-dev.sh remote  # remote API
    ```
 
-   This will create `.env.development` with the necessary configuration.
+   This copies the chosen preset to `.env.development.local`.
 
    **Note:** Environment variables are required for connecting to TheMusicTreeAPI backend.
 
@@ -186,7 +184,7 @@ The application requires several environment variables to connect to TheMusicTre
 - `NEXT_PUBLIC_SENTRY_DSN` - Sentry DSN for error tracking (optional)
 - Additional environment variables for authentication and features
 
-See `env/dev/example/` for complete environment variable templates.
+See `env/development/example/` for complete environment variable templates.
 
 #### Backend Requirement
 

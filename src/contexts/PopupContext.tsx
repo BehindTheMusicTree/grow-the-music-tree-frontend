@@ -35,9 +35,7 @@ export function PopupProvider({ children }: PopupProviderProps) {
 
   const hidePopup = (options?: HidePopupOptions) => {
     if (options?.onlyIfType !== undefined) {
-      setState((prev) =>
-        prev.type === options.onlyIfType ? { content: null, type: null } : prev,
-      );
+      setState((prev) => (prev.type === options.onlyIfType ? { content: null, type: null } : prev));
     } else {
       setState({ content: null, type: null });
     }

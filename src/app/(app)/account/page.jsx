@@ -7,6 +7,7 @@ import { useLogout } from "@hooks/useLogout";
 import { useSession } from "@contexts/SessionContext";
 import { useFetchSpotifyUser } from "@hooks/useSpotifyUser";
 import { spotifyUserProfileUrl } from "@lib/constants/routes";
+import Page from "@components/ui/Page";
 
 export default function AccountPage() {
   const { session } = useSession();
@@ -20,19 +21,19 @@ export default function AccountPage() {
 
   if (isLoading) {
     return (
-      <div className="p-8">
-        <h1 className="mb-6 text-2xl font-bold">Account</h1>
-        <div className="flex h-64 items-center justify-center">
-          <p>Loading...</p>
+      <Page title="Account">
+        <div className="p-8">
+          <div className="flex h-64 items-center justify-center">
+            <p>Loading...</p>
+          </div>
         </div>
-      </div>
+      </Page>
     );
   }
 
   return (
-    <div className="p-8">
-      <h1 className="mb-6 text-2xl font-bold">Account</h1>
-
+    <Page title="Account">
+      <div className="p-8">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <section className="overflow-hidden rounded-lg bg-white shadow-md">
           <div className="border-b border-gray-200 bg-green-600 p-4">
@@ -127,6 +128,7 @@ export default function AccountPage() {
           </button>
         </div>
       )}
-    </div>
+      </div>
+    </Page>
   );
 }

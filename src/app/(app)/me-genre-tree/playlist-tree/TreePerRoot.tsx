@@ -23,6 +23,7 @@ import { Scope } from "@app-types/Scope";
 import { buildTreeHierarchyStructure } from "./NodeHelper";
 import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./tree-renderer";
 import { getRootTreeColor } from "./constants";
+import { useUploadTrack } from "@hooks/useUploadedTrack";
 
 type GenrePlaylistTreePerRootProps = {
   scope: Scope;
@@ -51,6 +52,7 @@ export default function GenrePlaylistTreePerRoot({
   const { renameGenre, updateGenreParent } = useUpdateGenre(scope);
   const fetchGenre = useFetchGenre(scope);
   const { mutate: fetchGenrePlaylistDetailed } = useFetchGenrePlaylistDetailed(scope);
+  const { mutateAsync: uploadedTrackMutateAsync } = useUploadTrack(scope);
   const [visibleActionsContainerGenrePlaylist, setVisibleActionsContainerGenrePlaylist] =
     useState<CriteriaPlaylistSimple | null>(null);
 
@@ -66,7 +68,7 @@ export default function GenrePlaylistTreePerRoot({
         <TrackUploadPopup
           files={fileArray}
           genre={selectingFileGenreUuidRef.current}
-          scope={scope}
+          onProcessFile={(file, genre) => uploadedTrackMutateAsync({ file: file, genre: genre })}
           onComplete={() => {}}
           onClose={() => {
             hidePopup();

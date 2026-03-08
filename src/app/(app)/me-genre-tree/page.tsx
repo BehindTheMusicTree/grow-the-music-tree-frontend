@@ -6,10 +6,11 @@ import { usePopup } from "@contexts/PopupContext";
 import { useCreateGenre } from "@hooks/useGenre";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
+import Page from "@components/ui/Page";
 
 import { GenreTreeView } from "./GenreTreeView";
 
-export default function GenreTree() {
+export default function GenreTreePage() {
   const { mutate: createGenre, formErrors } = useCreateGenre("me");
   const { showPopup, hidePopup } = usePopup();
 
@@ -44,5 +45,9 @@ export default function GenreTree() {
     previousErrorsRef.current = formErrors || [];
   }, [formErrors, showCriteriaCreationPopup]);
 
-  return <GenreTreeView scope="me" handleGenreCreationAction={showCriteriaCreationPopup} />;
+  return (
+    <Page title="Genre Tree">
+      <GenreTreeView scope="me" handleGenreCreationAction={showCriteriaCreationPopup} />
+    </Page>
+  );
 }

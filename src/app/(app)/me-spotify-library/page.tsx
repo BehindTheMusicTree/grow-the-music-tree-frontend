@@ -11,6 +11,7 @@ import {
   useFullSyncSpotifyLibTracks,
 } from "@hooks/useSpotifyLibTracks";
 import type { SpotifyLibTrackSimple } from "@domain/spotify/spotify-lib-track";
+import Page from "@components/ui/Page";
 
 function formatDuration(durationStr: string): string {
   // Remove any leading/trailing whitespace
@@ -45,7 +46,7 @@ function formatDuration(durationStr: string): string {
   return durationStr;
 }
 
-export default function SpotifyLibrary() {
+export default function SpotifyLibraryPage() {
   const {
     data: spotifyLibTracksResponse,
     isPending: isListingPending,
@@ -98,18 +99,20 @@ export default function SpotifyLibrary() {
 
   if (isListingPending) {
     return (
-      <div className="flex flex-col items-center justify-center h-full">
-        <FaSpinner className="text-[#1DB954] text-4xl animate-spin" />
-        <p className="text-[#1DB954] mt-4">Loading Spotify library...</p>
-      </div>
+      <Page title="Your Spotify Library">
+        <div className="flex flex-col items-center justify-center flex-1">
+          <FaSpinner className="text-[#1DB954] text-4xl animate-spin" />
+          <p className="text-[#1DB954] mt-4">Loading Spotify library...</p>
+        </div>
+      </Page>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen w-full">
+    <Page title="Your Spotify Library">
+      <div className="flex min-h-0 flex-1 flex-col w-full">
       <div className="flex-none p-4">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Your Spotify Library</h1>
           <div className="text-sm text-gray-500">
             Showing {spotifyLibTracks.length} of {total} tracks
           </div>
@@ -201,6 +204,7 @@ export default function SpotifyLibrary() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </Page>
   );
 }

@@ -77,6 +77,18 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.3.0] - 2025-03-08
+
+### Added
+
+- **Full track metadata and Metadata Manager**: Fetch and display full audio metadata for a chosen file. New Metadata Manager page at `/metadata-manager` with file picker and full metadata JSON display; `useGetFullMetadata` hook and `audio-metadata/full` API endpoint. Artist display formatting via `getArtistsDisplay` on the uploaded library page. Track upload popup now passes file and genre correctly to `onProcessFile` and uses configurable timeout (`NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS`). Includes unit tests for Metadata Manager and TrackUploadPopup.
+
+- **Health endpoint**: `GET /health` returns `200` with JSON `{ "status": "ok" }` for uptime checks, load balancers, or readiness probes. Includes unit tests.
+
+### Changed
+
+- **Development environment layout**: Renamed `env/dev/` to `env/development/`. Templates live in `env/development/example/` (e.g. `.env.development.example`, `.env.development.api-local.example`, `.env.development.api-remote.example`). Presets go in `env/development/available/` (gitignored). Run `./scripts/setup-env-dev.sh local` or `remote` to copy a preset to `.env.development.local`. PORT is read from that file; the separate `.env.port` file is no longer used. README and CONTRIBUTING updated with new paths and instructions.
+
 ## [1.2.3] - 2025-02-23
 
 ### Added
@@ -197,7 +209,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Added package.json overrides section for glob dependency (13.0.1)
   - Added TypeScript 5.8.3 to devDependencies
 
-- **Environment Templates**: Moved environment templates from `env/dev/template/` to `env/dev/example/`
+- **Environment Templates**: Environment templates in `env/development/example/`, presets in `env/development/available/`
   - Updated CONTRIBUTING.md and README.md references to new location
   - Removed deprecated template files (.env.config-generation-tester, .env.dev.template)
 

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
 import { useFetchWrapper } from "./useFetchWrapper";
@@ -12,7 +12,7 @@ import { CriteriaSimpleSchema } from "@schemas/domain/criteria/response/simple";
 import { CriteriaCreationSchema } from "@schemas/domain/criteria/form/creation";
 import { CriteriaUpdateSchema } from "@schemas/domain/criteria/form/update";
 import { useValidatedMutation } from "./useValidatedMutation";
-import { genreEndpoints, genreQueryKeys } from "../api/endpoints/genres";
+import { genreEndpoints, genreQueryKeys } from "@api/domains/genres";
 import { Scope } from "@app-types/Scope";
 import { useQueryWithParse } from "./useQueryWithParse";
 

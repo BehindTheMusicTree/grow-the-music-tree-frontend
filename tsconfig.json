@@ -29,6 +29,7 @@
       "@app-types/*": ["src/types/*"],
       "@models/*": ["src/models/*"],
       "@schemas/*": ["src/schemas/*"],
+      "@api/*": ["src/api/*"],
       "@domain/*": ["src/schemas/domain/*"]
     },
     "plugins": [
