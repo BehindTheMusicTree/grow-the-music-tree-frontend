@@ -74,7 +74,7 @@ Used for:
 Guidelines:
 
 - Test behavior, not implementation details
-- Prefer queries like `getByRole`
+- Prefer queries like `getByRole` (find elements by accessibility role, e.g. `button`, `link`) so tests reflect how users interact and stay stable when markup changes
 - Mock server actions and data‑fetching
 
 ### 3.3 Integration Tests

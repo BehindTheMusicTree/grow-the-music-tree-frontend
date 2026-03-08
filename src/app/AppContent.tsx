@@ -69,10 +69,9 @@ export default function AppContent({ children }: { children: ReactNode }) {
       const error = connectivityError as ConnectivityError;
       const isSpotifyAllowlistOrAuthError =
         error instanceof BackendError &&
-        [
-          ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
-          ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR,
-        ].includes(error.code);
+        [ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST, ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR].includes(
+          error.code,
+        );
 
       if (isSpotifyAllowlistOrAuthError && !routeRequiresSpotify) {
         hidePopup();
@@ -85,21 +84,13 @@ export default function AppContent({ children }: { children: ReactNode }) {
         currentConnectivityErrorRef.current == null ||
         (![NetworkError, BackendError, ClientError, ServiceError, InvalidInputError].includes(
           currentConnectivityErrorRef.current,
-        ) && !(connectivityError instanceof currentConnectivityErrorRef.current))
+        ) &&
+          !(connectivityError instanceof currentConnectivityErrorRef.current))
       ) {
         let popup: ReactNode | null = null;
         let popupType: string | null = null;
-        if (
-          !isAccountPage &&
-          routeRequiresAuth &&
-          error instanceof AuthRequired
-        ) {
-          popup = (
-            <AuthPopup
-              handleSpotifyOAuth={handleSpotifyOAuth}
-              handleGoogleOAuth={handleGoogleOAuth}
-            />
-          );
+        if (!isAccountPage && routeRequiresAuth && error instanceof AuthRequired) {
+          popup = <AuthPopup handleSpotifyOAuth={handleSpotifyOAuth} handleGoogleOAuth={handleGoogleOAuth} />;
           popupType = AUTH_POPUP_TYPE;
         } else if (
           !isAccountPage &&
@@ -115,10 +106,9 @@ export default function AppContent({ children }: { children: ReactNode }) {
         } else if (
           routeRequiresSpotify &&
           error instanceof BackendError &&
-          [
-            ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST,
-            ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR,
-          ].includes(error.code)
+          [ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST, ErrorCode.BACKEND_SPOTIFY_AUTHENTICATION_ERROR].includes(
+            error.code,
+          )
         ) {
           popup = (
             <SpotifyAuthErrorPopup
@@ -162,7 +152,17 @@ export default function AppContent({ children }: { children: ReactNode }) {
         currentConnectivityErrorRef.current = error.constructor as typeof ConnectivityError;
       }
     }
-  }, [connectivityError, showPopup, hidePopup, clearConnectivityError, handleSpotifyOAuth, handleGoogleOAuth, isAccountPage, routeRequiresAuth, routeRequiresSpotify]);
+  }, [
+    connectivityError,
+    showPopup,
+    hidePopup,
+    clearConnectivityError,
+    handleSpotifyOAuth,
+    handleGoogleOAuth,
+    isAccountPage,
+    routeRequiresAuth,
+    routeRequiresSpotify,
+  ]);
 
   // Calculate dynamic heights based on player visibility
   const centerMaxHeight = {
@@ -183,11 +183,10 @@ export default function AppContent({ children }: { children: ReactNode }) {
       >
         <Menu className="menu left-0 z-40" />
         <div className="relative min-h-0 flex-grow w-full flex">
-          <div
-            className="min-h-0 flex-grow w-full flex"
-            style={activePopup ? { filter: "blur(4px)" } : undefined}
-          >
-            <main className="min-h-0 flex-grow w-full mx-8 overflow-y-auto">{children}</main>
+          <div className="min-h-0 flex-grow w-full flex" style={activePopup ? { filter: "blur(4px)" } : undefined}>
+            <main className="flex min-h-0 w-full flex-grow flex-col mx-8">
+              <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+            </main>
             {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
           </div>
           {activePopup && (
