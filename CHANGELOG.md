@@ -81,6 +81,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Full track metadata and Metadata Manager**: Fetch and display full audio metadata for a chosen file. New Metadata Manager page at `/metadata-manager` with file picker and full metadata JSON display; `useGetFullMetadata` hook and `audio-metadata/full` API endpoint. Artist display formatting via `getArtistsDisplay` on the uploaded library page. Track upload popup now passes file and genre correctly to `onProcessFile` and uses configurable timeout (`NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS`). Includes unit tests for Metadata Manager and TrackUploadPopup.
+
 - **Health endpoint**: `GET /health` returns `200` with JSON `{ "status": "ok" }` for uptime checks, load balancers, or readiness probes. Includes unit tests.
 
 ### Changed
