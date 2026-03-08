@@ -151,6 +151,19 @@ When a version tag is pushed (e.g., `git push origin v0.2.0`), the `publish.yml`
 
 ## Usage Examples
 
+### Using npm version
+
+The standard way to bump version in this Node/Next.js project is [npm version](https://docs.npmjs.com/cli/v10/commands/npm-version), which updates `package.json`, commits, and creates a git tag (e.g. `v1.2.3`) in one step. No extra tools required.
+
+```bash
+npm version patch   # 0.1.0 → 0.1.1
+npm version minor   # 0.1.0 → 0.2.0
+npm version major   # 0.1.0 → 1.0.0
+npm version 1.3.0 --no-git-tag-version   # set exact version (no commit/tag)
+```
+
+Use `--no-git-tag-version` when you only want to change `package.json` (e.g. before creating the tag manually). Otherwise `npm version` commits and tags. Push the tag when ready: `git push origin v<version>`. You still need to update `CHANGELOG.md` (move `[Unreleased]` to a versioned section with date) as in CONTRIBUTING.
+
 ### Creating a Release
 
 ```bash
