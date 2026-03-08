@@ -13,22 +13,26 @@ When creating or working on a pull request, **NEVER** write the PR description d
 
 ### Required Workflow
 
-1. **Create PR description file in `.pr-descriptions/` directory**
+1. **Always provide both PR title and PR description**
+   - When providing a PR description (in `.pr-descriptions/<branch-name>.md` or in responses), **always include a suggested PR title** at the top of the file or in the response.
+   - PR title should be a short, imperative summary (e.g. `feat(health): add GET /health endpoint and rename dev env to env/development`).
+
+2. **Create PR description file in `.pr-descriptions/` directory**
    - File name format: `<branch-name>.md`
    - Example: `.pr-descriptions/feature-genre-tree-visualization.md`
    - This directory is git-ignored for local drafting
 
-2. **Use the PR template structure**
+3. **Use the PR template structure**
    - Start from `.github/pull_request_template.md`
    - Fill in all relevant sections
    - Remove sections marked as "None" or not applicable
 
-3. **Draft and refine locally**
+4. **Draft and refine locally**
    - Keep the description file updated as you make changes
    - Update the checklist as you complete items
    - Add screenshots/notes as you progress
 
-4. **Copy to GitHub when ready**
+5. **Copy to GitHub when ready**
    - When creating the actual PR, copy the content from `.pr-descriptions/<branch-name>.md`
    - Paste into the GitHub PR description field
    - Do NOT commit the `.pr-descriptions/` files
@@ -79,8 +83,9 @@ Update your local PR description file when:
 
 ## Enforcement
 
+- **PR title required**: When providing a PR description (in a file or in a response), always provide a PR title as well. Place it at the top of the description file (e.g. `# PR title: feat(health): add GET /health endpoint`) or state it clearly when sharing the description.
 - AI assistant should always suggest creating/updating files in `.pr-descriptions/`
-- Never provide PR descriptions as plain text responses
+- Never provide PR descriptions as plain text responses without also giving a suggested PR title
 - Always reference the PR template when creating descriptions
 - Remind to copy content to GitHub when the PR is ready
 
