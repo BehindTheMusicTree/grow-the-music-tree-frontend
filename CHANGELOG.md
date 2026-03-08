@@ -77,6 +77,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Health endpoint**: `GET /health` returns `200` with JSON `{ "status": "ok" }` for uptime checks, load balancers, or readiness probes. Includes unit tests.
+
+### Changed
+
+- **Development environment layout**: Renamed `env/dev/` to `env/development/`. Templates live in `env/development/example/` (e.g. `.env.development.example`, `.env.development.api-local.example`, `.env.development.api-remote.example`). Presets go in `env/development/available/` (gitignored). Run `./scripts/setup-env-dev.sh local` or `remote` to copy a preset to `.env.development.local`. PORT is read from that file; the separate `.env.port` file is no longer used. README and CONTRIBUTING updated with new paths and instructions.
+
 ## [1.2.3] - 2025-02-23
 
 ### Added
