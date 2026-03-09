@@ -5,9 +5,10 @@ import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
 import Page from "@components/ui/Page";
 import { usePopup } from "@contexts/PopupContext";
 import { useGetFullMetadata } from "@hooks/useAudioMetadata";
+import { AudioMetadataDetailed } from "@schemas/domain/audio-metadata/detailed";
 
 export default function MetadataManagerPage() {
-  const [metadata, setMetadata] = useState<JSON | null>();
+  const [audioMetadata, setAudioMetadata] = useState<AudioMetadataDetailed>();
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const metadataMutation = useGetFullMetadata();
@@ -16,20 +17,23 @@ export default function MetadataManagerPage() {
   async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target?.files?.[0] ?? null;
 
+    async function onProcessFile(file: File, _genre: any) {
+      const audiometadata = await metadataMutation.mutateAsync(file);
+      setAudioMetadata(audiometadata);
+    }
+
     if (file) {
       setSelectedFileName(file.name);
       showPopup(
         <TrackUploadPopup
           files={[file]}
-          onProcessFile={(f, _genre) => metadataMutation.mutateAsync(f)}
+          onProcessFile={onProcessFile}
           onComplete={() => {}}
           onClose={() => {
             hidePopup();
           }}
         />,
       );
-      const response = await metadataMutation.mutateAsync(file);
-      setMetadata(response);
     }
   }
 
@@ -60,9 +64,9 @@ export default function MetadataManagerPage() {
           </span>
         </div>
         <div className="min-h-[200px] min-w-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 p-6">
-          {metadata != null ? (
+          {audioMetadata != null ? (
             <pre className="min-w-0 overflow-x-auto whitespace-pre-wrap break-all font-mono text-sm leading-relaxed text-gray-800">
-              {JSON.stringify(metadata, null, 2)}
+              {JSON.stringify(audioMetadata, null, 2)}
             </pre>
           ) : (
             <p className="flex min-h-[120px] items-center justify-center text-gray-500">No metadata</p>
