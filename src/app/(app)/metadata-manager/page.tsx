@@ -65,9 +65,8 @@ export default function MetadataManagerPage() {
             {selectedFileName ?? "No file chosen"}
           </span>
         </div>
-        "
-        {audioMetadata != null ? (
-          <div className="flex flex-col gap-3 lg:grid">
+        {audioMetadata && (
+          <div className="flex flex-col gap-3 md:grid md:grid-cols-2 lg:grid-cols-3">
             <section className={sectionBoxClass}>
               <header>
                 <h2>Technical Information</h2>
@@ -76,13 +75,23 @@ export default function MetadataManagerPage() {
             </section>
             <section className={sectionBoxClass}>
               <header>
+                <h2>Unified Metadata</h2>
+              </header>
+              <pre>{JSON.stringify(audioMetadata.unifiedMetadata, null, 2)}</pre>
+            </section>
+            <section className={sectionBoxClass}>
+              <header>
                 <h2>Metadata Format Headers</h2>
               </header>
               <pre>{JSON.stringify(audioMetadata.headers, null, 2)}</pre>
             </section>
+            <section className={sectionBoxClass}>
+              <header>
+                <h2>Metadata Raw</h2>
+              </header>
+              <pre>{JSON.stringify(audioMetadata.rawMetadata, null, 2)}</pre>
+            </section>
           </div>
-        ) : (
-          <p className="flex min-h-[120px] items-center justify-center text-gray-500">No metadata</p>
         )}
       </div>
     </Page>
