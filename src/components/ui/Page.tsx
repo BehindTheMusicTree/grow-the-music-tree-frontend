@@ -9,11 +9,11 @@ interface PageProps {
 
 export default function Page({ title, children, dataPage }: PageProps) {
   return (
-    <main className="flex min-h-0 flex-1 flex-col" data-page={dataPage}>
+    <div className="flex min-h-0 flex-1 flex-col" data-page={dataPage}>
       <header className="flex-none">
         <h1 className="page-title">{title}</h1>
       </header>
       <div className="page-content min-h-0 flex-1 overflow-y-auto">{children}</div>
-    </main>
+    </div>
   );
 }
