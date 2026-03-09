@@ -86,7 +86,7 @@ Example:
 
 ## Best practices
 
-- Write semantic, accessible HTML
+- Write semantic, accessible HTML; see [Semantic HTML](./SEMANTIC_HTML.md) for use of `<header>`, `<main>`, `<section>`, `<article>`, `<nav>`, `<footer>`
 - Use `data-*` attributes for testing hooks, UI state, or analytics only when appropriate; see [Data attributes](./DATA_ATTRIBUTES.md)
 - Use TypeScript types/interfaces for props and data structures
 - Follow the naming conventions above
