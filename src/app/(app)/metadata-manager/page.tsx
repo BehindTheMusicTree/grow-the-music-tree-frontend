@@ -35,7 +35,7 @@ export default function MetadataManagerPage() {
 
   return (
     <Page title="Metadata Manager" dataPage="metadata-manager">
-      <div className="flex max-w-3xl flex-col gap-6">
+      <div className="flex flex-col gap-6">
         <div className="flex flex-wrap items-center gap-3">
           <input
             ref={fileInputRef}
@@ -65,9 +65,7 @@ export default function MetadataManagerPage() {
               {JSON.stringify(metadata, null, 2)}
             </pre>
           ) : (
-            <p className="flex min-h-[120px] items-center justify-center text-gray-500">
-              No metadata
-            </p>
+            <p className="flex min-h-[120px] items-center justify-center text-gray-500">No metadata</p>
           )}
         </div>
       </div>
