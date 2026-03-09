@@ -34,7 +34,7 @@ export default function MetadataManagerPage() {
   }
 
   return (
-    <Page title="Metadata Manager">
+    <Page title="Metadata Manager" dataPage="metadata-manager">
       <div className="flex max-w-3xl flex-col gap-6">
         <div className="flex flex-wrap items-center gap-3">
           <input

@@ -46,7 +46,7 @@ export default function GenreTreePage() {
   }, [formErrors, showCriteriaCreationPopup]);
 
   return (
-    <Page title="Genre Tree">
+    <Page title="Genre Tree" dataPage="me-genre-tree">
       <GenreTreeView scope="me" handleGenreCreationAction={showCriteriaCreationPopup} />
     </Page>
   );

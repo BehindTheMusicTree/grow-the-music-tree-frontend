@@ -79,7 +79,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
-- **Page component**: Use semantic HTML per `docs/SEMANTIC_HTML.md`: outer wrapper is `<main>`, title block is `<header>` with `<h1>`, content in a sibling div. Aligns with one `<main>` per page and `<header>` for the title section only.
+- **Page component**: Use semantic HTML per `docs/SEMANTIC_HTML.md`: outer wrapper is `<main>`, title block is `<header>` with `<h1>`, content in a sibling div. Required `dataPage` prop sets `data-page` on `<main>` for E2E/analytics (route or feature id, e.g. `dataPage="metadata-manager"`); see `docs/DATA_ATTRIBUTES.md`. All page routes now pass `dataPage`.
 
 ### Documentation
 
