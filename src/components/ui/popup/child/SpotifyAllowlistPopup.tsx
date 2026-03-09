@@ -18,21 +18,23 @@ type SpotifyAllowlistPopupProps = Omit<
   onClose: () => void;
 };
 
-// @ts-expect-error: omitted props are set internally by the popup
-export default class SpotifyAllowlistPopup extends BasePopup<SpotifyAllowlistPopupProps> {
-  render() {
-    const { backendMessage, onClose, ...rest } = this.props;
-    return this.renderBase({
-      ...rest,
-      title: "Spotify account not in allowlist",
-      type: "warning",
-      isDismissable: true,
-      icon: UserPlus,
-      onClose,
-      showOkButton: true,
-      okButtonText: "Back",
-      onOk: onClose,
-      children: (
+export default function SpotifyAllowlistPopup({
+  backendMessage,
+  onClose,
+  ...rest
+}: SpotifyAllowlistPopupProps) {
+  return (
+    <BasePopup
+      {...rest}
+      title="Spotify account not in allowlist"
+      type="warning"
+      isDismissable
+      icon={UserPlus}
+      onClose={onClose}
+      showOkButton
+      okButtonText="Back"
+      onOk={onClose}
+      children={
         <div className="flex flex-col items-center space-y-6 py-4">
           <FaSpotify className="text-[#1DB954] text-6xl" />
           <div className="space-y-3 text-center">
@@ -57,7 +59,7 @@ export default class SpotifyAllowlistPopup extends BasePopup<SpotifyAllowlistPop
             </a>
           )}
         </div>
-      ),
-    });
-  }
+      }
+    />
+  );
 }

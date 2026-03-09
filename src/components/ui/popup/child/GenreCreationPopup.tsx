@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
 
@@ -10,47 +11,49 @@ type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon
   parent?: CriteriaMinimum | null;
 };
 
-// @ts-expect-error: ommitted props are set internally by the popup
-export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProps> {
-  state = {
-    parent: this.props.parent,
-    name: "",
+export default function GenreCreationPopup({
+  onSubmit,
+  onClose,
+  formErrors,
+  parent,
+  ...rest
+}: GenreCreationPopupProps) {
+  const [name, setName] = useState("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
   };
 
-  handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ name: e.target.value });
-  };
-
-  handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    this.props.onSubmit({ name: this.state.name, parent: this.state.parent?.uuid || undefined });
+    onSubmit({ name, parent: parent?.uuid || undefined });
   };
 
-  handleOkClick = () => {
-    this.props.onSubmit({ name: this.state.name, parent: this.state.parent?.uuid || undefined });
+  const handleOkClick = () => {
+    onSubmit({ name, parent: parent?.uuid || undefined });
   };
 
-  render() {
-    const { onClose, formErrors, ...rest } = this.props;
-    return this.renderBase({
-      ...rest,
-      title: "Create Genre",
-      isDismissable: true,
-      showOkButton: true,
-      showCancelButton: true,
-      okButtonText: "Save",
-      cancelButtonText: "Cancel",
-      onOk: this.handleOkClick,
-      onCancel: onClose,
-      children: (
-        <form onSubmit={this.handleSubmit} className="space-y-6">
+  return (
+    <BasePopup
+      {...rest}
+      onClose={onClose}
+      title="Create Genre"
+      isDismissable
+      showOkButton
+      showCancelButton
+      okButtonText="Save"
+      cancelButtonText="Cancel"
+      onOk={handleOkClick}
+      onCancel={onClose}
+      children={
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">Parent</label>
               <input
                 type="text"
                 name="parent"
-                value={this.state.parent?.name || "(root genre)"}
+                value={parent?.name || "(root genre)"}
                 className="w-full px-3 py-2 border rounded-md"
                 disabled
               />
@@ -60,8 +63,8 @@ export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProp
               <input
                 type="text"
                 name="name"
-                value={this.state.name}
-                onChange={this.handleChange}
+                value={name}
+                onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-md"
                 autoFocus
               />
@@ -77,7 +80,7 @@ export default class GenreCreationPopup extends BasePopup<GenreCreationPopupProp
             </div>
           )}
         </form>
-      ),
-    });
-  }
+      }
+    />
+  );
 }

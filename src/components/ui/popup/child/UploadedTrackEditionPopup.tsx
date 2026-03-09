@@ -15,15 +15,20 @@ type UploadedTrackEditionPopupProps = Omit<BasePopupProps, "title" | "children" 
   onClose?: () => void;
 };
 
-// @ts-expect-error: ommitted props are set internally by the popup
-export default class UploadedTrackEditionPopup extends BasePopup<UploadedTrackEditionPopupProps> {
-  render() {
-    const { uploadedTrack, formValues, onFormChange, onSubmit, onClose, ...rest } = this.props;
-    return this.renderBase({
-      ...rest,
-      title: "Edit Track",
-      isDismissable: true,
-      children: (
+export default function UploadedTrackEditionPopup({
+  uploadedTrack,
+  formValues,
+  onFormChange,
+  onSubmit,
+  onClose,
+  ...rest
+}: UploadedTrackEditionPopupProps) {
+  return (
+    <BasePopup
+      {...rest}
+      title="Edit Track"
+      isDismissable
+      children={
         <form onSubmit={onSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-4">
@@ -69,11 +74,11 @@ export default class UploadedTrackEditionPopup extends BasePopup<UploadedTrackEd
                 <label className="block text-sm font-medium text-gray-700 mb-1">Added on</label>
                 <div className="px-3 py-2 bg-gray-50 rounded-md">
                   {new Date(uploadedTrack.createdOn).toLocaleDateString("en-CA", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  timeZone: "UTC",
-                })}
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    timeZone: "UTC",
+                  })}
                 </div>
               </div>
               <div>
@@ -108,7 +113,7 @@ export default class UploadedTrackEditionPopup extends BasePopup<UploadedTrackEd
             </Button>
           </div>
         </form>
-      ),
-    });
-  }
+      }
+    />
+  );
 }

@@ -138,11 +138,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
         } else if (error instanceof BadRequestError || error instanceof BackendError || error instanceof ServiceError) {
           popup = <InternalErrorPopup errorCode={error.code} />;
         } else if (error instanceof NetworkError) {
-          popup = (
-            <NetworkErrorPopup title="Network Error">
-              Please check your internet connection and try again.
-            </NetworkErrorPopup>
-          );
+          popup = <NetworkErrorPopup />;
         }
 
         if (popup) {
