@@ -77,6 +77,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Page component**: Use semantic HTML per `docs/SEMANTIC_HTML.md`: outer wrapper is `<main>`, title block is `<header>` with `<h1>`, content in a sibling div. Aligns with one `<main>` per page and `<header>` for the title section only.
+
 ### Documentation
 
 - **Versioning**: Documented `npm version` as the standard way to bump versions in `docs/VERSIONING.md` (patch/minor/major and exact version with `--no-git-tag-version`). Aligns with CONTRIBUTING and avoids extra tooling.
