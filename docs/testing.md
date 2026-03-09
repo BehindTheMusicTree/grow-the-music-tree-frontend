@@ -75,6 +75,7 @@ Guidelines:
 
 - Test behavior, not implementation details
 - Prefer queries like `getByRole` (find elements by accessibility role, e.g. `button`, `link`) so tests reflect how users interact and stay stable when markup changes
+- Use `data-testid` only as a fallback when role/label/text are impractical; see [Data attributes](./DATA_ATTRIBUTES.md)
 - Mock server actions and data‑fetching
 
 ### 3.3 Integration Tests

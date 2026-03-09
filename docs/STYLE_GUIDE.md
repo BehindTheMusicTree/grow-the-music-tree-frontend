@@ -87,6 +87,7 @@ Example:
 ## Best practices
 
 - Write semantic, accessible HTML
+- Use `data-*` attributes for testing hooks, UI state, or analytics only when appropriate; see [Data attributes](./DATA_ATTRIBUTES.md)
 - Use TypeScript types/interfaces for props and data structures
 - Follow the naming conventions above
 - Keep components small and focused
