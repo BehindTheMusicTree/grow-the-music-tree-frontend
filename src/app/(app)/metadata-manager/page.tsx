@@ -14,6 +14,8 @@ export default function MetadataManagerPage() {
   const metadataMutation = useGetFullMetadata();
   const { showPopup, hidePopup } = usePopup();
 
+  const sectionBoxClass = "min-h-[200px] min-w-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 p-6";
+
   async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target?.files?.[0] ?? null;
 
@@ -63,15 +65,25 @@ export default function MetadataManagerPage() {
             {selectedFileName ?? "No file chosen"}
           </span>
         </div>
-        <div className="min-h-[200px] min-w-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 p-6">
-          {audioMetadata != null ? (
-            <pre className="min-w-0 overflow-x-auto whitespace-pre-wrap break-all font-mono text-sm leading-relaxed text-gray-800">
-              {JSON.stringify(audioMetadata, null, 2)}
-            </pre>
-          ) : (
-            <p className="flex min-h-[120px] items-center justify-center text-gray-500">No metadata</p>
-          )}
-        </div>
+        "
+        {audioMetadata != null ? (
+          <div className="flex flex-col gap-3 lg:grid">
+            <section className={sectionBoxClass}>
+              <header>
+                <h2>Technical Information</h2>
+              </header>
+              <pre>{JSON.stringify(audioMetadata.technicalInfo, null, 2)}</pre>
+            </section>
+            <section className={sectionBoxClass}>
+              <header>
+                <h2>Metadata Format Headers</h2>
+              </header>
+              <pre>{JSON.stringify(audioMetadata.headers, null, 2)}</pre>
+            </section>
+          </div>
+        ) : (
+          <p className="flex min-h-[120px] items-center justify-center text-gray-500">No metadata</p>
+        )}
       </div>
     </Page>
   );
