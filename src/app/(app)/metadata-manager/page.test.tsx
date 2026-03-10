@@ -1,21 +1,21 @@
 "use client";
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import MetadataManagerPage from "./page";
 
+const showPopupMock = vi.fn();
 vi.mock("@contexts/PopupContext", () => ({
-  usePopup: () => ({ showPopup: vi.fn(), hidePopup: vi.fn(), activePopup: null }),
+  usePopup: () => ({ showPopup: showPopupMock, hidePopup: vi.fn(), activePopup: null }),
 }));
 
-const mockMutateAsync = vi.fn();
 vi.mock("@hooks/useAudioMetadata", () => ({
-  useGetFullMetadata: () => ({ mutateAsync: mockMutateAsync }),
+  useGetFullMetadata: () => ({ mutateAsync: vi.fn() }),
 }));
 
 describe("MetadataManagerPage", () => {
   beforeEach(() => {
-    mockMutateAsync.mockReset();
+    showPopupMock.mockClear();
   });
 
   it("renders the heading Metadata Manager", () => {
@@ -26,29 +26,19 @@ describe("MetadataManagerPage", () => {
   it("shows No metadata when no file has been processed", () => {
     render(<MetadataManagerPage />);
     const noMetadataElements = screen.getAllByText("No metadata");
-    expect(noMetadataElements).toHaveLength(5);
+    expect(noMetadataElements).toHaveLength(6);
   });
 
-  it.only("after selecting a file and the mutation resolving, the returned metadata is displayed", async () => {
-    const metadata = {
-      unifiedMetadata: { title: "Test Track", artist: "Test Artist" },
-      technicalInfo: {},
-      headers: {},
-      rawMetadata: {},
-      metadataFormat: null,
-      formatPriorities: null,
-    };
-    mockMutateAsync.mockResolvedValue(metadata);
-
+  it("calls showPopup with upload popup and selected file when user selects a file", () => {
     render(<MetadataManagerPage />);
-    const input = document.querySelector('input[type="file"]');
-    if (!input) throw new Error("File input not found");
+    const [input] = screen.getAllByLabelText(/choose an audio file/i);
+    const file = new File([], "test.mp3", { type: "audio/mpeg" });
 
-    fireEvent.change(input, { target: { files: [new File([], "test.mp3", { type: "audio/mpeg" })] } });
+    fireEvent.change(input, { target: { files: [file] } });
 
-    await waitFor(() => {
-      expect(screen.getByText(/"title":\s*"Test Track"/)).toBeInTheDocument();
-    });
-    expect(screen.getByText(/"artist":\s*"Test Artist"/)).toBeInTheDocument();
+    expect(showPopupMock).toHaveBeenCalledTimes(1);
+    const popupElement = showPopupMock.mock.calls[0][0];
+    expect(popupElement.props.files).toHaveLength(1);
+    expect(popupElement.props.files[0]).toBe(file);
   });
 });
