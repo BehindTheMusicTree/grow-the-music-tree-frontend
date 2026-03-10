@@ -26,8 +26,7 @@ describe("MetadataManagerPage", () => {
   it("shows No metadata when no file has been processed", () => {
     render(<MetadataManagerPage />);
     const noMetadataElements = screen.getAllByText("No metadata");
-    expect(noMetadataElements.length).toBeGreaterThanOrEqual(1);
-    expect(noMetadataElements[0]).toBeInTheDocument();
+    expect(noMetadataElements.length).toHaveLength(4);
   });
 
   it("after selecting a file and the mutation resolving, the returned metadata is displayed", async () => {
