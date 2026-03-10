@@ -36,9 +36,14 @@ Follow **docs/testing.md** for overall strategy and **docs/DATA_ATTRIBUTES.md** 
     - Use on page/section roots for E2E and “am I on this page?” checks (e.g. `data-page="metadata-manager"`).
   - See **docs/DATA_ATTRIBUTES.md** for detailed conventions and examples.
 
+## Where tests live
+
+- **Unit and component tests:** Co-locate with source in `src/` as `*.test.ts` / `*.test.tsx` next to the file under test.
+- **Integration tests:** Place in **`tests/integration/`** at the project root (see **docs/testing.md** §6).
+- **E2E tests:** Place in **`e2e/`** or **`tests/e2e/`**; separate config/command from Vitest.
+
 ## Structure & style
 
-- Co‑locate tests with the code they cover as `*.test.ts` / `*.test.tsx`.
 - Use `describe` blocks to group by component/feature and scenario.
 - Keep tests small and focused; prefer multiple simple tests over a single huge one.
 - Avoid useless comments; only document non‑obvious behavior or decisions.

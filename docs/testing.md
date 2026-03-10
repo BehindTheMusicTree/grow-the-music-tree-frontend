@@ -131,3 +131,11 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
 }));
 ```
+
+---
+
+## 6. Directory Structure
+
+- **Unit and component tests:** Co-locate with source as `*.test.ts` or `*.test.tsx` next to the file under test (e.g. `page.tsx` → `page.test.tsx`, `utils.ts` → `utils.test.ts`).
+- **Integration tests:** Place in a dedicated directory so they are easy to run separately and don’t blur with unit/component tests. Use **`tests/integration/`** at the project root (e.g. `tests/integration/metadata-manager-flow.test.tsx`). Optionally mirror `src/` structure under `tests/integration/` if you have many integration tests. Use MSW and real or wrapped providers (e.g. `PopupProvider`) only where the test needs a multi-module flow.
+- **E2E tests:** Place in **`e2e/`** or **`tests/e2e/`** (e.g. Playwright specs). Keep them separate from Vitest so they can be run with a different command and config.
