@@ -13,12 +13,13 @@
    - [End-to-End Tests](#34-end-to-end-tests)
 4. [Next.js-Specific Testing Rules](#4-nextjs-specific-testing-rules)
 5. [Mocking Strategy](#5-mocking-strategy)
-6. [Directory Structure](#6-directory-structure)
-7. [Running Tests](#7-running-tests)
-8. [CI/CD Rules](#8-cicd-rules)
-9. [Coverage Expectations](#9-coverage-expectations)
-10. [Writing New Tests](#10-writing-new-tests)
-11. [Continuous Improvement](#11-continuous-improvement)
+6. [React Strict Mode](#6-react-strict-mode)
+7. [Directory Structure](#7-directory-structure)
+8. [Running Tests](#8-running-tests)
+9. [CI/CD Rules](#9-cicd-rules)
+10. [Coverage Expectations](#10-coverage-expectations)
+11. [Writing New Tests](#11-writing-new-tests)
+12. [Continuous Improvement](#12-continuous-improvement)
 
 ---
 
@@ -134,7 +135,18 @@ vi.mock("next/navigation", () => ({
 
 ---
 
-## 6. Directory Structure
+## 6. React Strict Mode
+
+We use a **hybrid** approach:
+
+- **Unit and component tests (Vitest):** Run **without** React Strict Mode. Do not wrap components in `<StrictMode>` in custom render helpers or test setup; do not call `configure({ reactStrictMode: true })` in RTL. Prefer exact assertions (e.g. `toHaveLength(6)`, `getByRole(...)` for a single element). If your environment still double-renders (e.g. some React 19 / Vite setups), use resilient assertions: `expect(elements.length).toBeGreaterThanOrEqual(n)` for counts and `getAllByRole` / `getAllByLabelText` then `expect(...length).toBeGreaterThanOrEqual(1)` for elements that should appear once.
+- **E2E tests (Playwright/Cypress):** Run the real app (dev or production build). The app uses whatever is configured in the Next.js root (e.g. `reactStrictMode` in `next.config.js`). If you enable Strict Mode in the app later, E2E will automatically exercise that behavior; no test change needed.
+
+This keeps Vitest tests simple and stable when possible; E2E still validates real user-facing behavior.
+
+---
+
+## 7. Directory Structure
 
 - **Unit and component tests:** Co-locate with source as `*.test.ts` or `*.test.tsx` next to the file under test (e.g. `page.tsx` → `page.test.tsx`, `utils.ts` → `utils.test.ts`).
 - **Integration tests:** Place in a dedicated directory so they are easy to run separately and don’t blur with unit/component tests. Use **`tests/integration/`** at the project root (e.g. `tests/integration/metadata-manager-flow.test.tsx`). Optionally mirror `src/` structure under `tests/integration/` if you have many integration tests. Use MSW and real or wrapped providers (e.g. `PopupProvider`) only where the test needs a multi-module flow.

@@ -39,8 +39,13 @@ Follow **docs/testing.md** for overall strategy and **docs/DATA_ATTRIBUTES.md** 
 ## Where tests live
 
 - **Unit and component tests:** Co-locate with source in `src/` as `*.test.ts` / `*.test.tsx` next to the file under test.
-- **Integration tests:** Place in **`tests/integration/`** at the project root (see **docs/testing.md** §6).
+- **Integration tests:** Place in **`tests/integration/`** at the project root (see **docs/testing.md** §7).
 - **E2E tests:** Place in **`e2e/`** or **`tests/e2e/`**; separate config/command from Vitest.
+
+## React Strict Mode (hybrid)
+
+- **Vitest:** Unit/component tests run **without** React Strict Mode. Do not wrap in `<StrictMode>` or use RTL `configure({ reactStrictMode: true })`. Prefer exact assertions (`toHaveLength(n)`, `getByRole` for single element). If the environment still double-renders, use resilient assertions: `toBeGreaterThanOrEqual(n)` for counts, `getAllByRole`/`getAllByLabelText` then `expect(...length).toBeGreaterThanOrEqual(1)` for single-element presence. See **docs/testing.md** §6.
+- **E2E:** Runs the real app; uses app’s Strict Mode setting (e.g. `reactStrictMode` in Next.js config).
 
 ## Structure & style
 
