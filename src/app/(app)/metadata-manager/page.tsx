@@ -69,19 +69,13 @@ export default function MetadataManagerPage() {
         <div className="flex flex-col gap-3 md:grid md:grid-cols-2 lg:grid-cols-3">
           <section className={sectionBoxClass}>
             <header>
-              <h2>Technical Information</h2>
+              <h2>Technical information</h2>
             </header>
             {audioMetadata ? <pre>{JSON.stringify(audioMetadata.technicalInfo, null, 2)}</pre> : noMetadataPlaceholder}
           </section>
           <section className={sectionBoxClass}>
             <header>
-              <h2>Format priorities</h2>
-            </header>
-            <pre>{audioMetadata ? JSON.stringify(audioMetadata.formatPriorities, null, 2) : noMetadataPlaceholder}</pre>
-          </section>
-          <section className={sectionBoxClass}>
-            <header>
-              <h2>Unified Metadata</h2>
+              <h2>Unified metadata</h2>
             </header>
             {audioMetadata ? (
               <pre>{JSON.stringify(audioMetadata.unifiedMetadata, null, 2)}</pre>
@@ -91,13 +85,25 @@ export default function MetadataManagerPage() {
           </section>
           <section className={sectionBoxClass}>
             <header>
-              <h2>Formats Headers</h2>
+              <h2>By metadata format</h2>
+            </header>
+            <pre>{audioMetadata ? JSON.stringify(audioMetadata.metadataFormat, null, 2) : noMetadataPlaceholder}</pre>
+          </section>
+          <section className={sectionBoxClass}>
+            <header>
+              <h2>Format priorities</h2>
+            </header>
+            <pre>{audioMetadata ? JSON.stringify(audioMetadata.formatPriorities, null, 2) : noMetadataPlaceholder}</pre>
+          </section>
+          <section className={sectionBoxClass}>
+            <header>
+              <h2>Formats headers</h2>
             </header>
             {audioMetadata ? <pre>{JSON.stringify(audioMetadata.headers, null, 2)}</pre> : noMetadataPlaceholder}
           </section>
           <section className={sectionBoxClass}>
             <header>
-              <h2>Metadata Raw</h2>
+              <h2>Metadata raw</h2>
             </header>
             {audioMetadata ? <pre>{JSON.stringify(audioMetadata.rawMetadata, null, 2)}</pre> : noMetadataPlaceholder}
           </section>
