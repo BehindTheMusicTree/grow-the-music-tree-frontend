@@ -75,6 +75,12 @@ export default function MetadataManagerPage() {
           </section>
           <section className={sectionBoxClass}>
             <header>
+              <h2>Format priorities</h2>
+            </header>
+            <pre>{audioMetadata ? JSON.stringify(audioMetadata.formatPriorities, null, 2) : noMetadataPlaceholder}</pre>
+          </section>
+          <section className={sectionBoxClass}>
+            <header>
               <h2>Unified Metadata</h2>
             </header>
             {audioMetadata ? (
