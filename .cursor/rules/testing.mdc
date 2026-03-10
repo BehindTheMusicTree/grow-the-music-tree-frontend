@@ -1,0 +1,54 @@
+---
+description: Testing best practices for Vitest + Testing Library in this repo
+globs:
+  - "src/**/*.test.{ts,tsx}"
+  - "src/**/*.spec.{ts,tsx}"
+alwaysApply: true
+---
+
+# Testing Guide
+
+Follow **docs/testing.md** for overall strategy and **docs/DATA_ATTRIBUTES.md** for `data-*` usage.
+
+## Core principles
+
+- **Behavior, not implementation**
+  - Test what the user sees and does, not internal details (DOM structure, class names, implementation-specific props) unless they _are_ the behavior.
+  - Prefer high‑level assertions (“button is disabled”, “error message is shown”) over fragile ones (“element has this exact Tailwind class list”).
+
+- **Finding elements (Testing Library)**
+  - Use Testing Library queries from `screen` (or the result of `render`).
+  - **Preferred order**:
+    - `getByRole` (with `name` when possible)
+    - `getByLabelText`
+    - `getByText`
+    - Then `getByPlaceholderText`, `getByDisplayValue`, etc. as needed
+  - Use `getByTestId` **only as a fallback** when role/label/text are impractical; see **docs/DATA_ATTRIBUTES.md**.
+  - **Do not** use `document.querySelector` or other raw DOM selectors in tests (e.g. `input[type="file"]`). Instead:
+    - Use `screen.getByRole('button', { name: /submit/i })`
+    - Or `screen.getByLabelText(/choose an audio file/i)` for an input with `aria-label="Choose an audio file"`.
+
+- **Data attributes in tests**
+  - `data-testid`:
+    - Use sparingly as a stable hook when no accessible role/label/text fits.
+    - Names should be kebab‑case and describe purpose (e.g. `metadata-manager-form`, `track-list`), not presentation.
+  - `data-page`:
+    - Use on page/section roots for E2E and “am I on this page?” checks (e.g. `data-page="metadata-manager"`).
+  - See **docs/DATA_ATTRIBUTES.md** for detailed conventions and examples.
+
+## Structure & style
+
+- Co‑locate tests with the code they cover as `*.test.ts` / `*.test.tsx`.
+- Use `describe` blocks to group by component/feature and scenario.
+- Keep tests small and focused; prefer multiple simple tests over a single huge one.
+- Avoid useless comments; only document non‑obvious behavior or decisions.
+
+## Mocking & environment
+
+- Use Vitest + Testing Library:
+  - Import from `@testing-library/react` and `@testing-library/jest-dom`.
+  - Use async helpers (`findBy*`, `waitFor`) for async behavior.
+- Mock:
+  - Network calls and server actions (e.g. with MSW) per **docs/testing.md**.
+  - `next/navigation` when routing behavior is involved.
+- Keep tests deterministic: no real network, no time‑dependent or random behavior without control.

@@ -48,10 +48,10 @@ Use them for **metadata or hooks** that are not part of visible content or seman
 - The visible text or label is unstable or duplicated
 - You need a stable hook for E2E or integration tests
 
-In this project we use **Vitest + Testing Library**; prefer `getByRole`, `getByLabelText`, `getByText`. Add `data-testid` only when those are impractical.
+In this project we use **Vitest + Testing Library**. Prefer querying by role, label, or text; add `data-testid` only when those are impractical. In tests, avoid `document.querySelector` and other implementation-detail selectors — see [Testing strategy](./testing.md) for query best practices.
 
 ```tsx
-// Prefer: query by role/label
+// Prefer: query by role/label (see testing.md)
 screen.getByRole('button', { name: /submit/i });
 screen.getByLabelText('Email');
 

@@ -74,8 +74,7 @@ Used for:
 Guidelines:
 
 - Test behavior, not implementation details
-- Prefer queries like `getByRole` (find elements by accessibility role, e.g. `button`, `link`) so tests reflect how users interact and stay stable when markup changes
-- Use `data-testid` only as a fallback when role/label/text are impractical; see [Data attributes](./DATA_ATTRIBUTES.md)
+- **Finding elements:** Use Testing Library queries from `screen` (or the result of `render`). Prefer, in order: `getByRole`, `getByLabelText`, `getByText`. Use `getByTestId` only when role/label/text are impractical; see [Data attributes](./DATA_ATTRIBUTES.md). Do **not** use `document.querySelector` or other DOM selectors (e.g. `input[type="file"]`) — they tie tests to implementation and bypass accessibility. Example: for an input with `aria-label="Choose an audio file"`, use `screen.getByLabelText(/choose an audio file/i)` instead of `document.querySelector('input[type="file"]')`.
 - Mock server actions and data‑fetching
 
 ### 3.3 Integration Tests
