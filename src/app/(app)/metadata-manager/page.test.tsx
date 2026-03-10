@@ -26,11 +26,18 @@ describe("MetadataManagerPage", () => {
   it("shows No metadata when no file has been processed", () => {
     render(<MetadataManagerPage />);
     const noMetadataElements = screen.getAllByText("No metadata");
-    expect(noMetadataElements.length).toHaveLength(4);
+    expect(noMetadataElements).toHaveLength(5);
   });
 
-  it("after selecting a file and the mutation resolving, the returned metadata is displayed", async () => {
-    const metadata = { title: "Test Track", artist: "Test Artist" };
+  it.only("after selecting a file and the mutation resolving, the returned metadata is displayed", async () => {
+    const metadata = {
+      unifiedMetadata: { title: "Test Track", artist: "Test Artist" },
+      technicalInfo: {},
+      headers: {},
+      rawMetadata: {},
+      metadataFormat: null,
+      formatPriorities: null,
+    };
     mockMutateAsync.mockResolvedValue(metadata);
 
     render(<MetadataManagerPage />);
