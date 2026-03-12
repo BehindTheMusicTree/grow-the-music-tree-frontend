@@ -162,7 +162,7 @@ npm version major   # 0.1.0 → 1.0.0
 npm version 1.3.0 --no-git-tag-version   # set exact version (no commit/tag)
 ```
 
-Use `--no-git-tag-version` when you only want to change `package.json` (e.g. before creating the tag manually). Otherwise `npm version` commits and tags. The `postversion` script automatically moves `[Unreleased]` content into a new `## [X.Y.Z] - YYYY-MM-DD` section below it and amends the version commit. Push the tag when ready: `git push origin v<version>`.
+Use `--no-git-tag-version` when you only want to change `package.json` (e.g. before creating the tag manually). Otherwise `npm version` commits and tags. The `postversion` script automatically: moves `[Unreleased]` into a new `## [X.Y.Z] - YYYY-MM-DD` section and amends the version commit; then deletes local and remote pre-release/dev tags for that version (e.g. `v1.4.0-dev-*`, `v1.4.0-rc*`). Push the tag when ready: `git push origin v<version>`.
 
 ### Creating a Release
 
@@ -176,13 +176,14 @@ git checkout -b release/v0.2.0
 git checkout main
 git merge release/v0.2.0
 
-# 3. On main: create and push the release version tag (triggers publish.yml)
-git tag v0.2.0
+# 3. On main: bump version (creates tag, updates CHANGELOG, deletes pre-release tags for this version)
+npm version minor
 git push origin v0.2.0
 
-# 4. Clean up pre-release version tags (dev, rc, beta, alpha)
-git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*" | xargs -n 1 git tag -d
-git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*" | xargs -n 1 git push origin --delete
+# Or if tagging manually: create tag then clean up pre-release tags for this version
+# git tag v0.2.0
+# git push origin v0.2.0
+# node scripts/delete-prerelease-tags.mjs
 ```
 
 ### Development Version Tag Testing
