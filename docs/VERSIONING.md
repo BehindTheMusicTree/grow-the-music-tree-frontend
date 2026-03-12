@@ -166,6 +166,8 @@ Use `--no-git-tag-version` when you only want to change `package.json` (e.g. bef
 
 ### Creating a Release
 
+Release tags are created **from main** (on the merge commit), not from the release branch. That way the tag points to the exact commit that is the canonical release and matches what is on the default branch. The publish workflow enforces this for release tags only (e.g. `v1.2.3`): if you push such a tag whose commit is not on `main`, the workflow fails and no deploy runs. Pre-release and dev tags (e.g. `v1.2.0-rc1`, `v1.2.3-dev-branch`) are not checked.
+
 ```bash
 # 1. Create release branch
 git checkout -b release/v0.2.0
@@ -174,9 +176,9 @@ git checkout -b release/v0.2.0
 git checkout main
 git merge release/v0.2.0
 
-# 3. Create and push the release version tag
+# 3. On main: create and push the release version tag (triggers publish.yml)
 git tag v0.2.0
-git push origin v0.2.0  # Triggers publish.yml workflow
+git push origin v0.2.0
 
 # 4. Clean up pre-release version tags (dev, rc, beta, alpha)
 git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*" | xargs -n 1 git tag -d
