@@ -80,6 +80,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.4.0] - 2025-03-12
+
 ### Improved
 
 - **Metadata Manager**: Reorganized and expanded metadata display into six sections (Technical information, Unified metadata, By metadata format, Format priorities, Formats headers, Metadata raw) with responsive grid layout (1 col → 2 on md → 3 on lg). Uses `AudioMetadataDetailed` and Zod validation via `AudioMetadataDetailedSchema` and `AlbumDetailedSchema`; `useGetFullMetadata` integrated with validated response. Includes updated unit tests for metadata display and "No metadata" placeholder.
