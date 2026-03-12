@@ -77,6 +77,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Improved
+
+- **Metadata Manager**: Reorganized and expanded metadata display into six sections (Technical information, Unified metadata, By metadata format, Format priorities, Formats headers, Metadata raw) with responsive grid layout (1 col → 2 on md → 3 on lg). Uses `AudioMetadataDetailed` and Zod validation via `AudioMetadataDetailedSchema` and `AlbumDetailedSchema`; `useGetFullMetadata` integrated with validated response. Includes updated unit tests for metadata display and "No metadata" placeholder.
+
 ### Changed
 
 - **Popups**: Refactored all popup components to function components. `BasePopup` is now a function component instead of a class; all 14 child popups (TrackUploadPopup, FormPopup, AuthPopup, ImagePopup, GenreCreationPopup, InternalErrorPopup, AuthErrorPopup, GenreRenamePopup, NetworkErrorPopup, SpotifyAuthErrorPopup, GenreDeletionPopup, InvalidInputPopup, SpotifyAllowlistPopup, UploadedTrackEditionPopup) compose it via `<BasePopup {...props} />` with `useState`/`useCallback` where they had local state or handlers. No change to public props or behavior.
