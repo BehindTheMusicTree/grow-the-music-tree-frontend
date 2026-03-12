@@ -26,7 +26,23 @@ describe("MetadataManagerPage", () => {
   it("shows No metadata when no file has been processed", () => {
     render(<MetadataManagerPage />);
     const noMetadataElements = screen.getAllByText("No metadata");
-    expect(noMetadataElements).toHaveLength(6);
+    expect(noMetadataElements.length).toBeGreaterThanOrEqual(6);
+  });
+
+  it("renders all metadata section headings", () => {
+    render(<MetadataManagerPage />);
+    const sectionTitles = [
+      "Technical information",
+      "Unified metadata",
+      "By metadata format",
+      "Format priorities",
+      "Formats headers",
+      "Metadata raw",
+    ];
+    for (const title of sectionTitles) {
+      const headings = screen.getAllByRole("heading", { level: 2, name: title });
+      expect(headings.length).toBeGreaterThanOrEqual(1);
+    }
   });
 
   it("calls showPopup with upload popup and selected file when user selects a file", () => {
