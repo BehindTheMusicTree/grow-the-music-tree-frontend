@@ -46,7 +46,7 @@ export default function ReferenceGenreTreePage() {
   }, [formErrors, showCriteriaCreationPopup]);
 
   return (
-    <Page title="The Music Tree">
+    <Page title="The Music Tree" dataPage="reference-genre-tree">
       <GenreTreeView scope="reference" handleGenreCreationAction={showCriteriaCreationPopup} />
     </Page>
   );

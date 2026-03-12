@@ -77,6 +77,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Popups**: Refactored all popup components to function components. `BasePopup` is now a function component instead of a class; all 14 child popups (TrackUploadPopup, FormPopup, AuthPopup, ImagePopup, GenreCreationPopup, InternalErrorPopup, AuthErrorPopup, GenreRenamePopup, NetworkErrorPopup, SpotifyAuthErrorPopup, GenreDeletionPopup, InvalidInputPopup, SpotifyAllowlistPopup, UploadedTrackEditionPopup) compose it via `<BasePopup {...props} />` with `useState`/`useCallback` where they had local state or handlers. No change to public props or behavior.
+
+- **Page component**: Use semantic HTML per `docs/SEMANTIC_HTML.md`: outer wrapper is `<div>` (layout already has one `<main>` in AppContent; avoid nested main). Title block is `<header>` with `<h1>`, content in a sibling div. Required `dataPage` prop sets `data-page` on the wrapper for E2E/analytics; all page routes pass `dataPage`.
+
 ### Documentation
 
 - **Versioning**: Documented `npm version` as the standard way to bump versions in `docs/VERSIONING.md` (patch/minor/major and exact version with `--no-git-tag-version`). Aligns with CONTRIBUTING and avoids extra tooling.

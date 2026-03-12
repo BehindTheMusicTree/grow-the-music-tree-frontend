@@ -26,14 +26,14 @@ export default function GenrePlaylistsPage() {
 
   if (error) {
     return (
-      <Page title="Genre Playlists">
+      <Page title="Genre Playlists" dataPage="me-genre-playlists">
         <div>Error loading genre playlists</div>
       </Page>
     );
   }
 
   return (
-    <Page title="Genre Playlists">
+    <Page title="Genre Playlists" dataPage="me-genre-playlists">
       <div className="container mx-auto py-8">
       <div className="rounded-md border overflow-auto">
         <Table>

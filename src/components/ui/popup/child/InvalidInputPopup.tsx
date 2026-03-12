@@ -3,7 +3,6 @@
 import { AlertCircle } from "lucide-react";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 
-// Only allow details as a custom prop
 type InvalidInputPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   details: {
     message: string;
@@ -11,16 +10,14 @@ type InvalidInputPopupProps = Omit<BasePopupProps, "title" | "children" | "icon"
   };
 };
 
-// @ts-expect-error: ommitted props are set internally by the popup
-export default class InvalidInputPopup extends BasePopup<InvalidInputPopupProps> {
-  render() {
-    const { details, ...rest } = this.props;
-    return this.renderBase({
-      ...rest,
-      title: "Invalid Input",
-      isDismissable: true,
-      icon: AlertCircle,
-      children: (
+export default function InvalidInputPopup({ details, ...rest }: InvalidInputPopupProps) {
+  return (
+    <BasePopup
+      {...rest}
+      title="Invalid Input"
+      isDismissable
+      icon={AlertCircle}
+      children={
         <div className="space-y-4">
           <div className="flex items-center">
             <AlertCircle size={20} color="red" />
@@ -43,7 +40,7 @@ export default class InvalidInputPopup extends BasePopup<InvalidInputPopupProps>
             </div>
           )}
         </div>
-      ),
-    });
-  }
+      }
+    />
+  );
 }

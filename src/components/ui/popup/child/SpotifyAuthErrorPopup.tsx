@@ -10,7 +10,6 @@ import {
   getSpotifyAllowlistMailtoHref,
 } from "@app-types/app-errors/app-error-messages";
 
-// Only allow message, details, onClose, and errorCode as custom props
 type SpotifyAuthErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   message: string;
   details?: string;
@@ -18,19 +17,23 @@ type SpotifyAuthErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "i
   errorCode?: ErrorCode;
 };
 
-// @ts-expect-error: ommitted props are set internally by the popup
-export default class SpotifyAuthErrorPopup extends BasePopup<SpotifyAuthErrorPopupProps> {
-  render() {
-    const { message, details, onClose, errorCode, ...rest } = this.props;
-    const contactEmail = getSpotifyAllowlistContactEmail();
-    const requestAccessHref = getSpotifyAllowlistMailtoHref();
+export default function SpotifyAuthErrorPopup({
+  message,
+  details,
+  onClose,
+  errorCode,
+  ...rest
+}: SpotifyAuthErrorPopupProps) {
+  const contactEmail = getSpotifyAllowlistContactEmail();
+  const requestAccessHref = getSpotifyAllowlistMailtoHref();
 
-    return this.renderBase({
-      ...rest,
-      title: "Authentication Failed",
-      isDismissable: true,
-      icon: User,
-      children: (
+  return (
+    <BasePopup
+      {...rest}
+      title="Authentication Failed"
+      isDismissable
+      icon={User}
+      children={
         <div className="flex flex-col items-center space-y-8 py-4">
           <FaSpotify className="text-[#1DB954] text-7xl" />
           <div className="space-y-3 text-center">
@@ -73,7 +76,7 @@ export default class SpotifyAuthErrorPopup extends BasePopup<SpotifyAuthErrorPop
             Try Again
           </Button>
         </div>
-      ),
-    });
-  }
+      }
+    />
+  );
 }

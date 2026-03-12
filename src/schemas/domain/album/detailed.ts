@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { ArtistMinimumSchema } from "@domain/artist/minimum";
 import { UploadedTrackSimpleWithoutAlbumWithTrackNumberSchema } from "@domain/uploaded-track/response/simple/simple-without-album-with-track-number";
-import { AlbumMinimumSchema } from "./minimum";
 
 export const AlbumDetailedSchema = z.object({
   uuid: z.string().uuid(),
@@ -19,4 +18,3 @@ export const AlbumDetailedSchema = z.object({
 });
 
 export type AlbumDetailed = z.infer<typeof AlbumDetailedSchema>;
-export type AlbumMinimum = z.infer<typeof AlbumMinimumSchema>;

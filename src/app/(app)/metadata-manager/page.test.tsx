@@ -1,21 +1,21 @@
 "use client";
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import MetadataManagerPage from "./page";
 
+const showPopupMock = vi.fn();
 vi.mock("@contexts/PopupContext", () => ({
-  usePopup: () => ({ showPopup: vi.fn(), hidePopup: vi.fn(), activePopup: null }),
+  usePopup: () => ({ showPopup: showPopupMock, hidePopup: vi.fn(), activePopup: null }),
 }));
 
-const mockMutateAsync = vi.fn();
 vi.mock("@hooks/useAudioMetadata", () => ({
-  useGetFullMetadata: () => ({ mutateAsync: mockMutateAsync }),
+  useGetFullMetadata: () => ({ mutateAsync: vi.fn() }),
 }));
 
 describe("MetadataManagerPage", () => {
   beforeEach(() => {
-    mockMutateAsync.mockReset();
+    showPopupMock.mockClear();
   });
 
   it("renders the heading Metadata Manager", () => {
@@ -26,23 +26,35 @@ describe("MetadataManagerPage", () => {
   it("shows No metadata when no file has been processed", () => {
     render(<MetadataManagerPage />);
     const noMetadataElements = screen.getAllByText("No metadata");
-    expect(noMetadataElements.length).toBeGreaterThanOrEqual(1);
-    expect(noMetadataElements[0]).toBeInTheDocument();
+    expect(noMetadataElements.length).toBeGreaterThanOrEqual(6);
   });
 
-  it("after selecting a file and the mutation resolving, the returned metadata is displayed", async () => {
-    const metadata = { title: "Test Track", artist: "Test Artist" };
-    mockMutateAsync.mockResolvedValue(metadata);
-
+  it("renders all metadata section headings", () => {
     render(<MetadataManagerPage />);
-    const input = document.querySelector('input[type="file"]');
-    if (!input) throw new Error("File input not found");
+    const sectionTitles = [
+      "Technical information",
+      "Unified metadata",
+      "By metadata format",
+      "Format priorities",
+      "Formats headers",
+      "Metadata raw",
+    ];
+    for (const title of sectionTitles) {
+      const headings = screen.getAllByRole("heading", { level: 2, name: title });
+      expect(headings.length).toBeGreaterThanOrEqual(1);
+    }
+  });
 
-    fireEvent.change(input, { target: { files: [new File([], "test.mp3", { type: "audio/mpeg" })] } });
+  it("calls showPopup with upload popup and selected file when user selects a file", () => {
+    render(<MetadataManagerPage />);
+    const [input] = screen.getAllByLabelText(/choose an audio file/i);
+    const file = new File([], "test.mp3", { type: "audio/mpeg" });
 
-    await waitFor(() => {
-      expect(screen.getByText(/"title":\s*"Test Track"/)).toBeInTheDocument();
-    });
-    expect(screen.getByText(/"artist":\s*"Test Artist"/)).toBeInTheDocument();
+    fireEvent.change(input, { target: { files: [file] } });
+
+    expect(showPopupMock).toHaveBeenCalledTimes(1);
+    const popupElement = showPopupMock.mock.calls[0][0];
+    expect(popupElement.props.files).toHaveLength(1);
+    expect(popupElement.props.files[0]).toBe(file);
   });
 });
