@@ -5,37 +5,44 @@ import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
 import Page from "@components/ui/Page";
 import { usePopup } from "@contexts/PopupContext";
 import { useGetFullMetadata } from "@hooks/useAudioMetadata";
+import { AudioMetadataDetailed } from "@schemas/domain/audio-metadata/detailed";
 
 export default function MetadataManagerPage() {
-  const [metadata, setMetadata] = useState<JSON | null>();
+  const [audioMetadata, setAudioMetadata] = useState<AudioMetadataDetailed>();
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const metadataMutation = useGetFullMetadata();
   const { showPopup, hidePopup } = usePopup();
 
+  const noMetadataPlaceholder = "No metadata";
+  const sectionBoxClass = "min-h-[200px] min-w-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 p-6";
+
   async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target?.files?.[0] ?? null;
+
+    async function onProcessFile(file: File, _genre: any) {
+      const audiometadata = await metadataMutation.mutateAsync(file);
+      setAudioMetadata(audiometadata);
+    }
 
     if (file) {
       setSelectedFileName(file.name);
       showPopup(
         <TrackUploadPopup
           files={[file]}
-          onProcessFile={(f, _genre) => metadataMutation.mutateAsync(f)}
+          onProcessFile={onProcessFile}
           onComplete={() => {}}
           onClose={() => {
             hidePopup();
           }}
         />,
       );
-      const response = await metadataMutation.mutateAsync(file);
-      setMetadata(response);
     }
   }
 
   return (
-    <Page title="Metadata Manager">
-      <div className="flex max-w-3xl flex-col gap-6">
+    <Page title="Metadata Manager" dataPage="metadata-manager">
+      <div className="flex flex-col gap-6">
         <div className="flex flex-wrap items-center gap-3">
           <input
             ref={fileInputRef}
@@ -59,16 +66,47 @@ export default function MetadataManagerPage() {
             {selectedFileName ?? "No file chosen"}
           </span>
         </div>
-        <div className="min-h-[200px] min-w-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 p-6">
-          {metadata != null ? (
-            <pre className="min-w-0 overflow-x-auto whitespace-pre-wrap break-all font-mono text-sm leading-relaxed text-gray-800">
-              {JSON.stringify(metadata, null, 2)}
-            </pre>
-          ) : (
-            <p className="flex min-h-[120px] items-center justify-center text-gray-500">
-              No metadata
-            </p>
-          )}
+        <div className="flex flex-col gap-3 md:grid md:grid-cols-2 lg:grid-cols-3">
+          <section className={sectionBoxClass}>
+            <header>
+              <h2>Technical information</h2>
+            </header>
+            {audioMetadata ? <pre>{JSON.stringify(audioMetadata.technicalInfo, null, 2)}</pre> : noMetadataPlaceholder}
+          </section>
+          <section className={sectionBoxClass}>
+            <header>
+              <h2>Unified metadata</h2>
+            </header>
+            {audioMetadata ? (
+              <pre>{JSON.stringify(audioMetadata.unifiedMetadata, null, 2)}</pre>
+            ) : (
+              noMetadataPlaceholder
+            )}
+          </section>
+          <section className={sectionBoxClass}>
+            <header>
+              <h2>By metadata format</h2>
+            </header>
+            <pre>{audioMetadata ? JSON.stringify(audioMetadata.metadataFormat, null, 2) : noMetadataPlaceholder}</pre>
+          </section>
+          <section className={sectionBoxClass}>
+            <header>
+              <h2>Format priorities</h2>
+            </header>
+            <pre>{audioMetadata ? JSON.stringify(audioMetadata.formatPriorities, null, 2) : noMetadataPlaceholder}</pre>
+          </section>
+          <section className={sectionBoxClass}>
+            <header>
+              <h2>Formats headers</h2>
+            </header>
+            {audioMetadata ? <pre>{JSON.stringify(audioMetadata.headers, null, 2)}</pre> : noMetadataPlaceholder}
+          </section>
+          <section className={sectionBoxClass}>
+            <header>
+              <h2>Metadata raw</h2>
+            </header>
+            {audioMetadata ? <pre>{JSON.stringify(audioMetadata.rawMetadata, null, 2)}</pre> : noMetadataPlaceholder}
+          </section>
         </div>
       </div>
     </Page>

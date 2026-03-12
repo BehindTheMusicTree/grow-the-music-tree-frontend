@@ -11,11 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [1.3.0 - 2025-03-08](#130---2025-03-08)
+- [1.2.3 - 2025-02-23](#123---2025-02-23)
+- [1.2.2 - 2025-02-21](#122---2025-02-21)
+- [1.2.1 - 2025-02-20](#121---2025-02-20)
 - [1.2.0 - 2025-02-20](#120---2025-02-20)
+- [1.1.0 - 2025-02-15](#110---2025-02-15)
+- [1.0.0 - 2025-02-12](#100---2025-02-12)
 - [0.2.0 - 2025-02-06](#020---2025-02-06)
-- [v0.1.2 - 2025-03-26](#v012---2025-03-26)
-- [v0.1.1 - 2024-09-29](#v011---2024-09-29)
-- [v0.1.0 - 2024-09-23](#v010---2024-09-23)
 
 ## Changelog Best Practices
 
@@ -73,9 +76,25 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Blocks invalid PRs to main and develop branches
 ```
 
-**Note:** During releases, maintainers will move entries from `[Unreleased]` to a versioned section (e.g., `## [0.2.0] - 2025-01-XX`).
+**Note:** During releases, maintainers run `npm version` on `main`; the postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md).
 
 ## [Unreleased]
+
+## [1.4.0] - 2025-03-12
+
+### Improved
+
+- **Metadata Manager**: Reorganized and expanded metadata display into six sections (Technical information, Unified metadata, By metadata format, Format priorities, Formats headers, Metadata raw) with responsive grid layout (1 col → 2 on md → 3 on lg). Uses `AudioMetadataDetailed` and Zod validation via `AudioMetadataDetailedSchema` and `AlbumDetailedSchema`; `useGetFullMetadata` integrated with validated response. Includes updated unit tests for metadata display and "No metadata" placeholder.
+
+### Changed
+
+- **Popups**: Refactored all popup components to function components. `BasePopup` is now a function component instead of a class; all 14 child popups (TrackUploadPopup, FormPopup, AuthPopup, ImagePopup, GenreCreationPopup, InternalErrorPopup, AuthErrorPopup, GenreRenamePopup, NetworkErrorPopup, SpotifyAuthErrorPopup, GenreDeletionPopup, InvalidInputPopup, SpotifyAllowlistPopup, UploadedTrackEditionPopup) compose it via `<BasePopup {...props} />` with `useState`/`useCallback` where they had local state or handlers. No change to public props or behavior.
+
+- **Page component**: Use semantic HTML per `docs/SEMANTIC_HTML.md`: outer wrapper is `<div>` (layout already has one `<main>` in AppContent; avoid nested main). Title block is `<header>` with `<h1>`, content in a sibling div. Required `dataPage` prop sets `data-page` on the wrapper for E2E/analytics; all page routes pass `dataPage`.
+
+### Documentation
+
+- **Versioning**: Documented `npm version` as the standard way to bump versions in `docs/VERSIONING.md` (patch/minor/major and exact version with `--no-git-tag-version`). Aligns with CONTRIBUTING and avoids extra tooling.
 
 ## [1.3.0] - 2025-03-08
 

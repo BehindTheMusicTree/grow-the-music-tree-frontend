@@ -42,7 +42,7 @@ export default function AboutPage() {
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
 
   return (
-    <Page title="About">
+    <Page title="About" dataPage="about">
       <div className="flex flex-col gap-6 max-w-2xl mx-auto py-8 w-full">
         <p className="text-center text-base text-gray-600">
           <Link href="/" className="font-medium text-gray-900 hover:text-gray-600 transition-colors">

@@ -256,57 +256,58 @@ function TrackUploadContent({
   );
 }
 
-type TrackUploadPopupState = {
-  successfulCount: number;
-  totalCount: number;
-  isComplete: boolean;
-  isUploading: boolean;
-};
+export default function TrackUploadPopup({
+  files,
+  genre,
+  onProcessFile,
+  onComplete,
+  onClose,
+  ...rest
+}: TrackUploadPopupProps) {
+  const [successfulCount, setSuccessfulCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isComplete, setIsComplete] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
-// Class component wrapper that extends BasePopup
-// @ts-expect-error: omitted props are set internally by the popup
-export default class TrackUploadPopup extends BasePopup<TrackUploadPopupProps, TrackUploadPopupState> {
-  state: TrackUploadPopupState = { successfulCount: 0, totalCount: 0, isComplete: false, isUploading: false };
+  const handleProgress = useCallback((successCount: number, total: number, uploading?: boolean) => {
+    const uploadingVal = uploading ?? false;
+    setSuccessfulCount(successCount);
+    setTotalCount(total);
+    setIsUploading(uploadingVal);
+    setIsComplete((prev) => (uploadingVal ? false : prev));
+  }, []);
 
-  handleProgress = (successfulCount: number, totalCount: number, isUploading?: boolean) => {
-    const uploading = isUploading ?? false;
-    this.setState((prev) => ({
-      successfulCount,
-      totalCount,
-      isUploading: uploading,
-      isComplete: uploading ? false : prev.isComplete,
-    }));
-  };
+  const handleComplete = useCallback(
+    (uploadedTracks: unknown[]) => {
+      setIsComplete(true);
+      setIsUploading(false);
+      onComplete?.(uploadedTracks);
+    },
+    [onComplete],
+  );
 
-  handleComplete = (uploadedTracks: unknown[]) => {
-    const { onComplete } = this.props;
-    this.setState({ isComplete: true, isUploading: false });
-    onComplete?.(uploadedTracks);
-  };
+  const displayTotal = totalCount > 0 ? totalCount : files.length;
 
-  render() {
-    const { files, genre, onProcessFile, onComplete: _onComplete, onClose, ...rest } = this.props;
-    const { successfulCount, totalCount, isComplete, isUploading } = this.state;
-    const displayTotal = totalCount > 0 ? totalCount : files.length;
-
-    return this.renderBase({
-      ...rest,
-      title: `Upload Tracks (${successfulCount}/${displayTotal})`,
-      isDismissable: true,
-      showOkButton: true,
-      okButtonText: "OK",
-      okButtonDisabled: isUploading || !isComplete,
-      onOk: onClose,
-      children: (
+  return (
+    <BasePopup
+      {...rest}
+      onClose={onClose}
+      title={`Upload Tracks (${successfulCount}/${displayTotal})`}
+      isDismissable
+      showOkButton
+      okButtonText="OK"
+      okButtonDisabled={isUploading || !isComplete}
+      onOk={onClose}
+      children={
         <TrackUploadContent
           files={files}
           genre={genre}
           onProcessFile={onProcessFile}
-          onComplete={this.handleComplete}
+          onComplete={handleComplete}
           onClose={onClose}
-          onProgress={this.handleProgress}
+          onProgress={handleProgress}
         />
-      ),
-    });
-  }
+      }
+    />
+  );
 }

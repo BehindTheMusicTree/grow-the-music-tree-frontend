@@ -52,7 +52,7 @@ The maintainer(s) are responsible for:
 - Maintaining the project's infrastructure
 - Creating and managing hotfix branches for urgent production fixes
 - Creating and managing release branches for preparing releases
-- Moving "Unreleased" changelog entries to versioned sections during releases
+- Running releases on `main` via `npm version` (postversion updates CHANGELOG and deletes pre-release tags for that version)
 - Managing repository automation (stale issues/PRs, auto-labeling, auto-assignment, etc.)
 
 **Important:** Even maintainers must go through Pull Requests. No direct commits to `main` or `develop` are allowed - all changes, including those from maintainers, must be submitted via Pull Requests and go through the standard review process.
@@ -119,7 +119,7 @@ We follow a **strict Git Flow** model:
 Clone the main repository directly:
 
 ```bash
-git clone https://github.com//BehindTheMusicTree/grow-the-music-tree.git
+git clone https://github.com/BehindTheMusicTree/grow-the-music-tree-frontend.git
 cd grow-the-music-tree
 ```
 
@@ -631,11 +631,11 @@ When you open a Pull Request, several automations may run automatically (if conf
 
 ### 7. Releasing _(For Maintainers)_
 
-Releases are created from the `main` branch using **strict Git Flow**.
+Releases are created from the `main` branch using **strict Git Flow**. Release tags are created **on main** (on the merge commit), not on the release branch. Version bump, changelog update, and pre-release tag cleanup are done with `npm version` and its postversion script. See [docs/VERSIONING.md](docs/VERSIONING.md) for details.
 
-Quick release process:
+**Quick release process:**
 
-1. **Ensure `develop` is ready for release** - All features for the release should be merged into `develop`
+1. **Ensure `develop` is ready for release** – All features for the release should be merged into `develop`.
 
    ```bash
    git checkout develop
@@ -649,22 +649,10 @@ Quick release process:
    git push origin release/v0.2.0
    ```
 
-3. **On the release branch, prepare the release:**
-   - Review and finalize `CHANGELOG.md`:
-     - Review changes in the `[Unreleased]` section
-     - Move content from `[Unreleased]` section to new version entry with date (e.g., `## [v0.2.0] - 2025-12-15`)
-     - Review and consolidate entries if needed
-     - Leave the `[Unreleased]` section empty (or with a placeholder) for future PRs
-
-   - Update version in `package.json`:
-
-     ```bash
-     npm version 0.2.0 --no-git-tag-version
-     ```
-
-   - Make any final bug fixes or adjustments on the release branch
-   - Ensure build completes: `npm run build`
-   - Ensure no linting errors: `npm run lint`
+3. **On the release branch, prepare the release**
+   - Review and finalize the `[Unreleased]` section in `CHANGELOG.md` (entries will be moved to the new version by postversion when you run `npm version` on main).
+   - Make any final bug fixes or adjustments.
+   - Ensure build and lint pass: `npm run build` and `npm run lint`.
 
 4. **Merge release branch into `main`**
 
@@ -675,31 +663,22 @@ Quick release process:
    git push origin main
    ```
 
-5. **Tag the release on `main`**
+5. **On `main`: bump version (creates tag, updates CHANGELOG, deletes pre-release tags for this version)**
 
    ```bash
-   git tag v0.2.0
+   npm version minor   # or patch / major
+   git push origin main
    git push origin v0.2.0
    ```
 
-   **Important:** The tag version must match the version in `CHANGELOG.md` and `package.json` (with the `v` prefix).
+   `npm version` updates `package.json`, creates a commit and the release tag. The **postversion** script then:
+   - Moves `[Unreleased]` content into `## [X.Y.Z] - YYYY-MM-DD` in `CHANGELOG.md` and amends the version commit.
+   - Recreates the tag on the amended commit.
+   - Deletes local and remote test and dev tags for that version (e.g. `v0.2.0-test`, `v0.2.0-dev-*`). Rc/beta/alpha tags are not deleted automatically. See `scripts/delete-test-dev-tags.mjs`.
 
-6. **Clean up pre-release tags**
+   The publish workflow runs on tag push and enforces that release tags (e.g. `v0.2.0`) point to a commit on `main`.
 
-   Delete all pre-release tags (dev, rc, beta, alpha) that were used for testing this release:
-
-   ```bash
-   # List all pre-release tags for this version
-   git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*"
-
-   # Delete all pre-release tags locally and remotely
-   git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*" | xargs -n 1 git tag -d
-   git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*" | xargs -n 1 git push origin --delete
-   ```
-
-   **Note:** Pre-release tags (dev, rc, beta, alpha) are temporary and should be cleaned up after the release is published to keep the repository clean.
-
-7. **Merge release branch back into `develop`** (to keep develop up to date)
+6. **Merge release branch back into `develop`**
 
    ```bash
    git checkout develop
@@ -708,60 +687,34 @@ Quick release process:
    git push origin develop
    ```
 
-8. **Delete the release branch** (locally and remotely)
+7. **Delete the release branch** (locally and remotely)
 
    ```bash
    git branch -d release/v0.2.0
    git push origin --delete release/v0.2.0
    ```
 
-9. **CI/CD will automatically:**
+**Hotfix release process**
 
-   When you push the version tag (step 5), the `deploy.yml` workflow will automatically:
-   - Build the application
-   - Build and push Docker image
-   - Deploy to the test server
-
-**Hotfix Release Process:**
-
-For urgent production fixes:
-
-1. Create hotfix branch from `main`:
+1. Create hotfix branch from `main`, make the fix, and add an entry to `CHANGELOG.md` under `[Unreleased]`.
+2. Merge hotfix into `main`:
 
    ```bash
    git checkout main
    git pull origin main
-   git checkout -b hotfix/critical-player-crash
-   ```
-
-2. Make the fix and update `CHANGELOG.md` in the `[Unreleased]` section
-
-3. Update version in `package.json`:
-
-   ```bash
-   npm version patch --no-git-tag-version
-   ```
-
-4. Merge hotfix into `main`:
-
-   ```bash
-   git checkout main
    git merge --no-ff hotfix/critical-player-crash
-   git tag v0.1.3  # Increment patch version
-   git push origin main --tags
+   git push origin main
    ```
 
-   **Important:** The tag version must match the version in `CHANGELOG.md` and `package.json` (with the `v` prefix).
-
-5. Merge hotfix into `develop`:
+3. On `main`, bump version and push:
 
    ```bash
-   git checkout develop
-   git merge --no-ff hotfix/critical-player-crash
-   git push origin develop
+   npm version patch
+   git push origin main
+   git push origin v0.1.3
    ```
 
-6. Delete the hotfix branch
+4. Merge hotfix into `develop`, then delete the hotfix branch.
 
 ## 🏷️ Issue & PR Labels
 

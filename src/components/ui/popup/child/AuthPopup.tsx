@@ -5,7 +5,6 @@ import { BasePopup, BasePopupProps } from "../BasePopup";
 import { Button } from "@components/ui/Button";
 import { FaSpotify } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import React from "react";
 
 type AuthPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   handleSpotifyOAuth: (redirectAfterAuthPath?: string) => void;
@@ -15,19 +14,24 @@ type AuthPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDi
   message?: string;
 };
 
-// @ts-expect-error: ommitted props are set internally by the popup
-export default class AuthPopup extends BasePopup<AuthPopupProps> {
-  render() {
-    const { handleSpotifyOAuth, handleGoogleOAuth, redirectAfterAuthPath, spotifyOnly, message, ...rest } =
-      this.props;
-    const showGoogle = !spotifyOnly && handleGoogleOAuth;
-    return this.renderBase({
-      ...rest,
-      title: spotifyOnly ? "Connect with Spotify" : "Sign in",
-      isDismissable: false,
-      icon: User,
-      type: "auth",
-      children: (
+export default function AuthPopup({
+  handleSpotifyOAuth,
+  handleGoogleOAuth,
+  redirectAfterAuthPath,
+  spotifyOnly,
+  message,
+  ...rest
+}: AuthPopupProps) {
+  const showGoogle = !spotifyOnly && handleGoogleOAuth;
+
+  return (
+    <BasePopup
+      {...rest}
+      title={spotifyOnly ? "Connect with Spotify" : "Sign in"}
+      isDismissable={false}
+      icon={User}
+      type="auth"
+      children={
         <div className="flex flex-col items-center space-y-7">
           <div className="px-2 text-center">
             {message && (
@@ -69,7 +73,7 @@ export default class AuthPopup extends BasePopup<AuthPopupProps> {
             )}
           </div>
         </div>
-      ),
-    });
-  }
+      }
+    />
+  );
 }

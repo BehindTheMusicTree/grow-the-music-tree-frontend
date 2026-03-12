@@ -99,7 +99,7 @@ export default function SpotifyLibraryPage() {
 
   if (isListingPending) {
     return (
-      <Page title="Your Spotify Library">
+      <Page title="Your Spotify Library" dataPage="me-spotify-library">
         <div className="flex flex-col items-center justify-center flex-1">
           <FaSpinner className="text-[#1DB954] text-4xl animate-spin" />
           <p className="text-[#1DB954] mt-4">Loading Spotify library...</p>
@@ -109,7 +109,7 @@ export default function SpotifyLibraryPage() {
   }
 
   return (
-    <Page title="Your Spotify Library">
+    <Page title="Your Spotify Library" dataPage="me-spotify-library">
       <div className="flex min-h-0 flex-1 flex-col w-full">
       <div className="flex-none p-4">
         <div className="flex justify-between items-center mb-4">

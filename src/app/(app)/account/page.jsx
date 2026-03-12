@@ -21,7 +21,7 @@ export default function AccountPage() {
 
   if (isLoading) {
     return (
-      <Page title="Account">
+      <Page title="Account" dataPage="account">
         <div className="p-8">
           <div className="flex h-64 items-center justify-center">
             <p>Loading...</p>
@@ -32,7 +32,7 @@ export default function AccountPage() {
   }
 
   return (
-    <Page title="Account">
+    <Page title="Account" dataPage="account">
       <div className="p-8">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <section className="overflow-hidden rounded-lg bg-white shadow-md">

@@ -1,3 +1,18 @@
+/**
+ * React Query mutation hook with Zod validation for input and output, and form error handling.
+ *
+ * - Validates `variables` with `inputSchema` before calling `mutationFn`; on failure sets
+ *   `formErrors` and throws so the mutation is not sent.
+ * - Validates the API response with `outputSchema`; on failure sets `formErrors` and throws.
+ * - If the API returns an error with a `.json` body shaped like
+ *   `{ details: { fieldErrors: Record<string, { message: string }[]> } }`, those are mapped
+ *   into `formErrors` for display.
+ *
+ * Use when you need client-side validation of form input, response validation, and/or
+ * display of server-side field errors (e.g. form submissions).
+ *
+ * @returns The same object as `useMutation` plus `formErrors: { field: string; message: string }[]`.
+ */
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { useState } from "react";
 import { z } from "zod";
@@ -16,6 +31,19 @@ type ValidatedMutationOptions<TData, TError, TVariables, TContext> = Omit<
   mutationFn: (data: TVariables) => Promise<unknown>;
 };
 
+/**
+ * Mutation hook with Zod validation and form error handling. See file-level JSDoc above.
+ *
+ * @template TData - Type of the mutation result (validated by outputSchema).
+ * @template TError - Type of the mutation error (default: Error).
+ * @template TVariables - Type of the variables passed to mutate() (validated by inputSchema).
+ * @template TContext - Type of the context passed to useMutation (e.g. in onMutate).
+ * @param options - Options for the validated mutation (and any useMutation options).
+ * @param options.inputSchema - Zod schema to validate variables before calling mutationFn.
+ * @param options.outputSchema - Zod schema to validate the API response.
+ * @param options.mutationFn - Async function that performs the request; receives validated variables.
+ * @returns useMutation result plus formErrors: { field: string; message: string }[].
+ */
 export function useValidatedMutation<TData, TError = Error, TVariables = unknown, TContext = unknown>({
   inputSchema,
   outputSchema,

@@ -8,16 +8,14 @@ type InternalErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon
   errorCode: ErrorCode;
 };
 
-// @ts-expect-error: ommitted props are set internally by the popup
-export default class InternalErrorPopup extends BasePopup<InternalErrorPopupProps> {
-  render() {
-    const { errorCode, ...rest } = this.props;
-    return this.renderBase({
-      ...rest,
-      title: "Internal Error",
-      isDismissable: false,
-      icon: AlertTriangle,
-      children: (
+export default function InternalErrorPopup({ errorCode, ...rest }: InternalErrorPopupProps) {
+  return (
+    <BasePopup
+      {...rest}
+      title="Internal Error"
+      isDismissable={false}
+      icon={AlertTriangle}
+      children={
         <div className="flex flex-col items-center space-y-6 py-4">
           <AlertCircle className="h-16 w-16 text-red-500" strokeWidth={1.5} />
           <div>
@@ -34,7 +32,7 @@ export default class InternalErrorPopup extends BasePopup<InternalErrorPopupProp
             </div>
           )}
         </div>
-      ),
-    });
-  }
+      }
+    />
+  );
 }
