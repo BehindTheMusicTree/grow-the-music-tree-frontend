@@ -11,11 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [1.3.0 - 2025-03-08](#130---2025-03-08)
+- [1.2.3 - 2025-02-23](#123---2025-02-23)
+- [1.2.2 - 2025-02-21](#122---2025-02-21)
+- [1.2.1 - 2025-02-20](#121---2025-02-20)
 - [1.2.0 - 2025-02-20](#120---2025-02-20)
+- [1.1.0 - 2025-02-15](#110---2025-02-15)
+- [1.0.0 - 2025-02-12](#100---2025-02-12)
 - [0.2.0 - 2025-02-06](#020---2025-02-06)
-- [v0.1.2 - 2025-03-26](#v012---2025-03-26)
-- [v0.1.1 - 2024-09-29](#v011---2024-09-29)
-- [v0.1.0 - 2024-09-23](#v010---2024-09-23)
 
 ## Changelog Best Practices
 
@@ -73,7 +76,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Blocks invalid PRs to main and develop branches
 ```
 
-**Note:** During releases, maintainers will move entries from `[Unreleased]` to a versioned section (e.g., `## [0.2.0] - 2025-01-XX`).
+**Note:** During releases, maintainers run `npm version` on `main`; the postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md).
 
 ## [Unreleased]
 

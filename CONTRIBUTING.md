@@ -674,7 +674,7 @@ Releases are created from the `main` branch using **strict Git Flow**. Release t
    `npm version` updates `package.json`, creates a commit and the release tag. The **postversion** script then:
    - Moves `[Unreleased]` content into `## [X.Y.Z] - YYYY-MM-DD` in `CHANGELOG.md` and amends the version commit.
    - Recreates the tag on the amended commit.
-   - Deletes local and remote pre-release/dev tags for that version (e.g. `v0.2.0-dev-*`, `v0.2.0-rc*`) via `scripts/delete-prerelease-tags.mjs`.
+   - Deletes local and remote test and dev tags for that version (e.g. `v0.2.0-test`, `v0.2.0-dev-*`). Rc/beta/alpha tags are not deleted automatically. See `scripts/delete-test-dev-tags.mjs`.
 
    The publish workflow runs on tag push and enforces that release tags (e.g. `v0.2.0`) point to a commit on `main`.
 

@@ -127,7 +127,7 @@ When you push a release candidate version tag (e.g., `v0.2.0-rc1`), the workflow
 
 ### Cleanup
 
-All pre-release version tags (dev, rc, beta, alpha) should be deleted during the release process to keep the repository clean. See [Creating a Release](#creating-a-release) for cleanup steps.
+Test and dev tags for the released version (e.g. `v1.4.0-test`, `v1.4.0-dev-*`) are deleted automatically by postversion. Rc/beta/alpha tags are not deleted automatically; delete them manually if desired.
 
 ## How Versioning Works
 
@@ -162,7 +162,7 @@ npm version major   # 0.1.0 → 1.0.0
 npm version 1.3.0 --no-git-tag-version   # set exact version (no commit/tag)
 ```
 
-Use `--no-git-tag-version` when you only want to change `package.json` (e.g. before creating the tag manually). Otherwise `npm version` commits and tags. The `postversion` script automatically: moves `[Unreleased]` into a new `## [X.Y.Z] - YYYY-MM-DD` section and amends the version commit; then deletes local and remote pre-release/dev tags for that version (e.g. `v1.4.0-dev-*`, `v1.4.0-rc*`). Push the tag when ready: `git push origin v<version>`.
+Use `--no-git-tag-version` when you only want to change `package.json` (e.g. before creating the tag manually). Otherwise `npm version` commits and tags. The `postversion` script automatically: moves `[Unreleased]` into a new `## [X.Y.Z] - YYYY-MM-DD` section and amends the version commit; then deletes local and remote test and dev tags for that version (e.g. `v1.4.0-test`, `v1.4.0-dev-*`). Rc/beta/alpha tags are not deleted automatically. Push the tag when ready: `git push origin v<version>`.
 
 ### Creating a Release
 
@@ -183,7 +183,7 @@ git push origin v0.2.0
 # Or if tagging manually: create tag then clean up pre-release tags for this version
 # git tag v0.2.0
 # git push origin v0.2.0
-# node scripts/delete-prerelease-tags.mjs
+# node scripts/delete-test-dev-tags.mjs
 ```
 
 ### Development Version Tag Testing
