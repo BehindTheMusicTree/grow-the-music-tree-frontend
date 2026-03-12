@@ -162,7 +162,7 @@ npm version major   # 0.1.0 → 1.0.0
 npm version 1.3.0 --no-git-tag-version   # set exact version (no commit/tag)
 ```
 
-Use `--no-git-tag-version` when you only want to change `package.json` (e.g. before creating the tag manually). Otherwise `npm version` commits and tags. Push the tag when ready: `git push origin v<version>`. You still need to update `CHANGELOG.md` (move `[Unreleased]` to a versioned section with date) as in CONTRIBUTING.
+Use `--no-git-tag-version` when you only want to change `package.json` (e.g. before creating the tag manually). Otherwise `npm version` commits and tags. The `postversion` script automatically moves `[Unreleased]` content into a new `## [X.Y.Z] - YYYY-MM-DD` section below it and amends the version commit. Push the tag when ready: `git push origin v<version>`.
 
 ### Creating a Release
 
