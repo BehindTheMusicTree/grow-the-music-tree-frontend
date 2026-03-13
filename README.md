@@ -131,6 +131,8 @@ NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-c
 
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback
+
+NEXT_PUBLIC_AUDIOMETA_URL=https://audiometa.themusictree.org
 ```
 
 In the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) → your app → **Settings** → **Redirect URIs**, add the **full** callback URL(s), e.g. `http://localhost:3000/auth/spotify/callback` for local dev and your production URL for deploy. The app builds the redirect URI from your origin when you use a path like `/auth/spotify/callback`.
@@ -140,6 +142,7 @@ For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/)
 **Notes:**
 
 - Only variables prefixed with `NEXT_PUBLIC_` are available in the browser
+- **`NEXT_PUBLIC_AUDIOMETA_URL`** (required): URL of the external Audio Metadata app. Sidebar link "Audio Metadata" opens this URL in a new tab. Build fails if unset. In CI/deploy this is built from GitHub vars `AUDIOMETA_SUBDOMAIN_NAME` and `DOMAIN_NAME` as `https://<AUDIOMETA_SUBDOMAIN_NAME>.<DOMAIN_NAME>`.
 - Changing env values requires a new build (restart `npm run dev` after env changes)
 - Do not commit `.env.local`
 - **Preset configs**: Put `.env.development.api-local` and `.env.development.api-remote` in `env/development/available/` (see `env/development/example/.env.development.api-*.example`). Then run `./scripts/setup-env-dev.sh local` or `./scripts/setup-env-dev.sh remote` to copy one to `.env.development.local`; Next.js only loads env files from the project root. Contents of `env/development/available/` are gitignored.
@@ -162,17 +165,17 @@ npm install --legacy-peer-deps
 
 ## Scripts
 
-| Command                 | Description                                          |
-| ----------------------- | ---------------------------------------------------- |
-| `npm run dev`           | Start local development server                       |
-| `npm run build`         | Build for production                                 |
-| `npm run start`         | Start production server (Node)                       |
-| `npm run lint`          | Run ESLint                                           |
-| `npm run verify-env`    | Verify environment configuration                     |
-| `npm run test`          | Run unit tests                                       |
-| `npm run test:watch`    | Run tests in watch mode                              |
-| `npm run test:ui`       | Run tests with UI                                    |
-| `npm run test:coverage` | Run tests with coverage                              |
+| Command                 | Description                      |
+| ----------------------- | -------------------------------- |
+| `npm run dev`           | Start local development server   |
+| `npm run build`         | Build for production             |
+| `npm run start`         | Start production server (Node)   |
+| `npm run lint`          | Run ESLint                       |
+| `npm run verify-env`    | Verify environment configuration |
+| `npm run test`          | Run unit tests                   |
+| `npm run test:watch`    | Run tests in watch mode          |
+| `npm run test:ui`       | Run tests with UI                |
+| `npm run test:coverage` | Run tests with coverage          |
 
 ## Docker
 

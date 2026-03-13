@@ -122,6 +122,7 @@ jobs:
             VAR_SPOTIFY_REDIRECT_RELATIVE_URI "${{ env.SPOTIFY_REDIRECT_RELATIVE_URI }}" \
             VAR_SPOTIFY_SCOPES "${{ env.SPOTIFY_SCOPES }}" \
             VAR_GOOGLE_REDIRECT_RELATIVE_URI "${{ env.GOOGLE_REDIRECT_RELATIVE_URI }}" \
+            VAR_AUDIOMETA_SUBDOMAIN_NAME "${{ vars.AUDIOMETA_SUBDOMAIN_NAME }}" \
             SECRET_GOOGLE_CLIENT_ID_TEST "${{ vars.GOOGLE_CLIENT_ID_TEST }}" \
             SECRET_GOOGLE_CLIENT_ID_PROD "${{ vars.GOOGLE_CLIENT_ID_PROD }}" \
             SECRET_SERVER_DEPLOY_USERNAME "${{ env.SERVER_DEPLOY_USERNAME }}" \
@@ -156,6 +157,7 @@ jobs:
           NEXT_PUBLIC_GOOGLE_REDIRECT_URI: https://ci.example.com/auth/google/callback
           NEXT_PUBLIC_SENTRY_IS_ACTIVE: false
           NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS: "300000"
+          NEXT_PUBLIC_AUDIOMETA_URL: https://audiometa.themusictree.org
         run: npm run build
 
   deploy-env-and-docker-compose:

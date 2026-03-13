@@ -135,7 +135,7 @@ Use Tailwind (or other utilities) on these elements as needed; they are layout a
 ```tsx
 <nav className="flex flex-col gap-2" aria-label="Main">
   <Link href="/">Home</Link>
-  <Link href="/metadata-manager">Metadata Manager</Link>
+  <Link href="/reference-genre-tree">Reference Genre Tree</Link>
   ...
 </nav>
 
