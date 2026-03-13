@@ -56,11 +56,11 @@ screen.getByRole('button', { name: /submit/i });
 screen.getByLabelText('Email');
 
 // Fallback: when no semantic hook is available
-<div data-testid="metadata-manager-form">...</div>
-// In test: screen.getByTestId('metadata-manager-form')
+<div data-testid="genre-tree-form">...</div>
+// In test: screen.getByTestId('genre-tree-form')
 ```
 
-**Naming:** Use kebab-case, and a name that reflects the **purpose or scope** (e.g. `metadata-manager-form`, `track-list`, `genre-tree-node`), not implementation details.
+**Naming:** Use kebab-case, and a name that reflects the **purpose or scope** (e.g. `genre-tree-form`, `track-list`, `genre-tree-node`), not implementation details.
 
 ---
 
@@ -126,7 +126,7 @@ Avoid storing **large or sensitive payloads** in attributes; use small identifie
 | Convention    | Example              | Notes                                      |
 |---------------|----------------------|--------------------------------------------|
 | **Kebab-case**| `data-testid="user-card"` | Matches HTML/JS convention; `dataset` yields camelCase in JS |
-| **Stable names** | `data-page="metadata-manager"` | Tie to route/feature, not UI copy          |
+| **Stable names** | `data-page="reference-genre-tree"` | Tie to route/feature, not UI copy          |
 | **Scoped**    | `data-testid="genre-tree-node-123"` | Optional suffix for lists (e.g. id) when needed |
 | **Purpose, not implementation** | `data-testid="track-list"` not `data-testid="div-with-flex"` | Keeps tests meaningful if markup changes |
 

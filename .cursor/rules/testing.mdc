@@ -31,9 +31,9 @@ Follow **docs/testing.md** for overall strategy and **docs/DATA_ATTRIBUTES.md** 
 - **Data attributes in tests**
   - `data-testid`:
     - Use sparingly as a stable hook when no accessible role/label/text fits.
-    - Names should be kebab‑case and describe purpose (e.g. `metadata-manager-form`, `track-list`), not presentation.
+    - Names should be kebab‑case and describe purpose (e.g. `genre-tree-form`, `track-list`), not presentation.
   - `data-page`:
-    - Use on page/section roots for E2E and “am I on this page?” checks (e.g. `data-page="metadata-manager"`).
+    - Use on page/section roots for E2E and “am I on this page?” checks (e.g. `data-page="reference-genre-tree"`).
   - See **docs/DATA_ATTRIBUTES.md** for detailed conventions and examples.
 
 ## Where tests live

@@ -1,1 +1,0 @@
-export { audioMetadataEndpoints } from "./endpoints";

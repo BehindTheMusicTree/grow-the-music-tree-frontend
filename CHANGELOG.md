@@ -80,6 +80,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Removed
+
+- **Metadata Manager page and related code**: Removed `/metadata-manager` page, `useGetFullMetadata` hook (`useAudioMetadata.ts`), `AudioMetadataDetailed` schema, and `audio-metadata` API domain. This functionality has been moved to the audiometa-frontend repository.
+
 ## [1.4.0] - 2025-03-12
 
 ### Improved

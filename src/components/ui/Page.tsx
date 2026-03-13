@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 interface PageProps {
   title: string;
   children: ReactNode;
-  /** Route or feature id for E2E/analytics (e.g. "metadata-manager"). See docs/DATA_ATTRIBUTES.md. */
+  /** Route or feature id for E2E/analytics (e.g. "reference-genre-tree"). See docs/DATA_ATTRIBUTES.md. */
   dataPage: string;
 }
 
