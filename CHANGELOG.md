@@ -80,6 +80,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### CI
+
+- **Validate workflow**: Trigger only on `pull_request` to `develop` and `main`; removed `push` trigger so validation runs on PRs instead of every push.
+
 ### Removed
 
 - **Metadata Manager page and related code**: Removed `/metadata-manager` page, `useGetFullMetadata` hook (`useAudioMetadata.ts`), `AudioMetadataDetailed` schema, and `audio-metadata` API domain. This functionality has been moved to the audiometa-frontend repository.
