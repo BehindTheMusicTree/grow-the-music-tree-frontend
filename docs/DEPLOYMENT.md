@@ -68,7 +68,7 @@ Use the workflow [`.github/workflows/sync-vercel-env.yml`](../.github/workflows/
 - **VERCEL_TOKEN**: Go to [vercel.com/account/tokens](https://vercel.com/account/tokens), click **Create Token**, give it a name (e.g. “GitHub Actions env sync”), and optionally limit it to the project. Copy the token once (it is shown only once) and store it as a GitHub secret.
 - **VERCEL_PROJECT_ID**: Open your project on Vercel → **Settings** → **General**. The **Project ID** is in the “Project ID” or “Project Name” field (you can use either the id or the project name). For a team project, use the project name/slug as shown in the project URL.
 
-**GitHub Environments:** Create two environments, **production** and **staging**, in **Settings → Environments**. Each sync job runs in one of these environments so per-environment variables (e.g. `APP_URL`) can differ. `NEXT_PUBLIC_BACKEND_BASE_URL` is built from repo vars: production = `https://<HTMT_API_SUBDOMAIN_NAME>.<DOMAIN_NAME>/`, preview = `https://<HTMT_API_SUBDOMAIN_NAME>-test.<DOMAIN_NAME>/`.
+**GitHub Environments:** Create two environments, **production** and **staging**, in **Settings → Environments**. Each sync job runs in one of these environments. All URLs are built from repo vars: no per-environment variables required.
 
 **Repo variables** (Settings → Secrets and variables → Actions → Variables):
 
@@ -79,19 +79,14 @@ Use the workflow [`.github/workflows/sync-vercel-env.yml`](../.github/workflows/
 | `SPOTIFY_SCOPES`             | `NEXT_PUBLIC_SPOTIFY_SCOPES` |
 | `GOOGLE_REDIRECT_RELATIVE_URI` | Path segment for `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` (e.g. `auth/google/callback`) |
 | `TRACK_UPLOAD_TIMEOUT_MS`    | `NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS` |
-| `DOMAIN_NAME`                | Builds `NEXT_PUBLIC_BACKEND_BASE_URL` and `NEXT_PUBLIC_AUDIOMETA_URL` with subdomain vars |
+| `DOMAIN_NAME`                | Base domain for all built URLs |
 | `HTMT_API_SUBDOMAIN_NAME`    | Builds `NEXT_PUBLIC_BACKEND_BASE_URL`: prod = `https://<this>.<DOMAIN_NAME>/`, preview = `https://<this>-test.<DOMAIN_NAME>/` |
+| `GTMT_FRONT_SUBDOMAIN_NAME`  | Builds app URL for redirect URIs: prod = `https://<this>.<DOMAIN_NAME>`, preview = `https://staging.<this>.<DOMAIN_NAME>` |
 | `AUDIOMETA_SUBDOMAIN_NAME`   | Builds `NEXT_PUBLIC_AUDIOMETA_URL` as `https://<this>.<DOMAIN_NAME>` |
 | `SPOTIFY_CLIENT_ID_PROD`     | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on production |
 | `SPOTIFY_CLIENT_ID_TEST`     | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on preview/staging |
 | `GOOGLE_CLIENT_ID_PROD`      | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on production |
 | `GOOGLE_CLIENT_ID_TEST`      | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on preview/staging |
-
-**Environment variables** (Settings → Environments → **production** / **staging** → Environment variables):
-
-| Variable   | Production env | Staging env |
-| ---------- | -------------- | ----------- |
-| `APP_URL`  | Production app URL (e.g. `https://app.themusictree.org`) | Staging app URL (e.g. `https://staging.grow.themusictree.org`) |
 
 **How the sync works:** The workflow has two jobs. Each job runs in a **GitHub Environment** (production or staging), so it sees that environment’s variables. It syncs only to the matching Vercel target.
 
@@ -100,7 +95,7 @@ Use the workflow [`.github/workflows/sync-vercel-env.yml`](../.github/workflows/
 | Repo variables + production env vars | Vercel **production** (`NEXT_PUBLIC_*` set for production) |
 | Repo variables + staging env vars    | Vercel **preview** (staging and PR previews) |
 
-The workflow also sets `NEXT_PUBLIC_SENTRY_IS_ACTIVE` to `true`, sets `NEXT_PUBLIC_SPOTIFY_AUTH_URL` to `https://accounts.spotify.com/authorize`, and builds `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` / `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` from `APP_URL` + relative path.
+The workflow also sets `NEXT_PUBLIC_SENTRY_IS_ACTIVE` to `true`, sets `NEXT_PUBLIC_SPOTIFY_AUTH_URL` to `https://accounts.spotify.com/authorize`, and builds `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` / `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` from the app URL (prod = `https://<GTMT_FRONT_SUBDOMAIN_NAME>.<DOMAIN_NAME>`, preview = `https://staging.<GTMT_FRONT_SUBDOMAIN_NAME>.<DOMAIN_NAME>`) + relative path.
 
 After the sync runs, trigger a redeploy in Vercel if you want the new values on the next build.
 
