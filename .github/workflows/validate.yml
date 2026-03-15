@@ -1,3 +1,4 @@
+# Vercel deploys: develop → staging, main → production (see docs/DEPLOYMENT.md).
 name: Validate
 
 on:

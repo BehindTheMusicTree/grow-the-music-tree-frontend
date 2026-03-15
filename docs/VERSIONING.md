@@ -34,7 +34,7 @@ Versions follow semantic versioning with a `v` prefix:
 
 ## Pre-Release Versions
 
-Pre-release version tags are used to test builds and deployments on the test server before final release. They follow semantic versioning conventions and are supported by the workflow system. All pre-release version tags automatically trigger the `publish.yml` workflow, which builds the application, creates a Docker image, and deploys it to the test server.
+Pre-release version tags are used to validate builds before final release. They follow semantic versioning conventions and are supported by the workflow system. All pre-release version tags automatically trigger the `publish.yml` workflow, which validates the tag and runs a build check. Deployment is done by Vercel on push to `main` or `develop` (see [DEPLOYMENT.md](DEPLOYMENT.md)).
 
 There are two main categories of pre-release versions, distinguished by **when** they're used and **where** they're created:
 
@@ -46,7 +46,7 @@ Development version tags are used to test builds and deployments from **feature 
 
 - Format: `v<version>-dev-<branch-name>` (e.g., `v0.3.6-dev-improve-cicd`)
 - Use the branch name **without** the type prefix (`feature/`, `hotfix/`, etc.)
-- Example: Branch `feature/improve-cicd` → Tag `v0.3.6-dev-improve-cicd` → Docker image: `username/repo:0.3.6-dev-improve-cicd`
+- Example: Branch `feature/improve-cicd` → Tag `v0.3.6-dev-improve-cicd`
 
 #### Naming Convention
 
@@ -70,10 +70,9 @@ The version number is a placeholder - the actual release version is determined w
 When you push a development version tag (e.g., `v0.3.6-dev-improve-cicd`), the workflow automatically:
 
 1. **Extracts the version number** from the tag: `v0.3.6-dev-improve-cicd` → `0.3.6-dev-improve-cicd`
-2. **Builds the Next.js application** using `npm run build`
-3. **Builds Docker image** using the version: `username/repo:0.3.6-dev-improve-cicd`
-4. **Deploys to test server** with that version
-5. **Creates Docker Compose configuration** with the versioned image
+2. **Runs a build check** using `npm run build` to verify the tagged commit builds successfully
+
+Staging and production are deployed by Vercel when you push to `develop` or `main` (see [DEPLOYMENT.md](DEPLOYMENT.md)).
 
 #### Republishing Development Version Tags
 
@@ -105,25 +104,24 @@ Release candidate version tags are used to test builds and deployments from **re
 
 - **`rc`** (Release Candidate): A version that is feature-complete and ready for final testing before release. **RC** stands for "Release Candidate" - it's a candidate for becoming the final release if testing passes.
   - Format: `v0.2.0-rc1`, `v0.2.0-rc2`, etc.
-  - Example: `v0.2.0-rc1` → Docker image: `username/repo:0.2.0-rc1`
+  - Example: `v0.2.0-rc1`
 
 - **`beta`** (Beta Release): An early release for testing with most features complete but may have known issues.
   - Format: `v0.2.0-beta1`, `v0.2.0-beta2`, etc.
-  - Example: `v0.2.0-beta1` → Docker image: `username/repo:0.2.0-beta1`
+  - Example: `v0.2.0-beta1`
 
 - **`alpha`** (Alpha Release): An early development release for internal testing.
   - Format: `v0.2.0-alpha1`, `v0.2.0-alpha2`, etc.
-  - Example: `v0.2.0-alpha1` → Docker image: `username/repo:0.2.0-alpha1`
+  - Example: `v0.2.0-alpha1`
 
 #### Workflow Behavior
 
 When you push a release candidate version tag (e.g., `v0.2.0-rc1`), the workflow automatically:
 
 1. **Extracts the version number** from the tag: `v0.2.0-rc1` → `0.2.0-rc1`
-2. **Builds the Next.js application** using `npm run build`
-3. **Builds Docker image** using the version: `username/repo:0.2.0-rc1`
-4. **Deploys to test server** with that version
-5. **Creates Docker Compose configuration** with the versioned image
+2. **Runs a build check** using `npm run build` to verify the tagged commit builds successfully
+
+Deployment is done by Vercel on push to `main` or `develop` (see [DEPLOYMENT.md](DEPLOYMENT.md)).
 
 ### Cleanup
 
@@ -135,11 +133,9 @@ Test and dev tags for the released version (e.g. `v1.4.0-test`, `v1.4.0-dev-*`) 
 
 When a version tag is pushed (e.g., `git push origin v0.2.0`), the `publish.yml` workflow:
 
-1. **Extracts version number from tag**: The workflow automatically extracts the version number from the git tag via `github.ref` (e.g., `refs/tags/v0.2.0` → `0.2.0`)
-
-2. **Uses version number throughout pipeline**:
-   - Docker image tags: `username/repo:0.2.0`
-   - Docker Compose service configurations
+1. **Validates the tag**: For release tags (e.g. `v1.2.3`), ensures the tag points to a commit on `main`.
+2. **Extracts version number from tag**: The workflow extracts the version number from the git tag (e.g., `refs/tags/v0.2.0` → `0.2.0`).
+3. **Runs a build check**: Runs `npm run build` to verify the tagged commit builds. It does not deploy or push any image; deployment is handled by Vercel when you push to `main` or `develop` (see [DEPLOYMENT.md](DEPLOYMENT.md)).
 
 ## Benefits
 
@@ -166,7 +162,7 @@ Use `--no-git-tag-version` when you only want to change `package.json` (e.g. bef
 
 ### Creating a Release
 
-Release tags are created **from main** (on the merge commit), not from the release branch. That way the tag points to the exact commit that is the canonical release and matches what is on the default branch. The publish workflow enforces this for release tags only (e.g. `v1.2.3`): if you push such a tag whose commit is not on `main`, the workflow fails and no deploy runs. Pre-release and dev tags (e.g. `v1.2.0-rc1`, `v1.2.3-dev-branch`) are not checked.
+Release tags are created **from main** (on the merge commit), not from the release branch. That way the tag points to the exact commit that is the canonical release and matches what is on the default branch. The publish workflow enforces this for release tags only (e.g. `v1.2.3`): if you push such a tag whose commit is not on `main`, the workflow fails. Pre-release and dev tags (e.g. `v1.2.0-rc1`, `v1.2.3-dev-branch`) are not checked.
 
 ```bash
 # 1. Create release branch
@@ -188,33 +184,33 @@ git push origin v0.2.0
 
 ### Development Version Tag Testing
 
-For testing builds and deployments from feature or hotfix branches:
+For validating builds from feature or hotfix branches (triggers publish workflow: tag validation + build check):
 
 ```bash
 # On a feature branch
 git checkout feature/improve-cicd
 git tag v0.3.6-dev-improve-cicd
 git push origin v0.3.6-dev-improve-cicd
-# Automatically builds and deploys: username/repo:0.3.6-dev-improve-cicd
+# Publish workflow runs: validates tag and runs npm run build
 ```
 
 ### Pre-Release Version Tag Testing
 
-For testing builds and deployments on the test server before final release:
+For validating builds before final release (triggers publish workflow: tag validation + build check):
 
 ```bash
 # Option 1: Create a release candidate version tag (recommended)
 git tag v0.2.0-rc1
 git push origin v0.2.0-rc1
-# Automatically builds and deploys: username/repo:0.2.0-rc1
+# Publish workflow runs: validates tag and runs npm run build
 
 # Option 2: Create a beta version tag
 git tag v0.2.0-beta1
 git push origin v0.2.0-beta1
-# Automatically builds and deploys: username/repo:0.2.0-beta1
+# Publish workflow runs: validates tag and runs npm run build
 
 # Option 3: Create an alpha version tag
 git tag v0.2.0-alpha1
 git push origin v0.2.0-alpha1
-# Automatically builds and deploys: username/repo:0.2.0-alpha1
+# Publish workflow runs: validates tag and runs npm run build
 ```

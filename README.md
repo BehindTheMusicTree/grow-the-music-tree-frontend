@@ -179,7 +179,7 @@ npm install --legacy-peer-deps
 
 ## Docker
 
-Docker builds the app and runs the Next.js server inside the container. The entrypoint builds at startup, then runs `next start` on `APP_PORT`. No static file server or volume is used; the reverse proxy should proxy to the container’s port.
+Production and staging hosting use **Vercel** (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). Docker is optional for local runs or self-hosted deployment. The Dockerfile builds the app and runs the Next.js server inside the container; the entrypoint builds at startup, then runs `next start` on `APP_PORT`.
 
 **Build image:**
 
@@ -194,7 +194,6 @@ docker run -p 3000:3000 -e APP_PORT=3000 -e APP_VERSION=0.1.0 \
   -e NEXT_PUBLIC_*="..." grow-the-music-tree-frontend
 ```
 
-See the repo scripts and `.github/workflows/publish.yml` for the full env and deploy flow.
 
 ## CI
 
@@ -205,9 +204,9 @@ The CI pipeline includes:
 - Dependency installation
 - Linting
 - Testing
-- Static build generation
-- Docker image build and push
-- Deployment to production server
+- Build check
+
+Deployment to staging and production is handled by Vercel on push to `develop` or `main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). The publish workflow (on version tag push) validates the tag and runs a build check; it does not deploy.
 
 **GitHub Actions workflow** (simplified):
 
@@ -245,7 +244,9 @@ npm run build
 npm run start
 ```
 
-Build output: `.next/`. The app is served by the Next.js Node server. In production, the Docker container builds once at startup then runs `next start`; the reverse proxy (Nginx, Traefik, etc.) should proxy to the container’s `APP_PORT`.
+Build output: `.next/`. The app is served by the Next.js Node server.
+
+**Deployment:** The app can be deployed to **Vercel** (recommended) or run in Docker. See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for Vercel staging and production setup, including the env sync workflow from GitHub to Vercel. For Docker, the container builds once at startup then runs `next start`; the reverse proxy (Nginx, Traefik, etc.) should proxy to the container’s `APP_PORT`.
 
 ## Troubleshooting
 
@@ -270,6 +271,7 @@ For additional information about this project, please refer to:
 - **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community code of conduct
 - **[TODO.md](TODO.md)** - Current development tasks and roadmap
 - **[docs/VERSIONING.md](docs/VERSIONING.md)** - Versioning strategy and guidelines
+- **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Vercel staging and production setup
 - **[docs/REVERSE_PROXY_CONFIG.md](docs/REVERSE_PROXY_CONFIG.md)** - Nginx/reverse-proxy configuration for deployment
 
 ## License
