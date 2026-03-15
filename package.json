@@ -1,7 +1,7 @@
 {
   "name": "grow-the-music-tree",
   "private": true,
-  "version": "1.4.0",
+  "version": "1.4.1",
   "scripts": {
     "dev": "next dev --turbo --hostname 127.0.0.1",
     "dev:local": "bash scripts/run-dev.sh local",

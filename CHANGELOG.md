@@ -77,8 +77,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ```
 
 **Note:** During releases, maintainers run `npm version` on `main`; the postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md).
-
 ## [Unreleased]
+
+
+
+## [1.4.1] - 2026-03-15
 
 ### CI
 
@@ -87,6 +90,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Removed
 
 - **Metadata Manager page and related code**: Removed `/metadata-manager` page, `useGetFullMetadata` hook (`useAudioMetadata.ts`), `AudioMetadataDetailed` schema, and `audio-metadata` API domain. This functionality has been moved to the audiometa-frontend repository.
+
 
 ## [1.4.0] - 2025-03-12
 
