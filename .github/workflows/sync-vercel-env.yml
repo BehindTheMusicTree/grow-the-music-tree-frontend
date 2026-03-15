@@ -1,6 +1,6 @@
 # Sync environment variables from GitHub to Vercel (Production and Preview).
 # Run manually: Actions → Sync Vercel env → Run workflow.
-# Uses GitHub Environments so BACKEND_BASE_URL, APP_URL (and client IDs per env) can differ:
+# Builds NEXT_PUBLIC_BACKEND_BASE_URL from repo vars: prod = https://HTMT_API_SUBDOMAIN_NAME.DOMAIN_NAME/, preview = https://HTMT_API_SUBDOMAIN_NAME-test.DOMAIN_NAME/. APP_URL per environment.
 #   Production env → Vercel "production"; Staging env → Vercel "preview".
 # Required: repo secrets VERCEL_TOKEN, VERCEL_PROJECT_ID; repo vars and env vars per docs/DEPLOYMENT.md §3.1.
 name: Sync Vercel env
@@ -22,10 +22,10 @@ jobs:
       GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
       TRACK_UPLOAD_TIMEOUT_MS: ${{ vars.TRACK_UPLOAD_TIMEOUT_MS }}
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+      HTMT_API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
       AUDIOMETA_SUBDOMAIN_NAME: ${{ vars.AUDIOMETA_SUBDOMAIN_NAME }}
       SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID_PROD }}
       GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID_PROD }}
-      BACKEND_BASE_URL: ${{ vars.BACKEND_BASE_URL }}
       APP_URL: ${{ vars.APP_URL }}
     steps:
       - name: Validate required env vars
@@ -39,10 +39,10 @@ jobs:
           [ -z "$GOOGLE_REDIRECT_RELATIVE_URI" ] && missing="$missing GOOGLE_REDIRECT_RELATIVE_URI"
           [ -z "$TRACK_UPLOAD_TIMEOUT_MS" ] && missing="$missing TRACK_UPLOAD_TIMEOUT_MS"
           [ -z "$DOMAIN_NAME" ] && missing="$missing DOMAIN_NAME"
+          [ -z "$HTMT_API_SUBDOMAIN_NAME" ] && missing="$missing HTMT_API_SUBDOMAIN_NAME"
           [ -z "$AUDIOMETA_SUBDOMAIN_NAME" ] && missing="$missing AUDIOMETA_SUBDOMAIN_NAME"
           [ -z "$SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID_PROD"
           [ -z "$GOOGLE_CLIENT_ID" ] && missing="$missing GOOGLE_CLIENT_ID_PROD"
-          [ -z "$BACKEND_BASE_URL" ] && missing="$missing BACKEND_BASE_URL"
           [ -z "$APP_URL" ] && missing="$missing APP_URL"
           if [ -n "$missing" ]; then
             echo "::error::Missing or empty (repo vars or production env):$missing"
@@ -53,6 +53,7 @@ jobs:
       - name: Sync to Vercel production
         run: |
           set -e
+          BACKEND_BASE_URL="https://${HTMT_API_SUBDOMAIN_NAME}.${DOMAIN_NAME}/"
           APP_URL_TRIM="${APP_URL%/}"
           SPOTIFY_REDIRECT_URI="${APP_URL_TRIM}/${SPOTIFY_REDIRECT_RELATIVE_URI#/}"
           GOOGLE_REDIRECT_URI="${APP_URL_TRIM}/${GOOGLE_REDIRECT_RELATIVE_URI#/}"
@@ -94,10 +95,10 @@ jobs:
       GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
       TRACK_UPLOAD_TIMEOUT_MS: ${{ vars.TRACK_UPLOAD_TIMEOUT_MS }}
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+      HTMT_API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
       AUDIOMETA_SUBDOMAIN_NAME: ${{ vars.AUDIOMETA_SUBDOMAIN_NAME }}
       SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID_TEST }}
       GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID_TEST }}
-      BACKEND_BASE_URL: ${{ vars.BACKEND_BASE_URL }}
       APP_URL: ${{ vars.APP_URL }}
     steps:
       - name: Validate required env vars
@@ -111,10 +112,10 @@ jobs:
           [ -z "$GOOGLE_REDIRECT_RELATIVE_URI" ] && missing="$missing GOOGLE_REDIRECT_RELATIVE_URI"
           [ -z "$TRACK_UPLOAD_TIMEOUT_MS" ] && missing="$missing TRACK_UPLOAD_TIMEOUT_MS"
           [ -z "$DOMAIN_NAME" ] && missing="$missing DOMAIN_NAME"
+          [ -z "$HTMT_API_SUBDOMAIN_NAME" ] && missing="$missing HTMT_API_SUBDOMAIN_NAME"
           [ -z "$AUDIOMETA_SUBDOMAIN_NAME" ] && missing="$missing AUDIOMETA_SUBDOMAIN_NAME"
           [ -z "$SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID_TEST"
           [ -z "$GOOGLE_CLIENT_ID" ] && missing="$missing GOOGLE_CLIENT_ID_TEST"
-          [ -z "$BACKEND_BASE_URL" ] && missing="$missing BACKEND_BASE_URL"
           [ -z "$APP_URL" ] && missing="$missing APP_URL"
           if [ -n "$missing" ]; then
             echo "::error::Missing or empty (repo vars or staging env):$missing"
@@ -125,6 +126,7 @@ jobs:
       - name: Sync to Vercel preview
         run: |
           set -e
+          BACKEND_BASE_URL="https://${HTMT_API_SUBDOMAIN_NAME}-test.${DOMAIN_NAME}/"
           APP_URL_TRIM="${APP_URL%/}"
           SPOTIFY_REDIRECT_URI="${APP_URL_TRIM}/${SPOTIFY_REDIRECT_RELATIVE_URI#/}"
           GOOGLE_REDIRECT_URI="${APP_URL_TRIM}/${GOOGLE_REDIRECT_RELATIVE_URI#/}"
