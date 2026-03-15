@@ -21,7 +21,6 @@ jobs:
       SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
       GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
       TRACK_UPLOAD_TIMEOUT_MS: ${{ vars.TRACK_UPLOAD_TIMEOUT_MS }}
-      SENTRY_IS_ACTIVE: ${{ vars.SENTRY_IS_ACTIVE }}
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
       AUDIOMETA_SUBDOMAIN_NAME: ${{ vars.AUDIOMETA_SUBDOMAIN_NAME }}
       SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID_PROD }}
@@ -39,7 +38,6 @@ jobs:
           [ -z "$SPOTIFY_SCOPES" ] && missing="$missing SPOTIFY_SCOPES"
           [ -z "$GOOGLE_REDIRECT_RELATIVE_URI" ] && missing="$missing GOOGLE_REDIRECT_RELATIVE_URI"
           [ -z "$TRACK_UPLOAD_TIMEOUT_MS" ] && missing="$missing TRACK_UPLOAD_TIMEOUT_MS"
-          [ -z "$SENTRY_IS_ACTIVE" ] && missing="$missing SENTRY_IS_ACTIVE"
           [ -z "$DOMAIN_NAME" ] && missing="$missing DOMAIN_NAME"
           [ -z "$AUDIOMETA_SUBDOMAIN_NAME" ] && missing="$missing AUDIOMETA_SUBDOMAIN_NAME"
           [ -z "$SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID_PROD"
@@ -72,7 +70,7 @@ jobs:
           }
           sync_var "$CONTACT_EMAIL" "NEXT_PUBLIC_CONTACT_EMAIL"
           sync_var "$BACKEND_BASE_URL" "NEXT_PUBLIC_BACKEND_BASE_URL"
-          sync_var "$SENTRY_IS_ACTIVE" "NEXT_PUBLIC_SENTRY_IS_ACTIVE"
+          sync_var "true" "NEXT_PUBLIC_SENTRY_IS_ACTIVE"
           sync_var "https://accounts.spotify.com/authorize" "NEXT_PUBLIC_SPOTIFY_AUTH_URL"
           sync_var "$SPOTIFY_CLIENT_ID" "NEXT_PUBLIC_SPOTIFY_CLIENT_ID"
           sync_var "$SPOTIFY_REDIRECT_URI" "NEXT_PUBLIC_SPOTIFY_REDIRECT_URI"
@@ -95,7 +93,6 @@ jobs:
       SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
       GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
       TRACK_UPLOAD_TIMEOUT_MS: ${{ vars.TRACK_UPLOAD_TIMEOUT_MS }}
-      SENTRY_IS_ACTIVE: ${{ vars.SENTRY_IS_ACTIVE }}
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
       AUDIOMETA_SUBDOMAIN_NAME: ${{ vars.AUDIOMETA_SUBDOMAIN_NAME }}
       SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID_TEST }}
@@ -113,7 +110,6 @@ jobs:
           [ -z "$SPOTIFY_SCOPES" ] && missing="$missing SPOTIFY_SCOPES"
           [ -z "$GOOGLE_REDIRECT_RELATIVE_URI" ] && missing="$missing GOOGLE_REDIRECT_RELATIVE_URI"
           [ -z "$TRACK_UPLOAD_TIMEOUT_MS" ] && missing="$missing TRACK_UPLOAD_TIMEOUT_MS"
-          [ -z "$SENTRY_IS_ACTIVE" ] && missing="$missing SENTRY_IS_ACTIVE"
           [ -z "$DOMAIN_NAME" ] && missing="$missing DOMAIN_NAME"
           [ -z "$AUDIOMETA_SUBDOMAIN_NAME" ] && missing="$missing AUDIOMETA_SUBDOMAIN_NAME"
           [ -z "$SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID_TEST"
@@ -146,7 +142,7 @@ jobs:
           }
           sync_var "$CONTACT_EMAIL" "NEXT_PUBLIC_CONTACT_EMAIL"
           sync_var "$BACKEND_BASE_URL" "NEXT_PUBLIC_BACKEND_BASE_URL"
-          sync_var "$SENTRY_IS_ACTIVE" "NEXT_PUBLIC_SENTRY_IS_ACTIVE"
+          sync_var "true" "NEXT_PUBLIC_SENTRY_IS_ACTIVE"
           sync_var "https://accounts.spotify.com/authorize" "NEXT_PUBLIC_SPOTIFY_AUTH_URL"
           sync_var "$SPOTIFY_CLIENT_ID" "NEXT_PUBLIC_SPOTIFY_CLIENT_ID"
           sync_var "$SPOTIFY_REDIRECT_URI" "NEXT_PUBLIC_SPOTIFY_REDIRECT_URI"
