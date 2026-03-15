@@ -1,10 +1,7 @@
+# Vercel deploys: develop → staging, main → production (see docs/DEPLOYMENT.md).
 name: Validate
 
 on:
-  push:
-    branches:
-      - develop
-      - main
   pull_request:
     branches:
       - develop
@@ -79,4 +76,5 @@ jobs:
           NEXT_PUBLIC_GOOGLE_CLIENT_ID: ci-placeholder.apps.googleusercontent.com
           NEXT_PUBLIC_GOOGLE_REDIRECT_URI: https://ci.example.com/auth/google/callback
           NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS: "300000"
+          NEXT_PUBLIC_AUDIOMETA_URL: https://audiometa.themusictree.org
         run: npm run build

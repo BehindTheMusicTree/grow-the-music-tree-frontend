@@ -339,7 +339,7 @@ When testing your changes, verify:
 
 #### 4.1. Testing Builds During Development
 
-You can test your build and deployment on the test server while working on a feature branch by creating a development tag. This is useful for validating changes before merging to `develop`.
+You can validate that your branch builds successfully by creating a development tag. This triggers the publish workflow (tag validation + build check). Staging and production are updated by Vercel when you push to `develop` or `main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
 **Choosing a Version Number:**
 
@@ -364,12 +364,12 @@ git tag v0.3.6-dev-improve-cicd  # branch: feature/improve-cicd
 git push origin v0.3.6-dev-improve-cicd
 ```
 
-This automatically triggers the `deploy.yml` workflow which will:
+This automatically triggers the `publish.yml` workflow which will:
 
-- Build the application
-- Build and push Docker image
-- Deploy to the test server
-- Allow you to validate your changes before creating a PR
+- Validate the tag and run a build check (`npm run build`)
+- Allow you to confirm the branch builds before creating a PR
+
+Deployment to staging or production is done by Vercel when you push to `develop` or merge to `main`.
 
 **Republishing After Changes:**
 

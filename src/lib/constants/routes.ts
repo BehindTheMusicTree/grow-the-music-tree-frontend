@@ -17,7 +17,6 @@ export const ROUTE_AUTH_CONFIG: readonly RouteAuthConfigItem[] = [
   { path: "/me-uploaded-library", authRequired: "any", label: "My Uploaded Library" },
   { path: "/me-spotify-library", authRequired: "spotify", label: "My Spotify Library" },
   { path: "/account", authRequired: "any", label: "Account" },
-  { path: "/metadata-manager", authRequired: false, label: "Metadata Manager" },
   { path: "/about", authRequired: false, label: "About" },
 ];
 

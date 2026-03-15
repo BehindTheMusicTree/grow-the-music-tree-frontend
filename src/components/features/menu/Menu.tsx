@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { PiGraphLight } from "react-icons/pi";
-import { FaSpotify, FaCloudUploadAlt, FaUser, FaList, FaInfoCircle, FaTags } from "react-icons/fa";
+import { FaSpotify, FaCloudUploadAlt, FaUser, FaList, FaInfoCircle } from "react-icons/fa";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { MenuGroup } from "./MenuGroup";
 import { useMediaQuery } from "@hooks/useMediaQuery";
@@ -15,6 +16,8 @@ import {
 } from "@lib/constants/layout";
 import { ROUTE_AUTH_CONFIG } from "@lib/constants/routes";
 
+const AUDIOMETA_URL = process.env.NEXT_PUBLIC_AUDIOMETA_URL ?? "";
+
 const MENU_ICONS: Record<string, React.ReactNode> = {
   "/reference-genre-tree": <PiGraphLight className="text-xl" />,
   "/me-genre-tree": <PiGraphLight className="text-xl" />,
@@ -22,7 +25,6 @@ const MENU_ICONS: Record<string, React.ReactNode> = {
   "/me-uploaded-library": <FaCloudUploadAlt className="text-xl" />,
   "/me-spotify-library": <FaSpotify className="text-xl" />,
   "/account": <FaUser className="text-xl" />,
-  "/metadata-manager": <FaTags className="text-xl" />,
   "/about": <FaInfoCircle className="text-xl" />,
 };
 
@@ -63,6 +65,27 @@ export default function Menu({ className }: { className?: string }) {
         </button>
       )}
       <MenuGroup items={menuGroup} collapsed={collapsed} />
+      {AUDIOMETA_URL && (
+        <a
+          href={AUDIOMETA_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Open Audio Metadata (external)"
+          className={`flex items-center mx-1 mt-1 py-2 rounded-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors duration-200 ${
+            collapsed ? "justify-center px-2" : "gap-3 px-4"
+          }`}
+        >
+          <Image
+            src="/assets/audiometa-icon.png"
+            alt=""
+            width={20}
+            height={20}
+            className="shrink-0"
+            aria-hidden
+          />
+          {!collapsed && <span className="flex-grow">Audio Metadata</span>}
+        </a>
+      )}
     </nav>
   );
 }

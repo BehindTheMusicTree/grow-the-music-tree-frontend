@@ -32,7 +32,7 @@ Code and UI styling conventions for this project.
 | Context providers  | PascalCase            | `AuthProvider.tsx`      |
 | API route handlers | lowercase             | `route.ts`              |
 
-The default export of every route file (`page.tsx` / `page.jsx`) must be a component named with the **`Page`** suffix (e.g. `MetadataManagerPage`, `GenreTreePage`).
+The default export of every route file (`page.tsx` / `page.jsx`) must be a component named with the **`Page`** suffix (e.g. `GenreTreePage`, `AccountPage`).
 
 ## Key directories
 

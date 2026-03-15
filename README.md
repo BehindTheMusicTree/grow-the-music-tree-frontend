@@ -131,6 +131,8 @@ NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-c
 
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback
+
+NEXT_PUBLIC_AUDIOMETA_URL=https://audiometa.themusictree.org
 ```
 
 In the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) → your app → **Settings** → **Redirect URIs**, add the **full** callback URL(s), e.g. `http://localhost:3000/auth/spotify/callback` for local dev and your production URL for deploy. The app builds the redirect URI from your origin when you use a path like `/auth/spotify/callback`.
@@ -140,6 +142,7 @@ For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/)
 **Notes:**
 
 - Only variables prefixed with `NEXT_PUBLIC_` are available in the browser
+- **`NEXT_PUBLIC_AUDIOMETA_URL`** (required): URL of the external Audio Metadata app. Sidebar link "Audio Metadata" opens this URL in a new tab. Build fails if unset. In CI/deploy this is built from GitHub vars `AUDIOMETA_SUBDOMAIN_NAME` and `DOMAIN_NAME` as `https://<AUDIOMETA_SUBDOMAIN_NAME>.<DOMAIN_NAME>`.
 - Changing env values requires a new build (restart `npm run dev` after env changes)
 - Do not commit `.env.local`
 - **Preset configs**: Put `.env.development.api-local` and `.env.development.api-remote` in `env/development/available/` (see `env/development/example/.env.development.api-*.example`). Then run `./scripts/setup-env-dev.sh local` or `./scripts/setup-env-dev.sh remote` to copy one to `.env.development.local`; Next.js only loads env files from the project root. Contents of `env/development/available/` are gitignored.
@@ -162,21 +165,21 @@ npm install --legacy-peer-deps
 
 ## Scripts
 
-| Command                 | Description                                          |
-| ----------------------- | ---------------------------------------------------- |
-| `npm run dev`           | Start local development server                       |
-| `npm run build`         | Build for production                                 |
-| `npm run start`         | Start production server (Node)                       |
-| `npm run lint`          | Run ESLint                                           |
-| `npm run verify-env`    | Verify environment configuration                     |
-| `npm run test`          | Run unit tests                                       |
-| `npm run test:watch`    | Run tests in watch mode                              |
-| `npm run test:ui`       | Run tests with UI                                    |
-| `npm run test:coverage` | Run tests with coverage                              |
+| Command                 | Description                      |
+| ----------------------- | -------------------------------- |
+| `npm run dev`           | Start local development server   |
+| `npm run build`         | Build for production             |
+| `npm run start`         | Start production server (Node)   |
+| `npm run lint`          | Run ESLint                       |
+| `npm run verify-env`    | Verify environment configuration |
+| `npm run test`          | Run unit tests                   |
+| `npm run test:watch`    | Run tests in watch mode          |
+| `npm run test:ui`       | Run tests with UI                |
+| `npm run test:coverage` | Run tests with coverage          |
 
 ## Docker
 
-Docker builds the app and runs the Next.js server inside the container. The entrypoint builds at startup, then runs `next start` on `APP_PORT`. No static file server or volume is used; the reverse proxy should proxy to the container’s port.
+Production and staging hosting use **Vercel** (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). Docker is optional for local runs or self-hosted deployment. The Dockerfile builds the app and runs the Next.js server inside the container; the entrypoint builds at startup, then runs `next start` on `APP_PORT`.
 
 **Build image:**
 
@@ -191,7 +194,6 @@ docker run -p 3000:3000 -e APP_PORT=3000 -e APP_VERSION=0.1.0 \
   -e NEXT_PUBLIC_*="..." grow-the-music-tree-frontend
 ```
 
-See the repo scripts and `.github/workflows/publish.yml` for the full env and deploy flow.
 
 ## CI
 
@@ -202,9 +204,9 @@ The CI pipeline includes:
 - Dependency installation
 - Linting
 - Testing
-- Static build generation
-- Docker image build and push
-- Deployment to production server
+- Build check
+
+Deployment to staging and production is handled by Vercel on push to `develop` or `main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). The publish workflow (on version tag push) validates the tag and runs a build check; it does not deploy.
 
 **GitHub Actions workflow** (simplified):
 
@@ -242,7 +244,9 @@ npm run build
 npm run start
 ```
 
-Build output: `.next/`. The app is served by the Next.js Node server. In production, the Docker container builds once at startup then runs `next start`; the reverse proxy (Nginx, Traefik, etc.) should proxy to the container’s `APP_PORT`.
+Build output: `.next/`. The app is served by the Next.js Node server.
+
+**Deployment:** The app can be deployed to **Vercel** (recommended) or run in Docker. See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for Vercel staging and production setup, including the env sync workflow from GitHub to Vercel. For Docker, the container builds once at startup then runs `next start`; the reverse proxy (Nginx, Traefik, etc.) should proxy to the container’s `APP_PORT`.
 
 ## Troubleshooting
 
@@ -267,6 +271,7 @@ For additional information about this project, please refer to:
 - **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community code of conduct
 - **[TODO.md](TODO.md)** - Current development tasks and roadmap
 - **[docs/VERSIONING.md](docs/VERSIONING.md)** - Versioning strategy and guidelines
+- **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Vercel staging and production setup
 - **[docs/REVERSE_PROXY_CONFIG.md](docs/REVERSE_PROXY_CONFIG.md)** - Nginx/reverse-proxy configuration for deployment
 
 ## License

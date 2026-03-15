@@ -1,5 +1,4 @@
-# Same flow as API publish: determine-version → check-required-vars → [test-build-app | deploy-env-and-docker-compose] → build-image-and-push → redeploy-webhook-call
-# Requires GitHub vars: GTMT_FRONT_APP_NAME, DOMAIN_NAME, etc.
+# On tag push (v*): validate tag is on main and run build check. Deployment is via Vercel on push to main/develop (see docs/DEPLOYMENT.md).
 name: Publish
 
 on:
@@ -7,25 +6,6 @@ on:
     tags:
       - "v*"
   workflow_call:
-
-env:
-  APP_IMAGE_REPO: ${{ vars.APP_IMAGE_REPO }}
-  SSH_DESTINATION: ${{ secrets.SERVER_DEPLOY_USERNAME }}@${{ vars.DOMAIN_NAME }}
-  CONTAINER_ROOT_DIR: /home/app/
-  DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
-  CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
-  API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
-  SPOTIFY_CLIENT_ID_TEST: ${{ secrets.SPOTIFY_CLIENT_ID_TEST }}
-  SPOTIFY_CLIENT_ID_PROD: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
-  SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
-  SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
-  GOOGLE_CLIENT_ID_TEST: ${{ secrets.GOOGLE_CLIENT_ID_TEST }}
-  GOOGLE_CLIENT_ID_PROD: ${{ secrets.GOOGLE_CLIENT_ID_PROD }}
-  GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
-  SERVER_DEPLOY_USERNAME: ${{ secrets.SERVER_DEPLOY_USERNAME }}
-  SERVER_DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
-  DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
-  DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
 jobs:
   validate-tag-on-main:
@@ -97,37 +77,6 @@ jobs:
             exit 1
           fi
 
-  check-required-vars:
-    name: Check required variables and secrets
-    runs-on: ubuntu-latest
-    needs: [determine-version]
-    environment: ${{ needs.determine-version.outputs.env }}
-    timeout-minutes: 1
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check required vars and secrets
-        run: |
-          bash scripts/check-required-vars.sh \
-            VAR_DOMAIN_NAME "${{ env.DOMAIN_NAME }}" \
-            VAR_APP_NAME "${{ vars.GTMT_FRONT_APP_NAME }}" \
-            VAR_DOCKERHUB_USERNAME "${{ env.DOCKERHUB_USERNAME }}" \
-            VAR_GTMT_FRONT_IMAGE_REPO "${{ env.APP_IMAGE_REPO }}" \
-            VAR_CONTACT_EMAIL "${{ env.CONTACT_EMAIL }}" \
-            VAR_API_SUBDOMAIN_NAME "${{ env.API_SUBDOMAIN_NAME }}" \
-            VAR_API_VERSION "${{ vars.API_VERSION }}" \
-            VAR_SENTRY_IS_ACTIVE "${{ vars.SENTRY_IS_ACTIVE }}" \
-            VAR_SECRET_SPOTIFY_CLIENT_ID "${{ env.SPOTIFY_CLIENT_ID_PROD }}" \
-            VAR_SPOTIFY_REDIRECT_RELATIVE_URI "${{ env.SPOTIFY_REDIRECT_RELATIVE_URI }}" \
-            VAR_SPOTIFY_SCOPES "${{ env.SPOTIFY_SCOPES }}" \
-            VAR_GOOGLE_REDIRECT_RELATIVE_URI "${{ env.GOOGLE_REDIRECT_RELATIVE_URI }}" \
-            SECRET_GOOGLE_CLIENT_ID_TEST "${{ vars.GOOGLE_CLIENT_ID_TEST }}" \
-            SECRET_GOOGLE_CLIENT_ID_PROD "${{ vars.GOOGLE_CLIENT_ID_PROD }}" \
-            SECRET_SERVER_DEPLOY_USERNAME "${{ env.SERVER_DEPLOY_USERNAME }}" \
-            SECRET_SERVER_DEPLOY_SSH_PRIVATE_KEY "${{ env.SERVER_DEPLOY_SSH_PRIVATE_KEY }}" \
-            SECRET_DOCKERHUB_ACCESS_TOKEN "${{ env.DOCKERHUB_ACCESS_TOKEN }}"
-
   test-build-app:
     name: Test build app
     runs-on: ubuntu-latest
@@ -156,41 +105,5 @@ jobs:
           NEXT_PUBLIC_GOOGLE_REDIRECT_URI: https://ci.example.com/auth/google/callback
           NEXT_PUBLIC_SENTRY_IS_ACTIVE: false
           NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS: "300000"
+          NEXT_PUBLIC_AUDIOMETA_URL: https://audiometa.themusictree.org
         run: npm run build
-
-  deploy-env-and-docker-compose:
-    name: Deploy
-    needs: [check-required-vars, determine-version]
-    uses: ./.github/workflows/deploy-env-and-docker-compose.yml
-    with:
-      app_version: ${{ needs.determine-version.outputs.app_version }}
-      env: ${{ needs.determine-version.outputs.env }}
-    secrets: inherit
-
-  build-image-and-push:
-    name: Docker image
-    runs-on: ubuntu-latest
-    needs: [check-required-vars, determine-version, test-build-app]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Login to Dockerhub
-        run: echo "${{ env.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
-
-      - name: Build image and push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.APP_IMAGE_REPO }}:${{ needs.determine-version.outputs.app_version }}
-          build-args: |
-            PROJECT_DIR=${{ env.CONTAINER_ROOT_DIR }}
-
-  redeploy-webhook-call:
-    name: Redeploy webhook
-    needs: [build-image-and-push, deploy-env-and-docker-compose, determine-version]
-    uses: BehindTheMusicTree/github-workflows/.github/workflows/call-redeployment-webhook.yml@main
-    with:
-      env: ${{ needs.determine-version.outputs.env }}
-    secrets: inherit
