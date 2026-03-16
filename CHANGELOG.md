@@ -80,6 +80,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-03-15
+
 ### CI
 
 - **Validate workflow**: Trigger only on `pull_request` to `develop` and `main`; removed `push` trigger so validation runs on PRs instead of every push.
