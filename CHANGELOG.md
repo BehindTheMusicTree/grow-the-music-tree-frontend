@@ -81,7 +81,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### CI
 
-- **Sync Vercel env**: `NEXT_PUBLIC_BACKEND_BASE_URL` now includes the API root segment (default `v2`, overridable via `HTMT_API_ROOT_SEGMENT`). Preview/staging API host uses `staging.<HTMT_API_SUBDOMAIN_NAME>.<DOMAIN_NAME>` instead of `<subdomain>-test.<DOMAIN_NAME>`. Preview job prefers `SPOTIFY_CLIENT_ID_STAGING` / `GOOGLE_CLIENT_ID_STAGING`, with fallback to the existing `*_TEST` variables.
+- **Sync Vercel env**: `NEXT_PUBLIC_BACKEND_BASE_URL` includes the API root from required repo var `HTMT_API_ROOT_SEGMENT` (e.g. `v2`); the workflow fails validation if it is missing. Preview/staging API host uses `staging.<HTMT_API_SUBDOMAIN_NAME>.<DOMAIN_NAME>` instead of `<subdomain>-test.<DOMAIN_NAME>`. Preview job prefers `SPOTIFY_CLIENT_ID_STAGING` / `GOOGLE_CLIENT_ID_STAGING`, with fallback to the existing `*_TEST` variables.
 
 ## [1.4.1] - 2026-03-15
 

@@ -1,6 +1,6 @@
 # Sync environment variables from GitHub to Vercel (Production and Preview).
 # Run manually: Actions → Sync Vercel env → Run workflow.
-# NEXT_PUBLIC_BACKEND_BASE_URL includes the Django API root segment (default v2, override with HTMT_API_ROOT_SEGMENT).
+# NEXT_PUBLIC_BACKEND_BASE_URL includes the Django API root segment (required repo var HTMT_API_ROOT_SEGMENT, e.g. v2).
 #   Prod API host: https://HTMT_API_SUBDOMAIN_NAME.DOMAIN_NAME/<root>/
 #   Preview/staging API host: https://staging.HTMT_API_SUBDOMAIN_NAME.DOMAIN_NAME/<root>/
 # APP_URL prod = https://GTMT_FRONT_SUBDOMAIN_NAME.DOMAIN_NAME, preview = https://staging.GTMT_FRONT_SUBDOMAIN_NAME.DOMAIN_NAME.
@@ -44,6 +44,7 @@ jobs:
           [ -z "$TRACK_UPLOAD_TIMEOUT_MS" ] && missing="$missing TRACK_UPLOAD_TIMEOUT_MS"
           [ -z "$DOMAIN_NAME" ] && missing="$missing DOMAIN_NAME"
           [ -z "$HTMT_API_SUBDOMAIN_NAME" ] && missing="$missing HTMT_API_SUBDOMAIN_NAME"
+          [ -z "$HTMT_API_ROOT_SEGMENT" ] && missing="$missing HTMT_API_ROOT_SEGMENT"
           [ -z "$GTMT_FRONT_SUBDOMAIN_NAME" ] && missing="$missing GTMT_FRONT_SUBDOMAIN_NAME"
           [ -z "$AUDIOMETA_SUBDOMAIN_NAME" ] && missing="$missing AUDIOMETA_SUBDOMAIN_NAME"
           [ -z "$SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID_PROD"
@@ -57,8 +58,7 @@ jobs:
       - name: Sync to Vercel production
         run: |
           set -e
-          API_ROOT="${HTMT_API_ROOT_SEGMENT:-v2}"
-          API_ROOT="${API_ROOT#/}"
+          API_ROOT="${HTMT_API_ROOT_SEGMENT#/}"
           API_ROOT="${API_ROOT%/}"
           BACKEND_BASE_URL="https://${HTMT_API_SUBDOMAIN_NAME}.${DOMAIN_NAME}/${API_ROOT}/"
           APP_URL="https://${GTMT_FRONT_SUBDOMAIN_NAME}.${DOMAIN_NAME}"
@@ -122,6 +122,7 @@ jobs:
           [ -z "$TRACK_UPLOAD_TIMEOUT_MS" ] && missing="$missing TRACK_UPLOAD_TIMEOUT_MS"
           [ -z "$DOMAIN_NAME" ] && missing="$missing DOMAIN_NAME"
           [ -z "$HTMT_API_SUBDOMAIN_NAME" ] && missing="$missing HTMT_API_SUBDOMAIN_NAME"
+          [ -z "$HTMT_API_ROOT_SEGMENT" ] && missing="$missing HTMT_API_ROOT_SEGMENT"
           [ -z "$GTMT_FRONT_SUBDOMAIN_NAME" ] && missing="$missing GTMT_FRONT_SUBDOMAIN_NAME"
           [ -z "$AUDIOMETA_SUBDOMAIN_NAME" ] && missing="$missing AUDIOMETA_SUBDOMAIN_NAME"
           [ -z "$SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID_STAGING|SPOTIFY_CLIENT_ID_TEST"
@@ -135,8 +136,7 @@ jobs:
       - name: Sync to Vercel preview
         run: |
           set -e
-          API_ROOT="${HTMT_API_ROOT_SEGMENT:-v2}"
-          API_ROOT="${API_ROOT#/}"
+          API_ROOT="${HTMT_API_ROOT_SEGMENT#/}"
           API_ROOT="${API_ROOT%/}"
           BACKEND_BASE_URL="https://staging.${HTMT_API_SUBDOMAIN_NAME}.${DOMAIN_NAME}/${API_ROOT}/"
           APP_URL="https://staging.${GTMT_FRONT_SUBDOMAIN_NAME}.${DOMAIN_NAME}"
