@@ -121,7 +121,7 @@ NODE_ENV=development
 PORT=3000
 
 NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com
-NEXT_PUBLIC_BACKEND_BASE_URL=https://api.themusictree.org/v0.4.0/
+NEXT_PUBLIC_BACKEND_BASE_URL=https://api.themusictree.org/v2/
 NEXT_PUBLIC_SENTRY_IS_ACTIVE=false
 
 NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize

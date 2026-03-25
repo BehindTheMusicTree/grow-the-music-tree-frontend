@@ -80,13 +80,16 @@ Use the workflow [`.github/workflows/sync-vercel-env.yml`](../.github/workflows/
 | `GOOGLE_REDIRECT_RELATIVE_URI` | Path segment for `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` (e.g. `auth/google/callback`) |
 | `TRACK_UPLOAD_TIMEOUT_MS`    | `NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS` |
 | `DOMAIN_NAME`                | Base domain for all built URLs |
-| `HTMT_API_SUBDOMAIN_NAME`    | Builds `NEXT_PUBLIC_BACKEND_BASE_URL`: prod = `https://<this>.<DOMAIN_NAME>/`, preview = `https://<this>-test.<DOMAIN_NAME>/` |
+| `HTMT_API_SUBDOMAIN_NAME`    | API host label (without `staging.`): builds `NEXT_PUBLIC_BACKEND_BASE_URL` with prod = `https://<this>.<DOMAIN_NAME>/…`, preview = `https://staging.<this>.<DOMAIN_NAME>/…` |
+| `HTMT_API_ROOT_SEGMENT`      | Optional. Django `API_ROOT_BASE` path segment (no slashes). Default in workflow: `v2`. Example result: `https://<api-host>/v2/` |
 | `GTMT_FRONT_SUBDOMAIN_NAME`  | Builds app URL for redirect URIs: prod = `https://<this>.<DOMAIN_NAME>`, preview = `https://staging.<this>.<DOMAIN_NAME>` |
 | `AUDIOMETA_SUBDOMAIN_NAME`   | Builds `NEXT_PUBLIC_AUDIOMETA_URL` as `https://<this>.<DOMAIN_NAME>` |
 | `SPOTIFY_CLIENT_ID_PROD`     | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on production |
-| `SPOTIFY_CLIENT_ID_TEST`     | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on preview/staging |
+| `SPOTIFY_CLIENT_ID_STAGING`  | Preferred: `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on Vercel preview/staging |
+| `SPOTIFY_CLIENT_ID_TEST`     | Fallback if `SPOTIFY_CLIENT_ID_STAGING` is unset (same Vercel target) |
 | `GOOGLE_CLIENT_ID_PROD`      | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on production |
-| `GOOGLE_CLIENT_ID_TEST`      | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on preview/staging |
+| `GOOGLE_CLIENT_ID_STAGING`   | Preferred: `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on Vercel preview/staging |
+| `GOOGLE_CLIENT_ID_TEST`      | Fallback if `GOOGLE_CLIENT_ID_STAGING` is unset |
 
 **How the sync works:** The workflow has two jobs. Each job runs in a **GitHub Environment** (production or staging), so it sees that environment’s variables. It syncs only to the matching Vercel target.
 

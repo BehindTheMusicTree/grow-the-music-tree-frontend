@@ -79,6 +79,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run `npm version` on `main`; the postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md).
 ## [Unreleased]
 
+### CI
+
+- **Sync Vercel env**: `NEXT_PUBLIC_BACKEND_BASE_URL` now includes the API root segment (default `v2`, overridable via `HTMT_API_ROOT_SEGMENT`). Preview/staging API host uses `staging.<HTMT_API_SUBDOMAIN_NAME>.<DOMAIN_NAME>` instead of `<subdomain>-test.<DOMAIN_NAME>`. Preview job prefers `SPOTIFY_CLIENT_ID_STAGING` / `GOOGLE_CLIENT_ID_STAGING`, with fallback to the existing `*_TEST` variables.
+
 ## [1.4.1] - 2026-03-15
 
 ### CI
