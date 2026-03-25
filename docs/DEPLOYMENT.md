@@ -80,10 +80,10 @@ Use the workflow [`.github/workflows/sync-vercel-env.yml`](../.github/workflows/
 | `GOOGLE_REDIRECT_RELATIVE_URI` | Path segment for `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` (e.g. `auth/google/callback`) |
 | `TRACK_UPLOAD_TIMEOUT_MS`    | `NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS` |
 | `DOMAIN_NAME`                | Base domain for all built URLs |
-| `HTMT_API_SUBDOMAIN_NAME`    | API host label (without `staging.`): builds `NEXT_PUBLIC_BACKEND_BASE_URL` with prod = `https://<this>.<DOMAIN_NAME>/…`, preview = `https://staging.<this>.<DOMAIN_NAME>/…` |
+| `HTMT_API_SUBDOMAIN`    | API host label (without `staging.`): builds `NEXT_PUBLIC_BACKEND_BASE_URL` with prod = `https://<this>.<DOMAIN_NAME>/…`, preview = `https://staging.<this>.<DOMAIN_NAME>/…` |
 | `HTMT_API_ROOT_SEGMENT`      | **Required.** Django `API_ROOT_BASE` path segment (no leading/trailing slashes), e.g. `v2`. Sync fails if unset. Example: `https://<api-host>/v2/` |
-| `GTMT_FRONT_SUBDOMAIN_NAME`  | Builds app URL for redirect URIs: prod = `https://<this>.<DOMAIN_NAME>`, preview = `https://staging.<this>.<DOMAIN_NAME>` |
-| `AUDIOMETA_SUBDOMAIN_NAME`   | Builds `NEXT_PUBLIC_AUDIOMETA_URL` as `https://<this>.<DOMAIN_NAME>` |
+| `GTMT_FRONT_SUBDOMAIN`  | Builds app URL for redirect URIs: prod = `https://<this>.<DOMAIN_NAME>`, preview = `https://staging.<this>.<DOMAIN_NAME>` |
+| `AUDIOMETA_SUBDOMAIN`   | Builds `NEXT_PUBLIC_AUDIOMETA_URL` as `https://<this>.<DOMAIN_NAME>` |
 | `SPOTIFY_CLIENT_ID_PROD`     | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on production |
 | `SPOTIFY_CLIENT_ID_STAGING`  | Preferred: `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on Vercel preview/staging |
 | `SPOTIFY_CLIENT_ID_TEST`     | Fallback if `SPOTIFY_CLIENT_ID_STAGING` is unset (same Vercel target) |
@@ -98,7 +98,7 @@ Use the workflow [`.github/workflows/sync-vercel-env.yml`](../.github/workflows/
 | Repo variables + production env vars | Vercel **production** (`NEXT_PUBLIC_*` set for production) |
 | Repo variables + staging env vars    | Vercel **preview** (staging and PR previews) |
 
-The workflow also sets `NEXT_PUBLIC_SENTRY_IS_ACTIVE` to `true`, sets `NEXT_PUBLIC_SPOTIFY_AUTH_URL` to `https://accounts.spotify.com/authorize`, and builds `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` / `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` from the app URL (prod = `https://<GTMT_FRONT_SUBDOMAIN_NAME>.<DOMAIN_NAME>`, preview = `https://staging.<GTMT_FRONT_SUBDOMAIN_NAME>.<DOMAIN_NAME>`) + relative path.
+The workflow also sets `NEXT_PUBLIC_SENTRY_IS_ACTIVE` to `true`, sets `NEXT_PUBLIC_SPOTIFY_AUTH_URL` to `https://accounts.spotify.com/authorize`, and builds `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` / `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` from the app URL (prod = `https://<GTMT_FRONT_SUBDOMAIN>.<DOMAIN_NAME>`, preview = `https://staging.<GTMT_FRONT_SUBDOMAIN>.<DOMAIN_NAME>`) + relative path.
 
 After the sync runs, trigger a redeploy in Vercel if you want the new values on the next build.
 
