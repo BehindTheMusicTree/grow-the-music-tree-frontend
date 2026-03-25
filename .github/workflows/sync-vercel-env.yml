@@ -29,8 +29,8 @@ jobs:
       HTMT_API_ROOT_SEGMENT: ${{ vars.HTMT_API_ROOT_SEGMENT }}
       GTMT_FRONT_SUBDOMAIN: ${{ vars.GTMT_FRONT_SUBDOMAIN }}
       AUDIOMETA_SUBDOMAIN: ${{ vars.AUDIOMETA_SUBDOMAIN }}
-      SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID_PROD }}
-      GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID_PROD }}
+      SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID_PROD }}
     steps:
       - name: Validate required env vars
         run: |
@@ -107,8 +107,8 @@ jobs:
       HTMT_API_ROOT_SEGMENT: ${{ vars.HTMT_API_ROOT_SEGMENT }}
       GTMT_FRONT_SUBDOMAIN: ${{ vars.GTMT_FRONT_SUBDOMAIN }}
       AUDIOMETA_SUBDOMAIN: ${{ vars.AUDIOMETA_SUBDOMAIN }}
-      SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID_STAGING }}
-      GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID_STAGING }}
+      SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID_STAGING }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID_STAGING }}
     steps:
       - name: Validate required env vars
         run: |
