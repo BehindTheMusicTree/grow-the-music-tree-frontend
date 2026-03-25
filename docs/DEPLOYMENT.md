@@ -85,11 +85,9 @@ Use the workflow [`.github/workflows/sync-vercel-env.yml`](../.github/workflows/
 | `GTMT_FRONT_SUBDOMAIN`  | Builds app URL for redirect URIs: prod = `https://<this>.<DOMAIN_NAME>`, preview = `https://staging.<this>.<DOMAIN_NAME>` |
 | `AUDIOMETA_SUBDOMAIN`   | Builds `NEXT_PUBLIC_AUDIOMETA_URL` as `https://<this>.<DOMAIN_NAME>` |
 | `SPOTIFY_CLIENT_ID_PROD`     | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on production |
-| `SPOTIFY_CLIENT_ID_STAGING`  | Preferred: `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on Vercel preview/staging |
-| `SPOTIFY_CLIENT_ID_TEST`     | Fallback if `SPOTIFY_CLIENT_ID_STAGING` is unset (same Vercel target) |
+| `SPOTIFY_CLIENT_ID_STAGING`  | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on Vercel preview/staging (required for preview sync) |
 | `GOOGLE_CLIENT_ID_PROD`      | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on production |
-| `GOOGLE_CLIENT_ID_STAGING`   | Preferred: `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on Vercel preview/staging |
-| `GOOGLE_CLIENT_ID_TEST`      | Fallback if `GOOGLE_CLIENT_ID_STAGING` is unset |
+| `GOOGLE_CLIENT_ID_STAGING`   | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on Vercel preview/staging (required for preview sync) |
 
 **How the sync works:** The workflow has two jobs. Each job runs in a **GitHub Environment** (production or staging), so it sees that environment’s variables. It syncs only to the matching Vercel target.
 

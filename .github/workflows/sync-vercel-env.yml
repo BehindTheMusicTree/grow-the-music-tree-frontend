@@ -107,8 +107,8 @@ jobs:
       HTMT_API_ROOT_SEGMENT: ${{ vars.HTMT_API_ROOT_SEGMENT }}
       GTMT_FRONT_SUBDOMAIN: ${{ vars.GTMT_FRONT_SUBDOMAIN }}
       AUDIOMETA_SUBDOMAIN: ${{ vars.AUDIOMETA_SUBDOMAIN }}
-      SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID_STAGING != '' && vars.SPOTIFY_CLIENT_ID_STAGING || vars.SPOTIFY_CLIENT_ID_TEST }}
-      GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID_STAGING != '' && vars.GOOGLE_CLIENT_ID_STAGING || vars.GOOGLE_CLIENT_ID_TEST }}
+      SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID_STAGING }}
+      GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID_STAGING }}
     steps:
       - name: Validate required env vars
         run: |
@@ -125,8 +125,8 @@ jobs:
           [ -z "$HTMT_API_ROOT_SEGMENT" ] && missing="$missing HTMT_API_ROOT_SEGMENT"
           [ -z "$GTMT_FRONT_SUBDOMAIN" ] && missing="$missing GTMT_FRONT_SUBDOMAIN"
           [ -z "$AUDIOMETA_SUBDOMAIN" ] && missing="$missing AUDIOMETA_SUBDOMAIN"
-          [ -z "$SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID_STAGING|SPOTIFY_CLIENT_ID_TEST"
-          [ -z "$GOOGLE_CLIENT_ID" ] && missing="$missing GOOGLE_CLIENT_ID_STAGING|GOOGLE_CLIENT_ID_TEST"
+          [ -z "$SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID_STAGING"
+          [ -z "$GOOGLE_CLIENT_ID" ] && missing="$missing GOOGLE_CLIENT_ID_STAGING"
           if [ -n "$missing" ]; then
             echo "::error::Missing or empty (repo vars or staging env):$missing"
             exit 1
