@@ -162,23 +162,36 @@ Use `--no-git-tag-version` when you only want to change `package.json` (e.g. bef
 
 ### Creating a Release
 
+Follow GitFlow release flow:
+
+1. Prepare and stabilize the version bump/changelog on `release/*`.
+2. Merge `release/*` to `main`.
+3. Create the final release tag on `main` (not on `release/*`).
+4. Merge `main` back to `develop`.
+
 Release tags are created **from main** (on the merge commit), not from the release branch. That way the tag points to the exact commit that is the canonical release and matches what is on the default branch. The publish workflow enforces this for release tags only (e.g. `v1.2.3`): if you push such a tag whose commit is not on `main`, the workflow fails. Pre-release and dev tags (e.g. `v1.2.0-rc1`, `v1.2.3-dev-branch`) are not checked.
 
 ```bash
-# 1. Create release branch
+# 1. Create release branch from develop and prepare release commit(s)
+git checkout develop
 git checkout -b release/v0.2.0
+npm version minor --no-git-tag-version
+git add package.json package-lock.json CHANGELOG.md
+git commit -m "chore(release): prepare v0.2.0"
 
-# 2. Merge to main
+# 2. Merge release branch to main
 git checkout main
 git merge release/v0.2.0
 
-# 3. On main: bump version (creates tag, updates CHANGELOG, deletes pre-release tags for this version)
-npm version minor
+# 3. On main: create release tag from canonical merge commit
+git tag v0.2.0
 git push origin v0.2.0
 
-# Or if tagging manually: create tag then clean up pre-release tags for this version
-# git tag v0.2.0
-# git push origin v0.2.0
+# 4. Merge main back to develop
+git checkout develop
+git merge main
+
+# Optional: clean up pre-release/dev tags for this version
 # node scripts/delete-test-dev-tags.mjs
 ```
 
