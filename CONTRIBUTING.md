@@ -52,7 +52,7 @@ The maintainer(s) are responsible for:
 - Maintaining the project's infrastructure
 - Creating and managing hotfix branches for urgent production fixes
 - Creating and managing release branches for preparing releases
-- Running releases on `main` via `npm version` (postversion updates CHANGELOG and deletes pre-release tags for that version)
+- Preparing releases on `release/*` branches, then merging via PR to `main`, tagging on `main`, and back-merging to `develop` via PR
 - Managing repository automation (stale issues/PRs, auto-labeling, auto-assignment, etc.)
 
 **Important:** Even maintainers must go through Pull Requests. No direct commits to `main` or `develop` are allowed - all changes, including those from maintainers, must be submitted via Pull Requests and go through the standard review process.
@@ -220,7 +220,7 @@ We follow **strict Git Flow** with the following branch structure:
 #### 🛡️ Branch Protection
 
 - **PRs to `main`** must come from `hotfix/*` or `release/*` branches only. This ensures production fixes are traceable and carefully released.
-- **PRs to `develop`** must come from `feature/*`, `fix/*`, `chore/*`, or `dependabot/*` branches only. PRs from other branch types (e.g., `refactor/*`, etc.) will be blocked by the branch protection workflow.
+- **PRs to `develop`** can come from `feature/*`, `fix/*`, `chore/*`, `dependabot/*`, `release/*`, `hotfix/*`, or `main` (required for post-release/hotfix back-merges). Other branch types (e.g., `refactor/*`, etc.) are blocked by the branch protection workflow.
 - Branch protection is enforced by the `branch-protection.yml` GitHub Actions workflow located at `.github/workflows/branch-protection.yml`.
 - **Invalid PRs will:**
   - Fail the CI check
@@ -275,8 +275,8 @@ We follow **strict Git Flow** with the following branch structure:
   ```
 
 - Only bug fixes and release-related changes go into release branches
-- When ready, merge into both `main` (for production) and `develop` (to keep develop up to date)
-- Tag the release on `main` after merging
+- When ready, open a PR from `release/*` to `main` (no direct merge), then tag the release on `main` after the PR merge
+- After tagging, open a PR from `main` to `develop` for the required back-merge (no direct merge)
 
 #### Hotfix Branches (`hotfix/<name>`) _(For Maintainers)_
 
@@ -294,7 +294,7 @@ We follow **strict Git Flow** with the following branch structure:
   ```
 
 - Contributors can submit fixes via feature branches that maintainers may promote to hotfixes if needed
-- When complete, merge into both `main` (for immediate production fix) and `develop` (to keep develop up to date)
+- When complete, open a PR from `hotfix/*` to `main` (no direct merge), tag on `main` if needed, then open a PR from `main` to `develop` for back-merge
 
 #### Chore Branches (`chore/<name>`)
 
