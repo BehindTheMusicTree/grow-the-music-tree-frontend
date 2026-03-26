@@ -40,12 +40,12 @@ There are two main categories of pre-release versions, distinguished by **when**
 
 ### Development Tags (`-dev`)
 
-Development version tags are used to test builds and deployments from **feature and hotfix branches** during active development, before merging to `develop` or creating a release branch.
+Development version tags are used to test builds and deployments from **feature, fix, and hotfix branches** during active development, before merging to `develop` or creating a release branch.
 
 #### Format
 
 - Format: `v<version>-dev-<branch-name>` (e.g., `v0.3.6-dev-improve-cicd`)
-- Use the branch name **without** the type prefix (`feature/`, `hotfix/`, etc.)
+- Use the branch name **without** the type prefix (`feature/`, `fix/`, `hotfix/`, etc.)
 - Example: Branch `feature/improve-cicd` → Tag `v0.3.6-dev-improve-cicd`
 
 #### Naming Convention
@@ -53,13 +53,14 @@ Development version tags are used to test builds and deployments from **feature 
 Development version tags should include the branch name (without type prefix) to identify what's being tested:
 
 - **Feature branches**: `feature/improve-cicd` → `v0.3.6-dev-improve-cicd`
+- **Fix branches**: `fix/resolve-timeout` → `v0.3.6-dev-resolve-timeout`
 - **Hotfix branches**: `hotfix/critical-bug` → `v0.3.6-dev-critical-bug`
 
 #### Version Selection
 
 Since the actual release version isn't known until the release branch is created, use these guidelines:
 
-- **Feature branches**: Typically minor version updates (e.g., `v0.3.6-dev-*` or `v0.4.0-dev-*`)
+- **Feature/fix branches**: Typically patch or minor version updates depending on scope (e.g., `v0.3.6-dev-*` or `v0.4.0-dev-*`)
 - **Hotfix branches**: Typically patch version updates (e.g., `v0.3.6-dev-*`)
 - **Breaking changes**: Major version (e.g., `v1.0.0-dev-*`)
 
@@ -195,7 +196,7 @@ git push origin v0.2.0
 
 ### Development Version Tag Testing
 
-For validating builds from feature or hotfix branches (triggers publish workflow: tag validation + build check):
+For validating builds from feature, fix, or hotfix branches (triggers publish workflow: tag validation + build check):
 
 ```bash
 # On a feature branch

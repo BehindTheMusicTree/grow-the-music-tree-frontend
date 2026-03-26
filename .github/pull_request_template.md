@@ -105,7 +105,7 @@ Fixes #
 - [ ] My commits follow the Conventional Commits format
 - [ ] I have rebased my branch on the latest target branch
 - [ ] I have resolved all merge conflicts
-- [ ] My PR targets the correct branch (`develop` for features/chores, `main` for hotfixes)
+- [ ] My PR targets the correct branch (`develop` for features/fixes/chores, `main` for hotfixes)
 
 ### Dependencies & Build
 
