@@ -77,7 +77,9 @@ When creating or updating GitHub Actions workflows that need version information
 
 - Final release versions: `v0.2.0`, `v1.0.0`
 - Prepare version/changelog on `release/*`, then merge to `main`
+- Merges to `main` and `develop` must go through Pull Requests (no direct merges)
 - Create final release tag on `main` merge commit (not on `release/*`)
+- After release/hotfix merge to `main`, back-merge to `develop` via PR (`main` -> `develop`)
 - Triggers production deployment
 
 ## Workflow Behavior
