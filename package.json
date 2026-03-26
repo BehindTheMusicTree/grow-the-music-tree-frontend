@@ -1,7 +1,7 @@
 {
   "name": "grow-the-music-tree",
   "private": true,
-  "version": "1.4.1",
+  "version": "1.4.2",
   "scripts": {
     "dev": "next dev --turbo --hostname 127.0.0.1",
     "dev:local": "bash scripts/run-dev.sh local",
@@ -9,7 +9,7 @@
     "build": "next build",
     "build:debug": "NODE_ENV=development next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "verify-env": "node scripts/verify-env.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -69,10 +69,14 @@
     "postcss": "8.5.3",
     "tailwindcss": "3.4.17",
     "typescript": "5.8.3",
+    "typescript-eslint": "8.54.0",
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "3.2.4"
   },
   "overrides": {
-    "glob": "13.0.1"
+    "glob": "13.0.1",
+    "minimatch@3": "3.1.4",
+    "minimatch@9": "9.0.7",
+    "minimatch@10": "10.2.3"
   }
 }

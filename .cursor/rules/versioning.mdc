@@ -76,7 +76,8 @@ When creating or updating GitHub Actions workflows that need version information
 ### Release Tags
 
 - Final release versions: `v0.2.0`, `v1.0.0`
-- Created after merging release branch to `main`
+- Prepare version/changelog on `release/*`, then merge to `main`
+- Create final release tag on `main` merge commit (not on `release/*`)
 - Triggers production deployment
 
 ## Workflow Behavior
