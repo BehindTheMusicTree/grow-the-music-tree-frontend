@@ -1,24 +1,33 @@
-# Sync environment variables from GitHub to Vercel (Production and Preview).
-# Run manually: Actions → Sync Vercel env → Run workflow.
+# Sync environment variables to Vercel and trigger deployment.
+# Runs on pushes to main/develop and can also be run manually.
 # NEXT_PUBLIC_BACKEND_BASE_URL includes the Django API root segment (required repo var HTMT_API_ROOT_SEGMENT, e.g. v2).
 #   Prod API host: https://HTMT_API_SUBDOMAIN.DOMAIN_NAME/<root>/
 #   Preview/staging API host: https://staging.HTMT_API_SUBDOMAIN.DOMAIN_NAME/<root>/
 # APP_URL prod = https://GTMT_FRONT_SUBDOMAIN.DOMAIN_NAME, preview = https://staging.GTMT_FRONT_SUBDOMAIN.DOMAIN_NAME.
-#   Production env → Vercel "production"; Staging env → Vercel "preview".
-# Required: repo secrets VERCEL_TOKEN, VERCEL_PROJECT_ID; repo vars and env vars per docs/DEPLOYMENT.md §3.1.
-name: Sync Vercel env
+#   Production env -> Vercel "production"; Staging env -> Vercel "preview".
+# Required:
+#   - repo secrets: VERCEL_TOKEN, VERCEL_PROJECT_ID
+#   - environment secret: VERCEL_DEPLOY_HOOK (set in each GitHub Environment)
+#   - repo vars and env vars per docs/DEPLOYMENT.md §3.1.
+name: Vercel deploy
 
 on:
+  push:
+    branches:
+      - main
+      - develop
   workflow_dispatch:
 
 jobs:
-  sync-production:
-    name: Sync to Vercel production
+  deploy-production:
+    name: Sync env and deploy production
     runs-on: ubuntu-latest
-    environment: production
+    environment: PROD
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
       CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
       SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
       SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
@@ -32,11 +41,15 @@ jobs:
       SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID_PROD }}
     steps:
-      - name: Validate required env vars
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate required vars
         run: |
           missing=""
           [ -z "$VERCEL_TOKEN" ] && missing="$missing VERCEL_TOKEN"
           [ -z "$VERCEL_PROJECT_ID" ] && missing="$missing VERCEL_PROJECT_ID"
+          [ -z "$VERCEL_DEPLOY_HOOK" ] && missing="$missing VERCEL_DEPLOY_HOOK"
           [ -z "$CONTACT_EMAIL" ] && missing="$missing CONTACT_EMAIL"
           [ -z "$SPOTIFY_REDIRECT_RELATIVE_URI" ] && missing="$missing SPOTIFY_REDIRECT_RELATIVE_URI"
           [ -z "$SPOTIFY_SCOPES" ] && missing="$missing SPOTIFY_SCOPES"
@@ -53,13 +66,16 @@ jobs:
             echo "::error::Missing or empty (repo vars or production env):$missing"
             exit 1
           fi
-          echo "All required env vars are set."
+          echo "All required vars are set."
 
-      - name: Sync to Vercel production
+      - name: Sync env to Vercel production
         run: |
           set -e
           API_ROOT="${HTMT_API_ROOT_SEGMENT#/}"
           API_ROOT="${API_ROOT%/}"
+          PKG_VERSION=$(jq -r '.version' package.json)
+          SHORT_SHA="${GITHUB_SHA::7}"
+          APP_VERSION="${PKG_VERSION}-dev+${SHORT_SHA}"
           BACKEND_BASE_URL="https://${HTMT_API_SUBDOMAIN}.${DOMAIN_NAME}/${API_ROOT}/"
           APP_URL="https://${GTMT_FRONT_SUBDOMAIN}.${DOMAIN_NAME}"
           APP_URL_TRIM="${APP_URL%/}"
@@ -88,15 +104,25 @@ jobs:
           sync_var "$GOOGLE_REDIRECT_URI" "NEXT_PUBLIC_GOOGLE_REDIRECT_URI"
           sync_var "$TRACK_UPLOAD_TIMEOUT_MS" "NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS"
           sync_var "$AUDIOMETA_URL" "NEXT_PUBLIC_AUDIOMETA_URL"
-          echo "Production sync done."
+          sync_var "$APP_VERSION" "NEXT_PUBLIC_APP_VERSION"
+          echo "Production env sync done."
 
-  sync-staging:
-    name: Sync to Vercel preview (staging)
+      - name: Trigger Vercel production deployment
+        run: |
+          set -e
+          echo "Triggering production deploy hook..."
+          curl -fsS -X POST "$VERCEL_DEPLOY_HOOK"
+          echo "Production deploy triggered."
+
+  deploy-staging:
+    name: Sync env and deploy staging
     runs-on: ubuntu-latest
-    environment: staging
+    environment: STAGING
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/develop'
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
       CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
       SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
       SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
@@ -110,11 +136,15 @@ jobs:
       SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID_STAGING }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID_STAGING }}
     steps:
-      - name: Validate required env vars
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate required vars
         run: |
           missing=""
           [ -z "$VERCEL_TOKEN" ] && missing="$missing VERCEL_TOKEN"
           [ -z "$VERCEL_PROJECT_ID" ] && missing="$missing VERCEL_PROJECT_ID"
+          [ -z "$VERCEL_DEPLOY_HOOK" ] && missing="$missing VERCEL_DEPLOY_HOOK"
           [ -z "$CONTACT_EMAIL" ] && missing="$missing CONTACT_EMAIL"
           [ -z "$SPOTIFY_REDIRECT_RELATIVE_URI" ] && missing="$missing SPOTIFY_REDIRECT_RELATIVE_URI"
           [ -z "$SPOTIFY_SCOPES" ] && missing="$missing SPOTIFY_SCOPES"
@@ -131,13 +161,16 @@ jobs:
             echo "::error::Missing or empty (repo vars or staging env):$missing"
             exit 1
           fi
-          echo "All required env vars are set."
+          echo "All required vars are set."
 
-      - name: Sync to Vercel preview
+      - name: Sync env to Vercel preview
         run: |
           set -e
           API_ROOT="${HTMT_API_ROOT_SEGMENT#/}"
           API_ROOT="${API_ROOT%/}"
+          PKG_VERSION=$(jq -r '.version' package.json)
+          SHORT_SHA="${GITHUB_SHA::7}"
+          APP_VERSION="${PKG_VERSION}-dev+${SHORT_SHA}"
           BACKEND_BASE_URL="https://staging.${HTMT_API_SUBDOMAIN}.${DOMAIN_NAME}/${API_ROOT}/"
           APP_URL="https://staging.${GTMT_FRONT_SUBDOMAIN}.${DOMAIN_NAME}"
           APP_URL_TRIM="${APP_URL%/}"
@@ -166,4 +199,12 @@ jobs:
           sync_var "$GOOGLE_REDIRECT_URI" "NEXT_PUBLIC_GOOGLE_REDIRECT_URI"
           sync_var "$TRACK_UPLOAD_TIMEOUT_MS" "NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS"
           sync_var "$AUDIOMETA_URL" "NEXT_PUBLIC_AUDIOMETA_URL"
-          echo "Preview sync done."
+          sync_var "$APP_VERSION" "NEXT_PUBLIC_APP_VERSION"
+          echo "Preview env sync done."
+
+      - name: Trigger Vercel staging deployment
+        run: |
+          set -e
+          echo "Triggering staging deploy hook..."
+          curl -fsS -X POST "$VERCEL_DEPLOY_HOOK"
+          echo "Staging deploy triggered."
