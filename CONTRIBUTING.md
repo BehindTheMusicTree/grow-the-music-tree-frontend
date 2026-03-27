@@ -52,7 +52,7 @@ The maintainer(s) are responsible for:
 - Maintaining the project's infrastructure
 - Creating and managing hotfix branches for urgent production fixes
 - Creating and managing release branches for preparing releases
-- Running releases on `main` via `npm version` (postversion updates CHANGELOG and deletes pre-release tags for that version)
+- Preparing releases on `release/*` branches, then merging via PR to `main`, tagging on `main`, and back-merging to `develop` via PR
 - Managing repository automation (stale issues/PRs, auto-labeling, auto-assignment, etc.)
 
 **Important:** Even maintainers must go through Pull Requests. No direct commits to `main` or `develop` are allowed - all changes, including those from maintainers, must be submitted via Pull Requests and go through the standard review process.
@@ -214,13 +214,13 @@ We follow **strict Git Flow** with the following branch structure:
 - All feature and chore branches merge into `develop`
 - `develop` is merged into `main` via release branches
 - **No direct commits allowed** - All changes must go through Pull Requests
-- Only receives merges from `feature/*`, `chore/*`, and `dependabot/*` branches
-- **Branch protection enforced** - GitHub Actions automatically blocks PRs to `develop` that don't come from `feature/*`, `chore/*`, or `dependabot/*` branches (see `.github/workflows/branch-protection.yml`)
+- Only receives merges from `feature/*`, `fix/*`, `chore/*`, and `dependabot/*` branches
+- **Branch protection enforced** - GitHub Actions automatically blocks PRs to `develop` that don't come from `feature/*`, `fix/*`, `chore/*`, or `dependabot/*` branches (see `.github/workflows/branch-protection.yml`)
 
 #### 🛡️ Branch Protection
 
 - **PRs to `main`** must come from `hotfix/*` or `release/*` branches only. This ensures production fixes are traceable and carefully released.
-- **PRs to `develop`** must come from `feature/*`, `chore/*`, or `dependabot/*` branches only. PRs from other branch types (e.g., `fix/*`, `refactor/*`, etc.) will be blocked by the branch protection workflow.
+- **PRs to `develop`** can come from `feature/*`, `fix/*`, `chore/*`, `dependabot/*`, `release/*`, `hotfix/*`, or `main` (required for post-release/hotfix back-merges). Other branch types (e.g., `refactor/*`, etc.) are blocked by the branch protection workflow.
 - Branch protection is enforced by the `branch-protection.yml` GitHub Actions workflow located at `.github/workflows/branch-protection.yml`.
 - **Invalid PRs will:**
   - Fail the CI check
@@ -245,6 +245,23 @@ We follow **strict Git Flow** with the following branch structure:
 
 - Merge into `develop` via Pull Request when complete and tested
 
+#### Fix Branches (`fix/<name>`)
+
+- For bug fixes that should land in `develop`
+- Branch from `develop`
+- Include issue numbers when applicable: `fix/789-resolve-audio-preview-timeout`
+- Examples:
+
+  ```bash
+  git checkout develop
+  git pull origin develop
+  git checkout -b fix/resolve-audio-preview-timeout
+
+  git checkout -b fix/789-resolve-audio-preview-timeout    # With issue number
+  ```
+
+- Merge into `develop` via Pull Request when complete and tested
+
 #### Release Branches (`release/<version>`) _(For Maintainers)_
 
 - Created from `develop` when preparing a new release
@@ -258,8 +275,8 @@ We follow **strict Git Flow** with the following branch structure:
   ```
 
 - Only bug fixes and release-related changes go into release branches
-- When ready, merge into both `main` (for production) and `develop` (to keep develop up to date)
-- Tag the release on `main` after merging
+- When ready, open a PR from `release/*` to `main` (no direct merge), then tag the release on `main` after the PR merge
+- After tagging, open a PR from `main` to `develop` for the required back-merge (no direct merge)
 
 #### Hotfix Branches (`hotfix/<name>`) _(For Maintainers)_
 
@@ -277,7 +294,7 @@ We follow **strict Git Flow** with the following branch structure:
   ```
 
 - Contributors can submit fixes via feature branches that maintainers may promote to hotfixes if needed
-- When complete, merge into both `main` (for immediate production fix) and `develop` (to keep develop up to date)
+- When complete, open a PR from `hotfix/*` to `main` (no direct merge), tag on `main` if needed, then open a PR from `main` to `develop` for back-merge
 
 #### Chore Branches (`chore/<name>`)
 
@@ -339,7 +356,7 @@ When testing your changes, verify:
 
 #### 4.1. Testing Builds During Development
 
-You can validate that your branch builds successfully by creating a development tag. This triggers the publish workflow (tag validation + build check). Staging and production are updated by Vercel when you push to `develop` or `main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
+You can validate that your branch builds successfully by running local CI checks (`npm run lint`, `npm run test`, `npm run build`) before opening a PR. Staging and production deployments are handled by the Vercel deploy workflow on push to `develop` or `main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
 **Choosing a Version Number:**
 
@@ -364,12 +381,9 @@ git tag v0.3.6-dev-improve-cicd  # branch: feature/improve-cicd
 git push origin v0.3.6-dev-improve-cicd
 ```
 
-This automatically triggers the `publish.yml` workflow which will:
+Development tags are still useful as release metadata, but they no longer trigger a dedicated publish workflow.
 
-- Validate the tag and run a build check (`npm run build`)
-- Allow you to confirm the branch builds before creating a PR
-
-Deployment to staging or production is done by Vercel when you push to `develop` or merge to `main`.
+Deployment to staging or production is handled by the Vercel deploy workflow when you push to `develop` or merge to `main`.
 
 **Republishing After Changes:**
 
@@ -471,13 +485,14 @@ Before submitting a Pull Request, ensure the following checks are completed:
 **4. Git Hygiene**
 
 - ✅ Commit messages follow the commit message convention
-- ✅ Branch is up to date with target branch (`develop` for features, `main` for hotfixes)
+- ✅ Branch is up to date with target branch (`develop` for features/fixes/chores, `main` for hotfixes)
 - ✅ No accidental commits (large files, secrets, personal configs, `.env` files)
-- ✅ Branch follows naming convention (`feature/`, `chore/`, `hotfix/`, `release/`)
+- ✅ Branch follows naming convention (`feature/`, `fix/`, `chore/`, `hotfix/`, `release/`)
 
 **5. Branch Target**
 
 - ✅ Feature branches target `develop` branch (NOT `main`)
+- ✅ Fix branches target `develop` branch (NOT `main`)
 - ✅ Hotfix branches target `main` branch
 - ✅ Release branches target both `main` and `develop` (maintainers only)
 - ✅ Chore branches target `develop` branch (NOT `main`)
@@ -527,7 +542,7 @@ Before submitting a Pull Request, ensure the following checks are completed:
 - ✅ All review comments are addressed
 - ✅ No unresolved discussions
 - ✅ Ready for release (if applicable)
-- ✅ Branch targets correct base branch (`develop` for features, `main` for hotfixes)
+- ✅ Branch targets correct base branch (`develop` for features/fixes/chores, `main` for hotfixes)
 
 #### 6.2. Opening a Pull Request
 
@@ -582,9 +597,10 @@ Pull Request titles must follow the same format as commit messages for consisten
 
 **Note on Branch Prefixes vs PR Title Types:**
 
-Branch prefixes (`feature/`, `chore/`, `hotfix/`, `release/`) are for branch organization and differ from PR title types:
+Branch prefixes (`feature/`, `fix/`, `chore/`, `hotfix/`, `release/`) are for branch organization and differ from PR title types:
 
 - Branch `feature/add-playlist-export` → PR title: `feat(playlist): add export functionality` (use `feat`, not `feature`)
+- Branch `fix/player-preview-timeout` → PR title: `fix(player): handle preview timeout` (use `fix`)
 - Branch `chore/update-dependencies` → PR title: `chore: update dependencies` (use `chore`)
 - Branch `hotfix/player-crash` → PR title: `fix(player): prevent crash on invalid track` (use `fix`, not `hotfix`)
 - Branch `release/v0.2.0` → PR title: `chore: prepare release v0.2.0` (use `chore`)

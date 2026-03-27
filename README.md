@@ -121,7 +121,7 @@ NODE_ENV=development
 PORT=3000
 
 NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com
-NEXT_PUBLIC_BACKEND_BASE_URL=https://api.themusictree.org/v0.4.0/
+NEXT_PUBLIC_BACKEND_BASE_URL=https://api.themusictree.org/v2/
 NEXT_PUBLIC_SENTRY_IS_ACTIVE=false
 
 NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize
@@ -142,7 +142,7 @@ For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/)
 **Notes:**
 
 - Only variables prefixed with `NEXT_PUBLIC_` are available in the browser
-- **`NEXT_PUBLIC_AUDIOMETA_URL`** (required): URL of the external Audio Metadata app. Sidebar link "Audio Metadata" opens this URL in a new tab. Build fails if unset. In CI/deploy this is built from GitHub vars `AUDIOMETA_SUBDOMAIN_NAME` and `DOMAIN_NAME` as `https://<AUDIOMETA_SUBDOMAIN_NAME>.<DOMAIN_NAME>`.
+- **`NEXT_PUBLIC_AUDIOMETA_URL`** (required): URL of the external Audio Metadata app. Sidebar link "Audio Metadata" opens this URL in a new tab. Build fails if unset. In CI/deploy this is built from GitHub vars `AUDIOMETA_SUBDOMAIN` and `DOMAIN_NAME` as `https://<AUDIOMETA_SUBDOMAIN>.<DOMAIN_NAME>`.
 - Changing env values requires a new build (restart `npm run dev` after env changes)
 - Do not commit `.env.local`
 - **Preset configs**: Put `.env.development.api-local` and `.env.development.api-remote` in `env/development/available/` (see `env/development/example/.env.development.api-*.example`). Then run `./scripts/setup-env-dev.sh local` or `./scripts/setup-env-dev.sh remote` to copy one to `.env.development.local`; Next.js only loads env files from the project root. Contents of `env/development/available/` are gitignored.
@@ -206,33 +206,25 @@ The CI pipeline includes:
 - Testing
 - Build check
 
-Deployment to staging and production is handled by Vercel on push to `develop` or `main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). The publish workflow (on version tag push) validates the tag and runs a build check; it does not deploy.
+Deployment to staging and production is handled by the GitHub Actions workflow [`.github/workflows/vercel-deploy.yml`](.github/workflows/vercel-deploy.yml), which syncs env vars to Vercel and then triggers deployment hooks for `develop`/`main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
 **GitHub Actions workflow** (simplified):
 
 ```yaml
-name: Publish
+name: Vercel deploy
 
 on:
   push:
-    tags: ["*"]
-  workflow_call:
+    branches: [main, develop]
+  workflow_dispatch:
 
 jobs:
-  build-image-and-push:
+  sync-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: npm
-      - run: npm ci --legacy-peer-deps
-      - run: npm run lint
-      - run: npm run test
-      - run: npm run build
-      - name: Build and push Docker image
-        # ... (additional deployment steps)
+      - name: Sync NEXT_PUBLIC_* vars to Vercel env
+      - name: Trigger Vercel deploy hook
 ```
 
 ## Build & Hosting

@@ -1,64 +1,87 @@
-# Sync environment variables from GitHub to Vercel (Production and Preview).
-# Run manually: Actions → Sync Vercel env → Run workflow.
-# Builds from repo vars: BACKEND_BASE_URL prod = https://HTMT_API_SUBDOMAIN_NAME.DOMAIN_NAME/, preview = https://HTMT_API_SUBDOMAIN_NAME-test.DOMAIN_NAME/; APP_URL prod = https://GTMT_FRONT_SUBDOMAIN_NAME.DOMAIN_NAME, preview = https://staging.GTMT_FRONT_SUBDOMAIN_NAME.DOMAIN_NAME.
-#   Production env → Vercel "production"; Staging env → Vercel "preview".
-# Required: repo secrets VERCEL_TOKEN, VERCEL_PROJECT_ID; repo vars and env vars per docs/DEPLOYMENT.md §3.1.
-name: Sync Vercel env
+# Sync environment variables to Vercel and trigger deployment.
+# Runs on pushes to main/develop and can also be run manually.
+# NEXT_PUBLIC_BACKEND_BASE_URL includes the Django API root segment (required repo var HTMT_API_ROOT_SEGMENT, e.g. v2).
+#   Prod API host: https://HTMT_API_SUBDOMAIN.DOMAIN_NAME/<root>/
+#   Preview/staging API host: https://staging.HTMT_API_SUBDOMAIN.DOMAIN_NAME/<root>/
+# APP_URL prod = https://GTMT_FRONT_SUBDOMAIN.DOMAIN_NAME, preview = https://staging.GTMT_FRONT_SUBDOMAIN.DOMAIN_NAME.
+#   Production env -> Vercel "production"; Staging env -> Vercel "preview".
+# Required:
+#   - repo secrets: VERCEL_TOKEN, VERCEL_PROJECT_ID
+#   - environment secret: VERCEL_DEPLOY_HOOK (set in each GitHub Environment)
+#   - repo vars and env vars per docs/DEPLOYMENT.md §3.1.
+name: Vercel deploy
 
 on:
+  push:
+    branches:
+      - main
+      - develop
   workflow_dispatch:
 
 jobs:
-  sync-production:
-    name: Sync to Vercel production
+  deploy-production:
+    name: Sync env and deploy production
     runs-on: ubuntu-latest
-    environment: production
+    environment: PROD
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
       CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
       SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
       SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
       GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
       TRACK_UPLOAD_TIMEOUT_MS: ${{ vars.TRACK_UPLOAD_TIMEOUT_MS }}
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
-      HTMT_API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
-      GTMT_FRONT_SUBDOMAIN_NAME: ${{ vars.GTMT_FRONT_SUBDOMAIN_NAME }}
-      AUDIOMETA_SUBDOMAIN_NAME: ${{ vars.AUDIOMETA_SUBDOMAIN_NAME }}
-      SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID_PROD }}
-      GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID_PROD }}
+      HTMT_API_SUBDOMAIN: ${{ vars.HTMT_API_SUBDOMAIN }}
+      HTMT_API_ROOT_SEGMENT: ${{ vars.HTMT_API_ROOT_SEGMENT }}
+      GTMT_FRONT_SUBDOMAIN: ${{ vars.GTMT_FRONT_SUBDOMAIN }}
+      AUDIOMETA_SUBDOMAIN: ${{ vars.AUDIOMETA_SUBDOMAIN }}
+      SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID_PROD }}
     steps:
-      - name: Validate required env vars
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate required vars
         run: |
           missing=""
           [ -z "$VERCEL_TOKEN" ] && missing="$missing VERCEL_TOKEN"
           [ -z "$VERCEL_PROJECT_ID" ] && missing="$missing VERCEL_PROJECT_ID"
+          [ -z "$VERCEL_DEPLOY_HOOK" ] && missing="$missing VERCEL_DEPLOY_HOOK"
           [ -z "$CONTACT_EMAIL" ] && missing="$missing CONTACT_EMAIL"
           [ -z "$SPOTIFY_REDIRECT_RELATIVE_URI" ] && missing="$missing SPOTIFY_REDIRECT_RELATIVE_URI"
           [ -z "$SPOTIFY_SCOPES" ] && missing="$missing SPOTIFY_SCOPES"
           [ -z "$GOOGLE_REDIRECT_RELATIVE_URI" ] && missing="$missing GOOGLE_REDIRECT_RELATIVE_URI"
           [ -z "$TRACK_UPLOAD_TIMEOUT_MS" ] && missing="$missing TRACK_UPLOAD_TIMEOUT_MS"
           [ -z "$DOMAIN_NAME" ] && missing="$missing DOMAIN_NAME"
-          [ -z "$HTMT_API_SUBDOMAIN_NAME" ] && missing="$missing HTMT_API_SUBDOMAIN_NAME"
-          [ -z "$GTMT_FRONT_SUBDOMAIN_NAME" ] && missing="$missing GTMT_FRONT_SUBDOMAIN_NAME"
-          [ -z "$AUDIOMETA_SUBDOMAIN_NAME" ] && missing="$missing AUDIOMETA_SUBDOMAIN_NAME"
+          [ -z "$HTMT_API_SUBDOMAIN" ] && missing="$missing HTMT_API_SUBDOMAIN"
+          [ -z "$HTMT_API_ROOT_SEGMENT" ] && missing="$missing HTMT_API_ROOT_SEGMENT"
+          [ -z "$GTMT_FRONT_SUBDOMAIN" ] && missing="$missing GTMT_FRONT_SUBDOMAIN"
+          [ -z "$AUDIOMETA_SUBDOMAIN" ] && missing="$missing AUDIOMETA_SUBDOMAIN"
           [ -z "$SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID_PROD"
           [ -z "$GOOGLE_CLIENT_ID" ] && missing="$missing GOOGLE_CLIENT_ID_PROD"
           if [ -n "$missing" ]; then
             echo "::error::Missing or empty (repo vars or production env):$missing"
             exit 1
           fi
-          echo "All required env vars are set."
+          echo "All required vars are set."
 
-      - name: Sync to Vercel production
+      - name: Sync env to Vercel production
         run: |
           set -e
-          BACKEND_BASE_URL="https://${HTMT_API_SUBDOMAIN_NAME}.${DOMAIN_NAME}/"
-          APP_URL="https://${GTMT_FRONT_SUBDOMAIN_NAME}.${DOMAIN_NAME}"
+          API_ROOT="${HTMT_API_ROOT_SEGMENT#/}"
+          API_ROOT="${API_ROOT%/}"
+          PKG_VERSION=$(jq -r '.version' package.json)
+          SHORT_SHA="${GITHUB_SHA::7}"
+          APP_VERSION="${PKG_VERSION}-dev+${SHORT_SHA}"
+          BACKEND_BASE_URL="https://${HTMT_API_SUBDOMAIN}.${DOMAIN_NAME}/${API_ROOT}/"
+          APP_URL="https://${GTMT_FRONT_SUBDOMAIN}.${DOMAIN_NAME}"
           APP_URL_TRIM="${APP_URL%/}"
           SPOTIFY_REDIRECT_URI="${APP_URL_TRIM}/${SPOTIFY_REDIRECT_RELATIVE_URI#/}"
           GOOGLE_REDIRECT_URI="${APP_URL_TRIM}/${GOOGLE_REDIRECT_RELATIVE_URI#/}"
-          AUDIOMETA_URL="https://${AUDIOMETA_SUBDOMAIN_NAME}.${DOMAIN_NAME}"
+          AUDIOMETA_URL="https://${AUDIOMETA_SUBDOMAIN}.${DOMAIN_NAME}"
           sync_var() {
             local value="$1"
             local key="$2"
@@ -81,58 +104,79 @@ jobs:
           sync_var "$GOOGLE_REDIRECT_URI" "NEXT_PUBLIC_GOOGLE_REDIRECT_URI"
           sync_var "$TRACK_UPLOAD_TIMEOUT_MS" "NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS"
           sync_var "$AUDIOMETA_URL" "NEXT_PUBLIC_AUDIOMETA_URL"
-          echo "Production sync done."
+          sync_var "$APP_VERSION" "NEXT_PUBLIC_APP_VERSION"
+          echo "Production env sync done."
 
-  sync-staging:
-    name: Sync to Vercel preview (staging)
+      - name: Trigger Vercel production deployment
+        run: |
+          set -e
+          echo "Triggering production deploy hook..."
+          curl -fsS -X POST "$VERCEL_DEPLOY_HOOK"
+          echo "Production deploy triggered."
+
+  deploy-staging:
+    name: Sync env and deploy staging
     runs-on: ubuntu-latest
-    environment: staging
+    environment: STAGING
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/develop'
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
       CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
       SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
       SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
       GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
       TRACK_UPLOAD_TIMEOUT_MS: ${{ vars.TRACK_UPLOAD_TIMEOUT_MS }}
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
-      HTMT_API_SUBDOMAIN_NAME: ${{ vars.HTMT_API_SUBDOMAIN_NAME }}
-      GTMT_FRONT_SUBDOMAIN_NAME: ${{ vars.GTMT_FRONT_SUBDOMAIN_NAME }}
-      AUDIOMETA_SUBDOMAIN_NAME: ${{ vars.AUDIOMETA_SUBDOMAIN_NAME }}
-      SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID_TEST }}
-      GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID_TEST }}
+      HTMT_API_SUBDOMAIN: ${{ vars.HTMT_API_SUBDOMAIN }}
+      HTMT_API_ROOT_SEGMENT: ${{ vars.HTMT_API_ROOT_SEGMENT }}
+      GTMT_FRONT_SUBDOMAIN: ${{ vars.GTMT_FRONT_SUBDOMAIN }}
+      AUDIOMETA_SUBDOMAIN: ${{ vars.AUDIOMETA_SUBDOMAIN }}
+      SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID_STAGING }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID_STAGING }}
     steps:
-      - name: Validate required env vars
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate required vars
         run: |
           missing=""
           [ -z "$VERCEL_TOKEN" ] && missing="$missing VERCEL_TOKEN"
           [ -z "$VERCEL_PROJECT_ID" ] && missing="$missing VERCEL_PROJECT_ID"
+          [ -z "$VERCEL_DEPLOY_HOOK" ] && missing="$missing VERCEL_DEPLOY_HOOK"
           [ -z "$CONTACT_EMAIL" ] && missing="$missing CONTACT_EMAIL"
           [ -z "$SPOTIFY_REDIRECT_RELATIVE_URI" ] && missing="$missing SPOTIFY_REDIRECT_RELATIVE_URI"
           [ -z "$SPOTIFY_SCOPES" ] && missing="$missing SPOTIFY_SCOPES"
           [ -z "$GOOGLE_REDIRECT_RELATIVE_URI" ] && missing="$missing GOOGLE_REDIRECT_RELATIVE_URI"
           [ -z "$TRACK_UPLOAD_TIMEOUT_MS" ] && missing="$missing TRACK_UPLOAD_TIMEOUT_MS"
           [ -z "$DOMAIN_NAME" ] && missing="$missing DOMAIN_NAME"
-          [ -z "$HTMT_API_SUBDOMAIN_NAME" ] && missing="$missing HTMT_API_SUBDOMAIN_NAME"
-          [ -z "$GTMT_FRONT_SUBDOMAIN_NAME" ] && missing="$missing GTMT_FRONT_SUBDOMAIN_NAME"
-          [ -z "$AUDIOMETA_SUBDOMAIN_NAME" ] && missing="$missing AUDIOMETA_SUBDOMAIN_NAME"
-          [ -z "$SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID_TEST"
-          [ -z "$GOOGLE_CLIENT_ID" ] && missing="$missing GOOGLE_CLIENT_ID_TEST"
+          [ -z "$HTMT_API_SUBDOMAIN" ] && missing="$missing HTMT_API_SUBDOMAIN"
+          [ -z "$HTMT_API_ROOT_SEGMENT" ] && missing="$missing HTMT_API_ROOT_SEGMENT"
+          [ -z "$GTMT_FRONT_SUBDOMAIN" ] && missing="$missing GTMT_FRONT_SUBDOMAIN"
+          [ -z "$AUDIOMETA_SUBDOMAIN" ] && missing="$missing AUDIOMETA_SUBDOMAIN"
+          [ -z "$SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID_STAGING"
+          [ -z "$GOOGLE_CLIENT_ID" ] && missing="$missing GOOGLE_CLIENT_ID_STAGING"
           if [ -n "$missing" ]; then
             echo "::error::Missing or empty (repo vars or staging env):$missing"
             exit 1
           fi
-          echo "All required env vars are set."
+          echo "All required vars are set."
 
-      - name: Sync to Vercel preview
+      - name: Sync env to Vercel preview
         run: |
           set -e
-          BACKEND_BASE_URL="https://${HTMT_API_SUBDOMAIN_NAME}-test.${DOMAIN_NAME}/"
-          APP_URL="https://staging.${GTMT_FRONT_SUBDOMAIN_NAME}.${DOMAIN_NAME}"
+          API_ROOT="${HTMT_API_ROOT_SEGMENT#/}"
+          API_ROOT="${API_ROOT%/}"
+          PKG_VERSION=$(jq -r '.version' package.json)
+          SHORT_SHA="${GITHUB_SHA::7}"
+          APP_VERSION="${PKG_VERSION}-dev+${SHORT_SHA}"
+          BACKEND_BASE_URL="https://staging.${HTMT_API_SUBDOMAIN}.${DOMAIN_NAME}/${API_ROOT}/"
+          APP_URL="https://staging.${GTMT_FRONT_SUBDOMAIN}.${DOMAIN_NAME}"
           APP_URL_TRIM="${APP_URL%/}"
           SPOTIFY_REDIRECT_URI="${APP_URL_TRIM}/${SPOTIFY_REDIRECT_RELATIVE_URI#/}"
           GOOGLE_REDIRECT_URI="${APP_URL_TRIM}/${GOOGLE_REDIRECT_RELATIVE_URI#/}"
-          AUDIOMETA_URL="https://${AUDIOMETA_SUBDOMAIN_NAME}.${DOMAIN_NAME}"
+          AUDIOMETA_URL="https://${AUDIOMETA_SUBDOMAIN}.${DOMAIN_NAME}"
           sync_var() {
             local value="$1"
             local key="$2"
@@ -155,4 +199,12 @@ jobs:
           sync_var "$GOOGLE_REDIRECT_URI" "NEXT_PUBLIC_GOOGLE_REDIRECT_URI"
           sync_var "$TRACK_UPLOAD_TIMEOUT_MS" "NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS"
           sync_var "$AUDIOMETA_URL" "NEXT_PUBLIC_AUDIOMETA_URL"
-          echo "Preview sync done."
+          sync_var "$APP_VERSION" "NEXT_PUBLIC_APP_VERSION"
+          echo "Preview env sync done."
+
+      - name: Trigger Vercel staging deployment
+        run: |
+          set -e
+          echo "Triggering staging deploy hook..."
+          curl -fsS -X POST "$VERCEL_DEPLOY_HOOK"
+          echo "Staging deploy triggered."

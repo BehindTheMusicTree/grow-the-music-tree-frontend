@@ -9,15 +9,22 @@ alwaysRun: true
 
 ## PR Description File Management
 
-When creating or working on a pull request, **NEVER** write the PR description directly in the GitHub UI or include it inline in responses.
+When creating or working on a pull request, **NEVER** write the PR description only in the GitHub UI draft without a local file, and **NEVER** deliver the full PR description only as inline chat text.
+
+### When the user asks for a PR description
+
+- **MUST** write the complete PR description to a **separate file**: `.pr-descriptions/<branch-name>.md`.
+- **MUST** determine `<branch-name>` from the repo (e.g. `git branch --show-current`); if unavailable, ask once or use the branch the user names.
+- **MUST** put the suggested PR title in that file at the top (e.g. `# PR title: feat(scope): summary`).
+- **MAY** reply in chat with a one-line pointer: branch, file path, and PR title only—not a duplicate of the full template body unless the user explicitly asks to paste it in the thread.
 
 ### Required Workflow
 
-1. **Always provide both PR title and PR description**
-   - When providing a PR description (in `.pr-descriptions/<branch-name>.md` or in responses), **always include a suggested PR title** at the top of the file or in the response.
+1. **Always provide both PR title and PR description in the file**
+   - The file is the source of truth for the full description.
    - PR title should be a short, imperative summary (e.g. `feat(health): add GET /health endpoint and rename dev env to env/development`).
 
-2. **Create PR description file in `.pr-descriptions/` directory**
+2. **Create or update the PR description file in `.pr-descriptions/`**
    - File name format: `<branch-name>.md`
    - Example: `.pr-descriptions/feature-genre-tree-visualization.md`
    - This directory is git-ignored for local drafting
@@ -83,11 +90,11 @@ Update your local PR description file when:
 
 ## Enforcement
 
-- **PR title required**: When providing a PR description (in a file or in a response), always provide a PR title as well. Place it at the top of the description file (e.g. `# PR title: feat(health): add GET /health endpoint`) or state it clearly when sharing the description.
-- AI assistant should always suggest creating/updating files in `.pr-descriptions/`
-- Never provide PR descriptions as plain text responses without also giving a suggested PR title
-- Always reference the PR template when creating descriptions
-- Remind to copy content to GitHub when the PR is ready
+- **Separate doc required**: On any request for a PR description, create or update `.pr-descriptions/<branch-name>.md` with the full content; do not treat chat as the primary place for the full description.
+- **PR title required**: Always include the suggested PR title at the top of that file (e.g. `# PR title: feat(health): add GET /health endpoint`).
+- **Chat reply**: Keep the message short: path to the file, PR title, and reminder to copy into GitHub when opening the PR.
+- Always reference the PR template when creating descriptions.
+- Remind to copy content to GitHub when the PR is ready.
 
 ---
 

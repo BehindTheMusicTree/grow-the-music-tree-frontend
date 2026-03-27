@@ -13,7 +13,7 @@ This rule defines how versioning and git tagging should be handled in this proje
 
 - **Release versions**: `v<major>.<minor>.<patch>` (e.g., `v0.2.0`, `v1.0.0`)
 - **Development tags**: `v<version>-dev-<branch-name>` (e.g., `v0.3.6-dev-improve-cicd`)
-  - Use branch name **without** type prefix (`feature/`, `hotfix/`, etc.)
+  - Use branch name **without** type prefix (`feature/`, `fix/`, `hotfix/`, etc.)
   - Example: Branch `feature/improve-cicd` → Tag `v0.3.6-dev-improve-cicd`
 - **Pre-release tags**: `v<version>-<identifier><number>` (e.g., `v0.2.0-rc1`, `v0.2.0-beta1`, `v0.2.0-alpha1`)
 
@@ -57,11 +57,12 @@ When creating or updating GitHub Actions workflows that need version information
 
 ### Development Tags (`-dev`)
 
-- Used for testing builds from **feature and hotfix branches**
+- Used for testing builds from **feature, fix, and hotfix branches**
 - Format: `v<version>-dev-<branch-name>`
 - Remove branch type prefix: `feature/improve-cicd` → `v0.3.6-dev-improve-cicd`
+- Remove branch type prefix: `fix/resolve-timeout` → `v0.3.6-dev-resolve-timeout`
 - Version selection:
-  - Feature branches: Typically minor version (e.g., `v0.3.6-dev-*` or `v0.4.0-dev-*`)
+  - Feature/fix branches: Typically patch or minor version (e.g., `v0.3.6-dev-*` or `v0.4.0-dev-*`)
   - Hotfix branches: Typically patch version (e.g., `v0.3.6-dev-*`)
   - Breaking changes: Major version (e.g., `v1.0.0-dev-*`)
 
@@ -76,7 +77,10 @@ When creating or updating GitHub Actions workflows that need version information
 ### Release Tags
 
 - Final release versions: `v0.2.0`, `v1.0.0`
-- Created after merging release branch to `main`
+- Prepare version/changelog on `release/*`, then merge to `main`
+- Merges to `main` and `develop` must go through Pull Requests (no direct merges)
+- Create final release tag on `main` merge commit (not on `release/*`)
+- After release/hotfix merge to `main`, back-merge to `develop` via PR (`main` -> `develop`)
 - Triggers production deployment
 
 ## Workflow Behavior

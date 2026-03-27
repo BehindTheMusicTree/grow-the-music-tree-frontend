@@ -79,6 +79,27 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run `npm version` on `main`; the postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md).
 ## [Unreleased]
 
+### CI
+
+- **Vercel deploy**: Replace `publish.yml` and `sync-vercel-env.yml` with `vercel-deploy.yml`, which syncs `NEXT_PUBLIC_*` variables to Vercel, sets `NEXT_PUBLIC_APP_VERSION` from `package.json` and the short Git SHA (`<version>-dev+<sha>`), and triggers deployment via the `VERCEL_DEPLOY_HOOK` secret on GitHub environments `PROD` and `STAGING`. Removes the previous publish workflow.
+- **Branch protection**: Allow `fix/*` as a valid source branch for pull requests targeting `develop`.
+
+### Fixed
+
+- **Dependencies**: Pin `picomatch@2` and `picomatch@4` via npm overrides (CVE-2026-27904).
+
+### Documentation
+
+- **Deployment and versioning**: Update `docs/DEPLOYMENT.md`, `docs/VERSIONING.md`, `README.md`, and `CONTRIBUTING.md` for hook-based Vercel deploys, required env configuration, and release flow (PR-only merges to `main`, release tag on `main`).
+- **Contributor workflow**: Update `.cursor/rules/pr-description-workflow.mdc` so draft PR descriptions live under `.pr-descriptions/<branch-name>.md`.
+
+## [1.4.2] - 2026-03-26
+
+### CI
+
+- **Sync Vercel env**: `NEXT_PUBLIC_BACKEND_BASE_URL` includes the API root from required repo var `HTMT_API_ROOT_SEGMENT` (e.g. `v2`); the workflow fails validation if it is missing. Preview/staging API host uses `staging.<HTMT_API_SUBDOMAIN>.<DOMAIN_NAME>` instead of `<subdomain>-test.<DOMAIN_NAME>`. Preview job prefers `SPOTIFY_CLIENT_ID_STAGING` / `GOOGLE_CLIENT_ID_STAGING`, with fallback to the existing `*_TEST` variables. Subdomain GitHub variables are `HTMT_API_SUBDOMAIN`, `GTMT_FRONT_SUBDOMAIN`, and `AUDIOMETA_SUBDOMAIN` (replaces the previous `*_SUBDOMAIN_NAME` names).
+
+
 ## [1.4.1] - 2026-03-15
 
 ### CI
@@ -88,7 +109,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Removed
 
 - **Metadata Manager page and related code**: Removed `/metadata-manager` page, `useGetFullMetadata` hook (`useAudioMetadata.ts`), `AudioMetadataDetailed` schema, and `audio-metadata` API domain. This functionality has been moved to the audiometa-frontend repository.
-
 
 ## [1.4.0] - 2025-03-12
 
@@ -339,7 +359,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Branch Protection**: Added Git Flow branch protection workflow
   - Enforces branch naming conventions for PRs to `main` (hotfix/_, release/_ only)
-  - Enforces branch naming conventions for PRs to `develop` (feature/_, chore/_, dependabot/\_ only)
+  - Enforces branch naming conventions for PRs to `develop` (feature/_, fix/_, chore/_, dependabot/\_ only)
   - Automatically comments on invalid PRs with clear instructions
   - Prevents merging branches that don't follow Git Flow workflow
 
