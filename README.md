@@ -206,33 +206,25 @@ The CI pipeline includes:
 - Testing
 - Build check
 
-Deployment to staging and production is handled by Vercel on push to `develop` or `main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). The publish workflow (on version tag push) validates the tag and runs a build check; it does not deploy.
+Deployment to staging and production is handled by the GitHub Actions workflow [`.github/workflows/vercel-deploy.yml`](.github/workflows/vercel-deploy.yml), which syncs env vars to Vercel and then triggers deployment hooks for `develop`/`main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
 **GitHub Actions workflow** (simplified):
 
 ```yaml
-name: Publish
+name: Vercel deploy
 
 on:
   push:
-    tags: ["*"]
-  workflow_call:
+    branches: [main, develop]
+  workflow_dispatch:
 
 jobs:
-  build-image-and-push:
+  sync-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: npm
-      - run: npm ci --legacy-peer-deps
-      - run: npm run lint
-      - run: npm run test
-      - run: npm run build
-      - name: Build and push Docker image
-        # ... (additional deployment steps)
+      - name: Sync NEXT_PUBLIC_* vars to Vercel env
+      - name: Trigger Vercel deploy hook
 ```
 
 ## Build & Hosting

@@ -356,7 +356,7 @@ When testing your changes, verify:
 
 #### 4.1. Testing Builds During Development
 
-You can validate that your branch builds successfully by creating a development tag. This triggers the publish workflow (tag validation + build check). Staging and production are updated by Vercel when you push to `develop` or `main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
+You can validate that your branch builds successfully by running local CI checks (`npm run lint`, `npm run test`, `npm run build`) before opening a PR. Staging and production deployments are handled by the Vercel deploy workflow on push to `develop` or `main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
 **Choosing a Version Number:**
 
@@ -381,12 +381,9 @@ git tag v0.3.6-dev-improve-cicd  # branch: feature/improve-cicd
 git push origin v0.3.6-dev-improve-cicd
 ```
 
-This automatically triggers the `publish.yml` workflow which will:
+Development tags are still useful as release metadata, but they no longer trigger a dedicated publish workflow.
 
-- Validate the tag and run a build check (`npm run build`)
-- Allow you to confirm the branch builds before creating a PR
-
-Deployment to staging or production is done by Vercel when you push to `develop` or merge to `main`.
+Deployment to staging or production is handled by the Vercel deploy workflow when you push to `develop` or merge to `main`.
 
 **Republishing After Changes:**
 
