@@ -27,6 +27,16 @@ The **head** branch name must match one of:
 
 The **head** branch must be `release/*` or `hotfix/*` only.
 
+## Never bypass PRs to `main` or `develop`
+
+**CONTRIBUTING.md** requires **Pull Requests** for all changes, including from maintainers: *“No direct commits to `main` or `develop`”* and *release/hotfix merged via PR*.
+
+When helping with Git:
+
+- **Do not** run **`git merge …` into `main` locally** and **`git push origin main`** to ship a **`release/*`** or **`hotfix/*`**. That skips the GitHub PR, checks, and review trail.
+- **Do** tell the user to **open a PR** (`release/*` or `hotfix/*` → `main`), merge it **in GitHub**, then **`git pull origin main`** locally before **`git tag`** / **`git push origin vX.Y.Z`**.
+- **Back-merge** **`main` → `develop`**: same rule — **PR on GitHub**, not a local merge + push to **`develop`**.
+
 ## Releases and version tags
 
 For a **shipping** release, **`npm version`** (with git tag) runs only on **`main`**, after the `release/*` or `hotfix/*` PR is merged. Do not push production **`vX.Y.Z`** tags from `chore/*`, `feature/*`, or `release/*`. See **CONTRIBUTING.md** §7 and **`docs/VERSIONING.md`**.
