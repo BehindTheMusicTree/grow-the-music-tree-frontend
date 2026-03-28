@@ -79,6 +79,20 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run `npm version` on `main`; the postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md).
 ## [Unreleased]
 
+### CI
+
+- **Vercel deploy**: Replace `publish.yml` and `sync-vercel-env.yml` with `vercel-deploy.yml`, which syncs `NEXT_PUBLIC_*` variables to Vercel, sets `NEXT_PUBLIC_APP_VERSION` from `package.json` and the short Git SHA (`<version>-dev+<sha>`), and triggers deployment via the `VERCEL_DEPLOY_HOOK` secret on GitHub environments `PROD` and `STAGING`. Removes the previous publish workflow.
+- **Branch protection**: Allow `fix/*` as a valid source branch for pull requests targeting `develop`.
+
+### Fixed
+
+- **Dependencies**: Pin `picomatch@2` and `picomatch@4` via npm overrides (CVE-2026-27904).
+
+### Documentation
+
+- **Deployment and versioning**: Update `docs/DEPLOYMENT.md`, `docs/VERSIONING.md`, `README.md`, and `CONTRIBUTING.md` for hook-based Vercel deploys, required env configuration, and release flow (PR-only merges to `main`, release tag on `main`).
+- **Contributor workflow**: Update `.cursor/rules/pr-description-workflow.mdc` so draft PR descriptions live under `.pr-descriptions/<branch-name>.md`.
+
 ## [1.4.2] - 2026-03-26
 
 ### CI
