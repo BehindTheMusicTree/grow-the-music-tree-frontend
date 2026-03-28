@@ -24,6 +24,8 @@ This document describes how application versioning is handled in CI/CD workflows
 
 **Release identity** is a **semver tag** on `main` (e.g. `v0.2.0`). Production deploy runs when that tag is pushed (see below), not on every merge to `main`.
 
+**`npm version`** for a shipping release runs **only on `main`**, after **`release/*` or `hotfix/*` is merged into `main` via PR** ([CONTRIBUTING.md](../CONTRIBUTING.md) §7). Prepare `package.json` / changelog on `release/*` with `npm version … --no-git-tag-version` if needed; the **tag** and **postversion** changelog move happen when you run **`npm version` on `main`**.
+
 **`package.json` `version`** is the string synced to `NEXT_PUBLIC_APP_VERSION` and shown in the app. For a tag-triggered deploy it **must equal** the tag (`v0.2.0` → `0.2.0`). A manual **Vercel deploy** run (`workflow_dispatch`) still uses `package.json` only.
 
 **Pre-release and dev tags** (`v1.0.0-rc1`, `v0.3.0-dev-*`, etc.) do **not** trigger production deploy.
@@ -170,7 +172,7 @@ npm version major   # 0.1.0 → 1.0.0
 npm version 1.3.0 --no-git-tag-version   # set exact version (no commit/tag)
 ```
 
-Use `--no-git-tag-version` when you only want to change `package.json` (e.g. before creating the tag manually). Otherwise `npm version` commits and tags. The `postversion` script automatically: moves `[Unreleased]` into a new `## [X.Y.Z] - YYYY-MM-DD` section and amends the version commit; then deletes local and remote test and dev tags for that version (e.g. `v1.4.0-test`, `v1.4.0-dev-*`). Rc/beta/alpha tags are not deleted automatically. Push the tag when ready: `git push origin v<version>`.
+Use `--no-git-tag-version` on **`release/*`** to bump `package.json` and prepare changelog without creating a tag. For the **final** release, run **`npm version` on `main`** (without `--no-git-tag-version`) so the tool commits, tags, and runs `postversion`. The `postversion` script moves `[Unreleased]` into `## [X.Y.Z] - YYYY-MM-DD`, amends the version commit, recreates **`vX.Y.Z`**, and deletes test/dev tags for that version. Rc/beta/alpha tags are not deleted automatically. From **`main`**: `git push origin main` and `git push origin v<version>`.
 
 ### Creating a Release
 
@@ -193,10 +195,11 @@ git commit -m "chore(release): prepare v0.2.0"
 
 # 2. Open PR: release/v0.2.0 -> main, wait for checks/review, merge in GitHub
 
-# 3. On updated main: create release tag from canonical merge commit
+# 3. On updated main: npm version creates commit + v0.2.0 tag (postversion updates CHANGELOG)
 git checkout main
 git pull origin main
-git tag v0.2.0
+npm version minor   # or patch / major — must match prepared release
+git push origin main
 git push origin v0.2.0
 
 # 4. Open PR: main -> develop for required back-merge, merge in GitHub

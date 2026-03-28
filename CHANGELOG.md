@@ -78,9 +78,13 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Blocks invalid PRs to main and develop branches
 ```
 
-**Note:** During releases, maintainers run `npm version` on `main`; the postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md).
+**Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+### Documentation
+
+- **Releases**: State that **`npm version`** and shipping **`vX.Y.Z`** run on **`main` only**, after merging **`release/*` or `hotfix/*`** via PR; align [CONTRIBUTING.md](CONTRIBUTING.md) §7, [docs/VERSIONING.md](docs/VERSIONING.md), changelog contributor note, and Cursor rules (`.cursor/rules/versioning.mdc`, `git-flow-branches.mdc`, `semver-guide.mdc`).
 
 ### CI
 
