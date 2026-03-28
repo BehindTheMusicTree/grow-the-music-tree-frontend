@@ -8,6 +8,7 @@ Code and UI styling conventions for this project.
 - [File and module naming](#file-and-module-naming)
 - [Key directories](#key-directories)
 - [Tailwind & UI styling](#tailwind--ui-styling)
+- [Repository workflow (branches and PRs)](#repository-workflow-branches-and-prs)
 - [Best practices](#best-practices)
 
 ## Technology guidelines
@@ -83,6 +84,10 @@ Example:
 | Button base     | `px-4 py-2 rounded font-medium` |
 | Primary button  | `bg-blue-600 text-white hover:bg-blue-700 transition-colors` |
 | Secondary button| `bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors` |
+
+## Repository workflow (branches and PRs)
+
+Git branch naming and PR targets follow **strict Git Flow** in **CONTRIBUTING.md** (§2 Branching, Branch Protection), enforced by `.github/workflows/branch-protection.yml`. Use `chore/*` for CI/tooling branches, not `ci/*`.
 
 ## Best practices
 
