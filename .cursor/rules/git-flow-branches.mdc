@@ -1,0 +1,32 @@
+---
+description: Git Flow branch name prefixes allowed for PRs; must match branch-protection.yml and CONTRIBUTING.md
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# Git Flow branch names (PR source branches)
+
+Enforced by `.github/workflows/branch-protection.yml`. Human-readable rules: **CONTRIBUTING.md** §2 Branching (Branch Protection).
+
+## PRs targeting `develop`
+
+The **head** branch name must match one of:
+
+- `feature/*`
+- `fix/*`
+- `chore/*` (use for **CI/CD**, GitHub Actions, and tooling—there is **no** `ci/*` prefix)
+- `dependabot/*`
+- `release/*`
+- `hotfix/*`
+- exactly `main` (back-merge after release/hotfix)
+
+**Not allowed** for PRs to `develop`: `ci/*`, `refactor/*`, or other prefixes. Rename to `chore/…` (or `fix/…` / `feature/…` as appropriate).
+
+## PRs targeting `main`
+
+The **head** branch must be `release/*` or `hotfix/*` only.
+
+## PR descriptions
+
+Draft file path `.pr-descriptions/<branch-name>.md` uses the **actual** branch name (may contain `/`); see **pr-description-workflow.mdc**.

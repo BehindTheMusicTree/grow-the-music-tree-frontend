@@ -214,13 +214,12 @@ We follow **strict Git Flow** with the following branch structure:
 - All feature and chore branches merge into `develop`
 - `develop` is merged into `main` via release branches
 - **No direct commits allowed** - All changes must go through Pull Requests
-- Only receives merges from `feature/*`, `fix/*`, `chore/*`, and `dependabot/*` branches
-- **Branch protection enforced** - GitHub Actions automatically blocks PRs to `develop` that don't come from `feature/*`, `fix/*`, `chore/*`, or `dependabot/*` branches (see `.github/workflows/branch-protection.yml`)
+- **Valid PR source branches** are enforced by `.github/workflows/branch-protection.yml` (see **Branch Protection** below)
 
 #### 🛡️ Branch Protection
 
 - **PRs to `main`** must come from `hotfix/*` or `release/*` branches only. This ensures production fixes are traceable and carefully released.
-- **PRs to `develop`** can come from `feature/*`, `fix/*`, `chore/*`, `dependabot/*`, `release/*`, `hotfix/*`, or `main` (required for post-release/hotfix back-merges). Other branch types (e.g., `refactor/*`, etc.) are blocked by the branch protection workflow.
+- **PRs to `develop`** may come only from branches whose names start with one of: `feature/`, `fix/`, `chore/`, `dependabot/`, `release/`, `hotfix/`, or from the branch named exactly `main` (post-release or post-hotfix back-merge). Anything else (including `ci/*`, `refactor/*`, etc.) is **rejected** by CI. Use **`chore/*`** for CI/CD and workflow changes (e.g. `chore/vercel-sync-workflow`), not `ci/*`.
 - Branch protection is enforced by the `branch-protection.yml` GitHub Actions workflow located at `.github/workflows/branch-protection.yml`.
 - **Invalid PRs will:**
   - Fail the CI check
@@ -298,7 +297,7 @@ We follow **strict Git Flow** with the following branch structure:
 
 #### Chore Branches (`chore/<name>`)
 
-- For maintenance, infrastructure, and configuration work
+- For maintenance, infrastructure, and configuration work (including **GitHub Actions and CI**). There is no separate `ci/*` branch prefix—use `chore/*` so PRs to `develop` pass branch protection.
 - Branch from `develop`
 - Include issue numbers when applicable: `chore/234-update-dependencies`
 - Examples: repository setup, CI/CD changes, dependency updates, documentation infrastructure
@@ -356,7 +355,7 @@ When testing your changes, verify:
 
 #### 4.1. Testing Builds During Development
 
-You can validate that your branch builds successfully by running local CI checks (`npm run lint`, `npm run test`, `npm run build`) before opening a PR. Staging and production deployments are handled by the Vercel deploy workflow on push to `develop` or `main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
+You can validate that your branch builds successfully by running local CI checks (`npm run lint`, `npm run test`, `npm run build`) before opening a PR. Staging builds come from **Vercel Git** on `develop`; production deploys use the **Vercel deploy** workflow on push to `main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
 **Choosing a Version Number:**
 
@@ -383,7 +382,7 @@ git push origin v0.3.6-dev-improve-cicd
 
 Development tags are still useful as release metadata, but they no longer trigger a dedicated publish workflow.
 
-Deployment to staging or production is handled by the Vercel deploy workflow when you push to `develop` or merge to `main`.
+Deployment to staging follows **Vercel Git** when you push to `develop`. Production is updated by the **Vercel deploy** workflow when you merge to `main`.
 
 **Republishing After Changes:**
 
@@ -487,7 +486,7 @@ Before submitting a Pull Request, ensure the following checks are completed:
 - ✅ Commit messages follow the commit message convention
 - ✅ Branch is up to date with target branch (`develop` for features/fixes/chores, `main` for hotfixes)
 - ✅ No accidental commits (large files, secrets, personal configs, `.env` files)
-- ✅ Branch follows naming convention (`feature/`, `fix/`, `chore/`, `hotfix/`, `release/`)
+- ✅ Branch follows naming convention for the target branch (see **Branch Protection**): for PRs to `develop`, use `feature/*`, `fix/*`, `chore/*`, `dependabot/*`, or (maintainers) `release/*`, `hotfix/*`, or `main` for back-merge; for PRs to `main`, use `release/*` or `hotfix/*` only
 
 **5. Branch Target**
 
@@ -597,11 +596,12 @@ Pull Request titles must follow the same format as commit messages for consisten
 
 **Note on Branch Prefixes vs PR Title Types:**
 
-Branch prefixes (`feature/`, `fix/`, `chore/`, `hotfix/`, `release/`) are for branch organization and differ from PR title types:
+Branch prefixes (`feature/`, `fix/`, `chore/`, `hotfix/`, `release/`, plus `dependabot/` and exact `main` when allowed) are for branch organization and differ from PR title types:
 
 - Branch `feature/add-playlist-export` → PR title: `feat(playlist): add export functionality` (use `feat`, not `feature`)
 - Branch `fix/player-preview-timeout` → PR title: `fix(player): handle preview timeout` (use `fix`)
 - Branch `chore/update-dependencies` → PR title: `chore: update dependencies` (use `chore`)
+- Branch `chore/vercel-sync-workflow` → PR title: `ci(vercel): …` or `chore: …` (branch stays `chore/*`; there is no `ci/*` branch prefix in this repo)
 - Branch `hotfix/player-crash` → PR title: `fix(player): prevent crash on invalid track` (use `fix`, not `hotfix`)
 - Branch `release/v0.2.0` → PR title: `chore: prepare release v0.2.0` (use `chore`)
 

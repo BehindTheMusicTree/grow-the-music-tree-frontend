@@ -101,7 +101,7 @@ Fixes #
 
 ### Git & Workflow
 
-- [ ] My branch follows the Git Flow naming convention (`feature/*`, `fix/*`, `chore/*`, etc.)
+- [ ] My branch name is allowed for this PR target (see [CONTRIBUTING.md §2 Branching](../CONTRIBUTING.md#2-branching) and **Branch Protection**): `develop` ← `feature/*`, `fix/*`, `chore/*`, `dependabot/*`, `release/*`, `hotfix/*`, or `main` (back-merge); `main` ← `release/*` or `hotfix/*` only (`ci/*` and similar prefixes are not allowed—use `chore/*` for CI changes)
 - [ ] My commits follow the Conventional Commits format
 - [ ] I have rebased my branch on the latest target branch
 - [ ] I have resolved all merge conflicts

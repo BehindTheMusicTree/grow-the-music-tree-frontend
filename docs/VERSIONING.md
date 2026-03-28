@@ -19,7 +19,6 @@ This document describes how application versioning is handled in CI/CD workflows
   - [Creating a Release](#creating-a-release)
   - [Development Version Tag Testing](#development-version-tag-testing)
   - [Pre-Release Version Tag Testing](#pre-release-version-tag-testing)
-- [Workflows Using Versioning](#workflows-using-versioning)
 
 ## Overview
 
@@ -34,7 +33,7 @@ Versions follow semantic versioning with a `v` prefix:
 
 ## Pre-Release Versions
 
-Pre-release version tags are used as release metadata before final release. They follow semantic versioning conventions and are supported by the release process. Deployment is done by the Vercel deploy workflow on push to `main` or `develop` (see [DEPLOYMENT.md](DEPLOYMENT.md)).
+Pre-release version tags are used as release metadata before final release. They follow semantic versioning conventions and are supported by the release process. Pushing a tag does not deploy by itself; production updates follow pushes to `main` (see [DEPLOYMENT.md](DEPLOYMENT.md)).
 
 There are two main categories of pre-release versions, distinguished by **when** they're used and **where** they're created:
 
@@ -70,7 +69,7 @@ The version number is a placeholder - the actual release version is determined w
 
 When you push a development version tag (e.g., `v0.3.6-dev-improve-cicd`), no deployment is triggered by the tag itself.
 
-Staging and production are deployed by the Vercel deploy workflow when you push to `develop` or `main` (see [DEPLOYMENT.md](DEPLOYMENT.md)).
+Staging is built by **Vercel Git** when you push to `develop`; production is updated by the **Vercel deploy** workflow when you push to `main` (see [DEPLOYMENT.md](DEPLOYMENT.md)).
 
 #### Republishing Development Version Tags
 
@@ -116,7 +115,7 @@ Release candidate version tags are used to test builds and deployments from **re
 
 When you push a release candidate version tag (e.g., `v0.2.0-rc1`), no deployment is triggered by the tag itself.
 
-Deployment is done by the Vercel deploy workflow on push to `main` or `develop` (see [DEPLOYMENT.md](DEPLOYMENT.md)).
+Production is updated by the Vercel deploy workflow on push to `main`; staging uses Vercel Git on `develop` (see [DEPLOYMENT.md](DEPLOYMENT.md)).
 
 ### Cleanup
 
@@ -126,11 +125,14 @@ Test and dev tags for the released version (e.g. `v1.4.0-test`, `v1.4.0-dev-*`) 
 
 ### Deployment Workflow (`vercel-deploy.yml`)
 
-When code is pushed to `main` or `develop`, the `vercel-deploy.yml` workflow:
+When code is pushed to **`main`**, [`vercel-deploy.yml`](../.github/workflows/vercel-deploy.yml):
 
-1. **Syncs env vars** from GitHub variables/secrets to the matching Vercel target.
-2. **Sets app version** as `NEXT_PUBLIC_APP_VERSION=<package.json version>-dev+<shortsha>`.
-3. **Triggers deployment** via Vercel deploy hook for the matching environment.
+1. **Sets** `NEXT_PUBLIC_APP_VERSION` on Vercel **production** to `<package.json version>-dev+<shortsha>` via the Vercel API.
+2. **Triggers** a **production** deployment via the `VERCEL_DEPLOY_HOOK` secret (Git production deploys for `main` are disabled in [`vercel.json`](../vercel.json); CI owns production deploys).
+
+**Staging (`develop` and PRs):** Vercel builds from Git only. `NEXT_PUBLIC_APP_VERSION` for preview is not updated by this workflow on every `develop` push; use Vercel project env or run [**Vercel sync env**](../.github/workflows/vercel-sync-env.yml) for preview when needed.
+
+**Other `NEXT_PUBLIC_*` variables:** Pushed only when you run the manual workflow [**Vercel sync env**](../.github/workflows/vercel-sync-env.yml) (`vercel-sync-env.yml`), not on every production deploy. See [DEPLOYMENT.md](DEPLOYMENT.md) §3.1.
 
 ## Benefits
 
@@ -197,7 +199,7 @@ For validating build metadata from feature, fix, or hotfix branches:
 git checkout feature/improve-cicd
 git tag v0.3.6-dev-improve-cicd
 git push origin v0.3.6-dev-improve-cicd
-# Tag is created for traceability; deployment still follows branch pushes
+# Tag is created for traceability; deploys follow Git/CI as in DEPLOYMENT.md
 ```
 
 ### Pre-Release Version Tag Testing

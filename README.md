@@ -206,25 +206,29 @@ The CI pipeline includes:
 - Testing
 - Build check
 
-Deployment to staging and production is handled by the GitHub Actions workflow [`.github/workflows/vercel-deploy.yml`](.github/workflows/vercel-deploy.yml), which syncs env vars to Vercel and then triggers deployment hooks for `develop`/`main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
+Staging builds use **Vercel Git** on `develop`. Production uses [`.github/workflows/vercel-deploy.yml`](.github/workflows/vercel-deploy.yml) on push to `main` (sets `NEXT_PUBLIC_APP_VERSION`, then the production deploy hook). Full `NEXT_PUBLIC_*` sync from GitHub is manual: [`.github/workflows/vercel-sync-env.yml`](.github/workflows/vercel-sync-env.yml). See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-**GitHub Actions workflow** (simplified):
+**GitHub Actions** (simplified):
 
 ```yaml
-name: Vercel deploy
-
+# vercel-deploy.yml — push to main
 on:
   push:
-    branches: [main, develop]
-  workflow_dispatch:
-
+    branches: [main]
 jobs:
-  sync-and-deploy:
-    runs-on: ubuntu-latest
+  deploy-production:
     steps:
-      - uses: actions/checkout@v4
-      - name: Sync NEXT_PUBLIC_* vars to Vercel env
-      - name: Trigger Vercel deploy hook
+      - checkout
+      - sync NEXT_PUBLIC_APP_VERSION to Vercel production
+      - POST production deploy hook
+
+# vercel-sync-env.yml — manual only
+on: workflow_dispatch
+jobs:
+  sync-production / sync-preview:
+    steps:
+      - checkout
+      - sync all mapped NEXT_PUBLIC_* to Vercel (no hook)
 ```
 
 ## Build & Hosting
