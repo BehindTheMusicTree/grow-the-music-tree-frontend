@@ -14,7 +14,7 @@ When creating or working on a pull request, **NEVER** write the PR description o
 ### When the user asks for a PR description
 
 - **MUST** write the complete PR description to a **separate file**: `.pr-descriptions/<branch-name>.md`.
-- **MUST** determine `<branch-name>` from the repo (e.g. `git branch --show-current`); if unavailable, ask once or use the branch the user names.
+- **MUST** determine `<branch-name>` from the repo (e.g. `git branch --show-current`); if unavailable, ask once or use the branch the user names. That branch name must be an **allowed PR source branch** for the target (e.g. `chore/*` for CI changes, not `ci/*`); see **git-flow-branches.mdc**.
 - **MUST** put the suggested PR title in that file at the top (e.g. `# PR title: feat(scope): summary`).
 - **MAY** reply in chat with a one-line pointer: branch, file path, and PR title only—not a duplicate of the full template body unless the user explicitly asks to paste it in the thread.
 
