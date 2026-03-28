@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [1.4.4 - 2026-03-28](#144---2026-03-28)
 - [1.4.3 - 2026-03-28](#143---2026-03-28)
 - [1.3.0 - 2025-03-08](#130---2025-03-08)
 - [1.2.3 - 2025-02-23](#123---2025-02-23)
@@ -80,6 +81,17 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run `npm version` on `main`; the postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md).
 
 ## [Unreleased]
+
+## [1.4.4] - 2026-03-28
+
+### CI
+
+- **Vercel**: Add `vercel-sync-env.yml` for manual full sync of mapped `NEXT_PUBLIC_*` variables to Vercel production and/or preview (no deploy hooks). Slim `vercel-deploy.yml` to **`main` only**: production `NEXT_PUBLIC_APP_VERSION` + production deploy hook; remove `develop` trigger and staging job. Staging builds use Vercel Git on `develop`. Add `scripts/vercel-sync-env-from-github.sh`.
+
+### Documentation
+
+- **Git Flow and tooling**: Align CONTRIBUTING, PR template, branch-protection error copy, `docs/STYLE_GUIDE.md`, and `.cursor/rules` (`git-flow-branches.mdc`, `pr-description-workflow.mdc`) with enforced PR branch prefixes; document `chore/*` for CI changes (not `ci/*`). Update DEPLOYMENT, VERSIONING, README, CONTRIBUTING, and `validate.yml` comment for the two-workflow model.
+
 
 ## [1.4.3] - 2026-03-28
 
