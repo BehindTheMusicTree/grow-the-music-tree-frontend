@@ -1,4 +1,4 @@
-# Vercel: develop → Git preview builds; main → Vercel deploy workflow + hook (see docs/DEPLOYMENT.md).
+# Vercel: develop → Git preview builds; production → semver tag or manual Vercel deploy + hook (see docs/DEPLOYMENT.md).
 name: Validate
 
 on:
