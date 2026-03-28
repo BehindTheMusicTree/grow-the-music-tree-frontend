@@ -30,7 +30,7 @@ if (nextSection === -1) {
 }
 
 const unreleasedContent = content.slice(second + marker.length, nextSection).trim();
-const newBlock = `${marker.trim()}\n\n## [${version}] - ${date}\n\n${unreleasedContent}\n\n`;
+const newBlock = `\n${marker.trim()}\n\n## [${version}] - ${date}\n\n${unreleasedContent}\n\n`;
 const newContent = content.slice(0, second) + newBlock + content.slice(nextSection);
 
 writeFileSync(changelogPath, newContent, "utf8");

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [1.4.3 - 2026-03-28](#143---2026-03-28)
 - [1.3.0 - 2025-03-08](#130---2025-03-08)
 - [1.2.3 - 2025-02-23](#123---2025-02-23)
 - [1.2.2 - 2025-02-21](#122---2025-02-21)
@@ -77,11 +78,15 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ```
 
 **Note:** During releases, maintainers run `npm version` on `main`; the postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md).
+
 ## [Unreleased]
+
+## [1.4.3] - 2026-03-28
 
 ### CI
 
 - **Vercel deploy**: Replace `publish.yml` and `sync-vercel-env.yml` with `vercel-deploy.yml`, which syncs `NEXT_PUBLIC_*` variables to Vercel, sets `NEXT_PUBLIC_APP_VERSION` from `package.json` and the short Git SHA (`<version>-dev+<sha>`), and triggers deployment via the `VERCEL_DEPLOY_HOOK` secret on GitHub environments `PROD` and `STAGING`. Removes the previous publish workflow.
+- **Vercel Git**: Add `vercel.json` with `git.deploymentEnabled.main: false` so pushes to `main` do not trigger a production deployment from Git; production deploys still run via the CI deploy hook. Preview and other branches (e.g. `develop`) keep automatic Git deployments.
 - **Branch protection**: Allow `fix/*` as a valid source branch for pull requests targeting `develop`.
 
 ### Fixed
@@ -92,6 +97,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Deployment and versioning**: Update `docs/DEPLOYMENT.md`, `docs/VERSIONING.md`, `README.md`, and `CONTRIBUTING.md` for hook-based Vercel deploys, required env configuration, and release flow (PR-only merges to `main`, release tag on `main`).
 - **Contributor workflow**: Update `.cursor/rules/pr-description-workflow.mdc` so draft PR descriptions live under `.pr-descriptions/<branch-name>.md`.
+
 
 ## [1.4.2] - 2026-03-26
 
