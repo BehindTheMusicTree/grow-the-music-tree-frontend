@@ -9,7 +9,7 @@ This guide covers deploying the app to Vercel with **develop → staging** and *
 3. Leave framework preset as **Next.js** and root directory as **./** (or `src` if your app lives there; this project uses root).
 4. Deploy. The first deployment will use your default branch.
 
-After this, configure production and staging as below so that **main** deploys to production and **develop** to staging.
+After this, configure production and staging as below: **production** builds from **`main`** when you push a **semver release tag** or run the deploy workflow manually; **develop** drives staging via Vercel Git.
 
 ## 2. Vercel project configuration
 
@@ -18,7 +18,7 @@ After this, configure production and staging as below so that **main** deploys t
 1. Open the project on Vercel → **Settings**.
 2. In the left sidebar, go to **Environments** (or **Git** → production branch, depending on UI).
 3. Set **Production Branch** to `main`. Save.
-4. Production deploys for `main` are triggered by the [**Vercel deploy**](../.github/workflows/vercel-deploy.yml) GitHub Action (deploy hook), not by Vercel’s Git integration (`vercel.json` disables Git-initiated production deploys for `main`). Merging to `main` runs that workflow, which updates `NEXT_PUBLIC_APP_VERSION` and calls the hook so Vercel builds production.
+4. Production deploys for `main` are triggered by the [**Vercel deploy**](../.github/workflows/vercel-deploy.yml) GitHub Action (deploy hook), not by Vercel’s Git integration (`vercel.json` disables Git-initiated production deploys for `main`). Pushing a **semver release tag** `vMAJOR.MINOR.PATCH` (or a manual **Vercel deploy** run) updates `NEXT_PUBLIC_APP_VERSION` and calls the hook so Vercel builds production. Merging to `main` alone does not run that workflow.
 
 ### 2.2 Production domain
 
@@ -42,7 +42,7 @@ Result:
 
 | Environment | Branch    | Deploys when       | URL example                    |
 | ----------- | --------- | ------------------ | ------------------------------ |
-| Production  | `main`    | Push/merge to main | `app.themusictree.org`         |
+| Production  | `main`    | Push tag `vX.Y.Z` or manual **Vercel deploy** | `app.themusictree.org`         |
 | Staging     | `develop` | Push to develop    | `staging.grow.themusictree.org` or preview URL |
 | PR previews | any       | Open PR            | `…-git-branch-…vercel.app`     |
 
@@ -59,9 +59,9 @@ You can push environment variables to Vercel from GitHub Actions so they stay in
 | Workflow | File | When it runs | What it does |
 | -------- | ---- | ------------ | ------------- |
 | **Vercel sync env** | [`vercel-sync-env.yml`](../.github/workflows/vercel-sync-env.yml) | **Manual only** (**Actions → Vercel sync env → Run workflow**) | Upserts **all** mapped `NEXT_PUBLIC_*` variables to Vercel **production** and/or **preview** (you choose via checkboxes). **Does not** trigger deploy hooks. |
-| **Vercel deploy** | [`vercel-deploy.yml`](../.github/workflows/vercel-deploy.yml) | Push to **`main`**, or manual **Actions → Vercel deploy** | Sets **only** `NEXT_PUBLIC_APP_VERSION` on Vercel production, then POSTs the **production** deploy hook. |
+| **Vercel deploy** | [`vercel-deploy.yml`](../.github/workflows/vercel-deploy.yml) | Push semver tag **`v*.*.*`** (exactly `vMAJOR.MINOR.PATCH`), or manual **Actions → Vercel deploy** | Sets **only** `NEXT_PUBLIC_APP_VERSION` on Vercel production (tag must match `package.json` on tag pushes), then POSTs the **production** deploy hook. |
 
-After you change GitHub **Variables** or **Secrets** that map to Vercel, run **Vercel sync env** so Vercel matches GitHub. Routine merges to `main` do **not** re-sync those values.
+After you change GitHub **Variables** or **Secrets** that map to Vercel, run **Vercel sync env** so Vercel matches GitHub. Routine merges to `main` do **not** re-sync those values or deploy production.
 
 **Staging (`develop` and PRs)** is built by **Vercel Git** only. Run **Vercel sync env** with “preview” enabled when preview/staging env vars in GitHub change, or set preview variables manually in Vercel. `NEXT_PUBLIC_APP_VERSION` is **not** updated on every `develop` push by CI.
 
@@ -107,7 +107,7 @@ After you change GitHub **Variables** or **Secrets** that map to Vercel, run **V
 | Repo variables + **PROD** env secrets | Vercel **production** |
 | Repo variables + **STAGING** env secrets | Vercel **preview** (staging and PR previews) |
 
-The sync sets `NEXT_PUBLIC_SENTRY_IS_ACTIVE` to `true`, `NEXT_PUBLIC_SPOTIFY_AUTH_URL` to `https://accounts.spotify.com/authorize`, builds `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` / `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` from the app URL (prod = `https://<GTMT_FRONT_SUBDOMAIN>.<DOMAIN_NAME>`, preview = `https://staging.<GTMT_FRONT_SUBDOMAIN>.<DOMAIN_NAME>`) + relative path, and sets `NEXT_PUBLIC_APP_VERSION` as `<package.json version>-dev+<shortsha>` (e.g. `1.4.2-dev+abc1234`).
+The sync sets `NEXT_PUBLIC_SENTRY_IS_ACTIVE` to `true`, `NEXT_PUBLIC_SPOTIFY_AUTH_URL` to `https://accounts.spotify.com/authorize`, builds `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` / `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` from the app URL (prod = `https://<GTMT_FRONT_SUBDOMAIN>.<DOMAIN_NAME>`, preview = `https://staging.<GTMT_FRONT_SUBDOMAIN>.<DOMAIN_NAME>`) + relative path, and sets `NEXT_PUBLIC_APP_VERSION`: **production** = `package.json` `version` (manual workflow; no tag check); **preview** = `<version>-dev+<shortsha>`.
 
 **New production setup:** Either configure all `NEXT_PUBLIC_*` in the Vercel UI or run **Vercel sync env** once for production before relying on **Vercel deploy** (which only updates `NEXT_PUBLIC_APP_VERSION` plus the hook).
 
@@ -115,9 +115,9 @@ The sync sets `NEXT_PUBLIC_SENTRY_IS_ACTIVE` to `true`, `NEXT_PUBLIC_SPOTIFY_AUT
 
 ## 4. Troubleshooting: Vercel shows old version
 
-If production or staging shows an old version after you pushed to `main` or `develop`:
+If production or staging shows an old version after you merged to `main`, pushed a tag, or pushed to `develop`:
 
-1. **Production branch** – Vercel → Project → **Settings → Git**. Ensure **Production Branch** is `main`. If it is `master` or something else, change it to `main` and save; the next push to `main` will deploy to production.
+1. **Production branch** – Vercel → Project → **Settings → Git**. Ensure **Production Branch** is `main`. If it is `master` or something else, change it to `main` and save. Production updates when **Vercel deploy** runs (release tag or manual), not on every merge to `main`.
 2. **Which URL you’re opening** – Confirm you’re on the right URL. Production domain goes to the latest `main` deployment; preview URLs are tied to a specific branch/commit. If you use a custom staging domain, check **Settings → Domains** and confirm which branch it’s assigned to.
 3. **Builds failing** – In Vercel → **Deployments**, check the latest deployment for your branch. If it’s **Failed**, fix the build (e.g. env vars, Node version, `npm run build` locally). Only successful builds update the live site.
 4. **Redeploy** – **Deployments** → open the latest deployment for `main` (or your branch) → **⋯** → **Redeploy** to force a fresh build from the same commit.
@@ -127,8 +127,8 @@ If production or staging shows an old version after you pushed to `main` or `dev
 ## 5. Summary
 
 - **Staging**: Push to `develop` (or open a PR) → Vercel builds **preview** deployments via **Git** (automatic).
-- **Production**: Push/merge to `main` → **Vercel deploy** workflow sets `NEXT_PUBLIC_APP_VERSION` and triggers the **production deploy hook** (not Vercel’s Git deploy for `main`).
+- **Production**: **Vercel deploy** runs on push of semver tag **`vMAJOR.MINOR.PATCH`** (must match `package.json`) or on manual dispatch → sets `NEXT_PUBLIC_APP_VERSION` and triggers the **production deploy hook** (not Vercel’s Git deploy for `main`).
 - **Domains**: **Settings → Domains**; assign production domain to production, staging domain to branch `develop`.
-- **Full env sync**: After changing GitHub vars/secrets that map to Vercel, run **Actions → Vercel sync env**. Push to `main` does not sync those values.
-- **Releases**: Tagging (e.g. `v0.2.0`) is independent; see [VERSIONING.md](VERSIONING.md). Tags do not deploy by themselves.
+- **Full env sync**: After changing GitHub vars/secrets that map to Vercel, run **Actions → Vercel sync env**. Merge to `main` does not sync those values or deploy production.
+- **Releases**: Use a semver tag on `main` to ship; optional manual **Vercel deploy** redeploys without a new tag. See [VERSIONING.md](VERSIONING.md).
 - **Old version showing**: See [§4 Troubleshooting](#4-troubleshooting-vercel-shows-old-version).

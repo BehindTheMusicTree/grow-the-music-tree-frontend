@@ -206,15 +206,16 @@ The CI pipeline includes:
 - Testing
 - Build check
 
-Staging builds use **Vercel Git** on `develop`. Production uses [`.github/workflows/vercel-deploy.yml`](.github/workflows/vercel-deploy.yml) on push to `main` (sets `NEXT_PUBLIC_APP_VERSION`, then the production deploy hook). Full `NEXT_PUBLIC_*` sync from GitHub is manual: [`.github/workflows/vercel-sync-env.yml`](.github/workflows/vercel-sync-env.yml). See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+Staging builds use **Vercel Git** on `develop`. Production uses [`.github/workflows/vercel-deploy.yml`](.github/workflows/vercel-deploy.yml) when you push a **semver release tag** `vX.Y.Z` (must match `package.json`) or run the workflow manually (sets `NEXT_PUBLIC_APP_VERSION`, then the production deploy hook). Full `NEXT_PUBLIC_*` sync from GitHub is manual: [`.github/workflows/vercel-sync-env.yml`](.github/workflows/vercel-sync-env.yml). See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 **GitHub Actions** (simplified):
 
 ```yaml
-# vercel-deploy.yml — push to main
+# vercel-deploy.yml — semver release tag or manual
 on:
   push:
-    branches: [main]
+    tags: ['v*.*.*']
+  workflow_dispatch:
 jobs:
   deploy-production:
     steps:

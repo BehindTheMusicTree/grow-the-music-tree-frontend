@@ -1,4 +1,5 @@
 # Production only: set NEXT_PUBLIC_APP_VERSION on Vercel, then trigger the production deploy hook.
+# Runs on semver release tag push (vX.Y.Z) or manual workflow_dispatch — not on every push to main.
 # Git must not deploy production (see vercel.json); staging uses Vercel Git builds on develop.
 # Full NEXT_PUBLIC_* sync: run workflow "Vercel sync env" manually (vercel-sync-env.yml).
 # See docs/DEPLOYMENT.md §3.1.
@@ -6,8 +7,8 @@ name: Vercel deploy
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*.*.*'
   workflow_dispatch:
 
 jobs:
@@ -34,6 +35,15 @@ jobs:
             exit 1
           fi
           echo "All required secrets are set."
+
+      - name: Require semver release tag on push
+        if: github.event_name == 'push'
+        run: |
+          ref="${GITHUB_REF}"
+          if [[ ! "$ref" =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Production deploy on tag push only accepts refs/tags/vMAJOR.MINOR.PATCH (got $ref)"
+            exit 1
+          fi
 
       - name: Sync app version to Vercel production
         run: bash scripts/vercel-sync-env-from-github.sh production app-version-only

@@ -5,7 +5,7 @@ usage() {
   echo "Usage: $0 <production|preview> <full|app-version-only>" >&2
   echo "  Upserts Vercel project env via API. Requires VERCEL_TOKEN, VERCEL_PROJECT_ID." >&2
   echo "  full: all NEXT_PUBLIC_* mirrored from GitHub env (see docs/DEPLOYMENT.md)." >&2
-  echo "  app-version-only: only NEXT_PUBLIC_APP_VERSION (needs package.json + GITHUB_SHA or git HEAD)." >&2
+  echo "  app-version-only: only NEXT_PUBLIC_APP_VERSION (production: tag vX.Y.Z must match package.json, or workflow_dispatch uses package.json; preview: + GITHUB_SHA or git HEAD)." >&2
   exit 1
 }
 
@@ -39,6 +39,16 @@ else
   SHORT_SHA="$(git rev-parse --short=7 HEAD 2>/dev/null || true)"
 fi
 
+compute_next_public_app_version() {
+  local pkg="$1"
+  local sha_short="$2"
+  if [ "$TARGET" = "production" ]; then
+    echo "$pkg"
+  else
+    echo "${pkg}-dev+${sha_short}"
+  fi
+}
+
 sync_var() {
   local value="$1"
   local key="$2"
@@ -58,11 +68,29 @@ sync_var() {
 
 if [ "$MODE" = "app-version-only" ]; then
   [ -f package.json ] || { echo "::error::package.json not found at repo root" >&2; exit 1; }
-  [ -n "$SHORT_SHA" ] || { echo "::error::GITHUB_SHA or git HEAD required for app version" >&2; exit 1; }
   PKG_VERSION=$(jq -r '.version' package.json)
-  APP_VERSION="${PKG_VERSION}-dev+${SHORT_SHA}"
+  if [ "$TARGET" = "preview" ]; then
+    [ -n "$SHORT_SHA" ] || { echo "::error::GITHUB_SHA or git HEAD required for preview app version" >&2; exit 1; }
+    APP_VERSION="$(compute_next_public_app_version "$PKG_VERSION" "$SHORT_SHA")"
+  else
+    EVENT="${GITHUB_EVENT_NAME:-}"
+    REF="${GITHUB_REF:-}"
+    if [[ "$REF" =~ ^refs/tags/v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+      TAG_VER="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+      if [ "$TAG_VER" != "$PKG_VERSION" ]; then
+        echo "::error::Release tag v$TAG_VER must match package.json version $PKG_VERSION" >&2
+        exit 1
+      fi
+      APP_VERSION="$PKG_VERSION"
+    elif [ "$EVENT" = "workflow_dispatch" ]; then
+      APP_VERSION="$PKG_VERSION"
+    else
+      echo "::error::Production app-version-only requires push of semver tag refs/tags/vX.Y.Z or workflow_dispatch (GITHUB_REF=$REF GITHUB_EVENT_NAME=$EVENT)" >&2
+      exit 1
+    fi
+  fi
   sync_var "$APP_VERSION" "NEXT_PUBLIC_APP_VERSION"
-  echo "App version sync done ($TARGET)."
+  echo "App version sync done ($TARGET): $APP_VERSION"
   exit 0
 fi
 
@@ -82,7 +110,7 @@ SPOTIFY_REDIRECT_URI="${APP_URL_TRIM}/${SPOTIFY_REDIRECT_RELATIVE_URI#/}"
 GOOGLE_REDIRECT_URI="${APP_URL_TRIM}/${GOOGLE_REDIRECT_RELATIVE_URI#/}"
 AUDIOMETA_URL="https://${AUDIOMETA_SUBDOMAIN}.${DOMAIN_NAME}"
 PKG_VERSION=$(jq -r '.version' package.json)
-APP_VERSION="${PKG_VERSION}-dev+${SHORT_SHA}"
+APP_VERSION="$(compute_next_public_app_version "$PKG_VERSION" "$SHORT_SHA")"
 
 sync_var "$CONTACT_EMAIL" "NEXT_PUBLIC_CONTACT_EMAIL"
 sync_var "$BACKEND_BASE_URL" "NEXT_PUBLIC_BACKEND_BASE_URL"

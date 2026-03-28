@@ -355,7 +355,7 @@ When testing your changes, verify:
 
 #### 4.1. Testing Builds During Development
 
-You can validate that your branch builds successfully by running local CI checks (`npm run lint`, `npm run test`, `npm run build`) before opening a PR. Staging builds come from **Vercel Git** on `develop`; production deploys use the **Vercel deploy** workflow on push to `main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
+You can validate that your branch builds successfully by running local CI checks (`npm run lint`, `npm run test`, `npm run build`) before opening a PR. Staging builds come from **Vercel Git** on `develop`; production deploys use the **Vercel deploy** workflow when a **semver release tag** is pushed or the workflow is run manually (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
 **Choosing a Version Number:**
 
@@ -382,7 +382,7 @@ git push origin v0.3.6-dev-improve-cicd
 
 Development tags are still useful as release metadata, but they no longer trigger a dedicated publish workflow.
 
-Deployment to staging follows **Vercel Git** when you push to `develop`. Production is updated by the **Vercel deploy** workflow when you merge to `main`.
+Deployment to staging follows **Vercel Git** when you push to `develop`. Production is updated by the **Vercel deploy** workflow when you push a **semver release tag** (or run it manually), after the release is on `main`.
 
 **Republishing After Changes:**
 
@@ -692,7 +692,7 @@ Releases are created from the `main` branch using **strict Git Flow**. Release t
    - Recreates the tag on the amended commit.
    - Deletes local and remote test and dev tags for that version (e.g. `v0.2.0-test`, `v0.2.0-dev-*`). Rc/beta/alpha tags are not deleted automatically. See `scripts/delete-test-dev-tags.mjs`.
 
-   The publish workflow runs on tag push and enforces that release tags (e.g. `v0.2.0`) point to a commit on `main`.
+   The **Vercel deploy** workflow runs when you push the release tag; the sync step requires the tag’s version to match `package.json`. Push the tag only from the intended **`main`** commit.
 
 6. **Merge release branch back into `develop`**
 

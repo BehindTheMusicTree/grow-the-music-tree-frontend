@@ -82,6 +82,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### CI
+
+- **Production deploy**: [`vercel-deploy.yml`](.github/workflows/vercel-deploy.yml) runs on push of semver tag **`vMAJOR.MINOR.PATCH`** (guarded so pre-release-style tags do not trigger) or on **`workflow_dispatch`**, not on every push to `main`. [`scripts/vercel-sync-env-from-github.sh`](scripts/vercel-sync-env-from-github.sh) requires the tag version to match **`package.json` `version`** on tag pushes; manual dispatch uses `package.json` only. Preview stays `<version>-dev+<sha>`.
+
 ## [1.4.4] - 2026-03-28
 
 ### CI
