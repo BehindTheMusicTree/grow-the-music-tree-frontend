@@ -18,7 +18,7 @@ After this, configure production and staging as below so that **main** deploys t
 1. Open the project on Vercel → **Settings**.
 2. In the left sidebar, go to **Environments** (or **Git** → production branch, depending on UI).
 3. Set **Production Branch** to `main`. Save.
-4. Every push (or merge) to `main` will trigger a **Production** deployment and update your production domain.
+4. Production deploys for `main` are triggered by the [**Vercel deploy**](../.github/workflows/vercel-deploy.yml) GitHub Action (deploy hook), not by Vercel’s Git integration (`vercel.json` disables Git-initiated production deploys for `main`). Merging to `main` runs that workflow, which updates `NEXT_PUBLIC_APP_VERSION` and calls the hook so Vercel builds production.
 
 ### 2.2 Production domain
 
@@ -54,25 +54,32 @@ On **Vercel** you can either set variables manually under **Settings → Environ
 
 ### 3.1 Syncing env vars from GitHub (recommended)
 
-You can push environment variables to Vercel from GitHub Actions so they stay in sync with GitHub Secrets and Variables.
+You can push environment variables to Vercel from GitHub Actions so they stay in sync with GitHub Secrets and Variables. There are **two** workflows:
 
-Use the workflow [`.github/workflows/vercel-deploy.yml`](../.github/workflows/vercel-deploy.yml). It runs automatically on push to `main`/`develop` (and can also run manually via **Actions → Vercel deploy → Run workflow**), syncs variables from GitHub to Vercel using the [Vercel REST API](https://vercel.com/docs/rest-api/reference/endpoints/projects/create-one-or-more-environment-variables), then triggers deployment hooks.
+| Workflow | File | When it runs | What it does |
+| -------- | ---- | ------------ | ------------- |
+| **Vercel sync env** | [`vercel-sync-env.yml`](../.github/workflows/vercel-sync-env.yml) | **Manual only** (**Actions → Vercel sync env → Run workflow**) | Upserts **all** mapped `NEXT_PUBLIC_*` variables to Vercel **production** and/or **preview** (you choose via checkboxes). **Does not** trigger deploy hooks. |
+| **Vercel deploy** | [`vercel-deploy.yml`](../.github/workflows/vercel-deploy.yml) | Push to **`main`**, or manual **Actions → Vercel deploy** | Sets **only** `NEXT_PUBLIC_APP_VERSION` on Vercel production, then POSTs the **production** deploy hook. |
+
+After you change GitHub **Variables** or **Secrets** that map to Vercel, run **Vercel sync env** so Vercel matches GitHub. Routine merges to `main` do **not** re-sync those values.
+
+**Staging (`develop` and PRs)** is built by **Vercel Git** only. Run **Vercel sync env** with “preview” enabled when preview/staging env vars in GitHub change, or set preview variables manually in Vercel. `NEXT_PUBLIC_APP_VERSION` is **not** updated on every `develop` push by CI.
 
 **Required** GitHub Secrets (repo level):
 
 - `VERCEL_TOKEN` – [Vercel token](https://vercel.com/account/tokens) with access to the project.
 - `VERCEL_PROJECT_ID` – Project id or name (e.g. `grow-the-music-tree-frontend`).
 
-**Required** GitHub Secrets (environment level):
+**Required** GitHub Secret (environment **PROD** only, for **Vercel deploy**):
 
-- `VERCEL_DEPLOY_HOOK` (set in each environment) – in `production`, set the `main` hook URL; in `staging`, set the `develop` hook URL.
+- `VERCEL_DEPLOY_HOOK` – URL of the Vercel deploy hook for **production** (`main`).
 
 **How to get them**
 
 - **VERCEL_TOKEN**: Go to [vercel.com/account/tokens](https://vercel.com/account/tokens), click **Create Token**, give it a name (e.g. “GitHub Actions env sync”), and optionally limit it to the project. Copy the token once (it is shown only once) and store it as a GitHub secret.
 - **VERCEL_PROJECT_ID**: Open your project on Vercel → **Settings** → **General**. The **Project ID** is in the “Project ID” or “Project Name” field (you can use either the id or the project name). For a team project, use the project name/slug as shown in the project URL.
 
-**GitHub Environments:** Create two environments, **production** and **staging**, in **Settings → Environments**. Each deployment job runs in one of these environments. Set `VERCEL_DEPLOY_HOOK` as an environment secret in each.
+**GitHub Environments:** Create **PROD** and **STAGING** in **Settings → Environments** (names must match the workflows). **Vercel deploy** uses **PROD** (needs `VERCEL_DEPLOY_HOOK`). **Vercel sync env** uses **PROD** for the production sync job and **STAGING** for the preview sync job; neither job requires a deploy hook.
 
 **Repo variables** (Settings → Secrets and variables → Actions → Variables):
 
@@ -89,20 +96,22 @@ Use the workflow [`.github/workflows/vercel-deploy.yml`](../.github/workflows/ve
 | `GTMT_FRONT_SUBDOMAIN`  | Builds app URL for redirect URIs: prod = `https://<this>.<DOMAIN_NAME>`, preview = `https://staging.<this>.<DOMAIN_NAME>` |
 | `AUDIOMETA_SUBDOMAIN`   | Builds `NEXT_PUBLIC_AUDIOMETA_URL` as `https://<this>.<DOMAIN_NAME>` |
 | `SPOTIFY_CLIENT_ID_PROD`     | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on production |
-| `SPOTIFY_CLIENT_ID_STAGING`  | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on Vercel preview/staging (required for preview sync) |
+| `SPOTIFY_CLIENT_ID_STAGING`  | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on Vercel preview/staging (required when running **Vercel sync env** for preview) |
 | `GOOGLE_CLIENT_ID_PROD`      | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on production |
-| `GOOGLE_CLIENT_ID_STAGING`   | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on Vercel preview/staging (required for preview sync) |
+| `GOOGLE_CLIENT_ID_STAGING`   | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on Vercel preview/staging (required when running **Vercel sync env** for preview) |
 
-**How the sync works:** The workflow has two jobs. Each job runs in a **GitHub Environment** (production or staging), so it sees that environment’s variables. It syncs only to the matching Vercel target.
+**How full sync works (`vercel-sync-env.yml`):** Each job runs in a **GitHub Environment** (**PROD** or **STAGING**), so it sees the right secrets. It syncs only to the matching Vercel target.
 
 | Source | → Vercel |
 |--------|----------|
-| Repo variables + production env vars | Vercel **production** (`NEXT_PUBLIC_*` set for production) |
-| Repo variables + staging env vars    | Vercel **preview** (staging and PR previews) |
+| Repo variables + **PROD** env secrets | Vercel **production** |
+| Repo variables + **STAGING** env secrets | Vercel **preview** (staging and PR previews) |
 
-The workflow also sets `NEXT_PUBLIC_SENTRY_IS_ACTIVE` to `true`, sets `NEXT_PUBLIC_SPOTIFY_AUTH_URL` to `https://accounts.spotify.com/authorize`, builds `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` / `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` from the app URL (prod = `https://<GTMT_FRONT_SUBDOMAIN>.<DOMAIN_NAME>`, preview = `https://staging.<GTMT_FRONT_SUBDOMAIN>.<DOMAIN_NAME>`) + relative path, and sets `NEXT_PUBLIC_APP_VERSION` automatically as `<package.json version>-dev+<shortsha>` (e.g. `1.4.2-dev+abc1234`).
+The sync sets `NEXT_PUBLIC_SENTRY_IS_ACTIVE` to `true`, `NEXT_PUBLIC_SPOTIFY_AUTH_URL` to `https://accounts.spotify.com/authorize`, builds `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` / `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` from the app URL (prod = `https://<GTMT_FRONT_SUBDOMAIN>.<DOMAIN_NAME>`, preview = `https://staging.<GTMT_FRONT_SUBDOMAIN>.<DOMAIN_NAME>`) + relative path, and sets `NEXT_PUBLIC_APP_VERSION` as `<package.json version>-dev+<shortsha>` (e.g. `1.4.2-dev+abc1234`).
 
-The workflow always triggers deployment after env sync. If the deploy hook secret is missing, the job fails fast.
+**New production setup:** Either configure all `NEXT_PUBLIC_*` in the Vercel UI or run **Vercel sync env** once for production before relying on **Vercel deploy** (which only updates `NEXT_PUBLIC_APP_VERSION` plus the hook).
+
+**Vercel deploy** requires `VERCEL_DEPLOY_HOOK` in **PROD**; if it is missing, the job fails fast.
 
 ## 4. Troubleshooting: Vercel shows old version
 
@@ -117,8 +126,9 @@ If production or staging shows an old version after you pushed to `main` or `dev
 
 ## 5. Summary
 
-- **Deploy**: Push to `develop` → staging; push/merge to `main` → production. Vercel builds and deploys automatically via Git.
+- **Staging**: Push to `develop` (or open a PR) → Vercel builds **preview** deployments via **Git** (automatic).
+- **Production**: Push/merge to `main` → **Vercel deploy** workflow sets `NEXT_PUBLIC_APP_VERSION` and triggers the **production deploy hook** (not Vercel’s Git deploy for `main`).
 - **Domains**: **Settings → Domains**; assign production domain to production, staging domain to branch `develop`.
-- **Env vars + deploy**: Configure repo/env variables in GitHub and run **Actions → Vercel deploy** (or push to `main`/`develop`) to sync env and trigger deployment.
-- **Releases**: Tagging (e.g. `v0.2.0`) is independent; see [VERSIONING.md](VERSIONING.md). Vercel does not deploy on tag push; it deploys on branch push.
+- **Full env sync**: After changing GitHub vars/secrets that map to Vercel, run **Actions → Vercel sync env**. Push to `main` does not sync those values.
+- **Releases**: Tagging (e.g. `v0.2.0`) is independent; see [VERSIONING.md](VERSIONING.md). Tags do not deploy by themselves.
 - **Old version showing**: See [§4 Troubleshooting](#4-troubleshooting-vercel-shows-old-version).
