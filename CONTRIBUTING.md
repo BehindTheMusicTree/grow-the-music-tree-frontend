@@ -668,9 +668,10 @@ Releases are created from the `main` branch using **strict Git Flow**. Release t
    ```
 
 3. **On the release branch, prepare the release**
-   - Review and finalize the `[Unreleased]` section in `CHANGELOG.md` (entries will be moved to the new version by postversion when you run `npm version` on main).
+   - Move `[Unreleased]` items into a new `## [X.Y.Z] - YYYY-MM-DD` section and add the TOC entry; bump **`package.json`** with **`npm pkg set version=X.Y.Z`** then **`npm install --package-lock-only`** (do **not** run **`npm version`** here — **`postversion`** is intended for **`main`** and will run `scripts/update-changelog-release.mjs` / amend the wrong commit).
    - Make any final bug fixes or adjustments.
    - Ensure build and lint pass: `npm run build` and `npm run lint`.
+   - Commit: `chore(release): prepare vX.Y.Z` (see prior release branches for examples).
 
 4. **Merge release branch into `main`**
 
