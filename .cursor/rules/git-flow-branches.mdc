@@ -27,6 +27,10 @@ The **head** branch name must match one of:
 
 The **head** branch must be `release/*` or `hotfix/*` only.
 
+## Releases and version tags
+
+For a **shipping** release, **`npm version`** (with git tag) runs only on **`main`**, after the `release/*` or `hotfix/*` PR is merged. Do not push production **`vX.Y.Z`** tags from `chore/*`, `feature/*`, or `release/*`. See **CONTRIBUTING.md** §7 and **`docs/VERSIONING.md`**.
+
 ## PR descriptions
 
 Draft file path `.pr-descriptions/<branch-name>.md` uses the **actual** branch name (may contain `/`); see **pr-description-workflow.mdc**.

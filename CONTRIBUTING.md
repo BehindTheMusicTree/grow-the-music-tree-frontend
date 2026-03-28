@@ -647,7 +647,9 @@ When you open a Pull Request, several automations may run automatically (if conf
 
 ### 7. Releasing _(For Maintainers)_
 
-Releases are created from the `main` branch using **strict Git Flow**. Release tags are created **on main** (on the merge commit), not on the release branch. Version bump, changelog update, and pre-release tag cleanup are done with `npm version` and its postversion script. See [docs/VERSIONING.md](docs/VERSIONING.md) for details.
+Releases are created from the `main` branch using **strict Git Flow**. Release tags are created **on `main`** (after the release or hotfix PR is merged), not from `chore/*`, `feature/*`, or the tip of `release/*`. Version bump, changelog roll into the versioned section, and pre-release tag cleanup are done with **`npm version` on `main`** and its postversion script. See [docs/VERSIONING.md](docs/VERSIONING.md) for details.
+
+**Do not** run `npm version` (with automatic tag) on a **chore** or **feature** branch to ship a release, and **do not** push **`vX.Y.Z`** from there: production deploy keys off the tag, and the tag must point at the canonical commit on **`main`**.
 
 **Quick release process:**
 
@@ -672,14 +674,16 @@ Releases are created from the `main` branch using **strict Git Flow**. Release t
 
 4. **Merge release branch into `main`**
 
+   Open and merge a **Pull Request** from `release/v0.2.0` to `main` in GitHub (no direct push merge to `main`). Then update local `main`:
+
    ```bash
    git checkout main
    git pull origin main
-   git merge --no-ff release/v0.2.0
-   git push origin main
    ```
 
 5. **On `main`: bump version (creates tag, updates CHANGELOG, deletes pre-release tags for this version)**
+
+   Stay on **`main`** — this is the only branch where the shipping tag should be created.
 
    ```bash
    npm version minor   # or patch / major
@@ -713,13 +717,11 @@ Releases are created from the `main` branch using **strict Git Flow**. Release t
 **Hotfix release process**
 
 1. Create hotfix branch from `main`, make the fix, and add an entry to `CHANGELOG.md` under `[Unreleased]`.
-2. Merge hotfix into `main`:
+2. Merge hotfix into `main` via **Pull Request**, then update local `main`:
 
    ```bash
    git checkout main
    git pull origin main
-   git merge --no-ff hotfix/critical-player-crash
-   git push origin main
    ```
 
 3. On `main`, bump version and push:
