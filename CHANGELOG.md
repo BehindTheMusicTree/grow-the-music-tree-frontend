@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [1.4.5 - 2026-03-28](#145---2026-03-28)
 - [1.4.4 - 2026-03-28](#144---2026-03-28)
 - [1.4.3 - 2026-03-28](#143---2026-03-28)
 - [1.3.0 - 2025-03-08](#130---2025-03-08)
@@ -78,9 +79,19 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Blocks invalid PRs to main and develop branches
 ```
 
-**Note:** During releases, maintainers run `npm version` on `main`; the postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md).
+**Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [1.4.5] - 2026-03-28
+
+### Documentation
+
+- **Releases**: State that **`npm version`** and shipping **`vX.Y.Z`** run on **`main` only**, after merging **`release/*` or `hotfix/*`** via PR; align [CONTRIBUTING.md](CONTRIBUTING.md) §7, [docs/VERSIONING.md](docs/VERSIONING.md), changelog contributor note, and Cursor rules (`.cursor/rules/versioning.mdc`, `git-flow-branches.mdc`, `semver-guide.mdc`).
+
+### CI
+
+- **Production deploy**: [`vercel-deploy.yml`](.github/workflows/vercel-deploy.yml) runs on push of semver tag **`vMAJOR.MINOR.PATCH`** (guarded so pre-release-style tags do not trigger) or on **`workflow_dispatch`**, not on every push to `main`. [`scripts/vercel-sync-env-from-github.sh`](scripts/vercel-sync-env-from-github.sh) requires the tag version to match **`package.json` `version`** on tag pushes; manual dispatch uses `package.json` only. Preview stays `<version>-dev+<sha>`.
 
 ## [1.4.4] - 2026-03-28
 

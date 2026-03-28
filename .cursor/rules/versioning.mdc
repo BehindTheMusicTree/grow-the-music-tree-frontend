@@ -1,126 +1,55 @@
-# Versioning and Tagging
+---
+description: Versioning, git tags, and where to run npm version; aligns with docs/VERSIONING.md and CONTRIBUTING §7
+globs:
+  - "**/*"
+alwaysApply: true
+---
 
-This rule defines how versioning and git tagging should be handled in this project. All versioning follows the strategy documented in `docs/VERSIONING.md`.
+# Versioning and tagging
 
-## Core Principles
+Strategy and tag formats: **`docs/VERSIONING.md`**. When to bump MAJOR/MINOR/PATCH: **`docs/SEMVER_GUIDE.md`**.
 
-1. **Git tags are the single source of truth** for versioning
-2. **Version is extracted from tags** in CI/CD workflows, not from variables or manual configuration
-3. **Semantic versioning** with `v` prefix: `v<major>.<minor>.<patch>`
-4. **The `v` prefix is stripped** when used in workflows (e.g., `v0.2.0` → `0.2.0`)
+## Release commits and tags (mandatory)
 
-## Version Format
+1. **`npm version` for a shipping release runs only on `main`**, after **`release/*` or `hotfix/*` has been merged into `main` via Pull Request** (same flow as **CONTRIBUTING.md** §7).
+2. **Do not** run `npm version` (with git tag) on **`chore/*`**, **`feature/*`**, **`fix/*`**, **`develop`**, or **`release/*`** to cut the **final** `vX.Y.Z` that production deploys from. On `release/*` you may use **`npm version … --no-git-tag-version`** plus commit to prepare `package.json` / changelog only; the **tag** and **postversion** changelog move happen on **`main`**.
+3. **Push `vX.Y.Z` only from the `main` line** (after `npm version` there) so the tag points at the canonical release commit on the default branch.
 
-- **Release versions**: `v<major>.<minor>.<patch>` (e.g., `v0.2.0`, `v1.0.0`)
-- **Development tags**: `v<version>-dev-<branch-name>` (e.g., `v0.3.6-dev-improve-cicd`)
-  - Use branch name **without** type prefix (`feature/`, `fix/`, `hotfix/`, etc.)
-  - Example: Branch `feature/improve-cicd` → Tag `v0.3.6-dev-improve-cicd`
-- **Pre-release tags**: `v<version>-<identifier><number>` (e.g., `v0.2.0-rc1`, `v0.2.0-beta1`, `v0.2.0-alpha1`)
+CI: production deploy is triggered by pushing **`vMAJOR.MINOR.PATCH`** (see **`.github/workflows/vercel-deploy.yml`**); **`scripts/vercel-sync-env-from-github.sh`** requires that tag to match **`package.json` `version`**.
 
-## Version Extraction in Workflows
+## Core principles
 
-When creating or updating GitHub Actions workflows that need version information:
+1. **Release identity** is a semver tag on **`main`** (e.g. `v0.2.0`).
+2. **`package.json` `version`** must match that tag for tag-triggered production deploys; manual **Vercel deploy** (`workflow_dispatch`) still reads `package.json`.
+3. **Semantic versioning** with `v` prefix: `v<major>.<minor>.<patch>`.
+4. The **`v` prefix is stripped** when comparing to `package.json` (e.g. `v0.2.0` → `0.2.0`).
 
-1. **Extract version from git tag ref** (when triggered by tag push):
+## Version format
 
-   ```yaml
-   - name: Extract version from tag
-     id: version
-     run: |
-       if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-         # Extract from tag ref (e.g., refs/tags/v0.3.4 -> 0.3.4)
-         VERSION="${GITHUB_REF#refs/tags/v}"
-         echo "Using version from tag ref: $VERSION"
-       else
-         # Fallback: fetch tags and get the latest one
-         git fetch --tags --force
-         LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-         if [ -z "$LATEST_TAG" ]; then
-           echo "Error: Cannot determine version. No tag provided."
-           exit 1
-         fi
-         # Remove 'v' prefix if present
-         VERSION="${LATEST_TAG#v}"
-         echo "Using latest tag version: $VERSION (from tag: $LATEST_TAG)"
-       fi
-       echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-   ```
+- **Release**: `v<major>.<minor>.<patch>` (e.g. `v0.2.0`, `v1.0.0`)
+- **Development tags**: `v<version>-dev-<branch-name>` (no `feature/` / `fix/` prefix in the tag), e.g. `v0.3.6-dev-improve-cicd`
+- **Pre-release**: `v0.2.0-rc1`, `v0.2.0-beta1`, `v0.2.0-alpha1`
 
-2. **Use extracted version** throughout the workflow:
-   - Docker image tags: `${{ steps.version.outputs.version }}`
-   - Job outputs: `outputs: version: ${{ steps.version.outputs.version }}`
-   - Cross-job references: `${{ needs.<job-name>.outputs.version }}`
+## Tag naming (summary)
 
-3. **Never hardcode versions** or use GitHub variables for `APP_VERSION` in workflows
+- **Dev tags**: from feature/fix/hotfix branches for testing; do not trigger production deploy.
+- **Pre-release tags**: from release branches; do not trigger production deploy.
+- **Release tags**: created on **`main`** via **`npm version`** after merge; trigger production deploy when pushed.
 
-## Tag Naming Guidelines
+## When working with versions
 
-### Development Tags (`-dev`)
-
-- Used for testing builds from **feature, fix, and hotfix branches**
-- Format: `v<version>-dev-<branch-name>`
-- Remove branch type prefix: `feature/improve-cicd` → `v0.3.6-dev-improve-cicd`
-- Remove branch type prefix: `fix/resolve-timeout` → `v0.3.6-dev-resolve-timeout`
-- Version selection:
-  - Feature/fix branches: Typically patch or minor version (e.g., `v0.3.6-dev-*` or `v0.4.0-dev-*`)
-  - Hotfix branches: Typically patch version (e.g., `v0.3.6-dev-*`)
-  - Breaking changes: Major version (e.g., `v1.0.0-dev-*`)
-
-### Pre-Release Tags (`-rc`, `-beta`, `-alpha`)
-
-- Used for testing builds from **release branches** before final release
-- Formats:
-  - Release Candidate: `v0.2.0-rc1`, `v0.2.0-rc2`
-  - Beta: `v0.2.0-beta1`, `v0.2.0-beta2`
-  - Alpha: `v0.2.0-alpha1`, `v0.2.0-alpha2`
-
-### Release Tags
-
-- Final release versions: `v0.2.0`, `v1.0.0`
-- Prepare version/changelog on `release/*`, then merge to `main`
-- Merges to `main` and `develop` must go through Pull Requests (no direct merges)
-- Create final release tag on `main` merge commit (not on `release/*`)
-- After release/hotfix merge to `main`, back-merge to `develop` via PR (`main` -> `develop`)
-- Triggers production deployment
-
-## Workflow Behavior
-
-When a version tag is pushed:
-
-1. Workflow extracts version number from tag
-2. Builds application
-3. Creates Docker image with versioned tag: `username/repo:<version>`
-4. Deploys to test/production server
-5. Creates Docker Compose configuration with versioned image
-
-## Cleanup
-
-- All pre-release version tags (dev, rc, beta, alpha) should be deleted during the release process
-- Cleanup commands:
-  ```bash
-  git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*" | xargs -n 1 git tag -d
-  git tag -l "v0.2.0-dev-*" "v0.2.0-rc*" "v0.2.0-beta*" "v0.2.0-alpha*" | xargs -n 1 git push origin --delete
-  ```
-
-## When Working with Versions
-
-- **Creating workflows**: Always extract version from git tags, never use hardcoded versions or GitHub variables
-- **Updating workflows**: Ensure version extraction logic matches the pattern above
-- **Tagging**: Follow the naming conventions for development, pre-release, and release tags
-- **Documentation**: Reference `docs/VERSIONING.md` for tag/CI strategy; reference `docs/SEMVER_GUIDE.md` for when to bump MAJOR, MINOR, or PATCH
+- **Workflows**: Use the project’s **Vercel** scripts and **`vercel-deploy.yml`**; do not assume Docker image tagging unless the repo adds it.
+- **Documentation**: **`docs/VERSIONING.md`**, **`docs/DEPLOYMENT.md`**, **CONTRIBUTING.md** §7.
 
 ## Examples
 
-✅ **Correct:**
+**Correct**
 
-- Extract version from tag in workflow step
-- Use `steps.version.outputs.version` for Docker tags
-- Create development tag: `v0.3.6-dev-improve-cicd` from branch `feature/improve-cicd`
-- Create release candidate: `v0.2.0-rc1` from release branch
+- Merge **`release/v0.2.0` → `main`** via PR, then on **`main`**: `npm version minor`, `git push origin main`, `git push origin v0.2.0`.
+- On **`release/*`**: `npm version 0.2.0 --no-git-tag-version` + commit to prepare files only; final `npm version` / tag on **`main`**.
 
-❌ **Incorrect:**
+**Incorrect**
 
-- Using `${{ vars.APP_VERSION }}` in workflows (version should be extracted from tags)
-- Hardcoding version numbers in workflows
-- Including branch type prefix in dev tags: `v0.3.6-dev-feature-improve-cicd` (should be `v0.3.6-dev-improve-cicd`)
-- Creating tags without `v` prefix: `0.2.0` (should be `v0.2.0`)
+- Running **`npm version patch`** on **`chore/…`** or **`feature/…`** and pushing **`v1.4.5`** for production (tag must be cut from **`main`** after release merge).
+- Using **`${{ vars.APP_VERSION }}`** for production version instead of tag + `package.json` alignment.
+- Release tag **`0.2.0`** without **`v`** prefix (use **`v0.2.0`**).

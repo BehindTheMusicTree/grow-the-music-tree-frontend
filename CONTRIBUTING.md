@@ -355,7 +355,7 @@ When testing your changes, verify:
 
 #### 4.1. Testing Builds During Development
 
-You can validate that your branch builds successfully by running local CI checks (`npm run lint`, `npm run test`, `npm run build`) before opening a PR. Staging builds come from **Vercel Git** on `develop`; production deploys use the **Vercel deploy** workflow on push to `main` (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
+You can validate that your branch builds successfully by running local CI checks (`npm run lint`, `npm run test`, `npm run build`) before opening a PR. Staging builds come from **Vercel Git** on `develop`; production deploys use the **Vercel deploy** workflow when a **semver release tag** is pushed or the workflow is run manually (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
 **Choosing a Version Number:**
 
@@ -382,7 +382,7 @@ git push origin v0.3.6-dev-improve-cicd
 
 Development tags are still useful as release metadata, but they no longer trigger a dedicated publish workflow.
 
-Deployment to staging follows **Vercel Git** when you push to `develop`. Production is updated by the **Vercel deploy** workflow when you merge to `main`.
+Deployment to staging follows **Vercel Git** when you push to `develop`. Production is updated by the **Vercel deploy** workflow when you push a **semver release tag** (or run it manually), after the release is on `main`.
 
 **Republishing After Changes:**
 
@@ -647,7 +647,9 @@ When you open a Pull Request, several automations may run automatically (if conf
 
 ### 7. Releasing _(For Maintainers)_
 
-Releases are created from the `main` branch using **strict Git Flow**. Release tags are created **on main** (on the merge commit), not on the release branch. Version bump, changelog update, and pre-release tag cleanup are done with `npm version` and its postversion script. See [docs/VERSIONING.md](docs/VERSIONING.md) for details.
+Releases are created from the `main` branch using **strict Git Flow**. Release tags are created **on `main`** (after the release or hotfix PR is merged), not from `chore/*`, `feature/*`, or the tip of `release/*`. Version bump, changelog roll into the versioned section, and pre-release tag cleanup are done with **`npm version` on `main`** and its postversion script. See [docs/VERSIONING.md](docs/VERSIONING.md) for details.
+
+**Do not** run `npm version` (with automatic tag) on a **chore** or **feature** branch to ship a release, and **do not** push **`vX.Y.Z`** from there: production deploy keys off the tag, and the tag must point at the canonical commit on **`main`**.
 
 **Quick release process:**
 
@@ -666,33 +668,38 @@ Releases are created from the `main` branch using **strict Git Flow**. Release t
    ```
 
 3. **On the release branch, prepare the release**
-   - Review and finalize the `[Unreleased]` section in `CHANGELOG.md` (entries will be moved to the new version by postversion when you run `npm version` on main).
+   - Move `[Unreleased]` items into a new `## [X.Y.Z] - YYYY-MM-DD` section and add the TOC entry; bump **`package.json`** with **`npm pkg set version=X.Y.Z`** then **`npm install --package-lock-only`** (do **not** run **`npm version`** here — **`postversion`** is intended for **`main`** and will run `scripts/update-changelog-release.mjs` / amend the wrong commit).
    - Make any final bug fixes or adjustments.
    - Ensure build and lint pass: `npm run build` and `npm run lint`.
+   - Commit: `chore(release): prepare vX.Y.Z` (see prior release branches for examples).
 
 4. **Merge release branch into `main`**
+
+   Open and merge a **Pull Request** from `release/v0.2.0` to `main` in GitHub (no direct push merge to `main`). Then update local `main`:
 
    ```bash
    git checkout main
    git pull origin main
-   git merge --no-ff release/v0.2.0
-   git push origin main
    ```
 
-5. **On `main`: bump version (creates tag, updates CHANGELOG, deletes pre-release tags for this version)**
+5. **On `main`: create the shipping tag (and version commit if needed)**
+
+   Stay on **`main`** — this is the only branch where the shipping **`vX.Y.Z`** tag should be created.
+
+   If **`package.json` and `CHANGELOG.md` were already prepared on the release branch** (step 3), merge has brought that commit onto **`main`**; then create the tag on the current **`main`** tip and push (no extra version bump):
 
    ```bash
-   npm version minor   # or patch / major
+   git tag v0.2.0   # must match package.json
    git push origin main
    git push origin v0.2.0
    ```
 
-   `npm version` updates `package.json`, creates a commit and the release tag. The **postversion** script then:
+   If **`main`** still needs a version bump and changelog roll-up (no full prepare on **`release/*`**), use **`npm version`** instead; it updates **`package.json`**, commits, and creates the tag. The **postversion** script then:
    - Moves `[Unreleased]` content into `## [X.Y.Z] - YYYY-MM-DD` in `CHANGELOG.md` and amends the version commit.
    - Recreates the tag on the amended commit.
    - Deletes local and remote test and dev tags for that version (e.g. `v0.2.0-test`, `v0.2.0-dev-*`). Rc/beta/alpha tags are not deleted automatically. See `scripts/delete-test-dev-tags.mjs`.
 
-   The publish workflow runs on tag push and enforces that release tags (e.g. `v0.2.0`) point to a commit on `main`.
+   The **Vercel deploy** workflow runs when you push the release tag; the sync step requires the tag’s version to match `package.json`. Push the tag only from the intended **`main`** commit. If you used **`git tag`** only (no **`npm version`**), run **`node scripts/delete-test-dev-tags.mjs`** when you still want test/dev tag cleanup for that version.
 
 6. **Merge release branch back into `develop`**
 
@@ -713,13 +720,11 @@ Releases are created from the `main` branch using **strict Git Flow**. Release t
 **Hotfix release process**
 
 1. Create hotfix branch from `main`, make the fix, and add an entry to `CHANGELOG.md` under `[Unreleased]`.
-2. Merge hotfix into `main`:
+2. Merge hotfix into `main` via **Pull Request**, then update local `main`:
 
    ```bash
    git checkout main
    git pull origin main
-   git merge --no-ff hotfix/critical-player-crash
-   git push origin main
    ```
 
 3. On `main`, bump version and push:
