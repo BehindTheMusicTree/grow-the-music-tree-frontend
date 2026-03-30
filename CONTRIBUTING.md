@@ -668,9 +668,10 @@ Releases are created from the `main` branch using **strict Git Flow**. Release t
    ```
 
 3. **On the release branch, prepare the release**
-   - Review and finalize the `[Unreleased]` section in `CHANGELOG.md` (entries will be moved to the new version by postversion when you run `npm version` on main).
+   - Move `[Unreleased]` items into a new `## [X.Y.Z] - YYYY-MM-DD` section and add the TOC entry; bump **`package.json`** with **`npm pkg set version=X.Y.Z`** then **`npm install --package-lock-only`** (do **not** run **`npm version`** here — **`postversion`** is intended for **`main`** and will run `scripts/update-changelog-release.mjs` / amend the wrong commit).
    - Make any final bug fixes or adjustments.
    - Ensure build and lint pass: `npm run build` and `npm run lint`.
+   - Commit: `chore(release): prepare vX.Y.Z` (see prior release branches for examples).
 
 4. **Merge release branch into `main`**
 
@@ -681,22 +682,24 @@ Releases are created from the `main` branch using **strict Git Flow**. Release t
    git pull origin main
    ```
 
-5. **On `main`: bump version (creates tag, updates CHANGELOG, deletes pre-release tags for this version)**
+5. **On `main`: create the shipping tag (and version commit if needed)**
 
-   Stay on **`main`** — this is the only branch where the shipping tag should be created.
+   Stay on **`main`** — this is the only branch where the shipping **`vX.Y.Z`** tag should be created.
+
+   If **`package.json` and `CHANGELOG.md` were already prepared on the release branch** (step 3), merge has brought that commit onto **`main`**; then create the tag on the current **`main`** tip and push (no extra version bump):
 
    ```bash
-   npm version minor   # or patch / major
+   git tag v0.2.0   # must match package.json
    git push origin main
    git push origin v0.2.0
    ```
 
-   `npm version` updates `package.json`, creates a commit and the release tag. The **postversion** script then:
+   If **`main`** still needs a version bump and changelog roll-up (no full prepare on **`release/*`**), use **`npm version`** instead; it updates **`package.json`**, commits, and creates the tag. The **postversion** script then:
    - Moves `[Unreleased]` content into `## [X.Y.Z] - YYYY-MM-DD` in `CHANGELOG.md` and amends the version commit.
    - Recreates the tag on the amended commit.
    - Deletes local and remote test and dev tags for that version (e.g. `v0.2.0-test`, `v0.2.0-dev-*`). Rc/beta/alpha tags are not deleted automatically. See `scripts/delete-test-dev-tags.mjs`.
 
-   The **Vercel deploy** workflow runs when you push the release tag; the sync step requires the tag’s version to match `package.json`. Push the tag only from the intended **`main`** commit.
+   The **Vercel deploy** workflow runs when you push the release tag; the sync step requires the tag’s version to match `package.json`. Push the tag only from the intended **`main`** commit. If you used **`git tag`** only (no **`npm version`**), run **`node scripts/delete-test-dev-tags.mjs`** when you still want test/dev tag cleanup for that version.
 
 6. **Merge release branch back into `develop`**
 

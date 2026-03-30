@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [1.4.6 - 2026-03-28](#146---2026-03-28)
+- [1.4.5 - 2026-03-28](#145---2026-03-28)
 - [1.4.4 - 2026-03-28](#144---2026-03-28)
 - [1.4.3 - 2026-03-28](#143---2026-03-28)
 - [1.3.0 - 2025-03-08](#130---2025-03-08)
@@ -81,6 +83,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [1.4.6] - 2026-03-28
+
+### Documentation
+
+- **Cursor / Git Flow**: Add **“Never bypass PRs to `main` or `develop`”** to [`.cursor/rules/git-flow-branches.mdc`](.cursor/rules/git-flow-branches.mdc) so automation matches **CONTRIBUTING.md** (no local `git merge` + `git push` to **`main`** / **`develop`**; use GitHub PRs, then pull locally before tagging).
+
+## [1.4.5] - 2026-03-28
 
 ### Documentation
 
