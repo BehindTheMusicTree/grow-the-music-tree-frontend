@@ -32,7 +32,7 @@
     "env-cmd": "10.1.0",
     "is-fullwidth-code-point": "3.0.0",
     "lucide-react": "0.487.0",
-    "next": "16.1.6",
+    "next": "16.1.7",
     "raf": "3.4.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -59,7 +59,7 @@
     "autoprefixer": "10.4.21",
     "dotenv": "16.4.5",
     "eslint": "9.39.2",
-    "eslint-config-next": "16.1.6",
+    "eslint-config-next": "16.1.7",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "5.1.0",
     "eslint-plugin-react-refresh": "0.5.0",
@@ -74,6 +74,7 @@
     "vitest": "3.2.4"
   },
   "overrides": {
+    "brace-expansion": "5.0.5",
     "glob": "13.0.1",
     "minimatch@3": "3.1.4",
     "minimatch@9": "9.0.7",
