@@ -84,6 +84,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Documentation
+
+- **README**: Added ecosystem section with portfolio links (`themusictree.org`, GrowTheMusicTree project page, `the-music-tree-frontend`).
+
 ### Fixed
 
 - **Dependencies**: Update `happy-dom` from `20.0.11` to `20.8.9` to remediate high-severity CVE-2026-33943 (unsanitized export names in `ECMAScriptModuleCompiler`).
