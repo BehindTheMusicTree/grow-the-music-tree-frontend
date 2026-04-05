@@ -108,6 +108,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### CI
 
 - **Vercel sync env**: Treat **`GH_PACKAGES_TOKEN`** / **`NPM_TOKEN`** like other inputs—validate in the workflow and require **`NPM_TOKEN`** for **`full`** sync in **`scripts/vercel-sync-env-from-github.sh`** (fail if missing).
+- **Validate**: Use **`secrets.GH_PACKAGES_TOKEN`** as **`NPM_TOKEN`** for **`npm ci`** (not **`github.token`**), with an up-front job that fails clearly if the secret is missing; fixes **403** `read_package` when **`@behindthemusictree/*`** is published from another org repository.
 
 ## [1.4.6] - 2026-03-28
 
