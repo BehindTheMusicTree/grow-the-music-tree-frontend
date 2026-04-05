@@ -60,10 +60,11 @@ sync_var() {
     --arg value "$value" \
     --argjson target "$TARGET_JSON" \
     '{key: $key, value: $value, type: "plain", target: $target}')
-  curl -sS -X POST "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/env?upsert=true" \
+  curl -sS --fail-with-body -X POST "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/env?upsert=true" \
     -H "Authorization: Bearer ${VERCEL_TOKEN}" \
     -H "Content-Type: application/json" \
     -d "$body"
+  echo
 }
 
 sync_secret_var() {
@@ -77,10 +78,11 @@ sync_secret_var() {
     --arg value "$value" \
     --argjson target "$TARGET_JSON" \
     '{key: $key, value: $value, type: "sensitive", target: $target}')
-  curl -sS -X POST "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/env?upsert=true" \
+  curl -sS --fail-with-body -X POST "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/env?upsert=true" \
     -H "Authorization: Bearer ${VERCEL_TOKEN}" \
     -H "Content-Type: application/json" \
     -d "$body"
+  echo
 }
 
 if [ "$MODE" = "app-version-only" ]; then
