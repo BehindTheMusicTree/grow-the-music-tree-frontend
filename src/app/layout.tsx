@@ -1,13 +1,22 @@
 import { Analytics } from "@vercel/analytics/next";
 import { Inter } from "next/font/google";
 import type { Metadata, Viewport } from "next";
+import growTheMusicTreeFavicon from "@behindthemusictree/assets/favicons/grow-the-music-tree/favicon.svg";
 import "./globals.css";
+import "@behindthemusictree/assets/styles/icon-links.css";
+
+const faviconUrl =
+  typeof growTheMusicTreeFavicon === "string"
+    ? growTheMusicTreeFavicon
+    : growTheMusicTreeFavicon.src;
 
 export const metadata: Metadata = {
   title: "GrowTheMusicTree",
   description: "The ultimate community-driven platform for exploring musical genres",
   icons: {
-    icon: "/icons8-tree-16.png",
+    icon: [{ url: faviconUrl, type: "image/svg+xml" }],
+    shortcut: faviconUrl,
+    apple: faviconUrl,
   },
 };
 

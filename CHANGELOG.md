@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [1.5.0 - 2026-04-05](#150---2026-04-05)
 - [1.4.6 - 2026-03-28](#146---2026-03-28)
 - [1.4.5 - 2026-03-28](#145---2026-03-28)
 - [1.4.4 - 2026-03-28](#144---2026-03-28)
@@ -83,6 +84,34 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [1.5.0] - 2026-04-05
+
+### Added
+
+- **Organization social links**: Sidebar footer row uses **`GithubSocialLink`**, **`LinkedInSocialLink`**, **`MastodonSocialLink`**, and **`EmailSocialLink`** from **`@behindthemusictree/assets`** (with **`icon-links.css`**).
+
+### Changed
+
+- **`@behindthemusictree/assets`**: Bumped to **6.1.0**. Banner **`TheMusicTreeByline`** follows v6 (organization site **`href`** baked into the published package; no app env). **`imageStyle`** height aligned with the org marketing site header.
+
+### Removed
+
+- **`NEXT_PUBLIC_THEMUSICTREE_URL`**: Dropped from required env (no longer used for the lockup).
+
+### Documentation
+
+- **README**: Added ecosystem section with portfolio links (`themusictree.org`, GrowTheMusicTree project page, `the-music-tree-frontend`).
+- **Vercel / GitHub Packages**: Document that **`NPM_TOKEN`** must be set for **Preview** as well as Production; add troubleshooting for failed **`npm install`** ([`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)). **CONTRIBUTING** install steps note **`NPM_TOKEN`** for local **`npm install`**. Add **`E401` / “token provided”** troubleshooting (SSO, fine-grained PAT, no **`GITHUB_TOKEN`** on Vercel). Add **`E403`** / **`read_package`** (CI and **`GH_PACKAGES_TOKEN`**) troubleshooting.
+
+### Fixed
+
+- **Dependencies**: Update `happy-dom` from `20.0.11` to `20.8.9` to remediate high-severity CVE-2026-33943 (unsanitized export names in `ECMAScriptModuleCompiler`).
+
+### CI
+
+- **Vercel sync env**: Treat **`GH_PACKAGES_TOKEN`** / **`NPM_TOKEN`** like other inputs—validate in the workflow and require **`NPM_TOKEN`** for **`full`** sync in **`scripts/vercel-sync-env-from-github.sh`** (fail if missing).
+- **Validate**: Use **`secrets.GH_PACKAGES_TOKEN`** as **`NPM_TOKEN`** for **`npm ci`** (not **`github.token`**), with an up-front job that fails clearly if the secret is missing; fixes **403** `read_package` when **`@behindthemusictree/*`** is published from another org repository.
 
 ## [1.4.6] - 2026-03-28
 

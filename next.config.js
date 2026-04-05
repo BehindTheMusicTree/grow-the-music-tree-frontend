@@ -4,6 +4,7 @@ const path = require("path");
 
 const nextConfig = {
   images: { unoptimized: true },
+  transpilePackages: ["@behindthemusictree/assets"],
   reactStrictMode: false,
   productionBrowserSourceMaps: true,
   turbopack: {

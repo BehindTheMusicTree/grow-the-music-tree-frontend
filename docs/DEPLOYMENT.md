@@ -52,6 +52,44 @@ For **local** runs (`npm run dev`): copy `env/development/example/.env.developme
 
 On **Vercel** you can either set variables manually under **Settings → Environment Variables**, or sync them from GitHub using the workflow below.
 
+### GitHub Packages (`@behindthemusictree/*`)
+
+The repo root [`.npmrc`](../.npmrc) registers `@behindthemusictree` with `npm.pkg.github.com` and uses **`${NPM_TOKEN}`** during `npm install` / `npm ci`. **Vercel** must define **`NPM_TOKEN`** (sensitive) for **Production**, **Preview**, and **Development** if you use `vercel dev`. Use a GitHub PAT with **`read:packages`** (and access to the org that owns the package). It is install-only; Next.js does not read it at runtime.
+
+**GitHub Actions ([Validate](../.github/workflows/validate.yml)):** Set repository secret **`GH_PACKAGES_TOKEN`** to that same PAT. The workflow exports it as **`NPM_TOKEN`** for **`npm ci`**. Do **not** rely on **`GITHUB_TOKEN`** for this scope: it cannot read packages published from **another** repository in the org, which surfaces as **403** `permission_denied: read_package`.
+
+**Local:** `export NPM_TOKEN=…` before `npm ci`, or use another credential flow you prefer. `npm` does not load `.env` for installs.
+
+**Vercel sync env:** Repository secret **`GH_PACKAGES_TOKEN`** (same PAT as Vercel **`NPM_TOKEN`**) is **required** for the [**Vercel sync env**](../.github/workflows/vercel-sync-env.yml) workflow: the job fails if it is missing or empty, and the script upserts **`NPM_TOKEN`** (sensitive) on Vercel for the selected targets.
+
+**PR / Preview builds:** Vercel assigns variables **per environment**. If **`NPM_TOKEN`** exists only under **Production**, branch and PR deployments (**Preview**) still run `npm install` without a token and fail (often as **`Command "npm install" exited with 1`** with little detail). Add **`NPM_TOKEN`** for **Preview** (and **Development** if you use `vercel dev`) as well.
+
+#### Troubleshooting: `npm install` fails on Vercel
+
+1. Confirm **`NPM_TOKEN`** is set for the deployment’s environment (**Preview** vs **Production**).
+2. Regenerate or verify the PAT has **`read:packages`** and access to the GitHub org that publishes **`@behindthemusictree/assets`**.
+3. After changing variables, **redeploy** (or push an empty commit) so the build picks them up.
+
+Local installs use the same [`.npmrc`](../.npmrc); export **`NPM_TOKEN`** before **`npm ci`** / **`npm install`** (npm does not read `.env` for installs).
+
+#### Troubleshooting: `E403` / `permission_denied: read_package` (CI or local)
+
+The token authenticates but is **not allowed** to read that package. For **GitHub Actions**, ensure **`GH_PACKAGES_TOKEN`** is set and the PAT has **`read:packages`** plus access to the org (and **SSO authorization** if the org requires it). **`GITHUB_TOKEN`** is insufficient when **`@behindthemusictree/assets`** is published from a repo other than this one.
+
+#### Troubleshooting: `E401 Unauthorized` / `User cannot be authenticated with the token provided`
+
+npm is reaching GitHub Packages but **rejecting the credential**. Typical causes:
+
+1. **Wrong token on Vercel** — Use a **personal** or **machine-user** GitHub PAT with **`read:packages`**. Do **not** paste a **`GITHUB_TOKEN`** from a workflow run into Vercel; it is not a long-lived install credential for Vercel builds.
+2. **Organization SSO** — If **BehindTheMusicTree** enforces SAML SSO, open **GitHub → Settings → Developer settings → Personal access tokens**, find the token, click **Configure SSO**, and **Authorize** it for that org. Without this, installs often return **401**.
+3. **Fine-grained PAT** — Grant access to the **repository that publishes** `@behindthemusictree/assets`, and include permission to **read** that repository’s **packages** (per [GitHub’s fine-grained PAT docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token)).
+4. **Value hygiene in Vercel** — Store the raw token only (no `Bearer ` prefix, no surrounding quotes). Remove accidental spaces or newlines if you pasted from a secret manager.
+5. **Sanity check locally** — `export NPM_TOKEN=…` then `npm ci` at the repo root. If local fails with the same **401**, fix the PAT/SSO before changing Vercel again.
+
+### Organization assets (branding)
+
+The banner **TheMusicTree** lockup and sidebar social icons use **`@behindthemusictree/assets`**. The lockup’s organization site URL is embedded when that package is published; **`NEXT_PUBLIC_THEMUSICTREE_URL`** is not used.
+
 ### 3.1 Syncing env vars from GitHub (recommended)
 
 You can push environment variables to Vercel from GitHub Actions so they stay in sync with GitHub Secrets and Variables. There are **two** workflows:
@@ -69,6 +107,7 @@ After you change GitHub **Variables** or **Secrets** that map to Vercel, run **V
 
 - `VERCEL_TOKEN` – [Vercel token](https://vercel.com/account/tokens) with access to the project.
 - `VERCEL_PROJECT_ID` – Project id or name (e.g. `grow-the-music-tree-frontend`).
+- `GH_PACKAGES_TOKEN` – GitHub PAT with **`read:packages`** (same value you use for Vercel **`NPM_TOKEN`**). Required for [**Validate**](../.github/workflows/validate.yml) (**`npm ci`** on PRs) and for [**Vercel sync env**](../.github/workflows/vercel-sync-env.yml) (sync **`NPM_TOKEN`** to Vercel). Workflows fail if it is unset or empty.
 
 **Required** GitHub Secret (environment **PROD** only, for **Vercel deploy**):
 

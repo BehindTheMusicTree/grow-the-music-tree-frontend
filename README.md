@@ -4,8 +4,17 @@ A community-driven platform for exploring and understanding musical genres throu
 
 This project is built with Next.js and served by the Next.js Node server in production (e.g. in Docker). The reverse proxy (e.g. Nginx, Traefik) should route traffic to the container’s app port.
 
+## Ecosystem
+
+Built inside the **[BehindTheMusicTree](https://github.com/BehindTheMusicTree)** ecosystem.
+
+Want the big picture? Explore the full project universe on **[themusictree.org](https://themusictree.org)**, and see where this app fits on **[GrowTheMusicTree](https://themusictree.org/projects/grow-the-music-tree)**.
+
+The portfolio website content lives in **[the-music-tree-frontend](https://github.com/BehindTheMusicTree/the-music-tree-frontend)**; this README focuses on building, testing, deploying, and contributing to this app.
+
 ## Table of Contents
 
+- [Ecosystem](#ecosystem)
 - [Overview](#overview)
 - [Pages](#pages)
 - [Tech Stack](#tech-stack)
