@@ -52,6 +52,18 @@ For **local** runs (`npm run dev`): copy `env/development/example/.env.developme
 
 On **Vercel** you can either set variables manually under **Settings → Environment Variables**, or sync them from GitHub using the workflow below.
 
+### GitHub Packages (`@behindthemusictree/*`)
+
+The repo root [`.npmrc`](../.npmrc) registers `@behindthemusictree` with `npm.pkg.github.com` and uses **`${NPM_TOKEN}`** during `npm install` / `npm ci`. **Vercel** must define **`NPM_TOKEN`** (sensitive) for **Production**, **Preview**, and **Development** if you use `vercel dev`. Use a GitHub PAT with **`read:packages`** (and access to the org that owns the package). It is install-only; Next.js does not read it at runtime.
+
+**Local:** `export NPM_TOKEN=…` before `npm ci`, or use another credential flow you prefer. `npm` does not load `.env` for installs.
+
+**Optional:** Repository secret **`GH_PACKAGES_TOKEN`** (same PAT). The [**Vercel sync env**](../.github/workflows/vercel-sync-env.yml) workflow passes it into the sync script so **`NPM_TOKEN`** is upserted on Vercel when the secret is set (skipped when empty).
+
+### Organization assets (branding)
+
+The banner **TheMusicTree** lockup and sidebar social icons use **`@behindthemusictree/assets`**. The lockup’s organization site URL is embedded when that package is published; **`NEXT_PUBLIC_THEMUSICTREE_URL`** is not used.
+
 ### 3.1 Syncing env vars from GitHub (recommended)
 
 You can push environment variables to Vercel from GitHub Actions so they stay in sync with GitHub Secrets and Variables. There are **two** workflows:
@@ -69,6 +81,10 @@ After you change GitHub **Variables** or **Secrets** that map to Vercel, run **V
 
 - `VERCEL_TOKEN` – [Vercel token](https://vercel.com/account/tokens) with access to the project.
 - `VERCEL_PROJECT_ID` – Project id or name (e.g. `grow-the-music-tree-frontend`).
+
+**Optional** GitHub Secret (repo level):
+
+- `GH_PACKAGES_TOKEN` – Same PAT as Vercel **`NPM_TOKEN`**; used by **Vercel sync env** to push **`NPM_TOKEN`** (sensitive) to Vercel when set.
 
 **Required** GitHub Secret (environment **PROD** only, for **Vercel deploy**):
 

@@ -66,6 +66,23 @@ sync_var() {
     -d "$body"
 }
 
+sync_secret_var() {
+  local value="$1"
+  local key="$2"
+  [ -z "$value" ] && return 0
+  echo "Syncing $key (sensitive) to $TARGET..."
+  local body
+  body=$(jq -n \
+    --arg key "$key" \
+    --arg value "$value" \
+    --argjson target "$TARGET_JSON" \
+    '{key: $key, value: $value, type: "sensitive", target: $target}')
+  curl -sS -X POST "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/env?upsert=true" \
+    -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -d "$body"
+}
+
 if [ "$MODE" = "app-version-only" ]; then
   [ -f package.json ] || { echo "::error::package.json not found at repo root" >&2; exit 1; }
   PKG_VERSION=$(jq -r '.version' package.json)
@@ -124,5 +141,6 @@ sync_var "$GOOGLE_REDIRECT_URI" "NEXT_PUBLIC_GOOGLE_REDIRECT_URI"
 sync_var "$TRACK_UPLOAD_TIMEOUT_MS" "NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS"
 sync_var "$AUDIOMETA_URL" "NEXT_PUBLIC_AUDIOMETA_URL"
 sync_var "$APP_VERSION" "NEXT_PUBLIC_APP_VERSION"
+sync_secret_var "${NPM_TOKEN:-}" "NPM_TOKEN"
 
 echo "Full env sync done ($TARGET)."

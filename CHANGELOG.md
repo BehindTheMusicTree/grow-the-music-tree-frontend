@@ -84,6 +84,18 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Organization social links**: Sidebar footer row uses **`GithubSocialLink`**, **`LinkedInSocialLink`**, **`MastodonSocialLink`**, and **`EmailSocialLink`** from **`@behindthemusictree/assets`** (with **`icon-links.css`**).
+
+### Changed
+
+- **`@behindthemusictree/assets`**: Bumped to **6.1.0**. Banner **`TheMusicTreeByline`** follows v6 (organization site **`href`** baked into the published package; no app env). **`imageStyle`** height aligned with the org marketing site header.
+
+### Removed
+
+- **`NEXT_PUBLIC_THEMUSICTREE_URL`**: Dropped from required env (no longer used for the lockup).
+
 ### Documentation
 
 - **README**: Added ecosystem section with portfolio links (`themusictree.org`, GrowTheMusicTree project page, `the-music-tree-frontend`).

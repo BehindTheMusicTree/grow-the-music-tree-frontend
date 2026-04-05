@@ -110,8 +110,8 @@ We follow a **strict Git Flow** model:
 2. Clone your fork:
 
    ```bash
-   git clone https://github.com/YOUR-USERNAME/grow-the-music-tree.git
-   cd grow-the-music-tree
+   git clone https://github.com/YOUR-USERNAME/grow-the-music-tree-frontend.git
+   cd grow-the-music-tree-frontend
    ```
 
 **For maintainers:**
@@ -120,7 +120,7 @@ Clone the main repository directly:
 
 ```bash
 git clone https://github.com/BehindTheMusicTree/grow-the-music-tree-frontend.git
-cd grow-the-music-tree
+cd grow-the-music-tree-frontend
 ```
 
 ### 1. Environment Setup
@@ -136,8 +136,8 @@ cd grow-the-music-tree
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/BehindTheMusicTree/grow-the-music-tree.git
-   cd grow-the-music-tree
+   git clone https://github.com/BehindTheMusicTree/grow-the-music-tree-frontend.git
+   cd grow-the-music-tree-frontend
    ```
 
 2. Install dependencies:
