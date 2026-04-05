@@ -24,6 +24,7 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      NPM_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
       CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
       SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
       SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
@@ -45,6 +46,7 @@ jobs:
           missing=""
           [ -z "$VERCEL_TOKEN" ] && missing="$missing VERCEL_TOKEN"
           [ -z "$VERCEL_PROJECT_ID" ] && missing="$missing VERCEL_PROJECT_ID"
+          [ -z "$NPM_TOKEN" ] && missing="$missing GH_PACKAGES_TOKEN"
           [ -z "$CONTACT_EMAIL" ] && missing="$missing CONTACT_EMAIL"
           [ -z "$SPOTIFY_REDIRECT_RELATIVE_URI" ] && missing="$missing SPOTIFY_REDIRECT_RELATIVE_URI"
           [ -z "$SPOTIFY_SCOPES" ] && missing="$missing SPOTIFY_SCOPES"
@@ -74,6 +76,7 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      NPM_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
       CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
       SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
       SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
@@ -95,6 +98,7 @@ jobs:
           missing=""
           [ -z "$VERCEL_TOKEN" ] && missing="$missing VERCEL_TOKEN"
           [ -z "$VERCEL_PROJECT_ID" ] && missing="$missing VERCEL_PROJECT_ID"
+          [ -z "$NPM_TOKEN" ] && missing="$missing GH_PACKAGES_TOKEN"
           [ -z "$CONTACT_EMAIL" ] && missing="$missing CONTACT_EMAIL"
           [ -z "$SPOTIFY_REDIRECT_RELATIVE_URI" ] && missing="$missing SPOTIFY_REDIRECT_RELATIVE_URI"
           [ -z "$SPOTIFY_SCOPES" ] && missing="$missing SPOTIFY_SCOPES"

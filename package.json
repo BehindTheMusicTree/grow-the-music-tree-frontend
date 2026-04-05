@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.4.6",
   "scripts": {
+    "preinstall": "node scripts/require-npm-token-on-vercel.mjs",
     "dev": "next dev --turbo --hostname 127.0.0.1",
     "dev:local": "bash scripts/run-dev.sh local",
     "dev:remote": "bash scripts/run-dev.sh remote",
@@ -18,6 +19,7 @@
     "postversion": "node scripts/update-changelog-release.mjs && git add CHANGELOG.md && git commit --amend --no-edit && (v=$(node -p \"require('./package.json').version\"); git tag -d v$v 2>/dev/null; git tag v$v) && node scripts/delete-test-dev-tags.mjs"
   },
   "dependencies": {
+    "@behindthemusictree/assets": "6.1.0",
     "@fortawesome/fontawesome-svg-core": "6.5.2",
     "@fortawesome/free-solid-svg-icons": "6.5.2",
     "@fortawesome/react-fontawesome": "3.1.1",

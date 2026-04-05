@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { FaGithub } from "react-icons/fa";
 import Page from "@components/ui/Page";
+import { AboutTheMusicTreeLockup } from "./AboutTheMusicTreeLockup";
 
-const GITHUB_REPO_URL = "https://github.com/BehindTheMusicTree/grow-the-music-tree";
 const GITHUB_ORG_URL = "https://github.com/BehindTheMusicTree";
 const GITHUB_AUDIOMETA_URL = "https://github.com/BehindTheMusicTree/audiometa";
 const GITHUB_API_URL = "https://github.com/BehindTheMusicTree/the-music-tree-api";
@@ -39,8 +38,6 @@ function EcosystemLink({ href, label, description }: { href: string; label: stri
 }
 
 export default function AboutPage() {
-  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
-
   return (
     <Page title="About" dataPage="about">
       <div className="flex flex-col gap-6 max-w-2xl mx-auto py-8 w-full">
@@ -66,19 +63,11 @@ export default function AboutPage() {
       </Section>
 
       <Section title="🌍 Part of BehindTheMusicTree">
+        <AboutTheMusicTreeLockup />
         <p>
-          This app is part of the{" "}
-          <a
-            href={GITHUB_ORG_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            BehindTheMusicTree
-          </a>{" "}
-          ecosystem—a set of open-source projects aimed at building a shared reference for how we explore, understand,
-          and organize music. The goal is a global map of music culture where your listening journey, your collection,
-          and the community all fit together.
+          This app is part of this ecosystem—a set of open-source projects aimed at building a shared reference for how
+          we explore, understand, and organize music. The goal is a global map of music culture where your listening
+          journey, your collection, and the community all fit together.
         </p>
         <p className="font-medium text-gray-800">Other projects in the ecosystem:</p>
         <div className="flex flex-col gap-2">
@@ -99,42 +88,6 @@ export default function AboutPage() {
           />
         </div>
       </Section>
-
-      <Section title="🐙 GitHub">
-        <div className="flex flex-col gap-3">
-          <a
-            href={GITHUB_REPO_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 w-fit px-5 py-2.5 text-base font-medium text-white bg-gray-800 rounded-lg shadow hover:bg-gray-700 transition-colors"
-          >
-            <FaGithub className="text-xl" />
-            View this project on GitHub
-          </a>
-          <p className="text-sm text-gray-600">
-            Explore the rest of the ecosystem at{" "}
-            <a
-              href={GITHUB_ORG_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 transition-colors"
-            >
-              github.com/BehindTheMusicTree
-            </a>
-          </p>
-        </div>
-      </Section>
-
-      {contactEmail && (
-        <Section title="✉️ Contact">
-          <a
-            href={`mailto:${contactEmail}`}
-            className="text-blue-600 hover:text-blue-800 transition-colors font-medium"
-          >
-            {contactEmail}
-          </a>
-        </Section>
-      )}
       </div>
     </Page>
   );

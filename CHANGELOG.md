@@ -84,13 +84,31 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Organization social links**: Sidebar footer row uses **`GithubSocialLink`**, **`LinkedInSocialLink`**, **`MastodonSocialLink`**, and **`EmailSocialLink`** from **`@behindthemusictree/assets`** (with **`icon-links.css`**).
+
+### Changed
+
+- **`@behindthemusictree/assets`**: Bumped to **6.1.0**. Banner **`TheMusicTreeByline`** follows v6 (organization site **`href`** baked into the published package; no app env). **`imageStyle`** height aligned with the org marketing site header.
+
+### Removed
+
+- **`NEXT_PUBLIC_THEMUSICTREE_URL`**: Dropped from required env (no longer used for the lockup).
+
 ### Documentation
 
 - **README**: Added ecosystem section with portfolio links (`themusictree.org`, GrowTheMusicTree project page, `the-music-tree-frontend`).
+- **Vercel / GitHub Packages**: Document that **`NPM_TOKEN`** must be set for **Preview** as well as Production; add troubleshooting for failed **`npm install`** ([`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)). **CONTRIBUTING** install steps note **`NPM_TOKEN`** for local **`npm install`**. Add **`E401` / “token provided”** troubleshooting (SSO, fine-grained PAT, no **`GITHUB_TOKEN`** on Vercel).
 
 ### Fixed
 
 - **Dependencies**: Update `happy-dom` from `20.0.11` to `20.8.9` to remediate high-severity CVE-2026-33943 (unsanitized export names in `ECMAScriptModuleCompiler`).
+
+### CI
+
+- **Vercel sync env**: Treat **`GH_PACKAGES_TOKEN`** / **`NPM_TOKEN`** like other inputs—validate in the workflow and require **`NPM_TOKEN`** for **`full`** sync in **`scripts/vercel-sync-env-from-github.sh`** (fail if missing).
+- **Validate**: Use **`secrets.GH_PACKAGES_TOKEN`** as **`NPM_TOKEN`** for **`npm ci`** (not **`github.token`**), with an up-front job that fails clearly if the secret is missing; fixes **403** `read_package` when **`@behindthemusictree/*`** is published from another org repository.
 
 ## [1.4.6] - 2026-03-28
 

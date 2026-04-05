@@ -6,6 +6,7 @@ import { PiGraphLight } from "react-icons/pi";
 import { FaSpotify, FaCloudUploadAlt, FaUser, FaList, FaInfoCircle } from "react-icons/fa";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { MenuGroup } from "./MenuGroup";
+import OrgSocialLinks from "./OrgSocialLinks";
 import { useMediaQuery } from "@hooks/useMediaQuery";
 import {
   MENU_WIDTH,
@@ -65,27 +66,30 @@ export default function Menu({ className }: { className?: string }) {
         </button>
       )}
       <MenuGroup items={menuGroup} collapsed={collapsed} />
-      {AUDIOMETA_URL && (
-        <a
-          href={AUDIOMETA_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          title="Open Audio Metadata (external)"
-          className={`flex items-center mx-1 mt-1 py-2 rounded-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors duration-200 ${
-            collapsed ? "justify-center px-2" : "gap-3 px-4"
-          }`}
-        >
-          <Image
-            src="/assets/audiometa-icon.png"
-            alt=""
-            width={20}
-            height={20}
-            className="shrink-0"
-            aria-hidden
-          />
-          {!collapsed && <span className="flex-grow">Audio Metadata</span>}
-        </a>
-      )}
+      <div className="mt-auto flex flex-col gap-1 pb-2">
+        {AUDIOMETA_URL && (
+          <a
+            href={AUDIOMETA_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open Audio Metadata (external)"
+            className={`flex items-center mx-1 py-2 rounded-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors duration-200 ${
+              collapsed ? "justify-center px-2" : "gap-3 px-4"
+            }`}
+          >
+            <Image
+              src="/assets/audiometa-icon.png"
+              alt=""
+              width={20}
+              height={20}
+              className="shrink-0"
+              aria-hidden
+            />
+            {!collapsed && <span className="flex-grow">Audio Metadata</span>}
+          </a>
+        )}
+        <OrgSocialLinks />
+      </div>
     </nav>
   );
 }
