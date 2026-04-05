@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
-import { Play } from "lucide-react";
 import { usePopup } from "@contexts/PopupContext";
 import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
 import { useSession } from "@contexts/SessionContext";
@@ -97,26 +96,28 @@ export function MenuGroup({
             href={item.href}
             prefetch={false}
             onClick={handleItemClick(item)}
-            title={!isHorizontal && collapsed ? item.label : undefined}
+            title={isHorizontal || (!isHorizontal && collapsed) ? item.label : undefined}
+            aria-current={isCurrentPage ? "page" : undefined}
             className={cn(
               "flex items-center transition-colors duration-200",
               isHorizontal
-                ? "shrink-0 gap-2 whitespace-nowrap rounded-md px-2 py-1.5 text-sm"
-                : cn("mx-1 mt-1 rounded-sm py-2", collapsed ? "justify-center px-2" : "gap-3 px-4"),
-              item.authRequired === "any"
-                ? "bg-[var(--private-menu-item-bg)] text-black hover:opacity-90"
-                : item.authRequired === "spotify"
-                  ? "bg-[var(--spotify-menu-item-bg)] text-white hover:opacity-90"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white",
+                ? "shrink-0 gap-2 whitespace-nowrap px-1.5 py-1.5 text-sm xl:gap-2 xl:px-2"
+                : cn("mx-1 mt-1 py-2", collapsed ? "justify-center px-2" : "gap-3 px-4"),
+              item.authRequired === "spotify"
+                ? "text-green-400 hover:text-green-300"
+                : item.authRequired === "any"
+                  ? "text-gray-200 hover:text-white"
+                  : "text-gray-300 hover:text-white",
+              isCurrentPage &&
+                (item.authRequired === "spotify" ? "font-semibold text-green-200" : "font-semibold text-white"),
             )}
           >
             {item.icon}
-            {(!isHorizontal ? !collapsed : true) && (
-              <>
-                <span className={cn(!isHorizontal && "flex-grow")}>{item.label}</span>
-                {isCurrentPage && <Play className="h-4 w-4 shrink-0 fill-current" />}
-              </>
-            )}
+            {isHorizontal ? (
+              <span className="sr-only xl:not-sr-only xl:inline">{item.label}</span>
+            ) : !collapsed ? (
+              <span className="flex-grow">{item.label}</span>
+            ) : null}
           </Link>
         );
       })}

@@ -1,6 +1,6 @@
-# My Genre Tree
+# MyMusicTree
 
-Route: `/my-genre-tree`
+Route: `/me-genre-tree`
 Access: authenticated
 
 ## Table of Contents

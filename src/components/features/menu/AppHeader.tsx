@@ -8,7 +8,6 @@ import logo from "@assets/images/logos/tree.png";
 import { TheMusicTreeByline } from "@behindthemusictree/assets/components";
 import { MenuGroup } from "./MenuGroup";
 import { REFERENCE_GENRE_TREE_PATH, ROUTE_AUTH_CONFIG } from "@lib/constants/routes";
-import { PRIVATE_MENU_ITEM_BG_COLOR, SPOTIFY_MENU_ITEM_BG_COLOR } from "@lib/constants/layout";
 
 const AUDIOMETA_URL = process.env.NEXT_PUBLIC_AUDIOMETA_URL ?? "";
 
@@ -37,22 +36,18 @@ export default function AppHeader({ className }: AppHeaderProps) {
   return (
     <header
       className={`fixed top-0 z-50 flex h-banner w-full shrink-0 items-stretch border-b border-zinc-800 bg-black text-gray-100 ${className ?? ""}`}
-      style={{
-        ["--private-menu-item-bg" as string]: PRIVATE_MENU_ITEM_BG_COLOR,
-        ["--spotify-menu-item-bg" as string]: SPOTIFY_MENU_ITEM_BG_COLOR,
-      }}
     >
       <div className="flex min-h-0 min-w-0 flex-1 items-center gap-2 py-2 pl-3 pr-14 sm:pr-16">
         <Link
           href={REFERENCE_GENRE_TREE_PATH}
           prefetch={false}
-          className="flex shrink-0 items-center gap-2 sm:gap-3"
+          className="flex shrink-0 items-center gap-2 xl:gap-3"
           aria-label="GrowTheMusicTree home"
         >
           <div className="shrink-0">
             <Image src={logo} alt="" width={40} height={40} className="h-auto w-10" aria-hidden />
           </div>
-          <h1 className="hidden truncate text-lg font-bold text-gray-100 sm:block sm:text-xl">
+          <h1 className="hidden truncate text-lg font-bold text-gray-100 xl:block xl:text-xl">
             GrowTheMusicTree
           </h1>
         </Link>

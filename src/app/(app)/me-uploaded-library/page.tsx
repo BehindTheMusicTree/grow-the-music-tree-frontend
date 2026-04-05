@@ -51,7 +51,7 @@ export default function UploadedLibraryPage() {
   };
 
   return (
-    <Page title="Uploaded Library" dataPage="me-uploaded-library">
+    <Page title="My Library" dataPage="me-uploaded-library">
       <div className="uploaded-library">
         <UploadButtons onFileChange={handleFileChange} />
         <div className="overflow-x-auto rounded-lg border border-gray-300 shadow-sm">
