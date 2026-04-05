@@ -7,7 +7,6 @@ import { FaSpotify, FaCloudUploadAlt, FaUser, FaList, FaInfoCircle } from "react
 import logo from "@assets/images/logos/tree.png";
 import { TheMusicTreeByline } from "@behindthemusictree/assets/components";
 import { MenuGroup } from "./MenuGroup";
-import OrgSocialLinks from "./OrgSocialLinks";
 import { REFERENCE_GENRE_TREE_PATH, ROUTE_AUTH_CONFIG } from "@lib/constants/routes";
 import { PRIVATE_MENU_ITEM_BG_COLOR, SPOTIFY_MENU_ITEM_BG_COLOR } from "@lib/constants/layout";
 
@@ -63,8 +62,8 @@ export default function AppHeader({ className }: AppHeaderProps) {
         >
           <MenuGroup items={menuGroup} layout="horizontal" />
         </nav>
-        <div className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-2">
-          {AUDIOMETA_URL ? (
+        {AUDIOMETA_URL ? (
+          <div className="flex shrink-0 items-center">
             <a
               href={AUDIOMETA_URL}
               target="_blank"
@@ -82,9 +81,8 @@ export default function AppHeader({ className }: AppHeaderProps) {
               />
               <span className="hidden truncate text-sm sm:inline">Audio Metadata</span>
             </a>
-          ) : null}
-          <OrgSocialLinks variant="header" />
-        </div>
+          </div>
+        ) : null}
       </div>
       <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
         <span className="pointer-events-auto inline-flex rounded-full border border-zinc-200 bg-white shadow-sm transition-colors hover:border-zinc-300 hover:bg-zinc-50">
