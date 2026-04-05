@@ -18,6 +18,8 @@ interface MenuItem {
   label: string;
   icon: ReactNode;
   authRequired?: false | "any" | "spotify";
+  /** Opens in a new tab; uses a plain anchor instead of Next.js `Link`. */
+  external?: boolean;
 }
 
 interface MenuGroupProps {
@@ -44,6 +46,10 @@ export function MenuGroup({ items, className = "", collapsed = false, layout = "
   const isHorizontal = layout === "horizontal";
 
   const handleItemClick = (item: MenuItem) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (item.external) {
+      hidePopup({ onlyIfType: AUTH_POPUP_TYPE });
+      return;
+    }
     if (item.authRequired === false) {
       hidePopup({ onlyIfType: AUTH_POPUP_TYPE });
       return;
@@ -79,7 +85,46 @@ export function MenuGroup({ items, className = "", collapsed = false, layout = "
       )}
     >
       {items.map((item) => {
-        const isCurrentPage = pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
+        const isCurrentPage =
+          !item.external &&
+          (pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`)));
+        const className = cn(
+          "flex items-center transition-colors duration-200",
+          isHorizontal
+            ? "shrink-0 gap-2 whitespace-nowrap px-1.5 py-1.5 text-sm lg:gap-2 lg:px-2"
+            : cn("mx-1 mt-1 py-2", collapsed ? "justify-center px-2" : "gap-3 px-4"),
+          item.authRequired === "spotify"
+            ? "text-green-400 hover:text-green-300"
+            : item.authRequired === "any"
+              ? "text-gray-200 hover:text-white"
+              : "text-gray-300 hover:text-white",
+          isCurrentPage &&
+            (item.authRequired === "spotify" ? "font-semibold text-green-200" : "font-semibold text-white"),
+        );
+        const label =
+          isHorizontal ? (
+            <span className="sr-only md:not-sr-only lg:inline">{item.label}</span>
+          ) : !collapsed ? (
+            <span className="flex-grow">{item.label}</span>
+          ) : null;
+
+        if (item.external) {
+          return (
+            <a
+              key={item.href}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleItemClick(item)}
+              title={isHorizontal || (!isHorizontal && collapsed) ? item.label : undefined}
+              className={className}
+            >
+              {item.icon}
+              {label}
+            </a>
+          );
+        }
+
         return (
           <Link
             key={item.href}
@@ -88,26 +133,10 @@ export function MenuGroup({ items, className = "", collapsed = false, layout = "
             onClick={handleItemClick(item)}
             title={isHorizontal || (!isHorizontal && collapsed) ? item.label : undefined}
             aria-current={isCurrentPage ? "page" : undefined}
-            className={cn(
-              "flex items-center transition-colors duration-200",
-              isHorizontal
-                ? "shrink-0 gap-2 whitespace-nowrap px-1.5 py-1.5 text-sm lg:gap-2 lg:px-2"
-                : cn("mx-1 mt-1 py-2", collapsed ? "justify-center px-2" : "gap-3 px-4"),
-              item.authRequired === "spotify"
-                ? "text-green-400 hover:text-green-300"
-                : item.authRequired === "any"
-                  ? "text-gray-200 hover:text-white"
-                  : "text-gray-300 hover:text-white",
-              isCurrentPage &&
-                (item.authRequired === "spotify" ? "font-semibold text-green-200" : "font-semibold text-white"),
-            )}
+            className={className}
           >
             {item.icon}
-            {isHorizontal ? (
-              <span className="sr-only md:not-sr-only lg:inline">{item.label}</span>
-            ) : !collapsed ? (
-              <span className="flex-grow">{item.label}</span>
-            ) : null}
+            {label}
           </Link>
         );
       })}

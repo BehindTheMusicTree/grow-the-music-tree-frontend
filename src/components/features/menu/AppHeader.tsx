@@ -3,11 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PiGraphLight } from "react-icons/pi";
-import { FaSpotify, FaCloudUploadAlt, FaUser, FaList, FaInfoCircle } from "react-icons/fa";
+import { FaCloudUploadAlt, FaList } from "react-icons/fa";
 import logo from "@assets/images/logos/tree.png";
 import { TheMusicTreeByline } from "@behindthemusictree/assets/components";
 import { MenuGroup } from "./MenuGroup";
-import { REFERENCE_GENRE_TREE_PATH, ROUTE_AUTH_CONFIG } from "@lib/constants/routes";
+import {
+  REFERENCE_GENRE_TREE_PATH,
+  ROUTE_AUTH_CONFIG,
+  ROUTE_PATHS_EXCLUDED_FROM_HEADER_NAV,
+} from "@lib/constants/routes";
 
 const AUDIOMETA_URL = process.env.NEXT_PUBLIC_AUDIOMETA_URL ?? "";
 
@@ -15,17 +19,36 @@ const MENU_ICONS: Record<string, React.ReactNode> = {
   "/me-genre-tree": <PiGraphLight className="text-xl" />,
   "/me-genre-playlists": <FaList className="text-xl" />,
   "/me-uploaded-library": <FaCloudUploadAlt className="text-xl" />,
-  "/me-spotify-library": <FaSpotify className="text-xl" />,
-  "/account": <FaUser className="text-xl" />,
-  "/about": <FaInfoCircle className="text-xl" />,
 };
 
-const menuGroup = ROUTE_AUTH_CONFIG.map((route) => ({
-  href: route.path,
-  label: route.label,
-  icon: MENU_ICONS[route.path],
-  authRequired: route.authRequired,
-}));
+const menuGroup = [
+  ...ROUTE_AUTH_CONFIG.filter(({ path }) => !ROUTE_PATHS_EXCLUDED_FROM_HEADER_NAV.has(path)).map((route) => ({
+    href: route.path,
+    label: route.label,
+    icon: MENU_ICONS[route.path],
+    authRequired: route.authRequired,
+  })),
+  ...(AUDIOMETA_URL
+    ? [
+        {
+          href: AUDIOMETA_URL,
+          label: "Audio Metadata",
+          icon: (
+            <Image
+              src="/assets/audiometa-icon.png"
+              alt=""
+              width={20}
+              height={20}
+              className="h-5 w-5 shrink-0"
+              aria-hidden
+            />
+          ),
+          authRequired: false as const,
+          external: true,
+        },
+      ]
+    : []),
+];
 
 interface AppHeaderProps {
   className?: string;
@@ -56,27 +79,6 @@ export default function AppHeader({ className }: AppHeaderProps) {
         >
           <MenuGroup items={menuGroup} layout="horizontal" />
         </nav>
-        {AUDIOMETA_URL ? (
-          <div className="flex shrink-0 items-center">
-            <a
-              href={AUDIOMETA_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Open Audio Metadata (external)"
-              className="flex max-w-[7rem] items-center gap-1.5 truncate rounded-sm px-1.5 py-1 text-gray-300 transition-colors duration-200 hover:bg-gray-800 hover:text-white sm:max-w-none sm:gap-2 sm:px-2"
-            >
-              <Image
-                src="/assets/audiometa-icon.png"
-                alt=""
-                width={18}
-                height={18}
-                className="shrink-0"
-                aria-hidden
-              />
-              <span className="hidden truncate text-sm sm:inline">Audio Metadata</span>
-            </a>
-          </div>
-        ) : null}
       </div>
       <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
         <span className="pointer-events-auto inline-flex rounded-full border border-zinc-200 bg-white shadow-sm transition-colors hover:border-zinc-300 hover:bg-zinc-50">
