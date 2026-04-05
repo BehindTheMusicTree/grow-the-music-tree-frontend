@@ -105,6 +105,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Dependencies**: Update `happy-dom` from `20.0.11` to `20.8.9` to remediate high-severity CVE-2026-33943 (unsanitized export names in `ECMAScriptModuleCompiler`).
 
+### CI
+
+- **Vercel sync env**: Treat **`GH_PACKAGES_TOKEN`** / **`NPM_TOKEN`** like other inputs—validate in the workflow and require **`NPM_TOKEN`** for **`full`** sync in **`scripts/vercel-sync-env-from-github.sh`** (fail if missing).
+
 ## [1.4.6] - 2026-03-28
 
 ### Documentation

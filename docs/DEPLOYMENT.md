@@ -58,7 +58,7 @@ The repo root [`.npmrc`](../.npmrc) registers `@behindthemusictree` with `npm.pk
 
 **Local:** `export NPM_TOKEN=…` before `npm ci`, or use another credential flow you prefer. `npm` does not load `.env` for installs.
 
-**Optional:** Repository secret **`GH_PACKAGES_TOKEN`** (same PAT). The [**Vercel sync env**](../.github/workflows/vercel-sync-env.yml) workflow passes it into the sync script so **`NPM_TOKEN`** is upserted on Vercel when the secret is set (skipped when empty).
+**Vercel sync env:** Repository secret **`GH_PACKAGES_TOKEN`** (same PAT as Vercel **`NPM_TOKEN`**) is **required** for the [**Vercel sync env**](../.github/workflows/vercel-sync-env.yml) workflow: the job fails if it is missing or empty, and the script upserts **`NPM_TOKEN`** (sensitive) on Vercel for the selected targets.
 
 **PR / Preview builds:** Vercel assigns variables **per environment**. If **`NPM_TOKEN`** exists only under **Production**, branch and PR deployments (**Preview**) still run `npm install` without a token and fail (often as **`Command "npm install" exited with 1`** with little detail). Add **`NPM_TOKEN`** for **Preview** (and **Development** if you use `vercel dev`) as well.
 
@@ -91,10 +91,7 @@ After you change GitHub **Variables** or **Secrets** that map to Vercel, run **V
 
 - `VERCEL_TOKEN` – [Vercel token](https://vercel.com/account/tokens) with access to the project.
 - `VERCEL_PROJECT_ID` – Project id or name (e.g. `grow-the-music-tree-frontend`).
-
-**Optional** GitHub Secret (repo level):
-
-- `GH_PACKAGES_TOKEN` – Same PAT as Vercel **`NPM_TOKEN`**; used by **Vercel sync env** to push **`NPM_TOKEN`** (sensitive) to Vercel when set.
+- `GH_PACKAGES_TOKEN` – GitHub PAT with **`read:packages`** (same value you use for Vercel **`NPM_TOKEN`**). **Vercel sync env** requires this so **`NPM_TOKEN`** can be synced to Vercel; the workflow fails if it is unset or empty.
 
 **Required** GitHub Secret (environment **PROD** only, for **Vercel deploy**):
 
