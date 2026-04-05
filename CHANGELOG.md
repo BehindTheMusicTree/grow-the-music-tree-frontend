@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [1.5.0 - 2026-04-05](#150---2026-04-05)
 - [1.4.6 - 2026-03-28](#146---2026-03-28)
 - [1.4.5 - 2026-03-28](#145---2026-03-28)
 - [1.4.4 - 2026-03-28](#144---2026-03-28)
@@ -84,6 +85,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-04-05
+
 ### Added
 
 - **Organization social links**: Sidebar footer row uses **`GithubSocialLink`**, **`LinkedInSocialLink`**, **`MastodonSocialLink`**, and **`EmailSocialLink`** from **`@behindthemusictree/assets`** (with **`icon-links.css`**).
@@ -99,7 +102,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Documentation
 
 - **README**: Added ecosystem section with portfolio links (`themusictree.org`, GrowTheMusicTree project page, `the-music-tree-frontend`).
-- **Vercel / GitHub Packages**: Document that **`NPM_TOKEN`** must be set for **Preview** as well as Production; add troubleshooting for failed **`npm install`** ([`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)). **CONTRIBUTING** install steps note **`NPM_TOKEN`** for local **`npm install`**. Add **`E401` / “token provided”** troubleshooting (SSO, fine-grained PAT, no **`GITHUB_TOKEN`** on Vercel).
+- **Vercel / GitHub Packages**: Document that **`NPM_TOKEN`** must be set for **Preview** as well as Production; add troubleshooting for failed **`npm install`** ([`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)). **CONTRIBUTING** install steps note **`NPM_TOKEN`** for local **`npm install`**. Add **`E401` / “token provided”** troubleshooting (SSO, fine-grained PAT, no **`GITHUB_TOKEN`** on Vercel). Add **`E403`** / **`read_package`** (CI and **`GH_PACKAGES_TOKEN`**) troubleshooting.
 
 ### Fixed
 
