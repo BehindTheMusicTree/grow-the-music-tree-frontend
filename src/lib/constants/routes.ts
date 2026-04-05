@@ -11,7 +11,6 @@ export interface RouteAuthConfigItem {
 }
 
 export const ROUTE_AUTH_CONFIG: readonly RouteAuthConfigItem[] = [
-  { path: "/reference-genre-tree", authRequired: false, label: "TheMusicTree" },
   { path: "/me-genre-tree", authRequired: "any", label: "MyMusicTree" },
   { path: "/me-genre-playlists", authRequired: "any", label: "My Genre Playlists" },
   { path: "/me-uploaded-library", authRequired: "any", label: "My Library" },

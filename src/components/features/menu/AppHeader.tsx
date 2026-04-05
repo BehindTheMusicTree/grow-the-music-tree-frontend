@@ -12,7 +12,6 @@ import { REFERENCE_GENRE_TREE_PATH, ROUTE_AUTH_CONFIG } from "@lib/constants/rou
 const AUDIOMETA_URL = process.env.NEXT_PUBLIC_AUDIOMETA_URL ?? "";
 
 const MENU_ICONS: Record<string, React.ReactNode> = {
-  "/reference-genre-tree": <PiGraphLight className="text-xl" />,
   "/me-genre-tree": <PiGraphLight className="text-xl" />,
   "/me-genre-playlists": <FaList className="text-xl" />,
   "/me-uploaded-library": <FaCloudUploadAlt className="text-xl" />,

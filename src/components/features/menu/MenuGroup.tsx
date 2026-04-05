@@ -27,12 +27,7 @@ interface MenuGroupProps {
   layout?: "vertical" | "horizontal";
 }
 
-export function MenuGroup({
-  items,
-  className = "",
-  collapsed = false,
-  layout = "vertical",
-}: MenuGroupProps) {
+export function MenuGroup({ items, className = "", collapsed = false, layout = "vertical" }: MenuGroupProps) {
   const pathname = usePathname();
   const { showPopup, hidePopup } = usePopup();
   const { session } = useSession();
@@ -56,11 +51,7 @@ export function MenuGroup({
     if (item.authRequired === "spotify" && (!isAuthenticated || !hasSpotifyAuth)) {
       e.preventDefault();
       showPopup(
-        <AuthPopup
-          handleSpotifyOAuth={handleSpotifyOAuth}
-          redirectAfterAuthPath={item.href}
-          spotifyOnly
-        />,
+        <AuthPopup handleSpotifyOAuth={handleSpotifyOAuth} redirectAfterAuthPath={item.href} spotifyOnly />,
         AUTH_POPUP_TYPE,
       );
       return;
@@ -88,8 +79,7 @@ export function MenuGroup({
       )}
     >
       {items.map((item) => {
-        const isCurrentPage =
-          pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
+        const isCurrentPage = pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
         return (
           <Link
             key={item.href}
@@ -101,7 +91,7 @@ export function MenuGroup({
             className={cn(
               "flex items-center transition-colors duration-200",
               isHorizontal
-                ? "shrink-0 gap-2 whitespace-nowrap px-1.5 py-1.5 text-sm xl:gap-2 xl:px-2"
+                ? "shrink-0 gap-2 whitespace-nowrap px-1.5 py-1.5 text-sm lg:gap-2 lg:px-2"
                 : cn("mx-1 mt-1 py-2", collapsed ? "justify-center px-2" : "gap-3 px-4"),
               item.authRequired === "spotify"
                 ? "text-green-400 hover:text-green-300"
@@ -114,7 +104,7 @@ export function MenuGroup({
           >
             {item.icon}
             {isHorizontal ? (
-              <span className="sr-only xl:not-sr-only xl:inline">{item.label}</span>
+              <span className="sr-only md:not-sr-only lg:inline">{item.label}</span>
             ) : !collapsed ? (
               <span className="flex-grow">{item.label}</span>
             ) : null}
