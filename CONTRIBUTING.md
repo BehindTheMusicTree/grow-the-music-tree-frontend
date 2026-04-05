@@ -142,7 +142,10 @@ cd grow-the-music-tree-frontend
 
 2. Install dependencies:
 
+   The repo [`.npmrc`](.npmrc) pulls **`@behindthemusictree/*`** from GitHub Packages using **`NPM_TOKEN`**. Export a [GitHub PAT](https://github.com/settings/tokens) with **`read:packages`** (and org access) before installing:
+
    ```bash
+   export NPM_TOKEN=ghp_…   # or use credentials in ~/.npmrc if you prefer
    npm install --legacy-peer-deps
    ```
 

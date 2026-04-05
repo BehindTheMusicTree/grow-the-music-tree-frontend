@@ -60,6 +60,16 @@ The repo root [`.npmrc`](../.npmrc) registers `@behindthemusictree` with `npm.pk
 
 **Optional:** Repository secret **`GH_PACKAGES_TOKEN`** (same PAT). The [**Vercel sync env**](../.github/workflows/vercel-sync-env.yml) workflow passes it into the sync script so **`NPM_TOKEN`** is upserted on Vercel when the secret is set (skipped when empty).
 
+**PR / Preview builds:** Vercel assigns variables **per environment**. If **`NPM_TOKEN`** exists only under **Production**, branch and PR deployments (**Preview**) still run `npm install` without a token and fail (often as **`Command "npm install" exited with 1`** with little detail). Add **`NPM_TOKEN`** for **Preview** (and **Development** if you use `vercel dev`) as well.
+
+#### Troubleshooting: `npm install` fails on Vercel
+
+1. Confirm **`NPM_TOKEN`** is set for the deployment’s environment (**Preview** vs **Production**).
+2. Regenerate or verify the PAT has **`read:packages`** and access to the GitHub org that publishes **`@behindthemusictree/assets`**.
+3. After changing variables, **redeploy** (or push an empty commit) so the build picks them up.
+
+Local installs use the same [`.npmrc`](../.npmrc); export **`NPM_TOKEN`** before **`npm ci`** / **`npm install`** (npm does not read `.env` for installs).
+
 ### Organization assets (branding)
 
 The banner **TheMusicTree** lockup and sidebar social icons use **`@behindthemusictree/assets`**. The lockup’s organization site URL is embedded when that package is published; **`NEXT_PUBLIC_THEMUSICTREE_URL`** is not used.

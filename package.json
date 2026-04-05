@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.4.6",
   "scripts": {
+    "preinstall": "node scripts/require-npm-token-on-vercel.mjs",
     "dev": "next dev --turbo --hostname 127.0.0.1",
     "dev:local": "bash scripts/run-dev.sh local",
     "dev:remote": "bash scripts/run-dev.sh remote",
