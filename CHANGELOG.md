@@ -99,7 +99,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Documentation
 
 - **README**: Added ecosystem section with portfolio links (`themusictree.org`, GrowTheMusicTree project page, `the-music-tree-frontend`).
-- **Vercel / GitHub Packages**: Document that **`NPM_TOKEN`** must be set for **Preview** as well as Production; add troubleshooting for failed **`npm install`** ([`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)). **CONTRIBUTING** install steps note **`NPM_TOKEN`** for local **`npm install`**.
+- **Vercel / GitHub Packages**: Document that **`NPM_TOKEN`** must be set for **Preview** as well as Production; add troubleshooting for failed **`npm install`** ([`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)). **CONTRIBUTING** install steps note **`NPM_TOKEN`** for local **`npm install`**. Add **`E401` / “token provided”** troubleshooting (SSO, fine-grained PAT, no **`GITHUB_TOKEN`** on Vercel).
 
 ### Fixed
 

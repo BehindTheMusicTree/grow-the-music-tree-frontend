@@ -70,6 +70,16 @@ The repo root [`.npmrc`](../.npmrc) registers `@behindthemusictree` with `npm.pk
 
 Local installs use the same [`.npmrc`](../.npmrc); export **`NPM_TOKEN`** before **`npm ci`** / **`npm install`** (npm does not read `.env` for installs).
 
+#### Troubleshooting: `E401 Unauthorized` / `User cannot be authenticated with the token provided`
+
+npm is reaching GitHub Packages but **rejecting the credential**. Typical causes:
+
+1. **Wrong token on Vercel** — Use a **personal** or **machine-user** GitHub PAT with **`read:packages`**. Do **not** paste a **`GITHUB_TOKEN`** from a workflow run into Vercel; it is not a long-lived install credential for Vercel builds.
+2. **Organization SSO** — If **BehindTheMusicTree** enforces SAML SSO, open **GitHub → Settings → Developer settings → Personal access tokens**, find the token, click **Configure SSO**, and **Authorize** it for that org. Without this, installs often return **401**.
+3. **Fine-grained PAT** — Grant access to the **repository that publishes** `@behindthemusictree/assets`, and include permission to **read** that repository’s **packages** (per [GitHub’s fine-grained PAT docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token)).
+4. **Value hygiene in Vercel** — Store the raw token only (no `Bearer ` prefix, no surrounding quotes). Remove accidental spaces or newlines if you pasted from a secret manager.
+5. **Sanity check locally** — `export NPM_TOKEN=…` then `npm ci` at the repo root. If local fails with the same **401**, fix the PAT/SSO before changing Vercel again.
+
 ### Organization assets (branding)
 
 The banner **TheMusicTree** lockup and sidebar social icons use **`@behindthemusictree/assets`**. The lockup’s organization site URL is embedded when that package is published; **`NEXT_PUBLIC_THEMUSICTREE_URL`** is not used.
