@@ -56,10 +56,10 @@ Music enthusiasts, researchers, and the general public interested in understandi
 - Google Auth Callback (`/auth/google/callback`)
 - Spotify Auth Callback (`/auth/spotify/callback`)
 - Genre Playlists (`/genre-playlists`)
-- My Genre Tree (`/my-genre-tree`)
-- Reference Genre Tree (`/reference-genre-tree`)
+- MyMusicTree (`/me-genre-tree`)
+- Reference tree (`/reference-genre-tree`, also the logo / home link)
 - Spotify Library (`/spotify-library`)
-- Uploaded Library (`/uploaded-library`)
+- My Library (`/me-uploaded-library`)
 
 See `docs/pages/` for detailed page documentation.
 

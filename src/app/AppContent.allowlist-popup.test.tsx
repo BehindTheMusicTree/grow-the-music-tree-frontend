@@ -53,8 +53,7 @@ vi.mock("@hooks/useGoogleAuth", () => ({
 
 vi.mock("@lib/sentry", () => ({ initSentry: vi.fn() }));
 
-vi.mock("@components/features/banner/Banner", () => ({ default: () => null }));
-vi.mock("@components/features/menu/Menu", () => ({ default: () => null }));
+vi.mock("@components/features/menu/AppHeader", () => ({ default: () => null }));
 vi.mock("@components/features/player/Player", () => ({ default: () => null }));
 vi.mock("@components/features/player/AutoAdvance", () => ({ default: () => null }));
 vi.mock("@components/features/track-list-sidebar/TrackListSidebar", () => ({ default: () => null }));

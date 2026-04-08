@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Page from "@components/ui/Page";
+import OrgSocialLinks from "@components/features/menu/OrgSocialLinks";
 import { AboutTheMusicTreeLockup } from "./AboutTheMusicTreeLockup";
 
 const GITHUB_ORG_URL = "https://github.com/BehindTheMusicTree";
@@ -48,46 +49,50 @@ export default function AboutPage() {
           — Explore how music genres connect and where your taste fits in.
         </p>
 
-      <Section title="🎵 Overview">
-        <p>
-          GrowTheMusicTree helps you explore how music genres connect. Browse a map of genres that grows with the
-          community, link your Spotify or Google account to see where your taste fits in, and discover new music along
-          the way.
-        </p>
-        <ul className="list-disc list-inside space-y-1.5 pl-1">
-          <li>Browse and explore the genre tree</li>
-          <li>Connect Spotify or sign in with Google to see your library on the map</li>
-          <li>Get playlists and suggestions based on your taste</li>
-          <li>Join in and help shape how genres are organized</li>
-        </ul>
-      </Section>
+        <Section title="🎵 Overview">
+          <p>
+            GrowTheMusicTree helps you explore how music genres connect. Browse a map of genres that grows with the
+            community, link your Spotify or Google account to see where your taste fits in, and discover new music along
+            the way.
+          </p>
+          <ul className="list-disc list-inside space-y-1.5 pl-1">
+            <li>Browse and explore the genre tree</li>
+            <li>Connect Spotify or sign in with Google to see your library on the map</li>
+            <li>Get playlists and suggestions based on your taste</li>
+            <li>Join in and help shape how genres are organized</li>
+          </ul>
+        </Section>
 
-      <Section title="🌍 Part of BehindTheMusicTree">
-        <AboutTheMusicTreeLockup />
-        <p>
-          This app is part of this ecosystem—a set of open-source projects aimed at building a shared reference for how
-          we explore, understand, and organize music. The goal is a global map of music culture where your listening
-          journey, your collection, and the community all fit together.
-        </p>
-        <p className="font-medium text-gray-800">Other projects in the ecosystem:</p>
-        <div className="flex flex-col gap-2">
-          <EcosystemLink
-            href={GITHUB_AUDIOMETA_URL}
-            label="🎵 AudioMeta"
-            description="a library for reading and writing metadata in your audio files (MP3, FLAC, WAV, and more)"
-          />
-          <EcosystemLink
-            href={GITHUB_API_URL}
-            label="🔌 The Music Tree API"
-            description="the backend that powers this app: genre data, recommendations, and your listening profile"
-          />
-          <EcosystemLink
-            href={GITHUB_ORG_URL}
-            label="🎧 HearTheMusicTree"
-            description="a cloud audio manager for collectors and DJs: smart playlists, many formats, and sync across devices (in development)"
-          />
-        </div>
-      </Section>
+        <Section title="🌍 Part of BehindTheMusicTree">
+          <AboutTheMusicTreeLockup />
+          <p>
+            This app is part of this ecosystem—a set of open-source projects aimed at building a shared reference for
+            how we explore, understand, and organize music. The goal is a global map of music culture where your
+            listening journey, your collection, and the community all fit together.
+          </p>
+          <p className="font-medium text-gray-800">Other projects in the ecosystem:</p>
+          <div className="flex flex-col gap-2">
+            <EcosystemLink
+              href={GITHUB_AUDIOMETA_URL}
+              label="🎵 AudioMeta"
+              description="a library for reading and writing metadata in your audio files (MP3, FLAC, WAV, and more)"
+            />
+            <EcosystemLink
+              href={GITHUB_API_URL}
+              label="🔌 TheMusicTreeAPI"
+              description="the backend that powers this app: genre data, recommendations, and your listening profile"
+            />
+            <EcosystemLink
+              href={GITHUB_ORG_URL}
+              label="🎧 HearTheMusicTree"
+              description="a cloud audio manager for collectors and DJs: smart playlists, many formats, and sync across devices (in development)"
+            />
+          </div>
+          <div className="border-t border-gray-100 pt-4">
+            <p className="mb-3 text-center text-sm text-gray-600">Follow BehindTheMusicTree and get in touch.</p>
+            <OrgSocialLinks />
+          </div>
+        </Section>
       </div>
     </Page>
   );

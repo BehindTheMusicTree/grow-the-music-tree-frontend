@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
 const playerHeight = "80px";
-const bannerHeight = "63.5px";
+const bannerHeight = "64px";
 const config = {
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   theme: {
