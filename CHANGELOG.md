@@ -85,6 +85,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- **Vite (Vitest)**: Added `overrides.vite` **~7.3.2** so the lockfile resolves **7.3.2**, remediating **CVE-2026-39363** (arbitrary file read via the Vite dev server WebSocket when the dev server is reachable on the network).
+
 ## [1.5.0] - 2026-04-05
 
 ### Added
