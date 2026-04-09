@@ -81,6 +81,7 @@
     "minimatch@9": "9.0.7",
     "minimatch@10": "10.2.3",
     "picomatch@2": "2.3.2",
-    "picomatch@4": "4.0.4"
+    "picomatch@4": "4.0.4",
+    "vite": "~7.3.2"
   }
 }
