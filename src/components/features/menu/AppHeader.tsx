@@ -2,23 +2,24 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { PiGraphLight } from "react-icons/pi";
 import { FaCloudUploadAlt, FaList } from "react-icons/fa";
 import logo from "@assets/images/logos/tree.png";
+import { APP_NAME } from "@lib/constants/app";
 import { TheMusicTreeByline } from "@behindthemusictree/assets/components";
+import btmtMark from "@behindthemusictree/assets/brand/behind-the-music-tree/behind-the-music-tree-mark.svg";
 import { MenuGroup } from "./MenuGroup";
 import {
-  REFERENCE_GENRE_TREE_PATH,
-  ROUTE_AUTH_CONFIG,
-  ROUTE_PATHS_EXCLUDED_FROM_HEADER_NAV,
+  PATHS as ROUTE_PATHS,
+  AUTH_CONFIG as ROUTE_AUTH_CONFIG,
+  PATHS_EXCLUDED_FROM_HEADER_NAV as ROUTE_PATHS_EXCLUDED_FROM_HEADER_NAV,
 } from "@lib/constants/routes";
 
 const AUDIOMETA_URL = process.env.NEXT_PUBLIC_AUDIOMETA_URL ?? "";
 
 const MENU_ICONS: Record<string, React.ReactNode> = {
-  "/me-genre-tree": <PiGraphLight className="text-xl" />,
-  "/me-genre-playlists": <FaList className="text-xl" />,
-  "/me-uploaded-library": <FaCloudUploadAlt className="text-xl" />,
+  [ROUTE_PATHS.ME_GENRE_TREE]: <Image src={btmtMark} alt="My Music Tree" width={20} height={20} />,
+  [ROUTE_PATHS.ME_GENRE_PLAYLISTS]: <FaList className="text-xl" />,
+  [ROUTE_PATHS.ME_UPLOADED_LIBRARY]: <FaCloudUploadAlt className="text-xl" />,
 };
 
 const menuGroup = [
@@ -32,7 +33,7 @@ const menuGroup = [
     ? [
         {
           href: AUDIOMETA_URL,
-          label: "Audio Metadata",
+          label: "Audiometa",
           icon: (
             <Image
               src="/assets/audiometa-icon.png"
@@ -61,17 +62,15 @@ export default function AppHeader({ className }: AppHeaderProps) {
     >
       <div className="flex min-h-0 min-w-0 flex-1 items-center gap-2 py-2 pl-3 pr-14 sm:pr-16">
         <Link
-          href={REFERENCE_GENRE_TREE_PATH}
+          href={ROUTE_PATHS.REFERENCE_GENRE_TREE}
           prefetch={false}
           className="flex shrink-0 items-center gap-2 xl:gap-3"
-          aria-label="GrowTheMusicTree home"
+          aria-label={`${APP_NAME} home`}
         >
           <div className="shrink-0">
             <Image src={logo} alt="" width={40} height={40} className="h-auto w-10" aria-hidden />
           </div>
-          <h1 className="hidden truncate text-lg font-bold text-gray-100 xl:block xl:text-xl">
-            GrowTheMusicTree
-          </h1>
+          <h1 className="hidden truncate text-lg font-bold text-gray-100 xl:block xl:text-xl">{APP_NAME}</h1>
         </Link>
         <nav
           aria-label="Main navigation"
