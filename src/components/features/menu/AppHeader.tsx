@@ -9,9 +9,9 @@ import { APP_NAME } from "@lib/constants/app";
 import { TheMusicTreeByline } from "@behindthemusictree/assets/components";
 import { MenuGroup } from "./MenuGroup";
 import {
-  REFERENCE_GENRE_TREE_PATH,
-  ROUTE_AUTH_CONFIG,
-  ROUTE_PATHS_EXCLUDED_FROM_HEADER_NAV,
+  PATHS as ROUTE_PATHS,
+  AUTH_CONFIG as ROUTE_AUTH_CONFIG,
+  PATHS_EXCLUDED_FROM_HEADER_NAV as ROUTE_PATHS_EXCLUDED_FROM_HEADER_NAV,
 } from "@lib/constants/routes";
 
 const AUDIOMETA_URL = process.env.NEXT_PUBLIC_AUDIOMETA_URL ?? "";
@@ -62,7 +62,7 @@ export default function AppHeader({ className }: AppHeaderProps) {
     >
       <div className="flex min-h-0 min-w-0 flex-1 items-center gap-2 py-2 pl-3 pr-14 sm:pr-16">
         <Link
-          href={REFERENCE_GENRE_TREE_PATH}
+          href={ROUTE_PATHS.REFERENCE_GENRE_TREE}
           prefetch={false}
           className="flex shrink-0 items-center gap-2 xl:gap-3"
           aria-label={`${APP_NAME} home`}
