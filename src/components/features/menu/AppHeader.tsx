@@ -33,7 +33,7 @@ const menuGroup = [
     ? [
         {
           href: AUDIOMETA_URL,
-          label: "Audio Metadata",
+          label: "Audiometa",
           icon: (
             <Image
               src="/assets/audiometa-icon.png"
