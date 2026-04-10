@@ -17,9 +17,9 @@ import {
 const AUDIOMETA_URL = process.env.NEXT_PUBLIC_AUDIOMETA_URL ?? "";
 
 const MENU_ICONS: Record<string, React.ReactNode> = {
-  "/me-genre-tree": <PiGraphLight className="text-xl" />,
-  "/me-genre-playlists": <FaList className="text-xl" />,
-  "/me-uploaded-library": <FaCloudUploadAlt className="text-xl" />,
+  [ROUTE_PATHS.ME_GENRE_TREE]: <PiGraphLight className="text-xl" />,
+  [ROUTE_PATHS.ME_GENRE_PLAYLISTS]: <FaList className="text-xl" />,
+  [ROUTE_PATHS.ME_UPLOADED_LIBRARY]: <FaCloudUploadAlt className="text-xl" />,
 };
 
 const menuGroup = [
