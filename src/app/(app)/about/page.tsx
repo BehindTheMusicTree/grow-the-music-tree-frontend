@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Page from "@components/ui/Page";
+import { APP_NAME } from "@constants/app";
 import OrgSocialLinks from "@components/features/menu/OrgSocialLinks";
 import { AboutTheMusicTreeLockup } from "./AboutTheMusicTreeLockup";
 
@@ -44,16 +45,15 @@ export default function AboutPage() {
       <div className="flex flex-col gap-6 max-w-2xl mx-auto py-8 w-full">
         <p className="text-center text-base text-gray-600">
           <Link href="/" className="font-medium text-gray-900 hover:text-gray-600 transition-colors">
-            GrowTheMusicTree 🌳
+            {APP_NAME} 🌳
           </Link>{" "}
           — Explore how music genres connect and where your taste fits in.
         </p>
 
         <Section title="🎵 Overview">
           <p>
-            GrowTheMusicTree helps you explore how music genres connect. Browse a map of genres that grows with the
-            community, link your Spotify or Google account to see where your taste fits in, and discover new music along
-            the way.
+            {APP_NAME} helps you explore how music genres connect. Browse a map of genres that grows with the community,
+            link your Spotify or Google account to see where your taste fits in, and discover new music along the way.
           </p>
           <ul className="list-disc list-inside space-y-1.5 pl-1">
             <li>Browse and explore the genre tree</li>
