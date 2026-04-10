@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { PiGraphLight } from "react-icons/pi";
 import { FaCloudUploadAlt, FaList } from "react-icons/fa";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { TheMusicTreeByline } from "@behindthemusictree/assets/components";
+import btmtMark from "@behindthemusictree/assets/brand/behind-the-music-tree/behind-the-music-tree-mark.svg";
 import { MenuGroup } from "./MenuGroup";
 import {
   PATHS as ROUTE_PATHS,
@@ -17,7 +17,7 @@ import {
 const AUDIOMETA_URL = process.env.NEXT_PUBLIC_AUDIOMETA_URL ?? "";
 
 const MENU_ICONS: Record<string, React.ReactNode> = {
-  [ROUTE_PATHS.ME_GENRE_TREE]: <PiGraphLight className="text-xl" />,
+  [ROUTE_PATHS.ME_GENRE_TREE]: <Image src={btmtMark} alt="My Music Tree" width={20} height={20} />,
   [ROUTE_PATHS.ME_GENRE_PLAYLISTS]: <FaList className="text-xl" />,
   [ROUTE_PATHS.ME_UPLOADED_LIBRARY]: <FaCloudUploadAlt className="text-xl" />,
 };
