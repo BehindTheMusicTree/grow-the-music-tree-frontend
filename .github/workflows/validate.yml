@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 env:
-  NPM_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+  NPM_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN_READ }}
 
 jobs:
   ensure-packages-token:
