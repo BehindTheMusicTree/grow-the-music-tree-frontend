@@ -56,6 +56,9 @@ importers:
       next:
         specifier: 16.2.3
         version: 16.2.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      prop-types:
+        specifier: 15.8.1
+        version: 15.8.1
       raf:
         specifier: 3.4.1
         version: 3.4.1
