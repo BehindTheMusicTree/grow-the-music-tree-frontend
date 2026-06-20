@@ -85,6 +85,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.5.1] - 2026-06-20
+
 ### CI
 
 - **Validate workflow**: Now also runs on `push` to `develop` and `main` (previously pull-request only), so merges and direct pushes are validated. Fixed `NPM_TOKEN` to read the `GH_PACKAGES_TOKEN_READ` secret (was referencing a stale secret name, causing `npm ci` to fail).
@@ -98,6 +100,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Site URLs**: `getBackendBaseUrl()` and `getAudiometaUrl()` now throw if `HTMT_API_SUBDOMAIN` / `AUDIOMETA_FRONT_SUBDOMAIN` are missing, instead of silently building a malformed URL.
 
 - **Site URLs**: `getBackendBaseUrl()` no longer honors a stale `NEXT_PUBLIC_BACKEND_BASE_URL` left in a Vercel project's environment settings — the override now only applies outside Vercel (when `NEXT_PUBLIC_VERCEL_ENV` is unset), e.g. for local or remote dev.
+
 
 ## [1.5.0] - 2026-04-05
 
