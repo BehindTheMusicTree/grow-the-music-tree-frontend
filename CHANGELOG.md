@@ -85,11 +85,17 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### CI
+
+- **Validate workflow**: Now also runs on `push` to `develop` and `main` (previously pull-request only), so merges and direct pushes are validated. Fixed `NPM_TOKEN` to read the `GH_PACKAGES_TOKEN_READ` secret (was referencing a stale secret name, causing `npm ci` to fail).
+
 ### Fixed
 
 - **Next.js**: Bumped **next** and **eslint-config-next** to **16.2.3** to remediate **GHSA-q4gf-8mx6-v5v3** (denial of service via Server Components).
 
 - **Vite (Vitest)**: Added `overrides.vite` **~7.3.2** so the lockfile resolves **7.3.2**, remediating **CVE-2026-39363** (arbitrary file read via the Vite dev server WebSocket when the dev server is reachable on the network).
+
+- **Site URLs**: `getBackendBaseUrl()` and `getAudiometaUrl()` now throw if `HTMT_API_SUBDOMAIN` / `AUDIOMETA_FRONT_SUBDOMAIN` are missing, instead of silently building a malformed URL.
 
 ## [1.5.0] - 2026-04-05
 
