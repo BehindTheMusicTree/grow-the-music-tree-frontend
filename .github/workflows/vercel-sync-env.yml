@@ -24,7 +24,7 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      NPM_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+      NPM_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN_READ }}
       CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
       SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
       SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
@@ -76,7 +76,7 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      NPM_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+      NPM_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN_READ }}
       CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
       SPOTIFY_REDIRECT_RELATIVE_URI: ${{ vars.SPOTIFY_REDIRECT_RELATIVE_URI }}
       SPOTIFY_SCOPES: ${{ vars.SPOTIFY_SCOPES }}
