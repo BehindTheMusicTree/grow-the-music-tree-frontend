@@ -14,10 +14,12 @@ export function getBackendBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_BACKEND_BASE_URL) return process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
   const apiRootSegment = process.env.NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT;
   if (!apiRootSegment) throw new Error("NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT is required");
+  if (!HTMT_API_SUBDOMAIN) throw new Error("HTMT_API_SUBDOMAIN is required");
   return `${subdomainOrigin(HTMT_API_SUBDOMAIN)}/${apiRootSegment.replace(/^\/+|\/+$/g, "")}/`;
 }
 
 /** AudioMeta web app URL. */
 export function getAudiometaUrl(): string {
+  if (!AUDIOMETA_FRONT_SUBDOMAIN) throw new Error("AUDIOMETA_FRONT_SUBDOMAIN is required");
   return subdomainOrigin(AUDIOMETA_FRONT_SUBDOMAIN);
 }
