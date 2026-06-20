@@ -5,7 +5,6 @@ let checkPerformed = false;
 interface EnvVars {
   NEXT_PUBLIC_BASE_URL_WITHOUT_PORT: string | undefined;
   NEXT_PUBLIC_CONTACT_EMAIL: string | undefined;
-  NEXT_PUBLIC_BACKEND_BASE_URL: string | undefined;
   NEXT_PUBLIC_SENTRY_IS_ACTIVE: string | undefined;
   NEXT_PUBLIC_SPOTIFY_CLIENT_ID: string | undefined;
   NEXT_PUBLIC_SPOTIFY_SCOPES: string | undefined;
@@ -22,7 +21,6 @@ export function validateEnv(): void {
     const clientEnvVars: EnvVars = {
       NEXT_PUBLIC_BASE_URL_WITHOUT_PORT: process.env.NEXT_PUBLIC_BASE_URL_WITHOUT_PORT,
       NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
-      NEXT_PUBLIC_BACKEND_BASE_URL: process.env.NEXT_PUBLIC_BACKEND_BASE_URL,
       NEXT_PUBLIC_SENTRY_IS_ACTIVE: process.env.NEXT_PUBLIC_SENTRY_IS_ACTIVE,
       NEXT_PUBLIC_SPOTIFY_CLIENT_ID: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
       NEXT_PUBLIC_SPOTIFY_SCOPES: process.env.NEXT_PUBLIC_SPOTIFY_SCOPES,

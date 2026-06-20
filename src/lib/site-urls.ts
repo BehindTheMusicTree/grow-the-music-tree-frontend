@@ -1,0 +1,23 @@
+import { AUDIOMETA_FRONT_SUBDOMAIN, HTMT_API_SUBDOMAIN, ORG_DOMAIN } from "@behindthemusictree/assets";
+
+function isProductionEnv(): boolean {
+  return process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
+}
+
+function subdomainOrigin(label: string): string {
+  const host = isProductionEnv() ? label : `${label}-staging`;
+  return `https://${host}.${ORG_DOMAIN}`;
+}
+
+/** HearTheMusicTree API base URL. Honors `NEXT_PUBLIC_BACKEND_BASE_URL` as a local/remote dev override. */
+export function getBackendBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_BACKEND_BASE_URL) return process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+  const apiRootSegment = process.env.NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT;
+  if (!apiRootSegment) throw new Error("NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT is required");
+  return `${subdomainOrigin(HTMT_API_SUBDOMAIN)}/${apiRootSegment.replace(/^\/+|\/+$/g, "")}/`;
+}
+
+/** AudioMeta web app URL. */
+export function getAudiometaUrl(): string {
+  return subdomainOrigin(AUDIOMETA_FRONT_SUBDOMAIN);
+}

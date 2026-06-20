@@ -34,7 +34,7 @@ Staging works on the **free (Hobby) plan**: use **Domains** to assign a custom U
 - **Preview URL only**: Every push to `develop` gets a preview URL (e.g. `grow-the-music-tree-frontend-git-develop-username.vercel.app`). No extra config.
 - **Staging custom domain** (recommended):
   1. **Settings → Domains** (not “Environments” / “Pre-production Environment”).
-  2. Click **Add** and enter your staging domain (e.g. `staging.grow.themusictree.org`).
+  2. Click **Add** and enter your staging domain (e.g. `grow-staging.themusictree.org` — **suffix**, not `staging.grow.themusictree.org`; the org's DNS/Coolify infra moved to the `<label>-staging.themusictree.org` convention, see [src/lib/site-urls.ts](../src/lib/site-urls.ts)).
   3. When adding the domain, set **Git Branch** to `develop`. Only deployments from `develop` will be served on this domain.
   4. Add the CNAME record (and any other DNS) Vercel shows at your DNS provider.
 
@@ -43,8 +43,10 @@ Result:
 | Environment | Branch    | Deploys when       | URL example                    |
 | ----------- | --------- | ------------------ | ------------------------------ |
 | Production  | `main`    | Push tag `vX.Y.Z` or manual **Vercel deploy** | `app.themusictree.org`         |
-| Staging     | `develop` | Push to develop    | `staging.grow.themusictree.org` or preview URL |
+| Staging     | `develop` | Push to develop    | `grow-staging.themusictree.org` or preview URL |
 | PR previews | any       | Open PR            | `…-git-branch-…vercel.app`     |
+
+**Required Vercel project setting:** Enable **Settings → Environment Variables → Automatically expose System Environment Variables**. This is what makes `NEXT_PUBLIC_VERCEL_ENV` available at build time, which `src/lib/site-urls.ts` uses to pick the production vs. `-staging` hostname.
 
 ## 3. Environment variables
 
@@ -86,9 +88,11 @@ npm is reaching GitHub Packages but **rejecting the credential**. Typical causes
 4. **Value hygiene in Vercel** — Store the raw token only (no `Bearer ` prefix, no surrounding quotes). Remove accidental spaces or newlines if you pasted from a secret manager.
 5. **Sanity check locally** — `export NPM_TOKEN=…` then `npm ci` at the repo root. If local fails with the same **401**, fix the PAT/SSO before changing Vercel again.
 
-### Organization assets (branding)
+### Organization assets (branding and subdomains)
 
 The banner **TheMusicTree** lockup and sidebar social icons use **`@behindthemusictree/assets`**. The lockup’s organization site URL is embedded when that package is published; **`NEXT_PUBLIC_THEMUSICTREE_URL`** is not used.
+
+[`src/lib/site-urls.ts`](../src/lib/site-urls.ts) also imports the org's subdomain labels (`HTMT_API_SUBDOMAIN`, `AUDIOMETA_FRONT_SUBDOMAIN`) and `ORG_DOMAIN` from this package to compute `NEXT_PUBLIC_BACKEND_BASE_URL` and the AudioMeta link at build/runtime — these are **no longer** GitHub repo variables (`HTMT_API_SUBDOMAIN`, `GTMT_FRONT_SUBDOMAIN`, `AUDIOMETA_SUBDOMAIN`, `DOMAIN_NAME` were removed). It picks the `-staging` suffix (e.g. `hear-api-staging.themusictree.org`) whenever `NEXT_PUBLIC_VERCEL_ENV !== "production"`, matching the org's live DNS/Coolify convention. Keep `@behindthemusictree/assets` reasonably current (`npm install` after a version bump) so these constants exist and stay accurate.
 
 ### 3.1 Syncing env vars from GitHub (recommended)
 
@@ -125,19 +129,17 @@ After you change GitHub **Variables** or **Secrets** that map to Vercel, run **V
 | Variable                     | Used for |
 | ---------------------------- | -------- |
 | `CONTACT_EMAIL`              | `NEXT_PUBLIC_CONTACT_EMAIL` |
-| `SPOTIFY_REDIRECT_RELATIVE_URI` | Path segment for `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` (e.g. `auth/spotify/callback`) |
+| `SPOTIFY_REDIRECT_RELATIVE_URI` | Relative path synced as `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` (e.g. `/auth/spotify/callback`). Resolved against `window.location.origin` at runtime (see `resolveRedirectUri` in [src/lib/auth/code-exchange.ts](../src/lib/auth/code-exchange.ts)), so it works on the canonical domain and on ad hoc preview URLs alike. |
 | `SPOTIFY_SCOPES`             | `NEXT_PUBLIC_SPOTIFY_SCOPES` |
-| `GOOGLE_REDIRECT_RELATIVE_URI` | Path segment for `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` (e.g. `auth/google/callback`) |
+| `GOOGLE_REDIRECT_RELATIVE_URI` | Relative path synced as `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` (e.g. `/auth/google/callback`) |
 | `TRACK_UPLOAD_TIMEOUT_MS`    | `NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS` |
-| `DOMAIN_NAME`                | Base domain for all built URLs |
-| `HTMT_API_SUBDOMAIN`    | API host label (without `staging.`): builds `NEXT_PUBLIC_BACKEND_BASE_URL` with prod = `https://<this>.<DOMAIN_NAME>/…`, preview = `https://staging.<this>.<DOMAIN_NAME>/…` |
-| `HTMT_API_ROOT_SEGMENT`      | **Required.** Django `API_ROOT_BASE` path segment (no leading/trailing slashes), e.g. `v2`. Sync fails if unset. Example: `https://<api-host>/v2/` |
-| `GTMT_FRONT_SUBDOMAIN`  | Builds app URL for redirect URIs: prod = `https://<this>.<DOMAIN_NAME>`, preview = `https://staging.<this>.<DOMAIN_NAME>` |
-| `AUDIOMETA_SUBDOMAIN`   | Builds `NEXT_PUBLIC_AUDIOMETA_URL` as `https://<this>.<DOMAIN_NAME>` |
+| `HTMT_API_ROOT_SEGMENT`      | **Required.** Django `API_ROOT_BASE` path segment (no leading/trailing slashes), e.g. `v2`. Synced as `NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT`; combined at runtime with the `HTMT_API_SUBDOMAIN` label from `@behindthemusictree/assets` to build `NEXT_PUBLIC_BACKEND_BASE_URL` (see [src/lib/site-urls.ts](../src/lib/site-urls.ts)). |
 | `SPOTIFY_CLIENT_ID_PROD`     | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on production |
 | `SPOTIFY_CLIENT_ID_STAGING`  | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on Vercel preview/staging (required when running **Vercel sync env** for preview) |
 | `GOOGLE_CLIENT_ID_PROD`      | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on production |
 | `GOOGLE_CLIENT_ID_STAGING`   | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on Vercel preview/staging (required when running **Vercel sync env** for preview) |
+
+The backend host and AudioMeta link are no longer GitHub-synced: they're computed at build/runtime from `@behindthemusictree/assets` (see [§ Organization assets](#organization-assets-branding-and-subdomains) above). `NEXT_PUBLIC_BACKEND_BASE_URL` remains valid as a manual override (e.g. local dev against `localhost:8000`, see `env/development/example/`); `NEXT_PUBLIC_AUDIOMETA_URL` is no longer read at all.
 
 **How full sync works (`vercel-sync-env.yml`):** Each job runs in a **GitHub Environment** (**PROD** or **STAGING**), so it sees the right secrets. It syncs only to the matching Vercel target.
 
@@ -146,7 +148,7 @@ After you change GitHub **Variables** or **Secrets** that map to Vercel, run **V
 | Repo variables + **PROD** env secrets | Vercel **production** |
 | Repo variables + **STAGING** env secrets | Vercel **preview** (staging and PR previews) |
 
-The sync sets `NEXT_PUBLIC_SENTRY_IS_ACTIVE` to `true`, `NEXT_PUBLIC_SPOTIFY_AUTH_URL` to `https://accounts.spotify.com/authorize`, builds `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` / `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` from the app URL (prod = `https://<GTMT_FRONT_SUBDOMAIN>.<DOMAIN_NAME>`, preview = `https://staging.<GTMT_FRONT_SUBDOMAIN>.<DOMAIN_NAME>`) + relative path, and sets `NEXT_PUBLIC_APP_VERSION`: **production** = `package.json` `version` (manual workflow; no tag check); **preview** = `<version>-dev+<shortsha>`.
+The sync sets `NEXT_PUBLIC_SENTRY_IS_ACTIVE` to `true`, `NEXT_PUBLIC_SPOTIFY_AUTH_URL` to `https://accounts.spotify.com/authorize`, passes `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` / `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` through as the relative callback path (resolved against the page's own origin at runtime), and sets `NEXT_PUBLIC_APP_VERSION`: **production** = `package.json` `version` (manual workflow; no tag check); **preview** = `<version>-dev+<shortsha>`.
 
 **New production setup:** Either configure all `NEXT_PUBLIC_*` in the Vercel UI or run **Vercel sync env** once for production before relying on **Vercel deploy** (which only updates `NEXT_PUBLIC_APP_VERSION` plus the hook).
 

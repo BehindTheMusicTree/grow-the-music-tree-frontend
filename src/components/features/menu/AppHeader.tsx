@@ -7,14 +7,13 @@ import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { TheMusicTreeByline } from "@behindthemusictree/assets/components";
 import btmtMark from "@behindthemusictree/assets/brand/behind-the-music-tree/behind-the-music-tree-mark.svg";
+import { getAudiometaUrl } from "@lib/site-urls";
 import { MenuGroup } from "./MenuGroup";
 import {
   PATHS as ROUTE_PATHS,
   AUTH_CONFIG as ROUTE_AUTH_CONFIG,
   PATHS_EXCLUDED_FROM_HEADER_NAV as ROUTE_PATHS_EXCLUDED_FROM_HEADER_NAV,
 } from "@lib/constants/routes";
-
-const AUDIOMETA_URL = process.env.NEXT_PUBLIC_AUDIOMETA_URL ?? "";
 
 const MENU_ICONS: Record<string, React.ReactNode> = {
   [ROUTE_PATHS.ME_GENRE_TREE]: <Image src={btmtMark} alt="My Music Tree" width={20} height={20} />,
@@ -29,26 +28,22 @@ const menuGroup = [
     icon: MENU_ICONS[route.path],
     authRequired: route.authRequired,
   })),
-  ...(AUDIOMETA_URL
-    ? [
-        {
-          href: AUDIOMETA_URL,
-          label: "Audiometa",
-          icon: (
-            <Image
-              src="/assets/audiometa-icon.png"
-              alt=""
-              width={20}
-              height={20}
-              className="h-5 w-5 shrink-0"
-              aria-hidden
-            />
-          ),
-          authRequired: false as const,
-          external: true,
-        },
-      ]
-    : []),
+  {
+    href: getAudiometaUrl(),
+    label: "Audiometa",
+    icon: (
+      <Image
+        src="/assets/audiometa-icon.png"
+        alt=""
+        width={20}
+        height={20}
+        className="h-5 w-5 shrink-0"
+        aria-hidden
+      />
+    ),
+    authRequired: false as const,
+    external: true,
+  },
 ];
 
 interface AppHeaderProps {

@@ -1,3 +1,4 @@
+import { getBackendBaseUrl } from "@lib/site-urls";
 import { ErrorCode } from "./app-error-codes";
 import { getSpotifyAllowlistMessage } from "./app-error-messages";
 import {
@@ -40,7 +41,7 @@ export async function createAppErrorFromHttpUrlAndErrorMessage(url: string, erro
 }
 
 export async function createAppErrorFromResult(result: Response): Promise<AppError> {
-  const isBackendError = result.url.includes(process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "");
+  const isBackendError = result.url.includes(getBackendBaseUrl());
   if (result.status === 400) {
     if (isBackendError) {
       try {
@@ -184,7 +185,7 @@ export async function createAppErrorFromResult(result: Response): Promise<AppErr
 }
 
 export function createNetworkOrBackendError(error: unknown, url: string): AppError {
-  const isBackendError = url.includes(process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "");
+  const isBackendError = url.includes(getBackendBaseUrl());
 
   if (!navigator.onLine) {
     return createAppErrorFromErrorCode(ErrorCode.NETWORK_OFFLINE);
