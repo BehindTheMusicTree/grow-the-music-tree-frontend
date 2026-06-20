@@ -9,9 +9,15 @@ function subdomainOrigin(label: string): string {
   return `https://${host}.${ORG_DOMAIN}`;
 }
 
-/** HearTheMusicTree API base URL. Honors `NEXT_PUBLIC_BACKEND_BASE_URL` as a local/remote dev override. */
+/**
+ * HearTheMusicTree API base URL. Off Vercel (no `NEXT_PUBLIC_VERCEL_ENV`), honors
+ * `NEXT_PUBLIC_BACKEND_BASE_URL` as a local/remote dev override; Vercel always sets that var,
+ * so a stale value left over in a Vercel project's env settings can never shadow this on a deployment.
+ */
 export function getBackendBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_BACKEND_BASE_URL) return process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+  if (!process.env.NEXT_PUBLIC_VERCEL_ENV && process.env.NEXT_PUBLIC_BACKEND_BASE_URL) {
+    return process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+  }
   const apiRootSegment = process.env.NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT;
   if (!apiRootSegment) throw new Error("NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT is required");
   if (!HTMT_API_SUBDOMAIN) throw new Error("HTMT_API_SUBDOMAIN is required");

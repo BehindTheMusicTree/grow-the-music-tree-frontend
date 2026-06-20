@@ -97,6 +97,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Site URLs**: `getBackendBaseUrl()` and `getAudiometaUrl()` now throw if `HTMT_API_SUBDOMAIN` / `AUDIOMETA_FRONT_SUBDOMAIN` are missing, instead of silently building a malformed URL.
 
+- **Site URLs**: `getBackendBaseUrl()` no longer honors a stale `NEXT_PUBLIC_BACKEND_BASE_URL` left in a Vercel project's environment settings — the override now only applies outside Vercel (when `NEXT_PUBLIC_VERCEL_ENV` is unset), e.g. for local or remote dev.
+
 ## [1.5.0] - 2026-04-05
 
 ### Added
