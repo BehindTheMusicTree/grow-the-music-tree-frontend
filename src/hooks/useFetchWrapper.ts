@@ -3,6 +3,7 @@ import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
 import { useSession } from "@contexts/SessionContext";
 import { BackendError, AuthRequired, ConnectivityError } from "@app-types/app-errors/app-error";
 import { fetchWrapper as rawFetch } from "@lib/fetch-wrapper";
+import { getBackendBaseUrl } from "@lib/site-urls";
 import { createAppErrorFromErrorCode } from "@app-types/app-errors/app-error-factory";
 import { ErrorCode } from "@app-types/app-errors/app-error-codes";
 
@@ -49,7 +50,7 @@ export const useFetchWrapper = () => {
     expectBinary: boolean = false,
     skipGlobalError: boolean = false,
   ) => {
-    const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_BASE_URL ?? "").replace(/\/+$/, "");
+    const baseUrl = getBackendBaseUrl().replace(/\/+$/, "");
     const endpointPath = String(backendEndpointOrUrl);
     if (fromBackend && endpointPath.startsWith("/")) {
       throw new Error(

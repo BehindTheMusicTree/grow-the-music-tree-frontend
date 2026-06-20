@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
+import { getBackendBaseUrl } from "@lib/site-urls";
 
 export function initSentry() {
   if (process.env.NEXT_PUBLIC_SENTRY_IS_ACTIVE !== "true") {
@@ -32,7 +33,7 @@ export function initSentry() {
       tracesSampleRate,
       tracePropagationTargets: [
         "localhost",
-        new RegExp(`^${process.env.NEXT_PUBLIC_BACKEND_BASE_URL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+        new RegExp(`^${getBackendBaseUrl().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
       ],
       replaysSessionSampleRate,
       replaysOnErrorSampleRate,

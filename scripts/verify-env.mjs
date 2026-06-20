@@ -16,7 +16,6 @@ if (existsSync(envFilePath)) {
 console.log("Checking required NEXT_PUBLIC_ variables:");
 
 const requiredVars = [
-  "NEXT_PUBLIC_BACKEND_BASE_URL",
   "NEXT_PUBLIC_CONTACT_EMAIL",
   "NEXT_PUBLIC_SPOTIFY_CLIENT_ID",
   "NEXT_PUBLIC_SPOTIFY_SCOPES",
@@ -24,8 +23,11 @@ const requiredVars = [
   "NEXT_PUBLIC_GOOGLE_CLIENT_ID",
   "NEXT_PUBLIC_GOOGLE_REDIRECT_URI",
   "NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS",
-  "NEXT_PUBLIC_AUDIOMETA_URL",
 ];
+
+console.log("Note: NEXT_PUBLIC_BACKEND_BASE_URL is an optional override; NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT is");
+console.log("required when unset. Both it and the AudioMeta URL are computed from @behindthemusictree/assets");
+console.log("when not overridden (see src/lib/site-urls.ts).");
 
 let allPresent = true;
 requiredVars.forEach((varName) => {

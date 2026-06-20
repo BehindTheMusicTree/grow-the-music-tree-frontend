@@ -1,4 +1,4 @@
-# Reference Genre Tree
+# TheMusicTree
 
 Route: `/reference-genre-tree`
 Access: public

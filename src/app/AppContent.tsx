@@ -15,8 +15,7 @@ import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 import SpotifyAuthErrorPopup from "@components/ui/popup/child/SpotifyAuthErrorPopup";
 import AuthErrorPopup from "@components/ui/popup/child/AuthErrorPopup";
 
-import Banner from "@components/features/banner/Banner";
-import Menu from "@components/features/menu/Menu";
+import AppHeader from "@components/features/menu/AppHeader";
 import Player from "@components/features/player/Player";
 import AutoAdvance from "@components/features/player/AutoAdvance";
 import TrackListSidebar from "@components/features/track-list-sidebar/TrackListSidebar";
@@ -169,16 +168,15 @@ export default function AppContent({ children }: { children: ReactNode }) {
   return (
     <div className="app col h-screen">
       <AuthCallbackHandler />
-      <Banner className="banner fixed w-full top-0 z-50 h-banner" />
+      <AppHeader />
 
       <div
-        className="center fixed top-banner bg-gray-100 h-full w-full flex"
+        className="center fixed top-banner flex h-full w-full bg-gray-100"
         style={{
           maxHeight: playerUploadedTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
         }}
       >
-        <Menu className="menu left-0 z-40" />
-        <div className="relative min-h-0 flex-grow w-full flex">
+        <div className="relative flex min-h-0 w-full flex-grow">
           <div className="min-h-0 flex-grow w-full flex" style={activePopup ? { filter: "blur(4px)" } : undefined}>
             <main className="flex min-h-0 w-full flex-grow flex-col mx-8">
               <div className="flex min-h-0 flex-1 flex-col">{children}</div>

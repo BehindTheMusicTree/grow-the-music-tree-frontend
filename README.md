@@ -56,10 +56,10 @@ Music enthusiasts, researchers, and the general public interested in understandi
 - Google Auth Callback (`/auth/google/callback`)
 - Spotify Auth Callback (`/auth/spotify/callback`)
 - Genre Playlists (`/genre-playlists`)
-- My Genre Tree (`/my-genre-tree`)
-- Reference Genre Tree (`/reference-genre-tree`)
+- MyMusicTree (`/me-genre-tree`)
+- Reference tree (`/reference-genre-tree`, also the logo / home link)
 - Spotify Library (`/spotify-library`)
-- Uploaded Library (`/uploaded-library`)
+- My Library (`/me-uploaded-library`)
 
 See `docs/pages/` for detailed page documentation.
 
@@ -130,7 +130,7 @@ NODE_ENV=development
 PORT=3000
 
 NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com
-NEXT_PUBLIC_BACKEND_BASE_URL=https://api.themusictree.org/v2/
+NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT=v2
 NEXT_PUBLIC_SENTRY_IS_ACTIVE=false
 
 NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize
@@ -140,8 +140,6 @@ NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-c
 
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback
-
-NEXT_PUBLIC_AUDIOMETA_URL=https://audiometa.themusictree.org
 ```
 
 In the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) → your app → **Settings** → **Redirect URIs**, add the **full** callback URL(s), e.g. `http://localhost:3000/auth/spotify/callback` for local dev and your production URL for deploy. The app builds the redirect URI from your origin when you use a path like `/auth/spotify/callback`.
@@ -151,7 +149,7 @@ For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/)
 **Notes:**
 
 - Only variables prefixed with `NEXT_PUBLIC_` are available in the browser
-- **`NEXT_PUBLIC_AUDIOMETA_URL`** (required): URL of the external Audio Metadata app. Sidebar link "Audio Metadata" opens this URL in a new tab. Build fails if unset. In CI/deploy this is built from GitHub vars `AUDIOMETA_SUBDOMAIN` and `DOMAIN_NAME` as `https://<AUDIOMETA_SUBDOMAIN>.<DOMAIN_NAME>`.
+- The sidebar "Audio Metadata" link and the backend host are computed from `@behindthemusictree/assets` (see [src/lib/site-urls.ts](src/lib/site-urls.ts)), not from env vars. `NEXT_PUBLIC_BACKEND_BASE_URL` remains available as a manual override (e.g. against `localhost:8000`); `NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT` is required when it's unset.
 - Changing env values requires a new build (restart `npm run dev` after env changes)
 - Do not commit `.env.local`
 - **Preset configs**: Put `.env.development.api-local` and `.env.development.api-remote` in `env/development/available/` (see `env/development/example/.env.development.api-*.example`). Then run `./scripts/setup-env-dev.sh local` or `./scripts/setup-env-dev.sh remote` to copy one to `.env.development.local`; Next.js only loads env files from the project root. Contents of `env/development/available/` are gitignored.

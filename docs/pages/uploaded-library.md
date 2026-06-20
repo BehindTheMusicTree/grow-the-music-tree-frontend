@@ -1,6 +1,6 @@
-# Uploaded Library
+# My Library
 
-Route: `/uploaded-library`
+Route: `/me-uploaded-library`
 Access: authenticated
 
 ## Table of Contents

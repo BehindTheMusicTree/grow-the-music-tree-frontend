@@ -113,28 +113,22 @@ if [ "$MODE" = "app-version-only" ]; then
   exit 0
 fi
 
+# Backend host, app host and AudioMeta host are computed at Next.js build/runtime from
+# @behindthemusictree/assets (see src/lib/site-urls.ts), not synced from here. Redirect URIs only
+# need the relative callback path: resolveRedirectUri() (src/lib/auth/code-exchange.ts) resolves it
+# against window.location.origin, so it works on the canonical domain (production/staging) and on
+# ad hoc preview URLs alike.
 API_ROOT="${HTMT_API_ROOT_SEGMENT#/}"
 API_ROOT="${API_ROOT%/}"
-
-if [ "$TARGET" = "production" ]; then
-  BACKEND_BASE_URL="https://${HTMT_API_SUBDOMAIN}.${DOMAIN_NAME}/${API_ROOT}/"
-  APP_URL="https://${GTMT_FRONT_SUBDOMAIN}.${DOMAIN_NAME}"
-else
-  BACKEND_BASE_URL="https://staging.${HTMT_API_SUBDOMAIN}.${DOMAIN_NAME}/${API_ROOT}/"
-  APP_URL="https://staging.${GTMT_FRONT_SUBDOMAIN}.${DOMAIN_NAME}"
-fi
-
-APP_URL_TRIM="${APP_URL%/}"
-SPOTIFY_REDIRECT_URI="${APP_URL_TRIM}/${SPOTIFY_REDIRECT_RELATIVE_URI#/}"
-GOOGLE_REDIRECT_URI="${APP_URL_TRIM}/${GOOGLE_REDIRECT_RELATIVE_URI#/}"
-AUDIOMETA_URL="https://${AUDIOMETA_SUBDOMAIN}.${DOMAIN_NAME}"
+SPOTIFY_REDIRECT_URI="/${SPOTIFY_REDIRECT_RELATIVE_URI#/}"
+GOOGLE_REDIRECT_URI="/${GOOGLE_REDIRECT_RELATIVE_URI#/}"
 PKG_VERSION=$(jq -r '.version' package.json)
 APP_VERSION="$(compute_next_public_app_version "$PKG_VERSION" "$SHORT_SHA")"
 
 : "${NPM_TOKEN:?NPM_TOKEN is required for full sync (GitHub Actions: GH_PACKAGES_TOKEN secret)}"
 
 sync_var "$CONTACT_EMAIL" "NEXT_PUBLIC_CONTACT_EMAIL"
-sync_var "$BACKEND_BASE_URL" "NEXT_PUBLIC_BACKEND_BASE_URL"
+sync_var "$API_ROOT" "NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT"
 sync_var "true" "NEXT_PUBLIC_SENTRY_IS_ACTIVE"
 sync_var "https://accounts.spotify.com/authorize" "NEXT_PUBLIC_SPOTIFY_AUTH_URL"
 sync_var "$SPOTIFY_CLIENT_ID" "NEXT_PUBLIC_SPOTIFY_CLIENT_ID"
@@ -143,7 +137,6 @@ sync_var "$SPOTIFY_SCOPES" "NEXT_PUBLIC_SPOTIFY_SCOPES"
 sync_var "$GOOGLE_CLIENT_ID" "NEXT_PUBLIC_GOOGLE_CLIENT_ID"
 sync_var "$GOOGLE_REDIRECT_URI" "NEXT_PUBLIC_GOOGLE_REDIRECT_URI"
 sync_var "$TRACK_UPLOAD_TIMEOUT_MS" "NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS"
-sync_var "$AUDIOMETA_URL" "NEXT_PUBLIC_AUDIOMETA_URL"
 sync_var "$APP_VERSION" "NEXT_PUBLIC_APP_VERSION"
 sync_secret_var "$NPM_TOKEN" "NPM_TOKEN"
 

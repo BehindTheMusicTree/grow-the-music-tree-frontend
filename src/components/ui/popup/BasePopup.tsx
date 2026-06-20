@@ -3,7 +3,7 @@
 import { createPortal } from "react-dom";
 import { ReactNode } from "react";
 import { PopupTitle } from "@components/ui/popup/PopupTitle";
-import { BANNER_HEIGHT, MENU_WIDTH } from "@lib/constants/layout";
+import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { PopupButtons } from "@components/ui/popup/PopupButtons";
 import { Button } from "@components/ui/Button";
 import { LucideIcon } from "lucide-react";
@@ -89,7 +89,7 @@ export function BasePopup(props: BasePopupProps) {
       className="fixed z-50 flex items-center justify-center bg-transparent"
       style={{
         top: BANNER_HEIGHT,
-        left: MENU_WIDTH,
+        left: 0,
         right: 0,
         bottom: 0,
       }}
