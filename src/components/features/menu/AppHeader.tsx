@@ -5,8 +5,8 @@ import Link from "next/link";
 import { FaCloudUploadAlt, FaList } from "react-icons/fa";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
-import { TheMusicTreeByline } from "@behindthemusictree/assets/components";
-import btmtMark from "@behindthemusictree/assets/brand/behind-the-music-tree/behind-the-music-tree-mark.svg";
+import { TheMusicTreeByline } from "@behindthemusictree/brand/components";
+import btmtMark from "@behindthemusictree/brand/marks/behind-the-music-tree/behind-the-music-tree-mark.svg";
 import { getAudiometaUrl } from "@lib/site-urls";
 import { MenuGroup } from "./MenuGroup";
 import {

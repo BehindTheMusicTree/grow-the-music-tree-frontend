@@ -6,7 +6,7 @@ import {
   GithubSocialLink,
   LinkedInSocialLink,
   MastodonSocialLink,
-} from "@behindthemusictree/assets/components";
+} from "@behindthemusictree/brand/components";
 
 export default function OrgSocialLinks() {
   const appVersion = process.env.NEXT_PUBLIC_APP_VERSION;

@@ -1,4 +1,4 @@
-import { AUDIOMETA_FRONT_SUBDOMAIN, HTMT_API_SUBDOMAIN, ORG_DOMAIN } from "@behindthemusictree/assets";
+import { AUDIOMETA_FRONT_SUBDOMAIN, HTMT_API_SUBDOMAIN, ORG_DOMAIN } from "@behindthemusictree/brand";
 
 function isProductionEnv(): boolean {
   return process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
