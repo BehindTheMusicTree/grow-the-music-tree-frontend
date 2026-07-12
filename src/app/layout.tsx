@@ -2,9 +2,9 @@ import { Analytics } from "@vercel/analytics/next";
 import { Inter } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import { APP_NAME } from "@constants/app";
-import growTheMusicTreeFavicon from "@behindthemusictree/assets/favicons/grow-the-music-tree/favicon.svg";
+import growTheMusicTreeFavicon from "@behindthemusictree/brand/favicons/grow-the-music-tree/favicon.svg";
 import "./globals.css";
-import "@behindthemusictree/assets/styles/icon-links.css";
+import "@behindthemusictree/brand/styles/icon-links.css";
 
 const faviconUrl = typeof growTheMusicTreeFavicon === "string" ? growTheMusicTreeFavicon : growTheMusicTreeFavicon.src;
 

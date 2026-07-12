@@ -8,9 +8,9 @@ importers:
 
   .:
     dependencies:
-      '@behindthemusictree/assets':
-        specifier: 11.4.3
-        version: 11.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@behindthemusictree/brand':
+        specifier: 11.5.1
+        version: 11.5.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@fortawesome/fontawesome-svg-core':
         specifier: 6.5.2
         version: 6.5.2
@@ -286,8 +286,8 @@ packages:
     resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
 
-  '@behindthemusictree/assets@11.4.3':
-    resolution: {integrity: sha512-RyfWcZ44gCC8M7Q4EOYS80NKGNN8Rbbxl0usUnEiFChwDeKxVjg1RxHNMw9yU3Sw5WjQZ/B7DrKbtgd6YslFqw==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/assets/11.4.3/4c725103e8fa380e78a86c67b5a9c2bc05b9bac2}
+  '@behindthemusictree/brand@11.5.1':
+    resolution: {integrity: sha512-6RKuESqwxHD51YtKuiodBNI0trqnCB1zPzjsp2p3i/bVqAQg4esOCqkd+VMoGIx3+tuJPUSCpIGcFjVRBEwb3w==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/brand/11.5.1/99d512558543a50dbc7b6cf7d778b3115f91dbac}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -4365,7 +4365,7 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
-  '@behindthemusictree/assets@11.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@behindthemusictree/brand@11.5.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
