@@ -11,6 +11,9 @@ importers:
       '@behindthemusictree/brand':
         specifier: 11.5.1
         version: 11.5.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@behindthemusictree/genre-tree-view':
+        specifier: 0.1.0
+        version: 0.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@fortawesome/fontawesome-svg-core':
         specifier: 6.5.2
         version: 6.5.2
@@ -288,6 +291,12 @@ packages:
 
   '@behindthemusictree/brand@11.5.1':
     resolution: {integrity: sha512-6RKuESqwxHD51YtKuiodBNI0trqnCB1zPzjsp2p3i/bVqAQg4esOCqkd+VMoGIx3+tuJPUSCpIGcFjVRBEwb3w==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/brand/11.5.1/99d512558543a50dbc7b6cf7d778b3115f91dbac}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+
+  '@behindthemusictree/genre-tree-view@0.1.0':
+    resolution: {integrity: sha512-32cjGoewDAAH0zFQSh8K2PoaucwRlwgfJOSYLji6MkQk8a7Fjp3Ckl1l+buVD3T/QyRD4zw+hSuWadp9RR+NnA==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/genre-tree-view/0.1.0/9fad99b6dc5884b0a9e8616cdca667d8f1c810dc}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -4369,6 +4378,13 @@ snapshots:
     dependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
+
+  '@behindthemusictree/genre-tree-view@0.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      d3: 7.8.5
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      react-icons: 5.5.0(react@19.1.0)
 
   '@csstools/color-helpers@6.0.2': {}
 

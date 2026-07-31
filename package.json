@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@behindthemusictree/brand": "11.5.1",
+    "@behindthemusictree/genre-tree-view": "0.1.0",
     "@fortawesome/fontawesome-svg-core": "6.5.2",
     "@fortawesome/free-solid-svg-icons": "6.5.2",
     "@fortawesome/react-fontawesome": "3.1.1",

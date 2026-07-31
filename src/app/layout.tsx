@@ -5,6 +5,7 @@ import { APP_NAME } from "@constants/app";
 import growTheMusicTreeFavicon from "@behindthemusictree/brand/favicons/grow-the-music-tree/favicon.svg";
 import "./globals.css";
 import "@behindthemusictree/brand/styles/icon-links.css";
+import "@behindthemusictree/genre-tree-view/styles.css";
 
 const faviconUrl = typeof growTheMusicTreeFavicon === "string" ? growTheMusicTreeFavicon : growTheMusicTreeFavicon.src;
 
