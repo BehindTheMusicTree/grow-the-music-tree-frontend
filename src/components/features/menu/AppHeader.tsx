@@ -22,7 +22,9 @@ const MENU_ICONS: Record<string, React.ReactNode> = {
 };
 
 const menuGroup = [
-  ...ROUTE_AUTH_CONFIG.filter(({ path }) => !ROUTE_PATHS_EXCLUDED_FROM_HEADER_NAV.has(path)).map((route) => ({
+  ...ROUTE_AUTH_CONFIG.filter(
+    ({ path, hiddenFromMenu }) => !ROUTE_PATHS_EXCLUDED_FROM_HEADER_NAV.has(path) && !hiddenFromMenu,
+  ).map((route) => ({
     href: route.path,
     label: route.label,
     icon: MENU_ICONS[route.path],
@@ -32,19 +34,13 @@ const menuGroup = [
     href: getAudiometaUrl(),
     label: "Audiometa",
     icon: (
-      <Image
-        src="/assets/audiometa-icon.png"
-        alt=""
-        width={20}
-        height={20}
-        className="h-5 w-5 shrink-0"
-        aria-hidden
-      />
+      <Image src="/assets/audiometa-icon.png" alt="" width={20} height={20} className="h-5 w-5 shrink-0" aria-hidden />
     ),
     authRequired: false as const,
     external: true,
+    hiddenFromMenu: true,
   },
-];
+].filter((item) => !item.hiddenFromMenu);
 
 interface AppHeaderProps {
   className?: string;
