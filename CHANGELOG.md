@@ -88,6 +88,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Fixed
 
 - **Org assets dependency**: Switched from the stale `@behindthemusictree/assets` package to `@behindthemusictree/brand`, which is the package actually published from the org's asset source repo. Mark asset subpaths moved from `/brand/*` to `/marks/*` to match the new package's exports map.
+- **Brand package**: Bumped `@behindthemusictree/brand` to `11.5.2`, which fixes broken image URLs in `TheMusicTreeByline`/`TheMusicTreeMarkLink` (previously bundled as relative paths that only resolved correctly relative to the package's own module location, 404ing in this app).
 
 ## [1.5.1] - 2026-06-20
 
