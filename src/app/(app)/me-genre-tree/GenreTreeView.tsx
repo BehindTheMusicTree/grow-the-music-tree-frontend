@@ -4,10 +4,10 @@ import { useState, useMemo } from "react";
 import { FaTree } from "react-icons/fa";
 import { Plus } from "lucide-react";
 import { IconTextButton } from "@components/ui/IconTextButton";
+import { getGenreTreeColor } from "@behindthemusictree/genre-tree-view";
 
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
-import { CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
 import { Scope } from "@app-types/Scope";
 import { useListFullGenrePlaylists } from "@hooks/useGenrePlaylist";
 import { useLoadExampleTreeGenre } from "@hooks/useGenre";
@@ -15,7 +15,6 @@ import { getGenrePlaylistsGroupedByRoot } from "@lib/genre-playlist-helpers";
 
 import GenrePlaylistTreePerRoot from "./playlist-tree/TreePerRoot";
 import { GenreTreeSkeleton } from "./Skeleton";
-import { getRootTreeColor } from "./playlist-tree/constants";
 
 type GenreTreeViewProps = {
   scope: Scope;
@@ -23,7 +22,7 @@ type GenreTreeViewProps = {
 };
 
 export function GenreTreeView({ scope, handleGenreCreationAction }: GenreTreeViewProps) {
-  const [genreGettingAssignedNewParent, setGenreGettingAssignedNewParent] = useState<CriteriaDetailed | null>(null);
+  const [reparentingGenreUuid, setReparentingGenreUuid] = useState<string | null>(null);
 
   const { data: genrePlaylists, isPending: isListingGenrePlaylists } = useListFullGenrePlaylists(scope);
   const loadTreeMutation = useLoadExampleTreeGenre(scope);
@@ -62,7 +61,7 @@ export function GenreTreeView({ scope, handleGenreCreationAction }: GenreTreeVie
       ) : (
         <div className="tree-container flex flex-col gap-4 text-gray-800 w-full overflow-x-auto overflow-y-auto relative">
           {Object.entries(groupedGenrePlaylistsByRoot).map(([uuid, genrePlaylistTreePerRoot]) => {
-            const rootColor = getRootTreeColor(uuid);
+            const rootColor = getGenreTreeColor(uuid);
             return (
               <div
                 key={uuid}
@@ -78,8 +77,8 @@ export function GenreTreeView({ scope, handleGenreCreationAction }: GenreTreeVie
                     scope={scope}
                     rootUuid={uuid}
                     genrePlaylistTreePerRoot={genrePlaylistTreePerRoot}
-                    genreGettingAssignedNewParent={genreGettingAssignedNewParent}
-                    setGenreGettingAssignedNewParent={setGenreGettingAssignedNewParent}
+                    reparentingGenreUuid={reparentingGenreUuid}
+                    setReparentingGenreUuid={setReparentingGenreUuid}
                     handleGenreCreationAction={handleGenreCreationAction}
                   />
                 </div>
