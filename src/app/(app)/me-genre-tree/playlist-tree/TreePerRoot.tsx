@@ -41,7 +41,7 @@ export default function GenrePlaylistTreePerRoot({
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup, hidePopup } = usePopup();
   const { trackList, playNewTrackListFromGenrePlaylist } = useTrackList();
-  const { renameGenre, updateGenreParent } = useUpdateGenre(scope);
+  const { mutate: updateGenreMutate } = useUpdateGenre(scope);
   const { mutate: fetchGenrePlaylistDetailed } = useFetchGenrePlaylistDetailed(scope);
   const { mutateAsync: uploadedTrackMutateAsync } = useUploadTrack(scope);
 
@@ -110,27 +110,32 @@ export default function GenrePlaylistTreePerRoot({
         <GenreRenamePopup
           genre={genre}
           onSubmit={({ name }) => {
-            try {
-              renameGenre(genre.uuid, name);
-            } catch (error: unknown) {
-              if (error && typeof error === "object" && "code" in error && error.code === 2001) {
-                showPopup(
-                  <InvalidInputPopup
-                    details={{
-                      message: "Invalid genre name",
-                      fieldErrors: { name: [{ message: "This name is already taken", code: "2001" }] },
-                    }}
-                  />,
-                );
-              }
-            }
-            hidePopup();
+            updateGenreMutate(
+              { uuid: genre.uuid, data: { name } },
+              {
+                onSuccess: () => {
+                  hidePopup();
+                },
+                onError: (error: unknown) => {
+                  if (error && typeof error === "object" && "code" in error && (error as { code: number }).code === 2001) {
+                    showPopup(
+                      <InvalidInputPopup
+                        details={{
+                          message: "Invalid genre name",
+                          fieldErrors: { name: [{ message: "This name is already taken", code: "2001" }] },
+                        }}
+                      />,
+                    );
+                  }
+                },
+              },
+            );
           }}
           onClose={hidePopup}
         />,
       );
     },
-    [genrePlaylistTreePerRoot, renameGenre, showPopup, hidePopup],
+    [genrePlaylistTreePerRoot, updateGenreMutate, showPopup, hidePopup],
   );
 
   const handleDeleteRequest = useCallback((node: GenreTreeNode) => {
@@ -147,11 +152,17 @@ export default function GenrePlaylistTreePerRoot({
   );
 
   const handleReparent = useCallback(
-    async (nodeId: string, newParentId: string) => {
-      await updateGenreParent(nodeId, newParentId);
-      setReparentingGenreUuid(null);
+    (nodeId: string, newParentId: string) => {
+      updateGenreMutate(
+        { uuid: nodeId, data: { parent: newParentId } },
+        {
+          onSuccess: () => {
+            setReparentingGenreUuid(null);
+          },
+        },
+      );
     },
-    [updateGenreParent, setReparentingGenreUuid],
+    [updateGenreMutate, setReparentingGenreUuid],
   );
 
   const handleUploadFiles = useCallback(
