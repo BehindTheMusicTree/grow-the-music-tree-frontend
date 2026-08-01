@@ -1,6 +1,6 @@
 "use client";
 
-import { TheMusicTreeByline } from "@behindthemusictree/assets/components";
+import { TheMusicTreeByline } from "@behindthemusictree/brand/components";
 
 export function AboutTheMusicTreeLockup() {
   return (

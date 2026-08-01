@@ -1,15 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import * as d3 from "d3";
+import { useCallback, useMemo } from "react";
+import { GenreTree, getGenreTreeColor, type GenreTreeNode } from "@behindthemusictree/genre-tree-view";
 
 import { usePopup } from "@contexts/PopupContext";
 import { useTrackList } from "@contexts/TrackListContext";
-import { useUpdateGenre, useCreateGenre, useFetchGenre } from "@hooks/useGenre";
+import { useUpdateGenre } from "@hooks/useGenre";
 import { useFetchGenrePlaylistDetailed } from "@hooks/useGenrePlaylist";
 import { usePlayer } from "@contexts/PlayerContext";
 
-import { PlayStates } from "@models/PlayStates";
 import { TrackListOriginType } from "@models/track-list/origin/TrackListOriginType";
 
 import TrackUploadPopup from "@components/ui/popup/child/TrackUploadPopup";
@@ -17,12 +16,7 @@ import InvalidInputPopup from "@components/ui/popup/child/InvalidInputPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import { CriteriaPlaylistSimple } from "@domain/playlist/criteria-playlist/simple";
 import { CriteriaMinimum } from "@domain/criteria/response/minimum";
-import { CriteriaDetailed } from "@schemas/domain/criteria/response/detailed";
 import { Scope } from "@app-types/Scope";
-
-import { buildTreeHierarchyStructure } from "./NodeHelper";
-import { calculateSvgDimensions, createTreeLayout, setupTreeLayout, renderTree } from "./tree-renderer";
-import { getRootTreeColor } from "./constants";
 import { useUploadTrack } from "@hooks/useUploadedTrack";
 
 type GenrePlaylistTreePerRootProps = {
@@ -30,8 +24,8 @@ type GenrePlaylistTreePerRootProps = {
   className?: string;
   rootUuid: string;
   genrePlaylistTreePerRoot: CriteriaPlaylistSimple[];
-  genreGettingAssignedNewParent: CriteriaDetailed | null;
-  setGenreGettingAssignedNewParent: (genre: CriteriaDetailed | null) => void;
+  reparentingGenreUuid: string | null;
+  setReparentingGenreUuid: (uuid: string | null) => void;
   handleGenreCreationAction: (parent: CriteriaMinimum | null) => void;
 };
 
@@ -40,48 +34,37 @@ export default function GenrePlaylistTreePerRoot({
   className,
   rootUuid,
   genrePlaylistTreePerRoot,
-  genreGettingAssignedNewParent,
-  setGenreGettingAssignedNewParent,
+  reparentingGenreUuid,
+  setReparentingGenreUuid,
   handleGenreCreationAction,
 }: GenrePlaylistTreePerRootProps) {
-  const [forbiddenNewParentsUuids, setForbiddenNewParentsUuids] = useState<string[]>([]);
   const { isPlaying, setIsPlaying } = usePlayer();
   const { showPopup, hidePopup } = usePopup();
   const { trackList, playNewTrackListFromGenrePlaylist } = useTrackList();
-  const { mutate: createGenre } = useCreateGenre(scope);
-  const { renameGenre, updateGenreParent } = useUpdateGenre(scope);
-  const fetchGenre = useFetchGenre(scope);
+  const { mutate: updateGenreMutate } = useUpdateGenre(scope);
   const { mutate: fetchGenrePlaylistDetailed } = useFetchGenrePlaylistDetailed(scope);
   const { mutateAsync: uploadedTrackMutateAsync } = useUploadTrack(scope);
-  const [visibleActionsContainerGenrePlaylist, setVisibleActionsContainerGenrePlaylist] =
-    useState<CriteriaPlaylistSimple | null>(null);
 
-  const svgRef = useRef<SVGSVGElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const selectingFileGenreUuidRef = useRef<string | null>(null);
+  const nodes: GenreTreeNode[] = useMemo(
+    () =>
+      genrePlaylistTreePerRoot.map((genrePlaylist) => ({
+        id: genrePlaylist.uuid,
+        parentId: genrePlaylist.parent?.uuid ?? null,
+        name: genrePlaylist.name,
+        itemCount: genrePlaylist.uploadedTracksCount,
+        actionable: Boolean(genrePlaylist.criteria),
+      })),
+    [genrePlaylistTreePerRoot],
+  );
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      const fileArray = Array.from(files);
-      showPopup(
-        <TrackUploadPopup
-          files={fileArray}
-          genre={selectingFileGenreUuidRef.current}
-          onProcessFile={(file, genre) => uploadedTrackMutateAsync({ file: file, genre: genre })}
-          onComplete={() => {}}
-          onClose={() => {
-            hidePopup();
-          }}
-        />,
-      );
-    }
-    event.target.value = "";
-  };
+  const playingNodeId =
+    trackList && trackList.origin.type === TrackListOriginType.PLAYLIST ? trackList.origin.uuid : null;
 
-  const handlePlayPauseIconAction = useCallback(
-    async (genrePlaylist: CriteriaPlaylistSimple) => {
-      // If already playing this playlist, toggle play/pause
+  const handlePlayPause = useCallback(
+    (nodeId: string) => {
+      const genrePlaylist = genrePlaylistTreePerRoot.find((g) => g.uuid === nodeId);
+      if (!genrePlaylist) return;
+
       if (
         trackList &&
         (trackList.origin.type === TrackListOriginType.PLAYLIST ||
@@ -92,12 +75,10 @@ export default function GenrePlaylistTreePerRoot({
         return;
       }
 
-      // If playlist has no tracks, do nothing
       if (genrePlaylist.uploadedTracksCount === 0) {
         return;
       }
 
-      // Fetch detailed genre playlist and play it
       fetchGenrePlaylistDetailed(genrePlaylist.uuid, {
         onSuccess: (detailedPlaylist) => {
           playNewTrackListFromGenrePlaylist(detailedPlaylist, scope);
@@ -107,140 +88,113 @@ export default function GenrePlaylistTreePerRoot({
         },
       });
     },
-    [trackList, isPlaying, setIsPlaying, playNewTrackListFromGenrePlaylist, fetchGenrePlaylistDetailed, scope],
+    [genrePlaylistTreePerRoot, trackList, isPlaying, setIsPlaying, playNewTrackListFromGenrePlaylist, fetchGenrePlaylistDetailed, scope],
   );
 
-  const { treeData, rootColor, svgWidth, svgHeight } = useMemo(() => {
-    // Build tree hierarchy
-    const root = buildTreeHierarchyStructure(d3, genrePlaylistTreePerRoot);
+  const handleAddChild = useCallback(
+    (parentId: string) => {
+      const genrePlaylist = genrePlaylistTreePerRoot.find((g) => g.uuid === parentId);
+      if (!genrePlaylist?.criteria) return;
+      handleGenreCreationAction(genrePlaylist.criteria);
+    },
+    [genrePlaylistTreePerRoot, handleGenreCreationAction],
+  );
 
-    // Create tree layout
-    const originalTreeData = createTreeLayout(d3, root);
+  const handleRenameRequest = useCallback(
+    (node: GenreTreeNode) => {
+      const genrePlaylist = genrePlaylistTreePerRoot.find((g) => g.uuid === node.id);
+      if (!genrePlaylist?.criteria) return;
+      const genre = genrePlaylist.criteria;
 
-    // Calculate dimensions
-    const {
-      svgWidth: width,
-      svgHeight: height,
-      highestVerticalCoordinate,
-    } = calculateSvgDimensions(d3, originalTreeData);
-
-    // Transform coordinates for SVG
-    const reshapedTreeData = setupTreeLayout(d3, originalTreeData, highestVerticalCoordinate);
-
-    // Get root-specific color
-    const rootColor = getRootTreeColor(rootUuid);
-
-    return { treeData: reshapedTreeData, rootColor, svgWidth: width, svgHeight: height };
-  }, [genrePlaylistTreePerRoot, rootUuid]);
-
-  // Calculate forbidden UUIDs for the genre getting assigned a new parent
-  const genreGettingAssignedNewParentForbiddenUuids = useMemo(() => {
-    if (!genreGettingAssignedNewParent) return [];
-
-    const descendantUuids = genreGettingAssignedNewParent.descendants.map((d) => d.descendant.uuid);
-    return [genreGettingAssignedNewParent.uuid, ...descendantUuids];
-  }, [genreGettingAssignedNewParent]);
-
-  useEffect(() => {
-    if (!svgRef.current) return;
-
-    // Clear any previous SVG content
-    d3.select(svgRef.current).selectAll("*").remove();
-
-    const handleRenameGenre = async (genreUuid: string, newName: string) => {
-      try {
-        renameGenre(genreUuid, newName);
-      } catch (error: unknown) {
-        if (error && typeof error === "object" && "code" in error && error.code === 2001) {
-          showPopup(
-            <InvalidInputPopup
-              details={{
-                message: "Invalid genre name",
-                fieldErrors: { name: [{ message: "This name is already taken", code: "2001" }] },
-              }}
-            />,
-          );
-        }
-      }
-    };
-
-    const showRenamePopup = (genre: CriteriaMinimum) => {
       showPopup(
         <GenreRenamePopup
           genre={genre}
           onSubmit={({ name }) => {
-            handleRenameGenre(genre.uuid, name);
-            hidePopup();
+            updateGenreMutate(
+              { uuid: genre.uuid, data: { name } },
+              {
+                onSuccess: () => {
+                  hidePopup();
+                },
+                onError: (error: unknown) => {
+                  if (error && typeof error === "object" && "code" in error && (error as { code: number }).code === 2001) {
+                    showPopup(
+                      <InvalidInputPopup
+                        details={{
+                          message: "Invalid genre name",
+                          fieldErrors: { name: [{ message: "This name is already taken", code: "2001" }] },
+                        }}
+                      />,
+                    );
+                  }
+                },
+              },
+            );
           }}
           onClose={hidePopup}
         />,
       );
-    };
+    },
+    [genrePlaylistTreePerRoot, updateGenreMutate, showPopup, hidePopup],
+  );
 
-    renderTree(
-      d3,
-      svgRef,
-      treeData,
-      svgWidth,
-      svgHeight,
-      visibleActionsContainerGenrePlaylist,
-      genreGettingAssignedNewParent,
-      genreGettingAssignedNewParentForbiddenUuids,
-      forbiddenNewParentsUuids,
-      trackList ? trackList.origin : null,
-      isPlaying ? PlayStates.PLAYING : PlayStates.STOPPED,
-      fileInputRef,
-      selectingFileGenreUuidRef,
-      rootColor,
-      {
-        setForbiddenNewParentsUuids,
-        handlePlayPauseIconAction,
-        handleGenreCreationAction,
-        setGenreGettingAssignedNewParent,
-        fetchGenre,
-        updateGenreParent,
-        handleRenameGenre,
-        showRenamePopup,
-        showPopup,
-        setVisibleActionsContainerGenrePlaylist,
-      },
-    );
-  }, [
-    genrePlaylistTreePerRoot,
-    isPlaying,
-    trackList?.origin,
-    genreGettingAssignedNewParent,
-    genreGettingAssignedNewParentForbiddenUuids,
-    forbiddenNewParentsUuids,
-    trackList,
-    visibleActionsContainerGenrePlaylist,
-    svgWidth,
-    svgHeight,
-    treeData,
-    rootColor,
-    createGenre,
-    handlePlayPauseIconAction,
-    setGenreGettingAssignedNewParent,
-    updateGenreParent,
-    showPopup,
-    handleGenreCreationAction,
-    renameGenre,
-    fetchGenre,
-  ]);
-
-  useEffect(() => {
-    const svgElement = svgRef.current;
-    return () => {
-      if (svgElement) {
-        d3.select(svgElement).selectAll("*").remove();
-      }
-    };
+  const handleDeleteRequest = useCallback((node: GenreTreeNode) => {
+    if (confirm(`Are you sure you want to delete "${node.name}"?`)) {
+      // TODO: Implement delete genre
+    }
   }, []);
 
+  const handleReparentRequest = useCallback(
+    (node: GenreTreeNode) => {
+      setReparentingGenreUuid(node.id);
+    },
+    [setReparentingGenreUuid],
+  );
+
+  const handleReparent = useCallback(
+    (nodeId: string, newParentId: string) => {
+      updateGenreMutate(
+        { uuid: nodeId, data: { parent: newParentId } },
+        {
+          onSuccess: () => {
+            setReparentingGenreUuid(null);
+          },
+        },
+      );
+    },
+    [updateGenreMutate, setReparentingGenreUuid],
+  );
+
+  const handleUploadFiles = useCallback(
+    (nodeId: string, files: File[]) => {
+      showPopup(
+        <TrackUploadPopup
+          files={files}
+          genre={nodeId}
+          onProcessFile={(file, genre) => uploadedTrackMutateAsync({ file, genre })}
+          onComplete={() => {}}
+          onClose={hidePopup}
+        />,
+      );
+    },
+    [showPopup, hidePopup, uploadedTrackMutateAsync],
+  );
+
   return (
-    <div className={className}>
-      <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
-      <svg ref={svgRef} width={svgWidth} height={svgHeight} className="mt-5"></svg>
-    </div>
+    <GenreTree
+      className={className}
+      nodes={nodes}
+      rootColor={getGenreTreeColor(rootUuid)}
+      playingNodeId={playingNodeId}
+      playState={isPlaying ? "playing" : "paused"}
+      reparentingNodeId={reparentingGenreUuid}
+      onPlayPause={handlePlayPause}
+      onAddChild={handleAddChild}
+      onRenameRequest={handleRenameRequest}
+      onDeleteRequest={handleDeleteRequest}
+      onReparentRequest={handleReparentRequest}
+      onReparent={handleReparent}
+      onUploadFiles={handleUploadFiles}
+    />
   );
 }

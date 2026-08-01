@@ -8,9 +8,12 @@ importers:
 
   .:
     dependencies:
-      '@behindthemusictree/assets':
-        specifier: 11.4.3
-        version: 11.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@behindthemusictree/brand':
+        specifier: 11.5.2
+        version: 11.5.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@behindthemusictree/genre-tree-view':
+        specifier: 0.1.0
+        version: 0.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@fortawesome/fontawesome-svg-core':
         specifier: 6.5.2
         version: 6.5.2
@@ -286,8 +289,14 @@ packages:
     resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
 
-  '@behindthemusictree/assets@11.4.3':
-    resolution: {integrity: sha512-RyfWcZ44gCC8M7Q4EOYS80NKGNN8Rbbxl0usUnEiFChwDeKxVjg1RxHNMw9yU3Sw5WjQZ/B7DrKbtgd6YslFqw==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/assets/11.4.3/4c725103e8fa380e78a86c67b5a9c2bc05b9bac2}
+  '@behindthemusictree/brand@11.5.2':
+    resolution: {integrity: sha512-hAdvojq9eJF4PdXSuO7Wgsd7Ac0SEtBPnX9G9Kq51E8jIRI0Sbad25iW4nuLZE5pyJNoxoXmNdfQYS5j2HOBww==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/brand/11.5.2/55e6b083518627f84521a3b12ea5d1a2e2eb5065}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+
+  '@behindthemusictree/genre-tree-view@0.1.0':
+    resolution: {integrity: sha512-32cjGoewDAAH0zFQSh8K2PoaucwRlwgfJOSYLji6MkQk8a7Fjp3Ckl1l+buVD3T/QyRD4zw+hSuWadp9RR+NnA==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/genre-tree-view/0.1.0/9fad99b6dc5884b0a9e8616cdca667d8f1c810dc}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -4365,10 +4374,17 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
-  '@behindthemusictree/assets@11.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@behindthemusictree/brand@11.5.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
+
+  '@behindthemusictree/genre-tree-view@0.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      d3: 7.8.5
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      react-icons: 5.5.0(react@19.1.0)
 
   '@csstools/color-helpers@6.0.2': {}
 
