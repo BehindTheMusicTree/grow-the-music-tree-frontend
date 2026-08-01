@@ -16,12 +16,18 @@ export interface RouteAuthConfigItem {
   path: string;
   authRequired: RouteAuthRequirement;
   label: string;
+  hiddenFromMenu?: boolean;
 }
 
 export const AUTH_CONFIG: readonly RouteAuthConfigItem[] = [
-  { path: PATHS.ME_GENRE_TREE, authRequired: "any", label: "MyMusicTree" },
-  { path: PATHS.ME_GENRE_PLAYLISTS, authRequired: "any", label: "My Genre Playlists" },
-  { path: PATHS.ME_UPLOADED_LIBRARY, authRequired: "any", label: "My Library" },
+  { path: PATHS.ME_GENRE_TREE, authRequired: "any", label: "MyMusicTree", hiddenFromMenu: true },
+  {
+    path: PATHS.ME_GENRE_PLAYLISTS,
+    authRequired: "any",
+    label: "My Genre Playlists",
+    hiddenFromMenu: true,
+  },
+  { path: PATHS.ME_UPLOADED_LIBRARY, authRequired: "any", label: "My Library", hiddenFromMenu: true },
   { path: PATHS.ME_SPOTIFY_LIBRARY, authRequired: "spotify", label: "My Spotify Library" },
   { path: PATHS.ACCOUNT, authRequired: "any", label: "Account" },
   { path: PATHS.ABOUT, authRequired: false, label: "About" },
