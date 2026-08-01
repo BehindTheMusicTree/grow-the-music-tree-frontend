@@ -85,6 +85,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-08-01
+
 ### Changed
 
 - **Genre tree component**: Extracted the D3-based genre tree visualization into a standalone, reusable package, `@behindthemusictree/genre-tree-view`, so it can be shared across BehindTheMusicTree repos. `me-genre-tree`/`reference-genre-tree` now render it through a thin adapter that maps app data to the package's generic node shape and wires its callback props to existing hooks/contexts; the previous in-repo `tree-renderer.ts`, `NodeHelper.tsx`, and `d3-helper/*` were removed.
@@ -93,6 +95,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Org assets dependency**: Switched from the stale `@behindthemusictree/assets` package to `@behindthemusictree/brand`, which is the package actually published from the org's asset source repo. Mark asset subpaths moved from `/brand/*` to `/marks/*` to match the new package's exports map.
 - **Brand package**: Bumped `@behindthemusictree/brand` to `11.5.2`, which fixes broken image URLs in `TheMusicTreeByline`/`TheMusicTreeMarkLink` (previously bundled as relative paths that only resolved correctly relative to the package's own module location, 404ing in this app).
+
 
 ## [1.5.1] - 2026-06-20
 
