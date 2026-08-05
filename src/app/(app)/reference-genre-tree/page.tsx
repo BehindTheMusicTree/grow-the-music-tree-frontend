@@ -43,13 +43,18 @@ export default function ReferenceGenreTreePage() {
     previousErrorsRef.current = formErrors || [];
   }, [formErrors, showCriteriaCreationPopup]);
 
+  const uploadTimeoutMs = Number(process.env.NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS);
+  if (!Number.isFinite(uploadTimeoutMs) || uploadTimeoutMs <= 0) {
+    throw new Error("NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS must be a positive number");
+  }
+
   return (
     <Page title="TheMusicTree" dataPage="reference-genre-tree">
       <GenreTreeView
         scope="reference"
         handleGenreCreationAction={showCriteriaCreationPopup}
         getBackendBaseUrl={getBackendBaseUrl}
-        uploadTimeoutMs={Number(process.env.NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS)}
+        uploadTimeoutMs={uploadTimeoutMs}
       />
     </Page>
   );
