@@ -21,7 +21,7 @@
   "dependencies": {
     "@behindthemusictree/app-kit": "0.1.0",
     "@behindthemusictree/brand": "11.5.2",
-    "@behindthemusictree/genre-tree-view": "0.1.0",
+    "@behindthemusictree/genre-tree-view": "0.3.0",
     "@fortawesome/fontawesome-svg-core": "6.5.2",
     "@fortawesome/free-solid-svg-icons": "6.5.2",
     "@fortawesome/react-fontawesome": "3.1.1",
@@ -32,7 +32,7 @@
     "@vercel/analytics": "^1.4.1",
     "classnames": "2.5.1",
     "clsx": "2.1.1",
-    "d3": "7.8.5",
+    "d3": "7.9.0",
     "env-cmd": "10.1.0",
     "is-fullwidth-code-point": "3.0.0",
     "lucide-react": "0.487.0",
@@ -42,7 +42,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-howler": "5.2.0",
-    "react-icons": "5.5.0",
+    "react-icons": "5.7.0",
     "server-only": "0.0.1",
     "sharp": "0.34.5",
     "tailwind-merge": "3.2.0",
@@ -78,14 +78,17 @@
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "3.2.4"
   },
-  "overrides": {
-    "glob": "13.0.1",
-    "lodash": "~4.18.0",
-    "minimatch@3": "3.1.4",
-    "minimatch@9": "9.0.7",
-    "minimatch@10": "10.2.3",
-    "picomatch@2": "2.3.2",
-    "picomatch@4": "4.0.4",
-    "vite": "~7.3.2"
+  "pnpm": {
+    "overrides": {
+      "@behindthemusictree/genre-tree-view": "0.3.0",
+      "glob": "13.0.1",
+      "lodash": "~4.18.0",
+      "minimatch@3": "3.1.4",
+      "minimatch@9": "9.0.7",
+      "minimatch@10": "10.2.3",
+      "picomatch@2": "2.3.2",
+      "picomatch@4": "4.0.4",
+      "vite": "~7.3.2"
+    }
   }
 }
