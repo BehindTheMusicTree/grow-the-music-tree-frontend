@@ -3,13 +3,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, waitFor } from "@testing-library/react";
 import AuthCallbackHandler from "./AuthCallbackHandler";
-import { ErrorCode } from "@app-types/app-errors/app-error-codes";
-import { BackendError } from "@app-types/app-errors/app-error";
+import { ErrorCode, BackendError } from "@behindthemusictree/app-kit/transport";
 import {
   GOOGLE_EXCHANGE_CONFIG,
   SPOTIFY_EXCHANGE_CONFIG,
-} from "@lib/auth/code-exchange";
-import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
+} from "@behindthemusictree/app-kit/auth";
+import { AUTH_POPUP_TYPE } from "@behindthemusictree/app-kit/popup";
 
 const mockReplace = vi.fn();
 const showPopupSpy = vi.fn();
@@ -18,10 +17,13 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: mockReplace }),
 }));
 
-vi.mock("@contexts/PopupContext", () => ({
-  usePopup: () => ({ showPopup: showPopupSpy }),
-  AUTH_POPUP_TYPE: "auth",
-}));
+vi.mock("@behindthemusictree/app-kit/popup", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@behindthemusictree/app-kit/popup")>();
+  return {
+    ...actual,
+    usePopup: () => ({ showPopup: showPopupSpy }),
+  };
+});
 
 const mockAuthToBackendFromGoogleCode = vi.fn();
 const mockAuthToBackendFromSpotifyCode = vi.fn();

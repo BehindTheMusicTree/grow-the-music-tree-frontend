@@ -2,11 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FaCloudUploadAlt, FaList } from "react-icons/fa";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { TheMusicTreeByline } from "@behindthemusictree/brand/components";
-import btmtMark from "@behindthemusictree/brand/marks/behind-the-music-tree/behind-the-music-tree-mark.svg";
 import { getAudiometaUrl } from "@lib/site-urls";
 import { MenuGroup } from "./MenuGroup";
 import {
@@ -15,11 +13,7 @@ import {
   PATHS_EXCLUDED_FROM_HEADER_NAV as ROUTE_PATHS_EXCLUDED_FROM_HEADER_NAV,
 } from "@lib/constants/routes";
 
-const MENU_ICONS: Record<string, React.ReactNode> = {
-  [ROUTE_PATHS.ME_GENRE_TREE]: <Image src={btmtMark} alt="My Music Tree" width={20} height={20} />,
-  [ROUTE_PATHS.ME_GENRE_PLAYLISTS]: <FaList className="text-xl" />,
-  [ROUTE_PATHS.ME_UPLOADED_LIBRARY]: <FaCloudUploadAlt className="text-xl" />,
-};
+const MENU_ICONS: Record<string, React.ReactNode> = {};
 
 const SHOW_AUDIOMETA_MENU_ITEM = false;
 

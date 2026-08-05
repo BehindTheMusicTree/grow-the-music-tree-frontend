@@ -1,15 +1,14 @@
 "use client";
 
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useFetchWrapper } from "@hooks/useFetchWrapper";
-import { useSession } from "@contexts/SessionContext";
-import { parseWithLog } from "@lib/parse-with-log";
-import { PaginatedResponseSchema } from "@schemas/api/paginated-response";
+import { useFetchWrapper, parseWithLog, PaginatedResponseSchema } from "@behindthemusictree/app-kit/transport";
+import { useSession } from "@behindthemusictree/app-kit/auth";
 import { SpotifyLibTrackSimpleSchema } from "@domain/spotify/spotify-lib-track";
 import { libraryEndpoints, libraryQueryKeys } from "@api/domains/library";
+import { getBackendBaseUrl } from "@lib/site-urls";
 
 export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTIFY_LIB_TRACKS_PAGE_SIZE || 50) {
-  const { fetch } = useFetchWrapper();
+  const { fetch } = useFetchWrapper(getBackendBaseUrl);
   const { session, sessionRestored } = useSession();
 
   return useInfiniteQuery({
@@ -31,7 +30,7 @@ export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTI
 
 export function useQuickSyncSpotifyLibTracks() {
   const queryClient = useQueryClient();
-  const { fetch } = useFetchWrapper();
+  const { fetch } = useFetchWrapper(getBackendBaseUrl);
 
   return useMutation({
     mutationFn: async () => {
@@ -48,7 +47,7 @@ export function useQuickSyncSpotifyLibTracks() {
 
 export function useFullSyncSpotifyLibTracks() {
   const queryClient = useQueryClient();
-  const { fetch } = useFetchWrapper();
+  const { fetch } = useFetchWrapper(getBackendBaseUrl);
 
   return useMutation({
     mutationFn: async () => {

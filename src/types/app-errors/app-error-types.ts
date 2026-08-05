@@ -1,6 +1,0 @@
-export enum ConnectivityErrorType {
-  NETWORK = "NETWORK",
-  INTERNAL = "INTERNAL",
-  AUTH_REQUIRED = "AUTH_REQUIRED",
-  BAD_REQUEST = "BAD_REQUEST",
-}

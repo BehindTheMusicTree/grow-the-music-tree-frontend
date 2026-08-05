@@ -1,20 +1,13 @@
 import { z } from "zod";
 import { SpotifyUserFromApiResponseSchema, SpotifyUserDetailed } from "@domain/spotify-user";
-import { useSession } from "@contexts/SessionContext";
-import { useFetchWrapper } from "./useFetchWrapper";
+import { useSession, getSpotifyRequiredCached, setSpotifyRequiredCached, clearSpotifyRequiredCached } from "@behindthemusictree/app-kit/auth";
+import { useFetchWrapper, useQueryWithParse, ErrorCode, BackendError } from "@behindthemusictree/app-kit/transport";
 import { userEndpoints, userQueryKeys } from "@api/domains/user";
-import { useQueryWithParse } from "./useQueryWithParse";
-import {
-  getSpotifyRequiredCached,
-  setSpotifyRequiredCached,
-  clearSpotifyRequiredCached,
-} from "@lib/spotify-required-cache";
-import { ErrorCode } from "@app-types/app-errors/app-error-codes";
-import { BackendError } from "@app-types/app-errors/app-error";
+import { getBackendBaseUrl } from "@lib/site-urls";
 
 export function useFetchSpotifyUser(options?: { skipGlobalError?: boolean; enabled?: boolean }) {
   const { sessionRestored } = useSession();
-  const { fetch } = useFetchWrapper();
+  const { fetch } = useFetchWrapper(getBackendBaseUrl);
   const skipGlobalError = options?.skipGlobalError ?? false;
   const enabledOverride = options?.enabled ?? true;
   const spotifyRequiredCached = getSpotifyRequiredCached();

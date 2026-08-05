@@ -3,10 +3,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, waitFor } from "@testing-library/react";
 import GoogleOAuthCallbackPage from "./page";
-import { ErrorCode } from "@app-types/app-errors/app-error-codes";
-import { BackendError } from "@app-types/app-errors/app-error";
-import { GOOGLE_EXCHANGE_CONFIG } from "@lib/auth/code-exchange";
-import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
+import { ErrorCode, BackendError } from "@behindthemusictree/app-kit/transport";
+import { GOOGLE_EXCHANGE_CONFIG } from "@behindthemusictree/app-kit/auth";
+import { AUTH_POPUP_TYPE } from "@behindthemusictree/app-kit/popup";
 
 const mockReplace = vi.fn();
 const showPopupSpy = vi.fn();
@@ -15,10 +14,13 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: mockReplace }),
 }));
 
-vi.mock("@contexts/PopupContext", () => ({
-  usePopup: () => ({ showPopup: showPopupSpy, hidePopup: vi.fn() }),
-  AUTH_POPUP_TYPE: "auth",
-}));
+vi.mock("@behindthemusictree/app-kit/popup", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@behindthemusictree/app-kit/popup")>();
+  return {
+    ...actual,
+    usePopup: () => ({ showPopup: showPopupSpy, hidePopup: vi.fn() }),
+  };
+});
 
 vi.mock("@hooks/useGoogleAuth", () => ({
   useGoogleAuth: () => ({

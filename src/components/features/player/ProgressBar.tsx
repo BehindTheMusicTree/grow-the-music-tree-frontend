@@ -1,20 +1,20 @@
 "use client";
 
-import { usePlayer, useCurrentTime } from "@contexts/PlayerContext";
+import { usePlayer, useCurrentTime } from "@behindthemusictree/app-kit/player";
 
 interface ProgressBarProps {
   className?: string;
 }
 
 export default function ProgressBar({ className }: ProgressBarProps) {
-  const { duration, playerUploadedTrackObject } = usePlayer();
+  const { duration, playerTrackObject } = usePlayer();
   const currentTime = useCurrentTime();
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!playerUploadedTrackObject?.audioElement) return;
+    if (!playerTrackObject?.audioElement) return;
 
     const newTime = parseFloat(e.target.value);
-    playerUploadedTrackObject.audioElement.currentTime = newTime;
+    playerTrackObject.audioElement.currentTime = newTime;
   };
 
   const formatTime = (time: number): string => {
@@ -23,7 +23,7 @@ export default function ProgressBar({ className }: ProgressBarProps) {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  if (!playerUploadedTrackObject || duration === 0) {
+  if (!playerTrackObject || duration === 0) {
     return null;
   }
 

@@ -85,6 +85,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Shared plumbing**: Replaced local genre-tree/player/track-list/upload/popup/auth/transport infrastructure with the published `@behindthemusictree/app-kit` package, now shared with `hear-the-music-tree-frontend`. `reference-genre-tree` renders `GenreTreeView` from the package instead of a local component; hooks that need the backend base URL now take it as an explicit `getBackendBaseUrl` parameter.
+
+### Removed
+
+- **MyMusicTree / My Genre Playlists / My Library**: Removed `/me-genre-tree`, `/me-genre-playlists`, and `/me-uploaded-library`. These personal-library features have moved to `hear-the-music-tree-frontend`, their proper home.
+
 ## [1.6.0] - 2026-08-01
 
 ### Changed
