@@ -4,11 +4,10 @@ import { useEffect, useRef, ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
-import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
-import { usePopup } from "@contexts/PopupContext";
-import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
-import { usePlayer } from "@contexts/PlayerContext";
-import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
+import { useConnectivityError } from "@behindthemusictree/app-kit/transport";
+import { usePopup, AUTH_POPUP_TYPE } from "@behindthemusictree/app-kit/popup";
+import { usePlayer } from "@behindthemusictree/app-kit/player";
+import { TrackListSidebar, useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
 import { initSentry } from "@lib/sentry";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
@@ -18,7 +17,6 @@ import AuthErrorPopup from "@components/ui/popup/child/AuthErrorPopup";
 import AppHeader from "@components/features/menu/AppHeader";
 import Player from "@components/features/player/Player";
 import AutoAdvance from "@components/features/player/AutoAdvance";
-import TrackListSidebar from "@components/features/track-list-sidebar/TrackListSidebar";
 
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
 import AuthPopup from "@components/ui/popup/child/AuthPopup";
@@ -34,13 +32,14 @@ import {
   ClientError,
   ServiceError,
   InvalidInputError,
-} from "@app-types/app-errors/app-error";
-import { ErrorCode } from "@app-types/app-errors/app-error-codes";
+  ErrorCode,
+} from "@behindthemusictree/app-kit/transport";
 import { getRouteAuthRequirement } from "@lib/constants/routes";
+import { getBackendBaseUrl } from "@lib/site-urls";
 
 export default function AppContent({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { playerUploadedTrackObject } = usePlayer();
+  const { playerTrackObject } = usePlayer();
   const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const { showPopup, hidePopup, activePopup } = usePopup();
   const { connectivityError, clearConnectivityError } = useConnectivityError();
@@ -56,7 +55,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
     initSentry();
   }, []);
 
-  useEffect(() => {}, [playerUploadedTrackObject]);
+  useEffect(() => {}, [playerTrackObject]);
 
   useEffect(() => {
     if (connectivityError === null) {
@@ -173,7 +172,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
       <div
         className="center fixed top-banner flex h-full w-full bg-gray-100"
         style={{
-          maxHeight: playerUploadedTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
+          maxHeight: playerTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
         }}
       >
         <div className="relative flex min-h-0 w-full flex-grow">
@@ -181,7 +180,9 @@ export default function AppContent({ children }: { children: ReactNode }) {
             <main className="flex min-h-0 w-full flex-grow flex-col mx-8">
               <div className="flex min-h-0 flex-1 flex-col">{children}</div>
             </main>
-            {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
+            {isTrackListSidebarVisible && (
+              <TrackListSidebar className="z-40" getBackendBaseUrl={getBackendBaseUrl} />
+            )}
           </div>
           {activePopup && (
             <div className="absolute top-0 right-0 bottom-0 left-0 z-40 pointer-events-none bg-black/10" aria-hidden />
@@ -189,7 +190,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
         </div>
       </div>
 
-      {playerUploadedTrackObject && (
+      {playerTrackObject && (
         <div className="fixed bottom-0 left-0 right-0 z-50">
           <div style={activePopup ? { filter: "blur(4px)" } : undefined}>
             <Player className="relative z-0" />

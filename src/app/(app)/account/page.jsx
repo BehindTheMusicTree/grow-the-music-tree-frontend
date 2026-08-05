@@ -3,8 +3,7 @@
 import Image from "next/image";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
-import { useLogout } from "@hooks/useLogout";
-import { useSession } from "@contexts/SessionContext";
+import { useLogout, useSession } from "@behindthemusictree/app-kit/auth";
 import { useFetchSpotifyUser } from "@hooks/useSpotifyUser";
 import { spotifyUserProfileUrl } from "@lib/constants/routes";
 import Page from "@components/ui/Page";

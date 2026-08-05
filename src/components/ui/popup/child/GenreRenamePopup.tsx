@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { BasePopup } from "../BasePopup";
-import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
+import { CriteriaMinimum } from "@behindthemusictree/app-kit/genre-tree";
 
 type GenreRenamePopupProps = {
   onSubmit: (values: { name: string }) => void;

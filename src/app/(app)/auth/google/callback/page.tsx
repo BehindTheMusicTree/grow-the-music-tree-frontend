@@ -2,15 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { usePopup } from "@contexts/PopupContext";
-import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
+import { usePopup, AUTH_POPUP_TYPE } from "@behindthemusictree/app-kit/popup";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
 import AuthPopup from "@components/ui/popup/child/AuthPopup";
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
-import { clearStoredRedirectUrl, GOOGLE_EXCHANGE_CONFIG } from "@lib/auth/code-exchange";
-import { ErrorCode } from "@app-types/app-errors/app-error-codes";
-import { BackendError } from "@app-types/app-errors/app-error";
+import { clearStoredRedirectUrl, GOOGLE_EXCHANGE_CONFIG } from "@behindthemusictree/app-kit/auth";
+import { ErrorCode, BackendError } from "@behindthemusictree/app-kit/transport";
 
 function getParamsFromUrl() {
   if (typeof window === "undefined") return { code: null, errorParam: null };

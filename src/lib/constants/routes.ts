@@ -1,8 +1,5 @@
 export const PATHS = {
   REFERENCE_GENRE_TREE: "/reference-genre-tree",
-  ME_GENRE_TREE: "/me-genre-tree",
-  ME_GENRE_PLAYLISTS: "/me-genre-playlists",
-  ME_UPLOADED_LIBRARY: "/me-uploaded-library",
   ME_SPOTIFY_LIBRARY: "/me-spotify-library",
   ACCOUNT: "/account",
   ABOUT: "/about",
@@ -20,14 +17,6 @@ export interface RouteAuthConfigItem {
 }
 
 export const AUTH_CONFIG: readonly RouteAuthConfigItem[] = [
-  { path: PATHS.ME_GENRE_TREE, authRequired: "any", label: "MyMusicTree", hiddenFromMenu: true },
-  {
-    path: PATHS.ME_GENRE_PLAYLISTS,
-    authRequired: "any",
-    label: "My Genre Playlists",
-    hiddenFromMenu: true,
-  },
-  { path: PATHS.ME_UPLOADED_LIBRARY, authRequired: "any", label: "My Library", hiddenFromMenu: true },
   { path: PATHS.ME_SPOTIFY_LIBRARY, authRequired: "spotify", label: "My Spotify Library" },
   { path: PATHS.ACCOUNT, authRequired: "any", label: "Account" },
   { path: PATHS.ABOUT, authRequired: false, label: "About" },

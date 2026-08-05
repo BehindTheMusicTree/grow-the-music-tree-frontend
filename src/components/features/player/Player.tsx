@@ -3,9 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import { FaVolumeUp, FaVolumeMute, FaList } from "react-icons/fa";
-import { usePlayer, useCurrentTime } from "@contexts/PlayerContext";
-import { useTrackList } from "@contexts/TrackListContext";
-import { useTrackListSidebarVisibility } from "@contexts/TrackListSidebarVisibilityContext";
+import { usePlayer, useCurrentTime, PlayerTrack } from "@behindthemusictree/app-kit/player";
+import { useTrackList, useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
+import { toPlayerTrack } from "@lib/player-track";
 import PlayerControls from "./PlayerControls";
 import ProgressBar from "./ProgressBar";
 
@@ -15,7 +15,7 @@ interface PlayerProps {
 
 export default function Player({ className }: PlayerProps) {
   const {
-    playerUploadedTrackObject,
+    playerTrackObject,
     isLoading,
     isPlaying,
     volume,
@@ -39,32 +39,41 @@ export default function Player({ className }: PlayerProps) {
       return currentIndex !== -1 && currentIndex + 1 < tracks.length;
     })();
 
+  const handleTrackChange = (track: PlayerTrack) => {
+    const found = trackList?.uploadedTracks.find((t) => t.uuid === track.id) ?? null;
+    setSelectedTrack(found);
+  };
+
   const handleNext = () => {
     if (trackList && selectedTrack) {
-      handleNextTrack(trackList.uploadedTracks, selectedTrack, setSelectedTrack);
+      handleNextTrack(trackList.uploadedTracks.map(toPlayerTrack), toPlayerTrack(selectedTrack), handleTrackChange);
     }
   };
 
   const handlePrevious = () => {
-    if (!playerUploadedTrackObject?.audioElement) return;
+    if (!playerTrackObject?.audioElement) return;
 
     // If we're at least 1 second into the track, restart the current song
     if (currentTime >= 1) {
-      playerUploadedTrackObject.audioElement.currentTime = 0;
+      playerTrackObject.audioElement.currentTime = 0;
       return;
     }
 
     // If less than 1 second, go to previous track
     if (trackList && selectedTrack) {
-      handlePreviousTrack(trackList.uploadedTracks, selectedTrack, setSelectedTrack);
+      handlePreviousTrack(
+        trackList.uploadedTracks.map(toPlayerTrack),
+        toPlayerTrack(selectedTrack),
+        handleTrackChange,
+      );
     }
   };
 
   const handleVolumeChange = (newVolume: number) => {
     setVolume(newVolume);
     // Update audio element volume if it exists
-    if (playerUploadedTrackObject?.audioElement) {
-      playerUploadedTrackObject.audioElement.volume = newVolume / 100;
+    if (playerTrackObject?.audioElement) {
+      playerTrackObject.audioElement.volume = newVolume / 100;
     }
   };
 
@@ -72,22 +81,22 @@ export default function Player({ className }: PlayerProps) {
     if (isMuted) {
       // Unmute: restore previous volume
       setVolume(previousVolume);
-      if (playerUploadedTrackObject?.audioElement) {
-        playerUploadedTrackObject.audioElement.volume = previousVolume / 100;
+      if (playerTrackObject?.audioElement) {
+        playerTrackObject.audioElement.volume = previousVolume / 100;
       }
       setIsMuted(false);
     } else {
       // Mute: save current volume and set to 0
       setPreviousVolume(volume);
       setVolume(0);
-      if (playerUploadedTrackObject?.audioElement) {
-        playerUploadedTrackObject.audioElement.volume = 0;
+      if (playerTrackObject?.audioElement) {
+        playerTrackObject.audioElement.volume = 0;
       }
       setIsMuted(true);
     }
   };
 
-  if (!playerUploadedTrackObject) {
+  if (!playerTrackObject) {
     return null;
   }
 
@@ -97,18 +106,18 @@ export default function Player({ className }: PlayerProps) {
         <div className="flex items-center flex-1 min-w-0">
           <Image
             src="/assets/album-cover-default.png"
-            alt={playerUploadedTrackObject.uploadedTrack.title}
+            alt={playerTrackObject.track.title}
             width={64}
             height={64}
             className="w-16 h-16 rounded flex-shrink-0"
           />
           <div className="ml-4 min-w-0 flex-1 flex flex-col justify-center">
-            <h3 className="font-bold text-lg text-overflow">{playerUploadedTrackObject.uploadedTrack.title}</h3>
+            <h3 className="font-bold text-lg text-overflow">{playerTrackObject.track.title}</h3>
             <p className="text-gray-400 text-base text-overflow">
-              {playerUploadedTrackObject.uploadedTrack.artists?.map((artist) => artist.name).join(", ") ?? ""}
+              {playerTrackObject.track.artists?.map((artist) => artist.name).join(", ") ?? ""}
             </p>
-            {playerUploadedTrackObject.loadError && (
-              <p className="text-red-400 text-sm text-overflow">{playerUploadedTrackObject.loadError}</p>
+            {playerTrackObject.loadError && (
+              <p className="text-red-400 text-sm text-overflow">{playerTrackObject.loadError}</p>
             )}
           </div>
         </div>

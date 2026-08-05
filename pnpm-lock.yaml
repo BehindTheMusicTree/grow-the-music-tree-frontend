@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@behindthemusictree/app-kit':
+        specifier: 0.1.0
+        version: 0.1.0(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.2.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@behindthemusictree/brand':
         specifier: 11.5.2
         version: 11.5.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -288,6 +291,14 @@ packages:
   '@babel/types@7.29.7':
     resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
+
+  '@behindthemusictree/app-kit@0.1.0':
+    resolution: {integrity: sha512-X9UB0EnVKcG7LkEH4qyVcTmRQBobv2OxmwKhNaYyDEbeRoBFj+TdtJYrs1VtZtBeqEDp9guQjGKG0NNameMgcw==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/app-kit/0.1.0/b67afb43b5828f79414f1ee7f2a0c28c0bc56742}
+    peerDependencies:
+      '@tanstack/react-query': '>=5.0.0'
+      next: '>=14.0.0'
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
 
   '@behindthemusictree/brand@11.5.2':
     resolution: {integrity: sha512-hAdvojq9eJF4PdXSuO7Wgsd7Ac0SEtBPnX9G9Kq51E8jIRI0Sbad25iW4nuLZE5pyJNoxoXmNdfQYS5j2HOBww==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/brand/11.5.2/55e6b083518627f84521a3b12ea5d1a2e2eb5065}
@@ -4373,6 +4384,21 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
+
+  '@behindthemusictree/app-kit@0.1.0(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.2.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@behindthemusictree/genre-tree-view': 0.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@tanstack/react-query': 5.72.2(react@19.1.0)
+      classnames: 2.5.1
+      clsx: 2.1.1
+      lucide-react: 0.487.0(react@19.1.0)
+      next: 16.2.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      react-icons: 5.5.0(react@19.1.0)
+      tailwind-merge: 3.2.0
+      uuid: 10.0.0
+      zod: 3.24.3
 
   '@behindthemusictree/brand@11.5.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
