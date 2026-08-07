@@ -89,7 +89,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Shared plumbing**: Replaced local genre-tree/player/track-list/upload/popup/auth/transport infrastructure with the published `@behindthemusictree/app-kit` package, now shared with `hear-the-music-tree-frontend`. `reference-genre-tree` renders `GenreTreeView` from the package instead of a local component; hooks that need the backend base URL now take it as an explicit `getBackendBaseUrl` parameter.
 - **`@behindthemusictree/genre-tree-view`**: Bumped to `0.3.0`.
-- **`@behindthemusictree/app-kit`**: Bumped to `0.1.1`, which now depends on `genre-tree-view@0.3.0` natively, removing the need for the `pnpm.overrides` entry that previously forced it.
+- **`@behindthemusictree/app-kit`**: Bumped to `0.1.2`, which now depends on `genre-tree-view@0.3.0` natively, removing the need for the `pnpm.overrides` entry that previously forced it.
+
+### Fixed
+
+- **Toolbar hover flicker**: Bumped `@behindthemusictree/app-kit` to `0.1.3`, which memoizes the `PopupProvider`, `TrackListProvider`, and `TrackListSidebarVisibilityProvider` context values and their handlers (`showPopup`/`hidePopup`, `toTrackAtPosition`/`playNewTrackListFromUploadedTrackUuid`/`playNewTrackListFromGenrePlaylist`, `toggleTrackListSidebar`/`showTrackListSidebar`/`hideTrackListSidebar`). They were previously recreated on every render, breaking memoization for consumers and causing downstream effects (e.g. the genre tree's tree-rebuilding effect) to rerun on unrelated re-renders, producing a toolbar show/hide flicker on hover.
 
 ### Removed
 
