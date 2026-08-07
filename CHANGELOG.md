@@ -91,6 +91,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **`@behindthemusictree/genre-tree-view`**: Bumped to `0.3.0`.
 - **`@behindthemusictree/app-kit`**: Bumped to `0.1.1`, which now depends on `genre-tree-view@0.3.0` natively, removing the need for the `pnpm.overrides` entry that previously forced it.
 
+### Fixed
+
+- **Toolbar hover flicker**: Bumped `@behindthemusictree/app-kit` to `0.1.2`, which memoizes `PopupProvider`'s context value and `showPopup`/`hidePopup` handlers. They were previously recreated on every render, breaking memoization for consumers and causing downstream effects (e.g. the genre tree's tree-rebuilding effect) to rerun on unrelated re-renders, producing a toolbar show/hide flicker on hover.
+
 ### Removed
 
 - **MyMusicTree / My Genre Playlists / My Library**: Removed `/me-genre-tree`, `/me-genre-playlists`, and `/me-uploaded-library`. These personal-library features have moved to `hear-the-music-tree-frontend`, their proper home.
