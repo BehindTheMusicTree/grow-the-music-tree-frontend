@@ -93,7 +93,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
-- **Toolbar hover flicker**: Bumped `@behindthemusictree/app-kit` to `0.1.2`, which memoizes `PopupProvider`'s context value and `showPopup`/`hidePopup` handlers. They were previously recreated on every render, breaking memoization for consumers and causing downstream effects (e.g. the genre tree's tree-rebuilding effect) to rerun on unrelated re-renders, producing a toolbar show/hide flicker on hover.
+- **Toolbar hover flicker**: Bumped `@behindthemusictree/app-kit` to `0.1.3`, which memoizes the `PopupProvider`, `TrackListProvider`, and `TrackListSidebarVisibilityProvider` context values and their handlers (`showPopup`/`hidePopup`, `toTrackAtPosition`/`playNewTrackListFromUploadedTrackUuid`/`playNewTrackListFromGenrePlaylist`, `toggleTrackListSidebar`/`showTrackListSidebar`/`hideTrackListSidebar`). They were previously recreated on every render, breaking memoization for consumers and causing downstream effects (e.g. the genre tree's tree-rebuilding effect) to rerun on unrelated re-renders, producing a toolbar show/hide flicker on hover.
 
 ### Removed
 
