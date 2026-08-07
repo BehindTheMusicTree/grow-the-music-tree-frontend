@@ -93,7 +93,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
-- **Toolbar hover flicker**: Bumped `@behindthemusictree/app-kit` to `0.1.3`, which memoizes the `PopupProvider`, `TrackListProvider`, and `TrackListSidebarVisibilityProvider` context values and their handlers (`showPopup`/`hidePopup`, `toTrackAtPosition`/`playNewTrackListFromUploadedTrackUuid`/`playNewTrackListFromGenrePlaylist`, `toggleTrackListSidebar`/`showTrackListSidebar`/`hideTrackListSidebar`). They were previously recreated on every render, breaking memoization for consumers and causing downstream effects (e.g. the genre tree's tree-rebuilding effect) to rerun on unrelated re-renders, producing a toolbar show/hide flicker on hover.
+- **Toolbar hover flicker**: Bumped `@behindthemusictree/app-kit` to `0.1.4`, which memoizes the `PopupProvider`, `TrackListProvider`, `TrackListSidebarVisibilityProvider`, and `SessionProvider` context values and their handlers (`showPopup`/`hidePopup`, `toTrackAtPosition`/`playNewTrackListFromUploadedTrackUuid`/`playNewTrackListFromGenrePlaylist`, `toggleTrackListSidebar`/`showTrackListSidebar`/`hideTrackListSidebar`, `setSession`/`clearSession`). They were previously recreated on every render, breaking memoization for consumers. `SessionProvider`'s `clearSession` in particular cascaded through `useFetchWrapper`'s `fetch` — a dependency of nearly every data-fetching hook in the package — into downstream effects (e.g. the genre tree's tree-rebuilding effect), causing them to rerun on unrelated re-renders and produce a toolbar show/hide flicker on hover even after the `0.1.2`/`0.1.3` fixes.
 
 ### Removed
 
