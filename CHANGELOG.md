@@ -98,7 +98,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Removed
 
 - **MyMusicTree / My Genre Playlists / My Library**: Removed `/me-genre-tree`, `/me-genre-playlists`, and `/me-uploaded-library`. These personal-library features have moved to `hear-the-music-tree-frontend`, their proper home.
-- **Reference genre tree**: Replaced the redundant "TheMusicTree" page title above `GenreTreeView` with a distinct "Reference Genre Tree" heading, matching every other page's convention of a non-redundant `<h1>`.
+- **Reference genre tree**: Removed the redundant "TheMusicTree" page title above `GenreTreeView`.
 
 ## [1.6.0] - 2026-08-01
 
