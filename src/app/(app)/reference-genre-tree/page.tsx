@@ -8,6 +8,8 @@ import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import Page from "@components/ui/Page";
 import { getBackendBaseUrl } from "@lib/site-urls";
 
+import HoverFlickerDiagnostics from "./HoverFlickerDiagnostics";
+
 export default function ReferenceGenreTreePage() {
   const { mutate: createGenre, formErrors } = useCreateGenre("reference", getBackendBaseUrl);
   const { showPopup, hidePopup } = usePopup();
@@ -50,6 +52,7 @@ export default function ReferenceGenreTreePage() {
 
   return (
     <Page title="Reference Genre Tree" visuallyHiddenTitle dataPage="reference-genre-tree">
+      <HoverFlickerDiagnostics />
       <GenreTreeView
         scope="reference"
         handleGenreCreationAction={showCriteriaCreationPopup}
