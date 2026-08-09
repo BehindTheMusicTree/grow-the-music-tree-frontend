@@ -85,6 +85,24 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-08-09
+
+### Changed
+
+- **Shared plumbing**: Replaced local genre-tree/player/track-list/upload/popup/auth/transport infrastructure with the published `@behindthemusictree/app-kit` package, now shared with `hear-the-music-tree-frontend`. `reference-genre-tree` renders `GenreTreeView` from the package instead of a local component; hooks that need the backend base URL now take it as an explicit `getBackendBaseUrl` parameter.
+- **`@behindthemusictree/genre-tree-view`**: Bumped to `0.3.0`.
+- **`@behindthemusictree/app-kit`**: Bumped to `0.1.6` (initially `0.1.2`, which depends on `genre-tree-view@0.3.0` natively, removing the need for the `pnpm.overrides` entry that previously forced it; see Fixed below for the subsequent `0.1.3`-`0.1.6` bumps).
+
+### Fixed
+
+- **Toolbar hover flicker**: Bumped `@behindthemusictree/app-kit` to `0.1.4`, which memoizes the `PopupProvider`, `TrackListProvider`, `TrackListSidebarVisibilityProvider`, and `SessionProvider` context values and their handlers (`showPopup`/`hidePopup`, `toTrackAtPosition`/`playNewTrackListFromUploadedTrackUuid`/`playNewTrackListFromGenrePlaylist`, `toggleTrackListSidebar`/`showTrackListSidebar`/`hideTrackListSidebar`, `setSession`/`clearSession`). They were previously recreated on every render, breaking memoization for consumers. `SessionProvider`'s `clearSession` in particular cascaded through `useFetchWrapper`'s `fetch` — a dependency of nearly every data-fetching hook in the package — into downstream effects (e.g. the genre tree's tree-rebuilding effect), causing them to rerun on unrelated re-renders and produce a toolbar show/hide flicker on hover even after the `0.1.2`/`0.1.3` fixes.
+- **Toolbar hover flicker (recurrence)**: Bumped `@behindthemusictree/app-kit` to `0.1.6`, fixing a genuine circular dependency in `PlayerProvider` between `onTrackEnd` state and `loadTrackForPlayer` — unlike the `0.1.2`-`0.1.4` fixes above, this wasn't an unmemoized-context-value bug but two otherwise-correct dependency arrays forming an actual cycle (`loadTrackForPlayer` depended on `onTrackEnd`, and `AutoAdvance`'s effect called `setOnTrackEnd` with a fresh closure every time `handleNextTrack`, derived from `loadTrackForPlayer`, changed identity), producing an unconditional infinite render loop from page load. Fixed upstream by reading `onTrackEnd` via a ref inside the `ended` event listener instead of listing it as a `loadTrackForPlayer` dependency.
+
+### Removed
+
+- **MyMusicTree / My Genre Playlists / My Library**: Removed `/me-genre-tree`, `/me-genre-playlists`, and `/me-uploaded-library`. These personal-library features have moved to `hear-the-music-tree-frontend`, their proper home.
+- **Reference genre tree**: Removed the redundant "TheMusicTree" page title above `GenreTreeView`. `Page` now supports a `visuallyHiddenTitle` option so the page still exposes a real, distinct `<h1>` ("Reference Genre Tree") for accessibility without reserving visible header space.
+
 ## [1.6.0] - 2026-08-01
 
 ### Changed

@@ -2,15 +2,15 @@
 
 import { useCallback } from "react";
 
-import { useSession } from "@contexts/SessionContext";
-import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
-import { useFetchWrapper } from "@hooks/useFetchWrapper";
+import { useSession } from "@behindthemusictree/app-kit/auth";
+import { useConnectivityError, useFetchWrapper } from "@behindthemusictree/app-kit/transport";
 import {
   exchangeCodeWithBackend,
   GOOGLE_EXCHANGE_CONFIG,
   resolveRedirectUri,
   storeRedirectUrl,
-} from "@lib/auth/code-exchange";
+} from "@behindthemusictree/app-kit/auth";
+import { getBackendBaseUrl } from "@lib/site-urls";
 
 const DEFAULT_GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const DEFAULT_GOOGLE_SCOPES = "openid email profile";
@@ -18,7 +18,7 @@ const DEFAULT_GOOGLE_SCOPES = "openid email profile";
 export function useGoogleAuth() {
   const { setSession } = useSession();
   const { setConnectivityError } = useConnectivityError();
-  const { fetch } = useFetchWrapper();
+  const { fetch } = useFetchWrapper(getBackendBaseUrl);
 
   const handleGoogleOAuth = (redirectAfterAuthPath?: string) => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;

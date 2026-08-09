@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
-import { usePopup } from "@contexts/PopupContext";
-import { AUTH_POPUP_TYPE } from "@contexts/PopupContext";
-import { useSession } from "@contexts/SessionContext";
+import { usePopup, AUTH_POPUP_TYPE } from "@behindthemusictree/app-kit/popup";
+import { useSession } from "@behindthemusictree/app-kit/auth";
 import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
 import { useGoogleAuth } from "@hooks/useGoogleAuth";
 import { useFetchSpotifyUser } from "@hooks/useSpotifyUser";

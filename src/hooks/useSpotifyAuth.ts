@@ -2,20 +2,20 @@
 
 import { useCallback } from "react";
 
-import { useSession } from "@contexts/SessionContext";
-import { useConnectivityError } from "@contexts/ConnectivityErrorContext";
-import { useFetchWrapper } from "@hooks/useFetchWrapper";
+import { useSession } from "@behindthemusictree/app-kit/auth";
+import { useConnectivityError, useFetchWrapper } from "@behindthemusictree/app-kit/transport";
 import {
   exchangeCodeWithBackend,
   resolveRedirectUri,
   SPOTIFY_EXCHANGE_CONFIG,
   storeRedirectUrl,
-} from "@lib/auth/code-exchange";
+} from "@behindthemusictree/app-kit/auth";
+import { getBackendBaseUrl } from "@lib/site-urls";
 
 export function useSpotifyAuth() {
   const { setSession } = useSession();
   const { setConnectivityError } = useConnectivityError();
-  const { fetch } = useFetchWrapper();
+  const { fetch } = useFetchWrapper(getBackendBaseUrl);
 
   const handleSpotifyOAuth = (redirectAfterAuthPath?: string) => {
     if (!process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || !process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI) {

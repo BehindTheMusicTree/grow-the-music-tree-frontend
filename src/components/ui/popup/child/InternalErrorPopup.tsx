@@ -2,7 +2,7 @@
 
 import { AlertTriangle, AlertCircle } from "lucide-react";
 import { BasePopup, BasePopupProps } from "../BasePopup";
-import { ErrorCode } from "@app-types/app-errors/app-error-codes";
+import { ErrorCode } from "@behindthemusictree/app-kit/transport";
 
 type InternalErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   errorCode: ErrorCode;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { BasePopup, BasePopupProps } from "../BasePopup";
-import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
+import { CriteriaMinimum } from "@behindthemusictree/app-kit/genre-tree";
 
 type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   onSubmit: (values: { name: string; parent?: string }) => void;

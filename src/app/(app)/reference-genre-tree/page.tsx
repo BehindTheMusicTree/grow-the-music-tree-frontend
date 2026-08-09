@@ -2,16 +2,14 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
-import { usePopup } from "@contexts/PopupContext";
-import { useCreateGenre } from "@hooks/useGenre";
+import { usePopup } from "@behindthemusictree/app-kit/popup";
+import { useCreateGenre, GenreTreeView, CriteriaMinimum } from "@behindthemusictree/app-kit/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
-import { CriteriaMinimum } from "@schemas/domain/criteria/response/minimum";
 import Page from "@components/ui/Page";
-
-import { GenreTreeView } from "../me-genre-tree/GenreTreeView";
+import { getBackendBaseUrl } from "@lib/site-urls";
 
 export default function ReferenceGenreTreePage() {
-  const { mutate: createGenre, formErrors } = useCreateGenre("reference");
+  const { mutate: createGenre, formErrors } = useCreateGenre("reference", getBackendBaseUrl);
   const { showPopup, hidePopup } = usePopup();
 
   const showCriteriaCreationPopup = useCallback(
@@ -45,9 +43,19 @@ export default function ReferenceGenreTreePage() {
     previousErrorsRef.current = formErrors || [];
   }, [formErrors, showCriteriaCreationPopup]);
 
+  const uploadTimeoutMs = Number(process.env.NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS);
+  if (!Number.isFinite(uploadTimeoutMs) || uploadTimeoutMs <= 0) {
+    throw new Error("NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS must be a positive number");
+  }
+
   return (
-    <Page title="TheMusicTree" dataPage="reference-genre-tree">
-      <GenreTreeView scope="reference" handleGenreCreationAction={showCriteriaCreationPopup} />
+    <Page title="Reference Genre Tree" visuallyHiddenTitle dataPage="reference-genre-tree">
+      <GenreTreeView
+        scope="reference"
+        handleGenreCreationAction={showCriteriaCreationPopup}
+        getBackendBaseUrl={getBackendBaseUrl}
+        uploadTimeoutMs={uploadTimeoutMs}
+      />
     </Page>
   );
 }

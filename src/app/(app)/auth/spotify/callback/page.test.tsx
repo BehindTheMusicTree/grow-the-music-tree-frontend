@@ -3,8 +3,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, waitFor } from "@testing-library/react";
 import SpotifyOAuthCallbackPage from "./page";
-import { ErrorCode } from "@app-types/app-errors/app-error-codes";
-import { BackendError } from "@app-types/app-errors/app-error";
+import { ErrorCode, BackendError } from "@behindthemusictree/app-kit/transport";
 
 const mockReplace = vi.fn();
 const showPopupSpy = vi.fn();
@@ -17,10 +16,13 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: mockReplace }),
 }));
 
-vi.mock("@contexts/PopupContext", () => ({
-  usePopup: () => ({ showPopup: showPopupSpy, hidePopup: hidePopupSpy }),
-  AUTH_POPUP_TYPE: "auth",
-}));
+vi.mock("@behindthemusictree/app-kit/popup", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@behindthemusictree/app-kit/popup")>();
+  return {
+    ...actual,
+    usePopup: () => ({ showPopup: showPopupSpy, hidePopup: hidePopupSpy }),
+  };
+});
 
 vi.mock("@hooks/useSpotifyAuth", () => ({
   useSpotifyAuth: () => ({

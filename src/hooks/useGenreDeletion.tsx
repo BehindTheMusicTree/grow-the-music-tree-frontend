@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback } from "react";
-import { usePopup } from "@contexts/PopupContext";
+import { usePopup } from "@behindthemusictree/app-kit/popup";
 import GenreDeletionPopup from "@components/ui/popup/child/GenreDeletionPopup";
-import { useDeleteGenre } from "./useGenre";
-import { Scope } from "@app-types/Scope";
+import { useDeleteGenre } from "@behindthemusictree/app-kit/genre-tree";
+import { Scope } from "@behindthemusictree/app-kit/transport";
+import { getBackendBaseUrl } from "@lib/site-urls";
 
 interface Genre {
   name: string;
@@ -17,7 +18,7 @@ interface UseGenreDeletionReturn {
 
 export function useGenreDeletion(scope: Scope, onDelete?: (genre: Genre) => void): UseGenreDeletionReturn {
   const { showPopup, hidePopup } = usePopup();
-  const deleteGenre = useDeleteGenre(scope);
+  const deleteGenre = useDeleteGenre(scope, getBackendBaseUrl);
 
   const showDeletePopup = useCallback(
     (genre: Genre) => {

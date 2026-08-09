@@ -4,28 +4,22 @@ import { FaSpotify } from "react-icons/fa";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 import { Button } from "@components/ui/Button";
 import { User } from "lucide-react";
-import { ErrorCode } from "@app-types/app-errors/app-error-codes";
-import {
-  getSpotifyAllowlistContactEmail,
-  getSpotifyAllowlistMailtoHref,
-} from "@app-types/app-errors/app-error-messages";
+import { getSpotifyAllowlistMailtoHref } from "@behindthemusictree/app-kit/transport";
 
 type SpotifyAuthErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   message: string;
   details?: string;
   onClose: () => void;
-  errorCode?: ErrorCode;
 };
 
 export default function SpotifyAuthErrorPopup({
   message,
   details,
   onClose,
-  errorCode,
   ...rest
 }: SpotifyAuthErrorPopupProps) {
-  const contactEmail = getSpotifyAllowlistContactEmail();
-  const requestAccessHref = getSpotifyAllowlistMailtoHref();
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? null;
+  const requestAccessHref = getSpotifyAllowlistMailtoHref(contactEmail);
 
   return (
     <BasePopup
