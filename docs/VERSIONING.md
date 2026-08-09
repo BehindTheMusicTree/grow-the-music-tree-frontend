@@ -24,7 +24,7 @@ This document describes how application versioning is handled in CI/CD workflows
 
 **Release identity** is a **semver tag** on `main` (e.g. `v0.2.0`). Production deploy runs when that tag is pushed (see below), not on every merge to `main`.
 
-**`npm version`** for a shipping release runs **only on `main`**, after **`release/*` or `hotfix/*` is merged into `main` via PR** ([CONTRIBUTING.md](../CONTRIBUTING.md) §7). Prepare `package.json` / changelog on `release/*` with `npm version … --no-git-tag-version` if needed; the **tag** and **postversion** changelog move happen when you run **`npm version` on `main`**.
+Version bump and changelog roll-up for a shipping release happen **once**, never both, via one of two paths ([CONTRIBUTING.md](../CONTRIBUTING.md) §7): **preferred** — prepare `package.json` / changelog on `release/*` (or `hotfix/*`) *before* it's merged, using **`npm pkg set version=X.Y.Z`** (not `npm version` — its `postversion` script assumes it's amending a commit `npm version` just created, and will instead amend whatever commit is currently `HEAD` if run on `release/*` without a full `npm version` invocation, corrupting shared history); once merged into `main` via PR, just tag `main`'s merge commit directly (no extra bump). **Fallback** — if `release/*`/`hotfix/*` did *not* prepare the bump, run the full `npm version` (bump + commit + tag + `postversion`) directly on `main` after the PR merges.
 
 **`package.json` `version`** is the string synced to `NEXT_PUBLIC_APP_VERSION` and shown in the app. For a tag-triggered deploy it **must equal** the tag (`v0.2.0` → `0.2.0`). A manual **Vercel deploy** run (`workflow_dispatch`) still uses `package.json` only.
 
@@ -172,41 +172,58 @@ npm version major   # 0.1.0 → 1.0.0
 npm version 1.3.0 --no-git-tag-version   # set exact version (no commit/tag)
 ```
 
-Use `--no-git-tag-version` on **`release/*`** to bump `package.json` and prepare changelog without creating a tag. For the **final** release, run **`npm version` on `main`** (without `--no-git-tag-version`) so the tool commits, tags, and runs `postversion`. The `postversion` script moves `[Unreleased]` into `## [X.Y.Z] - YYYY-MM-DD`, amends the version commit, recreates **`vX.Y.Z`**, and deletes test/dev tags for that version. Rc/beta/alpha tags are not deleted automatically. From **`main`**: `git push origin main` and `git push origin v<version>`.
+**Never run `npm version` on `release/*`/`hotfix/*`.** Its `postversion` script assumes it's amending the commit `npm version` itself just created; run without that fresh commit (e.g. via `--no-git-tag-version` on a release branch) and it instead amends whatever commit is currently `HEAD`, corrupting shared history. To bump `package.json` on a release branch, use `npm pkg set version=X.Y.Z` instead (no lifecycle scripts triggered) and move `[Unreleased]` into the new version's CHANGELOG section by hand — see [CONTRIBUTING.md](../CONTRIBUTING.md) §7.
+
+For the final tag on **`main`**, two cases, depending on whether `release/*` already prepared the bump:
+
+- **Already prepared on `release/*`** (preferred): after merge, `main`'s `package.json`/CHANGELOG are already correct. Just tag the merge commit directly — no `npm version` call: `git tag v<version>` then `git push origin v<version>`.
+- **Not prepared on `release/*`**: run **`npm version` on `main`** (after the `release/*`/`hotfix/*` → `main` PR merges) so the tool bumps `package.json`, commits, tags, and runs `postversion` in one step. The `postversion` script moves `[Unreleased]` into `## [X.Y.Z] - YYYY-MM-DD`, amends the version commit, recreates **`vX.Y.Z`**, and deletes test/dev tags for that version. Then `git push origin main` and `git push origin v<version>`.
+
+Rc/beta/alpha tags are not deleted automatically either way.
 
 ### Creating a Release
 
-Follow GitFlow release flow:
+Follow GitFlow release flow — see [CONTRIBUTING.md](../CONTRIBUTING.md) §7 for the full walkthrough (including the "prepare on `release/*`" step in detail). Summary, preferred path:
 
-1. Prepare and stabilize the version bump/changelog on `release/*`.
-2. Open and merge a Pull Request from `release/*` to `main` (no direct merge).
-3. Create the final release tag on `main` (not on `release/*`).
-4. Open and merge a Pull Request from `main` to `develop` for back-merge.
+1. Cut `release/*` from `develop`.
+2. On `release/*`: bump `package.json` with `npm pkg set version=X.Y.Z` (**never `npm version`** here), move `[Unreleased]` into `## [X.Y.Z] - YYYY-MM-DD` by hand, commit as `chore(release): prepare vX.Y.Z`. Apply any stabilization fixes as normal commits.
+3. Open and merge a Pull Request from `release/*` to `main` (no direct merge).
+4. On `main`, tag the merge commit directly — `git tag vX.Y.Z` (no `npm version`, since the bump already merged in).
+5. Open and merge a Pull Request from `main` to `develop` for back-merge.
 
-Release tags are created **from main** (on the merge commit), not from the release branch. That way the tag points to the exact commit that is the canonical release and matches what is on the default branch.
+Release tags are created **on `main`** (on the merge commit), not from the release branch. That way the tag points to the exact commit that is the canonical release and matches what is on the default branch.
 
 ```bash
-# 1. Create release branch from develop and prepare release commit(s)
+# 1. Create release branch from develop
 git checkout develop
 git checkout -b release/v0.2.0
-npm version minor --no-git-tag-version
+git push -u origin release/v0.2.0
+
+# 2. Prepare the release on the branch (no npm version!)
+npm pkg set version=0.2.0
+npm install --package-lock-only
+# ...move [Unreleased] into ## [0.2.0] - YYYY-MM-DD in CHANGELOG.md by hand...
 git add package.json package-lock.json CHANGELOG.md
 git commit -m "chore(release): prepare v0.2.0"
+git push
+# ...apply any further release-stabilization fixes here as normal commits...
 
-# 2. Open PR: release/v0.2.0 -> main, wait for checks/review, merge in GitHub
+# 3. Open PR: release/v0.2.0 -> main, wait for checks/review, merge in GitHub
 
-# 3. On updated main: npm version creates commit + v0.2.0 tag (postversion updates CHANGELOG)
+# 4. On updated main: tag the merge commit directly (already prepared, no npm version)
 git checkout main
 git pull origin main
-npm version minor   # or patch / major — must match prepared release
+git tag v0.2.0
 git push origin main
 git push origin v0.2.0
 
-# 4. Open PR: main -> develop for required back-merge, merge in GitHub
+# 5. Open PR: main -> develop for required back-merge, merge in GitHub
 
 # Optional: clean up pre-release/dev tags for this version
 # node scripts/delete-test-dev-tags.mjs
 ```
+
+If `release/*` was **not** prepared in step 2 (bump skipped), fall back to running `npm version` directly on `main` in step 4 instead of a plain `git tag` — see the "Using npm version" section above for that path.
 
 ### Development Version Tag Testing
 
