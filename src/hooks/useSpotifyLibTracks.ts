@@ -15,6 +15,9 @@ export function useListSpotifyLibTracks(pageSize = process.env.NEXT_PUBLIC_SPOTI
     queryKey: libraryQueryKeys.me.spotify.all,
     queryFn: async ({ pageParam = 1 }) => {
       const response = await fetch(libraryEndpoints.me.spotify.list(), true, true, {}, { page: pageParam, pageSize });
+      if (response == null) {
+        throw new Error("Spotify library tracks unavailable");
+      }
       return parseWithLog(PaginatedResponseSchema(SpotifyLibTrackSimpleSchema), response, "useListSpotifyLibTracks");
     },
     getNextPageParam: (lastPage) => {
