@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
 import {
@@ -17,11 +17,16 @@ import { getBackendBaseUrl } from "@lib/site-urls";
 // Surfaces the same query state GenreTreeView consumes internally, since that
 // component's loading state isn't otherwise observable from this page.
 function GenreTreeQueryDiagnostics() {
-  const backendBaseUrl = getBackendBaseUrl();
+  const [backendBaseUrl, setBackendBaseUrl] = useState<string | null>(null);
   const { data, status, fetchStatus, isPending, isError, error, dataUpdatedAt, errorUpdatedAt } =
     useListFullGenrePlaylists("reference", getBackendBaseUrl);
 
   useEffect(() => {
+    setBackendBaseUrl(getBackendBaseUrl());
+  }, []);
+
+  useEffect(() => {
+    if (backendBaseUrl === null) return;
     console.log("[diag:genre-tree]", {
       backendBaseUrl,
       status,
@@ -40,7 +45,7 @@ function GenreTreeQueryDiagnostics() {
       data-diag="genre-tree-query"
       className="fixed bottom-2 right-2 z-50 max-w-sm rounded-md bg-black/80 p-3 text-xs text-white font-mono"
     >
-      <div>backend: {backendBaseUrl}</div>
+      <div>backend: {backendBaseUrl ?? "…"}</div>
       <div>
         status: {status} / fetchStatus: {fetchStatus}
       </div>
