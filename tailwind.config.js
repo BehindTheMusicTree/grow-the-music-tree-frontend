@@ -3,7 +3,11 @@
 const playerHeight = "80px";
 const bannerHeight = "64px";
 const config = {
-  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{vue,js,ts,jsx,tsx}",
+    "./node_modules/@behindthemusictree/**/dist/**/*.{js,cjs}",
+  ],
   theme: {
     extend: {
       colors: {
