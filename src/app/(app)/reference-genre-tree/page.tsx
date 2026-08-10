@@ -35,8 +35,6 @@ function GenreTreeQueryDiagnostics() {
     });
   }, [backendBaseUrl, status, fetchStatus, isPending, isError, error, data, dataUpdatedAt, errorUpdatedAt]);
 
-  if (process.env.NEXT_PUBLIC_VERCEL_ENV === "production") return null;
-
   return (
     <div
       data-diag="genre-tree-query"
@@ -101,7 +99,7 @@ export default function ReferenceGenreTreePage() {
         getBackendBaseUrl={getBackendBaseUrl}
         uploadTimeoutMs={uploadTimeoutMs}
       />
-      <GenreTreeQueryDiagnostics />
+      {process.env.NEXT_PUBLIC_VERCEL_ENV !== "production" && <GenreTreeQueryDiagnostics />}
     </Page>
   );
 }
