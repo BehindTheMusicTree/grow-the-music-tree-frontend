@@ -85,6 +85,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### CI
+
+- **GitHub Copilot code review**: Added `.github/copilot-instructions.md` pointing Copilot's PR review at this repo's conventions (`CONTRIBUTING.md`, `docs/STYLE_GUIDE.md`, `.cursor/rules/*.mdc`).
+
 ### Fixed
 
 - **Spotify library tracks**: Guarded `useListSpotifyLibTracks` against `fetchWrapper` resolving to `null` (auth not ready yet, or a handled connectivity/backend error), throwing a clear error instead of feeding `null` into `parseWithLog`'s root schema, which previously logged a confusing `{ fieldErrors: {}, formErrors: ['Expected object, received null'] }` Zod-flatten dump.
