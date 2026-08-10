@@ -90,6 +90,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **GitHub Copilot code review**: Added `.github/copilot-instructions.md` pointing Copilot's PR review at this repo's conventions (`CONTRIBUTING.md`, `docs/STYLE_GUIDE.md`, `.cursor/rules/*.mdc`).
 - **PR type labeler**: Fixed `breaking-change` auto-labeling false positive — the detector matched any non-empty text after the `## Breaking Changes` heading, including the PR template's own HTML-comment placeholder and a plain "None." filler, so it labeled nearly every PR as a breaking change. It now strips HTML comments and ignores "None"/"N/A" filler before checking for real content.
 
+### Changed
+
+- **`@behindthemusictree/app-kit`**: Bumped to `0.1.9`. `GenreTreeSkeleton` now renders a horizontal SVG tree (rounded cards, curved connectors, root accent dot, shimmer sweep) that visually approximates the real `GenreTreeView` layout, replacing the previous dark, vertically-indented avatar+bar list skeleton.
+
 ### Fixed
 
 - **Spotify library tracks**: Guarded `useListSpotifyLibTracks` against `fetchWrapper` resolving to `null` (auth not ready yet, or a handled connectivity/backend error), throwing a clear error instead of feeding `null` into `parseWithLog`'s root schema, which previously logged a confusing `{ fieldErrors: {}, formErrors: ['Expected object, received null'] }` Zod-flatten dump.
