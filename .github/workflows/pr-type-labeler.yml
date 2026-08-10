@@ -55,13 +55,19 @@ jobs:
             // Check for '!' in title (Conventional Commits breaking change indicator)
             // Check for checked breaking change checkbox
             // Check for "BREAKING CHANGE:" in body (Conventional Commits format)
-            // Check for content in Breaking Changes section (not just the template header)
+            // Check for real content in the Breaking Changes section (not just the
+            // template header, its HTML-comment placeholder, or a "None"/"N/A" filler)
             const hasBreakingInTitle = title.includes('!');
             const hasCheckedBreakingCheckbox = body.includes('[x] 💥 Breaking change') || body.includes('[X] 💥 Breaking change');
-            const hasBreakingChangeNote = body.includes('BREAKING CHANGE:') || body.match(/BREAKING CHANGE\s*:/i);
-            const breakingChangesSection = body.match(/## Breaking Changes\s*\n\s*[^#\n]/i);
+            const hasBreakingChangeNote = body.includes('BREAKING CHANGE:') || /BREAKING CHANGE\s*:/i.test(body);
+            const breakingChangesMatch = body.match(/## Breaking Changes\s*\n([\s\S]*?)(?=\n## |$)/i);
+            const breakingChangesContent = breakingChangesMatch
+              ? breakingChangesMatch[1].replace(/<!--[\s\S]*?-->/g, '').trim()
+              : '';
+            const hasBreakingChangesSection = breakingChangesContent.length > 0 &&
+              !/^(none|n\/a|na)\.?$/i.test(breakingChangesContent);
 
-            if (hasBreakingInTitle || hasCheckedBreakingCheckbox || hasBreakingChangeNote || breakingChangesSection) {
+            if (hasBreakingInTitle || hasCheckedBreakingCheckbox || hasBreakingChangeNote || hasBreakingChangesSection) {
               labels.push('breaking-change');
             }
 

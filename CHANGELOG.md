@@ -88,6 +88,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### CI
 
 - **GitHub Copilot code review**: Added `.github/copilot-instructions.md` pointing Copilot's PR review at this repo's conventions (`CONTRIBUTING.md`, `docs/STYLE_GUIDE.md`, `.cursor/rules/*.mdc`).
+- **PR type labeler**: Fixed `breaking-change` auto-labeling false positive — the detector matched any non-empty text after the `## Breaking Changes` heading, including the PR template's own HTML-comment placeholder and a plain "None." filler, so it labeled nearly every PR as a breaking change. It now strips HTML comments and ignores "None"/"N/A" filler before checking for real content.
 
 ### Fixed
 
