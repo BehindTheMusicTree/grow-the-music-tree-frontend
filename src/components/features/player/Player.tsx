@@ -117,7 +117,7 @@ export default function Player({ className }: PlayerProps) {
         <button
           onClick={toggleTrackListSidebar}
           className="flex min-w-0 flex-1 flex-col items-start justify-center bg-transparent text-left"
-          aria-label={isTrackListSidebarVisible ? "Hide track in list" : "Show track in list"}
+          aria-label={isTrackListSidebarVisible ? "Hide track list" : "Show track list"}
         >
           <span className="text-sm font-medium text-overflow">{playerTrackObject.track.title}</span>
           <span className="text-xs text-gray-400 text-overflow">
