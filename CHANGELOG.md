@@ -92,7 +92,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
-- **`@behindthemusictree/app-kit`**: Bumped to `0.1.10`. `GenreTreeSkeleton` now renders a horizontal SVG tree (rounded cards, curved connectors, root accent dot, shimmer sweep) that visually approximates the real `GenreTreeView` layout, replacing the previous dark, vertically-indented avatar+bar list skeleton. (`0.1.10` itself only adds a GitHub Copilot code-review skill to the app-kit repo — no functional change.)
+- **`@behindthemusictree/app-kit`**: Bumped to `0.1.11`. `GenreTreeSkeleton` now renders a horizontal SVG tree (rounded cards, curved connectors, root accent dot, shimmer sweep) that visually approximates the real `GenreTreeView` layout, replacing the previous dark, vertically-indented avatar+bar list skeleton. `GenreTreeView`'s "Add root" button is now hidden while the tree is loading, instead of staying visible and clickable throughout. (`0.1.10` only added a GitHub Copilot code-review skill to the app-kit repo — no functional change.)
 
 ### Fixed
 
