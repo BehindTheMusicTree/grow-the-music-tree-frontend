@@ -31,7 +31,7 @@ export default function ProgressBar({ className }: ProgressBarProps) {
       value={currentTime}
       onChange={handleSeek}
       aria-label="Seek"
-      className={`h-1 w-full cursor-pointer appearance-none bg-gray-800 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:opacity-0 [&::-webkit-slider-thumb]:transition-opacity hover:[&::-webkit-slider-thumb]:opacity-100 ${className ?? ""}`}
+      className={`h-1 w-full cursor-pointer appearance-none bg-gray-800 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:opacity-0 [&::-moz-range-thumb]:transition-opacity [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:opacity-0 [&::-webkit-slider-thumb]:transition-opacity hover:[&::-moz-range-thumb]:opacity-100 hover:[&::-webkit-slider-thumb]:opacity-100 ${className ?? ""}`}
       style={{
         background: `linear-gradient(to right, #9ca3af ${progress}%, #27272a ${progress}%)`,
       }}
