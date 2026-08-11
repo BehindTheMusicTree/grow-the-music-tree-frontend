@@ -77,8 +77,8 @@ export default function AppHeader({ className }: AppHeaderProps) {
         </nav>
       </div>
       <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-        <span className="pointer-events-auto inline-flex rounded-full border border-zinc-200 bg-white shadow-sm transition-colors hover:border-zinc-300 hover:bg-zinc-50">
-          <TheMusicTreeByline imageStyle={{ height: 48, width: "auto" }} />
+        <span className="pointer-events-auto inline-flex opacity-80 transition-opacity hover:opacity-100">
+          <TheMusicTreeByline variant="onDark" imageStyle={{ height: 28, width: "auto" }} />
         </span>
       </div>
     </header>
