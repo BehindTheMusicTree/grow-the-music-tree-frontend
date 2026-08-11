@@ -26,7 +26,6 @@ export const AUTH_CONFIG: readonly RouteAuthConfigItem[] = [
 export const PATHS_EXCLUDED_FROM_HEADER_NAV: ReadonlySet<string> = new Set([
   PATHS.ME_SPOTIFY_LIBRARY,
   PATHS.ACCOUNT,
-  PATHS.ABOUT,
 ]);
 
 export function getRouteAuthRequirement(pathname: string): RouteAuthRequirement {
