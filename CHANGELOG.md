@@ -85,6 +85,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-08-11
+
 ### CI
 
 - **GitHub Copilot code review**: Added `.github/copilot-instructions.md` pointing Copilot's PR review at this repo's conventions (`CONTRIBUTING.md`, `docs/STYLE_GUIDE.md`, `.cursor/rules/*.mdc`).
@@ -99,6 +101,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Spotify library tracks**: Guarded `useListSpotifyLibTracks` against `fetchWrapper` resolving to `null` (auth not ready yet, or a handled connectivity/backend error), throwing a clear error instead of feeding `null` into `parseWithLog`'s root schema, which previously logged a confusing `{ fieldErrors: {}, formErrors: ['Expected object, received null'] }` Zod-flatten dump.
 - **`@behindthemusictree/app-kit`**: Bumped to `0.1.7`, which closes the same class of bug at its source — `parseWithLog` now throws a clear `"received null response before schema validation"` error for any `null`/`undefined` response instead of running it through `schema.safeParse`, covering every other app-kit consumer (`useFetchGenre`, `useQueryWithParse`, etc.) that previously had no guard.
 - **`@behindthemusictree/app-kit`**: Bumped to `0.1.8`. This release only fixes a CORS issue in app-kit's own `apps/playground` (unused here); no behavior change for this app.
+
 
 ## [2.0.0] - 2026-08-09
 
