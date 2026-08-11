@@ -156,6 +156,7 @@ export default function Player({ className }: PlayerProps) {
             max="100"
             value={volume}
             onChange={(e) => handleVolumeChange(Number(e.target.value))}
+            aria-label="Volume"
             className="w-16"
           />
         </div>
