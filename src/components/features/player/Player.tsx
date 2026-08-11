@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import { FaVolumeUp, FaVolumeMute, FaList } from "react-icons/fa";
+import { FaVolumeUp, FaVolumeMute } from "react-icons/fa";
 import { usePlayer, useCurrentTime, PlayerTrack } from "@behindthemusictree/app-kit/player";
 import { useTrackList, useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
 import { toPlayerTrack } from "@lib/player-track";
@@ -13,6 +12,12 @@ interface PlayerProps {
   className?: string;
 }
 
+function formatTime(time: number): string {
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60);
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+
 export default function Player({ className }: PlayerProps) {
   const {
     playerTrackObject,
@@ -20,6 +25,7 @@ export default function Player({ className }: PlayerProps) {
     isPlaying,
     volume,
     setVolume,
+    duration,
     handlePlayPauseAction,
     handleNextTrack,
     handlePreviousTrack,
@@ -101,27 +107,24 @@ export default function Player({ className }: PlayerProps) {
   }
 
   return (
-    <div className={`w-full bg-black text-white p-4 h-player ${className}`}>
-      <div className="flex items-center h-full">
-        <div className="flex items-center flex-1 min-w-0">
-          <Image
-            src="/assets/album-cover-default.png"
-            alt={playerTrackObject.track.title}
-            width={64}
-            height={64}
-            className="w-16 h-16 rounded flex-shrink-0"
-          />
-          <div className="ml-4 min-w-0 flex-1 flex flex-col justify-center">
-            <h3 className="font-bold text-lg text-overflow">{playerTrackObject.track.title}</h3>
-            <p className="text-gray-400 text-base text-overflow">
-              {playerTrackObject.track.artists?.map((artist) => artist.name).join(", ") ?? ""}
-            </p>
-            {playerTrackObject.loadError && (
-              <p className="text-red-400 text-sm text-overflow">{playerTrackObject.loadError}</p>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-col justify-center items-center flex-1 space-y-3">
+    <div className={`relative w-full bg-black text-white h-player ${className ?? ""}`}>
+      <ProgressBar className="absolute inset-x-0 top-0" />
+      <div className="flex h-full items-center gap-4 px-4">
+        <button
+          onClick={toggleTrackListSidebar}
+          className="flex min-w-0 flex-1 flex-col items-start justify-center bg-transparent text-left"
+          aria-label={isTrackListSidebarVisible ? "Hide track in list" : "Show track in list"}
+        >
+          <span className="text-sm font-medium text-overflow">{playerTrackObject.track.title}</span>
+          <span className="text-xs text-gray-400 text-overflow">
+            {playerTrackObject.track.artists?.map((artist) => artist.name).join(", ") ?? ""}
+          </span>
+          {playerTrackObject.loadError && (
+            <span className="text-xs text-red-400 text-overflow">{playerTrackObject.loadError}</span>
+          )}
+        </button>
+
+        <div className="flex shrink-0 items-center gap-3">
           <PlayerControls
             isPlaying={isPlaying}
             isLoading={isLoading}
@@ -130,37 +133,27 @@ export default function Player({ className }: PlayerProps) {
             onPrevious={handlePrevious}
             isNextDisabled={!hasNextTrack}
           />
-          <ProgressBar />
+          <span className="hidden text-xs text-gray-500 sm:inline">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
         </div>
-        <div className="flex items-center justify-end flex-1">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={handleVolumeToggle}
-                className="text-gray-400 hover:text-white bg-transparent transition-colors"
-                aria-label={isMuted ? "Unmute" : "Mute"}
-              >
-                {isMuted ? <FaVolumeMute size={16} /> : <FaVolumeUp size={16} />}
-              </button>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={volume}
-                onChange={(e) => handleVolumeChange(Number(e.target.value))}
-                className="w-24"
-              />
-            </div>
-            <button
-              onClick={toggleTrackListSidebar}
-              className={`bg-transparent transition-colors ${
-                isTrackListSidebarVisible ? "text-white" : "text-gray-400 hover:text-white"
-              }`}
-              aria-label="Toggle tracklist"
-            >
-              <FaList size={20} />
-            </button>
-          </div>
+
+        <div className="hidden shrink-0 items-center gap-2 sm:flex">
+          <button
+            onClick={handleVolumeToggle}
+            className="bg-transparent text-gray-400 transition-colors hover:text-white"
+            aria-label={isMuted ? "Unmute" : "Mute"}
+          >
+            {isMuted ? <FaVolumeMute size={14} /> : <FaVolumeUp size={14} />}
+          </button>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={volume}
+            onChange={(e) => handleVolumeChange(Number(e.target.value))}
+            className="w-16"
+          />
         </div>
       </div>
     </div>

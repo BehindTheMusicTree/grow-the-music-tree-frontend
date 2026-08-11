@@ -17,33 +17,24 @@ export default function ProgressBar({ className }: ProgressBarProps) {
     playerTrackObject.audioElement.currentTime = newTime;
   };
 
-  const formatTime = (time: number): string => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  };
-
   if (!playerTrackObject || duration === 0) {
     return null;
   }
 
+  const progress = (currentTime / duration) * 100;
+
   return (
-    <div className={`flex items-center justify-center ${className}`}>
-      <span className="text-xs text-gray-400 w-6 text-right mr-2">{formatTime(currentTime)}</span>
-      <input
-        type="range"
-        min="0"
-        max={duration}
-        value={currentTime}
-        onChange={handleSeek}
-        className="w-80 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-        style={{
-          background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(currentTime / duration) * 100}%, #374151 ${
-            (currentTime / duration) * 100
-          }%, #374151 100%)`,
-        }}
-      />
-      <span className="text-xs text-gray-400 w-6 text-left ml-2">{formatTime(duration)}</span>
-    </div>
+    <input
+      type="range"
+      min="0"
+      max={duration}
+      value={currentTime}
+      onChange={handleSeek}
+      aria-label="Seek"
+      className={`h-1 w-full cursor-pointer appearance-none bg-gray-800 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:opacity-0 [&::-webkit-slider-thumb]:transition-opacity hover:[&::-webkit-slider-thumb]:opacity-100 ${className ?? ""}`}
+      style={{
+        background: `linear-gradient(to right, #9ca3af ${progress}%, #27272a ${progress}%)`,
+      }}
+    />
   );
 }
