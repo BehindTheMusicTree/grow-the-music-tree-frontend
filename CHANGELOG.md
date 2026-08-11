@@ -85,6 +85,21 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### CI
+
+- **GitHub Copilot code review**: Added `.github/copilot-instructions.md` pointing Copilot's PR review at this repo's conventions (`CONTRIBUTING.md`, `docs/STYLE_GUIDE.md`, `.cursor/rules/*.mdc`).
+- **PR type labeler**: Fixed `breaking-change` auto-labeling false positive — the detector matched any non-empty text after the `## Breaking Changes` heading, including the PR template's own HTML-comment placeholder and a plain "None." filler, so it labeled nearly every PR as a breaking change. It now strips HTML comments and ignores "None"/"N/A" filler before checking for real content.
+
+### Changed
+
+- **`@behindthemusictree/app-kit`**: Bumped to `0.1.11`. `GenreTreeSkeleton` now renders a horizontal SVG tree (rounded cards, curved connectors, root accent dot, shimmer sweep) that visually approximates the real `GenreTreeView` layout, replacing the previous dark, vertically-indented avatar+bar list skeleton. `GenreTreeView`'s "Add root" button is now hidden while the tree is loading, instead of staying visible and clickable throughout. (`0.1.10` only added a GitHub Copilot code-review skill to the app-kit repo — no functional change.)
+
+### Fixed
+
+- **Spotify library tracks**: Guarded `useListSpotifyLibTracks` against `fetchWrapper` resolving to `null` (auth not ready yet, or a handled connectivity/backend error), throwing a clear error instead of feeding `null` into `parseWithLog`'s root schema, which previously logged a confusing `{ fieldErrors: {}, formErrors: ['Expected object, received null'] }` Zod-flatten dump.
+- **`@behindthemusictree/app-kit`**: Bumped to `0.1.7`, which closes the same class of bug at its source — `parseWithLog` now throws a clear `"received null response before schema validation"` error for any `null`/`undefined` response instead of running it through `schema.safeParse`, covering every other app-kit consumer (`useFetchGenre`, `useQueryWithParse`, etc.) that previously had no guard.
+- **`@behindthemusictree/app-kit`**: Bumped to `0.1.8`. This release only fixes a CORS issue in app-kit's own `apps/playground` (unused here); no behavior change for this app.
+
 ## [2.0.0] - 2026-08-09
 
 ### Changed

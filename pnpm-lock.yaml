@@ -19,8 +19,8 @@ importers:
   .:
     dependencies:
       '@behindthemusictree/app-kit':
-        specifier: 0.1.6
-        version: 0.1.6(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.2.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: 0.1.11
+        version: 0.1.11(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.2.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@behindthemusictree/brand':
         specifier: 11.5.2
         version: 11.5.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -302,8 +302,8 @@ packages:
     resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
 
-  '@behindthemusictree/app-kit@0.1.6':
-    resolution: {integrity: sha512-PjEMiubUMeEoEVIqDrDuWziVhZUq++eP54s4K1hsIp7IqcB27Riw+psZyadQjW0zcx7adsidSJrcA0X97YGkMA==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/app-kit/0.1.6/86bfe5916432abd41509f27fbbecb45eac48d2b7}
+  '@behindthemusictree/app-kit@0.1.11':
+    resolution: {integrity: sha512-lZGI+vVSVUVPY0ID6pu+KyFY8z6Lycvh53IeQtEvtlrdbHvi4V8awlrbKrhDdXTYkRb8YIPxmopz6RO91p0BKA==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/app-kit/0.1.11/5182ba4896decaf3d8176a0cf531bb0def93cd8c}
     peerDependencies:
       '@tanstack/react-query': '>=5.0.0'
       next: '>=14.0.0'
@@ -4340,7 +4340,7 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
-  '@behindthemusictree/app-kit@0.1.6(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.2.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@behindthemusictree/app-kit@0.1.11(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.2.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@behindthemusictree/genre-tree-view': 0.3.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tanstack/react-query': 5.72.2(react@19.1.0)
