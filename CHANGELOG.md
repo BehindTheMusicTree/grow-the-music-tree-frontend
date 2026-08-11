@@ -102,6 +102,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Header nav**: Added an "About" link to the main header nav. The `/about` page previously had no entry point anywhere in the UI.
 - **`@behindthemusictree/app-kit`**: Bumped to `0.1.11`. `GenreTreeSkeleton` now renders a horizontal SVG tree (rounded cards, curved connectors, root accent dot, shimmer sweep) that visually approximates the real `GenreTreeView` layout, replacing the previous dark, vertically-indented avatar+bar list skeleton. `GenreTreeView`'s "Add root" button is now hidden while the tree is loading, instead of staying visible and clickable throughout. (`0.1.10` only added a GitHub Copilot code-review skill to the app-kit repo — no functional change.)
 
 ### Fixed
