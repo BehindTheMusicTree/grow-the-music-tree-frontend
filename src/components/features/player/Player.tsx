@@ -103,7 +103,11 @@ export default function Player({ className }: PlayerProps) {
   };
 
   if (!playerTrackObject) {
-    return null;
+    return (
+      <div className={`flex w-full items-center bg-black px-4 text-white h-player ${className ?? ""}`}>
+        <span className="text-xs text-gray-500">Nothing playing — pick a track from the tree</span>
+      </div>
+    );
   }
 
   return (

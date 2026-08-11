@@ -157,11 +157,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
     routeRequiresSpotify,
   ]);
 
-  // Calculate dynamic heights based on player visibility
-  const centerMaxHeight = {
-    centerWithPlayer: `calc(100vh - ${BANNER_HEIGHT + PLAYER_HEIGHT}px)`,
-    centerWithoutPlayer: `calc(100vh - ${BANNER_HEIGHT}px)`,
-  };
+  const centerMaxHeight = `calc(100vh - ${BANNER_HEIGHT + PLAYER_HEIGHT}px)`;
 
   return (
     <div className="app col h-screen">
@@ -170,9 +166,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
 
       <div
         className="center fixed top-banner flex h-full w-full bg-gray-100"
-        style={{
-          maxHeight: playerTrackObject ? centerMaxHeight.centerWithPlayer : centerMaxHeight.centerWithoutPlayer,
-        }}
+        style={{ maxHeight: centerMaxHeight }}
       >
         <div className="relative flex min-h-0 w-full flex-grow">
           <div className="min-h-0 flex-grow w-full flex" style={activePopup ? { filter: "blur(4px)" } : undefined}>
@@ -189,14 +183,12 @@ export default function AppContent({ children }: { children: ReactNode }) {
         </div>
       </div>
 
-      {playerTrackObject && (
-        <div className="fixed bottom-0 left-0 right-0 z-50">
-          <div style={activePopup ? { filter: "blur(4px)" } : undefined}>
-            <Player className="relative z-0" />
-          </div>
-          {activePopup && <div className="absolute inset-0 z-10 pointer-events-none bg-black/10" aria-hidden />}
+      <div className="fixed bottom-0 left-0 right-0 z-50">
+        <div style={activePopup ? { filter: "blur(4px)" } : undefined}>
+          <Player className="relative z-0" />
         </div>
-      )}
+        {activePopup && <div className="absolute inset-0 z-10 pointer-events-none bg-black/10" aria-hidden />}
+      </div>
       <AutoAdvance />
       {activePopup}
     </div>
