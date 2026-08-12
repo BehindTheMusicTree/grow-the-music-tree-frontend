@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
-import { TheMusicTreeByline } from "@behindthemusictree/brand/components";
 import { getAudiometaUrl } from "@lib/site-urls";
 import { MenuGroup } from "./MenuGroup";
 import {
@@ -57,7 +56,7 @@ export default function AppHeader({ className }: AppHeaderProps) {
     <header
       className={`fixed top-0 z-50 flex h-banner w-full shrink-0 items-stretch border-b border-zinc-800 bg-black text-gray-100 ${className ?? ""}`}
     >
-      <div className="flex min-h-0 min-w-0 flex-1 items-center gap-2 py-2 pl-3 pr-14 sm:pr-16">
+      <div className="flex min-h-0 min-w-0 flex-1 items-center gap-2 py-2 pl-3 pr-3">
         <Link
           href={ROUTE_PATHS.REFERENCE_GENRE_TREE}
           prefetch={false}
@@ -75,11 +74,6 @@ export default function AppHeader({ className }: AppHeaderProps) {
         >
           <MenuGroup items={menuGroup} layout="horizontal" />
         </nav>
-      </div>
-      <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-        <span className="pointer-events-auto inline-flex rounded-full border border-zinc-200 bg-white shadow-sm transition-colors hover:border-zinc-300 hover:bg-zinc-50">
-          <TheMusicTreeByline imageStyle={{ height: 48, width: "auto" }} />
-        </span>
       </div>
     </header>
   );
