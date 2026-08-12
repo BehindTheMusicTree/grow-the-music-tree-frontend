@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 
-const playerHeight = "80px";
+const playerHeight = "56px";
 const bannerHeight = "64px";
 const config = {
   content: [

@@ -19,7 +19,7 @@
     "postversion": "node scripts/update-changelog-release.mjs && git add CHANGELOG.md && git commit --amend --no-edit && (v=$(node -p \"require('./package.json').version\"); git tag -d v$v 2>/dev/null; git tag v$v) && node scripts/delete-test-dev-tags.mjs"
   },
   "dependencies": {
-    "@behindthemusictree/app-kit": "0.1.11",
+    "@behindthemusictree/app-kit": "0.1.12",
     "@behindthemusictree/brand": "11.5.2",
     "@behindthemusictree/genre-tree-view": "0.3.0",
     "@fortawesome/fontawesome-svg-core": "6.5.2",

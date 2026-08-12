@@ -10,6 +10,7 @@ interface PlayerControlsProps {
   onNext: () => void;
   onPrevious: () => void;
   isNextDisabled?: boolean;
+  disabled?: boolean;
 }
 
 export default function PlayerControls({
@@ -19,37 +20,33 @@ export default function PlayerControls({
   onNext,
   onPrevious,
   isNextDisabled = false,
+  disabled = false,
 }: PlayerControlsProps) {
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex items-center gap-3">
       <button
         onClick={onPrevious}
-        className="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-200 hover:text-white transition-colors"
+        disabled={disabled}
+        className="bg-transparent text-gray-400 transition-colors hover:text-white disabled:pointer-events-none disabled:opacity-50"
         aria-label="Previous track"
       >
-        <FaStepBackward size={16} />
+        <FaStepBackward size={14} />
       </button>
       <button
         onClick={onPlayPause}
-        className="w-14 h-14 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-200 hover:text-white transition-all duration-200 hover:scale-105"
+        disabled={isLoading || disabled}
+        className="bg-transparent text-gray-200 transition-colors hover:text-white disabled:pointer-events-none disabled:opacity-50"
         aria-label={isLoading ? "Loading" : isPlaying ? "Pause" : "Play"}
-        disabled={isLoading}
       >
-        {isLoading ? (
-          <RingLoader size={24} />
-        ) : isPlaying ? (
-          <FaPause size={24} />
-        ) : (
-          <FaPlay size={24} className="ml-1" />
-        )}
+        {isLoading ? <RingLoader size={18} /> : isPlaying ? <FaPause size={18} /> : <FaPlay size={18} />}
       </button>
       <button
         onClick={onNext}
-        disabled={isNextDisabled}
-        className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-800 text-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none hover:bg-gray-700 hover:text-white"
+        disabled={isNextDisabled || disabled}
+        className="bg-transparent text-gray-400 transition-colors hover:text-white disabled:pointer-events-none disabled:opacity-50"
         aria-label="Next track"
       >
-        <FaStepForward size={16} />
+        <FaStepForward size={14} />
       </button>
     </div>
   );
