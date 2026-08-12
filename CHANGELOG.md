@@ -87,7 +87,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
-- **Player footer**: Added TheMusicTree brand badge (`TheMusicTreeByline` in a pill, matching the header's treatment) to the persistent player footer.
+- **Player footer**: Added TheMusicTree brand badge (`TheMusicTreeByline` in a pill) to the persistent player footer, moved there from the app header, which no longer shows it.
 
 ### CI
 
