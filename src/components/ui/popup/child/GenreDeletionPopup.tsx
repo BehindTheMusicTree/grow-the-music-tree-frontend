@@ -1,7 +1,7 @@
 "use client";
 
 import { BasePopup, BasePopupProps } from "../BasePopup";
-import { Button } from "@components/ui/Button";
+import { Button } from "@behindthemusictree/app-kit/ui";
 import { Trash2 } from "lucide-react";
 
 interface Genre {
