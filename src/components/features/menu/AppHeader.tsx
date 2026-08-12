@@ -6,6 +6,7 @@ import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { getAudiometaUrl } from "@lib/site-urls";
 import { MenuGroup } from "./MenuGroup";
+import { HeaderMenuDropdown } from "./HeaderMenuDropdown";
 import {
   PATHS as ROUTE_PATHS,
   AUTH_CONFIG as ROUTE_AUTH_CONFIG,
@@ -57,6 +58,7 @@ export default function AppHeader({ className }: AppHeaderProps) {
       className={`fixed top-0 z-50 flex h-banner w-full shrink-0 items-stretch border-b border-zinc-800 bg-black text-gray-100 ${className ?? ""}`}
     >
       <div className="flex min-h-0 min-w-0 flex-1 items-center gap-2 py-2 pl-3 pr-3">
+        <HeaderMenuDropdown />
         <Link
           href={ROUTE_PATHS.REFERENCE_GENRE_TREE}
           prefetch={false}
