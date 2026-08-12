@@ -17,7 +17,19 @@ export default function ProgressBar({ className }: ProgressBarProps) {
     playerTrackObject.audioElement.currentTime = newTime;
   };
 
-  if (!playerTrackObject || duration === 0) {
+  if (!playerTrackObject) {
+    return (
+      <input
+        type="range"
+        disabled
+        value={0}
+        aria-label="Seek"
+        className={`h-1 w-full cursor-not-allowed appearance-none bg-gray-800 opacity-50 ${className ?? ""}`}
+      />
+    );
+  }
+
+  if (duration === 0) {
     return null;
   }
 

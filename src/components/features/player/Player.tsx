@@ -102,14 +102,6 @@ export default function Player({ className }: PlayerProps) {
     }
   };
 
-  if (!playerTrackObject) {
-    return (
-      <div className={`flex w-full items-center bg-black px-4 text-white h-player ${className ?? ""}`}>
-        <span className="text-xs text-gray-500">Nothing playing — pick a track from the tree</span>
-      </div>
-    );
-  }
-
   return (
     <div className={`relative w-full bg-black text-white h-player ${className ?? ""}`}>
       <ProgressBar className="absolute inset-x-0 top-0" />
@@ -119,11 +111,15 @@ export default function Player({ className }: PlayerProps) {
           className="flex min-w-0 flex-1 flex-col items-start justify-center bg-transparent text-left"
           aria-label={isTrackListSidebarVisible ? "Hide track list" : "Show track list"}
         >
-          <span className="text-sm font-medium text-overflow">{playerTrackObject.track.title}</span>
-          <span className="text-xs text-gray-400 text-overflow">
-            {playerTrackObject.track.artists?.map((artist) => artist.name).join(", ") ?? ""}
+          <span className="text-sm font-medium text-overflow">
+            {playerTrackObject?.track.title ?? "Nothing playing"}
           </span>
-          {playerTrackObject.loadError && (
+          <span className="text-xs text-gray-400 text-overflow">
+            {playerTrackObject
+              ? (playerTrackObject.track.artists?.map((artist) => artist.name).join(", ") ?? "")
+              : "Pick a track from the tree"}
+          </span>
+          {playerTrackObject?.loadError && (
             <span className="text-xs text-red-400 text-overflow">{playerTrackObject.loadError}</span>
           )}
         </button>
@@ -136,6 +132,7 @@ export default function Player({ className }: PlayerProps) {
             onNext={handleNext}
             onPrevious={handlePrevious}
             isNextDisabled={!hasNextTrack}
+            disabled={!playerTrackObject}
           />
           <span className="hidden text-xs text-gray-500 sm:inline">
             {formatTime(currentTime)} / {formatTime(duration)}
@@ -145,7 +142,8 @@ export default function Player({ className }: PlayerProps) {
         <div className="hidden shrink-0 items-center gap-2 sm:flex">
           <button
             onClick={handleVolumeToggle}
-            className="bg-transparent text-gray-400 transition-colors hover:text-white"
+            disabled={!playerTrackObject}
+            className="bg-transparent text-gray-400 transition-colors hover:text-white disabled:pointer-events-none disabled:opacity-50"
             aria-label={isMuted ? "Unmute" : "Mute"}
           >
             {isMuted ? <FaVolumeMute size={14} /> : <FaVolumeUp size={14} />}
@@ -156,8 +154,9 @@ export default function Player({ className }: PlayerProps) {
             max="100"
             value={volume}
             onChange={(e) => handleVolumeChange(Number(e.target.value))}
+            disabled={!playerTrackObject}
             aria-label="Volume"
-            className="w-16"
+            className="w-16 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
       </div>
