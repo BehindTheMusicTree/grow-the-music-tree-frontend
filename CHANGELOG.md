@@ -85,6 +85,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-08-12
+
 ### Added
 
 - **Player footer**: Added TheMusicTree brand badge (`TheMusicTreeByline` in a pill) to the persistent player footer, moved there from the app header, which no longer shows it.
@@ -92,6 +94,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Changed
 
 - **Audio player**: Redesigned as a compact 56px "now playing" strip instead of a Spotify/Windows-Media-Player-style transport bar. Dropped the album-art image and large circular buttons; the track title/artist is now clickable and opens the tracklist sidebar, transport controls are flat icons, and the seek bar is a thin neutral strip along the top edge instead of a thick blue slider. It also now renders unconditionally as a persistent footer with an idle state, instead of mounting/unmounting (and shifting content height) when playback starts and stops.
+
 
 ## [2.0.1] - 2026-08-11
 
