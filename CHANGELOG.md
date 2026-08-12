@@ -85,6 +85,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Player footer**: Added TheMusicTree brand badge (`TheMusicTreeByline` in a pill, matching the header's treatment) to the persistent player footer.
+
 ### CI
 
 - **GitHub Copilot code review**: Added `.github/copilot-instructions.md` pointing Copilot's PR review at this repo's conventions (`CONTRIBUTING.md`, `docs/STYLE_GUIDE.md`, `.cursor/rules/*.mdc`).
