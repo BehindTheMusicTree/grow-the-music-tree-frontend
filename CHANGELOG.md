@@ -89,6 +89,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Player footer**: Added TheMusicTree brand badge (`TheMusicTreeByline` in a pill) to the persistent player footer, moved there from the app header, which no longer shows it.
 
+### Changed
+
+- **Audio player**: Redesigned as a compact 56px "now playing" strip instead of a Spotify/Windows-Media-Player-style transport bar. Dropped the album-art image and large circular buttons; the track title/artist is now clickable and opens the tracklist sidebar, transport controls are flat icons, and the seek bar is a thin neutral strip along the top edge instead of a thick blue slider. It also now renders unconditionally as a persistent footer with an idle state, instead of mounting/unmounting (and shifting content height) when playback starts and stops.
+
+## [2.0.1] - 2026-08-11
+
 ### CI
 
 - **GitHub Copilot code review**: Added `.github/copilot-instructions.md` pointing Copilot's PR review at this repo's conventions (`CONTRIBUTING.md`, `docs/STYLE_GUIDE.md`, `.cursor/rules/*.mdc`).
@@ -97,7 +103,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Changed
 
 - **`@behindthemusictree/app-kit`**: Bumped to `0.1.11`. `GenreTreeSkeleton` now renders a horizontal SVG tree (rounded cards, curved connectors, root accent dot, shimmer sweep) that visually approximates the real `GenreTreeView` layout, replacing the previous dark, vertically-indented avatar+bar list skeleton. `GenreTreeView`'s "Add root" button is now hidden while the tree is loading, instead of staying visible and clickable throughout. (`0.1.10` only added a GitHub Copilot code-review skill to the app-kit repo — no functional change.)
-- **Audio player**: Redesigned as a compact 56px "now playing" strip instead of a Spotify/Windows-Media-Player-style transport bar. Dropped the album-art image and large circular buttons; the track title/artist is now clickable and opens the tracklist sidebar, transport controls are flat icons, and the seek bar is a thin neutral strip along the top edge instead of a thick blue slider. It also now renders unconditionally as a persistent footer with an idle state, instead of mounting/unmounting (and shifting content height) when playback starts and stops.
 
 ### Fixed
 
