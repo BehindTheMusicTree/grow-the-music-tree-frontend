@@ -2,7 +2,7 @@
 
 import { FaSpotify } from "react-icons/fa";
 import { BasePopup, BasePopupProps } from "../BasePopup";
-import { Button } from "@components/ui/Button";
+import { Button } from "@behindthemusictree/app-kit/ui";
 import { User } from "lucide-react";
 import { getSpotifyAllowlistMailtoHref } from "@behindthemusictree/app-kit/transport";
 

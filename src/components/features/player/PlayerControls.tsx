@@ -1,7 +1,7 @@
 "use client";
 
 import { FaPlay, FaPause, FaStepForward, FaStepBackward } from "react-icons/fa";
-import RingLoader from "@components/ui/RingLoader";
+import { RingLoader } from "@behindthemusictree/app-kit/ui";
 
 interface PlayerControlsProps {
   isPlaying: boolean;
