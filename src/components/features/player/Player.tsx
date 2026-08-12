@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FaVolumeUp, FaVolumeMute } from "react-icons/fa";
 import { usePlayer, useCurrentTime, PlayerTrack } from "@behindthemusictree/app-kit/player";
 import { useTrackList, useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
+import { TheMusicTreeByline } from "@behindthemusictree/brand/components";
 import { toPlayerTrack } from "@lib/player-track";
 import PlayerControls from "./PlayerControls";
 import ProgressBar from "./ProgressBar";
@@ -159,6 +160,10 @@ export default function Player({ className }: PlayerProps) {
             className="w-16 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
+
+        <span className="inline-flex shrink-0 rounded-full border border-zinc-200 bg-white shadow-sm transition-colors hover:border-zinc-300 hover:bg-zinc-50">
+          <TheMusicTreeByline imageStyle={{ height: 32, width: "auto" }} />
+        </span>
       </div>
     </div>
   );
