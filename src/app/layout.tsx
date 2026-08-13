@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import { APP_NAME } from "@constants/app";
 import growTheMusicTreeFavicon from "@behindthemusictree/brand/favicons/grow-the-music-tree/favicon.svg";
 import "./globals.css";
+import "@behindthemusictree/brand/tokens/theme.css";
 import "@behindthemusictree/brand/styles/icon-links.css";
 import "@behindthemusictree/genre-tree-view/styles.css";
 

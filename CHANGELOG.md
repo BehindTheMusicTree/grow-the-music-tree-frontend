@@ -93,6 +93,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Audio player**: Redesigned as a compact 56px "now playing" strip instead of a Spotify/Windows-Media-Player-style transport bar. Dropped the album-art image and large circular buttons; the track title/artist is now clickable and opens the tracklist sidebar, transport controls are flat icons, and the seek bar is a thin neutral strip along the top edge instead of a thick blue slider. It also now renders unconditionally as a persistent footer with an idle state, instead of mounting/unmounting (and shifting content height) when playback starts and stops.
 - **UI primitives**: Replaced local `Button`, `RingLoader`, and `IconTextButton` (byte-identical forks of `@behindthemusictree/app-kit/ui`, never migrated after extraction) with imports from the package. Removed unused local `Table`, `Input`, `Skeleton`, and `Pagination` copies, which had zero call sites.
+- **`@behindthemusictree/brand`**: Bumped to `11.6.0` and imported its `tokens/theme.css` in `layout.tsx`, defining the CSS var color tokens (`--color-neutral-*`, `--color-red-*`, `--color-green-*`, `--color-blue-*`) that `@behindthemusictree/app-kit`'s `ui` components now reference.
+- **`@behindthemusictree/app-kit`**: Bumped to `0.2.0`. `ui` components (`Button`, `Pagination`, `RingLoader`, `Skeleton`, `TrackUploadPopup`) now reference brand's CSS var color tokens instead of hardcoded Tailwind color classes — no visual change on its own.
 
 ## [2.0.1] - 2026-08-11
 
