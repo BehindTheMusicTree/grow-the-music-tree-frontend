@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [2.2.0 - 2026-08-14](#220---2026-08-14)
 - [1.5.0 - 2026-04-05](#150---2026-04-05)
 - [1.4.6 - 2026-03-28](#146---2026-03-28)
 - [1.4.5 - 2026-03-28](#145---2026-03-28)
@@ -85,9 +86,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-08-14
+
 ### Added
 
 - **Player footer**: Added TheMusicTree brand badge (`TheMusicTreeByline` in a pill) to the persistent player footer, moved there from the app header, which no longer shows it.
+- **Reference genre tree**: Wired the reference genre tree page to GrowTheMusicTree's own API (`getGrowBackendBaseUrl()`, resolving `GTMT_API_SUBDOMAIN` + `NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT`) instead of HearTheMusicTree's.
 
 ### Changed
 
