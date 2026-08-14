@@ -1,7 +1,7 @@
 "use client";
 
 import { RefreshCw } from "lucide-react";
-import { IconTextButton } from "@components/ui/IconTextButton";
+import { IconTextButton } from "@behindthemusictree/app-kit/ui";
 
 export default function SyncButton({ onSync, isPending }) {
   return (

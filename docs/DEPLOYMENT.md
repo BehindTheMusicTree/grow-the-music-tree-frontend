@@ -134,6 +134,7 @@ After you change GitHub **Variables** or **Secrets** that map to Vercel, run **V
 | `GOOGLE_REDIRECT_RELATIVE_URI` | Relative path synced as `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` (e.g. `/auth/google/callback`) |
 | `TRACK_UPLOAD_TIMEOUT_MS`    | `NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS` |
 | `HTMT_API_ROOT_SEGMENT`      | **Required.** Django `API_ROOT_BASE` path segment (no leading/trailing slashes), e.g. `v2`. Synced as `NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT`; combined at runtime with the `HTMT_API_SUBDOMAIN` label from `@behindthemusictree/assets` to build `NEXT_PUBLIC_BACKEND_BASE_URL` (see [src/lib/site-urls.ts](../src/lib/site-urls.ts)). |
+| `GTMT_API_ROOT_SEGMENT`      | **Required.** GrowTheMusicTree API's `API_ROOT_BASE` path segment (no leading/trailing slashes), e.g. `v0`. Synced as `NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT`; combined at runtime with the `GTMT_API_SUBDOMAIN` label from `@behindthemusictree/assets` to build the grow-api base URL (see `getGrowBackendBaseUrl` in [src/lib/site-urls.ts](../src/lib/site-urls.ts)). |
 | `SPOTIFY_CLIENT_ID_PROD`     | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on production |
 | `SPOTIFY_CLIENT_ID_STAGING`  | `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` on Vercel preview/staging (required when running **Vercel sync env** for preview) |
 | `GOOGLE_CLIENT_ID_PROD`      | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` on production |

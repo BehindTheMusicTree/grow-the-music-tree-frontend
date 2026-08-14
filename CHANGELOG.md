@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [2.2.0 - 2026-08-14](#220---2026-08-14)
 - [1.5.0 - 2026-04-05](#150---2026-04-05)
 - [1.4.6 - 2026-03-28](#146---2026-03-28)
 - [1.4.5 - 2026-03-28](#145---2026-03-28)
@@ -85,13 +86,19 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-08-14
+
 ### Added
 
 - **Player footer**: Added TheMusicTree brand badge (`TheMusicTreeByline` in a pill) to the persistent player footer, moved there from the app header, which no longer shows it.
+- **Reference genre tree**: Wired the reference genre tree page to GrowTheMusicTree's own API (`getGrowBackendBaseUrl()`, resolving `GTMT_API_SUBDOMAIN` + `NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT`) instead of HearTheMusicTree's.
 
 ### Changed
 
 - **Audio player**: Redesigned as a compact 56px "now playing" strip instead of a Spotify/Windows-Media-Player-style transport bar. Dropped the album-art image and large circular buttons; the track title/artist is now clickable and opens the tracklist sidebar, transport controls are flat icons, and the seek bar is a thin neutral strip along the top edge instead of a thick blue slider. It also now renders unconditionally as a persistent footer with an idle state, instead of mounting/unmounting (and shifting content height) when playback starts and stops.
+- **UI primitives**: Replaced local `Button`, `RingLoader`, and `IconTextButton` (byte-identical forks of `@behindthemusictree/app-kit/ui`, never migrated after extraction) with imports from the package. Removed unused local `Table`, `Input`, `Skeleton`, and `Pagination` copies, which had zero call sites.
+- **`@behindthemusictree/brand`**: Bumped to `11.6.0` and imported its `tokens/theme.css` in `layout.tsx`, defining the CSS var color tokens (`--color-neutral-*`, `--color-red-*`, `--color-green-*`, `--color-blue-*`) that `@behindthemusictree/app-kit`'s `ui` components now reference.
+- **`@behindthemusictree/app-kit`**: Bumped to `0.2.0`. `ui` components (`Button`, `Pagination`, `RingLoader`, `Skeleton`, `TrackUploadPopup`) now reference brand's CSS var color tokens instead of hardcoded Tailwind color classes — no visual change on its own.
 
 ## [2.0.1] - 2026-08-11
 
