@@ -95,6 +95,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **UI primitives**: Replaced local `Button`, `RingLoader`, and `IconTextButton` (byte-identical forks of `@behindthemusictree/app-kit/ui`, never migrated after extraction) with imports from the package. Removed unused local `Table`, `Input`, `Skeleton`, and `Pagination` copies, which had zero call sites.
 - **`@behindthemusictree/brand`**: Bumped to `11.6.0` and imported its `tokens/theme.css` in `layout.tsx`, defining the CSS var color tokens (`--color-neutral-*`, `--color-red-*`, `--color-green-*`, `--color-blue-*`) that `@behindthemusictree/app-kit`'s `ui` components now reference.
 - **`@behindthemusictree/app-kit`**: Bumped to `0.2.0`. `ui` components (`Button`, `Pagination`, `RingLoader`, `Skeleton`, `TrackUploadPopup`) now reference brand's CSS var color tokens instead of hardcoded Tailwind color classes — no visual change on its own.
+- **UI primitives**: `Button`, `IconTextButton`, and `RingLoader` are now imported from the new `@behindthemusictree/ui` package instead of `@behindthemusictree/app-kit`'s `./ui` subpath, which that package is dropping. Props are unchanged.
 
 ## [2.0.1] - 2026-08-11
 

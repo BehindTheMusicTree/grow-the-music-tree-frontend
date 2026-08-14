@@ -22,6 +22,7 @@
     "@behindthemusictree/app-kit": "0.2.0",
     "@behindthemusictree/brand": "11.6.0",
     "@behindthemusictree/genre-tree-view": "0.3.0",
+    "@behindthemusictree/ui": "^0.1.0",
     "@fortawesome/fontawesome-svg-core": "6.5.2",
     "@fortawesome/free-solid-svg-icons": "6.5.2",
     "@fortawesome/react-fontawesome": "3.1.1",
