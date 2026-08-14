@@ -27,6 +27,9 @@ importers:
       '@behindthemusictree/genre-tree-view':
         specifier: 0.3.0
         version: 0.3.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@behindthemusictree/ui':
+        specifier: ^0.1.0
+        version: 0.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@fortawesome/fontawesome-svg-core':
         specifier: 6.5.2
         version: 6.5.2
@@ -318,6 +321,12 @@ packages:
 
   '@behindthemusictree/genre-tree-view@0.3.0':
     resolution: {integrity: sha512-ZWPIhLrW/MFjSrFg8NCeBIkFG7ohe+MXAUVtoAS4vtnV5fMchbxmuIAgu+0JApz5FFKW+Gxxq6XnwUZ+yC6lJQ==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/genre-tree-view/0.3.0/dd8ad101ecda92d55ab5c322d0902b071eb935e8}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+
+  '@behindthemusictree/ui@0.1.0':
+    resolution: {integrity: sha512-qLQup6B1U8ZisC7g63HLNW8B8nnJ/EX7CEJIS3mpQVT1W0xauxHb+q5abtGHFPo54RxLd9eftQqTBiP3eule4A==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/ui/0.1.0/c6dbdf3309d97be45f21d558a292f968e953a668}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -2167,6 +2176,9 @@ packages:
 
   cjs-module-lexer@2.2.0:
     resolution: {integrity: sha512-4bHTS2YuzUvtoLjdy+98ykbNB5jS0+07EvFNXerqZQJ89F7DI6ET7OQo/HJuW6K0aVsKA9hj9/RVb2kQVOrPDQ==}
+
+  class-variance-authority@0.7.1:
+    resolution: {integrity: sha512-Ka+9Trutv7G8M6WT6SeiRWz792K5qEqIGEGzXKhAE6xOWAY6pPH8U+9IY3oCMv6kqTmLsv7Xh/2w2RigkePMsg==}
 
   classnames@2.5.1:
     resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
@@ -4368,6 +4380,16 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
       react-icons: 5.7.0(react@19.1.0)
 
+  '@behindthemusictree/ui@0.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      class-variance-authority: 0.7.1
+      clsx: 2.1.1
+      lucide-react: 0.487.0(react@19.1.0)
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      react-icons: 5.7.0(react@19.1.0)
+      tailwind-merge: 3.2.0
+
   '@csstools/color-helpers@6.0.2': {}
 
   '@csstools/css-calc@3.2.1(@csstools/css-parser-algorithms@4.0.0(@csstools/css-tokenizer@4.0.0))(@csstools/css-tokenizer@4.0.0)':
@@ -6221,6 +6243,10 @@ snapshots:
   chrome-trace-event@1.0.4: {}
 
   cjs-module-lexer@2.2.0: {}
+
+  class-variance-authority@0.7.1:
+    dependencies:
+      clsx: 2.1.1
 
   classnames@2.5.1: {}
 
