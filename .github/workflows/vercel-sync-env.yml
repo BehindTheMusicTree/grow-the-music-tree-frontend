@@ -31,6 +31,7 @@ jobs:
       GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
       TRACK_UPLOAD_TIMEOUT_MS: ${{ vars.TRACK_UPLOAD_TIMEOUT_MS }}
       HTMT_API_ROOT_SEGMENT: ${{ vars.HTMT_API_ROOT_SEGMENT }}
+      GTMT_API_ROOT_SEGMENT: ${{ vars.GTMT_API_ROOT_SEGMENT }}
       SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID_PROD }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID_PROD }}
     steps:
@@ -49,6 +50,7 @@ jobs:
           [ -z "$GOOGLE_REDIRECT_RELATIVE_URI" ] && missing="$missing GOOGLE_REDIRECT_RELATIVE_URI"
           [ -z "$TRACK_UPLOAD_TIMEOUT_MS" ] && missing="$missing TRACK_UPLOAD_TIMEOUT_MS"
           [ -z "$HTMT_API_ROOT_SEGMENT" ] && missing="$missing HTMT_API_ROOT_SEGMENT"
+          [ -z "$GTMT_API_ROOT_SEGMENT" ] && missing="$missing GTMT_API_ROOT_SEGMENT"
           [ -z "$SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID_PROD"
           [ -z "$GOOGLE_CLIENT_ID" ] && missing="$missing GOOGLE_CLIENT_ID_PROD"
           if [ -n "$missing" ]; then
@@ -75,6 +77,7 @@ jobs:
       GOOGLE_REDIRECT_RELATIVE_URI: ${{ vars.GOOGLE_REDIRECT_RELATIVE_URI }}
       TRACK_UPLOAD_TIMEOUT_MS: ${{ vars.TRACK_UPLOAD_TIMEOUT_MS }}
       HTMT_API_ROOT_SEGMENT: ${{ vars.HTMT_API_ROOT_SEGMENT }}
+      GTMT_API_ROOT_SEGMENT: ${{ vars.GTMT_API_ROOT_SEGMENT }}
       SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID_STAGING }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID_STAGING }}
     steps:
@@ -93,6 +96,7 @@ jobs:
           [ -z "$GOOGLE_REDIRECT_RELATIVE_URI" ] && missing="$missing GOOGLE_REDIRECT_RELATIVE_URI"
           [ -z "$TRACK_UPLOAD_TIMEOUT_MS" ] && missing="$missing TRACK_UPLOAD_TIMEOUT_MS"
           [ -z "$HTMT_API_ROOT_SEGMENT" ] && missing="$missing HTMT_API_ROOT_SEGMENT"
+          [ -z "$GTMT_API_ROOT_SEGMENT" ] && missing="$missing GTMT_API_ROOT_SEGMENT"
           [ -z "$SPOTIFY_CLIENT_ID" ] && missing="$missing SPOTIFY_CLIENT_ID_STAGING"
           [ -z "$GOOGLE_CLIENT_ID" ] && missing="$missing GOOGLE_CLIENT_ID_STAGING"
           if [ -n "$missing" ]; then
