@@ -132,7 +132,15 @@ export default function AppContent({ children }: { children: ReactNode }) {
               }}
             />
           );
-        } else if (error instanceof BadRequestError || error instanceof BackendError || error instanceof ServiceError) {
+        } else if (
+          error instanceof BadRequestError ||
+          error instanceof BackendError ||
+          error instanceof ServiceError ||
+          error instanceof AuthRequired
+        ) {
+          // AuthRequired reaches here when the route doesn't require a session (e.g. a public
+          // reference page) or is the account page, so the AuthPopup branch above didn't fire —
+          // an unexpected 401 on those routes still needs to surface, not be dropped silently.
           popup = <InternalErrorPopup errorCode={error.code} />;
         } else if (error instanceof NetworkError) {
           popup = <NetworkErrorPopup />;
