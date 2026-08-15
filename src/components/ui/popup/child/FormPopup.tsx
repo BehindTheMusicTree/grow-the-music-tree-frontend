@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@behindthemusictree/app-kit/ui";
+import { Button } from "@behindthemusictree/ui";
 import { BasePopup, BasePopupProps } from "../BasePopup";
 import { ReactNode } from "react";
 

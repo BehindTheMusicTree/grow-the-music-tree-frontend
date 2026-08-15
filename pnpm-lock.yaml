@@ -27,6 +27,9 @@ importers:
       '@behindthemusictree/genre-tree-view':
         specifier: 0.3.0
         version: 0.3.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@behindthemusictree/ui':
+        specifier: 0.1.0
+        version: 0.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@fortawesome/fontawesome-svg-core':
         specifier: 6.5.2
         version: 6.5.2

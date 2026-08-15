@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 import { PopupTitle } from "@components/ui/popup/PopupTitle";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { PopupButtons } from "@components/ui/popup/PopupButtons";
-import { Button } from "@behindthemusictree/app-kit/ui";
+import { Button } from "@behindthemusictree/ui";
 import { LucideIcon } from "lucide-react";
 
 export interface BasePopupProps {
