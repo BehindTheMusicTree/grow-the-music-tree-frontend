@@ -1,14 +1,13 @@
 "use client";
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render } from "@testing-library/react";
-import type { ReactNode } from "react";
+import { render, screen, act } from "@testing-library/react";
+import { useEffect } from "react";
 import AppContent from "./AppContent";
-import { ErrorCode, BackendError } from "@behindthemusictree/app-kit/transport";
+import { PopupProvider } from "@behindthemusictree/app-kit/popup";
+import { ConnectivityErrorProvider, useConnectivityError, ErrorCode, BackendError } from "@behindthemusictree/app-kit/transport";
 
 const pathnameRef = { current: "/about" };
-const hidePopupSpy = vi.fn();
-const clearConnectivityErrorSpy = vi.fn();
 const allowlistError = new BackendError(ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST);
 
 vi.mock("next/navigation", () => ({
@@ -16,37 +15,9 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn() }),
 }));
 
-vi.mock("@behindthemusictree/app-kit/transport", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@behindthemusictree/app-kit/transport")>();
-  return {
-    ...actual,
-    useConnectivityError: () => ({
-      connectivityError: allowlistError,
-      setConnectivityError: vi.fn(),
-      clearConnectivityError: clearConnectivityErrorSpy,
-    }),
-    ConnectivityErrorProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
-  };
-});
-
-vi.mock("@behindthemusictree/app-kit/popup", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@behindthemusictree/app-kit/popup")>();
-  return {
-    ...actual,
-    usePopup: () => ({
-      showPopup: vi.fn(),
-      hidePopup: hidePopupSpy,
-      activePopup: null,
-    }),
-  };
-});
-
 vi.mock("@behindthemusictree/app-kit/player", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@behindthemusictree/app-kit/player")>();
-  return {
-    ...actual,
-    usePlayer: () => ({ playerTrackObject: null }),
-  };
+  return { ...actual, usePlayer: () => ({ playerTrackObject: null }) };
 });
 
 vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => {
@@ -73,34 +44,47 @@ vi.mock("@components/features/player/Player", () => ({ default: () => null }));
 vi.mock("@components/features/player/AutoAdvance", () => ({ default: () => null }));
 vi.mock("@components/auth/AuthCallbackHandler", () => ({ default: () => null }));
 
+function SetConnectivityError() {
+  const { setConnectivityError } = useConnectivityError();
+  useEffect(() => {
+    setConnectivityError(allowlistError);
+  }, [setConnectivityError]);
+  return null;
+}
+
+function renderAppContent() {
+  act(() => {
+    render(
+      <PopupProvider>
+        <ConnectivityErrorProvider>
+          <SetConnectivityError />
+          <AppContent>
+            <div>main</div>
+          </AppContent>
+        </ConnectivityErrorProvider>
+      </PopupProvider>,
+    );
+  });
+}
+
 describe("AppContent allowlist popup when navigating to a page where Spotify auth is not required", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("calls hidePopup and clearConnectivityError when route does not require Spotify and error is allowlist", () => {
+  it("does not show the popup when the route does not require Spotify", () => {
     pathnameRef.current = "/about";
 
-    render(
-      <AppContent>
-        <div>main</div>
-      </AppContent>,
-    );
+    renderAppContent();
 
-    expect(hidePopupSpy).toHaveBeenCalled();
-    expect(clearConnectivityErrorSpy).toHaveBeenCalled();
+    expect(screen.queryByText("Authentication Failed")).not.toBeInTheDocument();
   });
 
-  it("does not call hidePopup or clearConnectivityError when route requires Spotify and error is allowlist", () => {
+  it("shows the popup when the route requires Spotify", () => {
     pathnameRef.current = "/me-spotify-library";
 
-    render(
-      <AppContent>
-        <div>main</div>
-      </AppContent>,
-    );
+    renderAppContent();
 
-    expect(hidePopupSpy).not.toHaveBeenCalled();
-    expect(clearConnectivityErrorSpy).not.toHaveBeenCalled();
+    expect(screen.getByText("Authentication Failed")).toBeInTheDocument();
   });
 });

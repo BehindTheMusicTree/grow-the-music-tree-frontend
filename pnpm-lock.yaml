@@ -19,8 +19,8 @@ importers:
   .:
     dependencies:
       '@behindthemusictree/app-kit':
-        specifier: 0.2.0
-        version: 0.2.0(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.2.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: 1.1.0
+        version: 1.1.0(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.2.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@behindthemusictree/brand':
         specifier: 11.6.0
         version: 11.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -302,8 +302,8 @@ packages:
     resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
 
-  '@behindthemusictree/app-kit@0.2.0':
-    resolution: {integrity: sha512-nv7g3fJSUGQ3lE83tV41ts/Uq9LqXDka9KfYMrSXv/qpoq/UHUmT6auChjRX2L1vcAYT75YuayefLFN2OkC12g==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/app-kit/0.2.0/9f121f9babf4fa72fad8915e7ddcae60062ed2a4}
+  '@behindthemusictree/app-kit@1.1.0':
+    resolution: {integrity: sha512-+Mp0AvZezR9+rMKThmFiaaxDueJSLnTX6svxBhKoSyfJpt0REP94mGMT/NWQNfKXFlqlqbfxWY1/rjjmyYaNEQ==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/app-kit/1.1.0/43b9ed8cd1e2e3324da6bae7ce5939a2219bdf65}
     peerDependencies:
       '@tanstack/react-query': '>=5.0.0'
       next: '>=14.0.0'
@@ -316,8 +316,26 @@ packages:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
+  '@behindthemusictree/brand@12.0.0':
+    resolution: {integrity: sha512-9PrERlo0lHyB3dtSQJYg4XvrM1Pm8sZ6MO0zV/lO/8UBLMNtm3QDTnuWwNW5z8dQhPD3h0Hx8N0W373C69CzDQ==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/brand/12.0.0/aeba06e0b62328472fafecd16f9c1938af05e00f}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+
   '@behindthemusictree/genre-tree-view@0.3.0':
     resolution: {integrity: sha512-ZWPIhLrW/MFjSrFg8NCeBIkFG7ohe+MXAUVtoAS4vtnV5fMchbxmuIAgu+0JApz5FFKW+Gxxq6XnwUZ+yC6lJQ==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/genre-tree-view/0.3.0/dd8ad101ecda92d55ab5c322d0902b071eb935e8}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+
+  '@behindthemusictree/genre-tree-view@0.5.0':
+    resolution: {integrity: sha512-qexIrWvmsTBPAbgSnQJFkpwqrGsRhREeKzhOo8Vj05ZBSJfSro6cog+PjBFj8tUyqvCla6KxS7DMa292Zv8qhQ==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/genre-tree-view/0.5.0/a30f12e4af49b59021612ae10f02846f435c2582}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+
+  '@behindthemusictree/ui@0.1.0':
+    resolution: {integrity: sha512-qLQup6B1U8ZisC7g63HLNW8B8nnJ/EX7CEJIS3mpQVT1W0xauxHb+q5abtGHFPo54RxLd9eftQqTBiP3eule4A==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/ui/0.1.0/c6dbdf3309d97be45f21d558a292f968e953a668}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -2167,6 +2185,9 @@ packages:
 
   cjs-module-lexer@2.2.0:
     resolution: {integrity: sha512-4bHTS2YuzUvtoLjdy+98ykbNB5jS0+07EvFNXerqZQJ89F7DI6ET7OQo/HJuW6K0aVsKA9hj9/RVb2kQVOrPDQ==}
+
+  class-variance-authority@0.7.1:
+    resolution: {integrity: sha512-Ka+9Trutv7G8M6WT6SeiRWz792K5qEqIGEGzXKhAE6xOWAY6pPH8U+9IY3oCMv6kqTmLsv7Xh/2w2RigkePMsg==}
 
   classnames@2.5.1:
     resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
@@ -4340,12 +4361,12 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
-  '@behindthemusictree/app-kit@0.2.0(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.2.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@behindthemusictree/app-kit@1.1.0(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.2.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
-      '@behindthemusictree/brand': 11.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@behindthemusictree/genre-tree-view': 0.3.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@behindthemusictree/brand': 12.0.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@behindthemusictree/genre-tree-view': 0.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@behindthemusictree/ui': 0.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tanstack/react-query': 5.72.2(react@19.1.0)
-      classnames: 2.5.1
       clsx: 2.1.1
       lucide-react: 0.487.0(react@19.1.0)
       next: 16.2.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -4361,12 +4382,34 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
+  '@behindthemusictree/brand@12.0.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+
   '@behindthemusictree/genre-tree-view@0.3.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       d3: 7.9.0
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
       react-icons: 5.7.0(react@19.1.0)
+
+  '@behindthemusictree/genre-tree-view@0.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      d3: 7.9.0
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      react-icons: 5.7.0(react@19.1.0)
+
+  '@behindthemusictree/ui@0.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      class-variance-authority: 0.7.1
+      clsx: 2.1.1
+      lucide-react: 0.487.0(react@19.1.0)
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      react-icons: 5.7.0(react@19.1.0)
+      tailwind-merge: 3.2.0
 
   '@csstools/color-helpers@6.0.2': {}
 
@@ -6221,6 +6264,10 @@ snapshots:
   chrome-trace-event@1.0.4: {}
 
   cjs-module-lexer@2.2.0: {}
+
+  class-variance-authority@0.7.1:
+    dependencies:
+      clsx: 2.1.1
 
   classnames@2.5.1: {}
 
