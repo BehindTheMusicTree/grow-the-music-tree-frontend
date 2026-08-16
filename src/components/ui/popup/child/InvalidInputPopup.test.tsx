@@ -37,6 +37,6 @@ describe("InvalidInputPopup", () => {
   it("renders no field error section when fieldErrors is omitted", () => {
     render(<InvalidInputPopup details={{ message: "Invalid input" }} />);
 
-    expect(screen.queryByText(/required|invalid/i)).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("heading", { level: 4 })).toHaveLength(0);
   });
 });

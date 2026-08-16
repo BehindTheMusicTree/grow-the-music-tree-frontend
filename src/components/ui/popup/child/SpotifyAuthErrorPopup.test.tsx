@@ -17,26 +17,26 @@ describe("SpotifyAuthErrorPopup", () => {
   });
 
   it("renders the message", () => {
-    render(<SpotifyAuthErrorPopup message="Authentication Failed" onClose={vi.fn()} />);
+    render(<SpotifyAuthErrorPopup message="Invalid credentials" onClose={vi.fn()} />);
 
-    expect(screen.getByText("Authentication Failed")).toBeInTheDocument();
+    expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
   });
 
   it("renders details when provided", () => {
-    render(<SpotifyAuthErrorPopup message="Authentication Failed" details="invalid_grant" onClose={vi.fn()} />);
+    render(<SpotifyAuthErrorPopup message="Invalid credentials" details="invalid_grant" onClose={vi.fn()} />);
 
     expect(screen.getByText("invalid_grant")).toBeInTheDocument();
   });
 
   it("renders no details when omitted", () => {
-    render(<SpotifyAuthErrorPopup message="Authentication Failed" onClose={vi.fn()} />);
+    render(<SpotifyAuthErrorPopup message="Invalid credentials" onClose={vi.fn()} />);
 
     expect(screen.queryByText("invalid_grant")).not.toBeInTheDocument();
   });
 
   it("renders a mailto link with the contact email when NEXT_PUBLIC_CONTACT_EMAIL is set", () => {
     process.env.NEXT_PUBLIC_CONTACT_EMAIL = "support@example.com";
-    render(<SpotifyAuthErrorPopup message="Authentication Failed" onClose={vi.fn()} />);
+    render(<SpotifyAuthErrorPopup message="Invalid credentials" onClose={vi.fn()} />);
 
     const links = screen.getAllByRole("link", { name: /support@example.com|Spotify full name/i });
     expect(links.length).toBeGreaterThan(0);
@@ -45,7 +45,7 @@ describe("SpotifyAuthErrorPopup", () => {
 
   it("falls back to a generic message when no contact email is configured", () => {
     process.env.NEXT_PUBLIC_CONTACT_EMAIL = "";
-    render(<SpotifyAuthErrorPopup message="Authentication Failed" onClose={vi.fn()} />);
+    render(<SpotifyAuthErrorPopup message="Invalid credentials" onClose={vi.fn()} />);
 
     expect(screen.getByText(/To request access, contact the app owner\./)).toBeInTheDocument();
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
@@ -53,7 +53,7 @@ describe("SpotifyAuthErrorPopup", () => {
 
   it("calls onClose when Try Again is clicked", () => {
     const onClose = vi.fn();
-    render(<SpotifyAuthErrorPopup message="Authentication Failed" onClose={onClose} />);
+    render(<SpotifyAuthErrorPopup message="Invalid credentials" onClose={onClose} />);
 
     fireEvent.click(screen.getByRole("button", { name: /Try Again/i }));
 
