@@ -2,7 +2,7 @@
 
 import { User } from "lucide-react";
 import { BasePopup, BasePopupProps } from "../BasePopup";
-import { Button } from "@behindthemusictree/app-kit/ui";
+import { Button } from "@behindthemusictree/ui";
 import { FaSpotify } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 
