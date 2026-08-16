@@ -94,6 +94,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Popups**: Added a full behavioral test suite for the 11 child popups that previously had no test coverage (form submission, button-callback wiring, conditional rendering), following up on the app-kit migration above.
 
+### Documentation
+
+- **README**: Fixed the project structure diagram and example env vars, which had drifted from the actual `src/` layout and `env/development/example` file. Added the `NPM_TOKEN`/GitHub Packages install step, linked docs under `docs/` that weren't referenced (testing, style guide, semantic HTML, auth), and split the feature list into shipped vs. planned (AI genre detection, smart playlists, and community voting aren't implemented yet).
+
 ## [2.2.0] - 2026-08-14
 
 ### Added
