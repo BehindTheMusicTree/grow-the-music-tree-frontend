@@ -1,8 +1,9 @@
 "use client";
 
 import { FaSpotify } from "react-icons/fa";
-import { BasePopup, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
 import { UserPlus } from "lucide-react";
+import { BANNER_HEIGHT } from "@lib/constants/layout";
 
 const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "";
 const mailtoSubject = encodeURIComponent("Request to be added to Spotify allowlist");
@@ -27,6 +28,7 @@ export default function SpotifyAllowlistPopup({
     <BasePopup
       {...rest}
       title="Spotify account not in allowlist"
+      topOffset={BANNER_HEIGHT}
       type="warning"
       isDismissable
       icon={UserPlus}

@@ -1,7 +1,8 @@
 "use client";
 
 import { AlertCircle } from "lucide-react";
-import { BasePopup, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
+import { BANNER_HEIGHT } from "@lib/constants/layout";
 
 type InvalidInputPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   details: {
@@ -15,6 +16,7 @@ export default function InvalidInputPopup({ details, ...rest }: InvalidInputPopu
     <BasePopup
       {...rest}
       title="Invalid Input"
+      topOffset={BANNER_HEIGHT}
       isDismissable
       icon={AlertCircle}
       children={
