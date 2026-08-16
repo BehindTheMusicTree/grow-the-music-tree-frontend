@@ -1,10 +1,11 @@
 "use client";
 
 import { User } from "lucide-react";
-import { BasePopup, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
 import { Button } from "@behindthemusictree/ui";
 import { FaSpotify } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import { BANNER_HEIGHT } from "@lib/constants/layout";
 
 type AuthPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   handleSpotifyOAuth: (redirectAfterAuthPath?: string) => void;
@@ -28,6 +29,7 @@ export default function AuthPopup({
     <BasePopup
       {...rest}
       title={spotifyOnly ? "Connect with Spotify" : "Sign in"}
+      topOffset={BANNER_HEIGHT}
       isDismissable={false}
       icon={User}
       type="auth"

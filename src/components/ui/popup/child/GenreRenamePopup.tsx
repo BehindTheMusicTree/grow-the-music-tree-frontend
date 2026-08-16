@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { BasePopup } from "../BasePopup";
+import { BasePopup } from "@behindthemusictree/app-kit/popup";
 import { CriteriaMinimum } from "@behindthemusictree/app-kit/genre-tree";
+import { BANNER_HEIGHT } from "@lib/constants/layout";
 
 type GenreRenamePopupProps = {
   onSubmit: (values: { name: string }) => void;
@@ -35,6 +36,7 @@ export default function GenreRenamePopup({
   return (
     <BasePopup
       title="Rename Genre"
+      topOffset={BANNER_HEIGHT}
       isDismissable
       showOkButton
       showCancelButton

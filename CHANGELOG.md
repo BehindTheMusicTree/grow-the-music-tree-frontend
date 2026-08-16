@@ -86,6 +86,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Popups**: Replaced local `BasePopup`, `PopupTitle`, and `PopupButtons` (stale forks, never migrated after extraction) with imports from `@behindthemusictree/app-kit/popup`. Each child popup now explicitly passes `topOffset={BANNER_HEIGHT}` to `BasePopup` to preserve the existing banner-reserved positioning, since the shared component defaults `topOffset` to `0`.
+
 ## [2.2.0] - 2026-08-14
 
 ### Added
