@@ -53,8 +53,8 @@ describe("SpotifyAllowlistPopup", () => {
   it("reserves BANNER_HEIGHT at the top of the viewport so the popup doesn't cover the app header", () => {
     render(<SpotifyAllowlistPopup backendMessage="Not allowed." onClose={onClose} />);
 
-    const dialog = screen.getByRole("dialog");
-    expect(dialog.style.top).toBe(`${BANNER_HEIGHT}px`);
+    const dialogs = screen.getAllByRole("dialog");
+    expect(dialogs[dialogs.length - 1].style.top).toBe(`${BANNER_HEIGHT}px`);
   });
 
   it("mailto link has expected subject when Email to request access is shown", () => {
