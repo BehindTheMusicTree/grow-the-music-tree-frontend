@@ -1,31 +1,11 @@
 "use client";
 
-import { AlertCircle } from "lucide-react";
-import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
-import { Button } from "@behindthemusictree/ui";
+import { ComponentProps } from "react";
+import { AuthErrorPopup as AppKitAuthErrorPopup } from "@behindthemusictree/app-kit/popup";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 
-type AuthErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
-  message: string;
-  onClose: () => void;
-};
+type AuthErrorPopupProps = Omit<ComponentProps<typeof AppKitAuthErrorPopup>, "topOffset">;
 
-export default function AuthErrorPopup({ message, onClose, ...rest }: AuthErrorPopupProps) {
-  return (
-    <BasePopup
-      {...rest}
-      title="Sign-in error"
-      topOffset={BANNER_HEIGHT}
-      isDismissable
-      icon={AlertCircle}
-      children={
-        <div className="flex flex-col items-center space-y-6 py-4">
-          <p className="text-center text-lg font-medium text-gray-800">{message}</p>
-          <Button onClick={onClose} variant="secondary" className="w-full max-w-xs">
-            Close
-          </Button>
-        </div>
-      }
-    />
-  );
+export default function AuthErrorPopup(props: AuthErrorPopupProps) {
+  return <AppKitAuthErrorPopup {...props} topOffset={BANNER_HEIGHT} />;
 }

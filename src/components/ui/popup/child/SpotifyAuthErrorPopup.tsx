@@ -1,78 +1,20 @@
 "use client";
 
-import { FaSpotify } from "react-icons/fa";
-import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
-import { Button } from "@behindthemusictree/ui";
-import { User } from "lucide-react";
-import { getSpotifyAllowlistMailtoHref } from "@behindthemusictree/app-kit/transport";
+import { ComponentProps } from "react";
+import { SpotifyAuthErrorPopup as AppKitSpotifyAuthErrorPopup } from "@behindthemusictree/app-kit/popup";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 
-type SpotifyAuthErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
-  message: string;
-  details?: string;
-  onClose: () => void;
-};
+type SpotifyAuthErrorPopupProps = Omit<
+  ComponentProps<typeof AppKitSpotifyAuthErrorPopup>,
+  "topOffset" | "contactEmail"
+>;
 
-export default function SpotifyAuthErrorPopup({
-  message,
-  details,
-  onClose,
-  ...rest
-}: SpotifyAuthErrorPopupProps) {
-  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? null;
-  const requestAccessHref = getSpotifyAllowlistMailtoHref(contactEmail);
-
+export default function SpotifyAuthErrorPopup(props: SpotifyAuthErrorPopupProps) {
   return (
-    <BasePopup
-      {...rest}
-      title="Authentication Failed"
+    <AppKitSpotifyAuthErrorPopup
+      {...props}
       topOffset={BANNER_HEIGHT}
-      isDismissable
-      icon={User}
-      children={
-        <div className="flex flex-col items-center space-y-8 py-4">
-          <FaSpotify className="text-[#1DB954] text-7xl" />
-          <div className="space-y-3 text-center">
-            <p className="text-xl font-medium text-gray-800">{message}</p>
-            {details && (
-              <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">{details}</p>
-            )}
-            <div className="space-y-2 text-center">
-              <p className="text-base text-gray-700">
-                The Spotify app is in development mode, so only allowlisted accounts can connect.
-              </p>
-              {requestAccessHref && contactEmail ? (
-                <p className="text-base text-gray-700">
-                  Request access by emailing your{" "}
-                  <a
-                    href={requestAccessHref}
-                    className="text-[#1DB954] font-medium underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-[#1DB954] focus:ring-offset-1 rounded"
-                  >
-                    Spotify full name and Spotify email address
-                  </a>{" "}
-                  to{" "}
-                  <a
-                    href={requestAccessHref}
-                    className="text-[#1DB954] font-medium underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-[#1DB954] focus:ring-offset-1 rounded"
-                  >
-                    {contactEmail}
-                  </a>
-                  .
-                </p>
-              ) : (
-                <p className="text-base text-gray-700">To request access, contact the app owner.</p>
-              )}
-            </div>
-          </div>
-          <Button
-            onClick={onClose}
-            className="bg-[#1DB954] hover:bg-[#1DB954]/90 text-white w-full max-w-xs transform transition-all duration-200 hover:scale-[1.02] shadow-lg hover:shadow-xl"
-          >
-            <FaSpotify className="mr-2 text-lg" />
-            Try Again
-          </Button>
-        </div>
-      }
+      contactEmail={process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? null}
     />
   );
 }
