@@ -43,10 +43,13 @@ Music enthusiasts, researchers, and the general public interested in understandi
 
 - Interactive genre tree visualization using D3.js
 - Spotify OAuth integration for music library analysis
+- Rich contextual information for each genre (historical, cultural, technical)
+
+**Planned / not yet implemented** (see [VISION.md](VISION.md) and [TODO.md](TODO.md)):
+
 - AI-powered genre detection for tracks
 - Smart playlist generation based on musical journeys
 - Community discussions and voting on genre classifications
-- Rich contextual information for each genre (historical, cultural, technical)
 
 ## Pages
 
@@ -90,20 +93,24 @@ Google and Spotify OAuth redirect the user to `/auth/google/callback` or `/auth/
 
 ```
 .
-├── app/                    # Next.js App Router pages
-├── components/             # React components
-│   ├── features/          # Feature-specific components
-│   └── ui/                # Reusable UI components
-├── contexts/              # React contexts for state management
-├── hooks/                 # Custom React hooks
-├── lib/                   # Utility libraries and helpers
-├── models/                # Data models and types
-├── schemas/               # API and domain schemas
-├── types/                 # TypeScript type definitions
-├── utils/                 # Utility functions
-├── public/                # Static assets
-├── env/                   # Environment configuration
-├── scripts/               # Build and setup scripts
+├── src/
+│   ├── app/                # Next.js App Router pages (route groups, layouts, auth callbacks)
+│   ├── api/                # API client domains (per-resource request/response handling)
+│   ├── assets/             # Bundled images and static assets imported by components
+│   ├── components/         # React components
+│   │   ├── auth/          # Auth callback handling, guards
+│   │   ├── features/      # Feature-specific components
+│   │   └── ui/            # Reusable UI components
+│   ├── hooks/              # Custom React hooks
+│   ├── lib/                # Utility libraries and helpers (e.g. site-urls.ts)
+│   ├── models/              # Data models and types
+│   ├── schemas/             # API and domain schemas
+│   ├── types/               # TypeScript type definitions
+│   └── utils/               # Utility functions
+├── public/                # Static assets served as-is
+├── env/                   # Environment configuration (dev presets, examples)
+├── scripts/               # Build, release, and env setup scripts
+├── docs/                  # Architecture, auth, testing, and per-page documentation
 ├── .github/workflows/     # CI/CD workflows
 ├── Dockerfile             # Docker build configuration
 ├── next.config.js         # Next.js configuration
@@ -127,10 +134,13 @@ cp env/development/example/.env.development.example .env.local
 
 ```
 NODE_ENV=development
-PORT=3000
+PORT=9005
 
+APP_VERSION=dev
+
+NEXT_PUBLIC_APP_VERSION=dev
 NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com
-NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT=v2
+NEXT_PUBLIC_BACKEND_BASE_URL=http://localhost:8000/v2/
 NEXT_PUBLIC_SENTRY_IS_ACTIVE=false
 
 NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize
@@ -140,6 +150,8 @@ NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-c
 
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback
+
+NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS=300000
 ```
 
 In the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) → your app → **Settings** → **Redirect URIs**, add the **full** callback URL(s), e.g. `http://localhost:3000/auth/spotify/callback` for local dev and your production URL for deploy. The app builds the redirect URI from your origin when you use a path like `/auth/spotify/callback`.
@@ -158,13 +170,15 @@ For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/)
 
 ### Prerequisites
 
-- Node.js >= 18
-- npm / yarn / pnpm
+- Node.js 20 (see [`.nvmrc`](.nvmrc))
+- npm
+- A [GitHub PAT](https://github.com/settings/tokens) with `read:packages` (and org access) — [`.npmrc`](.npmrc) pulls `@behindthemusictree/*` packages from GitHub Packages
 - Docker (optional, for containerized builds)
 
 ### Install dependencies
 
 ```bash
+export NPM_TOKEN=ghp_…   # or set _authToken in ~/.npmrc instead
 npm install --legacy-peer-deps
 ```
 
@@ -275,8 +289,16 @@ For additional information about this project, please refer to:
 - **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community code of conduct
 - **[TODO.md](TODO.md)** - Current development tasks and roadmap
 - **[docs/VERSIONING.md](docs/VERSIONING.md)** - Versioning strategy and guidelines
+- **[docs/SEMVER_GUIDE.md](docs/SEMVER_GUIDE.md)** - SemVer conventions used for releases
 - **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Vercel staging and production setup
 - **[docs/REVERSE_PROXY_CONFIG.md](docs/REVERSE_PROXY_CONFIG.md)** - Nginx/reverse-proxy configuration for deployment
+- **[docs/testing.md](docs/testing.md)** - Testing strategy, tools, and conventions
+- **[docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md)** - Code and UI styling conventions
+- **[docs/SEMANTIC_HTML.md](docs/SEMANTIC_HTML.md)** - Semantic HTML conventions
+- **[docs/DATA_ATTRIBUTES.md](docs/DATA_ATTRIBUTES.md)** - `data-*` attribute conventions (e.g. test hooks)
+- **[docs/frontend-auth.md](docs/frontend-auth.md)** - Frontend auth flow details
+- **[docs/backend-auth.md](docs/backend-auth.md)** - Backend auth integration details
+- **[docs/backend-google-auth-implementation.md](docs/backend-google-auth-implementation.md)** - Google auth backend implementation notes
 
 ## License
 
