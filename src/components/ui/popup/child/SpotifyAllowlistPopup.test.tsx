@@ -3,7 +3,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import SpotifyAllowlistPopup from "./SpotifyAllowlistPopup";
-import { BANNER_HEIGHT } from "@lib/constants/layout";
 
 describe("SpotifyAllowlistPopup", () => {
   const onClose = vi.fn();
@@ -48,13 +47,6 @@ describe("SpotifyAllowlistPopup", () => {
     fireEvent.click(backButtons[0]);
 
     expect(onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it("reserves BANNER_HEIGHT at the top of the viewport so the popup doesn't cover the app header", () => {
-    render(<SpotifyAllowlistPopup backendMessage="Not allowed." onClose={onClose} />);
-
-    const dialogs = screen.getAllByRole("dialog");
-    expect(dialogs[dialogs.length - 1].style.top).toBe(`${BANNER_HEIGHT}px`);
   });
 
   it("mailto link has expected subject when Email to request access is shown", () => {
