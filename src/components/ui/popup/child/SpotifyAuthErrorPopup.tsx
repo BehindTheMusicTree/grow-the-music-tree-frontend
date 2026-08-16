@@ -1,10 +1,11 @@
 "use client";
 
 import { FaSpotify } from "react-icons/fa";
-import { BasePopup, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
 import { Button } from "@behindthemusictree/ui";
 import { User } from "lucide-react";
 import { getSpotifyAllowlistMailtoHref } from "@behindthemusictree/app-kit/transport";
+import { BANNER_HEIGHT } from "@lib/constants/layout";
 
 type SpotifyAuthErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   message: string;
@@ -25,6 +26,7 @@ export default function SpotifyAuthErrorPopup({
     <BasePopup
       {...rest}
       title="Authentication Failed"
+      topOffset={BANNER_HEIGHT}
       isDismissable
       icon={User}
       children={

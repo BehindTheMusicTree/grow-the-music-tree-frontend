@@ -1,8 +1,9 @@
 "use client";
 
-import { BasePopup, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
 import { Button } from "@behindthemusictree/ui";
 import { Trash2 } from "lucide-react";
+import { BANNER_HEIGHT } from "@lib/constants/layout";
 
 interface Genre {
   name: string;
@@ -25,6 +26,7 @@ export default function GenreDeletionPopup({ genre, onConfirm, onClose, ...rest 
       {...rest}
       onClose={onClose}
       title="Delete Genre"
+      topOffset={BANNER_HEIGHT}
       isDismissable
       icon={Trash2}
       children={

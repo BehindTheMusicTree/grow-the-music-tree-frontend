@@ -1,8 +1,9 @@
 "use client";
 
 import { AlertTriangle, AlertCircle } from "lucide-react";
-import { BasePopup, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
 import { ErrorCode } from "@behindthemusictree/app-kit/transport";
+import { BANNER_HEIGHT } from "@lib/constants/layout";
 
 type InternalErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   errorCode: ErrorCode;
@@ -13,6 +14,7 @@ export default function InternalErrorPopup({ errorCode, ...rest }: InternalError
     <BasePopup
       {...rest}
       title="Internal Error"
+      topOffset={BANNER_HEIGHT}
       isDismissable={false}
       icon={AlertTriangle}
       children={

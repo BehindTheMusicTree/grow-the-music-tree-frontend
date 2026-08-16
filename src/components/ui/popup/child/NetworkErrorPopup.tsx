@@ -1,7 +1,8 @@
 "use client";
 
 import { AlertTriangle } from "lucide-react";
-import { BasePopup, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
+import { BANNER_HEIGHT } from "@lib/constants/layout";
 
 type NetworkErrorPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable">;
 
@@ -10,6 +11,7 @@ export default function NetworkErrorPopup(props: NetworkErrorPopupProps) {
     <BasePopup
       {...props}
       title="Network Error"
+      topOffset={BANNER_HEIGHT}
       isDismissable={false}
       icon={AlertTriangle}
       children={
