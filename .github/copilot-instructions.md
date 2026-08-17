@@ -12,7 +12,7 @@ Full conventions live in the canonical sources below — read them before review
 
 - [`CONTRIBUTING.md`](../CONTRIBUTING.md) — Git Flow branching (`feature/*`, `fix/*`, `chore/*`, `release/*`, `hotfix/*`), commit/PR title format (`<type>(<scope>): <summary>`), PR process
 - [`docs/STYLE_GUIDE.md`](../docs/STYLE_GUIDE.md) — TypeScript/React/Next.js conventions, file naming, Tailwind usage
-- [`.cursor/rules/*.mdc`](../.cursor/rules) — per-topic rules (commit message format, semver, testing, no-useless-comments, Tailwind class order, etc.)
+- [`AGENTS.md`](../AGENTS.md) — project-specific critical rules and traps for AI coding agents
 
 ## What to flag in review
 
@@ -21,7 +21,7 @@ Full conventions live in the canonical sources below — read them before review
 - Non-Tailwind inline styles or CSS
 - Missing types / implicit `any`
 - Branch or PR title naming that doesn't match the conventions above
-- Deviations from `.cursor/rules/*.mdc`
+- Deviations from `AGENTS.md`
 
 ## Validation
 

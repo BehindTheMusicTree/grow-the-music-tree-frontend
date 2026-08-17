@@ -501,7 +501,7 @@ Before submitting a Pull Request, ensure the following checks are completed:
 
 **6. PR Description**
 
-- ✅ PR description drafted in `.pr-descriptions/<branch-name>.md` (see `.cursor/rules/pr-description-workflow.mdc`)
+- ✅ PR description drafted in `.pr-descriptions/<branch-name>.md` (see [PR Description Workflow](#pr-description-workflow) below)
 - ✅ All sections of the PR template are filled out
 - ✅ Screenshots/recordings included for UI changes
 
@@ -564,8 +564,6 @@ Before submitting a Pull Request, ensure the following checks are completed:
 2. **Edit the file locally** - Fill in all relevant sections, update as you work
 3. **Copy to GitHub when ready** - When creating the PR, copy content from your file to GitHub
 4. **Keep it updated** - Update the local file as you make changes or address feedback
-
-See `.cursor/rules/pr-description-workflow.mdc` for detailed guidelines.
 
 ##### PR Title Naming Convention
 
