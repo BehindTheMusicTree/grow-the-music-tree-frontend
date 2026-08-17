@@ -128,6 +128,7 @@ PKG_VERSION=$(jq -r '.version' package.json)
 APP_VERSION="$(compute_next_public_app_version "$PKG_VERSION" "$SHORT_SHA")"
 
 : "${NPM_TOKEN:?NPM_TOKEN is required for full sync (GitHub Actions: GH_PACKAGES_TOKEN secret)}"
+: "${GTMT_API_KEY:?GTMT_API_KEY is required for full sync}"
 
 sync_var "$CONTACT_EMAIL" "NEXT_PUBLIC_CONTACT_EMAIL"
 sync_var "$API_ROOT" "NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT"
@@ -142,5 +143,6 @@ sync_var "$GOOGLE_REDIRECT_URI" "NEXT_PUBLIC_GOOGLE_REDIRECT_URI"
 sync_var "$TRACK_UPLOAD_TIMEOUT_MS" "NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS"
 sync_var "$APP_VERSION" "NEXT_PUBLIC_APP_VERSION"
 sync_secret_var "$NPM_TOKEN" "NPM_TOKEN"
+sync_secret_var "$GTMT_API_KEY" "GTMT_API_KEY"
 
 echo "Full env sync done ($TARGET)."
