@@ -97,6 +97,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Documentation
 
 - **README**: Fixed the project structure diagram and example env vars, which had drifted from the actual `src/` layout and `env/development/example` file. Added the `NPM_TOKEN`/GitHub Packages install step, linked docs under `docs/` that weren't referenced (testing, style guide, semantic HTML, auth), and split the feature list into shipped vs. planned (AI genre detection, smart playlists, and community voting aren't implemented yet).
+- **AI agent instructions**: Replaced the unused `.cursor/rules/*.mdc` files with a single `AGENTS.md` (symlinked as `CLAUDE.md`) following the cross-tool AGENTS.md standard, and updated `CONTRIBUTING.md`, `docs/STYLE_GUIDE.md`, and `.github/copilot-instructions.md` to reference it instead of the removed Cursor rules.
 
 ## [2.2.0] - 2026-08-14
 
