@@ -100,4 +100,4 @@ Git branch naming and PR targets follow **strict Git Flow** in **CONTRIBUTING.md
 - Implement error boundaries for error handling
 - Use React Query for API data fetching
 - Follow the Tailwind class order in this guide
-- Avoid useless comments (see `.cursor/rules/no-useless-comments.mdc`)
+- Avoid useless comments (see `AGENTS.md`)
