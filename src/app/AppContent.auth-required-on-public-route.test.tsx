@@ -5,10 +5,10 @@ import { render, screen, act } from "@testing-library/react";
 import { useEffect } from "react";
 import AppContent from "./AppContent";
 import { PopupProvider } from "@behindthemusictree/app-kit/popup";
-import { ConnectivityErrorProvider, useConnectivityError, ErrorCode, BackendError } from "@behindthemusictree/app-kit/transport";
+import { ConnectivityErrorProvider, useConnectivityError, AuthRequired, ErrorCode } from "@behindthemusictree/app-kit/transport";
 
-const pathnameRef = { current: "/about" };
-const allowlistError = new BackendError(ErrorCode.BACKEND_SPOTIFY_USER_NOT_IN_ALLOWLIST);
+const pathnameRef = { current: "/reference-genre-tree" };
+const authRequiredError = new AuthRequired(ErrorCode.BACKEND_UNAUTHORIZED);
 
 vi.mock("next/navigation", () => ({
   usePathname: () => pathnameRef.current,
@@ -47,44 +47,32 @@ vi.mock("@components/auth/AuthCallbackHandler", () => ({ default: () => null }))
 function SetConnectivityError() {
   const { setConnectivityError } = useConnectivityError();
   useEffect(() => {
-    setConnectivityError(allowlistError);
+    setConnectivityError(authRequiredError);
   }, [setConnectivityError]);
   return null;
 }
 
-function renderAppContent() {
-  act(() => {
-    render(
-      <PopupProvider>
-        <ConnectivityErrorProvider>
-          <SetConnectivityError />
-          <AppContent>
-            <div>main</div>
-          </AppContent>
-        </ConnectivityErrorProvider>
-      </PopupProvider>,
-    );
-  });
-}
-
-describe("AppContent allowlist popup when navigating to a page where Spotify auth is not required", () => {
+describe("AppContent surfaces an AuthRequired error on a route that doesn't require auth", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("does not show the popup when the route does not require Spotify", () => {
-    pathnameRef.current = "/about";
+  it("shows an error popup instead of silently dropping it", () => {
+    pathnameRef.current = "/reference-genre-tree";
 
-    renderAppContent();
+    act(() => {
+      render(
+        <PopupProvider>
+          <ConnectivityErrorProvider>
+            <SetConnectivityError />
+            <AppContent>
+              <div>main</div>
+            </AppContent>
+          </ConnectivityErrorProvider>
+        </PopupProvider>,
+      );
+    });
 
-    expect(screen.queryByText("Authentication Failed")).not.toBeInTheDocument();
-  });
-
-  it("shows the popup when the route requires Spotify", () => {
-    pathnameRef.current = "/me-spotify-library";
-
-    renderAppContent();
-
-    expect(screen.getByText("Authentication Failed")).toBeInTheDocument();
+    expect(screen.getByText("Internal Error")).toBeInTheDocument();
   });
 });

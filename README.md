@@ -43,10 +43,13 @@ Music enthusiasts, researchers, and the general public interested in understandi
 
 - Interactive genre tree visualization using D3.js
 - Spotify OAuth integration for music library analysis
+- Rich contextual information for each genre (historical, cultural, technical)
+
+**Planned / not yet implemented** (see [VISION.md](VISION.md) and [TODO.md](TODO.md)):
+
 - AI-powered genre detection for tracks
 - Smart playlist generation based on musical journeys
 - Community discussions and voting on genre classifications
-- Rich contextual information for each genre (historical, cultural, technical)
 
 ## Pages
 
@@ -90,20 +93,24 @@ Google and Spotify OAuth redirect the user to `/auth/google/callback` or `/auth/
 
 ```
 .
-├── app/                    # Next.js App Router pages
-├── components/             # React components
-│   ├── features/          # Feature-specific components
-│   └── ui/                # Reusable UI components
-├── contexts/              # React contexts for state management
-├── hooks/                 # Custom React hooks
-├── lib/                   # Utility libraries and helpers
-├── models/                # Data models and types
-├── schemas/               # API and domain schemas
-├── types/                 # TypeScript type definitions
-├── utils/                 # Utility functions
-├── public/                # Static assets
-├── env/                   # Environment configuration
-├── scripts/               # Build and setup scripts
+├── src/
+│   ├── app/                # Next.js App Router pages (route groups, layouts, auth callbacks)
+│   ├── api/                # API client domains (per-resource request/response handling)
+│   ├── assets/             # Bundled images and static assets imported by components
+│   ├── components/         # React components
+│   │   ├── auth/          # Auth callback handling, guards
+│   │   ├── features/      # Feature-specific components
+│   │   └── ui/            # Reusable UI components
+│   ├── hooks/              # Custom React hooks
+│   ├── lib/                # Utility libraries and helpers (e.g. site-urls.ts)
+│   ├── models/              # Data models and types
+│   ├── schemas/             # API and domain schemas
+│   ├── types/               # TypeScript type definitions
+│   └── utils/               # Utility functions
+├── public/                # Static assets served as-is
+├── env/                   # Environment configuration (dev presets, examples)
+├── scripts/               # Build, release, and env setup scripts
+├── docs/                  # Architecture, auth, testing, and per-page documentation
 ├── .github/workflows/     # CI/CD workflows
 ├── Dockerfile             # Docker build configuration
 ├── next.config.js         # Next.js configuration
@@ -127,10 +134,13 @@ cp env/development/example/.env.development.example .env.local
 
 ```
 NODE_ENV=development
-PORT=3000
+PORT=9005
 
+APP_VERSION=dev
+
+NEXT_PUBLIC_APP_VERSION=dev
 NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com
-NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT=v2
+NEXT_PUBLIC_BACKEND_BASE_URL=http://localhost:8000/v2/
 NEXT_PUBLIC_SENTRY_IS_ACTIVE=false
 
 NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize
@@ -140,6 +150,8 @@ NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-c
 
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback
+
+NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS=300000
 ```
 
 In the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) → your app → **Settings** → **Redirect URIs**, add the **full** callback URL(s), e.g. `http://localhost:3000/auth/spotify/callback` for local dev and your production URL for deploy. The app builds the redirect URI from your origin when you use a path like `/auth/spotify/callback`.
@@ -158,17 +170,17 @@ For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/)
 
 ### Prerequisites
 
-- Node.js >= 18
-- npm / yarn / pnpm
+- Node.js 20 (see [`.nvmrc`](.nvmrc))
+- pnpm (`corepack enable && corepack prepare pnpm@10.33.2 --activate`, matching the Dockerfile and CI)
+- A [GitHub PAT](https://github.com/settings/tokens) with `read:packages` (and org access) — [`.npmrc`](.npmrc) pulls `@behindthemusictree/*` packages from GitHub Packages
 - Docker (optional, for containerized builds)
 
 ### Install dependencies
 
 ```bash
-npm install --legacy-peer-deps
+export NPM_TOKEN=ghp_…   # or set _authToken in ~/.npmrc instead
+pnpm install --frozen-lockfile
 ```
-
-**Note:** We use `--legacy-peer-deps` to handle peer dependency conflicts, particularly with ESLint and its plugins.
 
 ## Scripts
 
@@ -186,58 +198,48 @@ npm install --legacy-peer-deps
 
 ## Docker
 
-Production and staging hosting use **Vercel** (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). Docker is optional for local runs or self-hosted deployment. The Dockerfile builds the app and runs the Next.js server inside the container; the entrypoint builds at startup, then runs `next start` on `APP_PORT`.
+Production and staging hosting run on **Coolify** as a multi-stage Docker build (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). The Dockerfile builds the app in a `builder` stage (`pnpm build` against Next.js `output: "standalone"`) and copies only the standalone output into a slim `runner` stage that runs `node server.js`.
 
-**Build image:**
+**Build image** (requires the `GH_PACKAGES_TOKEN_READ` build secret to install `@behindthemusictree/*`):
 
 ```bash
-docker build -t grow-the-music-tree-frontend --build-arg PROJECT_DIR=/home/app/ .
+DOCKER_BUILDKIT=1 docker build \
+  --secret id=GH_PACKAGES_TOKEN_READ,src=<path-to-token-file> \
+  --build-arg NEXT_PUBLIC_BACKEND_BASE_URL=http://localhost:8000/v2/ \
+  --build-arg NEXT_PUBLIC_CONTACT_EMAIL=you@example.com \
+  --build-arg NEXT_PUBLIC_SPOTIFY_CLIENT_ID=... \
+  --build-arg NEXT_PUBLIC_SPOTIFY_SCOPES=... \
+  --build-arg NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/auth/spotify/callback \
+  --build-arg NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize \
+  --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=... \
+  --build-arg NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback \
+  --build-arg NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS=300000 \
+  --build-arg NEXT_PUBLIC_SENTRY_IS_ACTIVE=false \
+  -t grow-the-music-tree-frontend .
 ```
+
+Every `NEXT_PUBLIC_*` var is required at build time (baked in by `next build`); the build fails fast if one is missing (see `REQUIRED_ENV_VARS` in `next.config.js`).
 
 **Run container:**
 
 ```bash
-docker run -p 3000:3000 -e APP_PORT=3000 -e APP_VERSION=0.1.0 \
-  -e NEXT_PUBLIC_*="..." grow-the-music-tree-frontend
+docker run -p 3000:3000 -e PORT=3000 -e GTMT_API_KEY=... grow-the-music-tree-frontend
 ```
 
+`GTMT_API_KEY` is server-only and read at request time (not `NEXT_PUBLIC_*`), so it's a runtime env var, not a build arg — see [§ Grow-api write proxy](docs/DEPLOYMENT.md#grow-api-write-proxy-gtmt_api_key) in DEPLOYMENT.md.
 
 ## CI
 
-Continuous Integration runs on each push to main branch and pull requests.
+Continuous Integration ([`.github/workflows/validate.yml`](.github/workflows/validate.yml)) runs on each push to `main`/`develop` and on pull requests targeting them.
 
 The CI pipeline includes:
 
-- Dependency installation
+- Dependency installation (`pnpm install --frozen-lockfile`, needs the `GH_PACKAGES_TOKEN_READ` repo secret)
 - Linting
 - Testing
 - Build check
 
-Staging builds use **Vercel Git** on `develop`. Production uses [`.github/workflows/vercel-deploy.yml`](.github/workflows/vercel-deploy.yml) when you push a **semver release tag** `vX.Y.Z` (must match `package.json`) or run the workflow manually (sets `NEXT_PUBLIC_APP_VERSION`, then the production deploy hook). Full `NEXT_PUBLIC_*` sync from GitHub is manual: [`.github/workflows/vercel-sync-env.yml`](.github/workflows/vercel-sync-env.yml). See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
-
-**GitHub Actions** (simplified):
-
-```yaml
-# vercel-deploy.yml — semver release tag or manual
-on:
-  push:
-    tags: ['v*.*.*']
-  workflow_dispatch:
-jobs:
-  deploy-production:
-    steps:
-      - checkout
-      - sync NEXT_PUBLIC_APP_VERSION to Vercel production
-      - POST production deploy hook
-
-# vercel-sync-env.yml — manual only
-on: workflow_dispatch
-jobs:
-  sync-production / sync-preview:
-    steps:
-      - checkout
-      - sync all mapped NEXT_PUBLIC_* to Vercel (no hook)
-```
+Deployment is handled entirely by **Coolify**, driven by the `infrastructure` repo's Ansible config and GitHub Actions — not by anything in this repo's own CI. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Build & Hosting
 
@@ -248,9 +250,9 @@ npm run build
 npm run start
 ```
 
-Build output: `.next/`. The app is served by the Next.js Node server.
+Build output: `.next/`. The app is served by the Next.js Node server (`output: "standalone"` in production, via the Dockerfile's `runner` stage).
 
-**Deployment:** The app can be deployed to **Vercel** (recommended) or run in Docker. See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for Vercel staging and production setup, including the env sync workflow from GitHub to Vercel. For Docker, the container builds once at startup then runs `next start`; the reverse proxy (Nginx, Traefik, etc.) should proxy to the container’s `APP_PORT`.
+**Deployment:** The app is deployed to **Coolify** on push to `main` (production) or `develop` (staging), plus PR preview deployments off `develop`-targeted PRs. See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for the full Coolify setup, including which env vars are build-time vs. runtime. Outside Coolify, the same Dockerfile can be built and run standalone (see [Docker](#docker) above); the reverse proxy (Nginx, Traefik, etc.) should proxy to the container's `PORT`.
 
 ## Troubleshooting
 
@@ -275,8 +277,16 @@ For additional information about this project, please refer to:
 - **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community code of conduct
 - **[TODO.md](TODO.md)** - Current development tasks and roadmap
 - **[docs/VERSIONING.md](docs/VERSIONING.md)** - Versioning strategy and guidelines
-- **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Vercel staging and production setup
+- **[docs/SEMVER_GUIDE.md](docs/SEMVER_GUIDE.md)** - SemVer conventions used for releases
+- **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Coolify staging and production deployment setup
 - **[docs/REVERSE_PROXY_CONFIG.md](docs/REVERSE_PROXY_CONFIG.md)** - Nginx/reverse-proxy configuration for deployment
+- **[docs/testing.md](docs/testing.md)** - Testing strategy, tools, and conventions
+- **[docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md)** - Code and UI styling conventions
+- **[docs/SEMANTIC_HTML.md](docs/SEMANTIC_HTML.md)** - Semantic HTML conventions
+- **[docs/DATA_ATTRIBUTES.md](docs/DATA_ATTRIBUTES.md)** - `data-*` attribute conventions (e.g. test hooks)
+- **[docs/frontend-auth.md](docs/frontend-auth.md)** - Frontend auth flow details
+- **[docs/backend-auth.md](docs/backend-auth.md)** - Backend auth integration details
+- **[docs/backend-google-auth-implementation.md](docs/backend-google-auth-implementation.md)** - Google auth backend implementation notes
 
 ## License
 

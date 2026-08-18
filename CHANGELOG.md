@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [2.3.0 - 2026-08-18](#230---2026-08-18)
 - [2.2.0 - 2026-08-14](#220---2026-08-14)
 - [1.5.0 - 2026-04-05](#150---2026-04-05)
 - [1.4.6 - 2026-03-28](#146---2026-03-28)
@@ -85,6 +86,31 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [2.3.0] - 2026-08-18
+
+### Changed
+
+- **Popups**: Replaced local `BasePopup`, `PopupTitle`, and `PopupButtons` (stale forks, never migrated after extraction) with imports from `@behindthemusictree/app-kit/popup`. Each child popup now explicitly passes `topOffset={BANNER_HEIGHT}` to `BasePopup` to preserve the existing banner-reserved positioning, since the shared component defaults `topOffset` to `0`.
+- **Deployment**: Moved production/staging hosting from Vercel to Coolify (self-hosted, on the `infrastructure` repo's VPS), matching `hear-the-music-tree-frontend`. Rewrote the `Dockerfile` to a multi-stage build producing a Next.js `output: "standalone"` runtime image, with all `NEXT_PUBLIC_*` vars now passed as Docker build args (Coolify `buildtime_env`) instead of synced to Vercel. `GTMT_API_KEY` moves to a Coolify runtime env var (`static_env`), since it's read server-side at request time rather than baked in at build time.
+- **CI**: `.github/workflows/validate.yml` no longer references Vercel; it only runs lint/test/build checks. Deployment is entirely Coolify's responsibility — there is no deploy hook, deploy workflow, or version-tag gate in this repo anymore.
+
+### Added
+
+- **Popups**: Added a full behavioral test suite for the 11 child popups that previously had no test coverage (form submission, button-callback wiring, conditional rendering), following up on the app-kit migration above.
+
+### Documentation
+
+- **README**: Fixed the project structure diagram and example env vars, which had drifted from the actual `src/` layout and `env/development/example` file. Added the `NPM_TOKEN`/GitHub Packages install step, linked docs under `docs/` that weren't referenced (testing, style guide, semantic HTML, auth), and split the feature list into shipped vs. planned (AI genre detection, smart playlists, and community voting aren't implemented yet).
+- **AI agent instructions**: Replaced the unused `.cursor/rules/*.mdc` files with a single `AGENTS.md` (symlinked as `CLAUDE.md`) following the cross-tool AGENTS.md standard, and updated `CONTRIBUTING.md`, `docs/STYLE_GUIDE.md`, and `.github/copilot-instructions.md` to reference it instead of the removed Cursor rules.
+
+### Fixed
+
+- **Reference genre tree writes**: Fixed `401 Unauthorized` on genre/genre-playlist create, update, delete, and load-example requests. `grow-the-music-tree-api` requires an `X-API-Key` header on writes, which `@behindthemusictree/app-kit`'s transport layer has no mechanism to attach. Added a server-side proxy (`src/app/api/grow-proxy/reference/[...path]/route.ts`) that holds the key (`GTMT_API_KEY`, server-only) and forwards `reference/**` traffic to grow-api with it attached; `getGrowBackendBaseUrl()` now points at this same-origin proxy instead of the upstream host directly.
+
+### Removed
+
+- **Vercel**: Removed `vercel.json`, `.github/workflows/vercel-deploy.yml`, `.github/workflows/vercel-sync-env.yml`, and `scripts/vercel-sync-env-from-github.sh`. Production/staging no longer deploy from a semver tag or manual dispatch; Coolify auto-deploys on every push to `main`/`develop` instead.
 
 ## [2.2.0] - 2026-08-14
 

@@ -1,4 +1,4 @@
-# Vercel: develop → Git preview builds; production → semver tag or manual Vercel deploy + hook (see docs/DEPLOYMENT.md).
+# Deployment is handled by Coolify (auto-deploy on push to develop/main), not by this workflow — see docs/DEPLOYMENT.md.
 # pnpm install needs GH_PACKAGES_TOKEN: GITHUB_TOKEN cannot read @behindthemusictree/* when published from another repo (403 read_package).
 name: Validate
 

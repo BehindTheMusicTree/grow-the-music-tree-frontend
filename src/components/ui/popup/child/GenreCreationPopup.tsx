@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { BasePopup, BasePopupProps } from "../BasePopup";
+import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
 import { CriteriaMinimum } from "@behindthemusictree/app-kit/genre-tree";
+import { BANNER_HEIGHT } from "@lib/constants/layout";
 
 type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
   onSubmit: (values: { name: string; parent?: string }) => void;
@@ -38,6 +39,7 @@ export default function GenreCreationPopup({
       {...rest}
       onClose={onClose}
       title="Create Genre"
+      topOffset={BANNER_HEIGHT}
       isDismissable
       showOkButton
       showCancelButton
