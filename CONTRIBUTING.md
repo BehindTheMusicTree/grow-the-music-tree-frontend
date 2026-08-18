@@ -222,7 +222,7 @@ We follow **strict Git Flow** with the following branch structure:
 #### 🛡️ Branch Protection
 
 - **PRs to `main`** must come from `hotfix/*` or `release/*` branches only. This ensures production fixes are traceable and carefully released.
-- **PRs to `develop`** may come only from branches whose names start with one of: `feature/`, `fix/`, `chore/`, `dependabot/`, `release/`, `hotfix/`, or from the branch named exactly `main` (post-release or post-hotfix back-merge). Anything else (including `ci/*`, `refactor/*`, etc.) is **rejected** by CI. Use **`chore/*`** for CI/CD and workflow changes (e.g. `chore/vercel-sync-workflow`), not `ci/*`.
+- **PRs to `develop`** may come only from branches whose names start with one of: `feature/`, `fix/`, `chore/`, `dependabot/`, `release/`, `hotfix/`, or from the branch named exactly `main` (post-release or post-hotfix back-merge). Anything else (including `ci/*`, `refactor/*`, etc.) is **rejected** by CI. Use **`chore/*`** for CI/CD and workflow changes (e.g. `chore/update-validate-workflow`), not `ci/*`.
 - Branch protection is enforced by the `branch-protection.yml` GitHub Actions workflow located at `.github/workflows/branch-protection.yml`.
 - **Invalid PRs will:**
   - Fail the CI check
@@ -358,7 +358,7 @@ When testing your changes, verify:
 
 #### 4.1. Testing Builds During Development
 
-You can validate that your branch builds successfully by running local CI checks (`npm run lint`, `npm run test`, `npm run build`) before opening a PR. Staging builds come from **Vercel Git** on `develop`; production deploys use the **Vercel deploy** workflow when a **semver release tag** is pushed or the workflow is run manually (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
+You can validate that your branch builds successfully by running local CI checks (`npm run lint`, `npm run test`, `npm run build`) before opening a PR. Deployment is handled by Coolify, which auto-builds staging on every push to `develop` and production on every push to `main` — there is no tag or manual-dispatch gate (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
 **Choosing a Version Number:**
 
@@ -385,7 +385,7 @@ git push origin v0.3.6-dev-improve-cicd
 
 Development tags are still useful as release metadata, but they no longer trigger a dedicated publish workflow.
 
-Deployment to staging follows **Vercel Git** when you push to `develop`. Production is updated by the **Vercel deploy** workflow when you push a **semver release tag** (or run it manually), after the release is on `main`.
+Deployment to staging happens automatically via Coolify when you push to `develop`. Production deploys automatically via Coolify when the release lands on `main` — no separate deploy step or version tag is required to trigger it.
 
 **Republishing After Changes:**
 
@@ -602,7 +602,7 @@ Branch prefixes (`feature/`, `fix/`, `chore/`, `hotfix/`, `release/`, plus `depe
 - Branch `feature/add-playlist-export` → PR title: `feat(playlist): add export functionality` (use `feat`, not `feature`)
 - Branch `fix/player-preview-timeout` → PR title: `fix(player): handle preview timeout` (use `fix`)
 - Branch `chore/update-dependencies` → PR title: `chore: update dependencies` (use `chore`)
-- Branch `chore/vercel-sync-workflow` → PR title: `ci(vercel): …` or `chore: …` (branch stays `chore/*`; there is no `ci/*` branch prefix in this repo)
+- Branch `chore/update-validate-workflow` → PR title: `ci: …` or `chore: …` (branch stays `chore/*`; there is no `ci/*` branch prefix in this repo)
 - Branch `hotfix/player-crash` → PR title: `fix(player): prevent crash on invalid track` (use `fix`, not `hotfix`)
 - Branch `release/v0.2.0` → PR title: `chore: prepare release v0.2.0` (use `chore`)
 
@@ -700,7 +700,7 @@ Releases are created from the `main` branch using **strict Git Flow**. Release t
    - Recreates the tag on the amended commit.
    - Deletes local and remote test and dev tags for that version (e.g. `v0.2.0-test`, `v0.2.0-dev-*`). Rc/beta/alpha tags are not deleted automatically. See `scripts/delete-test-dev-tags.mjs`.
 
-   The **Vercel deploy** workflow runs when you push the release tag; the sync step requires the tag’s version to match `package.json`. Push the tag only from the intended **`main`** commit. If you used **`git tag`** only (no **`npm version`**), run **`node scripts/delete-test-dev-tags.mjs`** when you still want test/dev tag cleanup for that version.
+   Coolify has already deployed production from this push to `main`, independent of the tag — pushing the tag itself has no deploy effect, it only records release identity. Push the tag only from the intended **`main`** commit. If you used **`git tag`** only (no **`npm version`**), run **`node scripts/delete-test-dev-tags.mjs`** when you still want test/dev tag cleanup for that version.
 
 6. **Merge release branch back into `develop`**
 

@@ -103,6 +103,15 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Reference genre tree writes**: Fixed `401 Unauthorized` on genre/genre-playlist create, update, delete, and load-example requests. `grow-the-music-tree-api` requires an `X-API-Key` header on writes, which `@behindthemusictree/app-kit`'s transport layer has no mechanism to attach. Added a server-side proxy (`src/app/api/grow-proxy/reference/[...path]/route.ts`) that holds the key (`GTMT_API_KEY`, server-only) and forwards `reference/**` traffic to grow-api with it attached; `getGrowBackendBaseUrl()` now points at this same-origin proxy instead of the upstream host directly.
 
+### Changed
+
+- **Deployment**: Moved production/staging hosting from Vercel to Coolify (self-hosted, on the `infrastructure` repo's VPS), matching `hear-the-music-tree-frontend`. Rewrote the `Dockerfile` to a multi-stage build producing a Next.js `output: "standalone"` runtime image, with all `NEXT_PUBLIC_*` vars now passed as Docker build args (Coolify `buildtime_env`) instead of synced to Vercel. `GTMT_API_KEY` moves to a Coolify runtime env var (`static_env`), since it's read server-side at request time rather than baked in at build time.
+- **CI**: `.github/workflows/validate.yml` no longer references Vercel; it only runs lint/test/build checks. Deployment is entirely Coolify's responsibility — there is no deploy hook, deploy workflow, or version-tag gate in this repo anymore.
+
+### Removed
+
+- **Vercel**: Removed `vercel.json`, `.github/workflows/vercel-deploy.yml`, `.github/workflows/vercel-sync-env.yml`, and `scripts/vercel-sync-env-from-github.sh`. Production/staging no longer deploy from a semver tag or manual dispatch; Coolify auto-deploys on every push to `main`/`develop` instead.
+
 ## [2.2.0] - 2026-08-14
 
 ### Added

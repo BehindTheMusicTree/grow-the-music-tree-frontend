@@ -12,8 +12,7 @@ This document describes how application versioning is handled in CI/CD workflows
   - [Development Tags (`-dev`)](#development-tags--dev-)
   - [Release Candidate Tags (`-rc`, `-beta`, `-alpha`)](#release-candidate-tags--rc--beta--alpha-)
 - [How Versioning Works](#how-versioning-works)
-  - [Deployment Workflow (`vercel-deploy.yml`)](#deployment-workflow-vercel-deployyml)
-  - [Version Extraction Logic](#version-extraction-logic)
+  - [Relationship to Deployment](#relationship-to-deployment)
 - [Benefits](#benefits)
 - [Usage Examples](#usage-examples)
   - [Creating a Release](#creating-a-release)
@@ -22,13 +21,13 @@ This document describes how application versioning is handled in CI/CD workflows
 
 ## Overview
 
-**Release identity** is a **semver tag** on `main` (e.g. `v0.2.0`). Production deploy runs when that tag is pushed (see below), not on every merge to `main`.
+**Release identity** is a **semver tag** on `main` (e.g. `v0.2.0`). This tag is purely for traceability — Coolify auto-deploys production on every push to `main`, independent of tagging (see [DEPLOYMENT.md](DEPLOYMENT.md)). No deploy is gated on a version tag.
 
 Version bump and changelog roll-up for a shipping release happen **once**, never both, via one of two paths ([CONTRIBUTING.md](../CONTRIBUTING.md) §7): **preferred** — prepare `package.json` / changelog on `release/*` (or `hotfix/*`) *before* it's merged, using **`npm pkg set version=X.Y.Z`** (not `npm version` — its `postversion` script assumes it's amending a commit `npm version` just created, and will instead amend whatever commit is currently `HEAD` if run on `release/*` without a full `npm version` invocation, corrupting shared history); once merged into `main` via PR, just tag `main`'s merge commit directly (no extra bump). **Fallback** — if `release/*`/`hotfix/*` did *not* prepare the bump, run the full `npm version` (bump + commit + tag + `postversion`) directly on `main` after the PR merges.
 
-**`package.json` `version`** is the string synced to `NEXT_PUBLIC_APP_VERSION` and shown in the app. For a tag-triggered deploy it **must equal** the tag (`v0.2.0` → `0.2.0`). A manual **Vercel deploy** run (`workflow_dispatch`) still uses `package.json` only.
+**`package.json` `version`** is the release identity shown in `CHANGELOG.md` and matched against the tag. `NEXT_PUBLIC_APP_VERSION` (optionally displayed in the UI footer, see `src/components/features/menu/OrgSocialLinks.tsx`) is **not** wired into the Coolify build — the Dockerfile has no `NEXT_PUBLIC_APP_VERSION` build arg, so it's unset in production/staging unless set as a Coolify `buildtime_env` value.
 
-**Pre-release and dev tags** (`v1.0.0-rc1`, `v0.3.0-dev-*`, etc.) do **not** trigger production deploy.
+**Pre-release and dev tags** (`v1.0.0-rc1`, `v0.3.0-dev-*`, etc.) carry no deploy behavior at all — Coolify only reacts to pushes on `main`/`develop`, never to tags.
 
 ## Version Format
 
@@ -73,9 +72,9 @@ The version number is a placeholder - the actual release version is determined w
 
 #### Tag Behavior
 
-When you push a development version tag (e.g., `v0.3.6-dev-improve-cicd`), no deployment is triggered by the tag itself.
+When you push a development version tag (e.g., `v0.3.6-dev-improve-cicd`), no deployment is triggered by the tag itself — Coolify never reacts to tags.
 
-Staging is built by **Vercel Git** when you push to `develop`; production is updated when you push a **semver release tag** or run **Vercel deploy** manually (see [DEPLOYMENT.md](DEPLOYMENT.md)).
+Staging deploys automatically whenever `develop` is pushed; production deploys automatically whenever `main` is pushed (see [DEPLOYMENT.md](DEPLOYMENT.md)). Dev tags are metadata only.
 
 #### Republishing Development Version Tags
 
@@ -119,9 +118,9 @@ Release candidate version tags are used to test builds and deployments from **re
 
 #### Tag Behavior
 
-When you push a release candidate version tag (e.g., `v0.2.0-rc1`), no deployment is triggered by the tag itself.
+When you push a release candidate version tag (e.g., `v0.2.0-rc1`), no deployment is triggered by the tag itself — Coolify never reacts to tags.
 
-Production is updated by the Vercel deploy workflow on push of a semver release tag (or manual run); staging uses Vercel Git on `develop` (see [DEPLOYMENT.md](DEPLOYMENT.md)).
+Production deploys automatically on every push to `main`; staging deploys automatically on every push to `develop` (see [DEPLOYMENT.md](DEPLOYMENT.md)).
 
 ### Cleanup
 
@@ -129,27 +128,11 @@ Test and dev tags for the released version (e.g. `v1.4.0-test`, `v1.4.0-dev-*`) 
 
 ## How Versioning Works
 
-### Deployment Workflow (`vercel-deploy.yml`)
+### Relationship to Deployment
 
-[`vercel-deploy.yml`](../.github/workflows/vercel-deploy.yml) runs when you push a **semver release tag** `vMAJOR.MINOR.PATCH` (e.g. `v1.4.4`), or when you run it manually (**Actions → Vercel deploy**):
+Versioning (this document) and deployment (see [DEPLOYMENT.md](DEPLOYMENT.md)) are **independent** in this repo. Coolify auto-deploys production from every push to `main` and staging from every push to `develop`; there is no build or deploy step gated on `package.json` `version` or on a semver tag.
 
-1. **Sets** `NEXT_PUBLIC_APP_VERSION` on Vercel **production** from **`package.json` `version`**, after checking that the tag (if any) matches that version. **Preview** env (manual full sync) still uses `<version>-dev+<shortsha>`.
-2. **Triggers** a **production** deployment via the `VERCEL_DEPLOY_HOOK` secret (Git production deploys for `main` are disabled in [`vercel.json`](../vercel.json); CI owns production deploys).
-
-Merging to **`main` alone does not** run this workflow; push the release tag (or use manual dispatch to redeploy).
-
-**Staging (`develop` and PRs):** Vercel builds from Git only. `NEXT_PUBLIC_APP_VERSION` for preview is not updated by this workflow on every `develop` push; use Vercel project env or run [**Vercel sync env**](../.github/workflows/vercel-sync-env.yml) for preview when needed.
-
-**Other `NEXT_PUBLIC_*` variables:** Pushed only when you run the manual workflow [**Vercel sync env**](../.github/workflows/vercel-sync-env.yml) (`vercel-sync-env.yml`), not on every production deploy. See [DEPLOYMENT.md](DEPLOYMENT.md) §3.1.
-
-### Version Extraction Logic
-
-For **production** in `app-version-only` mode ([`scripts/vercel-sync-env-from-github.sh`](../scripts/vercel-sync-env-from-github.sh)):
-
-- **Tag push** `refs/tags/vX.Y.Z`: `X.Y.Z` must equal `package.json` `version`; that value is written to `NEXT_PUBLIC_APP_VERSION`.
-- **`workflow_dispatch`**: uses `package.json` `version` only (for redeploys without a new tag).
-
-Any other context fails with a clear error so production cannot be updated from an unexpected ref.
+The version tag on `main` still matters for **traceability**: it marks which commit shipped as a given release, matches `package.json` `version`, and drives the `CHANGELOG.md` roll-up via `npm version`'s `postversion` script (see [CONTRIBUTING.md](../CONTRIBUTING.md) §7). It just no longer *triggers* anything — pushing a tag has no side effect on Coolify, and merging to `main` deploys regardless of whether a tag follows.
 
 ## Benefits
 
