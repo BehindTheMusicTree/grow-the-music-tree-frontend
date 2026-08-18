@@ -88,6 +88,12 @@ npm is reaching GitHub Packages but **rejecting the credential**. Typical causes
 4. **Value hygiene in Vercel** — Store the raw token only (no `Bearer ` prefix, no surrounding quotes). Remove accidental spaces or newlines if you pasted from a secret manager.
 5. **Sanity check locally** — `export NPM_TOKEN=…` then `npm ci` at the repo root. If local fails with the same **401**, fix the PAT/SSO before changing Vercel again.
 
+### Grow-api write proxy (`GTMT_API_KEY`)
+
+`grow-the-music-tree-api` requires an `X-API-Key` header on writes (genre/genre-playlist create, update, delete, load-example). `grow-the-music-tree-frontend` never sends that key from the browser — the Route Handler at `src/app/api/grow-proxy/reference/[...path]/route.ts` attaches it server-side to reference-genre traffic before forwarding to grow-api (see `getGrowBackendBaseUrl` in [src/lib/site-urls.ts](../src/lib/site-urls.ts) and `getGrowApiUpstreamBaseUrl` in [src/lib/grow-api-upstream-url.ts](../src/lib/grow-api-upstream-url.ts)).
+
+**Vercel** must define **`GTMT_API_KEY`** (sensitive, server-only — not `NEXT_PUBLIC_*`) for **Production** and **Preview**. It is synced to Vercel the same way as `NPM_TOKEN` (see [§3.1](#31-syncing-env-vars-from-github-recommended)).
+
 ### Organization assets (branding and subdomains)
 
 The banner **TheMusicTree** lockup and sidebar social icons use **`@behindthemusictree/assets`**. The lockup’s organization site URL is embedded when that package is published; **`NEXT_PUBLIC_THEMUSICTREE_URL`** is not used.
@@ -112,6 +118,7 @@ After you change GitHub **Variables** or **Secrets** that map to Vercel, run **V
 - `VERCEL_TOKEN` – [Vercel token](https://vercel.com/account/tokens) with access to the project.
 - `VERCEL_PROJECT_ID` – Project id or name (e.g. `grow-the-music-tree-frontend`).
 - `GH_PACKAGES_TOKEN` – GitHub PAT with **`read:packages`** (same value you use for Vercel **`NPM_TOKEN`**). Required for [**Validate**](../.github/workflows/validate.yml) (**`npm ci`** on PRs) and for [**Vercel sync env**](../.github/workflows/vercel-sync-env.yml) (sync **`NPM_TOKEN`** to Vercel). Workflows fail if it is unset or empty.
+- `GTMT_API_KEY` – repo-level secret for the grow-api write proxy. Synced to Vercel as **`GTMT_API_KEY`** (sensitive) for both targets — see [§ Grow-api write proxy](#grow-api-write-proxy-gtmt_api_key).
 
 **Required** GitHub Secret (environment **PROD** only, for **Vercel deploy**):
 

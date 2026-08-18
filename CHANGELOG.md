@@ -99,6 +99,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **README**: Fixed the project structure diagram and example env vars, which had drifted from the actual `src/` layout and `env/development/example` file. Added the `NPM_TOKEN`/GitHub Packages install step, linked docs under `docs/` that weren't referenced (testing, style guide, semantic HTML, auth), and split the feature list into shipped vs. planned (AI genre detection, smart playlists, and community voting aren't implemented yet).
 - **AI agent instructions**: Replaced the unused `.cursor/rules/*.mdc` files with a single `AGENTS.md` (symlinked as `CLAUDE.md`) following the cross-tool AGENTS.md standard, and updated `CONTRIBUTING.md`, `docs/STYLE_GUIDE.md`, and `.github/copilot-instructions.md` to reference it instead of the removed Cursor rules.
 
+### Fixed
+
+- **Reference genre tree writes**: Fixed `401 Unauthorized` on genre/genre-playlist create, update, delete, and load-example requests. `grow-the-music-tree-api` requires an `X-API-Key` header on writes, which `@behindthemusictree/app-kit`'s transport layer has no mechanism to attach. Added a server-side proxy (`src/app/api/grow-proxy/reference/[...path]/route.ts`) that holds the key (`GTMT_API_KEY`, server-only) and forwards `reference/**` traffic to grow-api with it attached; `getGrowBackendBaseUrl()` now points at this same-origin proxy instead of the upstream host directly.
+
 ## [2.2.0] - 2026-08-14
 
 ### Added
