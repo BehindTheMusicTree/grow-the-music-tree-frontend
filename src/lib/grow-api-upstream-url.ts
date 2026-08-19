@@ -9,7 +9,7 @@ import { GTMT_API_SUBDOMAIN, ORG_DOMAIN } from "@behindthemusictree/brand";
  * logic locally instead.
  */
 export function getGrowApiUpstreamBaseUrl(): string {
-  const overrideUrl = !process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_GROW_BACKEND_BASE_URL : undefined;
+  const overrideUrl = process.env.NEXT_PUBLIC_GROW_BACKEND_BASE_URL;
   if (overrideUrl) return overrideUrl;
 
   if (!GTMT_API_SUBDOMAIN) throw new Error("GTMT_API_SUBDOMAIN is required");
@@ -17,7 +17,6 @@ export function getGrowApiUpstreamBaseUrl(): string {
   const apiRootSegment = process.env.NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT;
   if (!apiRootSegment) throw new Error("NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT is required");
 
-  const isProduction = process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
-  const host = isProduction ? GTMT_API_SUBDOMAIN : `${GTMT_API_SUBDOMAIN}-staging`;
+  const host = `${GTMT_API_SUBDOMAIN}-staging`;
   return `https://${host}.${ORG_DOMAIN}/${apiRootSegment.replace(/^\/+|\/+$/g, "")}/`;
 }

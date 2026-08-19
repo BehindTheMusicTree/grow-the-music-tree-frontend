@@ -87,6 +87,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- **Backend/AudioMeta URLs**: Fixed a runtime crash on staging (breaking Sentry init) where `getBackendBaseUrl()` threw on a missing `NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT` even though the Coolify-set `NEXT_PUBLIC_BACKEND_BASE_URL` override made it unnecessary. The override is now checked first in both `getBackendBaseUrl()` and `getAudiometaUrl()`, matching `hear-the-music-tree-frontend`'s already-migrated pattern.
+
+### Removed
+
+- **Vercel**: Removed the remaining `NEXT_PUBLIC_VERCEL_ENV`-gated code in `site-urls.ts` and `grow-api-upstream-url.ts` (dead now that Coolify never sets it) and the `@vercel/analytics` dependency, whose script 404s off Vercel.
+
 ## [2.3.0] - 2026-08-18
 
 ### Changed
