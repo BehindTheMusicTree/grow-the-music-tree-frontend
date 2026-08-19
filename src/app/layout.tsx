@@ -1,4 +1,3 @@
-import { Analytics } from "@vercel/analytics/next";
 import { Inter } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import { APP_NAME } from "@constants/app";
@@ -37,7 +36,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         {children}
-        <Analytics />
       </body>
     </html>
   );
