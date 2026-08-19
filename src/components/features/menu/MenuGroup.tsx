@@ -3,20 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
-import { usePopup, AUTH_POPUP_TYPE } from "@behindthemusictree/app-kit/popup";
-import { useSession } from "@behindthemusictree/app-kit/auth";
-import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
-import { useGoogleAuth } from "@hooks/useGoogleAuth";
-import { useFetchSpotifyUser } from "@hooks/useSpotifyUser";
-import { getRouteAuthRequirement } from "@lib/constants/routes";
-import AuthPopup from "@components/ui/popup/child/AuthPopup";
 import { cn } from "@lib/utils";
 
 interface MenuItem {
   href: string;
   label: string;
   icon: ReactNode;
-  authRequired?: false | "any" | "spotify";
   /** Opens in a new tab; uses a plain anchor instead of Next.js `Link`. */
   external?: boolean;
 }
@@ -30,51 +22,7 @@ interface MenuGroupProps {
 
 export function MenuGroup({ items, className = "", collapsed = false, layout = "vertical" }: MenuGroupProps) {
   const pathname = usePathname();
-  const { showPopup, hidePopup } = usePopup();
-  const { session } = useSession();
-  const { handleSpotifyOAuth } = useSpotifyAuth();
-  const { handleGoogleOAuth } = useGoogleAuth();
-  const routeAuthRequirement = getRouteAuthRequirement(pathname);
-  const fetchSpotifyUserEnabled = routeAuthRequirement === "spotify" || pathname === "/account";
-  const { data: spotifyProfile } = useFetchSpotifyUser({
-    skipGlobalError: true,
-    enabled: fetchSpotifyUserEnabled,
-  });
-  const isAuthenticated = Boolean(session?.accessToken);
-  const hasSpotifyAuth = Boolean(spotifyProfile?.id);
   const isHorizontal = layout === "horizontal";
-
-  const handleItemClick = (item: MenuItem) => (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (item.external) {
-      hidePopup({ onlyIfType: AUTH_POPUP_TYPE });
-      return;
-    }
-    if (item.authRequired === false) {
-      hidePopup({ onlyIfType: AUTH_POPUP_TYPE });
-      return;
-    }
-    if (item.authRequired === "spotify" && (!isAuthenticated || !hasSpotifyAuth)) {
-      e.preventDefault();
-      showPopup(
-        <AuthPopup handleSpotifyOAuth={handleSpotifyOAuth} redirectAfterAuthPath={item.href} spotifyOnly />,
-        AUTH_POPUP_TYPE,
-      );
-      return;
-    }
-    if (item.authRequired === "any" && !isAuthenticated) {
-      e.preventDefault();
-      showPopup(
-        <AuthPopup
-          handleSpotifyOAuth={handleSpotifyOAuth}
-          handleGoogleOAuth={handleGoogleOAuth}
-          redirectAfterAuthPath={item.href}
-        />,
-        AUTH_POPUP_TYPE,
-      );
-      return;
-    }
-    hidePopup({ onlyIfType: AUTH_POPUP_TYPE });
-  };
 
   return (
     <div
@@ -92,13 +40,8 @@ export function MenuGroup({ items, className = "", collapsed = false, layout = "
           isHorizontal
             ? "shrink-0 gap-2 whitespace-nowrap px-1.5 py-1.5 text-sm lg:gap-2 lg:px-2"
             : cn("mx-1 mt-1 py-2", collapsed ? "justify-center px-2" : "gap-3 px-4"),
-          item.authRequired === "spotify"
-            ? "text-green-400 hover:text-green-300"
-            : item.authRequired === "any"
-              ? "text-gray-200 hover:text-white"
-              : "text-gray-300 hover:text-white",
-          isCurrentPage &&
-            (item.authRequired === "spotify" ? "font-semibold text-green-200" : "font-semibold text-white"),
+          "text-gray-300 hover:text-white",
+          isCurrentPage && "font-semibold text-white",
         );
         const label =
           isHorizontal ? (
@@ -114,7 +57,6 @@ export function MenuGroup({ items, className = "", collapsed = false, layout = "
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={handleItemClick(item)}
               title={isHorizontal || (!isHorizontal && collapsed) ? item.label : undefined}
               className={className}
             >
@@ -129,7 +71,6 @@ export function MenuGroup({ items, className = "", collapsed = false, layout = "
             key={item.href}
             href={item.href}
             prefetch={false}
-            onClick={handleItemClick(item)}
             title={isHorizontal || (!isHorizontal && collapsed) ? item.label : undefined}
             aria-current={isCurrentPage ? "page" : undefined}
             className={className}

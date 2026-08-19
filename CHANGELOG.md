@@ -87,6 +87,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Playback**: Reference-tree track playback no longer depends on `hear-the-music-tree-api` at all. It previously fetched a downloaded audio file via `libraryEndpoints.reference.uploaded.download()`, which never actually worked against `grow-the-music-tree-api` (that backend has no audio storage). Tracks now play through an embedded YouTube video instead: `useLoadTrack()` fetches track metadata from `grow-the-music-tree-api`'s new `reference/library/youtube` endpoint and loads it into `@behindthemusictree/app-kit`'s player as a `"youtube"`-kind `PlayerTrack`. The player footer now renders app-kit's `PlayerVideoSurface` above the transport bar whenever a track is loaded, and `Player.tsx`/`ProgressBar.tsx` drive playback through the new `mediaController` API instead of reading/writing an `HTMLAudioElement` directly. A track with no `youtube_video_id` set surfaces a clear load error instead of silently failing.
+
 ### Fixed
 
 - **Backend/AudioMeta URLs**: Fixed a runtime crash on staging (breaking Sentry init) where `getBackendBaseUrl()` threw on a missing `NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT` even though the Coolify-set `NEXT_PUBLIC_BACKEND_BASE_URL` override made it unnecessary. The override is now checked first in both `getBackendBaseUrl()` and `getAudiometaUrl()`, matching `hear-the-music-tree-frontend`'s already-migrated pattern.

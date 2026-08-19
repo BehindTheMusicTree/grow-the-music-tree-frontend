@@ -86,7 +86,8 @@
       "minimatch@10": "10.2.3",
       "picomatch@2": "2.3.2",
       "picomatch@4": "4.0.4",
-      "vite": "~7.3.2"
+      "vite": "~7.3.2",
+      "@behindthemusictree/app-kit": "link:../app-kit/packages/app-kit"
     }
   }
 }

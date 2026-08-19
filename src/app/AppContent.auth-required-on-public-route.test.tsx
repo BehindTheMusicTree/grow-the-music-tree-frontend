@@ -29,20 +29,11 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => {
   };
 });
 
-vi.mock("@hooks/useSpotifyAuth", () => ({
-  useSpotifyAuth: () => ({ handleSpotifyOAuth: vi.fn() }),
-}));
-
-vi.mock("@hooks/useGoogleAuth", () => ({
-  useGoogleAuth: () => ({ handleGoogleOAuth: vi.fn() }),
-}));
-
 vi.mock("@lib/sentry", () => ({ initSentry: vi.fn() }));
 
 vi.mock("@components/features/menu/AppHeader", () => ({ default: () => null }));
 vi.mock("@components/features/player/Player", () => ({ default: () => null }));
 vi.mock("@components/features/player/AutoAdvance", () => ({ default: () => null }));
-vi.mock("@components/auth/AuthCallbackHandler", () => ({ default: () => null }));
 
 function SetConnectivityError() {
   const { setConnectivityError } = useConnectivityError();

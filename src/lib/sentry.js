@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
-import { getBackendBaseUrl } from "@lib/site-urls";
+import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
 export function initSentry() {
   if (process.env.NEXT_PUBLIC_SENTRY_IS_ACTIVE !== "true") {
@@ -31,10 +31,7 @@ export function initSentry() {
       dsn: "https://7f17fcd9feebfb634ad7ba2f638ba69a@o4507119053832192.ingest.de.sentry.io/4507119058026576",
       integrations,
       tracesSampleRate,
-      tracePropagationTargets: [
-        "localhost",
-        new RegExp(`^${getBackendBaseUrl().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
-      ],
+      tracePropagationTargets: ["localhost", getGrowBackendBaseUrl()],
       replaysSessionSampleRate,
       replaysOnErrorSampleRate,
       enabled: process.env.NEXT_PUBLIC_SENTRY_IS_ACTIVE === "true",

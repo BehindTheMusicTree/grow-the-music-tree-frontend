@@ -1,41 +1,26 @@
 "use client";
 
 import { useEffect, ReactNode } from "react";
-import { usePathname } from "next/navigation";
-import { useSpotifyAuth } from "@hooks/useSpotifyAuth";
-import { useGoogleAuth } from "@hooks/useGoogleAuth";
-import { usePopup, AUTH_POPUP_TYPE, useConnectivityErrorPopup } from "@behindthemusictree/app-kit/popup";
+import { usePopup, useConnectivityErrorPopup } from "@behindthemusictree/app-kit/popup";
 import { usePlayer } from "@behindthemusictree/app-kit/player";
 import { TrackListSidebar, useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
 import { initSentry } from "@lib/sentry";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
-import SpotifyAuthErrorPopup from "@components/ui/popup/child/SpotifyAuthErrorPopup";
-import AuthErrorPopup from "@components/ui/popup/child/AuthErrorPopup";
 
 import AppHeader from "@components/features/menu/AppHeader";
 import Player from "@components/features/player/Player";
 import AutoAdvance from "@components/features/player/AutoAdvance";
 
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
-import AuthPopup from "@components/ui/popup/child/AuthPopup";
-import AuthCallbackHandler from "@components/auth/AuthCallbackHandler";
 
 import { BANNER_HEIGHT, PLAYER_HEIGHT } from "@constants/layout";
-import { getRouteAuthRequirement } from "@lib/constants/routes";
-import { getBackendBaseUrl } from "@lib/site-urls";
+import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
 export default function AppContent({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
   const { playerTrackObject } = usePlayer();
   const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const { activePopup } = usePopup();
-  const { handleSpotifyOAuth } = useSpotifyAuth();
-  const { handleGoogleOAuth } = useGoogleAuth();
-  const isAccountPage = pathname === "/account";
-  const routeAuthRequirement = getRouteAuthRequirement(pathname);
-  const routeRequiresAuth = routeAuthRequirement === "any" || routeAuthRequirement === "spotify";
-  const routeRequiresSpotify = routeAuthRequirement === "spotify";
 
   useEffect(() => {
     initSentry();
@@ -44,19 +29,15 @@ export default function AppContent({ children }: { children: ReactNode }) {
   useEffect(() => {}, [playerTrackObject]);
 
   useConnectivityErrorPopup({
-    isAccountPage,
-    routeRequiresAuth,
-    routeRequiresSpotify,
+    isAccountPage: false,
+    routeRequiresAuth: false,
+    routeRequiresSpotify: false,
     renderers: {
-      renderAuthPopup: () => (
-        <AuthPopup handleSpotifyOAuth={handleSpotifyOAuth} handleGoogleOAuth={handleGoogleOAuth} />
-      ),
-      renderSpotifyOnlyAuthPopup: () => <AuthPopup handleSpotifyOAuth={handleSpotifyOAuth} spotifyOnly />,
+      renderAuthPopup: () => null,
+      renderSpotifyOnlyAuthPopup: () => null,
       renderInternalErrorPopup: (errorCode) => <InternalErrorPopup errorCode={errorCode} />,
-      renderSpotifyAuthErrorPopup: ({ message, onClose }) => (
-        <SpotifyAuthErrorPopup message={message} onClose={onClose} />
-      ),
-      renderGoogleAuthErrorPopup: ({ message, onClose }) => <AuthErrorPopup message={message} onClose={onClose} />,
+      renderSpotifyAuthErrorPopup: () => null,
+      renderGoogleAuthErrorPopup: () => null,
       renderNetworkErrorPopup: () => <NetworkErrorPopup />,
     },
   });
@@ -65,7 +46,6 @@ export default function AppContent({ children }: { children: ReactNode }) {
 
   return (
     <div className="app col h-screen">
-      <AuthCallbackHandler />
       <AppHeader />
 
       <div
@@ -78,7 +58,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
               <div className="flex min-h-0 flex-1 flex-col">{children}</div>
             </main>
             {isTrackListSidebarVisible && (
-              <TrackListSidebar className="z-40" getBackendBaseUrl={getBackendBaseUrl} />
+              <TrackListSidebar className="z-40" getBackendBaseUrl={getGrowBackendBaseUrl} />
             )}
           </div>
           {activePopup && (
