@@ -7,25 +7,11 @@ import { APP_NAME } from "@lib/constants/app";
 import { getAudiometaUrl } from "@lib/site-urls";
 import { MenuGroup } from "./MenuGroup";
 import { HeaderMenuDropdown } from "./HeaderMenuDropdown";
-import {
-  PATHS as ROUTE_PATHS,
-  AUTH_CONFIG as ROUTE_AUTH_CONFIG,
-  PATHS_EXCLUDED_FROM_HEADER_NAV as ROUTE_PATHS_EXCLUDED_FROM_HEADER_NAV,
-} from "@lib/constants/routes";
-
-const MENU_ICONS: Record<string, React.ReactNode> = {};
+import { PATHS as ROUTE_PATHS } from "@lib/constants/routes";
 
 const SHOW_AUDIOMETA_MENU_ITEM = false;
 
 const menuGroup = [
-  ...ROUTE_AUTH_CONFIG.filter(
-    ({ path, hiddenFromMenu }) => !ROUTE_PATHS_EXCLUDED_FROM_HEADER_NAV.has(path) && !hiddenFromMenu,
-  ).map((route) => ({
-    href: route.path,
-    label: route.label,
-    icon: MENU_ICONS[route.path],
-    authRequired: route.authRequired,
-  })),
   ...(SHOW_AUDIOMETA_MENU_ITEM
     ? [
         {
@@ -41,7 +27,6 @@ const menuGroup = [
               aria-hidden
             />
           ),
-          authRequired: false as const,
           external: true,
         },
       ]

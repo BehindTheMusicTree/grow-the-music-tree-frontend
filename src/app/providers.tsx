@@ -10,9 +10,10 @@ import {
   TrackListSidebarVisibilityProvider,
   TrackListProvider,
   libraryEndpoints,
-  UploadedTrackDetailed,
+  YoutubeTrackDetailed,
 } from "@behindthemusictree/app-kit/genre-tree";
-import { getBackendBaseUrl } from "@lib/site-urls";
+import { getGrowBackendBaseUrl } from "@lib/site-urls";
+import { toPlayerTrack } from "@lib/player-track";
 
 interface ProvidersProps {
   children: NonNullable<ReactNode>;
@@ -20,37 +21,22 @@ interface ProvidersProps {
 
 // grow only plays tracks from the reference (community) tree; the "me"-scope playback paths
 // (My Library, My Genre Playlists) are being removed from grow in favor of hear-the-music-tree.
-const PLAYER_SCOPE: Scope = "reference";
+const PLAYER_SCOPE = "reference" satisfies Scope;
 
 function useLoadTrack(): (trackId: string) => Promise<PlayerTrack> {
-  const { fetch } = useFetchWrapper(getBackendBaseUrl);
+  const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
 
   return useCallback(
     async (trackId: string): Promise<PlayerTrack> => {
-      const requiresAuth = PLAYER_SCOPE === "me";
-      const track = await fetch<UploadedTrackDetailed>(
-        libraryEndpoints[PLAYER_SCOPE].uploaded.detail(trackId),
+      const track = await fetch<YoutubeTrackDetailed>(
+        libraryEndpoints[PLAYER_SCOPE].youtube.detail(trackId),
         true,
-        requiresAuth,
+        false,
       );
-      const data = await fetch<ArrayBuffer>(
-        libraryEndpoints[PLAYER_SCOPE].uploaded.download(trackId),
-        true,
-        requiresAuth,
-        {},
-        {},
-        true,
-      );
-      if (!track || !data) {
+      if (!track) {
         throw new Error(`Failed to load track ${trackId}`);
       }
-      const blob = new Blob([data], { type: "audio/mpeg" });
-      return {
-        id: trackId,
-        streamUrl: URL.createObjectURL(blob),
-        title: track.title,
-        artists: track.artists?.map((artist) => ({ name: artist.name })),
-      };
+      return toPlayerTrack(track);
     },
     [fetch],
   );
@@ -63,7 +49,7 @@ function AppProviders({ children }: ProvidersProps) {
     <PlayerProvider loadTrack={loadTrack}>
       <PopupProvider>
         <TrackListSidebarVisibilityProvider>
-          <TrackListProvider getBackendBaseUrl={getBackendBaseUrl}>{children}</TrackListProvider>
+          <TrackListProvider getBackendBaseUrl={getGrowBackendBaseUrl}>{children}</TrackListProvider>
         </TrackListSidebarVisibilityProvider>
       </PopupProvider>
     </PlayerProvider>
@@ -73,11 +59,11 @@ function AppProviders({ children }: ProvidersProps) {
 export default function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <ConnectivityErrorProvider>
+      <ConnectivityErrorProvider>
+        <SessionProvider>
           <AppProviders>{children}</AppProviders>
-        </ConnectivityErrorProvider>
-      </SessionProvider>
+        </SessionProvider>
+      </ConnectivityErrorProvider>
     </QueryClientProvider>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FaVolumeUp, FaVolumeMute } from "react-icons/fa";
-import { usePlayer, useCurrentTime, PlayerTrack } from "@behindthemusictree/app-kit/player";
+import { usePlayer, useCurrentTime, PlayerTrack, PlayerVideoSurface } from "@behindthemusictree/app-kit/player";
 import { useTrackList, useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
 import { TheMusicTreeByline } from "@behindthemusictree/brand/components";
 import { toPlayerTrack } from "@lib/player-track";
@@ -58,11 +58,11 @@ export default function Player({ className }: PlayerProps) {
   };
 
   const handlePrevious = () => {
-    if (!playerTrackObject?.audioElement) return;
+    if (!playerTrackObject?.mediaController) return;
 
     // If we're at least 1 second into the track, restart the current song
     if (currentTime >= 1) {
-      playerTrackObject.audioElement.currentTime = 0;
+      playerTrackObject.mediaController.setCurrentTime(0);
       return;
     }
 
@@ -78,27 +78,20 @@ export default function Player({ className }: PlayerProps) {
 
   const handleVolumeChange = (newVolume: number) => {
     setVolume(newVolume);
-    // Update audio element volume if it exists
-    if (playerTrackObject?.audioElement) {
-      playerTrackObject.audioElement.volume = newVolume / 100;
-    }
+    playerTrackObject?.mediaController?.setVolume(newVolume);
   };
 
   const handleVolumeToggle = () => {
     if (isMuted) {
       // Unmute: restore previous volume
       setVolume(previousVolume);
-      if (playerTrackObject?.audioElement) {
-        playerTrackObject.audioElement.volume = previousVolume / 100;
-      }
+      playerTrackObject?.mediaController?.setVolume(previousVolume);
       setIsMuted(false);
     } else {
       // Mute: save current volume and set to 0
       setPreviousVolume(volume);
       setVolume(0);
-      if (playerTrackObject?.audioElement) {
-        playerTrackObject.audioElement.volume = 0;
-      }
+      playerTrackObject?.mediaController?.setVolume(0);
       setIsMuted(true);
     }
   };
@@ -107,6 +100,7 @@ export default function Player({ className }: PlayerProps) {
     <div className={`relative w-full bg-black text-white h-player ${className ?? ""}`}>
       <ProgressBar className="absolute inset-x-0 top-0" />
       <div className="flex h-full items-center gap-4 px-4">
+        <PlayerVideoSurface className="h-full aspect-square shrink-0 bg-black" />
         <button
           onClick={toggleTrackListSidebar}
           className="flex min-w-0 flex-1 flex-col items-start justify-center bg-transparent text-left"

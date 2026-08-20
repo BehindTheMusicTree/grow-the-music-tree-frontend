@@ -11,10 +11,10 @@ export default function ProgressBar({ className }: ProgressBarProps) {
   const currentTime = useCurrentTime();
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!playerTrackObject?.audioElement) return;
+    if (!playerTrackObject?.mediaController) return;
 
     const newTime = parseFloat(e.target.value);
-    playerTrackObject.audioElement.currentTime = newTime;
+    playerTrackObject.mediaController.setCurrentTime(newTime);
   };
 
   if (!playerTrackObject) {

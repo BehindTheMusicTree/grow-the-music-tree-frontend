@@ -87,12 +87,19 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Playback**: Reference-tree track playback no longer depends on `hear-the-music-tree-api` at all. It previously fetched a downloaded audio file via `libraryEndpoints.reference.uploaded.download()`, which never actually worked against `grow-the-music-tree-api` (that backend has no audio storage). Tracks now play through an embedded YouTube video instead: `useLoadTrack()` fetches track metadata from `grow-the-music-tree-api`'s new `reference/library/youtube` endpoint and loads it into `@behindthemusictree/app-kit`'s player as a `"youtube"`-kind `PlayerTrack`. The player footer now renders app-kit's `PlayerVideoSurface` above the transport bar whenever a track is loaded, and `Player.tsx`/`ProgressBar.tsx` drive playback through the new `mediaController` API instead of reading/writing an `HTMLAudioElement` directly. A track with no `youtube_video_id` set surfaces a clear load error instead of silently failing.
+- **Reference genre tree**: Wired up the genre rename popup (`GenreRenamePopup`, `useUpdateGenre`'s `renameGenre`) via app-kit's now-required `handleGenreRenameAction`.
+- **`grow-proxy` route**: Dropped the redundant `reference/` URL segment from the proxy's upstream path, matching `grow-the-music-tree-api` dropping the same prefix from all its routes.
+
 ### Fixed
 
 - **Backend/AudioMeta URLs**: Fixed a runtime crash on staging (breaking Sentry init) where `getBackendBaseUrl()` threw on a missing `NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT` even though the Coolify-set `NEXT_PUBLIC_BACKEND_BASE_URL` override made it unnecessary. The override is now checked first in both `getBackendBaseUrl()` and `getAudiometaUrl()`, matching `hear-the-music-tree-frontend`'s already-migrated pattern.
 
 ### Removed
 
+- **Login/Account**: Removed login and personal-library features entirely — `useSpotifyAuth`/`useGoogleAuth`/`useSpotifyUser`/`useSpotifyLibTracks`, `AuthCallbackHandler`, the `/account`, `/me-spotify-library`, and `/auth/{spotify,google}/callback` pages, and their popups (`AuthPopup`, `SpotifyAuthErrorPopup`, `AuthErrorPopup`, `SpotifyAllowlistPopup`), plus the dead `useGenreDeletion` hook and `GenreDeletionPopup`. `grow-the-music-tree-api` has no user/auth model (single-tenant, static API key) — per-user auth was never going to be built there, and personal-library features belong to `hear-the-music-tree-frontend` (v2.0.0 precedent). `providers.tsx` drops the `SessionProvider` wrap, `AppContent.tsx` drops the auth hook calls, `MenuGroup.tsx` drops the `authRequired`-gated click interception, and `routes.ts`/`site-urls.ts`/`next.config.js` drop the now-dead auth-routing and `NEXT_PUBLIC_BACKEND_BASE_URL`/`NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT` machinery.
 - **Vercel**: Removed the remaining `NEXT_PUBLIC_VERCEL_ENV`-gated code in `site-urls.ts` and `grow-api-upstream-url.ts` (dead now that Coolify never sets it) and the `@vercel/analytics` dependency, whose script 404s off Vercel.
 
 ## [2.3.0] - 2026-08-18
