@@ -10,7 +10,7 @@ function makeContext(path: string[]) {
   return { params: Promise.resolve({ path }) };
 }
 
-describe("grow-proxy reference route", () => {
+describe("grow-proxy route", () => {
   const originalApiKey = process.env.GTMT_API_KEY;
 
   beforeEach(() => {
@@ -27,12 +27,12 @@ describe("grow-proxy reference route", () => {
       .spyOn(global, "fetch")
       .mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200, headers: { "content-type": "application/json" } }));
 
-    const request = new NextRequest("http://localhost/api/grow-proxy/reference/genres/?foo=bar");
+    const request = new NextRequest("http://localhost/api/grow-proxy/genres/?foo=bar");
     const response = await GET(request, makeContext(["genres"]));
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe("https://grow-api-staging.themusictree.org/v0/reference/genres/?foo=bar");
+    expect(url).toBe("https://grow-api-staging.themusictree.org/v0/genres/?foo=bar");
     expect(init?.method).toBe("GET");
     expect((init?.headers as Record<string, string>)["X-API-Key"]).toBe("test-api-key");
     expect(init?.body).toBeUndefined();
@@ -45,7 +45,7 @@ describe("grow-proxy reference route", () => {
       .spyOn(global, "fetch")
       .mockResolvedValue(new Response(JSON.stringify({ created: true }), { status: 201, headers: { "content-type": "application/json" } }));
 
-    const request = new NextRequest("http://localhost/api/grow-proxy/reference/genres/tree/load-example/", {
+    const request = new NextRequest("http://localhost/api/grow-proxy/genres/tree/load-example/", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ name: "example" }),
@@ -54,7 +54,7 @@ describe("grow-proxy reference route", () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe("https://grow-api-staging.themusictree.org/v0/reference/genres/tree/load-example/");
+    expect(url).toBe("https://grow-api-staging.themusictree.org/v0/genres/tree/load-example/");
     expect(init?.method).toBe("POST");
     const headers = init?.headers as Record<string, string>;
     expect(headers["X-API-Key"]).toBe("test-api-key");
@@ -69,7 +69,7 @@ describe("grow-proxy reference route", () => {
       new Response(JSON.stringify({ detail: "not found" }), { status: 404, headers: { "content-type": "application/json" } })
     );
 
-    const request = new NextRequest("http://localhost/api/grow-proxy/reference/genres/missing/");
+    const request = new NextRequest("http://localhost/api/grow-proxy/genres/missing/");
     const response = await GET(request, makeContext(["genres", "missing"]));
 
     expect(response.status).toBe(404);
@@ -80,7 +80,7 @@ describe("grow-proxy reference route", () => {
     delete process.env.GTMT_API_KEY;
     const fetchMock = vi.spyOn(global, "fetch");
 
-    const request = new NextRequest("http://localhost/api/grow-proxy/reference/genres/");
+    const request = new NextRequest("http://localhost/api/grow-proxy/genres/");
     await expect(GET(request, makeContext(["genres"]))).rejects.toThrow("GTMT_API_KEY is required");
     expect(fetchMock).not.toHaveBeenCalled();
   });

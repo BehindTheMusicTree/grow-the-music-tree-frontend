@@ -8,7 +8,7 @@ async function forward(request: NextRequest, path: string[]): Promise<NextRespon
   }
 
   const upstreamBase = getGrowApiUpstreamBaseUrl().replace(/\/+$/, "");
-  const upstreamUrl = `${upstreamBase}/reference/${path.join("/")}/${request.nextUrl.search}`;
+  const upstreamUrl = `${upstreamBase}/${path.join("/")}/${request.nextUrl.search}`;
 
   const hasBody = request.method !== "GET" && request.method !== "HEAD";
   const contentType = request.headers.get("content-type");
