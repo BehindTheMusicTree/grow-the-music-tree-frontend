@@ -102,6 +102,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Login/Account**: Removed login and personal-library features entirely — `useSpotifyAuth`/`useGoogleAuth`/`useSpotifyUser`/`useSpotifyLibTracks`, `AuthCallbackHandler`, the `/account`, `/me-spotify-library`, and `/auth/{spotify,google}/callback` pages, and their popups (`AuthPopup`, `SpotifyAuthErrorPopup`, `AuthErrorPopup`, `SpotifyAllowlistPopup`), plus the dead `useGenreDeletion` hook and `GenreDeletionPopup`. `grow-the-music-tree-api` has no user/auth model (single-tenant, static API key) — per-user auth was never going to be built there, and personal-library features belong to `hear-the-music-tree-frontend` (v2.0.0 precedent). `providers.tsx` drops the `SessionProvider` wrap, `AppContent.tsx` drops the auth hook calls, `MenuGroup.tsx` drops the `authRequired`-gated click interception, and `routes.ts`/`site-urls.ts`/`next.config.js` drop the now-dead auth-routing and `NEXT_PUBLIC_BACKEND_BASE_URL`/`NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT` machinery.
 - **Vercel**: Removed the remaining `NEXT_PUBLIC_VERCEL_ENV`-gated code in `site-urls.ts` and `grow-api-upstream-url.ts` (dead now that Coolify never sets it) and the `@vercel/analytics` dependency, whose script 404s off Vercel.
 
+### CI
+
+- **Coverage gate**: `pnpm test` in CI's "Run Tests" job now runs `pnpm test:coverage` (added the missing `@vitest/coverage-v8` dependency) and fails the build if coverage drops below `vitest.config.ts`'s new `coverage.thresholds`. Also fixed the `coverage.exclude` glob (`node_modules/` → `**/node_modules/**`), which wasn't matching nested paths and let a stray, gitignored `out/` build directory of pre-instrumented vendor code inflate line/statement coverage from a true ~21% to a misleading ~85%. Thresholds are set to today's real numbers (lines/statements 21%, functions 51%, branches 71%) as a no-regression floor — raising them is separate, deliberate follow-up work, not bundled here.
+
 ## [2.3.0] - 2026-08-18
 
 ### Changed
