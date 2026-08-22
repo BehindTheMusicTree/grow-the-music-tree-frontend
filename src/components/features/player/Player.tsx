@@ -41,19 +41,19 @@ export default function Player({ className }: PlayerProps) {
     !!trackList &&
     !!selectedTrack &&
     (() => {
-      const tracks = trackList.uploadedTracks;
+      const tracks = trackList.tracks;
       const currentIndex = tracks.findIndex((t) => t.uuid === selectedTrack.uuid);
       return currentIndex !== -1 && currentIndex + 1 < tracks.length;
     })();
 
   const handleTrackChange = (track: PlayerTrack) => {
-    const found = trackList?.uploadedTracks.find((t) => t.uuid === track.id) ?? null;
+    const found = trackList?.tracks.find((t) => t.uuid === track.id) ?? null;
     setSelectedTrack(found);
   };
 
   const handleNext = () => {
     if (trackList && selectedTrack) {
-      handleNextTrack(trackList.uploadedTracks.map(toPlayerTrack), toPlayerTrack(selectedTrack), handleTrackChange);
+      handleNextTrack(trackList.tracks.map(toPlayerTrack), toPlayerTrack(selectedTrack), handleTrackChange);
     }
   };
 
@@ -69,7 +69,7 @@ export default function Player({ className }: PlayerProps) {
     // If less than 1 second, go to previous track
     if (trackList && selectedTrack) {
       handlePreviousTrack(
-        trackList.uploadedTracks.map(toPlayerTrack),
+        trackList.tracks.map(toPlayerTrack),
         toPlayerTrack(selectedTrack),
         handleTrackChange,
       );

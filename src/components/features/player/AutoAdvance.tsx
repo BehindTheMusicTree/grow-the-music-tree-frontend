@@ -13,8 +13,8 @@ export default function AutoAdvance() {
     const handleTrackEnd = () => {
       // Auto-advance to next track if available
       if (trackList && selectedTrack) {
-        handleNextTrack(trackList.uploadedTracks.map(toPlayerTrack), toPlayerTrack(selectedTrack), (track) => {
-          const found = trackList.uploadedTracks.find((t) => t.uuid === track.id) ?? null;
+        handleNextTrack(trackList.tracks.map(toPlayerTrack), toPlayerTrack(selectedTrack), (track) => {
+          const found = trackList.tracks.find((t) => t.uuid === track.id) ?? null;
           setSelectedTrack(found);
         });
       }
