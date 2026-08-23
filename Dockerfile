@@ -46,6 +46,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static/
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public/
 ENV PORT=3000
+# Docker auto-sets $HOSTNAME to the container ID; without this override, Next's standalone
+# server binds there instead of all interfaces, so Coolify's localhost healthcheck can't connect.
+ENV HOSTNAME=0.0.0.0
 USER nextjs
 EXPOSE 3000
 CMD ["node", "server.js"]
