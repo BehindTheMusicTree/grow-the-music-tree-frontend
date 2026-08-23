@@ -100,6 +100,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Backend/AudioMeta URLs**: Fixed a runtime crash on staging (breaking Sentry init) where `getBackendBaseUrl()` threw on a missing `NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT` even though the Coolify-set `NEXT_PUBLIC_BACKEND_BASE_URL` override made it unnecessary. The override is now checked first in both `getBackendBaseUrl()` and `getAudiometaUrl()`, matching `hear-the-music-tree-frontend`'s already-migrated pattern.
 - **Coolify deploy**: Fixed staging/production deploys always rolling back because Coolify's post-deploy healthcheck runs `curl`/`wget` inside the container, and the `node:20-alpine` runner had neither available. Installed `curl` in the runner stage of `Dockerfile`.
 - **Coolify deploy**: Fixed the healthcheck still failing (`Connection refused`) after the `curl` fix above, because Docker auto-sets `$HOSTNAME` to the container ID, and Next's standalone `server.js` binds to `process.env.HOSTNAME` when set instead of `0.0.0.0`, making it unreachable at `localhost` from inside its own container. `Dockerfile`'s runner stage now explicitly sets `ENV HOSTNAME=0.0.0.0`.
+- **Coolify deploy**: Hardened `apk add --no-cache curl` in the `runner` stage against transient Alpine mirror/TLS blips (observed as `TLS: unspecified error` fetching `APKINDEX.tar.gz`, failing the whole build) by retrying up to 3 times with backoff.
 
 ### Removed
 
