@@ -2,12 +2,12 @@
 
 import { useEffect } from "react";
 import { usePlayer } from "@behindthemusictree/app-kit/player";
-import { useTrackList } from "@behindthemusictree/app-kit/genre-tree";
+import { useTrackList, YoutubeTrackDetailed } from "@behindthemusictree/app-kit/genre-tree";
 import { toPlayerTrack } from "@lib/player-track";
 
 export default function AutoAdvance() {
   const { handleNextTrack, setOnTrackEnd } = usePlayer();
-  const { trackList, selectedTrack, setSelectedTrack } = useTrackList();
+  const { trackList, selectedTrack, setSelectedTrack } = useTrackList<YoutubeTrackDetailed>();
 
   useEffect(() => {
     const handleTrackEnd = () => {

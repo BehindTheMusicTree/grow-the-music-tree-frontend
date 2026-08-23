@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { FaVolumeUp, FaVolumeMute } from "react-icons/fa";
 import { usePlayer, useCurrentTime, PlayerTrack, PlayerVideoSurface } from "@behindthemusictree/app-kit/player";
-import { useTrackList, useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
+import {
+  useTrackList,
+  useTrackListSidebarVisibility,
+  YoutubeTrackDetailed,
+} from "@behindthemusictree/app-kit/genre-tree";
 import { TheMusicTreeByline } from "@behindthemusictree/brand/components";
 import { toPlayerTrack } from "@lib/player-track";
 import PlayerControls from "./PlayerControls";
@@ -31,7 +35,7 @@ export default function Player({ className }: PlayerProps) {
     handleNextTrack,
     handlePreviousTrack,
   } = usePlayer();
-  const { trackList, selectedTrack, setSelectedTrack } = useTrackList();
+  const { trackList, selectedTrack, setSelectedTrack } = useTrackList<YoutubeTrackDetailed>();
   const currentTime = useCurrentTime();
   const { toggleTrackListSidebar, isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const [isMuted, setIsMuted] = useState(false);

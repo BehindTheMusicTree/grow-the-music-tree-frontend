@@ -3,7 +3,14 @@
 import { useCallback, useEffect, useRef } from "react";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
-import { useCreateGenre, useUpdateGenre, GenreTreeView, CriteriaMinimum } from "@behindthemusictree/app-kit/genre-tree";
+import {
+  useCreateGenre,
+  useUpdateGenre,
+  GenreTreeView,
+  CriteriaMinimum,
+  YoutubeTrackDetailedSchema,
+  makeCriteriaPlaylistDetailedSchema,
+} from "@behindthemusictree/app-kit/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import Page from "@components/ui/Page";
@@ -69,6 +76,7 @@ export default function ReferenceGenreTreePage() {
         handleGenreCreationAction={showCriteriaCreationPopup}
         handleGenreRenameAction={showGenreRenamePopup}
         getBackendBaseUrl={getGrowBackendBaseUrl}
+        criteriaPlaylistDetailedSchema={makeCriteriaPlaylistDetailedSchema(YoutubeTrackDetailedSchema)}
       />
     </Page>
   );
