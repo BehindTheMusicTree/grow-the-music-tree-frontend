@@ -98,6 +98,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Fixed
 
 - **Backend/AudioMeta URLs**: Fixed a runtime crash on staging (breaking Sentry init) where `getBackendBaseUrl()` threw on a missing `NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT` even though the Coolify-set `NEXT_PUBLIC_BACKEND_BASE_URL` override made it unnecessary. The override is now checked first in both `getBackendBaseUrl()` and `getAudiometaUrl()`, matching `hear-the-music-tree-frontend`'s already-migrated pattern.
+- **Coolify deploy**: Fixed staging/production deploys always rolling back because Coolify's post-deploy healthcheck runs `curl`/`wget` inside the container, and the `node:20-alpine` runner had neither available. Installed `curl` in the runner stage of `Dockerfile`.
 
 ### Removed
 
