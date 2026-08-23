@@ -25,7 +25,7 @@ const nextConfig = {
   },
 };
 
-const REQUIRED_ENV_VARS = ["NEXT_PUBLIC_CONTACT_EMAIL", "NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS"];
+const REQUIRED_ENV_VARS = ["NEXT_PUBLIC_CONTACT_EMAIL"];
 
 module.exports = (phase, defaultConfig) => {
   const missing = REQUIRED_ENV_VARS.filter((key) => {

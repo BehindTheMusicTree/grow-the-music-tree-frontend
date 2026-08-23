@@ -58,7 +58,6 @@ These are the `NEXT_PUBLIC_*` `ARG`s declared in the [`Dockerfile`](../Dockerfil
 | `NEXT_PUBLIC_SPOTIFY_AUTH_URL`           | `https://accounts.spotify.com/authorize` |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID`           | Per-environment (prod/staging) |
 | `NEXT_PUBLIC_GOOGLE_REDIRECT_URI`        | Relative path (e.g. `/auth/google/callback`) |
-| `NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS`    | |
 | `NEXT_PUBLIC_BACKEND_BASE_URL`           | |
 | `NEXT_PUBLIC_SENTRY_IS_ACTIVE`           | |
 
@@ -79,7 +78,6 @@ DOCKER_BUILDKIT=1 docker build \
   --build-arg NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize \
   --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=... \
   --build-arg NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback \
-  --build-arg NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS=300000 \
   --build-arg NEXT_PUBLIC_SENTRY_IS_ACTIVE=false \
   -t grow-the-music-tree-frontend .
 

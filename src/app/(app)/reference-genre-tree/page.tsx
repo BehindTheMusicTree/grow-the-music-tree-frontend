@@ -62,11 +62,6 @@ export default function ReferenceGenreTreePage() {
     previousErrorsRef.current = formErrors || [];
   }, [formErrors, showCriteriaCreationPopup]);
 
-  const uploadTimeoutMs = Number(process.env.NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS);
-  if (!Number.isFinite(uploadTimeoutMs) || uploadTimeoutMs <= 0) {
-    throw new Error("NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS must be a positive number");
-  }
-
   return (
     <Page title="Reference Genre Tree" visuallyHiddenTitle dataPage="reference-genre-tree">
       <GenreTreeView
@@ -74,7 +69,6 @@ export default function ReferenceGenreTreePage() {
         handleGenreCreationAction={showCriteriaCreationPopup}
         handleGenreRenameAction={showGenreRenamePopup}
         getBackendBaseUrl={getGrowBackendBaseUrl}
-        uploadTimeoutMs={uploadTimeoutMs}
       />
     </Page>
   );
