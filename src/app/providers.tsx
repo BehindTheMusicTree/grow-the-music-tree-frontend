@@ -10,7 +10,9 @@ import {
   TrackListSidebarVisibilityProvider,
   TrackListProvider,
   libraryEndpoints,
+  libraryQueryKeys,
   YoutubeTrackDetailed,
+  YoutubeTrackDetailedSchema,
 } from "@behindthemusictree/app-kit/genre-tree";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { toPlayerTrack } from "@lib/player-track";
@@ -49,7 +51,14 @@ function AppProviders({ children }: ProvidersProps) {
     <PlayerProvider loadTrack={loadTrack}>
       <PopupProvider>
         <TrackListSidebarVisibilityProvider>
-          <TrackListProvider getBackendBaseUrl={getGrowBackendBaseUrl}>{children}</TrackListProvider>
+          <TrackListProvider
+            getBackendBaseUrl={getGrowBackendBaseUrl}
+            schema={YoutubeTrackDetailedSchema}
+            listEndpoint={(page) => libraryEndpoints[PLAYER_SCOPE].youtube.list(page)}
+            listQueryKey={(page) => libraryQueryKeys[PLAYER_SCOPE].youtube.list(page)}
+          >
+            {children}
+          </TrackListProvider>
         </TrackListSidebarVisibilityProvider>
       </PopupProvider>
     </PlayerProvider>
