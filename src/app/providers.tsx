@@ -54,7 +54,7 @@ function AppProviders({ children }: ProvidersProps) {
           <TrackListProvider
             getBackendBaseUrl={getGrowBackendBaseUrl}
             schema={YoutubeTrackDetailedSchema}
-            listEndpoint={(page) => libraryEndpoints[PLAYER_SCOPE].youtube.list(page)}
+            listEndpoint={() => libraryEndpoints[PLAYER_SCOPE].youtube.list()}
             listQueryKey={(page) => libraryQueryKeys[PLAYER_SCOPE].youtube.list(page)}
           >
             {children}
