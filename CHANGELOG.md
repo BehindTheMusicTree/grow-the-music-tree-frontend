@@ -94,6 +94,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **`grow-proxy` route**: Dropped the redundant `reference/` URL segment from the proxy's upstream path, matching `grow-the-music-tree-api` dropping the same prefix from all its routes.
 - **`@behindthemusictree/app-kit`**: Bumped `1.3.0` → `3.0.0`. `trackList.uploadedTracks` is renamed to `trackList.tracks` throughout `Player.tsx` and `AutoAdvance.tsx`, matching app-kit's generic-`Track` rename.
 - **`@behindthemusictree/app-kit`**: Bumped `3.0.0` → `4.0.0`, matching app-kit's `TrackListSidebar`/`TrackItem`/`TrackListProvider`/`GenreTreeView` becoming generic over `T extends TrackBase`. `TrackListSidebar` no longer takes `getBackendBaseUrl`. `TrackListProvider` now requires `schema`, `listEndpoint`, and `listQueryKey` props, passed as `YoutubeTrackDetailedSchema` and `libraryEndpoints`/`libraryQueryKeys`'s `reference.youtube.list(page)` in `providers.tsx`. `GenreTreeView` now requires a `criteriaPlaylistDetailedSchema` prop, passed as `makeCriteriaPlaylistDetailedSchema(YoutubeTrackDetailedSchema)` in `reference-genre-tree/page.tsx`.
+- **`@behindthemusictree/app-kit`**: Bumped `4.0.0` → `4.0.1`, picking up the fix making `criteria`/`updatedOn` nullable on criteria playlists.
 
 ### Fixed
 
