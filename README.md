@@ -150,8 +150,6 @@ NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-c
 
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback
-
-NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS=300000
 ```
 
 In the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) → your app → **Settings** → **Redirect URIs**, add the **full** callback URL(s), e.g. `http://localhost:3000/auth/spotify/callback` for local dev and your production URL for deploy. The app builds the redirect URI from your origin when you use a path like `/auth/spotify/callback`.
@@ -213,7 +211,6 @@ DOCKER_BUILDKIT=1 docker build \
   --build-arg NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize \
   --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=... \
   --build-arg NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback \
-  --build-arg NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS=300000 \
   --build-arg NEXT_PUBLIC_SENTRY_IS_ACTIVE=false \
   -t grow-the-music-tree-frontend .
 ```
@@ -291,3 +288,6 @@ For additional information about this project, please refer to:
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+<!-- verify-preview-staging-api: throwaway PR to confirm Coolify PR previews resolve to the staging API, no code change intended -->
+
