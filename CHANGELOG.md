@@ -108,6 +108,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Vercel**: Removed the remaining `NEXT_PUBLIC_VERCEL_ENV`-gated code in `site-urls.ts` and `grow-api-upstream-url.ts` (dead now that Coolify never sets it) and the `@vercel/analytics` dependency, whose script 404s off Vercel.
 - **Dead upload wiring**: Removed the `NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS` env var end-to-end (`next.config.js`, `scripts/verify-env.mjs`, `Dockerfile`, CI, `docs/DEPLOYMENT.md`, `README.md`, env templates) and the `uploadTimeoutMs` prop passed to `GenreTreeView` in `reference-genre-tree/page.tsx` — app-kit 2.0.0 already dropped the corresponding `uploadTimeoutMs`/`onUploadFiles` wiring from `GenreTreeView`, so this was already a type error against the updated pin, not just dead code. Also removed `src/lib/constants/domain.ts`, whose 5 exported constants had zero call sites.
 
+### CI
+
+- **Coverage gate**: `pnpm test` in CI's "Run Tests" job now runs `pnpm test:coverage` (added the missing `@vitest/coverage-v8` dependency) and fails the build if coverage drops below `vitest.config.ts`'s new `coverage.thresholds`. Also fixed the `coverage.exclude` glob (`node_modules/` → `**/node_modules/**`), which wasn't matching nested paths and let a stray, gitignored `out/` build directory of pre-instrumented vendor code inflate line/statement coverage from a true ~21% to a misleading ~85%. Thresholds are set to today's real numbers (lines/statements 21%, functions 51%, branches 71%) as a no-regression floor — raising them is separate, deliberate follow-up work, not bundled here.
+
 ## [2.3.0] - 2026-08-18
 
 ### Changed
