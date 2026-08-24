@@ -288,3 +288,6 @@ For additional information about this project, please refer to:
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+<!-- verify-preview-staging-api: throwaway PR to confirm Coolify PR previews resolve to the staging API, no code change intended -->
+

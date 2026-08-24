@@ -15,7 +15,6 @@ import AutoAdvance from "@components/features/player/AutoAdvance";
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
 
 import { BANNER_HEIGHT, PLAYER_HEIGHT } from "@constants/layout";
-import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
 export default function AppContent({ children }: { children: ReactNode }) {
   const { playerTrackObject } = usePlayer();
@@ -57,9 +56,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
             <main className="flex min-h-0 w-full flex-grow flex-col mx-8">
               <div className="flex min-h-0 flex-1 flex-col">{children}</div>
             </main>
-            {isTrackListSidebarVisible && (
-              <TrackListSidebar className="z-40" getBackendBaseUrl={getGrowBackendBaseUrl} />
-            )}
+            {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
           </div>
           {activePopup && (
             <div className="absolute top-0 right-0 bottom-0 left-0 z-40 pointer-events-none bg-black/10" aria-hidden />
