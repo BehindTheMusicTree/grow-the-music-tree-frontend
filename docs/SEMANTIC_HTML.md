@@ -39,8 +39,8 @@ Use Tailwind (or other utilities) on these elements as needed; they are layout a
 // Section header (heading + optional intro)
 <section>
   <header>
-    <h2>Uploaded library</h2>
-    <p>Manage your local files.</p>
+    <h2>Genre tree</h2>
+    <p>Browse tracks by genre.</p>
   </header>
   ...
 </section>
@@ -81,13 +81,13 @@ Use Tailwind (or other utilities) on these elements as needed; they are layout a
 
 **Use for:**
 
-- Chunks of the page that have a clear topic (e.g. “Uploaded library”, “Settings”, “Related tracks”). Use a heading (`<h2>`, etc.) inside to define the section.
+- Chunks of the page that have a clear topic (e.g. “Genre tree”, “Settings”, “Related tracks”). Use a heading (`<h2>`, etc.) inside to define the section.
 
 **Don’t:** Use as a generic wrapper for any div; if there’s no theme or heading, a `<div>` is fine.
 
 ```tsx
-<section className="space-y-4" aria-labelledby="uploaded-heading">
-  <h2 id="uploaded-heading">Uploaded library</h2>
+<section className="space-y-4" aria-labelledby="genre-tree-heading">
+  <h2 id="genre-tree-heading">Genre tree</h2>
   ...
 </section>
 
