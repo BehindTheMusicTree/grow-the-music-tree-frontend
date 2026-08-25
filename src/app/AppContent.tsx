@@ -14,7 +14,9 @@ import AutoAdvance from "@components/features/player/AutoAdvance";
 
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
 
-import { BANNER_HEIGHT, PLAYER_HEIGHT } from "@constants/layout";
+import { GenreTreeViewModeProvider } from "@contexts/GenreTreeViewModeProvider";
+
+import { PLAYER_HEIGHT } from "@constants/layout";
 
 export default function AppContent({ children }: { children: ReactNode }) {
   const { playerTrackObject } = usePlayer();
@@ -41,37 +43,36 @@ export default function AppContent({ children }: { children: ReactNode }) {
     },
   });
 
-  const centerMaxHeight = `calc(100vh - ${BANNER_HEIGHT + PLAYER_HEIGHT}px)`;
+  const centerMaxHeight = `calc(100vh - ${PLAYER_HEIGHT}px)`;
 
   return (
-    <div className="app col h-screen">
-      <AppHeader />
+    <GenreTreeViewModeProvider>
+      <div className="app col h-screen">
+        <AppHeader />
 
-      <div
-        className="center fixed top-banner flex h-full w-full bg-gray-100"
-        style={{ maxHeight: centerMaxHeight }}
-      >
-        <div className="relative flex min-h-0 w-full flex-grow">
-          <div className="min-h-0 flex-grow w-full flex" style={activePopup ? { filter: "blur(4px)" } : undefined}>
-            <main className="flex min-h-0 w-full flex-grow flex-col mx-8">
-              <div className="flex min-h-0 flex-1 flex-col">{children}</div>
-            </main>
-            {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
+        <div className="center fixed top-0 flex h-full w-full bg-gray-100" style={{ maxHeight: centerMaxHeight }}>
+          <div className="relative flex min-h-0 w-full flex-grow">
+            <div className="min-h-0 flex-grow w-full flex" style={activePopup ? { filter: "blur(4px)" } : undefined}>
+              <main className="flex min-h-0 w-full flex-grow flex-col mx-8 pt-20">
+                <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+              </main>
+              {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
+            </div>
+            {activePopup && (
+              <div className="absolute top-0 right-0 bottom-0 left-0 z-40 pointer-events-none bg-black/10" aria-hidden />
+            )}
           </div>
-          {activePopup && (
-            <div className="absolute top-0 right-0 bottom-0 left-0 z-40 pointer-events-none bg-black/10" aria-hidden />
-          )}
         </div>
-      </div>
 
-      <div className="fixed bottom-0 left-0 right-0 z-50">
-        <div style={activePopup ? { filter: "blur(4px)" } : undefined}>
-          <Player className="relative z-0" />
+        <div className="fixed bottom-0 left-0 right-0 z-50">
+          <div style={activePopup ? { filter: "blur(4px)" } : undefined}>
+            <Player className="relative z-0" />
+          </div>
+          {activePopup && <div className="absolute inset-0 z-10 pointer-events-none bg-black/10" aria-hidden />}
         </div>
-        {activePopup && <div className="absolute inset-0 z-10 pointer-events-none bg-black/10" aria-hidden />}
+        <AutoAdvance />
+        {activePopup}
       </div>
-      <AutoAdvance />
-      {activePopup}
-    </div>
+    </GenreTreeViewModeProvider>
   );
 }

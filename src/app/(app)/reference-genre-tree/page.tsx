@@ -14,9 +14,11 @@ import {
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import Page from "@components/ui/Page";
+import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
 export default function ReferenceGenreTreePage() {
+  const { viewMode } = useGenreTreeViewMode();
   const { mutate: createGenre, formErrors } = useCreateGenre("reference", getGrowBackendBaseUrl);
   const { renameGenre, formErrors: renameFormErrors } = useUpdateGenre("reference", getGrowBackendBaseUrl);
   const { showPopup, hidePopup } = usePopup();
@@ -77,6 +79,7 @@ export default function ReferenceGenreTreePage() {
         handleGenreRenameAction={showGenreRenamePopup}
         getBackendBaseUrl={getGrowBackendBaseUrl}
         criteriaPlaylistDetailedSchema={makeCriteriaPlaylistDetailedSchema(YoutubeTrackDetailedSchema)}
+        viewMode={viewMode}
       />
     </Page>
   );
