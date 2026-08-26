@@ -5,7 +5,7 @@ import growTheMusicTreeFavicon from "@behindthemusictree/brand/favicons/grow-the
 import "./globals.css";
 import "@behindthemusictree/brand/tokens/theme.css";
 import "@behindthemusictree/brand/styles/icon-links.css";
-import "@behindthemusictree/genre-tree-view/styles.css";
+import "@behindthemusictree/app-kit/genre-tree/styles.css";
 
 const faviconUrl = typeof growTheMusicTreeFavicon === "string" ? growTheMusicTreeFavicon : growTheMusicTreeFavicon.src;
 
