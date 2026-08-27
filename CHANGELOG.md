@@ -96,6 +96,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   is also dropped so the buttons sit directly on the page, matching the "Wheel"/"Pop/Core" contrast
   fix bundled with the move.
 
+- **Default genre tree view modes**: The root `/` route now redirects to the prototype demo tree
+  (`/prototype/reference-genre-tree`) instead of the real reference tree. The prototype tree now
+  defaults to the "Pop/Core" view mode (falling back to "Stacked" if the loaded tree has no
+  "Mainstream Pop" root); the reference tree now defaults to "Wheel" instead of "Stacked".
+
+- **Prototype-mode banner**: `PrototypeModeBanner` moves from fixed to the top of the viewport to
+  fixed to the bottom.
+
 ### Fixed
 
 - **Genre tree view-mode toggle**: The Stacked/Wheel/Pop-Core toggle previously shared a single
