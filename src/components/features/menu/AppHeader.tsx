@@ -49,7 +49,7 @@ interface AppHeaderProps {
 
 export default function AppHeader({ className }: AppHeaderProps) {
   const pathname = usePathname();
-  const { viewMode, setViewMode } = useGenreTreeViewMode();
+  const { viewMode, setViewMode, canShowPopCore } = useGenreTreeViewMode();
   const showGenreTreeViewModeToggle = pathname === ROUTE_PATHS.REFERENCE_GENRE_TREE;
 
   return (
@@ -81,6 +81,15 @@ export default function AppHeader({ className }: AppHeaderProps) {
           </Button>
           <Button variant={viewMode === "wheel" ? "default" : "outline"} size="sm" onClick={() => setViewMode("wheel")}>
             Wheel
+          </Button>
+          <Button
+            variant={viewMode === "pop-core" ? "default" : "outline"}
+            size="sm"
+            disabled={!canShowPopCore}
+            title={canShowPopCore ? undefined : "This genre tree has no 'Mainstream Pop' root yet"}
+            onClick={() => setViewMode("pop-core")}
+          >
+            Pop/Core
           </Button>
         </div>
       )}
