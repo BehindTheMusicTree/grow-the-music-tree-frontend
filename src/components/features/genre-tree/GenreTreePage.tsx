@@ -53,6 +53,8 @@ export default function GenreTreePage({ getBackendBaseUrl, title, readOnly }: Ge
     setCanShowPopCore(canShowPopCore);
   }, [canShowPopCore, setCanShowPopCore]);
 
+  const effectiveViewMode = viewMode === "pop-core" && !canShowPopCore ? "stacked" : viewMode;
+
   const showCriteriaCreationPopup = useCallback(
     (parent: CriteriaMinimum | null = null) => {
       showPopup(
@@ -109,7 +111,7 @@ export default function GenreTreePage({ getBackendBaseUrl, title, readOnly }: Ge
         handleGenreRenameAction={showGenreRenamePopup}
         getBackendBaseUrl={getBackendBaseUrl}
         criteriaPlaylistDetailedSchema={makeCriteriaPlaylistDetailedSchema(YoutubeTrackDetailedSchema)}
-        viewMode={viewMode}
+        viewMode={effectiveViewMode}
         readOnly={readOnly}
       />
     </Page>

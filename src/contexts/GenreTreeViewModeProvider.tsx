@@ -25,15 +25,13 @@ interface ModeState {
   canShowPopCore: boolean;
 }
 
-const INITIAL_MODE_STATE: ModeState = { viewMode: "stacked", canShowPopCore: false };
-
 export function GenreTreeViewModeProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const mode = isPrototypeRoute(pathname) ? "prototype" : "reference";
 
   const [stateByMode, setStateByMode] = useState<Record<"reference" | "prototype", ModeState>>({
-    reference: INITIAL_MODE_STATE,
-    prototype: INITIAL_MODE_STATE,
+    reference: { viewMode: "wheel", canShowPopCore: false },
+    prototype: { viewMode: "pop-core", canShowPopCore: false },
   });
 
   const setViewMode = useCallback(
