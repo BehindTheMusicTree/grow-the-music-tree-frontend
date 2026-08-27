@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { usePopup, useConnectivityErrorPopup } from "@behindthemusictree/app-kit/popup";
 import { usePlayer } from "@behindthemusictree/app-kit/player";
 import { TrackListSidebar, useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
 import { initSentry } from "@lib/sentry";
+import { isPrototypeRoute } from "@lib/prototype-mode";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
 import AppHeader from "@components/features/menu/AppHeader";
 import Player from "@components/features/player/Player";
 import AutoAdvance from "@components/features/player/AutoAdvance";
+import PrototypeModeBanner from "@components/features/banner/PrototypeModeBanner";
 
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
 
@@ -22,6 +25,8 @@ export default function AppContent({ children }: { children: ReactNode }) {
   const { playerTrackObject } = usePlayer();
   const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const { activePopup } = usePopup();
+  const pathname = usePathname();
+  const isPrototype = isPrototypeRoute(pathname);
 
   useEffect(() => {
     initSentry();
@@ -48,6 +53,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
   return (
     <GenreTreeViewModeProvider>
       <div className="app col h-screen">
+        {isPrototype && <PrototypeModeBanner />}
         <AppHeader />
 
         <div className="center fixed top-0 flex h-full w-full bg-gray-100" style={{ maxHeight: centerMaxHeight }}>

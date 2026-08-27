@@ -117,6 +117,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Coverage gate**: `pnpm test` in CI's "Run Tests" job now runs `pnpm test:coverage` (added the missing `@vitest/coverage-v8` dependency) and fails the build if coverage drops below `vitest.config.ts`'s new `coverage.thresholds`. Also fixed the `coverage.exclude` glob (`node_modules/` → `**/node_modules/**`), which wasn't matching nested paths and let a stray, gitignored `out/` build directory of pre-instrumented vendor code inflate line/statement coverage from a true ~21% to a misleading ~85%. Thresholds are set to today's real numbers (lines/statements 21%, functions 51%, branches 71%) as a no-regression floor — raising them is separate, deliberate follow-up work, not bundled here.
 
+## [Unreleased]
+
+### Added
+
+- **Prototype/demo mode**: Added a read-only `/prototype/reference-genre-tree` demo tree, backed by a second static-key `grow-the-music-tree-api` identity (`GTMT_PROTOTYPE_API_KEY` server-only env var, proxied via new `src/app/api/grow-prototype-proxy/[...path]/route.ts`). `src/components/features/genre-tree/GenreTreePage.tsx` is now shared by both the live and prototype reference-tree pages, passing `readOnly` through to `@behindthemusictree/app-kit@4.3.0`'s `GenreTreeView` (bumped from `4.2.0` for its new `readOnly` prop, which hides write-action UI) so prototype visitors can browse but not edit. `src/lib/prototype-mode.ts`'s `isPrototypeRoute` drives a persistent `PrototypeModeBanner` and picks the right backend base URL for the track player/library in `src/app/providers.tsx`. See [docs/prototype-mode.md](docs/prototype-mode.md).
+
 ## [2.3.0] - 2026-08-18
 
 ### Changed
