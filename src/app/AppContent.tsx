@@ -11,6 +11,7 @@ import { isPrototypeRoute } from "@lib/prototype-mode";
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
 import AppHeader from "@components/features/menu/AppHeader";
+import AppSubheader from "@components/features/menu/AppSubheader";
 import Player from "@components/features/player/Player";
 import AutoAdvance from "@components/features/player/AutoAdvance";
 import PrototypeModeBanner from "@components/features/banner/PrototypeModeBanner";
@@ -20,6 +21,7 @@ import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
 import { GenreTreeViewModeProvider } from "@contexts/GenreTreeViewModeProvider";
 
 import { PLAYER_HEIGHT } from "@constants/layout";
+import { PATHS as ROUTE_PATHS } from "@lib/constants/routes";
 
 export default function AppContent({ children }: { children: ReactNode }) {
   const { playerTrackObject } = usePlayer();
@@ -27,6 +29,8 @@ export default function AppContent({ children }: { children: ReactNode }) {
   const { activePopup } = usePopup();
   const pathname = usePathname();
   const isPrototype = isPrototypeRoute(pathname);
+  const showGenreTreeViewModeToggle =
+    pathname === ROUTE_PATHS.REFERENCE_GENRE_TREE || pathname === ROUTE_PATHS.PROTOTYPE_REFERENCE_GENRE_TREE;
 
   useEffect(() => {
     initSentry();
@@ -55,11 +59,14 @@ export default function AppContent({ children }: { children: ReactNode }) {
       <div className="app col h-screen">
         {isPrototype && <PrototypeModeBanner />}
         <AppHeader />
+        <AppSubheader />
 
         <div className="center fixed top-0 flex h-full w-full bg-gray-100" style={{ maxHeight: centerMaxHeight }}>
           <div className="relative flex min-h-0 w-full flex-grow">
             <div className="min-h-0 flex-grow w-full flex" style={activePopup ? { filter: "blur(4px)" } : undefined}>
-              <main className="flex min-h-0 w-full flex-grow flex-col mx-8 pt-20">
+              <main
+                className={`flex min-h-0 w-full flex-grow flex-col mx-8 ${showGenreTreeViewModeToggle ? "pt-32" : "pt-20"}`}
+              >
                 <div className="flex min-h-0 flex-1 flex-col">{children}</div>
               </main>
               {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
