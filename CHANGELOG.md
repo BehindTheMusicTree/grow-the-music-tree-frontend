@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [2.4.0 - 2026-08-27](#240---2026-08-27)
 - [2.3.0 - 2026-08-18](#230---2026-08-18)
 - [2.2.0 - 2026-08-14](#220---2026-08-14)
 - [1.5.0 - 2026-04-05](#150---2026-04-05)
@@ -86,6 +87,42 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [2.4.0] - 2026-08-27
+
+### Added
+
+- **Prototype/demo mode**: Added a read-only `/prototype/reference-genre-tree` demo tree, backed by a second static-key `grow-the-music-tree-api` identity (`GTMT_PROTOTYPE_API_KEY` server-only env var, proxied via new `src/app/api/grow-prototype-proxy/[...path]/route.ts`). `src/components/features/genre-tree/GenreTreePage.tsx` is now shared by both the live and prototype reference-tree pages, passing `readOnly` through to `@behindthemusictree/app-kit@4.3.0`'s `GenreTreeView` (bumped from `4.2.0` for its new `readOnly` prop, which hides write-action UI) so prototype visitors can browse but not edit. `src/lib/prototype-mode.ts`'s `isPrototypeRoute` drives a persistent `PrototypeModeBanner` and picks the right backend base URL for the track player/library in `src/app/providers.tsx`. See [docs/prototype-mode.md](docs/prototype-mode.md).
+
+### Changed
+
+- **Playback**: Reference-tree track playback no longer depends on `hear-the-music-tree-api` at all. It previously fetched a downloaded audio file via `libraryEndpoints.reference.uploaded.download()`, which never actually worked against `grow-the-music-tree-api` (that backend has no audio storage). Tracks now play through an embedded YouTube video instead: `useLoadTrack()` fetches track metadata from `grow-the-music-tree-api`'s new `reference/library/youtube` endpoint and loads it into `@behindthemusictree/app-kit`'s player as a `"youtube"`-kind `PlayerTrack`. The player footer now renders app-kit's `PlayerVideoSurface` above the transport bar whenever a track is loaded, and `Player.tsx`/`ProgressBar.tsx` drive playback through the new `mediaController` API instead of reading/writing an `HTMLAudioElement` directly. A track with no `youtube_video_id` set surfaces a clear load error instead of silently failing.
+- **Reference genre tree**: Wired up the genre rename popup (`GenreRenamePopup`, `useUpdateGenre`'s `renameGenre`) via app-kit's now-required `handleGenreRenameAction`.
+- **`grow-proxy` route**: Dropped the redundant `reference/` URL segment from the proxy's upstream path, matching `grow-the-music-tree-api` dropping the same prefix from all its routes.
+- **`@behindthemusictree/app-kit`**: Bumped `1.3.0` → `3.0.0`. `trackList.uploadedTracks` is renamed to `trackList.tracks` throughout `Player.tsx` and `AutoAdvance.tsx`, matching app-kit's generic-`Track` rename.
+- **`@behindthemusictree/app-kit`**: Bumped `3.0.0` → `4.0.0`, matching app-kit's `TrackListSidebar`/`TrackItem`/`TrackListProvider`/`GenreTreeView` becoming generic over `T extends TrackBase`. `TrackListSidebar` no longer takes `getBackendBaseUrl`. `TrackListProvider` now requires `schema`, `listEndpoint`, and `listQueryKey` props, passed as `YoutubeTrackDetailedSchema` and `libraryEndpoints`/`libraryQueryKeys`'s `reference.youtube.list(page)` in `providers.tsx`. `GenreTreeView` now requires a `criteriaPlaylistDetailedSchema` prop, passed as `makeCriteriaPlaylistDetailedSchema(YoutubeTrackDetailedSchema)` in `reference-genre-tree/page.tsx`.
+- **`@behindthemusictree/app-kit`**: Bumped `4.0.0` → `4.0.1`, picking up the fix making `criteria`/`updatedOn` nullable on criteria playlists.
+- **`@behindthemusictree/app-kit`**: Bumped `4.0.1` → `4.0.2`, picking up the fix validating `useLoadExampleTreeGenre`'s `tree/load-example` mutation response against its actual `{ message: string }` shape instead of `CriteriaDetailedSchema`, which previously logged an output-validation error on every call even though the import succeeded server-side.
+- **`@behindthemusictree/app-kit`**: Bumped `4.0.2` → `4.1.0`, picking up `GenreTreeView`'s new optional controlled `viewMode` prop. The Stacked/Wheel toggle previously rendered inside `GenreTreeView`'s own actions bar; it now moves up into the global `AppHeader`, shown only on `/reference-genre-tree`. A new `GenreTreeViewModeProvider` context (wrapping `AppContent`) shares the current `viewMode` between `AppHeader` and the `reference-genre-tree` page.
+- **`@behindthemusictree/app-kit`**: Bumped `4.1.0` → `4.2.0`, which now re-exports `@behindthemusictree/genre-tree-view`'s stylesheet at the `@behindthemusictree/app-kit/genre-tree/styles.css` subpath. `layout.tsx`'s stylesheet import switches to that subpath.
+
+### Fixed
+
+- **Backend/AudioMeta URLs**: Fixed a runtime crash on staging (breaking Sentry init) where `getBackendBaseUrl()` threw on a missing `NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT` even though the Coolify-set `NEXT_PUBLIC_BACKEND_BASE_URL` override made it unnecessary. The override is now checked first in both `getBackendBaseUrl()` and `getAudiometaUrl()`, matching `hear-the-music-tree-frontend`'s already-migrated pattern.
+- **Coolify deploy**: Fixed staging/production deploys always rolling back because Coolify's post-deploy healthcheck runs `curl`/`wget` inside the container, and the `node:20-alpine` runner had neither available. Installed `curl` in the runner stage of `Dockerfile`.
+- **Coolify deploy**: Fixed the healthcheck still failing (`Connection refused`) after the `curl` fix above, because Docker auto-sets `$HOSTNAME` to the container ID, and Next's standalone `server.js` binds to `process.env.HOSTNAME` when set instead of `0.0.0.0`, making it unreachable at `localhost` from inside its own container. `Dockerfile`'s runner stage now explicitly sets `ENV HOSTNAME=0.0.0.0`.
+- **Coolify deploy**: Hardened `apk add --no-cache curl` in the `runner` stage against transient Alpine mirror/TLS blips (observed as `TLS: unspecified error` fetching `APKINDEX.tar.gz`, failing the whole build) by retrying up to 3 times with backoff.
+
+### Removed
+
+- **Login/Account**: Removed login and personal-library features entirely — `useSpotifyAuth`/`useGoogleAuth`/`useSpotifyUser`/`useSpotifyLibTracks`, `AuthCallbackHandler`, the `/account`, `/me-spotify-library`, and `/auth/{spotify,google}/callback` pages, and their popups (`AuthPopup`, `SpotifyAuthErrorPopup`, `AuthErrorPopup`, `SpotifyAllowlistPopup`), plus the dead `useGenreDeletion` hook and `GenreDeletionPopup`. `grow-the-music-tree-api` has no user/auth model (single-tenant, static API key) — per-user auth was never going to be built there, and personal-library features belong to `hear-the-music-tree-frontend` (v2.0.0 precedent). `providers.tsx` drops the `SessionProvider` wrap, `AppContent.tsx` drops the auth hook calls, `MenuGroup.tsx` drops the `authRequired`-gated click interception, and `routes.ts`/`site-urls.ts`/`next.config.js` drop the now-dead auth-routing and `NEXT_PUBLIC_BACKEND_BASE_URL`/`NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT` machinery.
+- **Vercel**: Removed the remaining `NEXT_PUBLIC_VERCEL_ENV`-gated code in `site-urls.ts` and `grow-api-upstream-url.ts` (dead now that Coolify never sets it) and the `@vercel/analytics` dependency, whose script 404s off Vercel.
+- **Dead upload wiring**: Removed the `NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS` env var end-to-end (`next.config.js`, `scripts/verify-env.mjs`, `Dockerfile`, CI, `docs/DEPLOYMENT.md`, `README.md`, env templates) and the `uploadTimeoutMs` prop passed to `GenreTreeView` in `reference-genre-tree/page.tsx` — app-kit 2.0.0 already dropped the corresponding `uploadTimeoutMs`/`onUploadFiles` wiring from `GenreTreeView`, so this was already a type error against the updated pin, not just dead code. Also removed `src/lib/constants/domain.ts`, whose 5 exported constants had zero call sites.
+- **`@behindthemusictree/genre-tree-view`**: Dropped the direct dependency entirely. `@behindthemusictree/app-kit` is the intended sole facade over `genre-tree-view`, and its `4.2.0` release closes the last gap (its stylesheet) that still required consuming `genre-tree-view` directly.
+
+### CI
+
+- **Coverage gate**: `pnpm test` in CI's "Run Tests" job now runs `pnpm test:coverage` (added the missing `@vitest/coverage-v8` dependency) and fails the build if coverage drops below `vitest.config.ts`'s new `coverage.thresholds`. Also fixed the `coverage.exclude` glob (`node_modules/` → `**/node_modules/**`), which wasn't matching nested paths and let a stray, gitignored `out/` build directory of pre-instrumented vendor code inflate line/statement coverage from a true ~21% to a misleading ~85%. Thresholds are set to today's real numbers (lines/statements 21%, functions 51%, branches 71%) as a no-regression floor — raising them is separate, deliberate follow-up work, not bundled here.
 
 ## [2.3.0] - 2026-08-18
 

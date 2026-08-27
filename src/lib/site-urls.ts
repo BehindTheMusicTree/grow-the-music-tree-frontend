@@ -1,28 +1,5 @@
-import { AUDIOMETA_FRONT_SUBDOMAIN, HTMT_API_SUBDOMAIN, ORG_DOMAIN } from "@behindthemusictree/brand";
-import { buildBackendBaseUrl, buildSubdomainBaseUrl } from "@behindthemusictree/app-kit/transport";
-
-function isProductionEnv(): boolean {
-  return process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
-}
-
-/**
- * HearTheMusicTree API base URL. Off Vercel (no `NEXT_PUBLIC_VERCEL_ENV`), honors
- * `NEXT_PUBLIC_BACKEND_BASE_URL` as a local/remote dev override; Vercel always sets that var,
- * so a stale value left over in a Vercel project's env settings can never shadow this on a deployment.
- */
-export function getBackendBaseUrl(): string {
-  if (!HTMT_API_SUBDOMAIN) throw new Error("HTMT_API_SUBDOMAIN is required");
-  if (!ORG_DOMAIN) throw new Error("ORG_DOMAIN is required");
-  const apiRootSegment = process.env.NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT;
-  if (!apiRootSegment) throw new Error("NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT is required");
-  return buildBackendBaseUrl({
-    apiSubdomain: HTMT_API_SUBDOMAIN,
-    orgDomain: ORG_DOMAIN,
-    apiRootSegment,
-    isProduction: isProductionEnv(),
-    overrideUrl: !process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_BACKEND_BASE_URL : undefined,
-  });
-}
+import { AUDIOMETA_FRONT_SUBDOMAIN, ORG_DOMAIN } from "@behindthemusictree/brand";
+import { buildSubdomainBaseUrl } from "@behindthemusictree/app-kit/transport";
 
 /**
  * GrowTheMusicTree API base URL for client use — a same-origin path proxied by
@@ -35,13 +12,29 @@ export function getGrowBackendBaseUrl(): string {
   return "/api/grow-proxy";
 }
 
-/** AudioMeta web app URL. */
+/**
+ * GrowTheMusicTree API base URL for the read-only prototype/demo mode — a same-origin path
+ * proxied by `/api/grow-prototype-proxy`, which attaches the server-only `GTMT_PROTOTYPE_API_KEY`.
+ * Behaves identically to `getGrowBackendBaseUrl` for reads; grow-api 403s on writes made with the
+ * prototype key. See `docs/prototype-mode.md`.
+ */
+export function getGrowPrototypeBackendBaseUrl(): string {
+  return "/api/grow-prototype-proxy";
+}
+
+/**
+ * AudioMeta web app URL. Coolify (both prod and staging) always sets `NEXT_PUBLIC_AUDIOMETA_URL`
+ * as a buildtime var, which short-circuits everything below; the subdomain-derived fallback only
+ * fires for local dev run without it, so it always targets staging.
+ */
 export function getAudiometaUrl(): string {
+  const overrideUrl = process.env.NEXT_PUBLIC_AUDIOMETA_URL;
+  if (overrideUrl) return overrideUrl;
   if (!AUDIOMETA_FRONT_SUBDOMAIN) throw new Error("AUDIOMETA_FRONT_SUBDOMAIN is required");
   if (!ORG_DOMAIN) throw new Error("ORG_DOMAIN is required");
   return buildSubdomainBaseUrl({
     subdomain: AUDIOMETA_FRONT_SUBDOMAIN,
     orgDomain: ORG_DOMAIN,
-    isProduction: isProductionEnv(),
+    isProduction: false,
   });
 }

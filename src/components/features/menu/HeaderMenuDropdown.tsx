@@ -44,9 +44,9 @@ export function HeaderMenuDropdown() {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Open menu"
-        className="flex items-center justify-center rounded-md p-1.5 text-gray-300 transition-colors duration-200 hover:text-white"
+        className="flex items-center justify-center bg-transparent p-1.5 text-gray-900 drop-shadow-md transition-colors duration-200 hover:text-black"
       >
-        <Menu className="h-5 w-5" aria-hidden />
+        <Menu className="h-6 w-6" aria-hidden />
       </button>
       {open && (
         <div

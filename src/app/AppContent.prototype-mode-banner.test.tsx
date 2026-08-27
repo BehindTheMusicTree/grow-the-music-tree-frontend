@@ -1,14 +1,12 @@
 "use client";
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, act } from "@testing-library/react";
-import { useEffect } from "react";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { render, screen, act, cleanup } from "@testing-library/react";
 import AppContent from "./AppContent";
 import { PopupProvider } from "@behindthemusictree/app-kit/popup";
-import { ConnectivityErrorProvider, useConnectivityError, AuthRequired, ErrorCode } from "@behindthemusictree/app-kit/transport";
+import { ConnectivityErrorProvider } from "@behindthemusictree/app-kit/transport";
 
 const pathnameRef = { current: "/reference-genre-tree" };
-const authRequiredError = new AuthRequired(ErrorCode.BACKEND_UNAUTHORIZED);
 
 vi.mock("next/navigation", () => ({
   usePathname: () => pathnameRef.current,
@@ -35,35 +33,44 @@ vi.mock("@components/features/menu/AppHeader", () => ({ default: () => null }));
 vi.mock("@components/features/player/Player", () => ({ default: () => null }));
 vi.mock("@components/features/player/AutoAdvance", () => ({ default: () => null }));
 
-function SetConnectivityError() {
-  const { setConnectivityError } = useConnectivityError();
-  useEffect(() => {
-    setConnectivityError(authRequiredError);
-  }, [setConnectivityError]);
-  return null;
+function renderAppContent() {
+  return render(
+    <PopupProvider>
+      <ConnectivityErrorProvider>
+        <AppContent>
+          <div>main</div>
+        </AppContent>
+      </ConnectivityErrorProvider>
+    </PopupProvider>,
+  );
 }
 
-describe("AppContent surfaces an AuthRequired error on a route that doesn't require auth", () => {
+describe("AppContent prototype-mode banner", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("shows an error popup instead of silently dropping it", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("shows the banner under /prototype/reference-genre-tree", () => {
+    pathnameRef.current = "/prototype/reference-genre-tree";
+
+    act(() => {
+      renderAppContent();
+    });
+
+    expect(screen.getByRole("status")).toHaveTextContent("prototype demo tree");
+  });
+
+  it("does not show the banner under /reference-genre-tree", () => {
     pathnameRef.current = "/reference-genre-tree";
 
     act(() => {
-      render(
-        <PopupProvider>
-          <ConnectivityErrorProvider>
-            <SetConnectivityError />
-            <AppContent>
-              <div>main</div>
-            </AppContent>
-          </ConnectivityErrorProvider>
-        </PopupProvider>,
-      );
+      renderAppContent();
     });
 
-    expect(screen.getByText("Internal Error")).toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 });

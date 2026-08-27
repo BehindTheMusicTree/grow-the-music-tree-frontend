@@ -2,8 +2,4 @@ export { default as FormPopup } from "./FormPopup";
 export { default as InvalidInputPopup } from "./InvalidInputPopup";
 export { default as InternalErrorPopup } from "./InternalErrorPopup";
 export { default as NetworkErrorPopup } from "./NetworkErrorPopup";
-export { default as GenreDeletionPopup } from "./GenreDeletionPopup";
-export { default as AuthPopup } from "./AuthPopup";
-export { default as AuthErrorPopup } from "./AuthErrorPopup";
-export { default as SpotifyAuthErrorPopup } from "./SpotifyAuthErrorPopup";
 export { default as ImagePopup } from "./ImagePopup";

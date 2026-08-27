@@ -20,7 +20,6 @@ ARG NEXT_PUBLIC_SPOTIFY_SCOPES
 ARG NEXT_PUBLIC_SPOTIFY_REDIRECT_URI
 ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
 ARG NEXT_PUBLIC_GOOGLE_REDIRECT_URI
-ARG NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS
 ARG NEXT_PUBLIC_BACKEND_BASE_URL
 ARG NEXT_PUBLIC_SENTRY_IS_ACTIVE
 ARG NEXT_PUBLIC_SPOTIFY_AUTH_URL
@@ -30,7 +29,6 @@ ENV NEXT_PUBLIC_CONTACT_EMAIL=$NEXT_PUBLIC_CONTACT_EMAIL \
     NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=$NEXT_PUBLIC_SPOTIFY_REDIRECT_URI \
     NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID \
     NEXT_PUBLIC_GOOGLE_REDIRECT_URI=$NEXT_PUBLIC_GOOGLE_REDIRECT_URI \
-    NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS=$NEXT_PUBLIC_TRACK_UPLOAD_TIMEOUT_MS \
     NEXT_PUBLIC_BACKEND_BASE_URL=$NEXT_PUBLIC_BACKEND_BASE_URL \
     NEXT_PUBLIC_SENTRY_IS_ACTIVE=$NEXT_PUBLIC_SENTRY_IS_ACTIVE \
     NEXT_PUBLIC_SPOTIFY_AUTH_URL=$NEXT_PUBLIC_SPOTIFY_AUTH_URL
@@ -40,11 +38,18 @@ RUN pnpm build
 
 FROM node:20-alpine AS runner
 WORKDIR /app
+# Coolify's post-deploy healthcheck runs curl/wget inside the container; alpine ships neither
+# reliably (no curl at all), so without this the healthcheck always fails and Coolify rolls back.
+# Retry to ride out transient Alpine mirror/TLS blips, which otherwise fail the whole build.
+RUN apk add --no-cache curl || (sleep 2 && apk add --no-cache curl) || (sleep 5 && apk add --no-cache curl)
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static/
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public/
 ENV PORT=3000
+# Docker auto-sets $HOSTNAME to the container ID; without this override, Next's standalone
+# server binds there instead of all interfaces, so Coolify's localhost healthcheck can't connect.
+ENV HOSTNAME=0.0.0.0
 USER nextjs
 EXPOSE 3000
 CMD ["node", "server.js"]
