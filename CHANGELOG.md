@@ -88,6 +88,15 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- **Prototype demo tree**: Bumped `@behindthemusictree/app-kit` to `4.4.1`, which namespaces the
+  `"reference"`-scope genre-playlist query key by backend base URL. Previously the real reference
+  tree (`/reference-genre-tree`) and the prototype/demo tree (`/prototype/reference-genre-tree`)
+  shared a single react-query cache entry despite hitting different backends, so navigating
+  between them within the 60s stale-time window served stale data — this is what made clicking
+  "Prototype demo" appear to do nothing.
+
 ### Added
 
 - **Genre tree "Pop/Core" view mode**: Bumped `@behindthemusictree/app-kit` to `4.4.0`, which adds a third `"pop-core"` `GenreTreeView` mode rendering a radial view rooted at a "Mainstream Pop" node. `AppHeader.tsx`'s Stacked/Wheel toggle group now has a third "Pop/Core" button, always rendered but disabled (with a tooltip) when the loaded tree has no "Mainstream Pop" root. `GenreTreePage.tsx` computes this via app-kit's exported `hasMainstreamPopRoot` helper against the same `useListFullGenrePlaylists` data `GenreTreeView` fetches internally (shared react-query cache, no extra request), and pushes the result into `GenreTreeViewModeProvider`'s context (new `canShowPopCore`/`setCanShowPopCore`) so `AppHeader.tsx` can read it without new prop-drilling.
