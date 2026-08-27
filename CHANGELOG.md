@@ -88,6 +88,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Genre tree view-mode toggle**: The Stacked/Wheel/Pop-Core toggle moves out of `AppHeader` into a
+  new `AppSubheader` component, rendered as its own row below the header (still only on
+  `/reference-genre-tree` and `/prototype/reference-genre-tree`). The toggle's dark pill background
+  is also dropped so the buttons sit directly on the page, matching the "Wheel"/"Pop/Core" contrast
+  fix bundled with the move.
+
 ### Fixed
 
 - **Pop/Core toggle on the prototype tree**: Bumped `@behindthemusictree/app-kit` to `4.4.2`, which
