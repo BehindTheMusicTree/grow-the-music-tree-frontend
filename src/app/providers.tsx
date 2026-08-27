@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient, useFetchWrapper, ConnectivityErrorProvider, Scope } from "@behindthemusictree/app-kit/transport";
 import { SessionProvider } from "@behindthemusictree/app-kit/auth";
@@ -14,7 +15,8 @@ import {
   YoutubeTrackDetailed,
   YoutubeTrackDetailedSchema,
 } from "@behindthemusictree/app-kit/genre-tree";
-import { getGrowBackendBaseUrl } from "@lib/site-urls";
+import { getGrowBackendBaseUrl, getGrowPrototypeBackendBaseUrl } from "@lib/site-urls";
+import { isPrototypeRoute } from "@lib/prototype-mode";
 import { toPlayerTrack } from "@lib/player-track";
 
 interface ProvidersProps {
@@ -25,8 +27,8 @@ interface ProvidersProps {
 // (My Library, My Genre Playlists) are being removed from grow in favor of hear-the-music-tree.
 const PLAYER_SCOPE = "reference" satisfies Scope;
 
-function useLoadTrack(): (trackId: string) => Promise<PlayerTrack> {
-  const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
+function useLoadTrack(getBackendBaseUrl: () => string): (trackId: string) => Promise<PlayerTrack> {
+  const { fetch } = useFetchWrapper(getBackendBaseUrl);
 
   return useCallback(
     async (trackId: string): Promise<PlayerTrack> => {
@@ -45,14 +47,16 @@ function useLoadTrack(): (trackId: string) => Promise<PlayerTrack> {
 }
 
 function AppProviders({ children }: ProvidersProps) {
-  const loadTrack = useLoadTrack();
+  const pathname = usePathname();
+  const getBackendBaseUrl = isPrototypeRoute(pathname) ? getGrowPrototypeBackendBaseUrl : getGrowBackendBaseUrl;
+  const loadTrack = useLoadTrack(getBackendBaseUrl);
 
   return (
     <PlayerProvider loadTrack={loadTrack}>
       <PopupProvider>
         <TrackListSidebarVisibilityProvider>
           <TrackListProvider
-            getBackendBaseUrl={getGrowBackendBaseUrl}
+            getBackendBaseUrl={getBackendBaseUrl}
             schema={YoutubeTrackDetailedSchema}
             listEndpoint={() => libraryEndpoints[PLAYER_SCOPE].youtube.list()}
             listQueryKey={(page) => libraryQueryKeys[PLAYER_SCOPE].youtube.list(page)}

@@ -39,13 +39,24 @@ It's set from the `infrastructure` repo, not from anything in this repo, and the
 
 This repo has no secret of its own for `GTMT_API_KEY` — it's entirely infra-side configuration. Local dev sets `GTMT_API_KEY` directly in `.env.local` if you need to exercise the write proxy against a live grow-api.
 
-## 4. Organization assets (branding and subdomains)
+## 4. Prototype/demo mode proxy (`GTMT_PROTOTYPE_API_KEY`)
+
+`/prototype/*` is a read-only demo tree backed by a second, static-key `grow-the-music-tree-api` identity (`PROTOTYPE_USERNAME=prototype`). The Route Handler at `src/app/api/grow-prototype-proxy/[...path]/route.ts` reads `process.env.GTMT_PROTOTYPE_API_KEY` and attaches it server-side before forwarding to grow-api (see `getGrowPrototypeBackendBaseUrl` in [src/lib/site-urls.ts](../src/lib/site-urls.ts)). See [docs/prototype-mode.md](prototype-mode.md).
+
+Same runtime/build-time distinction as `GTMT_API_KEY`: read at request time, not `NEXT_PUBLIC_*`, so it's a **Coolify runtime env var** (`static_env`/`preview_static_env`), not a Docker build arg.
+
+- `ansible/roles/coolify/tasks/generate_app_secrets.yml` generates the value once per environment and exposes it as `coolify_gtmt_prototype_api_token_{prod,staging}` Ansible facts.
+- `ansible/playbooks/group_vars/all.yml` maps those facts into **both** `gtmt-front`'s `static_env.{production,staging}.GTMT_PROTOTYPE_API_KEY` (and `preview_static_env.staging.GTMT_PROTOTYPE_API_KEY`) **and** `gtmt-api`'s `static_env.{production,staging}.GROW_PROTOTYPE_API_KEY` — one generated value, two apps, set atomically in the same Ansible run.
+
+This repo has no secret of its own for `GTMT_PROTOTYPE_API_KEY` — entirely infra-side. Local dev sets `GTMT_PROTOTYPE_API_KEY` directly in `.env.local` if you need to exercise `/prototype/*` against a live grow-api.
+
+## 5. Organization assets (branding and subdomains)
 
 The banner **TheMusicTree** lockup and sidebar social icons use **`@behindthemusictree/assets`**. The lockup's organization site URL is embedded when that package is published; `NEXT_PUBLIC_THEMUSICTREE_URL` is not used.
 
 [`src/lib/site-urls.ts`](../src/lib/site-urls.ts) also imports the org's subdomain labels (`HTMT_API_SUBDOMAIN`, `AUDIOMETA_FRONT_SUBDOMAIN`) and `ORG_DOMAIN` from this package to compute `NEXT_PUBLIC_BACKEND_BASE_URL` and the AudioMeta link at build/runtime. Keep `@behindthemusictree/assets` reasonably current (`pnpm install` after a version bump) so these constants exist and stay accurate.
 
-## 5. Build-time env vars reference
+## 6. Build-time env vars reference
 
 These are the `NEXT_PUBLIC_*` `ARG`s declared in the [`Dockerfile`](../Dockerfile)'s `builder` stage. Coolify supplies them via `buildtime_env` (configured in `infrastructure`'s `ansible/playbooks/group_vars/all.yml`, in the `gtmt-front` project's `coolify_projects` entry):
 
@@ -63,7 +74,7 @@ These are the `NEXT_PUBLIC_*` `ARG`s declared in the [`Dockerfile`](../Dockerfil
 
 Values, per-environment overrides, and how they're sourced (GitHub vars/secrets) live entirely in the `infrastructure` repo, not here.
 
-## 6. Local build against the Dockerfile
+## 7. Local build against the Dockerfile
 
 To reproduce a Coolify build locally:
 
@@ -86,10 +97,10 @@ docker run -p 3000:3000 -e PORT=3000 -e GTMT_API_KEY=... grow-the-music-tree-fro
 
 The `GH_PACKAGES_TOKEN_READ` build secret is required — it's a GitHub PAT with `read:packages`, used by `pnpm install` inside the `builder` stage to pull `@behindthemusictree/*` from GitHub Packages. See [GitHub Packages tokens](https://github.com/BehindTheMusicTree/infrastructure/blob/main/docs/guides/github-packages-tokens.md) in the `infrastructure` repo for how it's provisioned as a Coolify build-only secret.
 
-## 7. Summary
+## 8. Summary
 
 - **Staging**: Push to `develop` (or open a PR against `develop`) → Coolify builds automatically from the Dockerfile.
 - **Production**: Push to `main` → Coolify builds automatically. There is no release-tag gate or manual deploy step in this repo; `main` is always deployable.
-- **Build-time vs. runtime**: `NEXT_PUBLIC_*` vars are Docker build args (Coolify `buildtime_env`); `GTMT_API_KEY` is a runtime container env var (Coolify `static_env`) — see [§2](#2-build-time-vs-runtime-environment-variables).
+- **Build-time vs. runtime**: `NEXT_PUBLIC_*` vars are Docker build args (Coolify `buildtime_env`); `GTMT_API_KEY` and `GTMT_PROTOTYPE_API_KEY` are runtime container env vars (Coolify `static_env`) — see [§2](#2-build-time-vs-runtime-environment-variables).
 - **All Coolify config** (which vars, which values, secrets sourcing) lives in the `infrastructure` repo's `ansible/playbooks/group_vars/all.yml`, not in this repo.
 - **Releases**: `package.json` `version` / `CHANGELOG.md` versioning still follows Git Flow (see [VERSIONING.md](VERSIONING.md)) for traceability, but no deploy is gated on a version tag — tagging and deploying are independent.

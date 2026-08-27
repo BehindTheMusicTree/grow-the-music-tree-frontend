@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@behindthemusictree/ui";
+import { FlaskConical } from "lucide-react";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { getAudiometaUrl } from "@lib/site-urls";
@@ -34,6 +35,12 @@ const menuGroup = [
         },
       ]
     : []),
+  {
+    href: ROUTE_PATHS.PROTOTYPE_REFERENCE_GENRE_TREE,
+    label: "Prototype demo",
+    icon: <FlaskConical className="h-5 w-5 shrink-0" aria-hidden />,
+    external: false,
+  },
 ];
 
 interface AppHeaderProps {
