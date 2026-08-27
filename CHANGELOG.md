@@ -98,6 +98,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Genre tree view-mode toggle**: The Stacked/Wheel/Pop-Core toggle previously shared a single
+  view-mode state across `/reference-genre-tree` and `/prototype/reference-genre-tree`, so
+  switching the view on one route also changed it on the other. `GenreTreeViewModeProvider` now
+  keys its state by route (reference vs. prototype) so the two trees drive the toggle
+  independently.
+
 - **Genre tree fetch errors**: Bumped `@behindthemusictree/app-kit` to `4.4.3`, which makes
   `TreePerRoot`/`TreeWheel` show an error popup when their fetch's `onError` fires, instead of
   only `console.error`-ing — a backend validation failure (e.g. a `ZodError` from a missing or
