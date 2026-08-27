@@ -50,7 +50,8 @@ interface AppHeaderProps {
 export default function AppHeader({ className }: AppHeaderProps) {
   const pathname = usePathname();
   const { viewMode, setViewMode, canShowPopCore } = useGenreTreeViewMode();
-  const showGenreTreeViewModeToggle = pathname === ROUTE_PATHS.REFERENCE_GENRE_TREE;
+  const showGenreTreeViewModeToggle =
+    pathname === ROUTE_PATHS.REFERENCE_GENRE_TREE || pathname === ROUTE_PATHS.PROTOTYPE_REFERENCE_GENRE_TREE;
 
   return (
     <div className={`fixed top-3 left-3 z-50 flex items-center gap-2 ${className ?? ""}`}>
