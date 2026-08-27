@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [2.4.0 - 2026-08-27](#240---2026-08-27)
 - [2.3.0 - 2026-08-18](#230---2026-08-18)
 - [2.2.0 - 2026-08-14](#220---2026-08-14)
 - [1.5.0 - 2026-04-05](#150---2026-04-05)
@@ -87,6 +88,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-08-27
+
+### Added
+
+- **Prototype/demo mode**: Added a read-only `/prototype/reference-genre-tree` demo tree, backed by a second static-key `grow-the-music-tree-api` identity (`GTMT_PROTOTYPE_API_KEY` server-only env var, proxied via new `src/app/api/grow-prototype-proxy/[...path]/route.ts`). `src/components/features/genre-tree/GenreTreePage.tsx` is now shared by both the live and prototype reference-tree pages, passing `readOnly` through to `@behindthemusictree/app-kit@4.3.0`'s `GenreTreeView` (bumped from `4.2.0` for its new `readOnly` prop, which hides write-action UI) so prototype visitors can browse but not edit. `src/lib/prototype-mode.ts`'s `isPrototypeRoute` drives a persistent `PrototypeModeBanner` and picks the right backend base URL for the track player/library in `src/app/providers.tsx`. See [docs/prototype-mode.md](docs/prototype-mode.md).
+
 ### Changed
 
 - **Playback**: Reference-tree track playback no longer depends on `hear-the-music-tree-api` at all. It previously fetched a downloaded audio file via `libraryEndpoints.reference.uploaded.download()`, which never actually worked against `grow-the-music-tree-api` (that backend has no audio storage). Tracks now play through an embedded YouTube video instead: `useLoadTrack()` fetches track metadata from `grow-the-music-tree-api`'s new `reference/library/youtube` endpoint and loads it into `@behindthemusictree/app-kit`'s player as a `"youtube"`-kind `PlayerTrack`. The player footer now renders app-kit's `PlayerVideoSurface` above the transport bar whenever a track is loaded, and `Player.tsx`/`ProgressBar.tsx` drive playback through the new `mediaController` API instead of reading/writing an `HTMLAudioElement` directly. A track with no `youtube_video_id` set surfaces a clear load error instead of silently failing.
@@ -116,12 +123,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### CI
 
 - **Coverage gate**: `pnpm test` in CI's "Run Tests" job now runs `pnpm test:coverage` (added the missing `@vitest/coverage-v8` dependency) and fails the build if coverage drops below `vitest.config.ts`'s new `coverage.thresholds`. Also fixed the `coverage.exclude` glob (`node_modules/` → `**/node_modules/**`), which wasn't matching nested paths and let a stray, gitignored `out/` build directory of pre-instrumented vendor code inflate line/statement coverage from a true ~21% to a misleading ~85%. Thresholds are set to today's real numbers (lines/statements 21%, functions 51%, branches 71%) as a no-regression floor — raising them is separate, deliberate follow-up work, not bundled here.
-
-## [Unreleased]
-
-### Added
-
-- **Prototype/demo mode**: Added a read-only `/prototype/reference-genre-tree` demo tree, backed by a second static-key `grow-the-music-tree-api` identity (`GTMT_PROTOTYPE_API_KEY` server-only env var, proxied via new `src/app/api/grow-prototype-proxy/[...path]/route.ts`). `src/components/features/genre-tree/GenreTreePage.tsx` is now shared by both the live and prototype reference-tree pages, passing `readOnly` through to `@behindthemusictree/app-kit@4.3.0`'s `GenreTreeView` (bumped from `4.2.0` for its new `readOnly` prop, which hides write-action UI) so prototype visitors can browse but not edit. `src/lib/prototype-mode.ts`'s `isPrototypeRoute` drives a persistent `PrototypeModeBanner` and picks the right backend base URL for the track player/library in `src/app/providers.tsx`. See [docs/prototype-mode.md](docs/prototype-mode.md).
 
 ## [2.3.0] - 2026-08-18
 
