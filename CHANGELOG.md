@@ -90,6 +90,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Pop/Core toggle on the prototype tree**: Bumped `@behindthemusictree/app-kit` to `4.4.2`, which
+  makes `useListFullGenrePlaylists` follow pagination (`next`) until the full result set is
+  collected, instead of assuming a single `pageSize: 1000` request returns everything. The
+  prototype tree has 1101 nodes, well past grow-api's `PAGINATION_PAGE_SIZE_MAX` of 100, so the
+  "full list" fetch was silently truncated to the first 100 nodes — `hasMainstreamPopRoot` then
+  reported `false` even though the tree genuinely has a "Mainstream Pop" root, leaving the
+  "Pop/Core" toggle permanently disabled on `/prototype/reference-genre-tree`.
+
 - **Prototype demo tree**: Bumped `@behindthemusictree/app-kit` to `4.4.1`, which namespaces the
   `"reference"`-scope genre-playlist query key by backend base URL. Previously the real reference
   tree (`/reference-genre-tree`) and the prototype/demo tree (`/prototype/reference-genre-tree`)
