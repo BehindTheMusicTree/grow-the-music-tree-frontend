@@ -98,6 +98,16 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Genre tree fetch errors**: Bumped `@behindthemusictree/app-kit` to `4.4.3`, which makes
+  `TreePerRoot`/`TreeWheel` show an error popup when their fetch's `onError` fires, instead of
+  only `console.error`-ing — a backend validation failure (e.g. a `ZodError` from a missing or
+  null field) previously failed silently with no visible feedback. It also relaxes
+  `durationInSec`/`durationStrInHourMinSec` in the criteria-playlist detailed schema to
+  `nullable().optional()`, so tracks without duration data no longer fail validation of the whole
+  playlist detail response — this paired with a backend fix
+  (`grow-the-music-tree-api` PR #52) for a serializer downcast bug that was rendering
+  `youtube_video_id` as `null`.
+
 - **Pop/Core toggle on the prototype tree**: Bumped `@behindthemusictree/app-kit` to `4.4.2`, which
   makes `useListFullGenrePlaylists` follow pagination (`next`) until the full result set is
   collected, instead of assuming a single `pageSize: 1000` request returns everything. The
