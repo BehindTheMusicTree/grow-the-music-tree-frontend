@@ -9,7 +9,7 @@ styled with Tailwind. Talks to the TheMusicTreeAPI backend.
 - Tailwind CSS 3 (utility classes only — no CSS modules)
 - Vitest + Testing Library (happy-dom) for tests
 - pnpm as package manager
-- Internal packages: `@behindthemusictree/app-kit`, `brand`, `genre-tree-view`, `ui`
+- Internal packages: `@behindthemusictree/app-kit`, `brand`, `ui`
 
 ## Commands
 
@@ -22,7 +22,7 @@ styled with Tailwind. Talks to the TheMusicTreeAPI backend.
 ## Structure
 
 - `src/app/` — App Router pages (route group `(app)/`)
-- `src/components/` — `ui/` (incl. `popup/`), `features/`, `auth/`
+- `src/components/` — `ui/` (incl. `popup/`), `features/`
 - `src/api/domains/` — API client modules per domain
 - `src/hooks/`, `src/lib/`, `src/models/`, `src/schemas/`, `src/types/`, `src/utils/`
 - Tests are co-located next to source as `*.test.ts(x)` — no separate test dir
@@ -63,8 +63,12 @@ styled with Tailwind. Talks to the TheMusicTreeAPI backend.
   (`// changed`, `// fix`, `// temp`, etc.).
 - **Env vars**: only `NEXT_PUBLIC_*`-prefixed vars are exposed to the browser.
   Installing requires a GitHub PAT with `read:packages` for `@behindthemusictree/*`.
+- **Dockerfile `runner` stage**: must keep `apk add curl` and `ENV HOSTNAME=0.0.0.0` —
+  Coolify's post-deploy healthcheck runs `curl`/`wget` inside the container (alpine ships
+  neither by default) against `localhost`, which is unreachable if `$HOSTNAME` is left at
+  Docker's auto-set container-ID value. Removing either regresses a real production
+  rollback incident (see `CHANGELOG.md` v2.4.0 "Fixed" and `ARCHITECTURE.md`).
 
 ## Further docs
 
-- Auth: `docs/backend-auth.md`, `docs/frontend-auth.md`
-- `docs/DEPLOYMENT.md`, `docs/DATA_ATTRIBUTES.md`, `docs/SEMANTIC_HTML.md`
+- `docs/DEPLOYMENT.md`, `docs/prototype-mode.md`, `docs/DATA_ATTRIBUTES.md`, `docs/SEMANTIC_HTML.md`

@@ -2,13 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Button } from "@behindthemusictree/ui";
 import { FlaskConical } from "lucide-react";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { getAudiometaUrl } from "@lib/site-urls";
-import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { MenuGroup } from "./MenuGroup";
 import { HeaderMenuDropdown } from "./HeaderMenuDropdown";
 import { PATHS as ROUTE_PATHS } from "@lib/constants/routes";
@@ -48,10 +45,6 @@ interface AppHeaderProps {
 }
 
 export default function AppHeader({ className }: AppHeaderProps) {
-  const pathname = usePathname();
-  const { viewMode, setViewMode } = useGenreTreeViewMode();
-  const showGenreTreeViewModeToggle = pathname === ROUTE_PATHS.REFERENCE_GENRE_TREE;
-
   return (
     <div className={`fixed top-3 left-3 z-50 flex items-center gap-2 ${className ?? ""}`}>
       <HeaderMenuDropdown />
@@ -66,24 +59,6 @@ export default function AppHeader({ className }: AppHeaderProps) {
         </div>
         <h1 className="hidden truncate text-lg font-bold text-gray-100 xl:block xl:text-xl">{APP_NAME}</h1>
       </Link>
-      {showGenreTreeViewModeToggle && (
-        <div
-          className="flex items-center gap-1 rounded-full bg-black/70 p-1 shadow-lg backdrop-blur"
-          role="group"
-          aria-label="Tree view mode"
-        >
-          <Button
-            variant={viewMode === "stacked" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setViewMode("stacked")}
-          >
-            Stacked
-          </Button>
-          <Button variant={viewMode === "wheel" ? "default" : "outline"} size="sm" onClick={() => setViewMode("wheel")}>
-            Wheel
-          </Button>
-        </div>
-      )}
       {menuGroup.length > 0 && (
         <nav
           aria-label="Main navigation"

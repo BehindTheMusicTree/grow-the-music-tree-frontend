@@ -1,15 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
 import {
   useCreateGenre,
   useUpdateGenre,
+  useListFullGenrePlaylists,
   GenreTreeView,
   CriteriaMinimum,
+  CriteriaPlaylistSimple,
   YoutubeTrackDetailedSchema,
   makeCriteriaPlaylistDetailedSchema,
+  hasMainstreamPopRoot,
 } from "@behindthemusictree/app-kit/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
@@ -23,10 +26,34 @@ interface GenreTreePageProps {
 }
 
 export default function GenreTreePage({ getBackendBaseUrl, title, readOnly }: GenreTreePageProps) {
-  const { viewMode } = useGenreTreeViewMode();
+  const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
   const { mutate: createGenre, formErrors } = useCreateGenre("reference", getBackendBaseUrl);
   const { renameGenre, formErrors: renameFormErrors } = useUpdateGenre("reference", getBackendBaseUrl);
   const { showPopup, hidePopup } = usePopup();
+
+  // Shares the react-query cache with GenreTreeView's internal fetch (same queryKey), so this
+  // doesn't trigger an extra network request. Used only to compute whether the "pop-core" view
+  // mode is available, so AppHeader can grey out its toggle button accordingly.
+  const { data: genrePlaylists } = useListFullGenrePlaylists("reference", getBackendBaseUrl);
+
+  const canShowPopCore = useMemo(
+    () =>
+      hasMainstreamPopRoot(
+        ((genrePlaylists?.results ?? []) as CriteriaPlaylistSimple[]).map((genrePlaylist) => ({
+          id: genrePlaylist.uuid,
+          parentId: genrePlaylist.parent?.uuid ?? null,
+          name: genrePlaylist.name,
+          itemCount: genrePlaylist.tracksCount,
+        })),
+      ),
+    [genrePlaylists?.results],
+  );
+
+  useEffect(() => {
+    setCanShowPopCore(canShowPopCore);
+  }, [canShowPopCore, setCanShowPopCore]);
+
+  const effectiveViewMode = viewMode === "pop-core" && !canShowPopCore ? "stacked" : viewMode;
 
   const showCriteriaCreationPopup = useCallback(
     (parent: CriteriaMinimum | null = null) => {
@@ -84,7 +111,7 @@ export default function GenreTreePage({ getBackendBaseUrl, title, readOnly }: Ge
         handleGenreRenameAction={showGenreRenamePopup}
         getBackendBaseUrl={getBackendBaseUrl}
         criteriaPlaylistDetailedSchema={makeCriteriaPlaylistDetailedSchema(YoutubeTrackDetailedSchema)}
-        viewMode={viewMode}
+        viewMode={effectiveViewMode}
         readOnly={readOnly}
       />
     </Page>

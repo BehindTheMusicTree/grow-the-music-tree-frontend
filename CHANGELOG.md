@@ -88,6 +88,63 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-08-28
+
+### Changed
+
+- **Genre tree view-mode toggle**: The Stacked/Wheel/Pop-Core toggle moves out of `AppHeader` into a
+  new `AppSubheader` component, rendered as its own row below the header (still only on
+  `/reference-genre-tree` and `/prototype/reference-genre-tree`). The toggle's dark pill background
+  is also dropped so the buttons sit directly on the page, matching the "Wheel"/"Pop/Core" contrast
+  fix bundled with the move.
+
+- **Default genre tree view modes**: The root `/` route now redirects to the prototype demo tree
+  (`/prototype/reference-genre-tree`) instead of the real reference tree. The prototype tree now
+  defaults to the "Pop/Core" view mode (falling back to "Stacked" if the loaded tree has no
+  "Mainstream Pop" root); the reference tree now defaults to "Wheel" instead of "Stacked".
+
+- **Prototype-mode banner**: `PrototypeModeBanner` moves from fixed to the top of the viewport to
+  fixed to the bottom.
+
+### Fixed
+
+- **Genre tree view-mode toggle**: The Stacked/Wheel/Pop-Core toggle previously shared a single
+  view-mode state across `/reference-genre-tree` and `/prototype/reference-genre-tree`, so
+  switching the view on one route also changed it on the other. `GenreTreeViewModeProvider` now
+  keys its state by route (reference vs. prototype) so the two trees drive the toggle
+  independently.
+
+- **Genre tree fetch errors**: Bumped `@behindthemusictree/app-kit` to `4.4.3`, which makes
+  `TreePerRoot`/`TreeWheel` show an error popup when their fetch's `onError` fires, instead of
+  only `console.error`-ing — a backend validation failure (e.g. a `ZodError` from a missing or
+  null field) previously failed silently with no visible feedback. It also relaxes
+  `durationInSec`/`durationStrInHourMinSec` in the criteria-playlist detailed schema to
+  `nullable().optional()`, so tracks without duration data no longer fail validation of the whole
+  playlist detail response — this paired with a backend fix
+  (`grow-the-music-tree-api` PR #52) for a serializer downcast bug that was rendering
+  `youtube_video_id` as `null`.
+
+- **Pop/Core toggle on the prototype tree**: Bumped `@behindthemusictree/app-kit` to `4.4.2`, which
+  makes `useListFullGenrePlaylists` follow pagination (`next`) until the full result set is
+  collected, instead of assuming a single `pageSize: 1000` request returns everything. The
+  prototype tree has 1101 nodes, well past grow-api's `PAGINATION_PAGE_SIZE_MAX` of 100, so the
+  "full list" fetch was silently truncated to the first 100 nodes — `hasMainstreamPopRoot` then
+  reported `false` even though the tree genuinely has a "Mainstream Pop" root, leaving the
+  "Pop/Core" toggle permanently disabled on `/prototype/reference-genre-tree`.
+
+- **Prototype demo tree**: Bumped `@behindthemusictree/app-kit` to `4.4.1`, which namespaces the
+  `"reference"`-scope genre-playlist query key by backend base URL. Previously the real reference
+  tree (`/reference-genre-tree`) and the prototype/demo tree (`/prototype/reference-genre-tree`)
+  shared a single react-query cache entry despite hitting different backends, so navigating
+  between them within the 60s stale-time window served stale data — this is what made clicking
+  "Prototype demo" appear to do nothing.
+
+### Added
+
+- **Genre tree "Pop/Core" view mode**: Bumped `@behindthemusictree/app-kit` to `4.4.0`, which adds a third `"pop-core"` `GenreTreeView` mode rendering a radial view rooted at a "Mainstream Pop" node. `AppHeader.tsx`'s Stacked/Wheel toggle group now has a third "Pop/Core" button, always rendered but disabled (with a tooltip) when the loaded tree has no "Mainstream Pop" root. `GenreTreePage.tsx` computes this via app-kit's exported `hasMainstreamPopRoot` helper against the same `useListFullGenrePlaylists` data `GenreTreeView` fetches internally (shared react-query cache, no extra request), and pushes the result into `GenreTreeViewModeProvider`'s context (new `canShowPopCore`/`setCanShowPopCore`) so `AppHeader.tsx` can read it without new prop-drilling.
+- **Genre tree view-mode toggle**: The Stacked/Wheel/Pop-Core toggle group in `AppHeader.tsx` now also renders on `/prototype/reference-genre-tree`, not just `/reference-genre-tree` — it previously only checked the live route, so the prototype page had no way to switch view modes.
+
+
 ## [2.4.0] - 2026-08-27
 
 ### Added

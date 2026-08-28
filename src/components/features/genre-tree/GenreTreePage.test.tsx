@@ -10,6 +10,8 @@ vi.mock("@behindthemusictree/app-kit/popup", () => ({
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   useCreateGenre: () => ({ mutate: vi.fn(), formErrors: [] }),
   useUpdateGenre: () => ({ renameGenre: vi.fn(), formErrors: [] }),
+  useListFullGenrePlaylists: () => ({ data: { results: [] } }),
+  hasMainstreamPopRoot: () => false,
   makeCriteriaPlaylistDetailedSchema: () => ({}),
   YoutubeTrackDetailedSchema: {},
   GenreTreeView: (props: { readOnly: boolean; getBackendBaseUrl: () => string }) => (

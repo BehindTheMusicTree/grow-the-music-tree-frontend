@@ -19,7 +19,6 @@ The portfolio website content lives in **[the-music-tree-frontend](https://githu
 - [Pages](#pages)
 - [Tech Stack](#tech-stack)
 - [Rendering Strategy](#rendering-strategy)
-- [Auth callbacks](#auth-callbacks)
 - [Project Structure](#project-structure)
 - [Environment Variables](#environment-variables)
 - [Getting Started](#getting-started)
@@ -34,15 +33,15 @@ The portfolio website content lives in **[the-music-tree-frontend](https://githu
 ## Overview
 
 **What the application does:**  
-GrowTheMusicTree is a web platform that allows users to explore and understand musical genres through an interactive, community-driven genre tree map. Users can visualize relationships between genres, connect their Spotify accounts to analyze their listening habits, and participate in genre classifications.
+GrowTheMusicTree is a web platform that allows users to explore and understand musical genres through an interactive, community-driven genre tree map, and to participate in genre classifications.
 
 **Target users:**  
 Music enthusiasts, researchers, and the general public interested in understanding music taxonomy and discovering new genres.
 
 **High-level features:**
 
-- Interactive genre tree visualization using D3.js
-- Spotify OAuth integration for music library analysis
+- Interactive genre tree visualization
+- A read-only `/prototype` demo tree for visitors without write access (see [docs/prototype-mode.md](docs/prototype-mode.md))
 - Rich contextual information for each genre (historical, cultural, technical)
 
 **Planned / not yet implemented** (see [VISION.md](VISION.md) and [TODO.md](TODO.md)):
@@ -53,22 +52,17 @@ Music enthusiasts, researchers, and the general public interested in understandi
 
 ## Pages
 
-- Home (`/`)
+- Home (`/`, redirects to `/reference-genre-tree`)
 - About (`/about`)
-- Account (`/account`)
-- Google Auth Callback (`/auth/google/callback`)
-- Spotify Auth Callback (`/auth/spotify/callback`)
-- Genre Playlists (`/genre-playlists`)
-- MyMusicTree (`/me-genre-tree`)
 - Reference tree (`/reference-genre-tree`, also the logo / home link)
-- Spotify Library (`/spotify-library`)
-- My Library (`/me-uploaded-library`)
+- Prototype/demo tree (`/prototype/reference-genre-tree`) — read-only, see [docs/prototype-mode.md](docs/prototype-mode.md)
+- Health check (`/health`)
 
-See `docs/pages/` for detailed page documentation.
+Login/personal-library pages (Account, Spotify/Google auth callbacks, MyMusicTree, Spotify Library, My Library) were removed in v2.4.0 — `grow-the-music-tree-api` is single-tenant with no per-user auth model; personal-library features live in `hear-the-music-tree-frontend` instead.
 
 ## Tech Stack
 
-- **Framework:** Next.js 15 with App Router
+- **Framework:** Next.js 16 with App Router
 - **Language:** TypeScript
 - **Rendering:** Next.js (Node server in production)
 - **Styling:** Tailwind CSS
@@ -85,20 +79,15 @@ The app is built with Next.js and served by the Node runtime in production:
 - The container runs `next start` and serves the app on `APP_PORT`
 - The reverse proxy (Nginx, Traefik, etc.) must proxy to the container’s port rather than to a static file root
 
-## Auth callbacks
-
-Google and Spotify OAuth redirect the user to `/auth/google/callback` or `/auth/spotify/callback`. The **layout-level** component `AuthCallbackHandler` (`src/components/auth/AuthCallbackHandler.tsx`) runs in the app shell on every load, reads `window.location` to detect these paths, exchanges the `code` with the backend, shows "Connecting…" or an error popup, then redirects. With the Next.js server, the callback route is served and mounted normally.
-
 ## Project Structure
 
 ```
 .
 ├── src/
-│   ├── app/                # Next.js App Router pages (route groups, layouts, auth callbacks)
+│   ├── app/                # Next.js App Router pages (route groups, layouts)
 │   ├── api/                # API client domains (per-resource request/response handling)
 │   ├── assets/             # Bundled images and static assets imported by components
 │   ├── components/         # React components
-│   │   ├── auth/          # Auth callback handling, guards
 │   │   ├── features/      # Feature-specific components
 │   │   └── ui/            # Reusable UI components
 │   ├── hooks/              # Custom React hooks
@@ -110,7 +99,7 @@ Google and Spotify OAuth redirect the user to `/auth/google/callback` or `/auth/
 ├── public/                # Static assets served as-is
 ├── env/                   # Environment configuration (dev presets, examples)
 ├── scripts/               # Build, release, and env setup scripts
-├── docs/                  # Architecture, auth, testing, and per-page documentation
+├── docs/                  # Deployment, testing, and per-page documentation
 ├── .github/workflows/     # CI/CD workflows
 ├── Dockerfile             # Docker build configuration
 ├── next.config.js         # Next.js configuration
@@ -220,10 +209,10 @@ Every `NEXT_PUBLIC_*` var is required at build time (baked in by `next build`); 
 **Run container:**
 
 ```bash
-docker run -p 3000:3000 -e PORT=3000 -e GTMT_API_KEY=... grow-the-music-tree-frontend
+docker run -p 3000:3000 -e PORT=3000 -e GTMT_API_KEY=... -e GTMT_PROTOTYPE_API_KEY=... grow-the-music-tree-frontend
 ```
 
-`GTMT_API_KEY` is server-only and read at request time (not `NEXT_PUBLIC_*`), so it's a runtime env var, not a build arg — see [§ Grow-api write proxy](docs/DEPLOYMENT.md#grow-api-write-proxy-gtmt_api_key) in DEPLOYMENT.md.
+`GTMT_API_KEY` and `GTMT_PROTOTYPE_API_KEY` are server-only and read at request time (not `NEXT_PUBLIC_*`), so they're runtime env vars, not build args — see [§ Grow-api write proxy](docs/DEPLOYMENT.md#grow-api-write-proxy-gtmt_api_key) and [§ Prototype/demo mode proxy](docs/DEPLOYMENT.md#4-prototypedemo-mode-proxy-gtmt_prototype_api_key) in DEPLOYMENT.md.
 
 ## CI
 
@@ -253,8 +242,6 @@ Build output: `.next/`. The app is served by the Next.js Node server (`output: "
 
 ## Troubleshooting
 
-- **Auth callback shows no "Connecting with Google/Spotify...", no network request:** Callbacks are handled by `AuthCallbackHandler` in the app shell (see [Auth callbacks](#auth-callbacks)). With the Next.js server, the callback URL is served by the app; ensure the reverse proxy forwards `/auth/.../callback` to the container. If the backend exchange never runs: (1) **Cache** — Do a hard refresh (Ctrl+Shift+R / Cmd+Shift+R) or open the callback URL in an incognito window. (2) Check the browser console for errors.
-
 - **Environment variables not applied:** Rebuild required after env changes
 - **Clear local cache:**
   ```bash
@@ -276,14 +263,12 @@ For additional information about this project, please refer to:
 - **[docs/VERSIONING.md](docs/VERSIONING.md)** - Versioning strategy and guidelines
 - **[docs/SEMVER_GUIDE.md](docs/SEMVER_GUIDE.md)** - SemVer conventions used for releases
 - **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Coolify staging and production deployment setup
+- **[docs/prototype-mode.md](docs/prototype-mode.md)** - Read-only `/prototype` demo tree, `GTMT_PROTOTYPE_API_KEY` wiring
 - **[docs/REVERSE_PROXY_CONFIG.md](docs/REVERSE_PROXY_CONFIG.md)** - Nginx/reverse-proxy configuration for deployment
 - **[docs/testing.md](docs/testing.md)** - Testing strategy, tools, and conventions
 - **[docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md)** - Code and UI styling conventions
 - **[docs/SEMANTIC_HTML.md](docs/SEMANTIC_HTML.md)** - Semantic HTML conventions
 - **[docs/DATA_ATTRIBUTES.md](docs/DATA_ATTRIBUTES.md)** - `data-*` attribute conventions (e.g. test hooks)
-- **[docs/frontend-auth.md](docs/frontend-auth.md)** - Frontend auth flow details
-- **[docs/backend-auth.md](docs/backend-auth.md)** - Backend auth integration details
-- **[docs/backend-google-auth-implementation.md](docs/backend-google-auth-implementation.md)** - Google auth backend implementation notes
 
 ## License
 
