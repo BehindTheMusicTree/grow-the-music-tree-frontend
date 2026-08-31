@@ -88,6 +88,17 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Genre tree Wheel/Pop-Core rendering**: Bumped `@behindthemusictree/app-kit` to `4.5.0`, which
+  adds a polar-layout radial loading skeleton for the Wheel and Pop/Core tree views (replacing the
+  linear skeleton while those views load) and defaults `GenreTreeView` to the Pop-Core Wheel view
+  instead of Stacked, falling back to Stacked when the loaded tree has no "Mainstream Pop" root. It
+  also bumps app-kit's own `@behindthemusictree/genre-tree-view` dependency to `1.1.1`, which fixes
+  wheel root sectors being sized disproportionately to their node count, uncrops the Pop/Core "fit
+  to frame", curves connecting links along the wheel's rings instead of cutting straight chords,
+  and corrects Pop/Core's outer-circle nesting and canvas sizing around deep core branches.
+
 ## [2.5.0] - 2026-08-28
 
 ### Changed
