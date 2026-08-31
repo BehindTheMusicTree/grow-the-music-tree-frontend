@@ -90,7 +90,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
-- **Genre tree Wheel/Pop-Core rendering**: Bumped `@behindthemusictree/app-kit` to `4.5.0`, which
+- **Genre tree Wheel/Pop-Core rendering**: Bumped `@behindthemusictree/app-kit` to `4.5.1`, which
   adds a polar-layout radial loading skeleton for the Wheel and Pop/Core tree views (replacing the
   linear skeleton while those views load) and defaults `GenreTreeView` to the Pop-Core Wheel view
   instead of Stacked, falling back to Stacked when the loaded tree has no "Mainstream Pop" root. It
