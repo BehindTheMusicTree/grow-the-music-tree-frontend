@@ -88,6 +88,16 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- **Genre tree Pop/Core crash**: Bumped `@behindthemusictree/app-kit` to `4.5.2`, which fixes
+  `GenreTreeView` crashing when Pop/Core is the active view and the loaded data has no "Mainstream
+  Pop" root — the fallback to Wheel view is now applied synchronously during render instead of only
+  in a `useEffect`, which ran too late to prevent `GenrePlaylistTreeWheelRadialPopCore` from mounting
+  and throwing. It also bumps app-kit's own `@behindthemusictree/genre-tree-view` dependency to
+  `1.1.2`, which fixes toolbar hover-label/button colors and contrast to match node labels, and
+  glues the pop subtree to the core circle in the Pop/Core radial layout.
+
 ### Changed
 
 - **Genre tree Wheel/Pop-Core rendering**: Bumped `@behindthemusictree/app-kit` to `4.5.1`, which
