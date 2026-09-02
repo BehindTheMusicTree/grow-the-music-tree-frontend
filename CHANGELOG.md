@@ -100,12 +100,20 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Player**: The track list sidebar now renders inline inside the player panel (via
   `TrackListSidebar layout="inline"`) instead of as a separate overlay panel, and the player
   was widened to accommodate it.
+- **Dependency maintenance**: Bumped `@behindthemusictree/app-kit` to `4.7.0` (from `4.6.0`).
 - **Dependency maintenance**: Bumped `@behindthemusictree/app-kit` to `4.6.0` (from `4.5.3`).
 - **Dependency maintenance**: Bumped `@behindthemusictree/app-kit` to `4.5.3` (from `4.5.2`) —
   app-kit's own release process moved to PR-based release/hotfix flow; no consumer-facing
   behavior change.
 
 ### Fixed
+
+- **Genre tree loading skeleton mismatch**: `GenreTreePage`'s `next/dynamic` fallback (shown
+  while the `GenreTreeView` chunk itself is still downloading) now uses app-kit `4.7.0`'s new
+  `GenreTreeViewSkeleton`, reading `viewMode` from `GenreTreeViewModeProvider` so it renders the
+  same skeleton shape (stacked vs. wheel/pop-core) `GenreTreeView` shows once mounted. Previously
+  it always rendered the stacked/linear skeleton first, causing a visible shape swap/flash on
+  routes that default to the wheel/pop-core view.
 
 - **Genre tree reference pages**: Removed an unwanted top margin above `GenreTreeView` on
   `/reference-genre-tree` and `/prototype/reference-genre-tree`.

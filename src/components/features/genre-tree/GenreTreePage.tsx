@@ -13,19 +13,29 @@ import {
   YoutubeTrackDetailedSchema,
   makeCriteriaPlaylistDetailedSchema,
   hasMainstreamPopRoot,
-  GenreTreeSkeleton,
+  GenreTreeViewSkeleton,
 } from "@behindthemusictree/app-kit/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 
-// GenreTreeWheelSkeleton computes SVG path/rect coordinates with trig math that can differ
-// in the last float digit between server (Node) and client (browser) V8, causing hydration
-// mismatches. Render client-only to avoid SSR-ing that non-deterministic output.
+// Reads viewMode from context (rather than receiving it as a prop) because next/dynamic's
+// `loading` render prop isn't passed the wrapped component's own props — this renders before
+// GenreTreeView ever mounts, so it must source viewMode independently to match the skeleton
+// shape (stacked vs wheel) GenreTreeView itself will show once its data starts loading.
+function GenreTreeViewLoadingFallback() {
+  const { viewMode } = useGenreTreeViewMode();
+  return <GenreTreeViewSkeleton viewMode={viewMode} />;
+}
+
+// GenreTreeWheelSkeleton (used by GenreTreeViewSkeleton for "wheel"/"pop-core") computes SVG
+// path/rect coordinates with trig math that can differ in the last float digit between server
+// (Node) and client (browser) V8, causing hydration mismatches. Render client-only to avoid
+// SSR-ing that non-deterministic output.
 const GenreTreeView = dynamic(
   () => import("@behindthemusictree/app-kit/genre-tree").then((mod) => mod.GenreTreeView),
-  { ssr: false, loading: () => <GenreTreeSkeleton /> },
+  { ssr: false, loading: () => <GenreTreeViewLoadingFallback /> },
 );
 
 interface GenreTreePageProps {
