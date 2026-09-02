@@ -97,6 +97,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Header**: Simplified the global header — removed the hamburger dropdown menu (replaced with
+  a direct About icon link), removed the "Prototype demo" nav item and the genre view mode toggle
+  buttons, pointed the home link at the prototype reference genre tree route, and added a
+  TheMusicTree brand mark link to the right of the header.
 - **Player**: The track list sidebar now renders inline inside the player panel (via
   `TrackListSidebar layout="inline"`) instead of as a separate overlay panel, and the player
   was widened to accommodate it.
