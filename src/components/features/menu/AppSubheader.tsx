@@ -27,14 +27,6 @@ export default function AppSubheader() {
           Stacked
         </Button>
         <Button
-          variant={viewMode === "wheel" ? "default" : "outline"}
-          size="sm"
-          className="shadow-lg"
-          onClick={() => setViewMode("wheel")}
-        >
-          Wheel
-        </Button>
-        <Button
           variant={viewMode === "pop-core" ? "default" : "outline"}
           size="sm"
           className="shadow-lg"
