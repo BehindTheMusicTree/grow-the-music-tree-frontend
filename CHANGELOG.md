@@ -122,6 +122,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   hover-label/button colors and contrast to match node labels, and glues the pop subtree to the core
   circle in the Pop/Core radial layout.
 
+### Removed
+
+- **Genre tree "Wheel" view-mode toggle**: Removed the "Wheel" button from `AppSubheader`'s
+  Stacked/Wheel/Pop-Core toggle, leaving Stacked and Pop-Core. The reference tree now defaults to
+  "Stacked" instead of "Wheel".
+
 ## [2.5.0] - 2026-08-28
 
 ### Changed
