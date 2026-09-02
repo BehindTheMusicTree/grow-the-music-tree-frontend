@@ -95,6 +95,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   checkout or merge changes `pnpm-lock.yaml`, so a stale local `node_modules` no longer silently
   drifts from the versions pinned in `package.json`.
 
+### Changed
+
+- **Dependency maintenance**: Bumped `@behindthemusictree/app-kit` to `4.5.3` (from `4.5.2`) —
+  app-kit's own release process moved to PR-based release/hotfix flow; no consumer-facing
+  behavior change.
+
 ### Fixed
 
 - **Genre tree Pop/Core crash**: Bumped `@behindthemusictree/app-kit` to `4.5.2` (from `4.5.1`),
