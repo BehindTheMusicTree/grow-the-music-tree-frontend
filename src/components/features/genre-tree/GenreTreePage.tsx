@@ -13,6 +13,7 @@ import {
   YoutubeTrackDetailedSchema,
   makeCriteriaPlaylistDetailedSchema,
   hasMainstreamPopRoot,
+  GenreTreeSkeleton,
 } from "@behindthemusictree/app-kit/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
@@ -24,7 +25,7 @@ import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 // mismatches. Render client-only to avoid SSR-ing that non-deterministic output.
 const GenreTreeView = dynamic(
   () => import("@behindthemusictree/app-kit/genre-tree").then((mod) => mod.GenreTreeView),
-  { ssr: false },
+  { ssr: false, loading: () => <GenreTreeSkeleton /> },
 );
 
 interface GenreTreePageProps {

@@ -136,12 +136,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   `GenreTreeWheelSkeleton`'s trig-based SVG coordinates differing by a trailing float digit
   between server (Node) and client (browser) rendering.
 
-### Changed
-
-- **Player UI**: Replaced the in-house player bar (progress bar, play/pause/next/previous
-  controls, volume slider) with a minimal floating YouTube video panel docked to the
-  bottom-right of the viewport, relying on the embedded YouTube player's own controls.
-
 ### Removed
 
 - **Prototype-mode banner**: Removed `PrototypeModeBanner`, the fixed bottom banner that read
