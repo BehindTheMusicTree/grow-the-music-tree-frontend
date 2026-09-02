@@ -111,6 +111,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   and corrects Pop/Core's outer-circle nesting and canvas sizing around deep core branches. (Both
   further bumped to `4.5.2`/`1.1.2` above.)
 
+- **Player UI**: Replaced the in-house player bar (progress bar, play/pause/next/previous
+  controls, volume slider) with a minimal floating YouTube video panel docked to the
+  bottom-right of the viewport, relying on the embedded YouTube player's own controls.
+
 ### Fixed
 
 - **Genre tree Pop/Core crash**: Bumped `@behindthemusictree/app-kit` to `4.5.2` (from `4.5.1`),
@@ -127,7 +131,15 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   during loading and only falls back to Stacked once loading has finished and the loaded tree is
   confirmed to have no "Mainstream Pop" root.
 
+- **Genre tree hydration mismatch**: `GenreTreeView` is now loaded client-only (`next/dynamic`
+  with `ssr: false`) on `GenreTreePage`, avoiding a React hydration error caused by
+  `GenreTreeWheelSkeleton`'s trig-based SVG coordinates differing by a trailing float digit
+  between server (Node) and client (browser) rendering.
+
 ### Removed
+
+- **Prototype-mode banner**: Removed `PrototypeModeBanner`, the fixed bottom banner that read
+  "You're viewing the prototype demo tree — browsing only, changes aren't saved."
 
 - **Genre tree "Wheel" view-mode toggle**: Removed the "Wheel" button from `AppSubheader`'s
   Stacked/Wheel/Pop-Core toggle, leaving Stacked and Pop-Core. The reference tree now defaults to
