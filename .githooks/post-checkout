@@ -11,5 +11,5 @@ is_branch_checkout=$3
 
 if ! git diff --quiet "$prev_head" "$new_head" -- pnpm-lock.yaml; then
   echo "pnpm-lock.yaml changed — running pnpm install to sync node_modules..."
-  pnpm install
+  pnpm install --frozen-lockfile
 fi

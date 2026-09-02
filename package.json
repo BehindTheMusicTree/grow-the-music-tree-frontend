@@ -3,7 +3,7 @@
   "private": true,
   "version": "2.5.0",
   "scripts": {
-    "prepare": "git config core.hooksPath .githooks",
+    "prepare": "git rev-parse --git-dir > /dev/null 2>&1 && git config core.hooksPath .githooks || true",
     "dev": "next dev --turbo --hostname 127.0.0.1",
     "dev:local": "bash scripts/run-dev.sh local",
     "dev:remote": "bash scripts/run-dev.sh remote",

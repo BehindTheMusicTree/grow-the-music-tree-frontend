@@ -5,5 +5,5 @@
 
 if ! git diff --quiet ORIG_HEAD HEAD -- pnpm-lock.yaml; then
   echo "pnpm-lock.yaml changed — running pnpm install to sync node_modules..."
-  pnpm install
+  pnpm install --frozen-lockfile
 fi
