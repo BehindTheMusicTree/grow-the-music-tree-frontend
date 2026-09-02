@@ -34,7 +34,10 @@ export default function GenreTreePage({ getBackendBaseUrl, title, readOnly }: Ge
   // Shares the react-query cache with GenreTreeView's internal fetch (same queryKey), so this
   // doesn't trigger an extra network request. Used only to compute whether the "pop-core" view
   // mode is available, so AppHeader can grey out its toggle button accordingly.
-  const { data: genrePlaylists } = useListFullGenrePlaylists("reference", getBackendBaseUrl);
+  const { data: genrePlaylists, isLoading: isLoadingGenrePlaylists } = useListFullGenrePlaylists(
+    "reference",
+    getBackendBaseUrl,
+  );
 
   const canShowPopCore = useMemo(
     () =>
@@ -53,7 +56,11 @@ export default function GenreTreePage({ getBackendBaseUrl, title, readOnly }: Ge
     setCanShowPopCore(canShowPopCore);
   }, [canShowPopCore, setCanShowPopCore]);
 
-  const effectiveViewMode = viewMode === "pop-core" && !canShowPopCore ? "stacked" : viewMode;
+  // While the data is still loading, keep "pop-core" as-is so GenreTreeView shows its radial
+  // wheel skeleton instead of the stacked/linear one; only fall back to "stacked" once we've
+  // actually confirmed the loaded tree has no "Mainstream Pop" root.
+  const effectiveViewMode =
+    viewMode === "pop-core" && !canShowPopCore && !isLoadingGenrePlaylists ? "stacked" : viewMode;
 
   const showCriteriaCreationPopup = useCallback(
     (parent: CriteriaMinimum | null = null) => {

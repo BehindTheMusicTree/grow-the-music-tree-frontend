@@ -122,6 +122,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   hover-label/button colors and contrast to match node labels, and glues the pop subtree to the core
   circle in the Pop/Core radial layout.
 
+- **Genre tree Pop/Core loading skeleton**: `GenreTreePage` no longer falls back to the Stacked
+  skeleton while genre playlists are still loading — it now keeps the Pop/Core view mode active
+  during loading and only falls back to Stacked once loading has finished and the loaded tree is
+  confirmed to have no "Mainstream Pop" root.
+
 ### Removed
 
 - **Genre tree "Wheel" view-mode toggle**: Removed the "Wheel" button from `AppSubheader`'s
