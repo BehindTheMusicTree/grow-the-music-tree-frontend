@@ -88,6 +88,13 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Dev tooling**: Added `post-checkout`/`post-merge` git hooks (`.githooks/`, wired up via a
+  `prepare` script that sets `core.hooksPath`) that automatically run `pnpm install` whenever a
+  checkout or merge changes `pnpm-lock.yaml`, so a stale local `node_modules` no longer silently
+  drifts from the versions pinned in `package.json`.
+
 ### Fixed
 
 - **Genre tree Pop/Core crash**: Bumped `@behindthemusictree/app-kit` to `4.5.2` (from `4.5.1`),
