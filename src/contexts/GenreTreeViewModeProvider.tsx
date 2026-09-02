@@ -44,7 +44,15 @@ export function GenreTreeViewModeProvider({ children }: { children: ReactNode })
 
   const setViewMode = useCallback(
     (viewMode: GenreTreeViewMode) => {
-      setStateByMode((prev) => ({ ...prev, [mode]: { ...prev[mode], viewMode } }));
+      setStateByMode((prev) => {
+        const current = prev[mode];
+        // Keep resolvedViewMode following viewMode when no override (e.g. GenreTreePage's
+        // pop-core-unavailable fallback to "stacked") is active, so consumers like the
+        // next/dynamic loading fallback don't render a stale skeleton shape after a toggle
+        // click until GenreTreePage's own effect catches up.
+        const resolvedViewMode = current.resolvedViewMode === current.viewMode ? viewMode : current.resolvedViewMode;
+        return { ...prev, [mode]: { ...current, viewMode, resolvedViewMode } };
+      });
     },
     [mode],
   );
