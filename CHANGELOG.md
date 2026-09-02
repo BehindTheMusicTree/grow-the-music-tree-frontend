@@ -101,6 +101,16 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   app-kit's own release process moved to PR-based release/hotfix flow; no consumer-facing
   behavior change.
 
+- **Genre tree Wheel/Pop-Core rendering**: Bumped `@behindthemusictree/app-kit` to `4.5.1`, which
+  adds a polar-layout radial loading skeleton for the Wheel and Pop/Core tree views (replacing the
+  linear skeleton while those views load) and defaults `GenreTreeView` to the Pop-Core Wheel view
+  instead of Stacked, falling back to Stacked when the loaded tree has no "Mainstream Pop" root. It
+  also bumps app-kit's own `@behindthemusictree/genre-tree-view` dependency to `1.1.1`, which fixes
+  wheel root sectors being sized disproportionately to their node count, uncrops the Pop/Core "fit
+  to frame", curves connecting links along the wheel's rings instead of cutting straight chords,
+  and corrects Pop/Core's outer-circle nesting and canvas sizing around deep core branches. (Both
+  further bumped to `4.5.2`/`1.1.2` above.)
+
 ### Fixed
 
 - **Genre tree Pop/Core crash**: Bumped `@behindthemusictree/app-kit` to `4.5.2` (from `4.5.1`),
@@ -111,18 +121,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   `@behindthemusictree/genre-tree-view` dependency to `1.1.2` (from `1.1.1`), which fixes toolbar
   hover-label/button colors and contrast to match node labels, and glues the pop subtree to the core
   circle in the Pop/Core radial layout.
-
-### Changed
-
-- **Genre tree Wheel/Pop-Core rendering**: Bumped `@behindthemusictree/app-kit` to `4.5.1`, which
-  adds a polar-layout radial loading skeleton for the Wheel and Pop/Core tree views (replacing the
-  linear skeleton while those views load) and defaults `GenreTreeView` to the Pop-Core Wheel view
-  instead of Stacked, falling back to Stacked when the loaded tree has no "Mainstream Pop" root. It
-  also bumps app-kit's own `@behindthemusictree/genre-tree-view` dependency to `1.1.1`, which fixes
-  wheel root sectors being sized disproportionately to their node count, uncrops the Pop/Core "fit
-  to frame", curves connecting links along the wheel's rings instead of cutting straight chords,
-  and corrects Pop/Core's outer-circle nesting and canvas sizing around deep core branches. (Both
-  further bumped to `4.5.2`/`1.1.2` above.)
 
 ## [2.5.0] - 2026-08-28
 
