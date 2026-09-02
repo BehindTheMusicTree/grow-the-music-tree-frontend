@@ -22,7 +22,9 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
       {props.getBackendBaseUrl()}
     </div>
   ),
-  GenreTreeSkeleton: () => <div data-testid="genre-tree-skeleton" />,
+  GenreTreeViewSkeleton: ({ viewMode }: { viewMode: string }) => (
+    <div data-testid="genre-tree-view-skeleton" data-viewmode={viewMode} />
+  ),
 }));
 
 /** Forces the provider's view mode to "pop-core" on mount, mirroring what clicking the
