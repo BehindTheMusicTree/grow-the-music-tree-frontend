@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import dynamic from "next/dynamic";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
 import {
   useCreateGenre,
   useUpdateGenre,
   useListFullGenrePlaylists,
-  GenreTreeView,
   CriteriaMinimum,
   CriteriaPlaylistSimple,
   YoutubeTrackDetailedSchema,
@@ -18,6 +18,14 @@ import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
+
+// GenreTreeWheelSkeleton computes SVG path/rect coordinates with trig math that can differ
+// in the last float digit between server (Node) and client (browser) V8, causing hydration
+// mismatches. Render client-only to avoid SSR-ing that non-deterministic output.
+const GenreTreeView = dynamic(
+  () => import("@behindthemusictree/app-kit/genre-tree").then((mod) => mod.GenreTreeView),
+  { ssr: false },
+);
 
 interface GenreTreePageProps {
   getBackendBaseUrl: () => string;
