@@ -3,7 +3,6 @@
 import { useEffect, ReactNode } from "react";
 import { usePopup, useConnectivityErrorPopup } from "@behindthemusictree/app-kit/popup";
 import { usePlayer } from "@behindthemusictree/app-kit/player";
-import { TrackListSidebar, useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
 import { initSentry } from "@lib/sentry";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
@@ -19,7 +18,6 @@ import { GenreTreeViewModeProvider } from "@contexts/GenreTreeViewModeProvider";
 
 export default function AppContent({ children }: { children: ReactNode }) {
   const { playerTrackObject } = usePlayer();
-  const { isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const { activePopup } = usePopup();
 
   useEffect(() => {
@@ -54,7 +52,6 @@ export default function AppContent({ children }: { children: ReactNode }) {
               <main className="flex min-h-0 w-full flex-grow flex-col">
                 <div className="flex min-h-0 flex-1 flex-col">{children}</div>
               </main>
-              {isTrackListSidebarVisible && <TrackListSidebar className="z-40" />}
             </div>
             {activePopup && (
               <div className="absolute top-0 right-0 bottom-0 left-0 z-40 pointer-events-none bg-black/10" aria-hidden />

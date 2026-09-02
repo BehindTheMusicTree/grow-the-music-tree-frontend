@@ -97,9 +97,18 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Player**: The track list sidebar now renders inline inside the player panel (via
+  `TrackListSidebar layout="inline"`) instead of as a separate overlay panel, and the player
+  was widened to accommodate it.
+- **Dependency maintenance**: Bumped `@behindthemusictree/app-kit` to `4.6.0` (from `4.5.3`).
 - **Dependency maintenance**: Bumped `@behindthemusictree/app-kit` to `4.5.3` (from `4.5.2`) —
   app-kit's own release process moved to PR-based release/hotfix flow; no consumer-facing
   behavior change.
+
+### Fixed
+
+- **Genre tree reference pages**: Removed an unwanted top margin above `GenreTreeView` on
+  `/reference-genre-tree` and `/prototype/reference-genre-tree`.
 
 - **Genre tree Wheel/Pop-Core rendering**: Bumped `@behindthemusictree/app-kit` to `4.5.1`, which
   adds a polar-layout radial loading skeleton for the Wheel and Pop/Core tree views (replacing the
@@ -114,8 +123,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Player UI**: Replaced the in-house player bar (progress bar, play/pause/next/previous
   controls, volume slider) with a minimal floating YouTube video panel docked to the
   bottom-right of the viewport, relying on the embedded YouTube player's own controls.
-
-### Fixed
 
 - **Genre tree Pop/Core crash**: Bumped `@behindthemusictree/app-kit` to `4.5.2` (from `4.5.1`),
   which fixes `GenreTreeView` crashing when Pop/Core is the active view and the loaded data has no
