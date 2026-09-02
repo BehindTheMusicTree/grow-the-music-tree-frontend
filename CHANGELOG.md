@@ -124,8 +124,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   controls, volume slider) with a minimal floating YouTube video panel docked to the
   bottom-right of the viewport, relying on the embedded YouTube player's own controls.
 
-### Fixed
-
 - **Genre tree Pop/Core crash**: Bumped `@behindthemusictree/app-kit` to `4.5.2` (from `4.5.1`),
   which fixes `GenreTreeView` crashing when Pop/Core is the active view and the loaded data has no
   "Mainstream Pop" root — the fallback to Wheel view is now applied synchronously during render
