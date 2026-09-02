@@ -125,3 +125,11 @@ button {
 .read-the-docs {
   color: #888;
 }
+
+/* GenreTreeView (from @behindthemusictree/app-kit) renders its own root with a Tailwind
+   `mt-4` margin-top, leaving a gap between the viewport top and the tree on these
+   full-height pages. Neutralize it here since that margin lives in a vendored component. */
+[data-page="reference-genre-tree"] .page-content > *,
+[data-page="prototype-reference-genre-tree"] .page-content > * {
+  margin-top: 0;
+}
