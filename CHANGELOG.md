@@ -108,7 +108,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Fixed
 
 - **Genre tree reference pages**: Removed an unwanted top margin above `GenreTreeView` on
-  `/reference/genre-tree` and `/prototype/reference/genre-tree`.
+  `/reference-genre-tree` and `/prototype/reference-genre-tree`.
 
 - **Genre tree Wheel/Pop-Core rendering**: Bumped `@behindthemusictree/app-kit` to `4.5.1`, which
   adds a polar-layout radial loading skeleton for the Wheel and Pop/Core tree views (replacing the
