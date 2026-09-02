@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
@@ -20,19 +20,30 @@ import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 
-// Reads viewMode from context (rather than receiving it as a prop) because next/dynamic's
+// Reads resolvedViewMode from context (rather than receiving it as a prop) because next/dynamic's
 // `loading` render prop isn't passed the wrapped component's own props — this renders before
-// GenreTreeView ever mounts, so it must source viewMode independently to match the skeleton
-// shape (stacked vs wheel) GenreTreeView itself will show once its data starts loading.
+// GenreTreeView ever mounts, so it must source the view mode independently. Uses `resolvedViewMode`
+// (not the raw `viewMode`) so it matches the skeleton shape GenreTreeView itself will show, since
+// GenreTreePage can override "pop-core" to "stacked" while data is still loading.
+//
+// `ssr:false` on next/dynamic below only skips the wrapped component itself — Next.js still
+// invokes this `loading` fallback on the server. GenreTreeWheelSkeleton (used by
+// GenreTreeViewSkeleton for "wheel"/"pop-core") computes SVG path/rect coordinates with trig math
+// that can differ in the last float digit between server (Node) and client (browser) V8, so
+// rendering it during SSR risks a hydration mismatch. Always render the deterministic "stacked"
+// skeleton for the server render and the first client render, then swap to the real resolved view
+// mode in an effect (client-only, post-hydration).
 function GenreTreeViewLoadingFallback() {
-  const { viewMode } = useGenreTreeViewMode();
-  return <GenreTreeViewSkeleton viewMode={viewMode} />;
+  const { resolvedViewMode } = useGenreTreeViewMode();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  return <GenreTreeViewSkeleton viewMode={isMounted ? resolvedViewMode : "stacked"} />;
 }
 
-// GenreTreeWheelSkeleton (used by GenreTreeViewSkeleton for "wheel"/"pop-core") computes SVG
-// path/rect coordinates with trig math that can differ in the last float digit between server
-// (Node) and client (browser) V8, causing hydration mismatches. Render client-only to avoid
-// SSR-ing that non-deterministic output.
 const GenreTreeView = dynamic(
   () => import("@behindthemusictree/app-kit/genre-tree").then((mod) => mod.GenreTreeView),
   { ssr: false, loading: () => <GenreTreeViewLoadingFallback /> },
@@ -45,7 +56,7 @@ interface GenreTreePageProps {
 }
 
 export default function GenreTreePage({ getBackendBaseUrl, title, readOnly }: GenreTreePageProps) {
-  const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
+  const { viewMode, setCanShowPopCore, setResolvedViewMode } = useGenreTreeViewMode();
   const { mutate: createGenre, formErrors } = useCreateGenre("reference", getBackendBaseUrl);
   const { renameGenre, formErrors: renameFormErrors } = useUpdateGenre("reference", getBackendBaseUrl);
   const { showPopup, hidePopup } = usePopup();
@@ -80,6 +91,10 @@ export default function GenreTreePage({ getBackendBaseUrl, title, readOnly }: Ge
   // actually confirmed the loaded tree has no "Mainstream Pop" root.
   const effectiveViewMode =
     viewMode === "pop-core" && !canShowPopCore && !isLoadingGenrePlaylists ? "stacked" : viewMode;
+
+  useEffect(() => {
+    setResolvedViewMode(effectiveViewMode);
+  }, [effectiveViewMode, setResolvedViewMode]);
 
   const showCriteriaCreationPopup = useCallback(
     (parent: CriteriaMinimum | null = null) => {
