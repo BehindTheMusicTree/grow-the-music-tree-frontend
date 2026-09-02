@@ -1,0 +1,15 @@
+#!/bin/sh
+# Re-syncs node_modules when a checkout brings in a different pnpm-lock.yaml,
+# so a stale local install doesn't silently drift from the pinned versions
+# (e.g. package.json says 4.5.2 but node_modules still has 4.4.3).
+
+prev_head=$1
+new_head=$2
+is_branch_checkout=$3
+
+[ "$is_branch_checkout" = "1" ] || exit 0
+
+if ! git diff --quiet "$prev_head" "$new_head" -- pnpm-lock.yaml; then
+  echo "pnpm-lock.yaml changed — running pnpm install to sync node_modules..."
+  pnpm install --frozen-lockfile
+fi
