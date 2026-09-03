@@ -8,7 +8,6 @@ import { initSentry } from "@lib/sentry";
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
 import AppHeader from "@components/features/menu/AppHeader";
-import AppSubheader from "@components/features/menu/AppSubheader";
 import Player from "@components/features/player/Player";
 import AutoAdvance from "@components/features/player/AutoAdvance";
 
@@ -44,7 +43,6 @@ export default function AppContent({ children }: { children: ReactNode }) {
     <GenreTreeViewModeProvider>
       <div className="app col h-screen">
         <AppHeader />
-        <AppSubheader />
 
         <div className="center fixed top-0 flex h-full w-full bg-gray-100">
           <div className="relative flex min-h-0 w-full flex-grow">
