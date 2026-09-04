@@ -33,7 +33,14 @@ import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 function GenreTreeViewLoadingFallback() {
   const { resolvedViewMode } = useGenreTreeViewMode();
 
-  return <GenreTreeViewSkeleton viewMode={resolvedViewMode} />;
+  return (
+    <div className="mt-4 flex h-full flex-col">
+      <div className="actions-container flex justify-start">
+        <div className="flex justify-start" />
+      </div>
+      <GenreTreeViewSkeleton viewMode={resolvedViewMode} />
+    </div>
+  );
 }
 
 const GenreTreeView = dynamic(
