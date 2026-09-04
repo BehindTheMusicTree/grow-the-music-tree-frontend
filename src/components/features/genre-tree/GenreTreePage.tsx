@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
@@ -28,20 +28,12 @@ import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 //
 // `ssr:false` on next/dynamic below only skips the wrapped component itself — Next.js still
 // invokes this `loading` fallback on the server. GenreTreeWheelSkeleton (used by
-// GenreTreeViewSkeleton for "wheel"/"pop-core") computes SVG path/rect coordinates with trig math
-// that can differ in the last float digit between server (Node) and client (browser) V8, so
-// rendering it during SSR risks a hydration mismatch. Always render the deterministic "stacked"
-// skeleton for the server render and the first client render, then swap to the real resolved view
-// mode in an effect (client-only, post-hydration).
+// GenreTreeViewSkeleton for "wheel"/"pop-core") rounds its SVG coordinates well below float
+// precision noise, so it renders byte-identically on server and client and can safely SSR.
 function GenreTreeViewLoadingFallback() {
   const { resolvedViewMode } = useGenreTreeViewMode();
-  const [isMounted, setIsMounted] = useState(false);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  return <GenreTreeViewSkeleton viewMode={isMounted ? resolvedViewMode : "stacked"} />;
+  return <GenreTreeViewSkeleton viewMode={resolvedViewMode} />;
 }
 
 const GenreTreeView = dynamic(
