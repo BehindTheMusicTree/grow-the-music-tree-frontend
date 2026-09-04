@@ -116,11 +116,15 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Fixed
 
 - **Genre tree loading skeleton mismatch**: `GenreTreePage`'s `next/dynamic` fallback (shown
-  while the `GenreTreeView` chunk itself is still downloading) now uses app-kit `4.7.0`'s new
-  `GenreTreeViewSkeleton`, reading `viewMode` from `GenreTreeViewModeProvider` so it renders the
-  same skeleton shape (stacked vs. wheel/pop-core) `GenreTreeView` shows once mounted. Previously
-  it always rendered the stacked/linear skeleton first, causing a visible shape swap/flash on
-  routes that default to the wheel/pop-core view.
+  while the `GenreTreeView` chunk itself is still downloading) uses app-kit's `GenreTreeViewSkeleton`,
+  reading `resolvedViewMode` from `GenreTreeViewModeProvider` so it renders the same skeleton
+  shape (stacked vs. wheel/pop-core) `GenreTreeView` shows once mounted — including during SSR,
+  since `@behindthemusictree/app-kit` now ships a deterministic (SSR-safe) wheel skeleton, so the
+  fallback no longer needs to force "stacked" until after hydration. It's also wrapped in the
+  same flex layout `GenreTreeView` uses around its own skeleton, so the wheel skeleton no longer
+  visibly resizes between its first (dynamic-loading) and second (mounted, still-loading) render.
+  Previously it always rendered the stacked/linear skeleton first, causing a visible shape swap
+  and resize on routes that default to the wheel/pop-core view.
 
 - **Genre tree reference pages**: Removed an unwanted top margin above `GenreTreeView` on
   `/reference-genre-tree` and `/prototype/reference-genre-tree`.
