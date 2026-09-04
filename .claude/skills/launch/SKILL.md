@@ -25,7 +25,7 @@ npm run verify-env
 
 - **Local API** — requires `TheMusicTreeAPI` (bodzify-api-django) checked out
   and running locally first (see that repo's own launch instructions).
-- **Remote API** — no local backend needed; uses a hosted `NEXT_PUBLIC_API_BASE_URL`.
+- **Remote API** — no local backend needed; uses a hosted `NEXT_PUBLIC_BACKEND_BASE_URL`.
 
 ## 3. Start the dev server
 
@@ -46,5 +46,5 @@ Default port is 3000 unless `PORT=` is set in the active env file.
 
 Open the printed `http://127.0.0.1:<port>` URL. If pages render but data is
 missing/erroring, the API target is almost certainly wrong or the local API
-isn't running — check `.env.development.local`'s `NEXT_PUBLIC_API_BASE_URL`
+isn't running — check `.env.development.local`'s `NEXT_PUBLIC_BACKEND_BASE_URL`
 before debugging further.
