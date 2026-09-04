@@ -94,6 +94,9 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   `prepare` script that sets `core.hooksPath`) that automatically run `pnpm install` whenever a
   checkout or merge changes `pnpm-lock.yaml`, so a stale local `node_modules` no longer silently
   drifts from the versions pinned in `package.json`.
+- **Dev tooling**: Added a `launch` Claude Code skill (`.claude/skills/launch/`) documenting how
+  to start the dev server, including required env setup and the companion TheMusicTreeAPI
+  backend dependency.
 
 ### Changed
 
