@@ -21,25 +21,23 @@ import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
-// Reads resolvedViewMode from context (rather than receiving it as a prop) because next/dynamic's
+// Reads viewMode from context (rather than receiving it as a prop) because next/dynamic's
 // `loading` render prop isn't passed the wrapped component's own props — this renders before
-// GenreTreeView ever mounts, so it must source the view mode independently. Uses `resolvedViewMode`
-// (not the raw `viewMode`) so it matches the skeleton shape GenreTreeView itself will show, since
-// GenreTreePage can override "pop-core" to "stacked" while data is still loading.
+// GenreTreeView ever mounts, so it must source the view mode independently.
 //
 // `ssr:false` on next/dynamic below only skips the wrapped component itself — Next.js still
 // invokes this `loading` fallback on the server. GenreTreeWheelSkeleton (used by
 // GenreTreeViewSkeleton for "wheel"/"pop-core") rounds its SVG coordinates well below float
 // precision noise, so it renders byte-identically on server and client and can safely SSR.
 function GenreTreeViewLoadingFallback() {
-  const { resolvedViewMode } = useGenreTreeViewMode();
+  const { viewMode } = useGenreTreeViewMode();
 
   return (
     <div className="mt-4 flex h-full flex-col">
       <div className="actions-container flex justify-start">
         <div className="flex justify-start" />
       </div>
-      <GenreTreeViewSkeleton viewMode={resolvedViewMode} />
+      <GenreTreeViewSkeleton viewMode={viewMode} />
     </div>
   );
 }
@@ -51,7 +49,7 @@ const GenreTreeView = dynamic(
 
 export default function GenreTreePage() {
   const getBackendBaseUrl = getGrowBackendBaseUrl;
-  const { viewMode, setCanShowPopCore, setResolvedViewMode } = useGenreTreeViewMode();
+  const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
   const { mutate: createGenre, formErrors } = useCreateGenre("reference", getBackendBaseUrl);
   const { renameGenre, formErrors: renameFormErrors } = useUpdateGenre("reference", getBackendBaseUrl);
   const { showPopup, hidePopup } = usePopup();
@@ -81,15 +79,9 @@ export default function GenreTreePage() {
     setCanShowPopCore(canShowPopCore);
   }, [canShowPopCore, setCanShowPopCore]);
 
-  // While the data is still loading, keep "pop-core" as-is so GenreTreeView shows its radial
-  // wheel skeleton instead of the stacked/linear one; only fall back to "stacked" once we've
-  // actually confirmed the loaded tree has no "Mainstream Pop" root.
-  const effectiveViewMode =
-    viewMode === "pop-core" && !canShowPopCore && !isLoadingGenrePlaylists ? "stacked" : viewMode;
-
-  useEffect(() => {
-    setResolvedViewMode(effectiveViewMode);
-  }, [effectiveViewMode, setResolvedViewMode]);
+  if (viewMode === "pop-core" && !isLoadingGenrePlaylists && !canShowPopCore) {
+    throw new Error('Cannot show "pop-core" view: the loaded genre tree has no "Mainstream Pop" root');
+  }
 
   const showCriteriaCreationPopup = useCallback(
     (parent: CriteriaMinimum | null = null) => {
@@ -147,7 +139,7 @@ export default function GenreTreePage() {
         handleGenreRenameAction={showGenreRenamePopup}
         getBackendBaseUrl={getBackendBaseUrl}
         criteriaPlaylistDetailedSchema={makeCriteriaPlaylistDetailedSchema(YoutubeTrackDetailedSchema)}
-        viewMode={effectiveViewMode}
+        viewMode={viewMode}
         readOnly={true}
       />
     </Page>
