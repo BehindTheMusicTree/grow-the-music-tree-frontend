@@ -125,6 +125,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Genre tree pop-core fallback removed**: `GenreTreePage` no longer silently falls back to the
+  "stacked" view when the loaded genre tree has no "Mainstream Pop" root while "pop-core" is
+  selected — it now throws immediately instead, per the project's fail-fast convention, so the
+  missing root surfaces rather than being masked by a different view.
 - **Header**: Removed the asymmetric `pr-4` padding on the collapsed brand-mark pill in
   `AppHeader` — it was sized for the `APP_NAME` label, which is hidden below the `xl` breakpoint,
   leaving visible empty space to the right of the logo icon on collapsed (non-`xl`) viewports.
