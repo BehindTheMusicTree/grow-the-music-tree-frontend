@@ -118,6 +118,9 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Header**: Marked the app logo `<Image>` in `AppHeader` as `priority` — Chrome DevTools flagged
+  it as the Largest Contentful Paint (LCP) element and recommended eager loading since it's always
+  above the fold.
 - **Genre tree default view mode**: The reference genre tree page (`/reference-genre-tree`) now
   defaults to the "pop-core" view mode instead of "stacked", matching the prototype route.
   `GenreTreeView`'s own fallback to "stacked" (when the loaded tree has no "Mainstream Pop" root)
