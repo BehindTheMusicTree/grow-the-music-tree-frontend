@@ -48,7 +48,7 @@ export default function AppHeader({ className }: AppHeaderProps) {
         aria-label={`${APP_NAME} home`}
       >
         <div className="shrink-0">
-          <Image src={logo} alt="" width={40} height={40} className="h-auto w-9" aria-hidden />
+          <Image src={logo} alt="" width={40} height={40} className="h-auto w-9" aria-hidden priority />
         </div>
         <h1 className="hidden truncate text-lg font-bold text-gray-100 xl:block xl:text-xl">{APP_NAME}</h1>
       </Link>
