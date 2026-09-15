@@ -12,13 +12,6 @@ interface GenreTreeViewModeContextValue {
    * fetch/prop-drilling path. Defaults to false so the toggle starts disabled until data loads. */
   canShowPopCore: boolean;
   setCanShowPopCore: (canShowPopCore: boolean) => void;
-  /** The view mode GenreTreeView is actually rendering with — may differ from `viewMode` while
-   * GenreTreePage is still resolving whether "pop-core" is available (see its `effectiveViewMode`).
-   * Pushed up from GenreTreePage so the `next/dynamic` loading fallback, which renders before
-   * GenreTreeView mounts and can't read its local state, shows the matching skeleton shape instead
-   * of guessing from the raw, not-yet-resolved `viewMode`. Defaults to `viewMode` itself. */
-  resolvedViewMode: GenreTreeViewMode;
-  setResolvedViewMode: (resolvedViewMode: GenreTreeViewMode) => void;
 }
 
 const GenreTreeViewModeContext = createContext<GenreTreeViewModeContextValue | null>(null);
@@ -26,41 +19,26 @@ const GenreTreeViewModeContext = createContext<GenreTreeViewModeContextValue | n
 interface ModeState {
   viewMode: GenreTreeViewMode;
   canShowPopCore: boolean;
-  resolvedViewMode: GenreTreeViewMode;
 }
 
 export function GenreTreeViewModeProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<ModeState>({
     viewMode: "pop-core",
     canShowPopCore: false,
-    resolvedViewMode: "pop-core",
   });
 
   const setViewMode = useCallback((viewMode: GenreTreeViewMode) => {
-    setState((prev) => {
-      // Keep resolvedViewMode following viewMode when no override (e.g. GenreTreePage's
-      // pop-core-unavailable fallback to "stacked") is active, so consumers like the
-      // next/dynamic loading fallback don't render a stale skeleton shape after a toggle
-      // click until GenreTreePage's own effect catches up.
-      const resolvedViewMode = prev.resolvedViewMode === prev.viewMode ? viewMode : prev.resolvedViewMode;
-      return { ...prev, viewMode, resolvedViewMode };
-    });
+    setState((prev) => ({ ...prev, viewMode }));
   }, []);
 
   const setCanShowPopCore = useCallback((canShowPopCore: boolean) => {
     setState((prev) => ({ ...prev, canShowPopCore }));
   }, []);
 
-  const setResolvedViewMode = useCallback((resolvedViewMode: GenreTreeViewMode) => {
-    setState((prev) => ({ ...prev, resolvedViewMode }));
-  }, []);
-
-  const { viewMode, canShowPopCore, resolvedViewMode } = state;
+  const { viewMode, canShowPopCore } = state;
 
   return (
-    <GenreTreeViewModeContext.Provider
-      value={{ viewMode, setViewMode, canShowPopCore, setCanShowPopCore, resolvedViewMode, setResolvedViewMode }}
-    >
+    <GenreTreeViewModeContext.Provider value={{ viewMode, setViewMode, canShowPopCore, setCanShowPopCore }}>
       {children}
     </GenreTreeViewModeContext.Provider>
   );

@@ -14,11 +14,13 @@ vi.mock("@behindthemusictree/app-kit/popup", () => ({
   usePopup: () => ({ showPopup: vi.fn(), hidePopup: vi.fn() }),
 }));
 
+const hasMainstreamPopRootMock = vi.fn(() => true);
+
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   useCreateGenre: () => ({ mutate: vi.fn(), formErrors: [] }),
   useUpdateGenre: () => ({ renameGenre: vi.fn(), formErrors: [] }),
   useListFullGenrePlaylists: () => useListFullGenrePlaylistsMock(),
-  hasMainstreamPopRoot: () => false,
+  hasMainstreamPopRoot: () => hasMainstreamPopRootMock(),
   makeCriteriaPlaylistDetailedSchema: () => ({}),
   YoutubeTrackDetailedSchema: {},
   GenreTreeView: (props: { readOnly: boolean; getBackendBaseUrl: () => string; viewMode: string }) => (
@@ -54,6 +56,7 @@ describe("GenreTreePage", () => {
   afterEach(() => {
     cleanup();
     useListFullGenrePlaylistsMock.mockReturnValue({ data: { results: [] }, isLoading: false });
+    hasMainstreamPopRootMock.mockReturnValue(true);
   });
 
   it("renders the genre tree read-only", async () => {
@@ -67,6 +70,7 @@ describe("GenreTreePage", () => {
 
   it("keeps the pop-core view mode (radial wheel skeleton) while genre playlists are still loading", async () => {
     useListFullGenrePlaylistsMock.mockReturnValue({ data: undefined, isLoading: true });
+    hasMainstreamPopRootMock.mockReturnValue(false);
 
     renderGenreTreePage({ forcePopCore: true });
 
@@ -74,12 +78,16 @@ describe("GenreTreePage", () => {
     expect(view.dataset.viewmode).toBe("pop-core");
   });
 
-  it("falls back to stacked once loading finishes and the tree has no Mainstream Pop root", async () => {
+  it("throws once loading finishes and the tree has no Mainstream Pop root", async () => {
     useListFullGenrePlaylistsMock.mockReturnValue({ data: { results: [] }, isLoading: false });
+    hasMainstreamPopRootMock.mockReturnValue(false);
+    // Swallow React's console.error noise from the thrown render error in this test only.
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    renderGenreTreePage({ forcePopCore: true });
+    expect(() => renderGenreTreePage({ forcePopCore: true })).toThrow(
+      'Cannot show "pop-core" view: the loaded genre tree has no "Mainstream Pop" root',
+    );
 
-    const view = await screen.findByTestId("genre-tree-view");
-    expect(view.dataset.viewmode).toBe("stacked");
+    consoleErrorSpy.mockRestore();
   });
 });
