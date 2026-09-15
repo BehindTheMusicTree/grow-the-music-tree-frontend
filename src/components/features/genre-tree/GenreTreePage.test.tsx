@@ -6,6 +6,10 @@ import { GenreTreeViewModeProvider, useGenreTreeViewMode } from "@contexts/Genre
 
 const useListFullGenrePlaylistsMock = vi.fn(() => ({ data: { results: [] }, isLoading: false }));
 
+vi.mock("@lib/site-urls", () => ({
+  getGrowBackendBaseUrl: () => "/api/grow-proxy",
+}));
+
 vi.mock("@behindthemusictree/app-kit/popup", () => ({
   usePopup: () => ({ showPopup: vi.fn(), hidePopup: vi.fn() }),
 }));
@@ -37,14 +41,11 @@ function ForcePopCoreViewMode() {
   return null;
 }
 
-function renderGenreTreePage(
-  props: { getBackendBaseUrl: () => string; title: string; readOnly: boolean },
-  { forcePopCore = false }: { forcePopCore?: boolean } = {},
-) {
+function renderGenreTreePage({ forcePopCore = false }: { forcePopCore?: boolean } = {}) {
   return render(
     <GenreTreeViewModeProvider>
       {forcePopCore && <ForcePopCoreViewMode />}
-      <GenreTreePage {...props} />
+      <GenreTreePage />
     </GenreTreeViewModeProvider>,
   );
 }
@@ -55,35 +56,19 @@ describe("GenreTreePage", () => {
     useListFullGenrePlaylistsMock.mockReturnValue({ data: { results: [] }, isLoading: false });
   });
 
-  it("passes readOnly={false} through for the live reference variant", async () => {
-    renderGenreTreePage({ getBackendBaseUrl: () => "/api/grow-proxy", title: "Reference Genre Tree", readOnly: false });
-
-    const view = await screen.findByTestId("genre-tree-view");
-    expect(view.dataset.readonly).toBe("false");
-    expect(view).toHaveTextContent("/api/grow-proxy");
-    expect(screen.getByRole("heading", { name: "Reference Genre Tree" })).toBeInTheDocument();
-  });
-
-  it("passes readOnly={true} through for the prototype variant", async () => {
-    renderGenreTreePage({
-      getBackendBaseUrl: () => "/api/grow-proxy",
-      title: "Prototype Genre Tree (Demo)",
-      readOnly: true,
-    });
+  it("renders the genre tree read-only", async () => {
+    renderGenreTreePage();
 
     const view = await screen.findByTestId("genre-tree-view");
     expect(view.dataset.readonly).toBe("true");
     expect(view).toHaveTextContent("/api/grow-proxy");
-    expect(screen.getByRole("heading", { name: "Prototype Genre Tree (Demo)" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Genre Tree" })).toBeInTheDocument();
   });
 
   it("keeps the pop-core view mode (radial wheel skeleton) while genre playlists are still loading", async () => {
     useListFullGenrePlaylistsMock.mockReturnValue({ data: undefined, isLoading: true });
 
-    renderGenreTreePage(
-      { getBackendBaseUrl: () => "/api/grow-proxy", title: "Reference Genre Tree", readOnly: false },
-      { forcePopCore: true },
-    );
+    renderGenreTreePage({ forcePopCore: true });
 
     const view = await screen.findByTestId("genre-tree-view");
     expect(view.dataset.viewmode).toBe("pop-core");
@@ -92,10 +77,7 @@ describe("GenreTreePage", () => {
   it("falls back to stacked once loading finishes and the tree has no Mainstream Pop root", async () => {
     useListFullGenrePlaylistsMock.mockReturnValue({ data: { results: [] }, isLoading: false });
 
-    renderGenreTreePage(
-      { getBackendBaseUrl: () => "/api/grow-proxy", title: "Reference Genre Tree", readOnly: false },
-      { forcePopCore: true },
-    );
+    renderGenreTreePage({ forcePopCore: true });
 
     const view = await screen.findByTestId("genre-tree-view");
     expect(view.dataset.viewmode).toBe("stacked");

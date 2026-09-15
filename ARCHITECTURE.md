@@ -10,29 +10,25 @@ them, and only covers the parts not already documented elsewhere.
 ```
 src/app/
 ├── layout.tsx              # Root layout: <html>/<body>, fonts, metadata, global CSS imports
-├── page.tsx                 # "/" — redirect("/reference-genre-tree"), no route group
 ├── globals.css
 ├── providers.tsx             # Client component: React Query, player, popup, track-list providers
-├── AppContent.tsx            # Client component: header, player footer, sidebar, prototype banner
+├── AppContent.tsx            # Client component: header, player footer, sidebar
 ├── health/route.ts           # GET /health — { status: "ok" }, used by Coolify's healthcheck
 ├── api/
 │   └── grow-proxy/[...path]/route.ts             # Server-only proxy to grow-the-music-tree-api
 └── (app)/                    # Route group: everything wrapped in Providers + AppContent
     ├── layout.tsx
-    ├── about/page.tsx
-    ├── reference-genre-tree/page.tsx
-    └── prototype/
-        ├── page.tsx
-        └── reference-genre-tree/page.tsx
+    ├── page.tsx               # "/" — the genre tree, read-only
+    └── about/page.tsx
 ```
 
 `(app)` exists purely to scope `Providers`/`AppContent` (React Query, player state, the app shell
-chrome) to the pages that need them, while `/` and `/health` stay outside that wrapping — `/`
-because it's just a redirect, `/health` because Coolify's healthcheck hits it directly and it must
-stay a trivial, dependency-free route (see [Build/deploy](#builddeploy) below).
+chrome) to the pages that need them, while `/health` stays outside that wrapping since Coolify's
+healthcheck hits it directly and it must stay a trivial, dependency-free route (see
+[Build/deploy](#builddeploy) below).
 
-Canonical path constants live in `src/lib/constants/routes.ts` (`PATHS.REFERENCE_GENRE_TREE`,
-`PATHS.PROTOTYPE_REFERENCE_GENRE_TREE`, etc.) — reach for these instead of hardcoding path strings.
+Canonical path constants live in `src/lib/constants/routes.ts` (`PATHS.ABOUT`) — reach for these
+instead of hardcoding path strings.
 
 **Login/personal-library pages do not exist anymore.** `/account`, `/auth/{google,spotify}/callback`,
 `/me-genre-tree`, `/me-uploaded-library`, `/spotify-library`, `/genre-playlists` and the
@@ -57,9 +53,8 @@ attaching the key there:
 
 - `src/app/api/grow-proxy/[...path]/route.ts` — reads `process.env.GTMT_API_KEY` (throws if unset),
   forwards `GET`/`POST`/`PUT`/`DELETE` to `getGrowApiUpstreamBaseUrl()` (`src/lib/grow-api-upstream-url.ts`)
-  with `X-API-Key` attached, and streams the upstream response straight back. Both
-  `/reference-genre-tree` and `/prototype/reference-genre-tree` go through this same proxy — see
-  [docs/prototype-mode.md](docs/prototype-mode.md).
+  with `X-API-Key` attached, and streams the upstream response straight back. `/` goes through this
+  proxy.
 
 Client code never calls grow-api directly; it calls the same-origin path returned by
 `src/lib/site-urls.ts`'s `getGrowBackendBaseUrl()` (`"/api/grow-proxy"`).
@@ -74,23 +69,16 @@ never `NEXT_PUBLIC_*`, never baked into the client bundle. See
 [docs/DEPLOYMENT.md §2-3](docs/DEPLOYMENT.md#2-build-time-vs-runtime-environment-variables) for the
 full build-time-vs-runtime distinction and how Coolify wires it in.
 
-## Prototype/read-only mode
+## Read-only mode
 
-`/prototype/*` is a second, read-only surface — a frontend-only UI flag, not a separate backend
-identity. Full design in [docs/prototype-mode.md](docs/prototype-mode.md); the pieces that matter
-for tracing code:
-
-- `isPrototypeRoute(pathname)` (`src/lib/prototype-mode.ts`) is the single source of truth for "are
-  we under `/prototype`" — a plain `pathname?.startsWith("/prototype")`.
-- `AppContent.tsx` renders `PrototypeModeBanner` when `isPrototypeRoute` is true.
-- `src/components/features/genre-tree/GenreTreePage.tsx` is shared between
-  `/reference-genre-tree` and `/prototype/reference-genre-tree`; the only difference is the
-  `readOnly` prop it passes through to app-kit's `GenreTreeView`, which hides write-action UI.
-  There is no backend-side enforcement — `readOnly` is the entire mechanism.
+The genre tree at `/` is always read-only — a frontend-only UI flag, not a separate backend
+identity. `src/components/features/genre-tree/GenreTreePage.tsx` hardcodes `readOnly={true}` when
+passing through to app-kit's `GenreTreeView`, which hides write-action UI. There is no
+backend-side enforcement — `readOnly` is the entire mechanism.
 
 This is unrelated to the (now-removed) provider-auth machinery — it's a static server-to-server
 key, not a user session, and it doesn't touch the app-kit `Scope` (`"reference"` vs `"me"`)
-concept either.
+concept either; `GenreTreePage.tsx` still uses `scope="reference"` against the same backend.
 
 ## State management
 
