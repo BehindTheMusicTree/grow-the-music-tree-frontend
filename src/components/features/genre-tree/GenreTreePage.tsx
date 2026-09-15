@@ -19,6 +19,7 @@ import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
+import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
 // Reads resolvedViewMode from context (rather than receiving it as a prop) because next/dynamic's
 // `loading` render prop isn't passed the wrapped component's own props — this renders before
@@ -48,13 +49,8 @@ const GenreTreeView = dynamic(
   { ssr: false, loading: () => <GenreTreeViewLoadingFallback /> },
 );
 
-interface GenreTreePageProps {
-  getBackendBaseUrl: () => string;
-  title: string;
-  readOnly: boolean;
-}
-
-export default function GenreTreePage({ getBackendBaseUrl, title, readOnly }: GenreTreePageProps) {
+export default function GenreTreePage() {
+  const getBackendBaseUrl = getGrowBackendBaseUrl;
   const { viewMode, setCanShowPopCore, setResolvedViewMode } = useGenreTreeViewMode();
   const { mutate: createGenre, formErrors } = useCreateGenre("reference", getBackendBaseUrl);
   const { renameGenre, formErrors: renameFormErrors } = useUpdateGenre("reference", getBackendBaseUrl);
@@ -144,7 +140,7 @@ export default function GenreTreePage({ getBackendBaseUrl, title, readOnly }: Ge
   }, [formErrors, showCriteriaCreationPopup]);
 
   return (
-    <Page title={title} visuallyHiddenTitle dataPage={readOnly ? "prototype-reference-genre-tree" : "reference-genre-tree"}>
+    <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
       <GenreTreeView
         scope="reference"
         handleGenreCreationAction={showCriteriaCreationPopup}
@@ -152,7 +148,7 @@ export default function GenreTreePage({ getBackendBaseUrl, title, readOnly }: Ge
         getBackendBaseUrl={getBackendBaseUrl}
         criteriaPlaylistDetailedSchema={makeCriteriaPlaylistDetailedSchema(YoutubeTrackDetailedSchema)}
         viewMode={effectiveViewMode}
-        readOnly={readOnly}
+        readOnly={true}
       />
     </Page>
   );

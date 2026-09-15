@@ -40,8 +40,7 @@ Music enthusiasts, researchers, and the general public interested in understandi
 
 **High-level features:**
 
-- Interactive genre tree visualization
-- A read-only `/prototype` demo tree for visitors without write access (see [docs/prototype-mode.md](docs/prototype-mode.md))
+- Interactive, read-only genre tree visualization at the root route
 - Rich contextual information for each genre (historical, cultural, technical)
 
 **Planned / not yet implemented** (see [VISION.md](VISION.md) and [TODO.md](TODO.md)):
@@ -52,10 +51,8 @@ Music enthusiasts, researchers, and the general public interested in understandi
 
 ## Pages
 
-- Home (`/`, redirects to `/reference-genre-tree`)
+- Genre tree (`/`, also the logo / home link) — read-only
 - About (`/about`)
-- Reference tree (`/reference-genre-tree`, also the logo / home link)
-- Prototype/demo tree (`/prototype/reference-genre-tree`) — read-only, see [docs/prototype-mode.md](docs/prototype-mode.md)
 - Health check (`/health`)
 
 Login/personal-library pages (Account, Spotify/Google auth callbacks, MyMusicTree, Spotify Library, My Library) were removed in v2.4.0 — `grow-the-music-tree-api` is single-tenant with no per-user auth model; personal-library features live in `hear-the-music-tree-frontend` instead.
@@ -263,7 +260,6 @@ For additional information about this project, please refer to:
 - **[docs/VERSIONING.md](docs/VERSIONING.md)** - Versioning strategy and guidelines
 - **[docs/SEMVER_GUIDE.md](docs/SEMVER_GUIDE.md)** - SemVer conventions used for releases
 - **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Coolify staging and production deployment setup
-- **[docs/prototype-mode.md](docs/prototype-mode.md)** - Read-only `/prototype` demo tree (frontend-only UI flag)
 - **[docs/REVERSE_PROXY_CONFIG.md](docs/REVERSE_PROXY_CONFIG.md)** - Nginx/reverse-proxy configuration for deployment
 - **[docs/testing.md](docs/testing.md)** - Testing strategy, tools, and conventions
 - **[docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md)** - Code and UI styling conventions

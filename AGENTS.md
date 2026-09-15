@@ -71,4 +71,4 @@ styled with Tailwind. Talks to the TheMusicTreeAPI backend.
 
 ## Further docs
 
-- `docs/DEPLOYMENT.md`, `docs/prototype-mode.md`, `docs/DATA_ATTRIBUTES.md`, `docs/SEMANTIC_HTML.md`
+- `docs/DEPLOYMENT.md`, `docs/DATA_ATTRIBUTES.md`, `docs/SEMANTIC_HTML.md`

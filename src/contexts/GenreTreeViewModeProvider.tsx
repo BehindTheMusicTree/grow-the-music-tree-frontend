@@ -1,9 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useCallback } from "react";
-import { usePathname } from "next/navigation";
 import type { GenreTreeViewMode } from "@behindthemusictree/app-kit/genre-tree";
-import { isPrototypeRoute } from "@lib/prototype-mode";
 
 interface GenreTreeViewModeContextValue {
   viewMode: GenreTreeViewMode;
@@ -25,8 +23,6 @@ interface GenreTreeViewModeContextValue {
 
 const GenreTreeViewModeContext = createContext<GenreTreeViewModeContextValue | null>(null);
 
-/** State is keyed by reference/prototype mode so the two genre trees drive the toggle
- * independently instead of sharing a single view mode across both routes. */
 interface ModeState {
   viewMode: GenreTreeViewMode;
   canShowPopCore: boolean;
@@ -34,44 +30,32 @@ interface ModeState {
 }
 
 export function GenreTreeViewModeProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
-  const mode = isPrototypeRoute(pathname) ? "prototype" : "reference";
-
-  const [stateByMode, setStateByMode] = useState<Record<"reference" | "prototype", ModeState>>({
-    reference: { viewMode: "pop-core", canShowPopCore: false, resolvedViewMode: "pop-core" },
-    prototype: { viewMode: "pop-core", canShowPopCore: false, resolvedViewMode: "pop-core" },
+  const [state, setState] = useState<ModeState>({
+    viewMode: "pop-core",
+    canShowPopCore: false,
+    resolvedViewMode: "pop-core",
   });
 
-  const setViewMode = useCallback(
-    (viewMode: GenreTreeViewMode) => {
-      setStateByMode((prev) => {
-        const current = prev[mode];
-        // Keep resolvedViewMode following viewMode when no override (e.g. GenreTreePage's
-        // pop-core-unavailable fallback to "stacked") is active, so consumers like the
-        // next/dynamic loading fallback don't render a stale skeleton shape after a toggle
-        // click until GenreTreePage's own effect catches up.
-        const resolvedViewMode = current.resolvedViewMode === current.viewMode ? viewMode : current.resolvedViewMode;
-        return { ...prev, [mode]: { ...current, viewMode, resolvedViewMode } };
-      });
-    },
-    [mode],
-  );
+  const setViewMode = useCallback((viewMode: GenreTreeViewMode) => {
+    setState((prev) => {
+      // Keep resolvedViewMode following viewMode when no override (e.g. GenreTreePage's
+      // pop-core-unavailable fallback to "stacked") is active, so consumers like the
+      // next/dynamic loading fallback don't render a stale skeleton shape after a toggle
+      // click until GenreTreePage's own effect catches up.
+      const resolvedViewMode = prev.resolvedViewMode === prev.viewMode ? viewMode : prev.resolvedViewMode;
+      return { ...prev, viewMode, resolvedViewMode };
+    });
+  }, []);
 
-  const setCanShowPopCore = useCallback(
-    (canShowPopCore: boolean) => {
-      setStateByMode((prev) => ({ ...prev, [mode]: { ...prev[mode], canShowPopCore } }));
-    },
-    [mode],
-  );
+  const setCanShowPopCore = useCallback((canShowPopCore: boolean) => {
+    setState((prev) => ({ ...prev, canShowPopCore }));
+  }, []);
 
-  const setResolvedViewMode = useCallback(
-    (resolvedViewMode: GenreTreeViewMode) => {
-      setStateByMode((prev) => ({ ...prev, [mode]: { ...prev[mode], resolvedViewMode } }));
-    },
-    [mode],
-  );
+  const setResolvedViewMode = useCallback((resolvedViewMode: GenreTreeViewMode) => {
+    setState((prev) => ({ ...prev, resolvedViewMode }));
+  }, []);
 
-  const { viewMode, canShowPopCore, resolvedViewMode } = stateByMode[mode];
+  const { viewMode, canShowPopCore, resolvedViewMode } = state;
 
   return (
     <GenreTreeViewModeContext.Provider

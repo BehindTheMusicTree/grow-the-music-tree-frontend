@@ -115,6 +115,13 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   TheMusicTree brand mark link to the right of the header.
 - **Header**: Moved the logo/app-name link, About icon, and TheMusicTree brand mark link into a
   single group at the top-right of the header (previously split between top-left and top-right).
+- **Single genre tree route**: Collapsed `/reference-genre-tree` and
+  `/prototype/reference-genre-tree` (and `/prototype`) into a single, always read-only genre tree
+  page served directly at `/`. The old URLs now 404 — there is no redirect or compatibility route.
+  Removed the "reference"/"prototype" naming and the frontend-only `isPrototypeRoute` distinction
+  from routing, view-mode state, the header logo link, `PATHS`, and the `data-page` attribute
+  (now `"genre-tree"`). Deleted `docs/prototype-mode.md` and `docs/pages/home.md`; renamed
+  `docs/pages/reference-genre-tree.md` to `docs/pages/genre-tree.md`.
 
 ### Fixed
 
