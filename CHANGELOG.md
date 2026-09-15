@@ -129,6 +129,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   "stacked" view when the loaded genre tree has no "Mainstream Pop" root while "pop-core" is
   selected — it now throws immediately instead, per the project's fail-fast convention, so the
   missing root surfaces rather than being masked by a different view.
+- **Genre tree error boundary**: Added `src/app/(app)/error.tsx` so the fail-fast throw above (and
+  any other render-time error under `/`) is caught by a route-level error boundary instead of
+  falling through to Next.js's default crash screen. Reuses the existing `InternalErrorPopup`
+  (`ErrorCode.CLIENT_INTERNAL_ERROR`) for a consistent, non-leaking user-facing message and reports
+  the underlying error to Sentry.
 - **Header**: Removed the asymmetric `pr-4` padding on the collapsed brand-mark pill in
   `AppHeader` — it was sized for the `APP_NAME` label, which is hidden below the `xl` breakpoint,
   leaving visible empty space to the right of the logo icon on collapsed (non-`xl`) viewports.
