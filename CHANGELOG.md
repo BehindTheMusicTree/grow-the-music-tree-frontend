@@ -118,6 +118,9 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Header**: Removed the asymmetric `pr-4` padding on the collapsed brand-mark pill in
+  `AppHeader` — it was sized for the `APP_NAME` label, which is hidden below the `xl` breakpoint,
+  leaving visible empty space to the right of the logo icon on collapsed (non-`xl`) viewports.
 - **Header**: Marked the app logo `<Image>` in `AppHeader` as `priority` — Chrome DevTools flagged
   it as the Largest Contentful Paint (LCP) element and recommended eager loading since it's always
   above the fold.
