@@ -44,7 +44,7 @@ export default function AppHeader({ className }: AppHeaderProps) {
       <Link
         href={ROUTE_PATHS.PROTOTYPE_REFERENCE_GENRE_TREE}
         prefetch={false}
-        className="flex shrink-0 items-center gap-2 rounded-full bg-black/70 py-1.5 pl-1.5 pr-4 shadow-lg backdrop-blur xl:gap-3"
+        className="flex shrink-0 items-center gap-2 rounded-full bg-black/70 py-1.5 pl-1.5 pr-1.5 shadow-lg backdrop-blur xl:gap-3 xl:pr-4"
         aria-label={`${APP_NAME} home`}
       >
         <div className="shrink-0">
