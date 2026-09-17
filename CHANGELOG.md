@@ -100,6 +100,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Dependencies**: Bumped `@behindthemusictree/app-kit` to `4.11.0`.
 - **Grow-api proxy consolidation**: `grow-the-music-tree-api` is consolidating its two backend
   identities (`system` full-access, `prototype` read-only) into just `system`, so this frontend no
   longer needs two proxy routes either. Removed `src/app/api/grow-prototype-proxy/[...path]/route.ts`
