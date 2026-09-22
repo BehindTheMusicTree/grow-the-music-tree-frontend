@@ -1,21 +1,6 @@
 #!/bin/sh
-# Re-syncs node_modules when a checkout brings in a different pnpm-lock.yaml,
-# so a stale local install doesn't silently drift from the pinned versions
-# (e.g. package.json says 4.5.2 but node_modules still has 4.4.3).
-
-prev_head=$1
-new_head=$2
-is_branch_checkout=$3
-
-[ "$is_branch_checkout" = "1" ] || exit 0
-
-if ! git diff --quiet "$prev_head" "$new_head" -- pnpm-lock.yaml; then
-  echo "pnpm-lock.yaml changed — running pnpm install to sync node_modules..."
-  pnpm install --frozen-lockfile
-fi
-
-# graphify-checkout-hook-start
-# Auto-rebuilds the knowledge graph (code only) when switching branches.
+# graphify-hook-start
+# Auto-rebuilds the knowledge graph after each commit (code files only, no LLM needed).
 # Installed by: graphify hook install
 (
 
@@ -31,28 +16,7 @@ if [ -n "${WINDIR:-}" ] || [ -n "${MSYSTEM:-}" ]; then
     export GRAPHIFY_MAX_WORKERS="${GRAPHIFY_MAX_WORKERS:-1}"
 fi
 
-PREV_HEAD=$1
-NEW_HEAD=$2
-BRANCH_SWITCH=$3
-
-# Only run on branch switches, not file checkouts
-if [ "$BRANCH_SWITCH" != "1" ]; then
-    exit 0
-fi
-
-# A no-op checkout (e.g. `git checkout -b` with no start point) reports a
-# branch switch but leaves the tree unchanged ΓÇö nothing to rebuild (#2421).
-[ "$PREV_HEAD" = "$NEW_HEAD" ] && exit 0
-
-# Only run if the output dir exists (graph has been built before). Resolve it
-# from GRAPHIFY_OUT like the rebuild body does (#1423): a literal graphify-out/
-# here made the branch-switch rebuild a silent no-op for every renamed output dir.
-_GFY_OUT="${GRAPHIFY_OUT:-graphify-out}"
-if [ ! -d "${_GFY_OUT%/}" ]; then
-    exit 0
-fi
-
-# Skip during rebase/merge/cherry-pick
+# Skip during rebase/merge/cherry-pick to avoid blocking --continue with unstaged changes
 # git exports GIT_DIR to hooks; the rev-parse fallback only runs when invoked by
 # hand (each git exec costs 1s+ on AV-scanned Windows machines).
 GIT_DIR=${GIT_DIR:-$(git rev-parse --git-dir 2>/dev/null)}
@@ -61,8 +25,6 @@ GIT_DIR=${GIT_DIR:-$(git rev-parse --git-dir 2>/dev/null)}
 [ -f "$GIT_DIR/MERGE_HEAD" ] && exit 0
 [ -f "$GIT_DIR/CHERRY_PICK_HEAD" ] && exit 0
 
-# Honor the same opt-out as post-commit: without this, GRAPHIFY_SKIP_HOOK=1
-# suppressed commit-triggered rebuilds but not branch-switch ones (#1809).
 [ "${GRAPHIFY_SKIP_HOOK:-0}" = "1" ] && exit 0
 
 _GFY_GITDIR=$(cd "$(git rev-parse --git-dir 2>/dev/null)" 2>/dev/null && pwd)
@@ -70,6 +32,32 @@ _GFY_COMMONDIR=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null 
 if [ -n "$_GFY_COMMONDIR" ] && [ "$_GFY_GITDIR" != "$_GFY_COMMONDIR" ]; then
     exit 0
 fi
+
+CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD 2>/dev/null)
+if [ -z "$CHANGED" ]; then
+    exit 0
+fi
+
+# Skip when only output-dir artifacts changed (avoids rebuild loop when graph
+# outputs are tracked in git). The dir is whatever GRAPHIFY_OUT names, the same
+# source the rebuild body reads (#1423): a literal graphify-out/ here let a
+# commit touching only a renamed output dir's graph.json trigger a full rebuild.
+_GFY_OUT="${GRAPHIFY_OUT:-graphify-out}"
+_GFY_OUT="${_GFY_OUT%/}"
+# The leading ( on each pattern is POSIX and keeps bash 3.2 (macOS /bin/sh)
+# from mis-parsing the pattern's ) as the end of the $(...) substitution.
+_NON_GRAPH=$(printf '%s
+' "$CHANGED" | while IFS= read -r _GFY_F; do
+    case "$_GFY_F" in
+        ("$_GFY_OUT"/*) ;;
+        (*) printf '%s
+' "$_GFY_F" ;;
+    esac
+done)
+if [ -z "$_NON_GRAPH" ]; then
+    exit 0
+fi
+
 # Detect the correct Python interpreter (handles uv tool, pipx, venv, system installs).
 # _PINNED was recorded at hook-install time; tried first so the hook works even
 # when the graphify launcher is not on PATH (common in GUI clients and CI).
@@ -184,16 +172,31 @@ if [ -z "$GRAPHIFY_PYTHON" ]; then
     fi
 fi
 
+export GRAPHIFY_CHANGED="$CHANGED"
+
+# Run the rebuild detached so git commit returns immediately. Full-repo rebuilds
+# can take hours; blocking the post-commit hook stalls the shell. The Python
+# launcher below detaches the child cross-platform, so it works on Git for
+# Windows' shell too (which lacks the coreutils backgrounding tools) (#1161).
 _GRAPHIFY_LOG="${HOME}/.cache/graphify-rebuild.log"
 mkdir -p "$(dirname "$_GRAPHIFY_LOG")"
 export GRAPHIFY_REBUILD_LOG="$_GRAPHIFY_LOG"
-echo "[graphify] Branch switched - launching background rebuild (log: $_GRAPHIFY_LOG)"
+echo "[graphify hook] launching background rebuild (log: $_GRAPHIFY_LOG)"
 "$GRAPHIFY_PYTHON" -c "import os, subprocess, sys
 _src = '''
-from graphify.watch import _rebuild_code, _apply_resource_limits
-from pathlib import Path
 import os, signal, sys, threading, multiprocessing
+from pathlib import Path
+
+changed_raw = os.environ.get('GRAPHIFY_CHANGED', '')
+changed = [Path(f.strip()) for f in changed_raw.strip().splitlines() if f.strip()]
+
+if not changed:
+    sys.exit(0)
+
+print(f'[graphify hook] {len(changed)} file(s) changed - rebuilding graph...')
+
 try:
+    from graphify.watch import _rebuild_code, _apply_resource_limits
     _apply_resource_limits()
     _timeout = int(os.environ.get('GRAPHIFY_REBUILD_TIMEOUT', '600'))
     if _timeout > 0:
@@ -213,7 +216,7 @@ try:
             signal.alarm(_timeout)
         else:
             def _bail():
-                print(f'[graphify] graphify rebuild exceeded {_timeout}s', flush=True)
+                print(f'[graphify hook] graphify rebuild exceeded {_timeout}s', flush=True)
                 for _child in multiprocessing.active_children():
                     _child.kill()
                 os._exit(1)
@@ -221,9 +224,6 @@ try:
             _watchdog.daemon = True
             _watchdog.start()
     _force = os.environ.get('GRAPHIFY_FORCE', '').lower() in ('1', 'true', 'yes')
-    # post-checkout: branch switch can touch arbitrary files; full rebuild path
-    # (no changed_paths) is correct here. The flock inside _rebuild_code still
-    # prevents pile-ups when commit + checkout fire back-to-back.
     _root = Path('.')
     _out = os.environ.get('GRAPHIFY_OUT', 'graphify-out')
     _saved = Path(_out) / '.graphify_root'
@@ -243,8 +243,8 @@ try:
             if _in_repo:
                 _root = _candidate
             else:
-                print(f'[graphify] ignoring out-of-repo .graphify_root: {_txt}')
-    _rebuild_code(_root, force=_force)
+                print(f'[graphify hook] ignoring out-of-repo .graphify_root: {_txt}')
+    _rebuild_code(_root, changed_paths=changed, force=_force)
     # Refresh the work-memory lessons doc when saved Q&A outcomes exist
     # (best-effort; never fails the hook).
     try:
@@ -257,10 +257,10 @@ try:
     except Exception:
         pass
 except TimeoutError as exc:
-    print(f'[graphify] {exc}')
+    print(f'[graphify hook] {exc}')
     sys.exit(1)
 except Exception as exc:
-    print(f'[graphify] Rebuild failed: {exc}')
+    print(f'[graphify hook] Rebuild failed: {exc}')
     sys.exit(1)
 
 '''
@@ -282,4 +282,4 @@ else:
     subprocess.Popen(_cmd, start_new_session=True, **_kw)
 "
 )
-# graphify-checkout-hook-end
+# graphify-hook-end
