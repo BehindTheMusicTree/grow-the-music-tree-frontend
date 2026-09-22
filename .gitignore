@@ -45,3 +45,6 @@ out/
 
 # PR descriptions (local drafts only)
 .pr-descriptions/
+
+# graphify knowledge graph (local, regenerated via post-commit hook)
+graphify-out/
