@@ -97,6 +97,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Dev tooling**: Added a `launch` Claude Code skill (`.claude/skills/launch/`) documenting how
   to start the dev server, including required env setup and the companion TheMusicTreeAPI
   backend dependency.
+- **Dev tooling**: Installed [graphify](https://pypi.org/project/graphifyy/) to generate a local
+  knowledge graph of the codebase for Claude Code. Adds `post-commit`/`post-checkout` hooks
+  (`.githooks/`) that auto-rebuild the graph, a `.gitattributes` merge driver for conflict-free
+  `graph.json` merges, and gitignores the regenerated `graphify-out/` output directory.
 
 ### Changed
 
