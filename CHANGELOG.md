@@ -101,6 +101,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   knowledge graph of the codebase for Claude Code. Adds `post-commit`/`post-checkout` hooks
   (`.githooks/`) that auto-rebuild the graph, a `.gitattributes` merge driver for conflict-free
   `graph.json` merges, and gitignores the regenerated `graphify-out/` output directory.
+- **Dev tooling**: Wired graphify into Claude Code (`AGENTS.md` section + `.claude/settings.json`
+  PreToolUse hooks) so it queries the knowledge graph before raw file searches.
 
 ### Changed
 
