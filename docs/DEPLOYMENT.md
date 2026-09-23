@@ -21,7 +21,7 @@ Auto-deploy on push and PR previews are both configured on the Coolify applicati
 This is the distinction that matters most when adding a new env var:
 
 - **`NEXT_PUBLIC_*` vars** are inlined into the JS bundle by `next build`. They must be passed as **Docker build args** (`ARG`/`ENV` in the `builder` stage of the [`Dockerfile`](../Dockerfile)) — Coolify supplies these via its **`buildtime_env`** config. Setting one only as a runtime container env var has no effect; it won't be in the built bundle.
-- **Server-only vars** (read via `process.env.X` inside a Route Handler or other server code, never referenced with the `NEXT_PUBLIC_` prefix) are read at **request time** by the running Next.js server. They must be **runtime container env vars** — Coolify supplies these via its **`static_env`** config. There's currently one such var: `GTMT_API_KEY` (see below).
+- **Server-only vars** (read via `process.env.X` inside a Route Handler or other server code, never referenced with the `NEXT_PUBLIC_` prefix) are read at **request time** by the running Next.js server. They must be **runtime container env vars** — Coolify supplies these via its **`static_env`** config. These are `GTMT_API_KEY` (see below) and the Auth.js admin sign-in vars `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_TRUST_HOST` (see [frontend-auth.md](frontend-auth.md)).
 
 `next.config.js`'s `REQUIRED_ENV_VARS` check runs at `next build` time and fails the build with "Missing required environment variable(s)" if any required `NEXT_PUBLIC_*` build arg is missing.
 

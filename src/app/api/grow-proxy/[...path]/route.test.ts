@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
-import { GET, POST } from "./route";
+import { GET, POST, DELETE } from "./route";
+
+const getAdminIdTokenMock = vi.fn<(request: Request) => Promise<string | null>>();
+
+vi.mock("@lib/auth", () => ({
+  getAdminIdToken: (request: Request) => getAdminIdTokenMock(request),
+}));
 
 vi.mock("@lib/grow-api-upstream-url", () => ({
   getGrowApiUpstreamBaseUrl: () => "https://grow-api-staging.themusictree.org/v0",
@@ -15,6 +21,7 @@ describe("grow-proxy route", () => {
 
   beforeEach(() => {
     process.env.GTMT_API_KEY = "test-api-key";
+    getAdminIdTokenMock.mockResolvedValue(null);
   });
 
   afterEach(() => {
@@ -22,7 +29,7 @@ describe("grow-proxy route", () => {
     vi.restoreAllMocks();
   });
 
-  it("forwards GET requests to the upstream URL with a trailing slash and query string, sending the API key and no body", async () => {
+  it("forwards anonymous GET requests to the upstream URL with a trailing slash and query string, sending the API key and no body", async () => {
     const fetchMock = vi
       .spyOn(global, "fetch")
       .mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200, headers: { "content-type": "application/json" } }));
@@ -35,12 +42,14 @@ describe("grow-proxy route", () => {
     expect(url).toBe("https://grow-api-staging.themusictree.org/v0/genres/?foo=bar");
     expect(init?.method).toBe("GET");
     expect((init?.headers as Record<string, string>)["X-API-Key"]).toBe("test-api-key");
+    expect((init?.headers as Record<string, string>)["Authorization"]).toBeUndefined();
     expect(init?.body).toBeUndefined();
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true });
   });
 
-  it("forwards POST requests with the body and Content-Type along with the API key", async () => {
+  it("forwards POST requests with the body, Content-Type, API key and the admin's Bearer ID token", async () => {
+    getAdminIdTokenMock.mockResolvedValue("admin-id-token");
     const fetchMock = vi
       .spyOn(global, "fetch")
       .mockResolvedValue(new Response(JSON.stringify({ created: true }), { status: 201, headers: { "content-type": "application/json" } }));
@@ -58,10 +67,29 @@ describe("grow-proxy route", () => {
     expect(init?.method).toBe("POST");
     const headers = init?.headers as Record<string, string>;
     expect(headers["X-API-Key"]).toBe("test-api-key");
+    expect(headers["Authorization"]).toBe("Bearer admin-id-token");
     expect(headers["Content-Type"]).toBe("application/json");
     expect(init?.body).toBeInstanceOf(ArrayBuffer);
     expect(response.status).toBe(201);
     expect(await response.json()).toEqual({ created: true });
+  });
+
+  it.each([
+    ["POST", POST],
+    ["DELETE", DELETE],
+  ])("returns 401 authentication_required for an anonymous %s without calling upstream", async (method, handler) => {
+    const fetchMock = vi.spyOn(global, "fetch");
+
+    const request = new NextRequest("http://localhost/api/grow-proxy/genres/some-uuid/", { method });
+    const response = await handler(request, makeContext(["genres", "some-uuid"]));
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(response.status).toBe(401);
+    expect(await response.json()).toMatchObject({
+      code: 401,
+      success: false,
+      details: { code: "authentication_required" },
+    });
   });
 
   it("passes through a non-2xx upstream status and body unchanged", async () => {

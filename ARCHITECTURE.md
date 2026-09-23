@@ -18,7 +18,7 @@ src/app/
 │   └── grow-proxy/[...path]/route.ts             # Server-only proxy to grow-the-music-tree-api
 └── (app)/                    # Route group: everything wrapped in Providers + AppContent
     ├── layout.tsx
-    ├── page.tsx               # "/" — the genre tree, read-only
+    ├── page.tsx               # "/" — the genre tree, read-only unless admin
     └── about/page.tsx
 ```
 
@@ -71,14 +71,11 @@ full build-time-vs-runtime distinction and how Coolify wires it in.
 
 ## Read-only mode
 
-The genre tree at `/` is always read-only — a frontend-only UI flag, not a separate backend
-identity. `src/components/features/genre-tree/GenreTreePage.tsx` hardcodes `readOnly={true}` when
-passing through to app-kit's `GenreTreeView`, which hides write-action UI. There is no
-backend-side enforcement — `readOnly` is the entire mechanism.
-
-This is unrelated to the (now-removed) provider-auth machinery — it's a static server-to-server
-key, not a user session, and it doesn't touch the app-kit `Scope` (`"reference"` vs `"me"`)
-concept either; `GenreTreePage.tsx` still uses `scope="reference"` against the same backend.
+The genre tree at `/` is read-only for everyone except the signed-in admin.
+`src/components/features/genre-tree/GenreTreePage.tsx` passes `readOnly={!useIsAdmin()}` to
+app-kit's `GenreTreeView`, which hides write-action UI. That's only the UI half: the grow-api proxy
+rejects anonymous writes with `401`, and grow-api verifies the admin's Google ID token on its own.
+See [docs/frontend-auth.md](docs/frontend-auth.md).
 
 ## State management
 

@@ -4,6 +4,7 @@ import { ReactNode, useCallback } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient, useFetchWrapper, ConnectivityErrorProvider, Scope } from "@behindthemusictree/app-kit/transport";
 import { SessionProvider } from "@behindthemusictree/app-kit/auth";
+import { SessionProvider as AuthSessionProvider } from "next-auth/react";
 import { PopupProvider } from "@behindthemusictree/app-kit/popup";
 import { PlayerProvider, PlayerTrack } from "@behindthemusictree/app-kit/player";
 import {
@@ -67,12 +68,14 @@ function AppProviders({ children }: ProvidersProps) {
 
 export default function Providers({ children }: ProvidersProps) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ConnectivityErrorProvider>
-        <SessionProvider>
-          <AppProviders>{children}</AppProviders>
-        </SessionProvider>
-      </ConnectivityErrorProvider>
-    </QueryClientProvider>
+    <AuthSessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <ConnectivityErrorProvider>
+          <SessionProvider>
+            <AppProviders>{children}</AppProviders>
+          </SessionProvider>
+        </ConnectivityErrorProvider>
+      </QueryClientProvider>
+    </AuthSessionProvider>
   );
 }

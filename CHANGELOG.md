@@ -58,6 +58,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Admin Google sign-in**: A hidden `/admin` page signs the owner in with Google via Auth.js v5
+  (`next-auth@5`). Sign-in is accepted only when grow-api's `auth/me/` reports the `admin` role; the
+  Google ID token stays in the encrypted session cookie and is refreshed server-side before expiry.
+  The grow-api proxy now answers anonymous writes with `401 authentication_required` without
+  calling grow-api, and forwards the admin's ID token as `Authorization: Bearer`. Genre tree write
+  controls are hidden unless signed in as admin. New server-only env vars: `AUTH_SECRET`,
+  `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_TRUST_HOST`. See `docs/frontend-auth.md`.
+
 - **Genre Tree Visualization**: Added interactive D3.js-based genre tree component
   - Includes unit tests for tree layout calculations and node interactions
   - Supports zoom, pan, and node expansion/collapse

@@ -1,7 +1,7 @@
 # TheMusicTree
 
 Route: `/`
-Access: public, read-only
+Access: public, read-only (editable when signed in as admin at `/admin`)
 
 ## Table of Contents
 
@@ -32,5 +32,5 @@ Cannot be statically generated - requires dynamic data and real-time updates.
 ## Notes
 
 - Public access allows non-authenticated users to explore the genre taxonomy
-- Features interactive tree visualization, always read-only (no write-action UI)
+- Features interactive tree visualization, read-only (no write-action UI) unless signed in as admin
 - Also the logo / home link
