@@ -136,11 +136,19 @@ NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-c
 
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback
+
+# Server-only: admin Google sign-in (Auth.js)
+AUTH_SECRET=generate-with-npx-auth-secret
+AUTH_GOOGLE_ID=your-google-client-id.apps.googleusercontent.com
+AUTH_GOOGLE_SECRET=your-google-client-secret
+AUTH_TRUST_HOST=true
 ```
 
 In the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) → your app → **Settings** → **Redirect URIs**, add the **full** callback URL(s), e.g. `http://localhost:3000/auth/spotify/callback` for local dev and your production URL for deploy. The app builds the redirect URI from your origin when you use a path like `/auth/spotify/callback`.
 
 For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials, create an OAuth 2.0 Client ID (Web application) and add the **full** redirect URI(s) under "Authorized redirect URIs", e.g. `http://localhost:3000/auth/google/callback`.
+
+**Admin sign-in** (hidden `/admin` page): `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` and `AUTH_TRUST_HOST` are server-only runtime vars. Create a Google OAuth client (Web application) with the redirect URI `<origin>/api/auth/callback/google` for each environment. Anonymous visitors are read-only; only the admin can write. See [docs/frontend-auth.md](docs/frontend-auth.md).
 
 **Notes:**
 

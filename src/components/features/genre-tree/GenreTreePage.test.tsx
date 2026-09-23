@@ -4,6 +4,12 @@ import { render, screen, cleanup } from "@testing-library/react";
 import GenreTreePage from "./GenreTreePage";
 import { GenreTreeViewModeProvider, useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 
+const useIsAdminMock = vi.fn(() => false);
+
+vi.mock("@hooks/useIsAdmin", () => ({
+  useIsAdmin: () => useIsAdminMock(),
+}));
+
 const useListFullGenrePlaylistsMock = vi.fn(() => ({ data: { results: [] }, isLoading: false }));
 
 vi.mock("@lib/site-urls", () => ({
@@ -57,15 +63,25 @@ describe("GenreTreePage", () => {
     cleanup();
     useListFullGenrePlaylistsMock.mockReturnValue({ data: { results: [] }, isLoading: false });
     hasMainstreamPopRootMock.mockReturnValue(true);
+    useIsAdminMock.mockReturnValue(false);
   });
 
-  it("renders the genre tree read-only", async () => {
+  it("renders the genre tree read-only, hiding its write controls, when not signed in as admin", async () => {
     renderGenreTreePage();
 
     const view = await screen.findByTestId("genre-tree-view");
     expect(view.dataset.readonly).toBe("true");
     expect(view).toHaveTextContent("/api/grow-proxy");
     expect(screen.getByRole("heading", { name: "Genre Tree" })).toBeInTheDocument();
+  });
+
+  it("renders the genre tree editable when signed in as admin", async () => {
+    useIsAdminMock.mockReturnValue(true);
+
+    renderGenreTreePage();
+
+    const view = await screen.findByTestId("genre-tree-view");
+    expect(view.dataset.readonly).toBe("false");
   });
 
   it("keeps the pop-core view mode (radial wheel skeleton) while genre playlists are still loading", async () => {

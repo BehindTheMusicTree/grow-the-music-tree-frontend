@@ -19,6 +19,7 @@ import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
+import { useIsAdmin } from "@hooks/useIsAdmin";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
 // Reads viewMode from context (rather than receiving it as a prop) because next/dynamic's
@@ -50,6 +51,7 @@ const GenreTreeView = dynamic(
 export default function GenreTreePage() {
   const getBackendBaseUrl = getGrowBackendBaseUrl;
   const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
+  const isAdmin = useIsAdmin();
   const { mutate: createGenre, formErrors } = useCreateGenre("reference", getBackendBaseUrl);
   const { renameGenre, formErrors: renameFormErrors } = useUpdateGenre("reference", getBackendBaseUrl);
   const { showPopup, hidePopup } = usePopup();
@@ -140,7 +142,7 @@ export default function GenreTreePage() {
         getBackendBaseUrl={getBackendBaseUrl}
         criteriaPlaylistDetailedSchema={makeCriteriaPlaylistDetailedSchema(YoutubeTrackDetailedSchema)}
         viewMode={viewMode}
-        readOnly={true}
+        readOnly={!isAdmin}
       />
     </Page>
   );
