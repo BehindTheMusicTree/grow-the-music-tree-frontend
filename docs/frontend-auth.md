@@ -34,8 +34,6 @@ write access. There are no user accounts beyond that.
   grow-api, in the API's error shape:
   `{"code": 401, "message": "...", "success": false, "details": {"message": "...", "code": "authentication_required"}}`.
 - With an admin session: forwarded with `Authorization: Bearer <id_token>`.
-- `X-API-Key` (`GTMT_API_KEY`) is still sent on every request until grow-api restricts the key to
-  pipeline imports; it will then be removed.
 
 grow-api verifies the ID token independently. Its errors: `401` with `details.code`
 `authentication_required` or `invalid_token`, and `403` with `permission_denied`.

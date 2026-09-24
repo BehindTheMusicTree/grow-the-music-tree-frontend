@@ -17,19 +17,15 @@ function makeContext(path: string[]) {
 }
 
 describe("grow-proxy route", () => {
-  const originalApiKey = process.env.GTMT_API_KEY;
-
   beforeEach(() => {
-    process.env.GTMT_API_KEY = "test-api-key";
     getAdminIdTokenMock.mockResolvedValue(null);
   });
 
   afterEach(() => {
-    process.env.GTMT_API_KEY = originalApiKey;
     vi.restoreAllMocks();
   });
 
-  it("forwards anonymous GET requests to the upstream URL with a trailing slash and query string, sending the API key and no body", async () => {
+  it("forwards anonymous GET requests to the upstream URL with a trailing slash and query string and no body", async () => {
     const fetchMock = vi
       .spyOn(global, "fetch")
       .mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200, headers: { "content-type": "application/json" } }));
@@ -41,14 +37,14 @@ describe("grow-proxy route", () => {
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe("https://grow-api-staging.themusictree.org/v1/genres/?foo=bar");
     expect(init?.method).toBe("GET");
-    expect((init?.headers as Record<string, string>)["X-API-Key"]).toBe("test-api-key");
+    expect((init?.headers as Record<string, string>)["X-API-Key"]).toBeUndefined();
     expect((init?.headers as Record<string, string>)["Authorization"]).toBeUndefined();
     expect(init?.body).toBeUndefined();
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true });
   });
 
-  it("forwards POST requests with the body, Content-Type, API key and the admin's Bearer ID token", async () => {
+  it("forwards POST requests with the body, Content-Type and the admin's Bearer ID token", async () => {
     getAdminIdTokenMock.mockResolvedValue("admin-id-token");
     const fetchMock = vi
       .spyOn(global, "fetch")
@@ -66,7 +62,7 @@ describe("grow-proxy route", () => {
     expect(url).toBe("https://grow-api-staging.themusictree.org/v1/genres/tree/load-example/");
     expect(init?.method).toBe("POST");
     const headers = init?.headers as Record<string, string>;
-    expect(headers["X-API-Key"]).toBe("test-api-key");
+    expect(headers["X-API-Key"]).toBeUndefined();
     expect(headers["Authorization"]).toBe("Bearer admin-id-token");
     expect(headers["Content-Type"]).toBe("application/json");
     expect(init?.body).toBeInstanceOf(ArrayBuffer);
@@ -104,12 +100,4 @@ describe("grow-proxy route", () => {
     expect(await response.json()).toEqual({ detail: "not found" });
   });
 
-  it("throws before fetching when GTMT_API_KEY is missing", async () => {
-    delete process.env.GTMT_API_KEY;
-    const fetchMock = vi.spyOn(global, "fetch");
-
-    const request = new NextRequest("http://localhost/api/grow-proxy/genres/");
-    await expect(GET(request, makeContext(["genres"]))).rejects.toThrow("GTMT_API_KEY is required");
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
 });

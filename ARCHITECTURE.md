@@ -47,14 +47,12 @@ there's no login UI, no `useSpotifyAuth`/`useGoogleAuth`, and `AppContent.tsx` p
 
 ## Talking to `grow-the-music-tree-api`
 
-The backend requires an `X-API-Key` header (`grow-the-music-tree-api`'s `GROW_API_KEY`). This app
-never puts that key in the browser — a Next.js Route Handler proxies every request server-side,
-attaching the key there:
+A Next.js Route Handler proxies every request server-side, attaching the signed-in admin's Google
+ID token (see [docs/frontend-auth.md](docs/frontend-auth.md)):
 
-- `src/app/api/grow-proxy/[...path]/route.ts` — reads `process.env.GTMT_API_KEY` (throws if unset),
-  forwards `GET`/`POST`/`PUT`/`DELETE` to `getGrowApiUpstreamBaseUrl()` (`src/lib/grow-api-upstream-url.ts`)
-  with `X-API-Key` attached, and streams the upstream response straight back. `/` goes through this
-  proxy.
+- `src/app/api/grow-proxy/[...path]/route.ts` — forwards `GET`/`POST`/`PUT`/`DELETE` to
+  `getGrowApiUpstreamBaseUrl()` (`src/lib/grow-api-upstream-url.ts`) and streams the upstream
+  response straight back. `/` goes through this proxy.
 
 Client code never calls grow-api directly; it calls the same-origin path returned by
 `src/lib/site-urls.ts`'s `getGrowBackendBaseUrl()` (`"/api/grow-proxy"`).
@@ -63,11 +61,6 @@ Client code never calls grow-api directly; it calls the same-origin path returne
 code) resolves the *real* upstream host — it deliberately reimplements `app-kit/transport`'s
 `buildBackendBaseUrl` logic locally rather than importing it, because that module calls
 `React.createContext` at import time and Route Handlers aren't a React runtime.
-
-`GTMT_API_KEY` is a **server-only, runtime** env var — read via `process.env` at request time,
-never `NEXT_PUBLIC_*`, never baked into the client bundle. See
-[docs/DEPLOYMENT.md §2-3](docs/DEPLOYMENT.md#2-build-time-vs-runtime-environment-variables) for the
-full build-time-vs-runtime distinction and how Coolify wires it in.
 
 ## Read-only mode
 
