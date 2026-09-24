@@ -11,27 +11,16 @@ RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
     fi && \
     NPM_TOKEN="$(cat /run/secrets/GH_PACKAGES_TOKEN_READ)" pnpm install --frozen-lockfile
 
-# next.config.js's REQUIRED_ENV_VARS check runs at `next build` time, so every NEXT_PUBLIC_* var it
-# needs must be passed as a build arg here, or the build fails with "Missing required environment
-# variable(s)". Coolify injects these via its buildtime_env config (see infrastructure repo).
+# src/lib/env.ts is imported by next.config.ts, so its schema is validated at `next build` time:
+# every NEXT_PUBLIC_* var baked into the client bundle must be passed as a build arg here, or the
+# build fails. Coolify injects these via its buildtime_env config (see infrastructure repo).
+# Server-only vars (src/lib/env.server.ts) are runtime env, validated at boot by src/instrumentation.ts.
 ARG NEXT_PUBLIC_CONTACT_EMAIL
-ARG NEXT_PUBLIC_SPOTIFY_CLIENT_ID
-ARG NEXT_PUBLIC_SPOTIFY_SCOPES
-ARG NEXT_PUBLIC_SPOTIFY_REDIRECT_URI
-ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
-ARG NEXT_PUBLIC_GOOGLE_REDIRECT_URI
-ARG NEXT_PUBLIC_BACKEND_BASE_URL
+ARG NEXT_PUBLIC_AUDIOMETA_URL
 ARG NEXT_PUBLIC_SENTRY_IS_ACTIVE
-ARG NEXT_PUBLIC_SPOTIFY_AUTH_URL
 ENV NEXT_PUBLIC_CONTACT_EMAIL=$NEXT_PUBLIC_CONTACT_EMAIL \
-    NEXT_PUBLIC_SPOTIFY_CLIENT_ID=$NEXT_PUBLIC_SPOTIFY_CLIENT_ID \
-    NEXT_PUBLIC_SPOTIFY_SCOPES=$NEXT_PUBLIC_SPOTIFY_SCOPES \
-    NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=$NEXT_PUBLIC_SPOTIFY_REDIRECT_URI \
-    NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID \
-    NEXT_PUBLIC_GOOGLE_REDIRECT_URI=$NEXT_PUBLIC_GOOGLE_REDIRECT_URI \
-    NEXT_PUBLIC_BACKEND_BASE_URL=$NEXT_PUBLIC_BACKEND_BASE_URL \
-    NEXT_PUBLIC_SENTRY_IS_ACTIVE=$NEXT_PUBLIC_SENTRY_IS_ACTIVE \
-    NEXT_PUBLIC_SPOTIFY_AUTH_URL=$NEXT_PUBLIC_SPOTIFY_AUTH_URL
+    NEXT_PUBLIC_AUDIOMETA_URL=$NEXT_PUBLIC_AUDIOMETA_URL \
+    NEXT_PUBLIC_SENTRY_IS_ACTIVE=$NEXT_PUBLIC_SENTRY_IS_ACTIVE
 
 COPY . .
 RUN pnpm build

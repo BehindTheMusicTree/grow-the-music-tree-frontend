@@ -7,9 +7,10 @@ import {
   LinkedInSocialLink,
   MastodonSocialLink,
 } from "@behindthemusictree/brand/components";
+import { publicEnv } from "@lib/env";
 
 export default function OrgSocialLinks() {
-  const appVersion = process.env.NEXT_PUBLIC_APP_VERSION;
+  const appVersion = publicEnv.NEXT_PUBLIC_APP_VERSION;
 
   return (
     <div className="flex flex-col items-center gap-2">

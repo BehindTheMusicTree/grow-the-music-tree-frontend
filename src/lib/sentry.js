@@ -1,8 +1,9 @@
 import * as Sentry from "@sentry/nextjs";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
+import { publicEnv } from "@lib/env";
 
 export function initSentry() {
-  if (process.env.NEXT_PUBLIC_SENTRY_IS_ACTIVE !== "true") {
+  if (publicEnv.NEXT_PUBLIC_SENTRY_IS_ACTIVE !== "true") {
     return;
   }
 
@@ -23,9 +24,9 @@ export function initSentry() {
       integrations.push(Sentry.replayIntegration());
     }
 
-    const tracesSampleRate = Number(process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE) || 0.1;
-    const replaysSessionSampleRate = Number(process.env.NEXT_PUBLIC_SENTRY_REPLAY_SESSION_SAMPLE_RATE) || 0.1;
-    const replaysOnErrorSampleRate = Number(process.env.NEXT_PUBLIC_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE) || 1.0;
+    const tracesSampleRate = publicEnv.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE;
+    const replaysSessionSampleRate = publicEnv.NEXT_PUBLIC_SENTRY_REPLAY_SESSION_SAMPLE_RATE;
+    const replaysOnErrorSampleRate = publicEnv.NEXT_PUBLIC_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE;
 
     Sentry.init({
       dsn: "https://7f17fcd9feebfb634ad7ba2f638ba69a@o4507119053832192.ingest.de.sentry.io/4507119058026576",
@@ -34,7 +35,7 @@ export function initSentry() {
       tracePropagationTargets: ["localhost", getGrowBackendBaseUrl()],
       replaysSessionSampleRate,
       replaysOnErrorSampleRate,
-      enabled: process.env.NEXT_PUBLIC_SENTRY_IS_ACTIVE === "true",
+      enabled: publicEnv.NEXT_PUBLIC_SENTRY_IS_ACTIVE === "true",
     });
   } catch (error) {
     console.error("Failed to initialize Sentry:", error);
