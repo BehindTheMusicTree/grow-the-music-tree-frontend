@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [2.6.0 - 2026-09-24](#260---2026-09-24)
+- [2.5.0 - 2026-08-28](#250---2026-08-28)
 - [2.4.0 - 2026-08-27](#240---2026-08-27)
 - [2.3.0 - 2026-08-18](#230---2026-08-18)
 - [2.2.0 - 2026-08-14](#220---2026-08-14)
@@ -58,14 +60,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
-- **Admin Google sign-in**: A hidden `/admin` page signs the owner in with Google via Auth.js v5
-  (`next-auth@5`). Sign-in is accepted only when grow-api's `auth/me/` reports the `admin` role; the
-  Google ID token stays in the encrypted session cookie and is refreshed server-side before expiry.
-  The grow-api proxy now answers anonymous writes with `401 authentication_required` without
-  calling grow-api, and forwards the admin's ID token as `Authorization: Bearer`. Genre tree write
-  controls are hidden unless signed in as admin. New server-only env vars: `AUTH_SECRET`,
-  `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_TRUST_HOST`. See `docs/frontend-auth.md`.
-
 - **Genre Tree Visualization**: Added interactive D3.js-based genre tree component
   - Includes unit tests for tree layout calculations and node interactions
   - Supports zoom, pan, and node expansion/collapse
@@ -73,12 +67,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Playlist Management**: Added drag-and-drop track reordering in playlists
   - Includes integration tests for drag-and-drop functionality
   - Optimistic UI updates with automatic rollback on API failure
-
-### Removed
-
-- **Grow-api proxy API key**: The proxy no longer sends `X-API-Key`, and the `GTMT_API_KEY` env var
-  is gone. grow-api only accepts that key on its pipeline import endpoints; admin writes use the
-  forwarded Google ID token.
 
 ### Fixed
 
@@ -102,7 +90,17 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-09-24
+
 ### Added
+
+- **Admin Google sign-in**: A hidden `/admin` page signs the owner in with Google via Auth.js v5
+  (`next-auth@5`). Sign-in is accepted only when grow-api's `auth/me/` reports the `admin` role; the
+  Google ID token stays in the encrypted session cookie and is refreshed server-side before expiry.
+  The grow-api proxy now answers anonymous writes with `401 authentication_required` without
+  calling grow-api, and forwards the admin's ID token as `Authorization: Bearer`. Genre tree write
+  controls are hidden unless signed in as admin. New server-only env vars: `AUTH_SECRET`,
+  `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_TRUST_HOST`. See `docs/frontend-auth.md`.
 
 - **Dev tooling**: Added `post-checkout`/`post-merge` git hooks (`.githooks/`, wired up via a
   `prepare` script that sets `core.hooksPath`) that automatically run `pnpm install` whenever a
@@ -180,8 +178,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   app-kit's own release process moved to PR-based release/hotfix flow; no consumer-facing
   behavior change.
 
-### Fixed
-
 - **Genre tree loading skeleton mismatch**: `GenreTreePage`'s `next/dynamic` fallback (shown
   while the `GenreTreeView` chunk itself is still downloading) uses app-kit's `GenreTreeViewSkeleton`,
   reading `resolvedViewMode` from `GenreTreeViewModeProvider` so it renders the same skeleton
@@ -231,12 +227,17 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Removed
 
+- **Grow-api proxy API key**: The proxy no longer sends `X-API-Key`, and the `GTMT_API_KEY` env var
+  is gone. grow-api only accepts that key on its pipeline import endpoints; admin writes use the
+  forwarded Google ID token.
+
 - **Prototype-mode banner**: Removed `PrototypeModeBanner`, the fixed bottom banner that read
   "You're viewing the prototype demo tree — browsing only, changes aren't saved."
 
 - **Genre tree "Wheel" view-mode toggle**: Removed the "Wheel" button from `AppSubheader`'s
   Stacked/Wheel/Pop-Core toggle, leaving Stacked and Pop-Core. The reference tree now defaults to
   "Stacked" instead of "Wheel".
+
 
 ## [2.5.0] - 2026-08-28
 
