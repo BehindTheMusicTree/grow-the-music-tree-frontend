@@ -1,9 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useCallback } from "react";
-import { usePathname } from "next/navigation";
 import type { GenreTreeViewMode } from "@behindthemusictree/app-kit/genre-tree";
-import { isPrototypeRoute } from "@lib/prototype-mode";
 
 interface GenreTreeViewModeContextValue {
   viewMode: GenreTreeViewMode;
@@ -18,37 +16,26 @@ interface GenreTreeViewModeContextValue {
 
 const GenreTreeViewModeContext = createContext<GenreTreeViewModeContextValue | null>(null);
 
-/** State is keyed by reference/prototype mode so the two genre trees drive the toggle
- * independently instead of sharing a single view mode across both routes. */
 interface ModeState {
   viewMode: GenreTreeViewMode;
   canShowPopCore: boolean;
 }
 
 export function GenreTreeViewModeProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
-  const mode = isPrototypeRoute(pathname) ? "prototype" : "reference";
-
-  const [stateByMode, setStateByMode] = useState<Record<"reference" | "prototype", ModeState>>({
-    reference: { viewMode: "wheel", canShowPopCore: false },
-    prototype: { viewMode: "pop-core", canShowPopCore: false },
+  const [state, setState] = useState<ModeState>({
+    viewMode: "pop-core",
+    canShowPopCore: false,
   });
 
-  const setViewMode = useCallback(
-    (viewMode: GenreTreeViewMode) => {
-      setStateByMode((prev) => ({ ...prev, [mode]: { ...prev[mode], viewMode } }));
-    },
-    [mode],
-  );
+  const setViewMode = useCallback((viewMode: GenreTreeViewMode) => {
+    setState((prev) => ({ ...prev, viewMode }));
+  }, []);
 
-  const setCanShowPopCore = useCallback(
-    (canShowPopCore: boolean) => {
-      setStateByMode((prev) => ({ ...prev, [mode]: { ...prev[mode], canShowPopCore } }));
-    },
-    [mode],
-  );
+  const setCanShowPopCore = useCallback((canShowPopCore: boolean) => {
+    setState((prev) => ({ ...prev, canShowPopCore }));
+  }, []);
 
-  const { viewMode, canShowPopCore } = stateByMode[mode];
+  const { viewMode, canShowPopCore } = state;
 
   return (
     <GenreTreeViewModeContext.Provider value={{ viewMode, setViewMode, canShowPopCore, setCanShowPopCore }}>

@@ -1,22 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getGrowApiUpstreamBaseUrl } from "@lib/grow-api-upstream-url";
+import { getAdminIdToken } from "@lib/auth";
+
+const AUTHENTICATION_REQUIRED_MESSAGE = "Authentication credentials were not provided.";
 
 async function forward(request: NextRequest, path: string[]): Promise<NextResponse> {
-  const apiKey = process.env.GTMT_API_KEY;
-  if (!apiKey) {
-    throw new Error("GTMT_API_KEY is required to proxy grow-api requests");
-  }
-
   const upstreamBase = getGrowApiUpstreamBaseUrl().replace(/\/+$/, "");
   const upstreamUrl = `${upstreamBase}/${path.join("/")}/${request.nextUrl.search}`;
 
   const hasBody = request.method !== "GET" && request.method !== "HEAD";
+  const idToken = await getAdminIdToken(request);
+  if (hasBody && !idToken) {
+    return NextResponse.json(
+      {
+        code: 401,
+        message: AUTHENTICATION_REQUIRED_MESSAGE,
+        success: false,
+        details: { message: AUTHENTICATION_REQUIRED_MESSAGE, code: "authentication_required" },
+      },
+      { status: 401 },
+    );
+  }
+
   const contentType = request.headers.get("content-type");
 
   const upstreamResponse = await fetch(upstreamUrl, {
     method: request.method,
     headers: {
-      "X-API-Key": apiKey,
+      ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
       ...(contentType ? { "Content-Type": contentType } : {}),
     },
     body: hasBody ? await request.arrayBuffer() : undefined,

@@ -5,7 +5,7 @@ interface PageProps {
   /** Keep the h1 in the a11y tree without reserving visible header space (e.g. when the title would be redundant with existing on-page chrome). */
   visuallyHiddenTitle?: boolean;
   children: ReactNode;
-  /** Route or feature id for E2E/analytics (e.g. "reference-genre-tree"). See docs/DATA_ATTRIBUTES.md. */
+  /** Route or feature id for E2E/analytics (e.g. "genre-tree"). See docs/DATA_ATTRIBUTES.md. */
   dataPage: string;
 }
 

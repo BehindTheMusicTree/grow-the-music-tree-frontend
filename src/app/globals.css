@@ -125,3 +125,17 @@ button {
 .read-the-docs {
   color: #888;
 }
+
+/* GenreTreeView (from @behindthemusictree/app-kit) renders its own root with a Tailwind
+   `mt-4` margin-top, leaving a gap between the viewport top and the tree on these
+   full-height pages. Neutralize it here since that margin lives in a vendored component. */
+[data-page="genre-tree"] .page-content > * {
+  margin-top: 0;
+}
+
+/* GenreTreeView (from @behindthemusictree/app-kit) always renders a "Rotation"/"Toolbar"
+   display-options group (no prop to disable it) that sits under AppHeader's floating pill.
+   Hide it since these controls aren't meant to be user-facing here. */
+[data-page="genre-tree"] [aria-label="Tree display options"] {
+  display: none;
+}

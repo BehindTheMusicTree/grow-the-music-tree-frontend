@@ -3,23 +3,13 @@ import { buildSubdomainBaseUrl } from "@behindthemusictree/app-kit/transport";
 
 /**
  * GrowTheMusicTree API base URL for client use — a same-origin path proxied by
- * `/api/grow-proxy`, which attaches the server-only `GTMT_API_KEY` grow-api requires on writes.
+ * `/api/grow-proxy`, which attaches the signed-in admin's ID token server-side.
  * The real upstream host is resolved separately in `@lib/grow-api-upstream-url` (server-only,
  * used by the proxy route handler itself — see that file for why it can't reuse this module's
  * app-kit-based `buildBackendBaseUrl`).
  */
 export function getGrowBackendBaseUrl(): string {
   return "/api/grow-proxy";
-}
-
-/**
- * GrowTheMusicTree API base URL for the read-only prototype/demo mode — a same-origin path
- * proxied by `/api/grow-prototype-proxy`, which attaches the server-only `GTMT_PROTOTYPE_API_KEY`.
- * Behaves identically to `getGrowBackendBaseUrl` for reads; grow-api 403s on writes made with the
- * prototype key. See `docs/prototype-mode.md`.
- */
-export function getGrowPrototypeBackendBaseUrl(): string {
-  return "/api/grow-prototype-proxy";
 }
 
 /**

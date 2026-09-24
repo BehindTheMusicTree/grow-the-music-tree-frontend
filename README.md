@@ -40,8 +40,7 @@ Music enthusiasts, researchers, and the general public interested in understandi
 
 **High-level features:**
 
-- Interactive genre tree visualization
-- A read-only `/prototype` demo tree for visitors without write access (see [docs/prototype-mode.md](docs/prototype-mode.md))
+- Interactive, read-only genre tree visualization at the root route
 - Rich contextual information for each genre (historical, cultural, technical)
 
 **Planned / not yet implemented** (see [VISION.md](VISION.md) and [TODO.md](TODO.md)):
@@ -52,10 +51,8 @@ Music enthusiasts, researchers, and the general public interested in understandi
 
 ## Pages
 
-- Home (`/`, redirects to `/reference-genre-tree`)
+- Genre tree (`/`, also the logo / home link) — read-only
 - About (`/about`)
-- Reference tree (`/reference-genre-tree`, also the logo / home link)
-- Prototype/demo tree (`/prototype/reference-genre-tree`) — read-only, see [docs/prototype-mode.md](docs/prototype-mode.md)
 - Health check (`/health`)
 
 Login/personal-library pages (Account, Spotify/Google auth callbacks, MyMusicTree, Spotify Library, My Library) were removed in v2.4.0 — `grow-the-music-tree-api` is single-tenant with no per-user auth model; personal-library features live in `hear-the-music-tree-frontend` instead.
@@ -139,11 +136,19 @@ NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-c
 
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback
+
+# Server-only: admin Google sign-in (Auth.js)
+AUTH_SECRET=generate-with-npx-auth-secret
+AUTH_GOOGLE_ID=your-google-client-id.apps.googleusercontent.com
+AUTH_GOOGLE_SECRET=your-google-client-secret
+AUTH_TRUST_HOST=true
 ```
 
 In the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) → your app → **Settings** → **Redirect URIs**, add the **full** callback URL(s), e.g. `http://localhost:3000/auth/spotify/callback` for local dev and your production URL for deploy. The app builds the redirect URI from your origin when you use a path like `/auth/spotify/callback`.
 
 For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials, create an OAuth 2.0 Client ID (Web application) and add the **full** redirect URI(s) under "Authorized redirect URIs", e.g. `http://localhost:3000/auth/google/callback`.
+
+**Admin sign-in** (hidden `/admin` page): `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` and `AUTH_TRUST_HOST` are server-only runtime vars. Create a Google OAuth client (Web application) with the redirect URI `<origin>/api/auth/callback/google` for each environment. Anonymous visitors are read-only; only the admin can write. See [docs/frontend-auth.md](docs/frontend-auth.md).
 
 **Notes:**
 
@@ -209,10 +214,8 @@ Every `NEXT_PUBLIC_*` var is required at build time (baked in by `next build`); 
 **Run container:**
 
 ```bash
-docker run -p 3000:3000 -e PORT=3000 -e GTMT_API_KEY=... -e GTMT_PROTOTYPE_API_KEY=... grow-the-music-tree-frontend
+docker run -p 3000:3000 -e PORT=3000 grow-the-music-tree-frontend
 ```
-
-`GTMT_API_KEY` and `GTMT_PROTOTYPE_API_KEY` are server-only and read at request time (not `NEXT_PUBLIC_*`), so they're runtime env vars, not build args — see [§ Grow-api write proxy](docs/DEPLOYMENT.md#grow-api-write-proxy-gtmt_api_key) and [§ Prototype/demo mode proxy](docs/DEPLOYMENT.md#4-prototypedemo-mode-proxy-gtmt_prototype_api_key) in DEPLOYMENT.md.
 
 ## CI
 
@@ -263,7 +266,6 @@ For additional information about this project, please refer to:
 - **[docs/VERSIONING.md](docs/VERSIONING.md)** - Versioning strategy and guidelines
 - **[docs/SEMVER_GUIDE.md](docs/SEMVER_GUIDE.md)** - SemVer conventions used for releases
 - **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Coolify staging and production deployment setup
-- **[docs/prototype-mode.md](docs/prototype-mode.md)** - Read-only `/prototype` demo tree, `GTMT_PROTOTYPE_API_KEY` wiring
 - **[docs/REVERSE_PROXY_CONFIG.md](docs/REVERSE_PROXY_CONFIG.md)** - Nginx/reverse-proxy configuration for deployment
 - **[docs/testing.md](docs/testing.md)** - Testing strategy, tools, and conventions
 - **[docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md)** - Code and UI styling conventions

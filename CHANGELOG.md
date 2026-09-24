@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [2.6.0 - 2026-09-24](#260---2026-09-24)
+- [2.5.0 - 2026-08-28](#250---2026-08-28)
 - [2.4.0 - 2026-08-27](#240---2026-08-27)
 - [2.3.0 - 2026-08-18](#230---2026-08-18)
 - [2.2.0 - 2026-08-14](#220---2026-08-14)
@@ -87,6 +89,155 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [2.6.0] - 2026-09-24
+
+### Added
+
+- **Admin Google sign-in**: A hidden `/admin` page signs the owner in with Google via Auth.js v5
+  (`next-auth@5`). Sign-in is accepted only when grow-api's `auth/me/` reports the `admin` role; the
+  Google ID token stays in the encrypted session cookie and is refreshed server-side before expiry.
+  The grow-api proxy now answers anonymous writes with `401 authentication_required` without
+  calling grow-api, and forwards the admin's ID token as `Authorization: Bearer`. Genre tree write
+  controls are hidden unless signed in as admin. New server-only env vars: `AUTH_SECRET`,
+  `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_TRUST_HOST`. See `docs/frontend-auth.md`.
+
+- **Dev tooling**: Added `post-checkout`/`post-merge` git hooks (`.githooks/`, wired up via a
+  `prepare` script that sets `core.hooksPath`) that automatically run `pnpm install` whenever a
+  checkout or merge changes `pnpm-lock.yaml`, so a stale local `node_modules` no longer silently
+  drifts from the versions pinned in `package.json`.
+- **Dev tooling**: Added a `launch` Claude Code skill (`.claude/skills/launch/`) documenting how
+  to start the dev server, including required env setup and the companion TheMusicTreeAPI
+  backend dependency.
+- **Dev tooling**: Installed [graphify](https://pypi.org/project/graphifyy/) to generate a local
+  knowledge graph of the codebase for Claude Code. Adds `post-commit`/`post-checkout` hooks
+  (`.githooks/`) that auto-rebuild the graph, a `.gitattributes` merge driver for conflict-free
+  `graph.json` merges, and gitignores the regenerated `graphify-out/` output directory.
+- **Dev tooling**: Wired graphify into Claude Code (`AGENTS.md` section + `.claude/settings.json`
+  PreToolUse hooks) so it queries the knowledge graph before raw file searches.
+
+### Changed
+
+- **Dependencies**: Bumped `@behindthemusictree/app-kit` to `4.11.0`.
+- **Grow-api proxy consolidation**: `grow-the-music-tree-api` is consolidating its two backend
+  identities (`system` full-access, `prototype` read-only) into just `system`, so this frontend no
+  longer needs two proxy routes either. Removed `src/app/api/grow-prototype-proxy/[...path]/route.ts`
+  and `getGrowPrototypeBackendBaseUrl()` — `/reference-genre-tree` and
+  `/prototype/reference-genre-tree` now both go through `/api/grow-proxy` (`GTMT_API_KEY`).
+  `/prototype/*`'s read-only behavior is unchanged; it's now purely a frontend UI flag
+  (`isPrototypeRoute`/`readOnly`) with no backend identity behind it. Removed
+  `GTMT_PROTOTYPE_API_KEY` from env examples and deployment docs. See
+  [docs/prototype-mode.md](docs/prototype-mode.md).
+- **Header**: Simplified the global header — removed the hamburger dropdown menu (replaced with
+  a direct About icon link), removed the "Prototype demo" nav item and the genre view mode toggle
+  buttons, pointed the home link at the prototype reference genre tree route, and added a
+  TheMusicTree brand mark link to the right of the header.
+- **Header**: Moved the logo/app-name link, About icon, and TheMusicTree brand mark link into a
+  single group at the top-right of the header (previously split between top-left and top-right).
+- **Single genre tree route**: Collapsed `/reference-genre-tree` and
+  `/prototype/reference-genre-tree` (and `/prototype`) into a single, always read-only genre tree
+  page served directly at `/`. The old URLs now 404 — there is no redirect or compatibility route.
+  Removed the "reference"/"prototype" naming and the frontend-only `isPrototypeRoute` distinction
+  from routing, view-mode state, the header logo link, `PATHS`, and the `data-page` attribute
+  (now `"genre-tree"`). Deleted `docs/prototype-mode.md` and `docs/pages/home.md`; renamed
+  `docs/pages/reference-genre-tree.md` to `docs/pages/genre-tree.md`.
+
+### Fixed
+
+- **Genre tree pop-core fallback removed**: `GenreTreePage` no longer silently falls back to the
+  "stacked" view when the loaded genre tree has no "Mainstream Pop" root while "pop-core" is
+  selected — it now throws immediately instead, per the project's fail-fast convention, so the
+  missing root surfaces rather than being masked by a different view.
+- **Genre tree error boundary**: Added `src/app/(app)/error.tsx` so the fail-fast throw above (and
+  any other render-time error under `/`) is caught by a route-level error boundary instead of
+  falling through to Next.js's default crash screen. Reuses the existing `InternalErrorPopup`
+  (`ErrorCode.CLIENT_INTERNAL_ERROR`) for a consistent, non-leaking user-facing message and reports
+  the underlying error to Sentry.
+- **Header**: Removed the asymmetric `pr-4` padding on the collapsed brand-mark pill in
+  `AppHeader` — it was sized for the `APP_NAME` label, which is hidden below the `xl` breakpoint,
+  leaving visible empty space to the right of the logo icon on collapsed (non-`xl`) viewports.
+- **Header**: Marked the app logo `<Image>` in `AppHeader` as `priority` — Chrome DevTools flagged
+  it as the Largest Contentful Paint (LCP) element and recommended eager loading since it's always
+  above the fold.
+- **Genre tree default view mode**: The reference genre tree page (`/reference-genre-tree`) now
+  defaults to the "pop-core" view mode instead of "stacked", matching the prototype route.
+  `GenreTreeView`'s own fallback to "stacked" (when the loaded tree has no "Mainstream Pop" root)
+  still applies. Added tests enforcing the pop-core default on both routes.
+- **Genre tree display options**: Hid `GenreTreeView`'s "Rotation"/"Toolbar" display-options
+  toggle group (no prop exists to disable it) on the reference and prototype genre tree pages —
+  it isn't meant to be user-facing here and was rendering underneath the floating header pill.
+- **Player**: The track list sidebar now renders inline inside the player panel (via
+  `TrackListSidebar layout="inline"`) instead of as a separate overlay panel, and the player
+  was widened to accommodate it.
+- **Dependency maintenance**: Bumped `@behindthemusictree/app-kit` to `4.10.0` (from `4.5.3`), and
+  `@behindthemusictree/brand` to `12.0.0` (from `11.6.0`) to match the version app-kit now pulls
+  transitively. `4.10.0` bumps app-kit's own `@behindthemusictree/genre-tree-view` catalog pin to
+  `1.6.0` and removes the (unused-here) `GenreDetailPanel` export in favor of `GenreTreeView`'s
+  `renderExtraDetails` render prop; no consumer-facing change for this app.
+- **Dependency maintenance**: Bumped `@behindthemusictree/app-kit` to `4.5.3` (from `4.5.2`) —
+  app-kit's own release process moved to PR-based release/hotfix flow; no consumer-facing
+  behavior change.
+
+- **Genre tree loading skeleton mismatch**: `GenreTreePage`'s `next/dynamic` fallback (shown
+  while the `GenreTreeView` chunk itself is still downloading) uses app-kit's `GenreTreeViewSkeleton`,
+  reading `resolvedViewMode` from `GenreTreeViewModeProvider` so it renders the same skeleton
+  shape (stacked vs. wheel/pop-core) `GenreTreeView` shows once mounted — including during SSR,
+  since `@behindthemusictree/app-kit` now ships a deterministic (SSR-safe) wheel skeleton, so the
+  fallback no longer needs to force "stacked" until after hydration. It's also wrapped in the
+  same flex layout `GenreTreeView` uses around its own skeleton, so the wheel skeleton no longer
+  visibly resizes between its first (dynamic-loading) and second (mounted, still-loading) render.
+  Previously it always rendered the stacked/linear skeleton first, causing a visible shape swap
+  and resize on routes that default to the wheel/pop-core view.
+
+- **Genre tree reference pages**: Removed an unwanted top margin above `GenreTreeView` on
+  `/reference-genre-tree` and `/prototype/reference-genre-tree`.
+
+- **Genre tree Wheel/Pop-Core rendering**: Bumped `@behindthemusictree/app-kit` to `4.5.1`, which
+  adds a polar-layout radial loading skeleton for the Wheel and Pop/Core tree views (replacing the
+  linear skeleton while those views load) and defaults `GenreTreeView` to the Pop-Core Wheel view
+  instead of Stacked, falling back to Stacked when the loaded tree has no "Mainstream Pop" root. It
+  also bumps app-kit's own `@behindthemusictree/genre-tree-view` dependency to `1.1.1`, which fixes
+  wheel root sectors being sized disproportionately to their node count, uncrops the Pop/Core "fit
+  to frame", curves connecting links along the wheel's rings instead of cutting straight chords,
+  and corrects Pop/Core's outer-circle nesting and canvas sizing around deep core branches. (Both
+  further bumped to `4.5.2`/`1.1.2` above.)
+
+- **Player UI**: Replaced the in-house player bar (progress bar, play/pause/next/previous
+  controls, volume slider) with a minimal floating YouTube video panel docked to the
+  bottom-right of the viewport, relying on the embedded YouTube player's own controls.
+
+- **Genre tree Pop/Core crash**: Bumped `@behindthemusictree/app-kit` to `4.5.2` (from `4.5.1`),
+  which fixes `GenreTreeView` crashing when Pop/Core is the active view and the loaded data has no
+  "Mainstream Pop" root — the fallback to Wheel view is now applied synchronously during render
+  instead of only in a `useEffect`, which ran too late to prevent
+  `GenrePlaylistTreeWheelRadialPopCore` from mounting and throwing. It also bumps app-kit's own
+  `@behindthemusictree/genre-tree-view` dependency to `1.1.2` (from `1.1.1`), which fixes toolbar
+  hover-label/button colors and contrast to match node labels, and glues the pop subtree to the core
+  circle in the Pop/Core radial layout.
+
+- **Genre tree Pop/Core loading skeleton**: `GenreTreePage` no longer falls back to the Stacked
+  skeleton while genre playlists are still loading — it now keeps the Pop/Core view mode active
+  during loading and only falls back to Stacked once loading has finished and the loaded tree is
+  confirmed to have no "Mainstream Pop" root.
+
+- **Genre tree hydration mismatch**: `GenreTreeView` is now loaded client-only (`next/dynamic`
+  with `ssr: false`) on `GenreTreePage`, avoiding a React hydration error caused by
+  `GenreTreeWheelSkeleton`'s trig-based SVG coordinates differing by a trailing float digit
+  between server (Node) and client (browser) rendering.
+
+### Removed
+
+- **Grow-api proxy API key**: The proxy no longer sends `X-API-Key`, and the `GTMT_API_KEY` env var
+  is gone. grow-api only accepts that key on its pipeline import endpoints; admin writes use the
+  forwarded Google ID token.
+
+- **Prototype-mode banner**: Removed `PrototypeModeBanner`, the fixed bottom banner that read
+  "You're viewing the prototype demo tree — browsing only, changes aren't saved."
+
+- **Genre tree "Wheel" view-mode toggle**: Removed the "Wheel" button from `AppSubheader`'s
+  Stacked/Wheel/Pop-Core toggle, leaving Stacked and Pop-Core. The reference tree now defaults to
+  "Stacked" instead of "Wheel".
+
 
 ## [2.5.0] - 2026-08-28
 

@@ -10,30 +10,25 @@ them, and only covers the parts not already documented elsewhere.
 ```
 src/app/
 ├── layout.tsx              # Root layout: <html>/<body>, fonts, metadata, global CSS imports
-├── page.tsx                 # "/" — redirect("/reference-genre-tree"), no route group
 ├── globals.css
 ├── providers.tsx             # Client component: React Query, player, popup, track-list providers
-├── AppContent.tsx            # Client component: header, player footer, sidebar, prototype banner
+├── AppContent.tsx            # Client component: header, player footer, sidebar
 ├── health/route.ts           # GET /health — { status: "ok" }, used by Coolify's healthcheck
 ├── api/
-│   ├── grow-proxy/[...path]/route.ts             # Server-only proxy to grow-the-music-tree-api
-│   └── grow-prototype-proxy/[...path]/route.ts   # Same, against the prototype identity
+│   └── grow-proxy/[...path]/route.ts             # Server-only proxy to grow-the-music-tree-api
 └── (app)/                    # Route group: everything wrapped in Providers + AppContent
     ├── layout.tsx
-    ├── about/page.tsx
-    ├── reference-genre-tree/page.tsx
-    └── prototype/
-        ├── page.tsx
-        └── reference-genre-tree/page.tsx
+    ├── page.tsx               # "/" — the genre tree, read-only unless admin
+    └── about/page.tsx
 ```
 
 `(app)` exists purely to scope `Providers`/`AppContent` (React Query, player state, the app shell
-chrome) to the pages that need them, while `/` and `/health` stay outside that wrapping — `/`
-because it's just a redirect, `/health` because Coolify's healthcheck hits it directly and it must
-stay a trivial, dependency-free route (see [Build/deploy](#builddeploy) below).
+chrome) to the pages that need them, while `/health` stays outside that wrapping since Coolify's
+healthcheck hits it directly and it must stay a trivial, dependency-free route (see
+[Build/deploy](#builddeploy) below).
 
-Canonical path constants live in `src/lib/constants/routes.ts` (`PATHS.REFERENCE_GENRE_TREE`,
-`PATHS.PROTOTYPE_REFERENCE_GENRE_TREE`, etc.) — reach for these instead of hardcoding path strings.
+Canonical path constants live in `src/lib/constants/routes.ts` (`PATHS.ABOUT`) — reach for these
+instead of hardcoding path strings.
 
 **Login/personal-library pages do not exist anymore.** `/account`, `/auth/{google,spotify}/callback`,
 `/me-genre-tree`, `/me-uploaded-library`, `/spotify-library`, `/genre-playlists` and the
@@ -52,54 +47,28 @@ there's no login UI, no `useSpotifyAuth`/`useGoogleAuth`, and `AppContent.tsx` p
 
 ## Talking to `grow-the-music-tree-api`
 
-The backend requires an `X-API-Key` header (`grow-the-music-tree-api`'s `GROW_API_KEY`/
-`GROW_PROTOTYPE_API_KEY`). This app never puts that key in the browser — two Next.js Route
-Handlers proxy every request server-side, attaching the key there:
+A Next.js Route Handler proxies every request server-side, attaching the signed-in admin's Google
+ID token (see [docs/frontend-auth.md](docs/frontend-auth.md)):
 
-- `src/app/api/grow-proxy/[...path]/route.ts` — reads `process.env.GTMT_API_KEY` (throws if unset),
-  forwards `GET`/`POST`/`PUT`/`DELETE` to `getGrowApiUpstreamBaseUrl()` (`src/lib/grow-api-upstream-url.ts`)
-  with `X-API-Key` attached, and streams the upstream response straight back.
-- `src/app/api/grow-prototype-proxy/[...path]/route.ts` — identical shape, reads
-  `process.env.GTMT_PROTOTYPE_API_KEY` instead. See [docs/prototype-mode.md](docs/prototype-mode.md).
+- `src/app/api/grow-proxy/[...path]/route.ts` — forwards `GET`/`POST`/`PUT`/`DELETE` to
+  `getGrowApiUpstreamBaseUrl()` (`src/lib/grow-api-upstream-url.ts`) and streams the upstream
+  response straight back. `/` goes through this proxy.
 
-Client code never calls grow-api directly; it calls same-origin paths returned by
-`src/lib/site-urls.ts`:
-
-- `getGrowBackendBaseUrl()` → `"/api/grow-proxy"`
-- `getGrowPrototypeBackendBaseUrl()` → `"/api/grow-prototype-proxy"`
-
-`src/app/providers.tsx` picks between the two per-request based on `isPrototypeRoute(pathname)`
-(`src/lib/prototype-mode.ts`), and passes the chosen base URL into `@behindthemusictree/app-kit`'s
-`TrackListProvider` and its own `useLoadTrack` hook (used by the player).
+Client code never calls grow-api directly; it calls the same-origin path returned by
+`src/lib/site-urls.ts`'s `getGrowBackendBaseUrl()` (`"/api/grow-proxy"`).
 
 `getGrowApiUpstreamBaseUrl()` (server-only, used inside the Route Handler, not exported to client
 code) resolves the *real* upstream host — it deliberately reimplements `app-kit/transport`'s
 `buildBackendBaseUrl` logic locally rather than importing it, because that module calls
 `React.createContext` at import time and Route Handlers aren't a React runtime.
 
-Both `GTMT_API_KEY` and `GTMT_PROTOTYPE_API_KEY` are **server-only, runtime** env vars — read via
-`process.env` at request time, never `NEXT_PUBLIC_*`, never baked into the client bundle. See
-[docs/DEPLOYMENT.md §2-4](docs/DEPLOYMENT.md#2-build-time-vs-runtime-environment-variables) for the
-full build-time-vs-runtime distinction and how Coolify wires them in.
+## Read-only mode
 
-## Prototype/read-only mode
-
-`/prototype/*` is a second, read-only surface backed by grow-api's separate `prototype` static-key
-identity. Full design in [docs/prototype-mode.md](docs/prototype-mode.md); the pieces that matter
-for tracing code:
-
-- `isPrototypeRoute(pathname)` (`src/lib/prototype-mode.ts`) is the single source of truth for "are
-  we under `/prototype`" — a plain `pathname?.startsWith("/prototype")`.
-- `AppContent.tsx` renders `PrototypeModeBanner` when `isPrototypeRoute` is true.
-- `src/components/features/genre-tree/GenreTreePage.tsx` is shared between
-  `/reference-genre-tree` and `/prototype/reference-genre-tree`; the only difference is the
-  `readOnly` prop it passes through to app-kit's `GenreTreeView`, which hides write-action UI.
-  Grow-api itself also 403s any write attempted with the prototype key
-  (`{"code": "prototype_read_only"}`) — the UI gating is a courtesy, not the enforcement boundary.
-
-This is unrelated to the (now-removed) provider-auth machinery — it's a static server-to-server
-key, not a user session, and it doesn't touch the app-kit `Scope` (`"reference"` vs `"me"`)
-concept either.
+The genre tree at `/` is read-only for everyone except the signed-in admin.
+`src/components/features/genre-tree/GenreTreePage.tsx` passes `readOnly={!useIsAdmin()}` to
+app-kit's `GenreTreeView`, which hides write-action UI. That's only the UI half: the grow-api proxy
+rejects anonymous writes with `401`, and grow-api verifies the admin's Google ID token on its own.
+See [docs/frontend-auth.md](docs/frontend-auth.md).
 
 ## State management
 

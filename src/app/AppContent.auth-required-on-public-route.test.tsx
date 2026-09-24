@@ -7,7 +7,7 @@ import AppContent from "./AppContent";
 import { PopupProvider } from "@behindthemusictree/app-kit/popup";
 import { ConnectivityErrorProvider, useConnectivityError, AuthRequired, ErrorCode } from "@behindthemusictree/app-kit/transport";
 
-const pathnameRef = { current: "/reference-genre-tree" };
+const pathnameRef = { current: "/" };
 const authRequiredError = new AuthRequired(ErrorCode.BACKEND_UNAUTHORIZED);
 
 vi.mock("next/navigation", () => ({
@@ -49,7 +49,7 @@ describe("AppContent surfaces an AuthRequired error on a route that doesn't requ
   });
 
   it("shows an error popup instead of silently dropping it", () => {
-    pathnameRef.current = "/reference-genre-tree";
+    pathnameRef.current = "/";
 
     act(() => {
       render(
