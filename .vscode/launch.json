@@ -2,13 +2,16 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Local",
+      "name": "Launch Dev",
       "type": "node",
       "request": "launch",
-      "preLaunchTask": "setup-and-verify-local",
-      "runtimeExecutable": "bash",
-      "runtimeArgs": ["./scripts/run-dev-on-env-port.sh"],
-      "skipFiles": ["<node_internals>/**"],
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "dev"
+      ],
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
       "console": "integratedTerminal",
       "smartStep": true,
       "autoAttachChildProcesses": false,
@@ -24,13 +27,16 @@
       }
     },
     {
-      "name": "Launch Remote",
+      "name": "Launch Dev",
       "type": "node",
       "request": "launch",
-      "preLaunchTask": "verify-env-dev-remote",
-      "runtimeExecutable": "bash",
-      "runtimeArgs": ["./scripts/run-dev-on-env-port.sh"],
-      "skipFiles": ["<node_internals>/**"],
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "dev"
+      ],
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
       "console": "integratedTerminal",
       "smartStep": true,
       "autoAttachChildProcesses": false,
@@ -49,7 +55,7 @@
       "type": "firefox",
       "request": "launch",
       "name": "Debug in Firefox",
-      "url": "http://localhost:5000",
+      "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}",
       "firefoxExecutable": "/Applications/Firefox.app/Contents/MacOS/firefox",
       "profile": "default",
@@ -61,7 +67,7 @@
       },
       "pathMappings": [
         {
-          "url": "http://localhost:5000/",
+          "url": "http://localhost:3000/",
           "path": "${workspaceFolder}/"
         }
       ],
@@ -74,16 +80,11 @@
   ],
   "compounds": [
     {
-      "name": "Debug Local",
-      "configurations": ["Launch Local", "Debug in Firefox"],
-      "stopAll": true,
-      "presentation": {
-        "hidden": true
-      }
-    },
-    {
-      "name": "Debug Remote",
-      "configurations": ["Launch Remote", "Debug in Firefox"],
+      "name": "Debug Dev",
+      "configurations": [
+        "Launch Dev",
+        "Debug in Firefox"
+      ],
       "stopAll": true,
       "presentation": {
         "hidden": true

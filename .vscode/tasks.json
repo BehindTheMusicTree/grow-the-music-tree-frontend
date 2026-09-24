@@ -2,96 +2,13 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "dev (local API)",
-      "type": "npm",
-      "script": "dev:local",
-      "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      },
-      "problemMatcher": [
-        {
-          "owner": "custom",
-          "pattern": [
-            { "regexp": "ERROR in (.*)", "file": 1 },
-            { "regexp": "\\s*(.*):(\\d+):(\\d+)", "line": 2, "column": 3 },
-            { "regexp": "\\s*(.*)$", "message": 1 }
-          ],
-          "background": {
-            "activeOnStart": true,
-            "beginsPattern": "^.*(?:starting dev server|Using local API).*$",
-            "endsPattern": "^.*(?:Compiled successfully|Failed to compile).*$"
-          }
-        }
-      ]
-    },
-    {
-      "label": "dev (remote API)",
-      "type": "npm",
-      "script": "dev:remote",
-      "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      },
-      "problemMatcher": [
-        {
-          "owner": "custom",
-          "pattern": [
-            { "regexp": "ERROR in (.*)", "file": 1 },
-            { "regexp": "\\s*(.*):(\\d+):(\\d+)", "line": 2, "column": 3 },
-            { "regexp": "\\s*(.*)$", "message": 1 }
-          ],
-          "background": {
-            "activeOnStart": true,
-            "beginsPattern": "^.*(?:starting dev server|Using remote API).*$",
-            "endsPattern": "^.*(?:Compiled successfully|Failed to compile).*$"
-          }
-        }
-      ]
-    },
-    {
-      "label": "verify-env",
-      "type": "npm",
-      "script": "verify-env",
-      "group": { "kind": "build", "isDefault": true },
-      "presentation": { "reveal": "always", "panel": "shared" },
-      "problemMatcher": []
-    },
-    {
-      "label": "build (local)",
-      "type": "shell",
-      "command": "bash scripts/setup-env-dev.sh local && npm run build",
-      "presentation": { "reveal": "always", "panel": "shared" },
-      "problemMatcher": []
-    },
-    {
-      "label": "build (remote)",
-      "type": "shell",
-      "command": "bash scripts/setup-env-dev.sh remote && npm run build",
-      "presentation": { "reveal": "always", "panel": "shared" },
-      "problemMatcher": []
-    },
-    {
       "label": "ensure-debug-dirs",
       "type": "shell",
       "command": "mkdir -p .vscode/firefox-debug-profile",
-      "presentation": { "reveal": "silent", "panel": "shared" },
-      "problemMatcher": []
-    },
-    {
-      "label": "setup-and-verify-local",
-      "type": "shell",
-      "command": "bash scripts/setup-env-dev.sh local && npm run verify-env",
-      "presentation": { "reveal": "always", "panel": "shared" },
-      "problemMatcher": []
-    },
-    {
-      "label": "verify-env-dev-remote",
-      "type": "shell",
-      "command": "bash scripts/setup-env-dev.sh remote && npm run verify-env",
-      "presentation": { "reveal": "always", "panel": "shared" },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
       "problemMatcher": []
     }
   ]

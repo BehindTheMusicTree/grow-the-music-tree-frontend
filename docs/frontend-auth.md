@@ -63,4 +63,4 @@ example tree, add child, rename and reparent controls, all gated by `GenreTreeVi
 The same client ID must be configured on grow-api (`GOOGLE_OAUTH_CLIENT_ID`) so it accepts the
 token's audience, and the admin's Google `sub` must be set there as `ADMIN_GOOGLE_SUB`.
 
-Missing `AUTH_SECRET`, `AUTH_GOOGLE_ID` or `AUTH_GOOGLE_SECRET` makes the first auth or proxy request throw.
+Locally, put them in `.env.local` (see `.env.example`). Missing `AUTH_SECRET`, `AUTH_GOOGLE_ID` or `AUTH_GOOGLE_SECRET` stops the server at boot (`src/lib/env.server.ts`).

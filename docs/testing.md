@@ -140,7 +140,7 @@ vi.mock("next/navigation", () => ({
 We use a **hybrid** approach:
 
 - **Unit and component tests (Vitest):** Run **without** React Strict Mode. Do not wrap components in `<StrictMode>` in custom render helpers or test setup; do not call `configure({ reactStrictMode: true })` in RTL. Prefer exact assertions (e.g. `toHaveLength(6)`, `getByRole(...)` for a single element). If your environment still double-renders (e.g. some React 19 / Vite setups), use resilient assertions: `expect(elements.length).toBeGreaterThanOrEqual(n)` for counts and `getAllByRole` / `getAllByLabelText` then `expect(...length).toBeGreaterThanOrEqual(1)` for elements that should appear once.
-- **E2E tests (Playwright/Cypress):** Run the real app (dev or production build). The app uses whatever is configured in the Next.js root (e.g. `reactStrictMode` in `next.config.js`). If you enable Strict Mode in the app later, E2E will automatically exercise that behavior; no test change needed.
+- **E2E tests (Playwright/Cypress):** Run the real app (dev or production build). The app uses whatever is configured in the Next.js root (e.g. `reactStrictMode` in `next.config.ts`). If you enable Strict Mode in the app later, E2E will automatically exercise that behavior; no test change needed.
 
 This keeps Vitest tests simple and stable when possible; E2E still validates real user-facing behavior.
 

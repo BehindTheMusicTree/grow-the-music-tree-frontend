@@ -90,6 +90,17 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Env vars**: Validated by Zod schemas (`src/lib/env.ts` for build-time `NEXT_PUBLIC_*`,
+  `src/lib/env.server.ts` for server runtime vars). A missing or invalid value fails `next build` /
+  server boot with a message naming it, instead of a 500 on first request. `next.config.js` →
+  `next.config.ts`. Local setup now uses the standard Next.js cascade: committed `.env`
+  (non-secret defaults, staging grow-api) plus a personal `.env.local` from `.env.example`.
+  Removed the `env/` presets, `verify-env`, `dev:local`/`dev:remote` and their scripts. The
+  Dockerfile now forwards `NEXT_PUBLIC_AUDIOMETA_URL` as a build arg and drops stale Spotify/Google
+  args; `.dockerignore` excludes `.env*` so local env files never reach the image.
+
 ## [2.6.0] - 2026-09-24
 
 ### Added

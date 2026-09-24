@@ -4,6 +4,7 @@ import Google from "next-auth/providers/google";
 import { getToken, type JWT } from "next-auth/jwt";
 import { z } from "zod";
 import { getGrowApiUpstreamBaseUrl } from "@lib/grow-api-upstream-url";
+import { getServerEnv } from "@lib/env.server";
 
 declare module "next-auth" {
   interface Session {
@@ -30,11 +31,6 @@ const GoogleRefreshSchema = z.object({
   refresh_token: z.string().optional(),
 });
 
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`${name} is required`);
-  return value;
-}
 
 async function isGrowApiAdmin(idToken: string): Promise<boolean> {
   const upstreamBase = getGrowApiUpstreamBaseUrl().replace(/\/+$/, "");
@@ -56,8 +52,8 @@ async function refreshIdToken(token: JWT): Promise<JWT> {
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       body: new URLSearchParams({
-        client_id: requireEnv("AUTH_GOOGLE_ID"),
-        client_secret: requireEnv("AUTH_GOOGLE_SECRET"),
+        client_id: getServerEnv().AUTH_GOOGLE_ID,
+        client_secret: getServerEnv().AUTH_GOOGLE_SECRET,
         grant_type: "refresh_token",
         refresh_token: token.refreshToken,
       }),
@@ -78,13 +74,13 @@ async function refreshIdToken(token: JWT): Promise<JWT> {
 
 // Lazy config so a missing env var fails the first auth request instead of `next build`.
 export const { handlers, auth, signIn, signOut } = NextAuth(() => ({
-  secret: requireEnv("AUTH_SECRET"),
+  secret: getServerEnv().AUTH_SECRET,
   useSecureCookies,
   session: { strategy: "jwt" },
   providers: [
     Google({
-      clientId: requireEnv("AUTH_GOOGLE_ID"),
-      clientSecret: requireEnv("AUTH_GOOGLE_SECRET"),
+      clientId: getServerEnv().AUTH_GOOGLE_ID,
+      clientSecret: getServerEnv().AUTH_GOOGLE_SECRET,
       authorization: { params: { access_type: "offline", prompt: "consent", scope: "openid email profile" } },
     }),
   ],
@@ -116,7 +112,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => ({
  * The ID token lives only in the encrypted JWT cookie and is never put on the client session.
  */
 export async function getAdminIdToken(request: Request): Promise<string | null> {
-  const token = await getToken({ req: request, secret: requireEnv("AUTH_SECRET"), secureCookie: useSecureCookies });
+  const token = await getToken({ req: request, secret: getServerEnv().AUTH_SECRET, secureCookie: useSecureCookies });
   if (!token || token.error || !token.idToken) return null;
   if (!isExpired(token)) return token.idToken;
   // ponytail: the refreshed token isn't written back to the cookie here; the client's next

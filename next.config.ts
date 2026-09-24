@@ -1,8 +1,8 @@
-/** @type {import('next').NextConfig} */
+import path from "path";
+import type { NextConfig } from "next";
+import "./src/lib/env";
 
-const path = require("path");
-
-const nextConfig = {
+const nextConfig: NextConfig = {
   output: "standalone",
   images: { unoptimized: true },
   transpilePackages: ["@behindthemusictree/assets"],
@@ -25,17 +25,4 @@ const nextConfig = {
   },
 };
 
-const REQUIRED_ENV_VARS = ["NEXT_PUBLIC_CONTACT_EMAIL"];
-
-module.exports = (phase, defaultConfig) => {
-  const missing = REQUIRED_ENV_VARS.filter((key) => {
-    const value = process.env[key];
-    return !value || value.trim() === "";
-  });
-  if (missing.length > 0) {
-    throw new Error(
-      `Missing required environment variable(s): ${missing.join(", ")}. Set them in .env, .env.local, .env.development, or .env.production.`,
-    );
-  }
-  return nextConfig;
-};
+export default nextConfig;

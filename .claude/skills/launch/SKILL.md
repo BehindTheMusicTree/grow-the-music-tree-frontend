@@ -9,42 +9,30 @@ This is a Next.js (App Router) frontend that requires an env file and a
 running TheMusicTreeAPI backend (local or remote) before `next dev` will work
 correctly — API calls fail without one.
 
-## 1. Env setup (first run, or after pulling env template changes)
-
-Copy templates from `env/development/example/` into `env/development/available/`
-if not already present (see `env/development/example/` for the list — one file
-per preset, e.g. `.env.development.api-local.example` → `.env.development.api-local`).
-
-Then verify:
+## 1. Env setup (first run)
 
 ```bash
-npm run verify-env
+cp .env.example .env.local
 ```
+
+Fill in the secrets listed there. Non-secret defaults (staging grow-api) are in the
+committed `.env`. Missing/invalid vars stop `pnpm dev` with a message naming them.
 
 ## 2. Pick an API target
 
-- **Local API** — requires `TheMusicTreeAPI` (bodzify-api-django) checked out
-  and running locally first (see that repo's own launch instructions).
-- **Remote API** — no local backend needed; uses a hosted `NEXT_PUBLIC_BACKEND_BASE_URL`.
+- **Staging** (default) — nothing to do.
+- **Local API** — run TheMusicTreeAPI locally, then set
+  `NEXT_PUBLIC_GROW_BACKEND_BASE_URL=http://127.0.0.1:8000/v1/` in `.env.local`.
 
 ## 3. Start the dev server
 
-Prefer the wrapper scripts — they copy the right env preset to
-`.env.development.local` and pick a port from it automatically:
-
 ```bash
-pnpm dev:local   # bash scripts/run-dev.sh local  — needs the local API running
-pnpm dev:remote  # bash scripts/run-dev.sh remote — no local API needed
+pnpm dev                 # port 3000
+pnpm dev -- --port 3001  # another port
 ```
-
-Plain `pnpm dev` also works but skips the env-preset copy step — only use it
-if `.env.development.local` is already in place from a previous run.
-
-Default port is 3000 unless `PORT=` is set in the active env file.
 
 ## 4. Verify
 
 Open the printed `http://127.0.0.1:<port>` URL. If pages render but data is
-missing/erroring, the API target is almost certainly wrong or the local API
-isn't running — check `.env.development.local`'s `NEXT_PUBLIC_BACKEND_BASE_URL`
-before debugging further.
+missing/erroring, check `NEXT_PUBLIC_GROW_BACKEND_BASE_URL` in `.env.local`
+(or that the local API is running) before debugging further.

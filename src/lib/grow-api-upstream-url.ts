@@ -1,4 +1,5 @@
 import { GTMT_API_SUBDOMAIN, ORG_DOMAIN } from "@behindthemusictree/brand";
+import { getServerEnv } from "@lib/env.server";
 
 /**
  * GrowTheMusicTree API base URL, as seen by the `/api/grow-proxy` route handler.
@@ -9,14 +10,12 @@ import { GTMT_API_SUBDOMAIN, ORG_DOMAIN } from "@behindthemusictree/brand";
  * logic locally instead.
  */
 export function getGrowApiUpstreamBaseUrl(): string {
-  const overrideUrl = process.env.NEXT_PUBLIC_GROW_BACKEND_BASE_URL;
+  const overrideUrl = getServerEnv().NEXT_PUBLIC_GROW_BACKEND_BASE_URL;
   if (overrideUrl) return overrideUrl;
 
   if (!GTMT_API_SUBDOMAIN) throw new Error("GTMT_API_SUBDOMAIN is required");
   if (!ORG_DOMAIN) throw new Error("ORG_DOMAIN is required");
-  const apiRootSegment = process.env.NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT;
-  if (!apiRootSegment) throw new Error("NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT is required");
 
   const host = `${GTMT_API_SUBDOMAIN}-staging`;
-  return `https://${host}.${ORG_DOMAIN}/${apiRootSegment.replace(/^\/+|\/+$/g, "")}/`;
+  return `https://${host}.${ORG_DOMAIN}/${getServerEnv().NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT.replace(/^\/+|\/+$/g, "")}/`;
 }
