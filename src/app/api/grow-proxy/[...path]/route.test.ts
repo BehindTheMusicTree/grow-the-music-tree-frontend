@@ -9,7 +9,7 @@ vi.mock("@lib/auth", () => ({
 }));
 
 vi.mock("@lib/grow-api-upstream-url", () => ({
-  getGrowApiUpstreamBaseUrl: () => "https://grow-api-staging.themusictree.org/v0",
+  getGrowApiUpstreamBaseUrl: () => "https://grow-api-staging.themusictree.org/v1",
 }));
 
 function makeContext(path: string[]) {
@@ -39,7 +39,7 @@ describe("grow-proxy route", () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe("https://grow-api-staging.themusictree.org/v0/genres/?foo=bar");
+    expect(url).toBe("https://grow-api-staging.themusictree.org/v1/genres/?foo=bar");
     expect(init?.method).toBe("GET");
     expect((init?.headers as Record<string, string>)["X-API-Key"]).toBe("test-api-key");
     expect((init?.headers as Record<string, string>)["Authorization"]).toBeUndefined();
@@ -63,7 +63,7 @@ describe("grow-proxy route", () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe("https://grow-api-staging.themusictree.org/v0/genres/tree/load-example/");
+    expect(url).toBe("https://grow-api-staging.themusictree.org/v1/genres/tree/load-example/");
     expect(init?.method).toBe("POST");
     const headers = init?.headers as Record<string, string>;
     expect(headers["X-API-Key"]).toBe("test-api-key");
