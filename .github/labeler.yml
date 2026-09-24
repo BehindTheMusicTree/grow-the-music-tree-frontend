@@ -76,7 +76,7 @@ react:
 nextjs:
   - changed-files:
       - any-glob-to-any-file:
-          - "next.config.js"
+          - "next.config.ts"
           - "src/app/**"
           - "src/middleware.ts"
 
