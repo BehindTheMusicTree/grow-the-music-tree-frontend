@@ -5,11 +5,6 @@ import { getAdminIdToken } from "@lib/auth";
 const AUTHENTICATION_REQUIRED_MESSAGE = "Authentication credentials were not provided.";
 
 async function forward(request: NextRequest, path: string[]): Promise<NextResponse> {
-  const apiKey = process.env.GTMT_API_KEY;
-  if (!apiKey) {
-    throw new Error("GTMT_API_KEY is required to proxy grow-api requests");
-  }
-
   const upstreamBase = getGrowApiUpstreamBaseUrl().replace(/\/+$/, "");
   const upstreamUrl = `${upstreamBase}/${path.join("/")}/${request.nextUrl.search}`;
 
@@ -32,7 +27,6 @@ async function forward(request: NextRequest, path: string[]): Promise<NextRespon
   const upstreamResponse = await fetch(upstreamUrl, {
     method: request.method,
     headers: {
-      "X-API-Key": apiKey,
       ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
       ...(contentType ? { "Content-Type": contentType } : {}),
     },

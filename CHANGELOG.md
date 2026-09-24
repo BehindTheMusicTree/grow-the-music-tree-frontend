@@ -74,6 +74,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Includes integration tests for drag-and-drop functionality
   - Optimistic UI updates with automatic rollback on API failure
 
+### Removed
+
+- **Grow-api proxy API key**: The proxy no longer sends `X-API-Key`, and the `GTMT_API_KEY` env var
+  is gone. grow-api only accepts that key on its pipeline import endpoints; admin writes use the
+  forwarded Google ID token.
+
 ### Fixed
 
 - **Audio Player**: Fixed track progress bar not updating correctly on mobile Safari

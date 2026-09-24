@@ -214,10 +214,8 @@ Every `NEXT_PUBLIC_*` var is required at build time (baked in by `next build`); 
 **Run container:**
 
 ```bash
-docker run -p 3000:3000 -e PORT=3000 -e GTMT_API_KEY=... grow-the-music-tree-frontend
+docker run -p 3000:3000 -e PORT=3000 grow-the-music-tree-frontend
 ```
-
-`GTMT_API_KEY` is server-only and read at request time (not `NEXT_PUBLIC_*`), so it's a runtime env var, not a build arg — see [§ Grow-api write proxy](docs/DEPLOYMENT.md#grow-api-write-proxy-gtmt_api_key) in DEPLOYMENT.md.
 
 ## CI
 
