@@ -50,16 +50,16 @@ describe("grow-proxy route", () => {
       .spyOn(global, "fetch")
       .mockResolvedValue(new Response(JSON.stringify({ created: true }), { status: 201, headers: { "content-type": "application/json" } }));
 
-    const request = new NextRequest("http://localhost/api/grow-proxy/genres/tree/load-example/", {
+    const request = new NextRequest("http://localhost/api/grow-proxy/genres/tree/import/", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ name: "example" }),
     });
-    const response = await POST(request, makeContext(["genres", "tree", "load-example"]));
+    const response = await POST(request, makeContext(["genres", "tree", "import"]));
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe("https://grow-api-staging.themusictree.org/v1/genres/tree/load-example/");
+    expect(url).toBe("https://grow-api-staging.themusictree.org/v1/genres/tree/import/");
     expect(init?.method).toBe("POST");
     const headers = init?.headers as Record<string, string>;
     expect(headers["X-API-Key"]).toBeUndefined();
