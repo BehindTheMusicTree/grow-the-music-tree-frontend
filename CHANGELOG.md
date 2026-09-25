@@ -92,6 +92,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Google sign-in setup docs**: `docs/frontend-auth.md` now walks through the Google Cloud Console
+  step by step with the exact value for every field. It uses one OAuth client per environment
+  (`gtmt-front dev|staging|production`), and the dev client registers the callback for localhost
+  ports 3000–3009, so parallel worktrees can sign in. Local dev now uses the dev client with a local
+  grow-api instead of the staging client.
 - **Env vars**: Validated by Zod schemas (`src/lib/env.ts` for build-time `NEXT_PUBLIC_*`,
   `src/lib/env.server.ts` for server runtime vars). A missing or invalid value fails `next build` /
   server boot with a message naming it, instead of a 500 on first request. `next.config.js` →
