@@ -56,11 +56,11 @@ client below already exists, edit it to match instead of creating a new one.
 Hosts used below (from the `infrastructure` repo's GitHub variables: `DOMAIN_NAME=themusictree.org`,
 `GTMT_FRONT_SUBDOMAIN=grow`, `GTMT_API_SUBDOMAIN=grow-api`, and a `-staging` suffix for staging):
 
-| Environment | grow front origin                       | grow-api host                               |
-| ----------- | --------------------------------------- | ------------------------------------------- |
-| dev         | `http://localhost:3000`–`3009`          | `http://127.0.0.1:8000` (local grow-api)    |
-| staging     | `https://grow-staging.themusictree.org` | `https://grow-api-staging.themusictree.org` |
-| production  | `https://grow.themusictree.org`         | `https://grow-api.themusictree.org`         |
+| Environment | grow front origin                       | grow-api host                                                 |
+| ----------- | --------------------------------------- | ------------------------------------------------------------- |
+| dev         | `http://localhost:3000`–`3009`          | `http://127.0.0.1:8001` (local grow-api, `docker compose up`) |
+| staging     | `https://grow-staging.themusictree.org` | `https://grow-api-staging.themusictree.org`                   |
+| production  | `https://grow.themusictree.org`         | `https://grow-api.themusictree.org`                           |
 
 #### 1.1 Project
 
@@ -185,7 +185,7 @@ grow-api (`GOOGLE_OAUTH_CLIENT_ID`, the ID token audience), so the two always ag
 
 | Client     | Put the Client ID and secret in                                                                                                                                                                                         |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| dev        | `.env.local` → `AUTH_GOOGLE_ID=…`, `AUTH_GOOGLE_SECRET=…`, `NEXT_PUBLIC_GROW_BACKEND_BASE_URL=http://127.0.0.1:8000/v1/`; local grow-api → `GOOGLE_OAUTH_CLIENT_ID=…` (same ID) and `ADMIN_GOOGLE_SUB` (see its README) |
+| dev        | `.env.local` → `AUTH_GOOGLE_ID=…`, `AUTH_GOOGLE_SECRET=…`, `NEXT_PUBLIC_GROW_BACKEND_BASE_URL=http://127.0.0.1:8001/v1/`; local grow-api → `GOOGLE_OAUTH_CLIENT_ID=…` (same ID) and `ADMIN_GOOGLE_SUB` (see its README) |
 | staging    | `infrastructure` repo → Settings → Secrets and variables → Actions → **secrets** `GROW_GOOGLE_OAUTH_CLIENT_ID_STAGING`, `GROW_GOOGLE_OAUTH_CLIENT_SECRET_STAGING`                                                       |
 | production | same place → **secrets** `GROW_GOOGLE_OAUTH_CLIENT_ID_PROD`, `GROW_GOOGLE_OAUTH_CLIENT_SECRET_PROD`                                                                                                                     |
 
