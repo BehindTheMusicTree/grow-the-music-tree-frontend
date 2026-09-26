@@ -2,23 +2,21 @@
 
 import { useState } from "react";
 import { BasePopup } from "@behindthemusictree/app-kit/popup";
-import { CriteriaMinimum } from "@behindthemusictree/app-kit/genre-tree";
+import { CriteriaMinimum, useUpdateGenre } from "@behindthemusictree/app-kit/genre-tree";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
+import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
 type GenreRenamePopupProps = {
-  onSubmit: (values: { name: string }) => void;
-  onClose?: () => void;
-  formErrors?: Array<{ field: string; message: string }>;
+  onClose: () => void;
   genre: CriteriaMinimum;
 };
 
-export default function GenreRenamePopup({
-  onSubmit,
-  onClose,
-  formErrors,
-  genre,
-}: GenreRenamePopupProps) {
+// Owns its mutation: showPopup stores a frozen element, so formErrors passed as props would never update.
+export default function GenreRenamePopup({ onClose, genre }: GenreRenamePopupProps) {
   const [name, setName] = useState(genre.name);
+  const { mutate, formErrors } = useUpdateGenre("reference", getGrowBackendBaseUrl);
+
+  const submit = () => mutate({ uuid: genre.uuid, data: { name } }, { onSuccess: onClose });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -26,11 +24,7 @@ export default function GenreRenamePopup({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name });
-  };
-
-  const handleOkClick = () => {
-    onSubmit({ name });
+    submit();
   };
 
   return (
@@ -42,7 +36,7 @@ export default function GenreRenamePopup({
       showCancelButton
       okButtonText="Save"
       cancelButtonText="Cancel"
-      onOk={handleOkClick}
+      onOk={submit}
       onCancel={onClose}
       onClose={onClose}
       children={
@@ -58,10 +52,10 @@ export default function GenreRenamePopup({
               autoFocus
             />
           </div>
-          {formErrors && formErrors.length > 0 && (
+          {formErrors.length > 0 && (
             <div className="flex justify-end gap-3">
-              {formErrors.map((error) => (
-                <p key={error.field} className="text-red-500">
+              {formErrors.map((error, index) => (
+                <p key={index} className="text-red-500">
                   {error.message}
                 </p>
               ))}

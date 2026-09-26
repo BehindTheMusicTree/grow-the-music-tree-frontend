@@ -90,6 +90,15 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Genre name review**: `/admin/genre-review` now shows each name conflict as a group — the genre that already held the name next to every genre flagged against it, each with its parent and Wikidata link. Any name in the group can be edited inline, and one **Validate** saves the group: renamed genres get their new name, unchanged ones keep theirs, and the group leaves the list (the next import won't flag them again). A rejected name shows its error under that genre. The `/admin` link counts groups instead of genres.
+
+### Fixed
+
+- **Genre tree**: Creating or renaming a genre with a name that's already taken now shows the error in the popup, which stays open with the typed name and parent, instead of closing silently.
+- **Genre name review**: The conflict list is now validated against a schema, so a malformed grow-api response fails loudly instead of rendering broken rows.
+
 ## [2.7.0] - 2026-09-26
 
 ### Added

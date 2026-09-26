@@ -12,10 +12,16 @@ import GenreCreationPopup from "./GenreCreationPopup";
 import InternalErrorPopup from "./InternalErrorPopup";
 import InvalidInputPopup from "./InvalidInputPopup";
 
+vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api/grow-proxy" }));
+vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
+  useUpdateGenre: () => ({ mutate: vi.fn(), formErrors: [] }),
+  useCreateGenre: () => ({ mutate: vi.fn(), formErrors: [] }),
+}));
+
 const genre = { uuid: "00000000-0000-0000-0000-000000000000", name: "Rock" };
 
 const popups: Array<[string, () => React.ReactElement]> = [
-  ["GenreRenamePopup", () => <GenreRenamePopup onSubmit={vi.fn()} genre={genre} />],
+  ["GenreRenamePopup", () => <GenreRenamePopup onClose={vi.fn()} genre={genre} />],
   ["ImagePopup", () => <ImagePopup imageUrl="https://example.com/image.jpg" />],
   [
     "FormPopup",
@@ -26,7 +32,7 @@ const popups: Array<[string, () => React.ReactElement]> = [
     ),
   ],
   ["NetworkErrorPopup", () => <NetworkErrorPopup />],
-  ["GenreCreationPopup", () => <GenreCreationPopup onSubmit={vi.fn()} />],
+  ["GenreCreationPopup", () => <GenreCreationPopup onClose={vi.fn()} />],
   ["InternalErrorPopup", () => <InternalErrorPopup errorCode={ErrorCode.CLIENT_INTERNAL_ERROR} />],
   ["InvalidInputPopup", () => <InvalidInputPopup details={{ message: "Invalid input" }} />],
 ];
