@@ -1,5 +1,6 @@
 import { AUDIOMETA_FRONT_SUBDOMAIN, ORG_DOMAIN } from "@behindthemusictree/brand";
 import { buildSubdomainBaseUrl } from "@behindthemusictree/app-kit/transport";
+import { publicEnv } from "@lib/env";
 
 /**
  * GrowTheMusicTree API base URL for client use — a same-origin path proxied by
@@ -18,7 +19,7 @@ export function getGrowBackendBaseUrl(): string {
  * fires for local dev run without it, so it always targets staging.
  */
 export function getAudiometaUrl(): string {
-  const overrideUrl = process.env.NEXT_PUBLIC_AUDIOMETA_URL;
+  const overrideUrl = publicEnv.NEXT_PUBLIC_AUDIOMETA_URL;
   if (overrideUrl) return overrideUrl;
   if (!AUDIOMETA_FRONT_SUBDOMAIN) throw new Error("AUDIOMETA_FRONT_SUBDOMAIN is required");
   if (!ORG_DOMAIN) throw new Error("ORG_DOMAIN is required");

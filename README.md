@@ -94,12 +94,11 @@ The app is built with Next.js and served by the Node runtime in production:
 │   ├── types/               # TypeScript type definitions
 │   └── utils/               # Utility functions
 ├── public/                # Static assets served as-is
-├── env/                   # Environment configuration (dev presets, examples)
 ├── scripts/               # Build, release, and env setup scripts
 ├── docs/                  # Deployment, testing, and per-page documentation
 ├── .github/workflows/     # CI/CD workflows
 ├── Dockerfile             # Docker build configuration
-├── next.config.js         # Next.js configuration
+├── next.config.ts         # Next.js configuration
 ├── package.json           # Dependencies and scripts
 ├── tailwind.config.js     # Tailwind CSS configuration
 ├── vitest.config.ts       # Testing configuration
@@ -108,55 +107,27 @@ The app is built with Next.js and served by the Node runtime in production:
 
 ## Environment Variables
 
-Environment variables are resolved at build time.
+Env vars are declared and validated with Zod in two schemas; a missing or invalid value fails fast with a message naming it:
 
-Create a local environment file:
+- [`src/lib/env.ts`](src/lib/env.ts) — `NEXT_PUBLIC_*` build-time vars, validated when `next.config.ts` loads (`pnpm dev` / `pnpm build`).
+- [`src/lib/env.server.ts`](src/lib/env.server.ts) — server-only runtime vars (`AUTH_*`, grow-api target), validated at server boot by [`src/instrumentation.ts`](src/instrumentation.ts).
+
+Local files (standard Next.js cascade):
+
+- `.env` (committed, excluded from Docker) — non-secret defaults for dev and local builds, targets the staging grow-api.
+- `.env.local` (gitignored) — your secrets and personal overrides. Start from the template:
 
 ```bash
-cp env/development/example/.env.development.example .env.local
+cp .env.example .env.local
 ```
-
-**Example variables:**
-
-```
-NODE_ENV=development
-PORT=9005
-
-APP_VERSION=dev
-
-NEXT_PUBLIC_APP_VERSION=dev
-NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com
-NEXT_PUBLIC_BACKEND_BASE_URL=http://localhost:8000/v2/
-NEXT_PUBLIC_SENTRY_IS_ACTIVE=false
-
-NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize
-NEXT_PUBLIC_SPOTIFY_CLIENT_ID=your-spotify-client-id
-NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/auth/spotify/callback
-NEXT_PUBLIC_SPOTIFY_SCOPES=user-read-email playlist-read-private playlist-read-collaborative user-library-read user-top-read
-
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback
-
-# Server-only: admin Google sign-in (Auth.js)
-AUTH_SECRET=generate-with-npx-auth-secret
-AUTH_GOOGLE_ID=your-google-client-id.apps.googleusercontent.com
-AUTH_GOOGLE_SECRET=your-google-client-secret
-AUTH_TRUST_HOST=true
-```
-
-In the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) → your app → **Settings** → **Redirect URIs**, add the **full** callback URL(s), e.g. `http://localhost:3000/auth/spotify/callback` for local dev and your production URL for deploy. The app builds the redirect URI from your origin when you use a path like `/auth/spotify/callback`.
-
-For Google sign-in, in [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials, create an OAuth 2.0 Client ID (Web application) and add the **full** redirect URI(s) under "Authorized redirect URIs", e.g. `http://localhost:3000/auth/google/callback`.
 
 **Admin sign-in** (hidden `/admin` page): `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` and `AUTH_TRUST_HOST` are server-only runtime vars. Create a Google OAuth client (Web application) with the redirect URI `<origin>/api/auth/callback/google` for each environment. Anonymous visitors are read-only; only the admin can write. See [docs/frontend-auth.md](docs/frontend-auth.md).
 
 **Notes:**
 
 - Only variables prefixed with `NEXT_PUBLIC_` are available in the browser
-- The sidebar "Audio Metadata" link and the backend host are computed from `@behindthemusictree/assets` (see [src/lib/site-urls.ts](src/lib/site-urls.ts)), not from env vars. `NEXT_PUBLIC_BACKEND_BASE_URL` remains available as a manual override (e.g. against `localhost:8000`); `NEXT_PUBLIC_HTMT_API_ROOT_SEGMENT` is required when it's unset.
-- Changing env values requires a new build (restart `npm run dev` after env changes)
-- Do not commit `.env.local`
-- **Preset configs**: Put `.env.development.api-local` and `.env.development.api-remote` in `env/development/available/` (see `env/development/example/.env.development.api-*.example`). Then run `./scripts/setup-env-dev.sh local` or `./scripts/setup-env-dev.sh remote` to copy one to `.env.development.local`; Next.js only loads env files from the project root. Contents of `env/development/available/` are gitignored.
+- The grow-api host and the sidebar "Audio Metadata" link are computed from `@behindthemusictree/assets` (see [src/lib/site-urls.ts](src/lib/site-urls.ts)). Set `NEXT_PUBLIC_GROW_BACKEND_BASE_URL` in `.env.local` to target a local grow-api instead.
+- Restart `pnpm dev` after env changes
 
 ## Getting Started
 
@@ -182,7 +153,6 @@ pnpm install --frozen-lockfile
 | `npm run build`         | Build for production             |
 | `npm run start`         | Start production server (Node)   |
 | `npm run lint`          | Run ESLint                       |
-| `npm run verify-env`    | Verify environment configuration |
 | `npm run test`          | Run unit tests                   |
 | `npm run test:watch`    | Run tests in watch mode          |
 | `npm run test:ui`       | Run tests with UI                |
@@ -197,19 +167,12 @@ Production and staging hosting run on **Coolify** as a multi-stage Docker build 
 ```bash
 DOCKER_BUILDKIT=1 docker build \
   --secret id=GH_PACKAGES_TOKEN_READ,src=<path-to-token-file> \
-  --build-arg NEXT_PUBLIC_BACKEND_BASE_URL=http://localhost:8000/v2/ \
   --build-arg NEXT_PUBLIC_CONTACT_EMAIL=you@example.com \
-  --build-arg NEXT_PUBLIC_SPOTIFY_CLIENT_ID=... \
-  --build-arg NEXT_PUBLIC_SPOTIFY_SCOPES=... \
-  --build-arg NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=/auth/spotify/callback \
-  --build-arg NEXT_PUBLIC_SPOTIFY_AUTH_URL=https://accounts.spotify.com/authorize \
-  --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=... \
-  --build-arg NEXT_PUBLIC_GOOGLE_REDIRECT_URI=/auth/google/callback \
   --build-arg NEXT_PUBLIC_SENTRY_IS_ACTIVE=false \
   -t grow-the-music-tree-frontend .
 ```
 
-Every `NEXT_PUBLIC_*` var is required at build time (baked in by `next build`); the build fails fast if one is missing (see `REQUIRED_ENV_VARS` in `next.config.js`).
+`NEXT_PUBLIC_*` vars are baked in by `next build`; the build fails fast if one is missing or invalid (see [`src/lib/env.ts`](src/lib/env.ts)). Server-only vars (`AUTH_*`, `NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT`) are passed at `docker run` time.
 
 **Run container:**
 

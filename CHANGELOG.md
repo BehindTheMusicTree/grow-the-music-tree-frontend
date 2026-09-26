@@ -90,6 +90,29 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-09-26
+
+### Added
+
+- **Genre name review**: New admin-only page, `/admin/genre-review`, linked from `/admin` with a count. It lists the genres the import flagged with a name conflict, i.e. a name already taken by another genre, and lets an admin rename each one; a renamed genre drops off the list. Signed-out visitors are redirected to `/admin`.
+
+### Changed
+
+- **Google sign-in setup docs**: `docs/frontend-auth.md` now walks through the Google Cloud Console
+  step by step with the exact value for every field. It uses one OAuth client per environment
+  (`gtmt-front dev|staging|production`), and the dev client registers the callback for localhost
+  ports 3000–3009, so parallel worktrees can sign in. Local dev now uses the dev client with a local
+  grow-api instead of the staging client.
+- **Env vars**: Validated by Zod schemas (`src/lib/env.ts` for build-time `NEXT_PUBLIC_*`,
+  `src/lib/env.server.ts` for server runtime vars). A missing or invalid value fails `next build` /
+  server boot with a message naming it, instead of a 500 on first request. `next.config.js` →
+  `next.config.ts`. Local setup now uses the standard Next.js cascade: committed `.env`
+  (non-secret defaults, staging grow-api) plus a personal `.env.local` from `.env.example`.
+  Removed the `env/` presets, `verify-env`, `dev:local`/`dev:remote` and their scripts. The
+  Dockerfile now forwards `NEXT_PUBLIC_AUDIOMETA_URL` as a build arg and drops stale Spotify/Google
+  args; `.dockerignore` excludes `.env*` so local env files never reach the image.
+
+
 ## [2.6.0] - 2026-09-24
 
 ### Added

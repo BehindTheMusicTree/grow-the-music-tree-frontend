@@ -2,9 +2,6 @@
 logs
 *.logsc
 
-env/development/available/*
-!env/development/available/.gitkeep
-env/to-load/
 .env.sentry-build-plugin
 
 npm-debug.log*
@@ -39,7 +36,6 @@ tsconfig.tsbuildinfo
 # Next.js build artifacts
 .next/
 out/
-.env.development
 
 .vscode/chrome-debug-profile/*
 
