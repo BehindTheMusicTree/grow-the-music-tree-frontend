@@ -90,6 +90,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Genre name review**: New admin-only page, `/admin/genre-review`, linked from `/admin` with a count. It lists the genres the import flagged with a name conflict, i.e. a name already taken by another genre, and lets an admin rename each one; a renamed genre drops off the list. Signed-out visitors are redirected to `/admin`.
+
 ### Changed
 
 - **Google sign-in setup docs**: `docs/frontend-auth.md` now walks through the Google Cloud Console
