@@ -126,7 +126,7 @@ cp .env.example .env.local
 **Notes:**
 
 - Only variables prefixed with `NEXT_PUBLIC_` are available in the browser
-- The grow-api host and the sidebar "Audio Metadata" link are computed from `@behindthemusictree/assets` (see [src/lib/site-urls.ts](src/lib/site-urls.ts)). Set `NEXT_PUBLIC_GROW_BACKEND_BASE_URL` in `.env.local` to target a local grow-api instead.
+- The grow-api origin comes from `GROW_API_ORIGIN` (staging by default in `.env`); the app appends the API contract version itself (see [src/lib/grow-api-upstream-url.ts](src/lib/grow-api-upstream-url.ts)). Set `GROW_API_ORIGIN=http://127.0.0.1:8001` in `.env.local` to target a local grow-api instead. The sidebar "Audio Metadata" link is computed from `@behindthemusictree/assets` (see [src/lib/site-urls.ts](src/lib/site-urls.ts)).
 - Restart `pnpm dev` after env changes
 
 ## Getting Started
@@ -172,7 +172,7 @@ DOCKER_BUILDKIT=1 docker build \
   -t grow-the-music-tree-frontend .
 ```
 
-`NEXT_PUBLIC_*` vars are baked in by `next build`; the build fails fast if one is missing or invalid (see [`src/lib/env.ts`](src/lib/env.ts)). Server-only vars (`AUTH_*`, `NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT`) are passed at `docker run` time.
+`NEXT_PUBLIC_*` vars are baked in by `next build`; the build fails fast if one is missing or invalid (see [`src/lib/env.ts`](src/lib/env.ts)). Server-only vars (`AUTH_*`, `GROW_API_ORIGIN`) are passed at `docker run` time.
 
 **Run container:**
 
