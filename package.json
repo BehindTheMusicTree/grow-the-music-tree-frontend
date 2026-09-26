@@ -1,7 +1,7 @@
 {
   "name": "grow-the-music-tree",
   "private": true,
-  "version": "2.7.0",
+  "version": "2.8.0",
   "scripts": {
     "prepare": "git rev-parse --git-dir > /dev/null 2>&1 && git config core.hooksPath .githooks || true",
     "dev": "next dev --turbo --hostname 127.0.0.1",
@@ -16,7 +16,7 @@
     "postversion": "node scripts/update-changelog-release.mjs && git add CHANGELOG.md && git commit --amend --no-edit && (v=$(node -p \"require('./package.json').version\"); git tag -d v$v 2>/dev/null; git tag v$v) && node scripts/delete-test-dev-tags.mjs"
   },
   "dependencies": {
-    "@behindthemusictree/app-kit": "4.11.0",
+    "@behindthemusictree/app-kit": "5.1.2",
     "@behindthemusictree/brand": "12.0.0",
     "@behindthemusictree/ui": "0.1.0",
     "@fortawesome/fontawesome-svg-core": "6.5.2",

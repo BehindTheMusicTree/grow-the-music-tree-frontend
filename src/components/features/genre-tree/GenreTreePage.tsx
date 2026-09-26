@@ -1,12 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
 import {
-  useCreateGenre,
-  useUpdateGenre,
   useListFullGenrePlaylists,
   CriteriaMinimum,
   CriteriaPlaylistSimple,
@@ -52,8 +50,6 @@ export default function GenreTreePage() {
   const getBackendBaseUrl = getGrowBackendBaseUrl;
   const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
   const isAdmin = useIsAdmin();
-  const { mutate: createGenre, formErrors } = useCreateGenre("reference", getBackendBaseUrl);
-  const { renameGenre, formErrors: renameFormErrors } = useUpdateGenre("reference", getBackendBaseUrl);
   const { showPopup, hidePopup } = usePopup();
 
   // Shares the react-query cache with GenreTreeView's internal fetch (same queryKey), so this
@@ -86,52 +82,14 @@ export default function GenreTreePage() {
   }
 
   const showCriteriaCreationPopup = useCallback(
-    (parent: CriteriaMinimum | null = null) => {
-      showPopup(
-        <GenreCreationPopup
-          parent={parent}
-          onSubmit={({ name, parent }: { name: string; parent?: string }) => {
-            createGenre({ name, parent });
-            hidePopup();
-          }}
-          onClose={hidePopup}
-          formErrors={formErrors}
-        />,
-      );
-    },
-    [formErrors, createGenre, hidePopup, showPopup],
+    (parent: CriteriaMinimum | null = null) => showPopup(<GenreCreationPopup parent={parent} onClose={hidePopup} />),
+    [hidePopup, showPopup],
   );
 
   const showGenreRenamePopup = useCallback(
-    (genre: CriteriaMinimum) => {
-      showPopup(
-        <GenreRenamePopup
-          genre={genre}
-          onSubmit={({ name }: { name: string }) => {
-            renameGenre(genre.uuid, name);
-            hidePopup();
-          }}
-          onClose={hidePopup}
-          formErrors={renameFormErrors}
-        />,
-      );
-    },
-    [renameFormErrors, renameGenre, hidePopup, showPopup],
+    (genre: CriteriaMinimum) => showPopup(<GenreRenamePopup genre={genre} onClose={hidePopup} />),
+    [hidePopup, showPopup],
   );
-
-  const previousErrorsRef = useRef<typeof formErrors>([]);
-
-  useEffect(() => {
-    if (
-      formErrors &&
-      formErrors.length > 0 &&
-      (previousErrorsRef.current.length === 0 ||
-        JSON.stringify(previousErrorsRef.current) !== JSON.stringify(formErrors))
-    ) {
-      showCriteriaCreationPopup();
-    }
-    previousErrorsRef.current = formErrors || [];
-  }, [formErrors, showCriteriaCreationPopup]);
 
   return (
     <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
