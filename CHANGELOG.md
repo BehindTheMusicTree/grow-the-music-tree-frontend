@@ -90,6 +90,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- **Genre tree**: When loading the genre tree fails in the pop-core view, the page no longer crashes with a misleading "no Mainstream Pop root" error; the failed request is reported as it happened.
+
 ## [2.8.0] - 2026-09-26
 
 ### Changed
