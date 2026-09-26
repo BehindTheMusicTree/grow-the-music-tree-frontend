@@ -9,7 +9,7 @@ const fetchConflictsMock = vi.fn();
 
 vi.mock("@lib/auth", () => ({ auth: () => authMock() }));
 vi.mock("next/navigation", () => ({ redirect: (url: string) => redirectMock(url) }));
-vi.mock("@lib/genre-name-conflicts", () => ({ fetchGenreNameConflicts: () => fetchConflictsMock() }));
+vi.mock("@lib/genre-name-conflicts", () => ({ fetchGenreNameConflictGroups: () => fetchConflictsMock() }));
 
 describe("GenreReviewPage", () => {
   it.each([null, { error: "RefreshTokenError" }])("redirects to /admin when not signed in (%o)", async (session) => {

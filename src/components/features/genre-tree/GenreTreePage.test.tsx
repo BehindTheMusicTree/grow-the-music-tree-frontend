@@ -23,8 +23,6 @@ vi.mock("@behindthemusictree/app-kit/popup", () => ({
 const hasMainstreamPopRootMock = vi.fn(() => true);
 
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
-  useCreateGenre: () => ({ mutate: vi.fn(), formErrors: [] }),
-  useUpdateGenre: () => ({ renameGenre: vi.fn(), formErrors: [] }),
   useListFullGenrePlaylists: () => useListFullGenrePlaylistsMock(),
   hasMainstreamPopRoot: () => hasMainstreamPopRootMock(),
   makeCriteriaPlaylistDetailedSchema: () => ({}),

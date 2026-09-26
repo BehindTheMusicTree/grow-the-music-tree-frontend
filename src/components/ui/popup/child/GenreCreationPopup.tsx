@@ -2,24 +2,21 @@
 
 import { useState } from "react";
 import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
-import { CriteriaMinimum } from "@behindthemusictree/app-kit/genre-tree";
+import { CriteriaMinimum, useCreateGenre } from "@behindthemusictree/app-kit/genre-tree";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
+import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
-type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {
-  onSubmit: (values: { name: string; parent?: string }) => void;
-  onClose?: () => void;
-  formErrors?: { field: string; message: string }[];
+type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable" | "onClose"> & {
+  onClose: () => void;
   parent?: CriteriaMinimum | null;
 };
 
-export default function GenreCreationPopup({
-  onSubmit,
-  onClose,
-  formErrors,
-  parent,
-  ...rest
-}: GenreCreationPopupProps) {
+// Owns its mutation: showPopup stores a frozen element, so formErrors passed as props would never update.
+export default function GenreCreationPopup({ onClose, parent, ...rest }: GenreCreationPopupProps) {
   const [name, setName] = useState("");
+  const { mutate, formErrors } = useCreateGenre("reference", getGrowBackendBaseUrl);
+
+  const submit = () => mutate({ name, parent: parent?.uuid || undefined }, { onSuccess: onClose });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -27,11 +24,7 @@ export default function GenreCreationPopup({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name, parent: parent?.uuid || undefined });
-  };
-
-  const handleOkClick = () => {
-    onSubmit({ name, parent: parent?.uuid || undefined });
+    submit();
   };
 
   return (
@@ -45,7 +38,7 @@ export default function GenreCreationPopup({
       showCancelButton
       okButtonText="Save"
       cancelButtonText="Cancel"
-      onOk={handleOkClick}
+      onOk={submit}
       onCancel={onClose}
       children={
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -72,10 +65,10 @@ export default function GenreCreationPopup({
               />
             </div>
           </div>
-          {formErrors && formErrors.length > 0 && (
+          {formErrors.length > 0 && (
             <div className="flex justify-end gap-3">
-              {formErrors.map((error) => (
-                <p key={error.field} className="text-red-500">
+              {formErrors.map((error, index) => (
+                <p key={index} className="text-red-500">
                   {error.message}
                 </p>
               ))}

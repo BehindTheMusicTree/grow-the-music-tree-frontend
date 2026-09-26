@@ -2,13 +2,13 @@ import { Button } from "@behindthemusictree/ui";
 import Page from "@components/ui/Page";
 import Link from "next/link";
 import { auth, signIn, signOut } from "@lib/auth";
-import { fetchGenreNameConflicts } from "@lib/genre-name-conflicts";
+import { fetchGenreNameConflictGroups } from "@lib/genre-name-conflicts";
 
 export default async function AdminPage() {
   const session = await auth();
   const isSignedIn = !!session && !session.error;
   // A grow-api outage must not take down sign-in/sign-out: show the link without a count.
-  const conflictCount = isSignedIn ? await fetchGenreNameConflicts().then((r) => r.count, () => null) : null;
+  const conflictCount = isSignedIn ? await fetchGenreNameConflictGroups().then((groups) => groups.length, () => null) : null;
 
   return (
     <Page title="Admin" dataPage="admin">
