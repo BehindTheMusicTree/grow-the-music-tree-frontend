@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.0.0 - 2026-09-27](#300---2026-09-27)
 - [2.6.0 - 2026-09-24](#260---2026-09-24)
 - [2.5.0 - 2026-08-28](#250---2026-08-28)
 - [2.4.0 - 2026-08-27](#240---2026-08-27)
@@ -89,6 +90,21 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [3.0.0] - 2026-09-27
+
+### Changed
+
+- **Dependencies**: `@behindthemusictree/app-kit` 5.1.2 → 6.0.0. The genre tree no longer expects archived-track fields, which grow never used.
+- **Deployment**: The grow-api address is now the runtime var `GROW_API_ORIGIN`, an origin without a path (e.g. `https://grow-api.themusictree.org`). The API contract version (`v1`) is a constant in the code, not configuration. The server now fails at boot if `GROW_API_ORIGIN` is missing, instead of quietly falling back to staging.
+
+### Removed
+
+- **Deployment**: `NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT` and `NEXT_PUBLIC_GROW_BACKEND_BASE_URL` are no longer read. Set `GROW_API_ORIGIN` before deploying this release.
+
+### Fixed
+
+- **Genre tree**: When loading the genre tree fails in the pop-core view, the page no longer crashes with a misleading "no Mainstream Pop root" error; the failed request is reported as it happened.
 
 ## [2.8.0] - 2026-09-26
 

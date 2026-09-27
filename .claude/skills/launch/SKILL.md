@@ -22,7 +22,7 @@ committed `.env`. Missing/invalid vars stop `pnpm dev` with a message naming the
 
 - **Staging** (default) — nothing to do.
 - **Local API** — run TheMusicTreeAPI locally, then set
-  `NEXT_PUBLIC_GROW_BACKEND_BASE_URL=http://127.0.0.1:8000/v1/` in `.env.local`.
+  `GROW_API_ORIGIN=http://127.0.0.1:8000` in `.env.local`.
 
 ## 3. Start the dev server
 
@@ -34,5 +34,5 @@ pnpm dev -- --port 3001  # another port
 ## 4. Verify
 
 Open the printed `http://127.0.0.1:<port>` URL. If pages render but data is
-missing/erroring, check `NEXT_PUBLIC_GROW_BACKEND_BASE_URL` in `.env.local`
+missing/erroring, check `GROW_API_ORIGIN` in `.env.local`
 (or that the local API is running) before debugging further.

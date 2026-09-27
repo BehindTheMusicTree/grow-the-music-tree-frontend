@@ -5,8 +5,11 @@ const ServerEnvSchema = z.object({
   AUTH_SECRET: z.string().min(1),
   AUTH_GOOGLE_ID: z.string().min(1),
   AUTH_GOOGLE_SECRET: z.string().min(1),
-  NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT: z.string().min(1),
-  NEXT_PUBLIC_GROW_BACKEND_BASE_URL: z.string().url().optional(),
+  GROW_API_ORIGIN: z
+    .string()
+    .url()
+    .refine((value) => URL.canParse(value) && new URL(value).pathname === "/", "must be an origin without a path")
+    .transform((value) => new URL(value).origin),
 });
 
 let cached: z.infer<typeof ServerEnvSchema> | undefined;
@@ -19,8 +22,7 @@ export function getServerEnv() {
     AUTH_SECRET: process.env.AUTH_SECRET,
     AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
-    NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT: process.env.NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT,
-    NEXT_PUBLIC_GROW_BACKEND_BASE_URL: process.env.NEXT_PUBLIC_GROW_BACKEND_BASE_URL || undefined,
+    GROW_API_ORIGIN: process.env.GROW_API_ORIGIN,
   });
   if (!parsed.success) {
     throw new Error(`Invalid server environment variables:\n${formatIssues(parsed.error)}`);

@@ -104,4 +104,13 @@ describe("GenreTreePage", () => {
 
     consoleErrorSpy.mockRestore();
   });
+
+  it("does not blame a missing Mainstream Pop root when the genre playlists fetch failed", async () => {
+    useListFullGenrePlaylistsMock.mockReturnValue({ data: undefined, isLoading: false });
+    hasMainstreamPopRootMock.mockReturnValue(false);
+
+    renderGenreTreePage({ forcePopCore: true });
+
+    expect(await screen.findByTestId("genre-tree-view")).toBeInTheDocument();
+  });
 });

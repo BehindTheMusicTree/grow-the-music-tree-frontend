@@ -25,17 +25,26 @@ describe("env", () => {
     vi.stubEnv("AUTH_SECRET", "secret");
     vi.stubEnv("AUTH_GOOGLE_ID", "id");
     vi.stubEnv("AUTH_GOOGLE_SECRET", "google-secret");
-    vi.stubEnv("NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT", "v1");
+    vi.stubEnv("GROW_API_ORIGIN", "https://grow-api.example.org/");
     const { getServerEnv } = await import("@lib/env.server");
-    expect(getServerEnv().NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT).toBe("v1");
+    expect(getServerEnv().GROW_API_ORIGIN).toBe("https://grow-api.example.org");
+  });
+
+  it("rejects a GROW_API_ORIGIN that carries a path", async () => {
+    vi.stubEnv("AUTH_SECRET", "secret");
+    vi.stubEnv("AUTH_GOOGLE_ID", "id");
+    vi.stubEnv("AUTH_GOOGLE_SECRET", "google-secret");
+    vi.stubEnv("GROW_API_ORIGIN", "https://grow-api.example.org/v1/");
+    const { getServerEnv } = await import("@lib/env.server");
+    expect(() => getServerEnv()).toThrow(/GROW_API_ORIGIN/);
   });
 
   it("throws naming every missing server var", async () => {
     vi.stubEnv("AUTH_SECRET", "");
     vi.stubEnv("AUTH_GOOGLE_ID", "");
     vi.stubEnv("AUTH_GOOGLE_SECRET", "");
-    vi.stubEnv("NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT", "");
+    vi.stubEnv("GROW_API_ORIGIN", "");
     const { getServerEnv } = await import("@lib/env.server");
-    expect(() => getServerEnv()).toThrow(/AUTH_SECRET[\s\S]*NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT/);
+    expect(() => getServerEnv()).toThrow(/AUTH_SECRET[\s\S]*GROW_API_ORIGIN/);
   });
 });
