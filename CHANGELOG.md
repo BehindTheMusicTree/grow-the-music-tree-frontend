@@ -91,6 +91,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Genre tree**: `@behindthemusictree/app-kit` 6.0.0 → 7.0.0. Selecting a node (notably in the Outline view) opens the detail panel without lag: only the two affected rows re-render, the panel loads the lean genre overview (grow-api v8.0.0) and prefetches it on hover.
+
 ## [3.0.0] - 2026-09-27
 
 ### Changed
