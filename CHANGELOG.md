@@ -92,6 +92,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Dependencies**: `@behindthemusictree/app-kit` 5.1.2 → 6.0.0. The genre tree no longer expects archived-track fields, which grow never used.
 - **Deployment**: The grow-api address is now the runtime var `GROW_API_ORIGIN`, an origin without a path (e.g. `https://grow-api.themusictree.org`). The API contract version (`v1`) is a constant in the code, not configuration. The server now fails at boot if `GROW_API_ORIGIN` is missing, instead of quietly falling back to staging.
 
 ### Removed
