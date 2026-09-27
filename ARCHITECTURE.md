@@ -58,8 +58,10 @@ Client code never calls grow-api directly; it calls the same-origin path returne
 `src/lib/site-urls.ts`'s `getGrowBackendBaseUrl()` (`"/api/grow-proxy"`).
 
 `getGrowApiUpstreamBaseUrl()` (server-only, used inside the Route Handler, not exported to client
-code) resolves the *real* upstream host — it deliberately reimplements `app-kit/transport`'s
-`buildBackendBaseUrl` logic locally rather than importing it, because that module calls
+code) returns the *real* upstream URL, `${GROW_API_ORIGIN}/v1/`. `GROW_API_ORIGIN` is a runtime
+env var (origin only, validated at boot by `src/lib/env.server.ts`); the API version is the
+`GROW_API_VERSION` constant in code, since it's part of the API contract, not deploy config. It
+doesn't use `app-kit/transport`'s `buildBackendBaseUrl`, because that module calls
 `React.createContext` at import time and Route Handlers aren't a React runtime.
 
 ## Read-only mode
