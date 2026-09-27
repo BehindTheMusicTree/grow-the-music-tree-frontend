@@ -183,11 +183,11 @@ Notes on redirect URIs:
 Each environment's client is shared by grow front (`AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`) and
 grow-api (`GOOGLE_OAUTH_CLIENT_ID`, the ID token audience), so the two always agree.
 
-| Client     | Put the Client ID and secret in                                                                                                                                                                                         |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| dev        | `.env.local` → `AUTH_GOOGLE_ID=…`, `AUTH_GOOGLE_SECRET=…`, `NEXT_PUBLIC_GROW_BACKEND_BASE_URL=http://127.0.0.1:8001/v1/`; local grow-api → `GOOGLE_OAUTH_CLIENT_ID=…` (same ID) and `ADMIN_GOOGLE_SUB` (see its README) |
-| staging    | `infrastructure` repo → Settings → Secrets and variables → Actions → **secrets** `GROW_GOOGLE_OAUTH_CLIENT_ID_STAGING`, `GROW_GOOGLE_OAUTH_CLIENT_SECRET_STAGING`                                                       |
-| production | same place → **secrets** `GROW_GOOGLE_OAUTH_CLIENT_ID_PROD`, `GROW_GOOGLE_OAUTH_CLIENT_SECRET_PROD`                                                                                                                     |
+| Client     | Put the Client ID and secret in                                                                                                                                                                   |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| dev        | `.env.local` → `AUTH_GOOGLE_ID=…`, `AUTH_GOOGLE_SECRET=…`, `GROW_API_ORIGIN=http://127.0.0.1:8001`; local grow-api → `GOOGLE_OAUTH_CLIENT_ID=…` (same ID) and `ADMIN_GOOGLE_SUB` (see its README) |
+| staging    | `infrastructure` repo → Settings → Secrets and variables → Actions → **secrets** `GROW_GOOGLE_OAUTH_CLIENT_ID_STAGING`, `GROW_GOOGLE_OAUTH_CLIENT_SECRET_STAGING`                                 |
+| production | same place → **secrets** `GROW_GOOGLE_OAUTH_CLIENT_ID_PROD`, `GROW_GOOGLE_OAUTH_CLIENT_SECRET_PROD`                                                                                               |
 
 The admin's `sub` for staging and production is the `infrastructure` secret `GROW_ADMIN_GOOGLE_SUB`.
 

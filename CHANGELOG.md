@@ -90,6 +90,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Deployment**: The grow-api address is now the runtime var `GROW_API_ORIGIN`, an origin without a path (e.g. `https://grow-api.themusictree.org`). The API contract version (`v1`) is a constant in the code, not configuration. The server now fails at boot if `GROW_API_ORIGIN` is missing, instead of quietly falling back to staging.
+
+### Removed
+
+- **Deployment**: `NEXT_PUBLIC_GTMT_API_ROOT_SEGMENT` and `NEXT_PUBLIC_GROW_BACKEND_BASE_URL` are no longer read. Set `GROW_API_ORIGIN` before deploying this release.
+
 ### Fixed
 
 - **Genre tree**: When loading the genre tree fails in the pop-core view, the page no longer crashes with a misleading "no Mainstream Pop root" error; the failed request is reported as it happened.
