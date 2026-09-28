@@ -3,12 +3,14 @@ import Page from "@components/ui/Page";
 import Link from "next/link";
 import { auth, signIn, signOut } from "@lib/auth";
 import { fetchGenreNameConflictGroups } from "@lib/genre-name-conflicts";
+import { fetchUnacceptedRoots } from "@lib/genre-unaccepted-roots";
 
 export default async function AdminPage() {
   const session = await auth();
   const isSignedIn = !!session && !session.error;
   // A grow-api outage must not take down sign-in/sign-out: show the link without a count.
   const conflictCount = isSignedIn ? await fetchGenreNameConflictGroups().then((groups) => groups.length, () => null) : null;
+  const rootCount = isSignedIn ? await fetchUnacceptedRoots().then((roots) => roots.length, () => null) : null;
 
   return (
     <Page title="Admin" dataPage="admin">
@@ -18,6 +20,9 @@ export default async function AdminPage() {
             <p>Signed in as {session.user?.email}</p>
             <Link href="/admin/genre-review" className="font-medium underline">
               Genre review{conflictCount === null ? "" : ` (${conflictCount})`}
+            </Link>
+            <Link href="/admin/root-review" className="font-medium underline">
+              Root review{rootCount === null ? "" : ` (${rootCount})`}
             </Link>
             <form
               action={async () => {
