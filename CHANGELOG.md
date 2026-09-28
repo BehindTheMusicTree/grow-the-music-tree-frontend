@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.0.2 - 2026-09-28](#302---2026-09-28)
 - [3.0.0 - 2026-09-27](#300---2026-09-27)
 - [2.6.0 - 2026-09-24](#260---2026-09-24)
 - [2.5.0 - 2026-08-28](#250---2026-08-28)
@@ -90,6 +91,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [3.0.2] - 2026-09-28
+
+### Fixed
+
+- **Genre tree**: the tree now fills the full screen instead of starting below a band holding the search and Rotation/Toolbar buttons, which now float top-left over the tree (`@behindthemusictree/app-kit` 7.0.0 → 7.0.1).
 
 ## [3.0.1] - 2026-09-27
 
