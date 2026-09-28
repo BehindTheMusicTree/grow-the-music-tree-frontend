@@ -93,6 +93,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Dev**: the committed `.env` targets a local grow-api (`http://127.0.0.1:8001`) instead of staging, so admin sign-in works out of the box with the dev Google client; staging is an opt-in override in `.env.local`
+
 ### Fixed
 
 - **Dev**: `pnpm dev` binds and prints `localhost` instead of `127.0.0.1`, so opening the printed URL no longer fails admin sign-in with Google `redirect_uri_mismatch`

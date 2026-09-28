@@ -157,7 +157,7 @@ cd grow-the-music-tree-frontend
    cp .env.example .env.local
    ```
 
-   Fill in the secrets listed there. Non-secret dev defaults live in the committed `.env` (staging grow-api). Missing or invalid values fail fast at `pnpm dev` with a message naming them (see `src/lib/env.ts` and `src/lib/env.server.ts`).
+   Fill in the secrets listed there. Non-secret dev defaults live in the committed `.env`, which targets a local grow-api at `http://127.0.0.1:8001`. Missing or invalid values fail fast at `pnpm dev` with a message naming them (see `src/lib/env.ts` and `src/lib/env.server.ts`).
 
 4. Start the development server:
 
@@ -171,10 +171,7 @@ cd grow-the-music-tree-frontend
 
 This frontend application requires TheMusicTreeAPI backend to function. You can find TheMusicTreeAPI on GitHub at: [TheMusicTreeAPI](https://github.com/BehindTheMusicTree/bodzify-api-django)
 
-For development, you can either:
-
-- Run the backend locally (see backend repository for setup instructions)
-- Use a remote API instance (configure via `NEXT_PUBLIC_API_BASE_URL`)
+For development, run grow-api locally (`docker compose up` in [grow-the-music-tree-api](https://github.com/BehindTheMusicTree/grow-the-music-tree-api)); the committed `.env` points at it. For read-only UI work against staging data, set `GROW_API_ORIGIN=https://grow-api-staging.themusictree.org` in `.env.local` (admin sign-in won't work there).
 
 ### 2. Branching
 
