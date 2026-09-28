@@ -95,6 +95,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Genre tree**: playing a genre starts after its first 100 tracks load, and the queue loads more as you near the end or scroll the sidebar (app-kit 8.0.0)
 - **Dev**: the committed `.env` targets a local grow-api (`http://127.0.0.1:8001`) instead of staging, so admin sign-in works out of the box with the dev Google client; staging is an opt-in override in `.env.local`
 - **Docs**: `AGENTS.md` says how to start and health-check the local grow-api
 

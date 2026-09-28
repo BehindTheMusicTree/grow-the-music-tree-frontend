@@ -8,8 +8,6 @@ import {
   useListFullGenrePlaylists,
   CriteriaMinimum,
   CriteriaPlaylistSimple,
-  YoutubeTrackDetailedSchema,
-  makeCriteriaPlaylistDetailedSchema,
   hasMainstreamPopRoot,
   GenreTreeViewSkeleton,
 } from "@behindthemusictree/app-kit/genre-tree";
@@ -104,7 +102,6 @@ export default function GenreTreePage() {
         handleGenreCreationAction={showCriteriaCreationPopup}
         handleGenreRenameAction={showGenreRenamePopup}
         getBackendBaseUrl={getBackendBaseUrl}
-        criteriaPlaylistDetailedSchema={makeCriteriaPlaylistDetailedSchema(YoutubeTrackDetailedSchema)}
         viewMode={viewMode}
         readOnly={!isAdmin}
       />
