@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.1.0 - 2026-09-28](#310---2026-09-28)
 - [3.0.2 - 2026-09-28](#302---2026-09-28)
 - [3.0.0 - 2026-09-27](#300---2026-09-27)
 - [2.6.0 - 2026-09-24](#260---2026-09-24)
@@ -91,6 +92,13 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [3.1.0] - 2026-09-28
+
+### Added
+
+- **Admin**: root review page (`/admin/root-review`) listing top-level genres the pipeline flagged as unaccepted roots, each with its Wikidata link and an "Accept as root" button; the admin page links to it with a pending count
+- **Genre tree**: header toggle between the pop-core wheel and an outline (nested list) view (`@behindthemusictree/app-kit` 7.0.1 → 7.0.2)
 
 ## [3.0.2] - 2026-09-28
 

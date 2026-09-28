@@ -78,8 +78,13 @@ export default function GenreTreePage() {
   }, [canShowPopCore, setCanShowPopCore]);
 
   // No data after loading means the fetch failed; GenreTreeView surfaces that error itself.
-  if (viewMode === "pop-core" && !isLoadingGenrePlaylists && genrePlaylists && !canShowPopCore) {
-    throw new Error('Cannot show "pop-core" view: the loaded genre tree has no "Mainstream Pop" root');
+  if (
+    (viewMode === "pop-core" || viewMode === "outline") &&
+    !isLoadingGenrePlaylists &&
+    genrePlaylists &&
+    !canShowPopCore
+  ) {
+    throw new Error(`Cannot show "${viewMode}" view: the loaded genre tree has no "Mainstream Pop" root`);
   }
 
   const showCriteriaCreationPopup = useCallback(

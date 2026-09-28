@@ -2,13 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Info } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { CircleDot, Info, List } from "lucide-react";
 import { TheMusicTreeMarkLink } from "@behindthemusictree/brand/components";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { getAudiometaUrl } from "@lib/site-urls";
 import { MenuGroup } from "./MenuGroup";
 import { PATHS as ROUTE_PATHS } from "@lib/constants/routes";
+import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 
 const SHOW_AUDIOMETA_MENU_ITEM = false;
 
@@ -39,6 +41,10 @@ interface AppHeaderProps {
 }
 
 export default function AppHeader({ className }: AppHeaderProps) {
+  const pathname = usePathname();
+  const { viewMode, setViewMode, canShowPopCore } = useGenreTreeViewMode();
+  const isOutline = viewMode === "outline";
+
   return (
     <div className={`fixed top-3 right-3 z-50 flex items-center gap-2 ${className ?? ""}`}>
       <Link
@@ -59,6 +65,16 @@ export default function AppHeader({ className }: AppHeaderProps) {
         >
           <MenuGroup items={menuGroup} layout="horizontal" />
         </nav>
+      )}
+      {pathname === "/" && canShowPopCore && (
+        <button
+          type="button"
+          onClick={() => setViewMode(isOutline ? "pop-core" : "outline")}
+          className="flex shrink-0 items-center justify-center rounded-full bg-black/70 p-2 text-gray-100 shadow-lg backdrop-blur transition-colors duration-200 hover:text-white"
+          aria-label={isOutline ? "Show wheel view" : "Show outline view"}
+        >
+          {isOutline ? <CircleDot className="h-5 w-5" aria-hidden /> : <List className="h-5 w-5" aria-hidden />}
+        </button>
       )}
       <Link
         href={ROUTE_PATHS.ABOUT}
