@@ -92,6 +92,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Admin**: root review page (`/admin/root-review`) listing top-level genres the pipeline flagged as unaccepted roots, each with its Wikidata link and an "Accept as root" button; the admin page links to it with a pending count
+
 ## [3.0.2] - 2026-09-28
 
 ### Fixed
