@@ -185,7 +185,7 @@ grow-api (`GOOGLE_OAUTH_CLIENT_ID`, the ID token audience), so the two always ag
 
 | Client     | Put the Client ID and secret in                                                                                                                                                                   |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| dev        | `.env.local` → `AUTH_GOOGLE_ID=…`, `AUTH_GOOGLE_SECRET=…`, `GROW_API_ORIGIN=http://127.0.0.1:8001`; local grow-api → `GOOGLE_OAUTH_CLIENT_ID=…` (same ID) and `ADMIN_GOOGLE_SUB` (see its README) |
+| dev        | `.env.local` → `AUTH_GOOGLE_ID=…`, `AUTH_GOOGLE_SECRET=…` (`.env` already targets the local grow-api); local grow-api → `GOOGLE_OAUTH_CLIENT_ID=…` (same ID) and `ADMIN_GOOGLE_SUB` (see its README) |
 | staging    | `infrastructure` repo → Settings → Secrets and variables → Actions → **secrets** `GROW_GOOGLE_OAUTH_CLIENT_ID_STAGING`, `GROW_GOOGLE_OAUTH_CLIENT_SECRET_STAGING`                                 |
 | production | same place → **secrets** `GROW_GOOGLE_OAUTH_CLIENT_ID_PROD`, `GROW_GOOGLE_OAUTH_CLIENT_SECRET_PROD`                                                                                               |
 
