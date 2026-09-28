@@ -91,6 +91,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- **Genre tree**: the tree now fills the full screen instead of starting below a band holding the search and Rotation/Toolbar buttons, which now float top-left over the tree (`@behindthemusictree/app-kit` 7.0.0 → 7.0.1).
+
 ## [3.0.1] - 2026-09-27
 
 ### Changed

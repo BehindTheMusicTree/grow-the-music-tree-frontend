@@ -32,8 +32,8 @@ function GenreTreeViewLoadingFallback() {
   const { viewMode } = useGenreTreeViewMode();
 
   return (
-    <div className="mt-4 flex h-full flex-col">
-      <div className="actions-container flex justify-start">
+    <div className="relative flex h-full flex-col">
+      <div className="actions-container absolute left-3 top-3 z-30 flex justify-start">
         <div className="flex justify-start" />
       </div>
       <GenreTreeViewSkeleton viewMode={viewMode} />
