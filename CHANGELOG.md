@@ -93,6 +93,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- **Dev**: `pnpm dev` binds and prints `localhost` instead of `127.0.0.1`, so opening the printed URL no longer fails admin sign-in with Google `redirect_uri_mismatch`
+
 ## [3.1.0] - 2026-09-28
 
 ### Added

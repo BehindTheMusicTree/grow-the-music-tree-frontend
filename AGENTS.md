@@ -64,8 +64,8 @@ styled with Tailwind. Talks to the TheMusicTreeAPI backend.
 - **Env vars**: only `NEXT_PUBLIC_*`-prefixed vars are exposed to the browser.
   Installing requires a GitHub PAT with `read:packages` for `@behindthemusictree/*`.
 - **Admin sign-in locally**: use the dev Google client and a local grow-api; staging
-  grow-api rejects dev-client tokens. Open `http://localhost:<3000–3009>`, not the
-  `127.0.0.1` URL `pnpm dev` prints, or Google returns `redirect_uri_mismatch`. See
+  grow-api rejects dev-client tokens. Open `http://localhost:<3000–3009>` (what `pnpm dev`
+  prints), never `127.0.0.1`, or Google returns `redirect_uri_mismatch`. See
   `docs/frontend-auth.md` → Setup.
 - **Dockerfile `runner` stage**: must keep `apk add curl` and `ENV HOSTNAME=0.0.0.0` —
   Coolify's post-deploy healthcheck runs `curl`/`wget` inside the container (alpine ships
