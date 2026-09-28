@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.2.0 - 2026-09-28](#320---2026-09-28)
 - [3.1.0 - 2026-09-28](#310---2026-09-28)
 - [3.0.2 - 2026-09-28](#302---2026-09-28)
 - [3.0.0 - 2026-09-27](#300---2026-09-27)
@@ -92,6 +93,18 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [3.2.0] - 2026-09-28
+
+### Changed
+
+- **Genre tree**: playing a genre starts after its first 100 tracks load, and the queue loads more as you near the end or scroll the sidebar (app-kit 8.0.0)
+- **Dev**: the committed `.env` targets a local grow-api (`http://127.0.0.1:8001`) instead of staging, so admin sign-in works out of the box with the dev Google client; staging is an opt-in override in `.env.local`
+- **Docs**: `AGENTS.md` says how to start and health-check the local grow-api
+
+### Fixed
+
+- **Dev**: `pnpm dev` binds and prints `localhost` instead of `127.0.0.1`, so opening the printed URL no longer fails admin sign-in with Google `redirect_uri_mismatch`
 
 ## [3.1.0] - 2026-09-28
 
