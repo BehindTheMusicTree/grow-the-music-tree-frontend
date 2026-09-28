@@ -95,6 +95,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Added
 
 - **Admin**: root review page (`/admin/root-review`) listing top-level genres the pipeline flagged as unaccepted roots, each with its Wikidata link and an "Accept as root" button; the admin page links to it with a pending count
+- **Genre tree**: header toggle between the pop-core wheel and an outline (nested list) view (`@behindthemusictree/app-kit` 7.0.1 → 7.0.2)
 
 ## [3.0.2] - 2026-09-28
 
