@@ -96,6 +96,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Changed
 
 - **Dev**: the committed `.env` targets a local grow-api (`http://127.0.0.1:8001`) instead of staging, so admin sign-in works out of the box with the dev Google client; staging is an opt-in override in `.env.local`
+- **Docs**: `AGENTS.md` says how to start and health-check the local grow-api
 
 ### Fixed
 
