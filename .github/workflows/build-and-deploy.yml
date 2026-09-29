@@ -1,0 +1,109 @@
+# Builds the image on GitHub-hosted runners (this repo is public, so minutes are free) and pushes it
+# to GHCR, keeping Docker builds off the CPU-bound VPS. NEXT_PUBLIC_* vars are inlined at build time,
+# so develop and main each build their own image (`staging` / `prod` tag), which Coolify deploys.
+# Requires org-level vars CONTACT_EMAIL, AUDIOMETA_FRONT_SUBDOMAIN, COOLIFY_API_SUBDOMAIN, DOMAIN_NAME,
+# SERVER_HOST and org-level secrets COOLIFY_API_TOKEN, GH_PACKAGES_TOKEN_READ (private
+# @behindthemusictree packages; GITHUB_TOKEN can't read another repo's packages).
+name: Build and deploy
+
+on:
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Serializes build+deploy per branch so an older run can't overwrite a newer :staging/:prod tag.
+concurrency:
+  group: build-and-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  IMAGE: ghcr.io/behindthemusictree/gtmt-front
+  # Staging hosts are "<subdomain>-staging".
+  HOST_SUFFIX: ${{ github.ref != 'refs/heads/main' && '-staging' || '' }}
+
+jobs:
+  build:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5.0.1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=staging,enable=${{ github.ref == 'refs/heads/develop' }}
+            type=raw,value=prod,enable=${{ github.ref == 'refs/heads/main' }}
+            type=sha,prefix=sha-
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          build-args: |
+            NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}
+            NEXT_PUBLIC_AUDIOMETA_URL=https://${{ vars.AUDIOMETA_FRONT_SUBDOMAIN }}${{ env.HOST_SUFFIX }}.${{ vars.DOMAIN_NAME }}
+            NEXT_PUBLIC_SENTRY_IS_ACTIVE=true
+          secrets: |
+            GH_PACKAGES_TOKEN_READ=${{ secrets.GH_PACKAGES_TOKEN_READ }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-staging:
+    name: Deploy (staging)
+    if: github.ref == 'refs/heads/develop'
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment: STAGING
+    steps:
+      - name: Trigger gtmt-front deploy
+        uses: BehindTheMusicTree/github-workflows/.github/actions/trigger-coolify-deploy@v4.3.4
+        with:
+          app_name: gtmt-front
+          coolify_environment: staging
+          coolify_subdomain: ${{ vars.COOLIFY_API_SUBDOMAIN }}
+          domain: ${{ vars.DOMAIN_NAME }}
+          coolify_api_token: ${{ secrets.COOLIFY_API_TOKEN }}
+          health_check_path: /health
+          health_check_origin_ip: ${{ vars.SERVER_HOST }}
+
+  deploy-prod:
+    name: Deploy (prod)
+    if: github.ref == 'refs/heads/main'
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment: PROD
+    steps:
+      - name: Trigger gtmt-front deploy
+        uses: BehindTheMusicTree/github-workflows/.github/actions/trigger-coolify-deploy@v4.3.4
+        with:
+          app_name: gtmt-front
+          coolify_environment: production
+          coolify_subdomain: ${{ vars.COOLIFY_API_SUBDOMAIN }}
+          domain: ${{ vars.DOMAIN_NAME }}
+          coolify_api_token: ${{ secrets.COOLIFY_API_TOKEN }}
+          health_check_path: /health
+          health_check_origin_ip: ${{ vars.SERVER_HOST }}
