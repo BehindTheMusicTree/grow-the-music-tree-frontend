@@ -5,50 +5,24 @@ description: Use this skill when asked to run, start, dev-serve, or preview grow
 
 # Launch grow-the-music-tree-frontend
 
-Next.js frontend backed by a local grow-api (`../grow-the-music-tree-api`, `http://127.0.0.1:8001`,
-the committed `.env` default).
-
-## 1. Env (first run)
-
-If `.env.local` is missing: `cp .env.example .env.local` and fill in the secrets it lists.
-Missing/invalid vars stop `pnpm dev` with a message naming them.
-
-## 2. Start the API
+Run from the repo root (any worktree):
 
 ```bash
-cd ../grow-the-music-tree-api && docker compose up -d --wait
-curl -sf 127.0.0.1:8001/health/
+./scripts/dev-up.sh [--port <n>] [--restore|--no-restore]
 ```
 
-## 3. Prod data
+Map args: a port → `--port <n>` (omit it to get the first free port in 3000–3009), `restore` → `--restore`
+(wipes the local DB), `no-restore` → `--no-restore`. The default restores prod data only when the local DB is empty.
 
-Restoring wipes the local DB (`pg_restore --clean`), so by default only restore when it's empty:
+Trust its `key=value` output and don't re-verify with `curl`/`lsof`:
 
-```bash
-docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select count(*) from grow_genre"'
-```
-
-- `0` (or arg `restore`) → restore; arg `no-restore` → skip.
-- Restore (~5 MB download, restarts api/worker, applies the API branch's migrations):
-
-  ```bash
-  RCLONE_CONFIG=~/.config/rclone/gtmt-backup.conf R2_BACKUP_BUCKET_NAME=btmt-backups ./scripts/restore-prod-db.sh
-  ```
-
-  Needs `rclone` and that config (read-only R2 token) — see the API README if missing.
-
-## 4. Start the web
-
-Run in the background from the frontend root, default port 3000:
-
-```bash
-pnpm dev --port <port>
-```
-
-## 5. Verify
-
-`curl 127.0.0.1:8001/health/` and `curl localhost:<port>` both return 200. Open
-`http://localhost:<port>` — never `127.0.0.1`, or Google sign-in fails with `redirect_uri_mismatch`.
+- `status=ok` → give the user `web_url` (always `localhost`, never `127.0.0.1`, or Google sign-in fails).
+- Surface `api_warning` (the API checkout isn't on an up-to-date `main`/`develop`, so migrations or endpoints may
+  differ) and `signin=disabled` (see `docs/frontend-auth.md` → Setup).
+- `reason=env-local-overrides-api-origin` → `.env.local` points `GROW_API_ORIGIN` elsewhere (e.g. staging). Ask
+  whether to comment that line out, or to run plain `pnpm dev` against it deliberately.
+- `reason=port-in-use` → rerun without `--port`, or with another port.
+- Other `error` → relay the reason and `log_tail`.
 
 ## Troubleshooting
 

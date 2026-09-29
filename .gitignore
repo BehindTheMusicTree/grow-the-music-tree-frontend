@@ -44,3 +44,6 @@ out/
 
 # graphify knowledge graph (local, regenerated via post-commit hook)
 graphify-out/
+
+# scripts/dev-up.sh web server log
+.dev-up.log
