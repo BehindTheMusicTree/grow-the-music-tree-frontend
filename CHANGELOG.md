@@ -94,6 +94,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.2.1] - 2026-09-29
+
 ### Changed
 
 - **Deploy**: `build-and-deploy.yml` builds the image on GitHub-hosted runners, pushes it to GHCR (`ghcr.io/behindthemusictree/gtmt-front`, `staging` / `prod` tags), and triggers the Coolify deploy, instead of Coolify building from git on the VPS. `NEXT_PUBLIC_*` build args come from org-level GitHub variables.
