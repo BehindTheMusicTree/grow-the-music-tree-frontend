@@ -64,10 +64,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
-- **Dev**: `scripts/dev-up.sh` starts the local grow-api (restoring prod data when its DB is empty), then the web server on a free port, from any worktree. The `launch` skill now runs it.
-
-### Added
-
 - **Genre Tree Visualization**: Added interactive D3.js-based genre tree component
   - Includes unit tests for tree layout calculations and node interactions
   - Supports zoom, pan, and node expansion/collapse
@@ -97,6 +93,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+### Added
+
+- **Dev**: `scripts/dev-up.sh` starts the local grow-api (restoring prod data when its DB is empty), then the web server on a free port, from any worktree. The `launch` skill now runs it.
 
 ## [3.2.1] - 2026-09-29
 
