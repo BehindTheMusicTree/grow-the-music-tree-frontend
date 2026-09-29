@@ -13,7 +13,7 @@ RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
 
 # src/lib/env.ts is imported by next.config.ts, so its schema is validated at `next build` time:
 # every NEXT_PUBLIC_* var baked into the client bundle must be passed as a build arg here, or the
-# build fails. Coolify injects these via its buildtime_env config (see infrastructure repo).
+# build fails. .github/workflows/build-and-deploy.yml passes these as build args.
 # Server-only vars (src/lib/env.server.ts) are runtime env, validated at boot by src/instrumentation.ts.
 ARG NEXT_PUBLIC_CONTACT_EMAIL
 ARG NEXT_PUBLIC_AUDIOMETA_URL

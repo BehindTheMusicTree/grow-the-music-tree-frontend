@@ -191,7 +191,7 @@ The CI pipeline includes:
 - Testing
 - Build check
 
-Deployment is handled entirely by **Coolify**, driven by the `infrastructure` repo's Ansible config and GitHub Actions — not by anything in this repo's own CI. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+`build-and-deploy.yml` builds the image and triggers a **Coolify** deploy; the Coolify app itself is configured by the `infrastructure` repo's Ansible. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Build & Hosting
 
@@ -204,7 +204,7 @@ npm run start
 
 Build output: `.next/`. The app is served by the Next.js Node server (`output: "standalone"` in production, via the Dockerfile's `runner` stage).
 
-**Deployment:** The app is deployed to **Coolify** on push to `main` (production) or `develop` (staging), plus PR preview deployments off `develop`-targeted PRs. See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for the full Coolify setup, including which env vars are build-time vs. runtime. Outside Coolify, the same Dockerfile can be built and run standalone (see [Docker](#docker) above); the reverse proxy (Nginx, Traefik, etc.) should proxy to the container's `PORT`.
+**Deployment:** The app is deployed to **Coolify** on push to `main` (production) or `develop` (staging); GitHub Actions builds the image and pushes it to GHCR. See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for the full Coolify setup, including which env vars are build-time vs. runtime. Outside Coolify, the same Dockerfile can be built and run standalone (see [Docker](#docker) above); the reverse proxy (Nginx, Traefik, etc.) should proxy to the container's `PORT`.
 
 ## Troubleshooting
 
