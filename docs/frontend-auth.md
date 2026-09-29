@@ -171,9 +171,6 @@ Notes on redirect URIs:
   `http://localhost:3000` to `http://localhost:3009`, one entry per port. `pnpm dev` uses 3000; start
   another worktree on the next free port with `pnpm dev -p 3001` (up to 3009). Any other port fails
   with `redirect_uri_mismatch`.
-- Staging PR previews (`*.grow-staging.themusictree.org`) can't sign in: wildcard hosts can't be
-  registered. Browse them anonymously, or add a preview's exact callback URI to the staging client
-  while testing it.
 - JavaScript origins stay empty because the OAuth flow runs server-side (redirect and code
   exchange), never through Google's JavaScript library.
 - Changes take effect after a few minutes, sometimes longer.
@@ -223,7 +220,7 @@ Locally, put them in `.env.local` (see `.env.example`). Missing `AUTH_SECRET`, `
 
 | Symptom                                                               | Cause and fix                                                                                                                                                                                                  |
 | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Error 400: redirect_uri_mismatch`                                    | The callback URI isn't on the client (1.6): wrong port, `127.0.0.1` instead of `localhost`, a PR preview host, or a change that hasn't propagated yet                                                          |
+| `Error 400: redirect_uri_mismatch`                                    | The callback URI isn't on the client (1.6): wrong port, `127.0.0.1` instead of `localhost`, or a change that hasn't propagated yet                                                          |
 | `Access blocked: … has not completed the Google verification process` | The account isn't a test user (1.5)                                                                                                                                                                            |
 | Google account picker succeeds, then Auth.js shows `AccessDenied`     | grow-api's `auth/me/` didn't answer `{"role": "admin"}`: the client ID differs from grow-api's `GOOGLE_OAUTH_CLIENT_ID` (dev client against staging grow-api), or the account's `sub` isn't `ADMIN_GOOGLE_SUB` |
 | Signed out after about a week                                         | Testing-mode refresh tokens expire after 7 days (1.5). Sign in again, or publish the app                                                                                                                       |
