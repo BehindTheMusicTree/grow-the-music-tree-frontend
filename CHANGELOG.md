@@ -102,6 +102,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- **Genre wheel**: bumped `@behindthemusictree/app-kit` to 8.0.2, whose genre-playlists hook requests only the canonical tree (`allowsMultiplePrimaryParents=false`), so parentless regional genres no longer show up as extra roots.
+
 ### Added
 
 - **App version**: `package.json` version is shown discreetly at the bottom-left of the main view (injected as `NEXT_PUBLIC_APP_VERSION` from `next.config.ts`, so the About page version is now populated too).
