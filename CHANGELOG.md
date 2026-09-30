@@ -102,7 +102,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
-## [3.3.1] - 2026-09-30
+## [3.4.0] - 2026-09-30
 
 ### Added
 
