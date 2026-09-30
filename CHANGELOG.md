@@ -102,6 +102,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-09-30
+
 ### Fixed
 
 - **Genre wheel**: bumped `@behindthemusictree/app-kit` to 8.0.2, whose genre-playlists hook requests only the canonical tree (`allowsMultiplePrimaryParents=false`), so parentless regional genres no longer show up as extra roots.
@@ -119,6 +121,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Documentation
 
 - **Branching**: `fix/*` and `chore/*` are not strict Gitflow and branch protection now rejects them for PRs to `develop`; bug fixes and CI/tooling/maintenance work use `feature/*`.
+
 
 ## [3.2.1] - 2026-09-29
 
