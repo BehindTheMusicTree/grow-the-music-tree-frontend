@@ -40,10 +40,10 @@ styled with Tailwind. Talks to the TheMusicTreeAPI backend.
 
 ## Critical rules agents get wrong here
 
-- **Branching**: PRs to `develop` only from `feature/*`, `fix/*`,
+- **Branching**: PRs to `develop` only from `feature/*`,
   `dependabot/*`, `release/*`, `hotfix/*`. PRs to `main` only from `release/*` or
-  `hotfix/*`. **`chore/*` is not strict Gitflow and CI rejects it** — CI/tooling/maintenance
-  work goes on `feature/*`. There is no `ci/*` prefix.
+  `hotfix/*`. **`chore/*` and `fix/*` are not strict Gitflow and CI rejects them** — bug fixes
+  and CI/tooling/maintenance work go on `feature/*`. There is no `ci/*` prefix.
   Never commit directly to `main`/`develop`.
 - **Never locally `git merge` + `git push origin main`** to ship a release/hotfix —
   it skips the PR/branch-protection checks. Always open a PR; merge on GitHub; then

@@ -109,7 +109,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Documentation
 
-- **Branching**: `chore/*` is not strict Gitflow and branch protection now rejects it for PRs to `develop`; CI/tooling/maintenance work uses `feature/*`.
+- **Branching**: `fix/*` and `chore/*` are not strict Gitflow and branch protection now rejects them for PRs to `develop`; bug fixes and CI/tooling/maintenance work use `feature/*`.
 
 ## [3.2.1] - 2026-09-29
 
