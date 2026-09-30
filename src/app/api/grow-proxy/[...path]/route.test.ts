@@ -100,4 +100,22 @@ describe("grow-proxy route", () => {
     expect(await response.json()).toEqual({ detail: "not found" });
   });
 
+
+  it("forwards If-None-Match and passes an upstream 304 through with its ETag and no body", async () => {
+    const fetchMock = vi
+      .spyOn(global, "fetch")
+      .mockResolvedValue(new Response(null, { status: 304, headers: { etag: '"abc"' } }));
+
+    const request = new NextRequest("http://localhost/api/grow-proxy/genre-playlists/", {
+      headers: { "if-none-match": '"abc"' },
+    });
+    const response = await GET(request, makeContext(["genre-playlists"]));
+
+    const [, init] = fetchMock.mock.calls[0];
+    expect((init?.headers as Record<string, string>)["If-None-Match"]).toBe('"abc"');
+    expect(response.status).toBe(304);
+    expect(response.headers.get("etag")).toBe('"abc"');
+    expect(response.headers.get("cache-control")).toBe("private, no-cache");
+    expect(response.body).toBeNull();
+  });
 });

@@ -107,6 +107,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **App version**: `package.json` version is shown discreetly at the bottom-left of the main view (injected as `NEXT_PUBLIC_APP_VERSION` from `next.config.ts`, so the About page version is now populated too).
 - **Dev**: `scripts/dev-up.sh` starts the local grow-api (restoring prod data when its DB is empty), then the web server on a free port, from any worktree. The `launch` skill now runs it.
 
+### Improved
+
+- **Genre tree reloads**: `/api/grow-proxy` forwards `If-None-Match` and passes the API's `ETag` (with `Cache-Control: private, no-cache`) and `304` responses through, so a full page load revalidates the genre tree instead of re-downloading it.
+- **Admin link**: a discreet link on the About page opens `/admin` with client-side navigation, keeping the loaded genre tree in memory.
+
 ### Documentation
 
 - **Branching**: `fix/*` and `chore/*` are not strict Gitflow and branch protection now rejects them for PRs to `develop`; bug fixes and CI/tooling/maintenance work use `feature/*`.
