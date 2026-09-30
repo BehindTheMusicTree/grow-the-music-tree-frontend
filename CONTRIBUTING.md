@@ -197,7 +197,7 @@ We follow **strict Git Flow** with the following branch structure:
 #### 🛡️ Branch Protection
 
 - **PRs to `main`** must come from `hotfix/*` or `release/*` branches only. This ensures production fixes are traceable and carefully released.
-- **PRs to `develop`** may come only from branches whose names start with one of: `feature/`, `fix/`, `chore/`, `dependabot/`, `release/`, `hotfix/`, or from the branch named exactly `main` (post-release or post-hotfix back-merge). Anything else (including `ci/*`, `refactor/*`, etc.) is **rejected** by CI. Use **`chore/*`** for CI/CD and workflow changes (e.g. `chore/update-validate-workflow`), not `ci/*`.
+- **PRs to `develop`** may come only from branches whose names start with one of: `feature/`, `fix/`, `chore/`, `dependabot/`, `release/`, `hotfix/`, or from the branch named exactly `main` (post-release or post-hotfix back-merge). Anything else (including `ci/*`, `refactor/*`, etc.) is **rejected** by CI. `chore/` is still accepted but is **not strict Gitflow** — use **`feature/*`** for CI/CD, workflow, and tooling changes (e.g. `feature/update-validate-workflow`), not `chore/*` or `ci/*`.
 - Branch protection is enforced by the `branch-protection.yml` GitHub Actions workflow located at `.github/workflows/branch-protection.yml`.
 - **Invalid PRs will:**
   - Fail the CI check
@@ -273,9 +273,11 @@ We follow **strict Git Flow** with the following branch structure:
 - Contributors can submit fixes via feature branches that maintainers may promote to hotfixes if needed
 - When complete, open a PR from `hotfix/*` to `main` (no direct merge), tag on `main` if needed, then open a PR from `main` to `develop` for back-merge
 
-#### Chore Branches (`chore/<name>`)
+#### Chore Branches (`chore/<name>`) — legacy, do not create
 
-- For maintenance, infrastructure, and configuration work (including **GitHub Actions and CI**). There is no separate `ci/*` branch prefix—use `chore/*` so PRs to `develop` pass branch protection.
+> **`chore/*` is not part of strict Gitflow.** Branch protection still accepts it so existing branches can merge, but new maintenance, infrastructure, CI, and tooling work goes on **`feature/*`**. The section below documents the legacy convention only.
+
+- For maintenance, infrastructure, and configuration work (including **GitHub Actions and CI**). There is no separate `ci/*` branch prefix.
 - Branch from `develop`
 - Include issue numbers when applicable: `chore/234-update-dependencies`
 - Examples: repository setup, CI/CD changes, dependency updates, documentation infrastructure

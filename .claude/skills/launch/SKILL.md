@@ -19,8 +19,8 @@ Trust its `key=value` output and don't re-verify with `curl`/`lsof`:
 - `status=ok` → give the user `web_url` (always `localhost`, never `127.0.0.1`, or Google sign-in fails).
 - Surface `api_warning` (the API checkout isn't on an up-to-date `main`/`develop`, so migrations or endpoints may
   differ) and `signin=disabled` (see `docs/frontend-auth.md` → Setup).
-- `reason=env-local-overrides-api-origin` → `.env.local` points `GROW_API_ORIGIN` elsewhere (e.g. staging). Ask
-  whether to comment that line out, or to run plain `pnpm dev` against it deliberately.
+- `reason=api-origin-overridden` → the shell env, `.env.development.local` or `.env.local` points `GROW_API_ORIGIN`
+  elsewhere (e.g. staging). Ask whether to remove that override, or to run plain `pnpm dev` against it deliberately.
 - `reason=port-in-use` → rerun without `--port`, or with another port.
 - Other `error` → relay the reason and `log_tail`.
 

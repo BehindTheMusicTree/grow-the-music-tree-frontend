@@ -45,9 +45,13 @@ if [[ ! -f "$env_local" ]]; then
 fi
 
 api_url="http://127.0.0.1:8001"
-origin="$(grep -E '^GROW_API_ORIGIN=' "$env_local" | tail -1 | cut -d= -f2- | tr -d "\"'")"
-if [[ -n "$origin" && "$origin" != "$api_url" ]]; then
-  echo "status=blocked reason=env-local-overrides-api-origin origin=$origin"
+read_origin() { grep -E '^GROW_API_ORIGIN=' "$1" 2>/dev/null | tail -1 | cut -d= -f2- | sed -E 's/[[:space:]]+#.*//' | tr -d "\"' "; }
+# Next.js precedence: shell env > .env.development.local > .env.local
+origin="${GROW_API_ORIGIN:-$(read_origin "$repo_root/.env.development.local")}"
+origin="${origin:-$(read_origin "$env_local")}"
+origin="${origin%/}"
+if [[ -n "$origin" && "$origin" != "$api_url" && "$origin" != "http://localhost:8001" ]]; then
+  echo "status=blocked reason=api-origin-overridden origin=$origin"
   exit 1
 fi
 
@@ -69,10 +73,12 @@ fi
 echo "api_health=ok"
 
 count_genres() {
+  local n
   # shellcheck disable=SC2016 # expanded inside the db container
-  "${compose[@]}" exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select count(*) from grow_genre"'
+  n="$("${compose[@]}" exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select count(*) from grow_genre"')" \
+    && [[ "$n" =~ ^[0-9]+$ ]] && echo "$n"
 }
-genres="$(count_genres)"
+genres="$(count_genres)" || { echo "status=error reason=genre-count-failed"; exit 1; }
 restored=0
 if [[ "$restore" == "force" || ( "$restore" == "auto" && "$genres" == "0" ) ]]; then
   if ! RCLONE_CONFIG="$HOME/.config/rclone/gtmt-backup.conf" R2_BACKUP_BUCKET_NAME=btmt-backups \
@@ -81,7 +87,7 @@ if [[ "$restore" == "force" || ( "$restore" == "auto" && "$genres" == "0" ) ]]; 
     exit 1
   fi
   restored=1
-  genres="$(count_genres)"
+  genres="$(count_genres)" || { echo "status=error reason=genre-count-failed"; exit 1; }
 fi
 echo "restored=$restored"
 echo "genres=$genres"
@@ -109,11 +115,12 @@ fi
 
 log_file="$repo_root/.dev-up.log"
 nohup pnpm -C "$repo_root" dev --port "$port" >"$log_file" 2>&1 &
-echo "pid=$!"
+pid=$!
+echo "pid=$pid"
 web_url="http://localhost:$port"
 deadline=$((SECONDS + 120))
 until curl -sf -o /dev/null "$web_url"; do
-  if (( SECONDS > deadline )); then
+  if ! kill -0 "$pid" 2>/dev/null || (( SECONDS > deadline )); then
     echo "status=error reason=web-not-ready log_tail=$(tail -n 20 "$log_file" | tr '\n' '|')"
     exit 1
   fi

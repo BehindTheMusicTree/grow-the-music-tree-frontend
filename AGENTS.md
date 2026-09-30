@@ -42,7 +42,8 @@ styled with Tailwind. Talks to the TheMusicTreeAPI backend.
 
 - **Branching**: PRs to `develop` only from `feature/*`, `fix/*`, `chore/*`,
   `dependabot/*`, `release/*`, `hotfix/*`. PRs to `main` only from `release/*` or
-  `hotfix/*`. There is **no `ci/*` prefix** — CI/tooling changes use `chore/*`.
+  `hotfix/*`. **`chore/*` is not strict Gitflow** — CI still accepts it, but never
+  create one: CI/tooling/maintenance work goes on `feature/*`. There is no `ci/*` prefix.
   Never commit directly to `main`/`develop`.
 - **Never locally `git merge` + `git push origin main`** to ship a release/hotfix —
   it skips the PR/branch-protection checks. Always open a PR; merge on GitHub; then
