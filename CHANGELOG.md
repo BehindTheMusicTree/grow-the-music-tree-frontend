@@ -62,6 +62,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ```markdown
 ## [Unreleased]
 
+### Changed
+
+- Bumped `@behindthemusictree/app-kit` to 8.0.1 to align with grow API v8.3.3: album artists now parse (`albumArtists`), and a genre can be reparented to root (`parent: null`).
+
+### Removed
+
+- Dead Spotify/user API code (`src/api`, Spotify schemas, `api-auth-spotify`, `spotify-required-cache`) and the `@api/*` alias; the API no longer serves those endpoints.
+
 ### Added
 
 - **Genre Tree Visualization**: Added interactive D3.js-based genre tree component
