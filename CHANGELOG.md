@@ -99,6 +99,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **App version**: `package.json` version is shown discreetly at the bottom-left of the main view (injected as `NEXT_PUBLIC_APP_VERSION` from `next.config.ts`, so the About page version is now populated too).
 - **Dev**: `scripts/dev-up.sh` starts the local grow-api (restoring prod data when its DB is empty), then the web server on a free port, from any worktree. The `launch` skill now runs it.
 
+### Documentation
+
+- **Branching**: `chore/*` is documented as not strict Gitflow; CI/tooling/maintenance work uses `feature/*` (CI still accepts existing `chore/*` branches).
+
 ## [3.2.1] - 2026-09-29
 
 ### Changed
