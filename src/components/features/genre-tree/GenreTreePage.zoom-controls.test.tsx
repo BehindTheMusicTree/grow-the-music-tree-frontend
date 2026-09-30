@@ -58,13 +58,6 @@ function renderGenreTreePage(viewMode: GenreTreeViewMode) {
 
 describe("GenreTreePage zoom controls", () => {
   beforeEach(() => {
-    // Node's experimental global localStorage shadows happy-dom's and is undefined without --localstorage-file.
-    const store = new Map<string, string>();
-    vi.stubGlobal("localStorage", {
-      getItem: (key: string) => store.get(key) ?? null,
-      setItem: (key: string, value: string) => store.set(key, value),
-      removeItem: (key: string) => store.delete(key),
-    });
     vi.stubGlobal(
       "fetch",
       vi.fn(async (input: RequestInfo | URL) => {
