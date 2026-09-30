@@ -87,7 +87,7 @@ Example:
 
 ## Repository workflow (branches and PRs)
 
-Git branch naming and PR targets follow **strict Git Flow** in **CONTRIBUTING.md** (§2 Branching, Branch Protection), enforced by `.github/workflows/branch-protection.yml`. `chore/*` is not strict Gitflow: use `feature/*` for CI/tooling branches, not `chore/*` or `ci/*`.
+Git branch naming and PR targets follow **strict Git Flow** in **CONTRIBUTING.md** (§2 Branching, Branch Protection), enforced by `.github/workflows/branch-protection.yml`. `chore/*` is not strict Gitflow and CI rejects it: use `feature/*` for CI/tooling branches, never `chore/*` or `ci/*`.
 
 ## Best practices
 

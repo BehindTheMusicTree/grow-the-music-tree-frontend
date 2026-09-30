@@ -189,7 +189,7 @@ We follow **strict Git Flow** with the following branch structure:
 #### Develop Branch (`develop`)
 
 - The integration branch for ongoing development
-- All feature and chore branches merge into `develop`
+- All feature and fix branches merge into `develop`
 - `develop` is merged into `main` via release branches
 - **No direct commits allowed** - All changes must go through Pull Requests
 - **Valid PR source branches** are enforced by `.github/workflows/branch-protection.yml` (see **Branch Protection** below)
@@ -197,7 +197,7 @@ We follow **strict Git Flow** with the following branch structure:
 #### 🛡️ Branch Protection
 
 - **PRs to `main`** must come from `hotfix/*` or `release/*` branches only. This ensures production fixes are traceable and carefully released.
-- **PRs to `develop`** may come only from branches whose names start with one of: `feature/`, `fix/`, `chore/`, `dependabot/`, `release/`, `hotfix/`, or from the branch named exactly `main` (post-release or post-hotfix back-merge). Anything else (including `ci/*`, `refactor/*`, etc.) is **rejected** by CI. `chore/` is still accepted but is **not strict Gitflow** — use **`feature/*`** for CI/CD, workflow, and tooling changes (e.g. `feature/update-validate-workflow`), not `chore/*` or `ci/*`.
+- **PRs to `develop`** may come only from branches whose names start with one of: `feature/`, `fix/`, `dependabot/`, `release/`, `hotfix/`, or from the branch named exactly `main` (post-release or post-hotfix back-merge). Anything else (including `chore/*`, `ci/*`, `refactor/*`, etc.) is **rejected** by CI. `chore/*` is **not strict Gitflow** — use **`feature/*`** for CI/CD, workflow, and tooling changes (e.g. `feature/update-validate-workflow`).
 - Branch protection is enforced by the `branch-protection.yml` GitHub Actions workflow located at `.github/workflows/branch-protection.yml`.
 - **Invalid PRs will:**
   - Fail the CI check
@@ -273,33 +273,13 @@ We follow **strict Git Flow** with the following branch structure:
 - Contributors can submit fixes via feature branches that maintainers may promote to hotfixes if needed
 - When complete, open a PR from `hotfix/*` to `main` (no direct merge), tag on `main` if needed, then open a PR from `main` to `develop` for back-merge
 
-#### Chore Branches (`chore/<name>`) — legacy, do not create
-
-> **`chore/*` is not part of strict Gitflow.** Branch protection still accepts it so existing branches can merge, but new maintenance, infrastructure, CI, and tooling work goes on **`feature/*`**. The section below documents the legacy convention only.
-
-- For maintenance, infrastructure, and configuration work (including **GitHub Actions and CI**). There is no separate `ci/*` branch prefix.
-- Branch from `develop`
-- Include issue numbers when applicable: `chore/234-update-dependencies`
-- Examples: repository setup, CI/CD changes, dependency updates, documentation infrastructure
-- Examples:
-
-  ```bash
-  git checkout develop
-  git pull origin develop
-  git checkout -b chore/github-setup
-  git checkout -b chore/update-dependencies
-  git checkout -b chore/234-setup-eslint                # With issue number
-  ```
-
-- Merge into `develop` via Pull Request when complete
-
 #### Dependabot Branches (`dependabot/*`)
 
 - For automated dependency updates created by [Dependabot](https://github.com/dependabot)
 - Typically generated/managed by GitHub and follow a naming convention like `dependabot/<ecosystem>/<package>-<version>` (e.g., `dependabot/npm_and_yarn/lodash-4.17.21`)
 - Branch from `develop`
 - Dependabot opens Pull Requests that should target `develop` for dependency bumps and security updates
-- Merge into `develop` via Pull Request when complete; treat them like `chore/*` changes or dependency maintenance
+- Merge into `develop` via Pull Request when complete; treat them as dependency maintenance
 
 ### 3. Developing
 
@@ -464,9 +444,9 @@ Before submitting a Pull Request, ensure the following checks are completed:
 **4. Git Hygiene**
 
 - ✅ Commit messages follow the commit message convention
-- ✅ Branch is up to date with target branch (`develop` for features/fixes/chores, `main` for hotfixes)
+- ✅ Branch is up to date with target branch (`develop` for features/fixes, `main` for hotfixes)
 - ✅ No accidental commits (large files, secrets, personal configs, `.env` files)
-- ✅ Branch follows naming convention for the target branch (see **Branch Protection**): for PRs to `develop`, use `feature/*`, `fix/*`, `chore/*`, `dependabot/*`, or (maintainers) `release/*`, `hotfix/*`, or `main` for back-merge; for PRs to `main`, use `release/*` or `hotfix/*` only
+- ✅ Branch follows naming convention for the target branch (see **Branch Protection**): for PRs to `develop`, use `feature/*`, `fix/*`, `dependabot/*`, or (maintainers) `release/*`, `hotfix/*`, or `main` for back-merge; for PRs to `main`, use `release/*` or `hotfix/*` only
 
 **5. Branch Target**
 
@@ -521,7 +501,7 @@ Before submitting a Pull Request, ensure the following checks are completed:
 - ✅ All review comments are addressed
 - ✅ No unresolved discussions
 - ✅ Ready for release (if applicable)
-- ✅ Branch targets correct base branch (`develop` for features/fixes/chores, `main` for hotfixes)
+- ✅ Branch targets correct base branch (`develop` for features/fixes, `main` for hotfixes)
 
 #### 6.2. Opening a Pull Request
 
@@ -574,12 +554,12 @@ Pull Request titles must follow the same format as commit messages for consisten
 
 **Note on Branch Prefixes vs PR Title Types:**
 
-Branch prefixes (`feature/`, `fix/`, `chore/`, `hotfix/`, `release/`, plus `dependabot/` and exact `main` when allowed) are for branch organization and differ from PR title types:
+Branch prefixes (`feature/`, `fix/`, `hotfix/`, `release/`, plus `dependabot/` and exact `main` when allowed) are for branch organization and differ from PR title types:
 
 - Branch `feature/add-playlist-export` → PR title: `feat(playlist): add export functionality` (use `feat`, not `feature`)
 - Branch `fix/player-preview-timeout` → PR title: `fix(player): handle preview timeout` (use `fix`)
-- Branch `chore/update-dependencies` → PR title: `chore: update dependencies` (use `chore`)
-- Branch `chore/update-validate-workflow` → PR title: `ci: …` or `chore: …` (branch stays `chore/*`; there is no `ci/*` branch prefix in this repo)
+- Branch `feature/update-dependencies` → PR title: `chore: update dependencies` (use `chore`)
+- Branch `feature/update-validate-workflow` → PR title: `ci: …` or `chore: …` (branch stays `feature/*`; there are no `chore/*` or `ci/*` branch prefixes in this repo)
 - Branch `hotfix/player-crash` → PR title: `fix(player): prevent crash on invalid track` (use `fix`, not `hotfix`)
 - Branch `release/v0.2.0` → PR title: `chore: prepare release v0.2.0` (use `chore`)
 
@@ -590,7 +570,7 @@ GitHub automatically generates PR titles based on branch names. **GitHub's auto-
 - ❌ **GitHub suggestion**: `Feature/add playlist export` (from branch `feature/add-playlist-export`)
 - ✅ **Correct format**: `feat(playlist): add export functionality`
 
-- ❌ **GitHub suggestion**: `Chore/update tailwind` (from branch `chore/update-tailwind`)
+- ❌ **GitHub suggestion**: `Feature/update tailwind` (from branch `feature/update-tailwind`)
 - ✅ **Correct format**: `chore: update tailwind to v3.4`
 
 **Examples:**
@@ -625,9 +605,9 @@ When you open a Pull Request, several automations may run automatically (if conf
 
 ### 7. Releasing _(For Maintainers)_
 
-Releases are created from the `main` branch using **strict Git Flow**. Release tags are created **on `main`** (after the release or hotfix PR is merged), not from `chore/*`, `feature/*`, or the tip of `release/*`. Version bump, changelog roll into the versioned section, and pre-release tag cleanup are done with **`npm version` on `main`** and its postversion script. See [docs/VERSIONING.md](docs/VERSIONING.md) for details.
+Releases are created from the `main` branch using **strict Git Flow**. Release tags are created **on `main`** (after the release or hotfix PR is merged), not from `feature/*`, or the tip of `release/*`. Version bump, changelog roll into the versioned section, and pre-release tag cleanup are done with **`npm version` on `main`** and its postversion script. See [docs/VERSIONING.md](docs/VERSIONING.md) for details.
 
-**Do not** run `npm version` (with automatic tag) on a **chore** or **feature** branch to ship a release, and **do not** push **`vX.Y.Z`** from there: production deploy keys off the tag, and the tag must point at the canonical commit on **`main`**.
+**Do not** run `npm version` (with automatic tag) on a **feature** branch to ship a release, and **do not** push **`vX.Y.Z`** from there: production deploy keys off the tag, and the tag must point at the canonical commit on **`main`**.
 
 **Quick release process:**
 
