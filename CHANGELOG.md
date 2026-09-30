@@ -102,6 +102,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-09-30
+
 ### Added
 
 - **Genre tree**: the genre info panel lists the genre's modifications (renames, moves, creation, …), newest first, with the actor's pseudo or "Pipeline", from grow-api's `GET /v1/genres/{uuid}/history/`.
