@@ -28,8 +28,8 @@ jobs:
                 error_message="Pull requests to main must come from hotfix/* or release/* branches only.\n\nFor features or bug fixes, please target the 'develop' branch instead."
                 ;;
               develop)
-                valid_prefixes=("feature/" "fix/" "dependabot/" "main" "hotfix/" "release/")
-                error_message="Pull requests to develop must come from feature/*, fix/*, dependabot/*, main (release back-merge), hotfix/*, or release/* branches.\n\nPrefixes such as chore/*, ci/* or refactor/* are not allowed—use feature/* for CI/CD and tooling (e.g. feature/vercel-workflow).\n\nExamples:\n - feature/improve-genre-classification\n - fix/picomatch-cve-2026-27904\n - dependabot/pip/requests-2.28.0\n - main (post-release or post-hotfix back-merge)"
+                valid_prefixes=("feature/" "dependabot/" "main" "hotfix/" "release/")
+                error_message="Pull requests to develop must come from feature/*, dependabot/*, main (release back-merge), hotfix/*, or release/* branches.\n\nPrefixes such as fix/*, chore/*, ci/* or refactor/* are not allowed—use feature/* for bug fixes, CI/CD and tooling (e.g. feature/vercel-workflow).\n\nExamples:\n - feature/improve-genre-classification\n - feature/picomatch-cve-2026-27904\n - dependabot/pip/requests-2.28.0\n - main (post-release or post-hotfix back-merge)"
                 ;;
               *)
                 echo "⚠️  Unknown target branch: $target"

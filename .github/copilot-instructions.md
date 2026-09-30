@@ -10,7 +10,7 @@ Next.js (App Router) + React + TypeScript frontend for Behind The Music Tree, st
 
 Full conventions live in the canonical sources below — read them before reviewing, don't rely on this summary alone:
 
-- [`CONTRIBUTING.md`](../CONTRIBUTING.md) — Git Flow branching (`feature/*`, `fix/*`, `release/*`, `hotfix/*`), commit/PR title format (`<type>(<scope>): <summary>`), PR process
+- [`CONTRIBUTING.md`](../CONTRIBUTING.md) — Git Flow branching (`feature/*`, `release/*`, `hotfix/*`), commit/PR title format (`<type>(<scope>): <summary>`), PR process
 - [`docs/STYLE_GUIDE.md`](../docs/STYLE_GUIDE.md) — TypeScript/React/Next.js conventions, file naming, Tailwind usage
 - [`AGENTS.md`](../AGENTS.md) — project-specific critical rules and traps for AI coding agents
 

@@ -49,7 +49,7 @@ Development version tags are used to test builds and deployments from **feature,
 #### Format
 
 - Format: `v<version>-dev-<branch-name>` (e.g., `v0.3.6-dev-improve-cicd`)
-- Use the branch name **without** the type prefix (`feature/`, `fix/`, `hotfix/`, etc.)
+- Use the branch name **without** the type prefix (`feature/`, `hotfix/`, etc.)
 - Example: Branch `feature/improve-cicd` → Tag `v0.3.6-dev-improve-cicd`
 
 #### Naming Convention
@@ -57,7 +57,6 @@ Development version tags are used to test builds and deployments from **feature,
 Development version tags should include the branch name (without type prefix) to identify what's being tested:
 
 - **Feature branches**: `feature/improve-cicd` → `v0.3.6-dev-improve-cicd`
-- **Fix branches**: `fix/resolve-timeout` → `v0.3.6-dev-resolve-timeout`
 - **Hotfix branches**: `hotfix/critical-bug` → `v0.3.6-dev-critical-bug`
 
 #### Version Selection

@@ -189,7 +189,7 @@ We follow **strict Git Flow** with the following branch structure:
 #### Develop Branch (`develop`)
 
 - The integration branch for ongoing development
-- All feature and fix branches merge into `develop`
+- All feature branches merge into `develop`
 - `develop` is merged into `main` via release branches
 - **No direct commits allowed** - All changes must go through Pull Requests
 - **Valid PR source branches** are enforced by `.github/workflows/branch-protection.yml` (see **Branch Protection** below)
@@ -197,7 +197,7 @@ We follow **strict Git Flow** with the following branch structure:
 #### 🛡️ Branch Protection
 
 - **PRs to `main`** must come from `hotfix/*` or `release/*` branches only. This ensures production fixes are traceable and carefully released.
-- **PRs to `develop`** may come only from branches whose names start with one of: `feature/`, `fix/`, `dependabot/`, `release/`, `hotfix/`, or from the branch named exactly `main` (post-release or post-hotfix back-merge). Anything else (including `chore/*`, `ci/*`, `refactor/*`, etc.) is **rejected** by CI. `chore/*` is **not strict Gitflow** — use **`feature/*`** for CI/CD, workflow, and tooling changes (e.g. `feature/update-validate-workflow`).
+- **PRs to `develop`** may come only from branches whose names start with one of: `feature/`, `dependabot/`, `release/`, `hotfix/`, or from the branch named exactly `main` (post-release or post-hotfix back-merge). Anything else (including `fix/*`, `chore/*`, `ci/*`, `refactor/*`, etc.) is **rejected** by CI. `fix/*` and `chore/*` are **not strict Gitflow** — use **`feature/*`** for bug fixes and CI/CD, workflow, and tooling changes (e.g. `feature/resolve-audio-preview-timeout`, `feature/update-validate-workflow`).
 - Branch protection is enforced by the `branch-protection.yml` GitHub Actions workflow located at `.github/workflows/branch-protection.yml`.
 - **Invalid PRs will:**
   - Fail the CI check
@@ -218,23 +218,6 @@ We follow **strict Git Flow** with the following branch structure:
 
   git checkout -b feature/123-add-playlist-export        # With issue number
   git checkout -b feature/456-fix-mobile-player-ui       # With issue number
-  ```
-
-- Merge into `develop` via Pull Request when complete and tested
-
-#### Fix Branches (`fix/<name>`)
-
-- For bug fixes that should land in `develop`
-- Branch from `develop`
-- Include issue numbers when applicable: `fix/789-resolve-audio-preview-timeout`
-- Examples:
-
-  ```bash
-  git checkout develop
-  git pull origin develop
-  git checkout -b fix/resolve-audio-preview-timeout
-
-  git checkout -b fix/789-resolve-audio-preview-timeout    # With issue number
   ```
 
 - Merge into `develop` via Pull Request when complete and tested
@@ -444,14 +427,13 @@ Before submitting a Pull Request, ensure the following checks are completed:
 **4. Git Hygiene**
 
 - ✅ Commit messages follow the commit message convention
-- ✅ Branch is up to date with target branch (`develop` for features/fixes, `main` for hotfixes)
+- ✅ Branch is up to date with target branch (`develop` for features, `main` for hotfixes)
 - ✅ No accidental commits (large files, secrets, personal configs, `.env` files)
-- ✅ Branch follows naming convention for the target branch (see **Branch Protection**): for PRs to `develop`, use `feature/*`, `fix/*`, `dependabot/*`, or (maintainers) `release/*`, `hotfix/*`, or `main` for back-merge; for PRs to `main`, use `release/*` or `hotfix/*` only
+- ✅ Branch follows naming convention for the target branch (see **Branch Protection**): for PRs to `develop`, use `feature/*`, `dependabot/*`, or (maintainers) `release/*`, `hotfix/*`, or `main` for back-merge; for PRs to `main`, use `release/*` or `hotfix/*` only
 
 **5. Branch Target**
 
 - ✅ Feature branches target `develop` branch (NOT `main`)
-- ✅ Fix branches target `develop` branch (NOT `main`)
 - ✅ Hotfix branches target `main` branch
 - ✅ Release branches target both `main` and `develop` (maintainers only)
 - ✅ Chore branches target `develop` branch (NOT `main`)
@@ -501,7 +483,7 @@ Before submitting a Pull Request, ensure the following checks are completed:
 - ✅ All review comments are addressed
 - ✅ No unresolved discussions
 - ✅ Ready for release (if applicable)
-- ✅ Branch targets correct base branch (`develop` for features/fixes, `main` for hotfixes)
+- ✅ Branch targets correct base branch (`develop` for features, `main` for hotfixes)
 
 #### 6.2. Opening a Pull Request
 
@@ -554,10 +536,10 @@ Pull Request titles must follow the same format as commit messages for consisten
 
 **Note on Branch Prefixes vs PR Title Types:**
 
-Branch prefixes (`feature/`, `fix/`, `hotfix/`, `release/`, plus `dependabot/` and exact `main` when allowed) are for branch organization and differ from PR title types:
+Branch prefixes (`feature/`, `hotfix/`, `release/`, plus `dependabot/` and exact `main` when allowed) are for branch organization and differ from PR title types:
 
 - Branch `feature/add-playlist-export` → PR title: `feat(playlist): add export functionality` (use `feat`, not `feature`)
-- Branch `fix/player-preview-timeout` → PR title: `fix(player): handle preview timeout` (use `fix`)
+- Branch `feature/player-preview-timeout` → PR title: `fix(player): handle preview timeout` (use `fix` for bug fixes; the branch stays `feature/*`)
 - Branch `feature/update-dependencies` → PR title: `chore: update dependencies` (use `chore`)
 - Branch `feature/update-validate-workflow` → PR title: `ci: …` or `chore: …` (branch stays `feature/*`; there are no `chore/*` or `ci/*` branch prefixes in this repo)
 - Branch `hotfix/player-crash` → PR title: `fix(player): prevent crash on invalid track` (use `fix`, not `hotfix`)
