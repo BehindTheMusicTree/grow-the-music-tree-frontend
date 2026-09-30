@@ -64,6 +64,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- Every Vitest test now gets an in-memory `localStorage` stub from `vitest.setup.ts`, so tests rendering `<Providers>` no longer need their own.
 - Bumped `@behindthemusictree/app-kit` to 8.1.1 (genre-tree-view 1.9.1): the pop-core wheel's zoom controls now float in a bottom-right overlay instead of the actions row.
 - Bumped `@behindthemusictree/app-kit` to 8.0.1 to align with grow API v8.3.3: album artists now parse (`albumArtists`), and a genre can be reparented to root (`parent: null`).
 
