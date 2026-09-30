@@ -101,11 +101,11 @@ Fixes #
 
 ### Git & Workflow
 
-- [ ] My branch name is allowed for this PR target (see [CONTRIBUTING.md §2 Branching](../CONTRIBUTING.md#2-branching) and **Branch Protection**): `develop` ← `feature/*`, `fix/*`, `chore/*`, `dependabot/*`, `release/*`, `hotfix/*`, or `main` (back-merge); `main` ← `release/*` or `hotfix/*` only (`ci/*` and similar prefixes are not allowed—use `chore/*` for CI changes)
+- [ ] My branch name is allowed for this PR target (see [CONTRIBUTING.md §2 Branching](../CONTRIBUTING.md#2-branching) and **Branch Protection**): `develop` ← `feature/*`, `dependabot/*`, `release/*`, `hotfix/*`, or `main` (back-merge); `main` ← `release/*` or `hotfix/*` only (`fix/*`, `chore/*`, `ci/*` and similar prefixes are rejected—use `feature/*` for bug fixes and CI/tooling changes)
 - [ ] My commits follow the Conventional Commits format
 - [ ] I have rebased my branch on the latest target branch
 - [ ] I have resolved all merge conflicts
-- [ ] My PR targets the correct branch (`develop` for features/fixes/chores, `main` for hotfixes)
+- [ ] My PR targets the correct branch (`develop` for features, `main` for hotfixes)
 
 ### Dependencies & Build
 

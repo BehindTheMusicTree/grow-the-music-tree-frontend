@@ -1,38 +1,30 @@
 ---
 name: launch
-description: Use this skill when asked to run, start, dev-serve, or preview grow-the-music-tree-frontend, or to confirm a change works in the real app. Covers required env setup and the companion TheMusicTreeAPI backend this app talks to.
+description: Use this skill when asked to run, start, dev-serve, or preview grow-the-music-tree-frontend, or to confirm a change works in the real app. Starts the local grow-api (restoring prod data into it when empty) and the Next.js dev server. Args - optional port, `restore` (force a fresh prod restore), `no-restore`.
 ---
 
 # Launch grow-the-music-tree-frontend
 
-This is a Next.js (App Router) frontend that requires an env file and a
-running TheMusicTreeAPI backend (local or remote) before `next dev` will work
-correctly — API calls fail without one.
-
-## 1. Env setup (first run)
+Run from the repo root (any worktree):
 
 ```bash
-cp .env.example .env.local
+./scripts/dev-up.sh [--port <n>] [--restore|--no-restore]
 ```
 
-Fill in the secrets listed there. Non-secret defaults (staging grow-api) are in the
-committed `.env`. Missing/invalid vars stop `pnpm dev` with a message naming them.
+Map args: a port → `--port <n>` (omit it to get the first free port in 3000–3009), `restore` → `--restore`
+(wipes the local DB), `no-restore` → `--no-restore`. The default restores prod data only when the local DB is empty.
 
-## 2. Pick an API target
+Trust its `key=value` output and don't re-verify with `curl`/`lsof`:
 
-- **Staging** (default) — nothing to do.
-- **Local API** — run TheMusicTreeAPI locally, then set
-  `GROW_API_ORIGIN=http://127.0.0.1:8000` in `.env.local`.
+- `status=ok` → give the user `web_url` (always `localhost`, never `127.0.0.1`, or Google sign-in fails).
+- Surface `api_warning` (the API checkout isn't on an up-to-date `main`/`develop`, so migrations or endpoints may
+  differ) and `signin=disabled` (see `docs/frontend-auth.md` → Setup).
+- `reason=api-origin-overridden` → the shell env, `.env.development.local` or `.env.local` points `GROW_API_ORIGIN`
+  elsewhere (e.g. staging). Ask whether to remove that override, or to run plain `pnpm dev` against it deliberately.
+- `reason=port-in-use` → rerun without `--port`, or with another port.
+- Other `error` → relay the reason and `log_tail`.
 
-## 3. Start the dev server
+## Troubleshooting
 
-```bash
-pnpm dev                 # port 3000
-pnpm dev -- --port 3001  # another port
-```
-
-## 4. Verify
-
-Open the printed `http://127.0.0.1:<port>` URL. If pages render but data is
-missing/erroring, check `GROW_API_ORIGIN` in `.env.local`
-(or that the local API is running) before debugging further.
+- Docker `input/output error` / `500 Internal Server Error` from the daemon → disk is full. Free space,
+  then restart Docker Desktop.

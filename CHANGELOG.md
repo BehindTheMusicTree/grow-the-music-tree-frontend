@@ -62,6 +62,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ```markdown
 ## [Unreleased]
 
+### Changed
+
+- Bumped `@behindthemusictree/app-kit` to 8.0.1 to align with grow API v8.3.3: album artists now parse (`albumArtists`), and a genre can be reparented to root (`parent: null`).
+
+### Removed
+
+- Dead Spotify/user API code (`src/api`, Spotify schemas, `api-auth-spotify`, `spotify-required-cache`) and the `@api/*` alias; the API no longer serves those endpoints.
+
 ### Added
 
 - **Genre Tree Visualization**: Added interactive D3.js-based genre tree component
@@ -93,6 +101,27 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [3.3.0] - 2026-09-30
+
+### Fixed
+
+- **Genre wheel**: bumped `@behindthemusictree/app-kit` to 8.0.2, whose genre-playlists hook requests only the canonical tree (`allowsMultiplePrimaryParents=false`), so parentless regional genres no longer show up as extra roots.
+
+### Added
+
+- **App version**: `package.json` version is shown discreetly at the bottom-left of the main view (injected as `NEXT_PUBLIC_APP_VERSION` from `next.config.ts`, so the About page version is now populated too).
+- **Dev**: `scripts/dev-up.sh` starts the local grow-api (restoring prod data when its DB is empty), then the web server on a free port, from any worktree. The `launch` skill now runs it.
+
+### Improved
+
+- **Genre tree reloads**: `/api/grow-proxy` forwards `If-None-Match` and passes the API's `ETag` (with `Cache-Control: private, no-cache`) and `304` responses through, so a full page load revalidates the genre tree instead of re-downloading it.
+- **Admin link**: a discreet link on the About page opens `/admin` with client-side navigation, keeping the loaded genre tree in memory.
+
+### Documentation
+
+- **Branching**: `fix/*` and `chore/*` are not strict Gitflow and branch protection now rejects them for PRs to `develop`; bug fixes and CI/tooling/maintenance work use `feature/*`.
+
 
 ## [3.2.1] - 2026-09-29
 

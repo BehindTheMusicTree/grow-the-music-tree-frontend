@@ -1,9 +1,11 @@
 import path from "path";
 import type { NextConfig } from "next";
 import "./src/lib/env";
+import { version } from "./package.json";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  env: { NEXT_PUBLIC_APP_VERSION: version },
   images: { unoptimized: true },
   transpilePackages: ["@behindthemusictree/assets"],
   reactStrictMode: false,

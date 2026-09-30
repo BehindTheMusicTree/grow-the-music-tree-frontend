@@ -91,6 +91,11 @@ export default function AboutPage() {
           <div className="border-t border-gray-100 pt-4">
             <p className="mb-3 text-center text-sm text-gray-600">Follow BehindTheMusicTree and get in touch.</p>
             <OrgSocialLinks />
+            <p className="mt-3 text-center text-xs text-gray-400">
+              <Link href="/admin" className="hover:text-gray-600 transition-colors">
+                Admin
+              </Link>
+            </p>
           </div>
         </Section>
       </div>
