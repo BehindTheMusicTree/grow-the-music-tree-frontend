@@ -102,6 +102,18 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-09-30
+
+### Added
+
+- **Genre tree**: the genre info panel lists the genre's modifications (renames, moves, creation, …), newest first, with the actor's pseudo or "Pipeline", from grow-api's `GET /v1/genres/{uuid}/history/`.
+
+**Deploy note**: requires grow-api with `actorPseudo` in the history payload (grow-api PR #158). Release grow-api first, or the panel shows "Could not load modifications." for every genre.
+
+### Fixed
+
+- **Genre wheel**: bumped `@behindthemusictree/app-kit` to 8.1.0, whose genre-playlists hook filters the canonical tree with `treeName=canonical` — grow-api v10 replaced the `allowsMultiplePrimaryParents` filter, so the old query no longer restricted the wheel to canonical genres.
+
 ## [3.3.0] - 2026-09-30
 
 ### Fixed

@@ -13,6 +13,7 @@ import {
 } from "@behindthemusictree/app-kit/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
+import GenreHistory from "@components/features/genre-tree/GenreHistory";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
@@ -104,6 +105,7 @@ export default function GenreTreePage() {
         getBackendBaseUrl={getBackendBaseUrl}
         viewMode={viewMode}
         readOnly={!isAdmin}
+        renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
       />
     </Page>
   );
