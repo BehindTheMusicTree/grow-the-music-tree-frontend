@@ -102,6 +102,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Genre tree search**: bumped `@behindthemusictree/app-kit` to 8.2.1 — the result rows and the ✕ no longer render as black blocks (the global `button` background in `globals.css` overrode them).
 - **Genre tree stacked view** (via app-kit 8.1.2/8.1.3, pulled by the 8.2.0 bump): wheel and one-finger touch over a tree scroll the list instead of zooming it (Ctrl/Cmd+wheel still zooms); the first card no longer sits under the actions row; a horizontal trackpad swipe pans the tree instead of triggering macOS back-navigation; a pinch zooms the tree instead of scrolling the page.
 
 ## [3.4.0] - 2026-09-30
