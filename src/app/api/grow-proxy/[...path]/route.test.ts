@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
-import { GET, POST, DELETE } from "./route";
+import { GET, POST, PATCH, DELETE } from "./route";
 
 const getAdminIdTokenMock = vi.fn<(request: Request) => Promise<string | null>>();
 
@@ -72,6 +72,7 @@ describe("grow-proxy route", () => {
 
   it.each([
     ["POST", POST],
+    ["PATCH", PATCH],
     ["DELETE", DELETE],
   ])("returns 401 authentication_required for an anonymous %s without calling upstream", async (method, handler) => {
     const fetchMock = vi.spyOn(global, "fetch");

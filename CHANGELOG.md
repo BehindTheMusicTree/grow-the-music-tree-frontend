@@ -94,6 +94,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Curation admin** (`/admin/curation`, linked from `/admin`): lists grow-api's pipeline curation lists, and `/admin/curation/<list>` is a generic table editor (add, edit, delete rows) driven by each list's registry columns, with `exclude_other_parents` as a checkbox and API validation errors shown inline under the row. A banner notes that changes apply on the next pipeline run.
+- The `/api/grow-proxy` route now forwards `PATCH`.
+
 ### Changed
 
 - Every Vitest test now gets an in-memory `localStorage` stub from `vitest.setup.ts`, so tests rendering `<Providers>` no longer need their own.
