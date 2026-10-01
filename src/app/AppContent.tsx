@@ -4,7 +4,6 @@ import { useEffect, ReactNode } from "react";
 import { usePopup, useConnectivityErrorPopup } from "@behindthemusictree/app-kit/popup";
 import { usePlayer } from "@behindthemusictree/app-kit/player";
 import { initSentry } from "@lib/sentry";
-import { publicEnv } from "@lib/env";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
@@ -52,11 +51,6 @@ export default function AppContent({ children }: { children: ReactNode }) {
                 <div className="flex min-h-0 flex-1 flex-col">{children}</div>
               </main>
             </div>
-            {publicEnv.NEXT_PUBLIC_APP_VERSION && (
-              <p className="pointer-events-none absolute bottom-2 left-2 z-30 text-xs text-gray-400 tabular-nums select-none">
-                v{publicEnv.NEXT_PUBLIC_APP_VERSION}
-              </p>
-            )}
             {activePopup && (
               <div className="absolute top-0 right-0 bottom-0 left-0 z-40 pointer-events-none bg-black/10" aria-hidden />
             )}

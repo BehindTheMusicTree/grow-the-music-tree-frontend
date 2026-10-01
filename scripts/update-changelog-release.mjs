@@ -16,22 +16,21 @@ const changelogPath = join(root, "CHANGELOG.md");
 let content = readFileSync(changelogPath, "utf8");
 
 const marker = "\n## [Unreleased]\n\n";
-const first = content.indexOf(marker);
-const second = content.indexOf(marker, first + 1);
-if (second === -1) {
+const start = content.indexOf(marker);
+if (start === -1) {
   console.error("update-changelog-release: could not find [Unreleased] section");
   process.exit(1);
 }
 
-const nextSection = content.indexOf("\n## [", second + marker.length);
+const nextSection = content.indexOf("\n## [", start + marker.length);
 if (nextSection === -1) {
   console.error("update-changelog-release: could not find next version section");
   process.exit(1);
 }
 
-const unreleasedContent = content.slice(second + marker.length, nextSection).trim();
+const unreleasedContent = content.slice(start + marker.length, nextSection).trim();
 const newBlock = `\n${marker.trim()}\n\n## [${version}] - ${date}\n\n${unreleasedContent}\n\n`;
-const newContent = content.slice(0, second) + newBlock + content.slice(nextSection);
+const newContent = content.slice(0, start) + newBlock + content.slice(nextSection);
 
 writeFileSync(changelogPath, newContent, "utf8");
 console.log(`CHANGELOG: moved [Unreleased] to [${version}] - ${date}`);

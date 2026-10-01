@@ -9,8 +9,18 @@ export default async function AdminPage() {
   const session = await auth();
   const isSignedIn = !!session && !session.error;
   // A grow-api outage must not take down sign-in/sign-out: show the link without a count.
-  const conflictCount = isSignedIn ? await fetchGenreNameConflictGroups().then((groups) => groups.length, () => null) : null;
-  const rootCount = isSignedIn ? await fetchUnacceptedRoots().then((roots) => roots.length, () => null) : null;
+  const conflictCount = isSignedIn
+    ? await fetchGenreNameConflictGroups().then(
+        (groups) => groups.length,
+        () => null,
+      )
+    : null;
+  const rootCount = isSignedIn
+    ? await fetchUnacceptedRoots().then(
+        (roots) => roots.length,
+        () => null,
+      )
+    : null;
 
   return (
     <Page title="Admin" dataPage="admin">
@@ -23,6 +33,9 @@ export default async function AdminPage() {
             </Link>
             <Link href="/admin/root-review" className="font-medium underline">
               Root review{rootCount === null ? "" : ` (${rootCount})`}
+            </Link>
+            <Link href="/admin/curation" className="font-medium underline">
+              Curation
             </Link>
             <form
               action={async () => {
