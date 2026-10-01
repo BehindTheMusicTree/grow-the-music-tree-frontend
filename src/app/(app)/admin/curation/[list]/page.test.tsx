@@ -38,4 +38,19 @@ describe("CurationListPage", () => {
     await expect(CurationListPage(props("nope"))).rejects.toThrow("NEXT_NOT_FOUND");
     expect(fetchEntriesMock).not.toHaveBeenCalled();
   });
+
+  it("goes back to page 1 when the requested page is past the last one", async () => {
+    authMock.mockResolvedValue({ user: {} });
+    fetchListsMock.mockResolvedValue([{ name: "main_parent", keyColumns: [], columns: [], description: "" }]);
+    fetchEntriesMock.mockResolvedValue(null);
+
+    await expect(
+      CurationListPage({
+        params: Promise.resolve({ list: "main_parent" }),
+        searchParams: Promise.resolve({ page: "8" }),
+      }),
+    ).rejects.toThrow("NEXT_REDIRECT");
+    expect(fetchEntriesMock).toHaveBeenCalledWith("main_parent", 8);
+    expect(redirectMock).toHaveBeenCalledWith("/admin/curation/main_parent");
+  });
 });

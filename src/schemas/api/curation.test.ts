@@ -25,6 +25,18 @@ describe("buildCurationRowSchema", () => {
       "exclude_other_parents",
     ]);
   });
+
+  it("rejects a tab in a key column", () => {
+    const result = schema.safeParse({ item_id: "Q1", reason: "a\tb", exclude_other_parents: "" });
+    expect(result.success).toBe(true);
+    expect(
+      buildCurationRowSchema({ ...list, keyColumns: ["reason"] }).safeParse({
+        item_id: "Q1",
+        reason: "a\tb",
+        exclude_other_parents: "",
+      }).success,
+    ).toBe(false);
+  });
 });
 
 describe("toCurationRow", () => {

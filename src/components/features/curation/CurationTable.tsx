@@ -135,7 +135,7 @@ function EntryRow({ list, entry }: { list: CurationList; entry: CurationEntry })
           </Button>
         </td>
       </tr>
-      <ErrorRow list={list} errors={[...save.formErrors, ...remove.formErrors]} />
+      <ErrorRow list={list} errors={[...(draft ? save.formErrors : []), ...remove.formErrors]} />
     </>
   );
 }

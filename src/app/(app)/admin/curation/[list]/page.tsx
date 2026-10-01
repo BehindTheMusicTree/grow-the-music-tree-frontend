@@ -16,8 +16,10 @@ export default async function CurationListPage({ params, searchParams }: Props) 
   const list = (await fetchCurationLists()).find((candidate) => candidate.name === listName);
   if (!list) notFound();
 
-  const page = Math.max(1, Number((await searchParams).page) || 1);
+  const pageParam = (await searchParams).page;
+  const page = pageParam && /^[1-9]\d{0,5}$/.test(pageParam) ? Number(pageParam) : 1;
   const entries = await fetchCurationEntries(list.name, page);
+  if (!entries) redirect(`/admin/curation/${list.name}`);
 
   return (
     <Page title={list.name} dataPage="admin-curation-list">

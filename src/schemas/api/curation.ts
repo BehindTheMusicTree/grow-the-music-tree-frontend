@@ -41,7 +41,8 @@ export function buildCurationRowSchema(list: CurationList): z.ZodType<CurationRo
     Object.fromEntries(
       list.columns.map((column) => {
         if (BOOL_COLUMNS.has(column)) return [column, z.enum(["true", ""])];
-        const required = z.string().trim().min(1, "Required");
+        const value = z.string().trim().min(1, "Required");
+        const required = list.keyColumns.includes(column) ? value.regex(/^[^\t]*$/, "Must not contain a tab") : value;
         return [
           column,
           ITEM_ID_COLUMNS.has(column)
