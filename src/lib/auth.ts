@@ -111,7 +111,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => ({
  * Server-only: the admin's Google ID token for forwarding to grow-api, or null when signed out.
  * The ID token lives only in the encrypted JWT cookie and is never put on the client session.
  */
-export async function getAdminIdToken(request: Request): Promise<string | null> {
+export async function getAdminIdToken(request: { headers: Headers }): Promise<string | null> {
   const token = await getToken({ req: request, secret: getServerEnv().AUTH_SECRET, secureCookie: useSecureCookies });
   if (!token || token.error || !token.idToken) return null;
   if (!isExpired(token)) return token.idToken;
