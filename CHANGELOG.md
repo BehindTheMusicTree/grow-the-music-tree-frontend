@@ -103,6 +103,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - Every Vitest test now gets an in-memory `localStorage` stub from `vitest.setup.ts`, so tests rendering `<Providers>` no longer need their own.
 - Bumped `@behindthemusictree/app-kit` to 8.1.1 (genre-tree-view 1.9.1): the pop-core wheel's zoom controls now float in a bottom-right overlay instead of the actions row.
+- The app version no longer overlays the bottom-left corner of every page (it covered the genre tree); it is shown only on `/about`.
 - **Genre tree search**: bumped `@behindthemusictree/app-kit` to 8.2.0 (genre-tree-view 1.11.0) for a Google Maps-style search bar. The pill-shaped bar sits first in the action row and shows the selected genre's name; its single ✕ clears the text, closes the details panel and deselects the node. The panel header no longer has its own ✕, the panel opens just below the bar instead of under it, and typing keeps the panel open until a new result is picked.
 
 ### Fixed
