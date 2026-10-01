@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import Player from "./Player";
 
 const usePlayerMock = vi.fn();
@@ -68,5 +68,22 @@ describe("Player", () => {
     expect(screen.getByRole("button", { name: "Hide track list" })).toBeInTheDocument();
     const sidebar = screen.getByTestId("track-list-sidebar");
     expect(sidebar).toHaveAttribute("data-layout", "inline");
+  });
+
+  it("hides on close without unmounting the video, and reopens on a new track", () => {
+    isTrackListSidebarVisibleMock.mockReturnValue(false);
+    usePlayerMock.mockReturnValue({ playerTrackObject: { track: { id: "a", title: "Song A" } } });
+
+    const { container, rerender } = render(<Player />);
+    expect(screen.getByText("Song A")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Close player" }));
+
+    expect(container.firstChild).toHaveClass("hidden");
+    expect(screen.getByTestId("player-video-surface")).toBeInTheDocument();
+
+    usePlayerMock.mockReturnValue({ playerTrackObject: { track: { id: "b", title: "Song B" } } });
+    rerender(<Player />);
+
+    expect(container.firstChild).not.toHaveClass("hidden");
   });
 });
