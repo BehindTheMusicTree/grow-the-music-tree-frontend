@@ -60,17 +60,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Example:**
 
 ```markdown
-## [Unreleased]
-
-### Changed
-
-- Every Vitest test now gets an in-memory `localStorage` stub from `vitest.setup.ts`, so tests rendering `<Providers>` no longer need their own.
-- Bumped `@behindthemusictree/app-kit` to 8.1.1 (genre-tree-view 1.9.1): the pop-core wheel's zoom controls now float in a bottom-right overlay instead of the actions row.
-- Bumped `@behindthemusictree/app-kit` to 8.0.1 to align with grow API v8.3.3: album artists now parse (`albumArtists`), and a genre can be reparented to root (`parent: null`).
-
-### Removed
-
-- Dead Spotify/user API code (`src/api`, Spotify schemas, `api-auth-spotify`, `spotify-required-cache`) and the `@api/*` alias; the API no longer serves those endpoints.
+## [1.4.0] - YYYY-MM-DD
 
 ### Added
 
@@ -104,6 +94,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- Every Vitest test now gets an in-memory `localStorage` stub from `vitest.setup.ts`, so tests rendering `<Providers>` no longer need their own.
+- Bumped `@behindthemusictree/app-kit` to 8.1.1 (genre-tree-view 1.9.1): the pop-core wheel's zoom controls now float in a bottom-right overlay instead of the actions row.
+
 ## [3.4.0] - 2026-09-30
 
 ### Added
@@ -118,19 +113,27 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [3.3.0] - 2026-09-30
 
-### Fixed
-
-- **Genre wheel**: bumped `@behindthemusictree/app-kit` to 8.0.2, whose genre-playlists hook requests only the canonical tree (`allowsMultiplePrimaryParents=false`), so parentless regional genres no longer show up as extra roots.
-
 ### Added
 
 - **App version**: `package.json` version is shown discreetly at the bottom-left of the main view (injected as `NEXT_PUBLIC_APP_VERSION` from `next.config.ts`, so the About page version is now populated too).
 - **Dev**: `scripts/dev-up.sh` starts the local grow-api (restoring prod data when its DB is empty), then the web server on a free port, from any worktree. The `launch` skill now runs it.
 
+### Changed
+
+- Bumped `@behindthemusictree/app-kit` to 8.0.1 to align with grow API v8.3.3: album artists now parse (`albumArtists`), and a genre can be reparented to root (`parent: null`).
+
 ### Improved
 
 - **Genre tree reloads**: `/api/grow-proxy` forwards `If-None-Match` and passes the API's `ETag` (with `Cache-Control: private, no-cache`) and `304` responses through, so a full page load revalidates the genre tree instead of re-downloading it.
 - **Admin link**: a discreet link on the About page opens `/admin` with client-side navigation, keeping the loaded genre tree in memory.
+
+### Removed
+
+- Dead Spotify/user API code (`src/api`, Spotify schemas, `api-auth-spotify`, `spotify-required-cache`) and the `@api/*` alias; the API no longer serves those endpoints.
+
+### Fixed
+
+- **Genre wheel**: bumped `@behindthemusictree/app-kit` to 8.0.2, whose genre-playlists hook requests only the canonical tree (`allowsMultiplePrimaryParents=false`), so parentless regional genres no longer show up as extra roots.
 
 ### Documentation
 
