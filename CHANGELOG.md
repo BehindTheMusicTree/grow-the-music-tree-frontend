@@ -98,6 +98,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Curation admin** (`/admin/curation`, linked from `/admin`): lists grow-api's pipeline curation lists, and `/admin/curation/<list>` is a generic table editor (add, edit, delete rows) driven by each list's registry columns, with `exclude_other_parents` as a checkbox and API validation errors shown inline under the row. A banner notes that changes apply on the next pipeline run.
 - The `/api/grow-proxy` route now forwards `PATCH`.
+- **Genre panel tracks**: bumped `@behindthemusictree/app-kit` to 8.3.0. The genre details panel lists the genre playlist's tracks with infinite scroll, and clicking one plays the genre playlist starting from that track.
 
 ### Changed
 
