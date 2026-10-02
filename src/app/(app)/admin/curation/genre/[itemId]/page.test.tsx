@@ -15,11 +15,11 @@ vi.mock("next/navigation", () => ({
   },
 }));
 vi.mock("@lib/curation", () => ({
+  fetchCurationStatus: async () => ({ appliedExportOn: null, pendingCount: 0 }),
   fetchCurationLists: async () => [],
   fetchCurationRules: (itemId: string) => fetchRulesMock(itemId),
   fetchCurationHistory: async () => ({ overallTotal: 7, page: 1, totalPages: 2, results: [] }),
 }));
-vi.mock("@components/features/curation/CurationBanner", () => ({ default: () => null }));
 vi.mock("@components/features/curation/CurationGenreRules", () => ({ default: () => null }));
 vi.mock("@components/features/curation/CurationHistory", () => ({ default: () => null }));
 

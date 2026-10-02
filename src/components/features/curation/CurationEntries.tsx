@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Button, Pagination } from "@behindthemusictree/ui";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import CurationEntryEditor from "@components/features/curation/CurationEntryEditor";
+import { isPendingCurationEntry } from "@components/features/curation/CurationStatus";
 import GenreRef from "@components/features/curation/GenreRef";
 import { useDebouncedValue } from "@hooks/useDebouncedValue";
 import { PAIRED_LABEL_COLUMNS, curationColumnTitle, displayedCurationColumns } from "@lib/curationColumns";
@@ -26,6 +27,7 @@ type Props = {
   q: string;
   ordering: CurationOrdering;
   showQid: boolean;
+  appliedExportOn: string | null;
 };
 
 function useUpdateQuery() {
@@ -76,11 +78,13 @@ function EntryActions({
   list,
   entry,
   labels,
+  pending,
   onEdit,
 }: {
   list: CurationList;
   entry: CurationEntry;
   labels: Record<string, string>;
+  pending: boolean;
   onEdit: () => void;
 }) {
   const router = useRouter();
@@ -95,6 +99,14 @@ function EntryActions({
 
   return (
     <div className="flex flex-col gap-1">
+      {pending && (
+        <span
+          title="Modifiée depuis le dernier run du pipeline"
+          className="self-start px-2 py-0.5 text-xs font-medium text-yellow-900 bg-yellow-100 rounded-full"
+        >
+          En attente
+        </span>
+      )}
       <div className="flex gap-2">
         <Button onClick={onEdit} disabled={remove.isPending} aria-label={`Modifier ${name}`}>
           Modifier
@@ -124,7 +136,7 @@ function EntryActions({
   );
 }
 
-function Toolbar({ q, ordering, showQid, onAdd }: Omit<Props, "list" | "entries"> & { onAdd: () => void }) {
+function Toolbar({ q, ordering, showQid, onAdd }: Omit<Props, "list" | "entries" | "appliedExportOn"> & { onAdd: () => void }) {
   const updateQuery = useUpdateQuery();
   const [text, setText] = useState(q);
   const search = useDebouncedValue(text.trim(), 300);
@@ -175,12 +187,14 @@ export function CurationEntryRows({
   results,
   labels,
   showQid,
+  appliedExportOn,
   onEdit,
 }: {
   list: CurationList;
   results: CurationEntry[];
   labels: Record<string, string>;
   showQid: boolean;
+  appliedExportOn: string | null;
   onEdit: (entry: CurationEntry) => void;
 }) {
   const columns = displayedCurationColumns(list.columns);
@@ -209,7 +223,13 @@ export function CurationEntryRows({
                   </td>
                 ))}
                 <td className="p-2">
-                  <EntryActions list={list} entry={entry} labels={labels} onEdit={() => onEdit(entry)} />
+                  <EntryActions
+                    list={list}
+                    entry={entry}
+                    labels={labels}
+                    pending={isPendingCurationEntry(entry, appliedExportOn)}
+                    onEdit={() => onEdit(entry)}
+                  />
                 </td>
               </tr>
             ))}
@@ -230,7 +250,13 @@ export function CurationEntryRows({
                   </div>
                 ))}
               </dl>
-              <EntryActions list={list} entry={entry} labels={labels} onEdit={() => onEdit(entry)} />
+              <EntryActions
+                    list={list}
+                    entry={entry}
+                    labels={labels}
+                    pending={isPendingCurationEntry(entry, appliedExportOn)}
+                    onEdit={() => onEdit(entry)}
+                  />
             </article>
           </li>
         ))}
@@ -239,7 +265,7 @@ export function CurationEntryRows({
   );
 }
 
-export default function CurationEntries({ list, entries, q, ordering, showQid }: Props) {
+export default function CurationEntries({ list, entries, q, ordering, showQid, appliedExportOn }: Props) {
   const updateQuery = useUpdateQuery();
   const [editing, setEditing] = useState<CurationEntry | "new" | null>(null);
   const { labels, results } = entries;
@@ -252,7 +278,14 @@ export default function CurationEntries({ list, entries, q, ordering, showQid }:
         {q && ` pour « ${q} »`}
       </p>
       {results.length > 0 && (
-        <CurationEntryRows list={list} results={results} labels={labels} showQid={showQid} onEdit={setEditing} />
+        <CurationEntryRows
+          list={list}
+          results={results}
+          labels={labels}
+          showQid={showQid}
+          appliedExportOn={appliedExportOn}
+          onEdit={setEditing}
+        />
       )}
       <Pagination
         currentPage={entries.page}

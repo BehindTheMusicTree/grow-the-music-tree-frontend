@@ -2,11 +2,11 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 import Page from "@components/ui/Page";
-import CurationBanner from "@components/features/curation/CurationBanner";
+import CurationStatus from "@components/features/curation/CurationStatus";
 import CurationHistory from "@components/features/curation/CurationHistory";
 import GenreRef from "@components/features/curation/GenreRef";
 import { auth } from "@lib/auth";
-import { fetchCurationHistory, fetchCurationLists, type CurationHistoryFilter } from "@lib/curation";
+import { fetchCurationHistory, fetchCurationLists, fetchCurationStatus, type CurationHistoryFilter } from "@lib/curation";
 import { curationListTitle } from "@lib/curationGroups";
 import { ITEM_ID_PATTERN } from "@schemas/api/curation";
 
@@ -36,13 +36,16 @@ export default async function CurationHistoryPage({ searchParams }: Props) {
   const filter = { list, entry, itemId };
   const page = pageParam && /^[1-9]\d{0,5}$/.test(pageParam) ? Number(pageParam) : 1;
 
-  const history = await fetchCurationHistory(filter, { page, pageSize: PAGE_SIZE });
+  const [history, status] = await Promise.all([
+    fetchCurationHistory(filter, { page, pageSize: PAGE_SIZE }),
+    fetchCurationStatus(),
+  ]);
   if (!history) redirect(historyHref(filter));
 
   return (
     <Page title="Historique de curation" dataPage="admin-curation-history">
       <div className="flex flex-col gap-4 p-4">
-        <CurationBanner />
+        <CurationStatus status={status} />
         {(list || entry || itemId) && (
           <p className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
             Filtré sur

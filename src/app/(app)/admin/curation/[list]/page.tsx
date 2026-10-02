@@ -1,9 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import Page from "@components/ui/Page";
-import CurationBanner from "@components/features/curation/CurationBanner";
+import CurationStatus from "@components/features/curation/CurationStatus";
 import CurationEntries from "@components/features/curation/CurationEntries";
 import { auth } from "@lib/auth";
-import { fetchCurationEntries, fetchCurationLists } from "@lib/curation";
+import { fetchCurationEntries, fetchCurationLists, fetchCurationStatus } from "@lib/curation";
 import { curationListTitle } from "@lib/curationGroups";
 import { CURATION_ORDERINGS } from "@schemas/api/curation";
 
@@ -24,7 +24,10 @@ export default async function CurationListPage({ params, searchParams }: Props) 
   const ordering = CURATION_ORDERINGS.find((candidate) => candidate === orderingParam) ?? "key";
   const showQid = qid === "1";
 
-  const entries = await fetchCurationEntries(list.name, { page, q, ordering });
+  const [entries, status] = await Promise.all([
+    fetchCurationEntries(list.name, { page, q, ordering }),
+    fetchCurationStatus(),
+  ]);
   if (!entries) {
     const kept = new URLSearchParams();
     if (q) kept.set("q", q);
@@ -37,7 +40,7 @@ export default async function CurationListPage({ params, searchParams }: Props) 
   return (
     <Page title={curationListTitle(list.name)} dataPage="admin-curation-list">
       <div className="flex flex-col gap-4 p-4">
-        <CurationBanner />
+        <CurationStatus status={status} />
         <p>{list.description}</p>
         <CurationEntries
           list={list}
@@ -45,6 +48,7 @@ export default async function CurationListPage({ params, searchParams }: Props) 
           q={q}
           ordering={ordering}
           showQid={showQid}
+          appliedExportOn={status.appliedExportOn}
         />
       </div>
     </Page>

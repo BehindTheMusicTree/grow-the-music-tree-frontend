@@ -14,6 +14,7 @@ const fetchEntriesMock = vi.fn();
 vi.mock("@lib/auth", () => ({ auth: () => authMock() }));
 vi.mock("next/navigation", () => ({ redirect: (url: string) => redirectMock(url), notFound: () => notFoundMock() }));
 vi.mock("@lib/curation", () => ({
+  fetchCurationStatus: async () => ({ appliedExportOn: null, pendingCount: 0 }),
   fetchCurationLists: () => fetchListsMock(),
   fetchCurationEntries: (...args: unknown[]) => fetchEntriesMock(...args),
 }));
