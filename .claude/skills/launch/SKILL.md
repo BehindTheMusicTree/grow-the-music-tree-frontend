@@ -14,7 +14,8 @@ Run from the repo root (any worktree):
 Map args: a port → `--port <n>` (omit it to get the first free port in 3000–3009), `restore` → `--restore`
 (wipes the local DB), `no-restore` → `--no-restore`. The default restores prod data only when the local DB is empty.
 
-Trust its `key=value` output and don't re-verify with `curl`/`lsof`:
+Trust its `key=value` output and don't re-verify with `curl`/`lsof`. If the output is lost, read
+`.dev-up.status` at the repo root, which holds the last run's lines:
 
 - `status=ok` → give the user `web_url` (always `localhost`, never `127.0.0.1`, or Google sign-in fails).
 - Surface `api_warning` (the API checkout isn't on an up-to-date `main`/`develop`, so migrations or endpoints may
