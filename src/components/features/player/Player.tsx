@@ -19,7 +19,7 @@ export default function Player({ className }: PlayerProps) {
 
   useEffect(() => {
     setDismissed(false);
-  }, [track]);
+  }, [track?.id]);
 
   // Hidden via CSS, never unmounted, so the video keeps playing while the panel is closed.
   // Geometry mirrors the genre-tree-view info panel: 60px top (under the header), 280px wide,
