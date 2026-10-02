@@ -11,6 +11,7 @@ const fetchListsMock = vi.fn();
 vi.mock("@lib/auth", () => ({ auth: () => authMock() }));
 vi.mock("next/navigation", () => ({ redirect: (url: string) => redirectMock(url) }));
 vi.mock("@lib/curation", () => ({ fetchCurationLists: () => fetchListsMock() }));
+vi.mock("@components/features/curation/CurationGenreSearch", () => ({ default: () => null }));
 
 const list = (name: string, count: number) => ({ name, keyColumns: [], columns: [], description: "", count });
 

@@ -24,15 +24,17 @@ type Props = {
   list: CurationList;
   /** Absent when adding an entry. */
   entry?: CurationEntry;
+  /** Prefills a new entry, e.g. with the genre it is added for. */
+  initialRow?: CurationRow;
   labels: Record<string, string>;
   onClose: () => void;
 };
 
-export default function CurationEntryEditor({ list, entry, labels, onClose }: Props) {
+export default function CurationEntryEditor({ list, entry, initialRow, labels, onClose }: Props) {
   const id = useId();
   const router = useRouter();
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
-  const [row, setRow] = useState<CurationRow>(() => toCurationRow(list, entry?.row ?? {}));
+  const [row, setRow] = useState<CurationRow>(() => toCurationRow(list, entry?.row ?? initialRow ?? {}));
   const inputSchema = useMemo(() => z.object({ row: buildCurationRowSchema(list) }), [list]);
   const path = entry ? `curation/${list.name}/entries/${entry.uuid}/` : `curation/${list.name}/entries/`;
   const { mutate, formErrors, isPending } = useValidatedMutation({
