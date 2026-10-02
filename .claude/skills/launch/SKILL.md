@@ -24,6 +24,8 @@ Trust its `key=value` output and don't re-verify with `curl`/`lsof`. If the outp
   elsewhere (e.g. staging). Ask whether to remove that override, or to run plain `pnpm dev` against it deliberately.
 - `reason=port-in-use` → rerun without `--port`, or with another port.
 - Other `error` → relay the reason and `log_tail`.
+- No `status=` line (in the output or `.dev-up.status`) → the run was cut off or is still going (e.g. waiting for
+  the web server); don't report a URL from a bare `pid=`. Check `.dev-up.log`, then rerun.
 
 ## Troubleshooting
 
