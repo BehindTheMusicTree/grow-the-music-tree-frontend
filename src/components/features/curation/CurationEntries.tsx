@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { z } from "zod";
 import { Button, Pagination } from "@behindthemusictree/ui";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
@@ -106,6 +107,13 @@ function EntryActions({
         >
           Supprimer
         </Button>
+        <Link
+          href={`/admin/curation/history?${new URLSearchParams({ list: list.name, entry: entry.uuid })}`}
+          aria-label={`Historique de ${name}`}
+          className="self-center text-sm underline"
+        >
+          Historique
+        </Link>
       </div>
       {remove.formErrors.map((error, index) => (
         <p key={index} role="alert" className="text-red-500">

@@ -17,9 +17,11 @@ vi.mock("next/navigation", () => ({
 vi.mock("@lib/curation", () => ({
   fetchCurationLists: async () => [],
   fetchCurationRules: (itemId: string) => fetchRulesMock(itemId),
+  fetchCurationHistory: async () => ({ overallTotal: 7, page: 1, totalPages: 2, results: [] }),
 }));
 vi.mock("@components/features/curation/CurationBanner", () => ({ default: () => null }));
 vi.mock("@components/features/curation/CurationGenreRules", () => ({ default: () => null }));
+vi.mock("@components/features/curation/CurationHistory", () => ({ default: () => null }));
 
 const params = (itemId: string) => ({ params: Promise.resolve({ itemId }) });
 
@@ -56,5 +58,13 @@ describe("CurationGenrePage", () => {
     expect(fetchRulesMock).toHaveBeenCalledWith("LOCAL:afro-jazz");
     expect(screen.getByRole("heading", { level: 1, name: "LOCAL:afro-jazz" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Voir sur Wikidata" })).not.toBeInTheDocument();
+  });
+
+  it("links to the genre's whole history", async () => {
+    render(await CurationGenrePage(params("Q1")));
+    expect(screen.getByRole("link", { name: "Tout l'historique" })).toHaveAttribute(
+      "href",
+      "/admin/curation/history?item_id=Q1",
+    );
   });
 });

@@ -45,6 +45,31 @@ export const CurationRulesSchema = z.object({
 
 export type CurationRules = z.infer<typeof CurationRulesSchema>;
 
+export const CurationHistoryPageSchema = z.object({
+  overallTotal: z.number(),
+  page: z.number(),
+  totalPages: z.number(),
+  results: z.array(
+    z.object({
+      uuid: z.string().uuid(),
+      action: z.enum(["created", "updated", "deleted"]),
+      /** Null when the pipeline made the edit. */
+      actorPseudo: z.string().nullable(),
+      /** JSON snapshots of `{list_name, ...row}`. */
+      oldValue: z.string().nullable(),
+      newValue: z.string().nullable(),
+      createdOn: z.string(),
+      entry: z.string().uuid(),
+    }),
+  ),
+});
+
+export type CurationHistoryPage = z.infer<typeof CurationHistoryPageSchema>;
+export type CurationHistoryItem = CurationHistoryPage["results"][number];
+
+/** A history snapshot's row; `list_name` sits next to the columns. */
+export const CurationSnapshotSchema = z.record(z.union([z.string(), z.boolean(), z.null()]));
+
 export const CURATION_ORDERINGS = ["key", "-updated_on"] as const;
 export type CurationOrdering = (typeof CURATION_ORDERINGS)[number];
 
