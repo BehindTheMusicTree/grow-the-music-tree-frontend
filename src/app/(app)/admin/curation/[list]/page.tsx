@@ -5,6 +5,7 @@ import CurationBanner from "@components/features/curation/CurationBanner";
 import CurationTable from "@components/features/curation/CurationTable";
 import { auth } from "@lib/auth";
 import { fetchCurationEntries, fetchCurationLists } from "@lib/curation";
+import { curationListTitle } from "@lib/curationGroups";
 
 type Props = { params: Promise<{ list: string }>; searchParams: Promise<{ page?: string }> };
 
@@ -22,7 +23,7 @@ export default async function CurationListPage({ params, searchParams }: Props) 
   if (!entries) redirect(`/admin/curation/${list.name}`);
 
   return (
-    <Page title={list.name} dataPage="admin-curation-list">
+    <Page title={curationListTitle(list.name)} dataPage="admin-curation-list">
       <div className="flex flex-col gap-4 p-4">
         <CurationBanner />
         <p>{list.description}</p>
