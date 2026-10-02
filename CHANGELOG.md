@@ -99,6 +99,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Player panel**: the player (video + track list) is now a dark panel at the top right of the tree view, matching the genre details panel (280px, under the header, clear of the zoom controls). Its header shows the current track title, the track-list toggle, and a close button; closing keeps playback running and the panel reopens on the next track.
 - **Genre details panel**: tracks now show a play/pause button on hover, left of the title (always visible on the current track); clicking the row text no longer starts playback (app-kit 8.4.0).
 - **Genre tree**: loads faster, since the full canonical playlist list is now fetched as parallel 100-item pages (grow-api's max) instead of one page after another (app-kit 8.4.1).
+- **Dev**: `scripts/dev-up.sh` also writes its `key=value` result lines to `.dev-up.status` (git-ignored), so the last run's outcome can be read back if the terminal output is lost.
 
 ### Fixed
 
