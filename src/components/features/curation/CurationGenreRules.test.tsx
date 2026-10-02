@@ -39,6 +39,7 @@ describe("CurationGenreRules", () => {
         itemId="Q1"
         lists={[capitalized, mainParent]}
         rules={{ results: [rule], labels: { Q1: "Rock", Q2: "Palaeo" } }}
+        appliedExportOn={null}
       />,
     );
 
@@ -55,7 +56,7 @@ describe("CurationGenreRules", () => {
   });
 
   it("says when no rule concerns the genre, and adds one prefilled with it", () => {
-    render(<CurationGenreRules itemId="Q1" lists={[capitalized, mainParent]} rules={{ results: [], labels: {} }} />);
+    render(<CurationGenreRules itemId="Q1" lists={[capitalized, mainParent]} rules={{ results: [], labels: {} }} appliedExportOn={null} />);
 
     expect(screen.getByText(/aucune règle/i)).toBeInTheDocument();
     const select = screen.getByRole("combobox", { name: "Ajouter une règle pour ce genre" });

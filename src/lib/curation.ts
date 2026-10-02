@@ -7,6 +7,7 @@ import {
   CurationHistoryPageSchema,
   CurationListsSchema,
   CurationRulesSchema,
+  CurationStatusSchema,
   type CurationList,
   type CurationOrdering,
 } from "@schemas/api/curation";
@@ -60,4 +61,10 @@ export async function fetchCurationHistory(
   if (itemId) query.set("item_id", itemId);
   const response = await fetchAsAdmin(`curation/history/?${query}`);
   return response.ok ? CurationHistoryPageSchema.parse(await response.json()) : null;
+}
+
+export async function fetchCurationStatus() {
+  const response = await fetchAsAdmin("curation/status/");
+  if (!response.ok) throw new Error(`Failed to fetch curation status: ${response.status}`);
+  return CurationStatusSchema.parse(await response.json());
 }

@@ -70,6 +70,14 @@ export type CurationHistoryItem = CurationHistoryPage["results"][number];
 /** A history snapshot's row; `list_name` sits next to the columns. */
 export const CurationSnapshotSchema = z.record(z.union([z.string(), z.boolean(), z.null()]));
 
+export const CurationStatusSchema = z.object({
+  /** When the pipeline last applied an export to the canonical tree; null before its first run. */
+  appliedExportOn: z.string().nullable(),
+  pendingCount: z.number(),
+});
+
+export type CurationStatus = z.infer<typeof CurationStatusSchema>;
+
 export const CURATION_ORDERINGS = ["key", "-updated_on"] as const;
 export type CurationOrdering = (typeof CURATION_ORDERINGS)[number];
 

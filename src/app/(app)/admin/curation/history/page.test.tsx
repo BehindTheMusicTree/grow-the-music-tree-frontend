@@ -15,10 +15,10 @@ vi.mock("next/navigation", () => ({
   },
 }));
 vi.mock("@lib/curation", () => ({
+  fetchCurationStatus: async () => ({ appliedExportOn: null, pendingCount: 0 }),
   fetchCurationLists: async () => [{ name: "main_parent" }],
   fetchCurationHistory: (...args: unknown[]) => fetchHistoryMock(...args),
 }));
-vi.mock("@components/features/curation/CurationBanner", () => ({ default: () => null }));
 vi.mock("@components/features/curation/CurationHistory", () => ({ default: () => null }));
 
 const props = (searchParams: Record<string, string>) => ({ searchParams: Promise.resolve(searchParams) });

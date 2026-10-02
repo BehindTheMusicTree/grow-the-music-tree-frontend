@@ -15,7 +15,7 @@ import {
   type CurationRules,
 } from "@schemas/api/curation";
 
-type Props = { itemId: string; lists: CurationList[]; rules: CurationRules };
+type Props = { itemId: string; lists: CurationList[]; rules: CurationRules; appliedExportOn: string | null };
 
 type Editing = { list: CurationList; entry?: CurationEntry; initialRow?: CurationRow };
 
@@ -24,7 +24,7 @@ function genreKeyColumn(list: CurationList) {
   return list.keyColumns.find((column) => ITEM_ID_COLUMNS.has(column));
 }
 
-export default function CurationGenreRules({ itemId, lists, rules }: Props) {
+export default function CurationGenreRules({ itemId, lists, rules, appliedExportOn }: Props) {
   const { results, labels } = rules;
   const [editing, setEditing] = useState<Editing | null>(null);
   const addable = lists.filter(genreKeyColumn);
@@ -58,6 +58,7 @@ export default function CurationGenreRules({ itemId, lists, rules }: Props) {
             results={entries}
             labels={labels}
             showQid={false}
+            appliedExportOn={appliedExportOn}
             onEdit={(entry) => setEditing({ list, entry })}
           />
         </section>

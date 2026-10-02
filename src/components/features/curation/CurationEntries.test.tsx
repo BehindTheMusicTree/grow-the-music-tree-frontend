@@ -39,8 +39,18 @@ const entry = {
 };
 const entries = { overallTotal: 1, page: 1, totalPages: 1, results: [entry], labels: { Q1: "Palaeo", Q2: "Rock" } };
 
-const renderEntries = (props: Partial<{ q: string; showQid: boolean }> = {}) =>
-  render(<CurationEntries list={list} entries={entries} q="" ordering="key" showQid={false} {...props} />);
+const renderEntries = (props: Partial<{ q: string; showQid: boolean; appliedExportOn: string | null }> = {}) =>
+  render(
+    <CurationEntries
+      list={list}
+      entries={entries}
+      q=""
+      ordering="key"
+      showQid={false}
+      appliedExportOn={null}
+      {...props}
+    />,
+  );
 
 describe("CurationEntries", () => {
   beforeEach(() => {
@@ -53,6 +63,16 @@ describe("CurationEntries", () => {
     vi.clearAllMocks();
     formErrorsMock.mockReturnValue([]);
     searchResultsMock.mockReturnValue({ results: [] });
+  });
+
+  it.each([
+    [null, false],
+    ["2026-09-30T00:00:00Z", true],
+    ["2026-10-01T00:00:00Z", false],
+  ])("flags entries edited since the last applied run (applied %s)", (appliedExportOn, pending) => {
+    renderEntries({ appliedExportOn });
+    const row = within(screen.getByRole("table"));
+    expect(row.queryByText("En attente") !== null).toBe(pending);
   });
 
   it("shows genre names with French headers, and QIDs only once toggled on", () => {
