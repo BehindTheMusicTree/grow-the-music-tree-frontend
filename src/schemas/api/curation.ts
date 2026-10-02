@@ -11,6 +11,7 @@ export const CurationListsSchema = z.array(
     keyColumns: z.array(z.string()),
     columns: z.array(z.string()),
     description: z.string(),
+    count: z.number(),
   }),
 );
 

@@ -17,6 +17,7 @@ const list = {
   keyColumns: ["item_id"],
   columns: ["item_id", "item_label", "reason", "parent_item_id", "exclude_other_parents"],
   description: "Forced main parent.",
+  count: 0,
 };
 const entry = {
   uuid: "11111111-1111-1111-1111-111111111111",

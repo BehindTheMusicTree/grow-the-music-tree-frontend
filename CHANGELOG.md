@@ -96,6 +96,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Admin curation**: admin pages share a nav (Curation, Genre review, Root review). The curation index groups the 18 lists by intent (Racines, Parenté, Exclusions, Libellés, Régional, Matching des chansons) under readable French titles with their entry counts; a list the frontend doesn't map yet shows under "Non classées". Requires grow-api's per-list `count`.
 - **Player panel**: the player (video + track list) is now a dark panel at the top right of the tree view, matching the genre details panel (280px, under the header, clear of the zoom controls). Its header shows the current track title, the track-list toggle, and a close button; closing keeps playback running and the panel reopens on the next track.
 - **Genre details panel**: tracks now show a play/pause button on hover, left of the title (always visible on the current track); clicking the row text no longer starts playback (app-kit 8.4.0).
 - **Genre tree**: loads faster, since the full canonical playlist list is now fetched as parallel 100-item pages (grow-api's max) instead of one page after another (app-kit 8.4.1).
