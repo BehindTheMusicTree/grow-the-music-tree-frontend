@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 // Mirrors grow-api's grow/curation/lists.py; the registry response doesn't carry column kinds.
-const ITEM_ID_COLUMNS = new Set(["item_id", "parent_item_id", "overview_item_id", "parent_id"]);
-const ITEM_ID_PATTERN = /^(Q\d+|LOCAL:[a-z0-9-]+)$/;
+export const ITEM_ID_COLUMNS = new Set(["item_id", "parent_item_id", "overview_item_id", "parent_id"]);
+export const ITEM_ID_PATTERN = /^(Q\d+|LOCAL:[a-z0-9-]+)$/;
 export const BOOL_COLUMNS = new Set(["exclude_other_parents"]);
 
 export const CurationListsSchema = z.array(
@@ -21,7 +21,7 @@ export const CurationEntrySchema = z.object({
   uuid: z.string().uuid(),
   row: z.record(z.union([z.string(), z.boolean()])),
   createdOn: z.string(),
-  updatedOn: z.string(),
+  updatedOn: z.string().nullable(),
 });
 
 export type CurationEntry = z.infer<typeof CurationEntrySchema>;
@@ -33,7 +33,13 @@ export const CurationEntriesPageSchema = z.object({
   page: z.number(),
   totalPages: z.number(),
   results: z.array(CurationEntrySchema),
+  labels: z.record(z.string()),
 });
+
+export type CurationEntriesPage = z.infer<typeof CurationEntriesPageSchema>;
+
+export const CURATION_ORDERINGS = ["key", "-updated_on"] as const;
+export type CurationOrdering = (typeof CURATION_ORDERINGS)[number];
 
 export type CurationRow = Record<string, string>;
 
@@ -63,3 +69,7 @@ export function toCurationRow(list: CurationList, row: CurationEntry["row"]): Cu
     }),
   );
 }
+
+export const CanonicalGenreSearchSchema = z.object({
+  results: z.array(z.object({ uuid: z.string().uuid(), name: z.string(), wikidataId: z.string().nullable() })),
+});

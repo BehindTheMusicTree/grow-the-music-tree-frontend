@@ -2,7 +2,12 @@ import "server-only";
 import { headers } from "next/headers";
 import { getAdminIdToken } from "@lib/auth";
 import { getGrowApiUpstreamBaseUrl } from "@lib/grow-api-upstream-url";
-import { CurationEntriesPageSchema, CurationListsSchema, type CurationList } from "@schemas/api/curation";
+import {
+  CurationEntriesPageSchema,
+  CurationListsSchema,
+  type CurationList,
+  type CurationOrdering,
+} from "@schemas/api/curation";
 
 export const CURATION_PAGE_SIZE = 100;
 
@@ -24,9 +29,12 @@ export async function fetchCurationLists(): Promise<CurationList[]> {
 }
 
 /** Null when `page` is past the last page, e.g. after deleting every entry of the last page. */
-export async function fetchCurationEntries(listName: string, page: number) {
-  const response = await fetchAsAdmin(
-    `curation/${encodeURIComponent(listName)}/entries/?page=${page}&page_size=${CURATION_PAGE_SIZE}`,
-  );
+export async function fetchCurationEntries(
+  listName: string,
+  { page, q, ordering }: { page: number; q: string; ordering: CurationOrdering },
+) {
+  const query = new URLSearchParams({ page: String(page), page_size: String(CURATION_PAGE_SIZE), ordering });
+  if (q) query.set("q", q);
+  const response = await fetchAsAdmin(`curation/${encodeURIComponent(listName)}/entries/?${query}`);
   return response.ok ? CurationEntriesPageSchema.parse(await response.json()) : null;
 }
