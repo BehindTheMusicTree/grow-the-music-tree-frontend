@@ -162,10 +162,78 @@ function Toolbar({ q, ordering, showQid, onAdd }: Omit<Props, "list" | "entries"
   );
 }
 
+export function CurationEntryRows({
+  list,
+  results,
+  labels,
+  showQid,
+  onEdit,
+}: {
+  list: CurationList;
+  results: CurationEntry[];
+  labels: Record<string, string>;
+  showQid: boolean;
+  onEdit: (entry: CurationEntry) => void;
+}) {
+  const columns = displayedCurationColumns(list.columns);
+  return (
+    <>
+      <div className="hidden overflow-x-auto md:block">
+        <table className="w-full text-left">
+          <thead>
+            <tr>
+              {columns.map((column) => (
+                <th key={column} className="p-2 text-sm font-medium text-gray-600">
+                  {curationColumnTitle(column)}
+                </th>
+              ))}
+              <th className="p-2">
+                <span className="sr-only">Actions</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {results.map((entry) => (
+              <tr key={entry.uuid} className="align-top border-t">
+                {columns.map((column) => (
+                  <td key={column} className="p-2">
+                    <Cell column={column} entry={entry} labels={labels} showQid={showQid} />
+                  </td>
+                ))}
+                <td className="p-2">
+                  <EntryActions list={list} entry={entry} labels={labels} onEdit={() => onEdit(entry)} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <ul className="flex flex-col gap-3 md:hidden">
+        {results.map((entry) => (
+          <li key={entry.uuid}>
+            <article className="flex flex-col gap-3 p-3 border rounded-lg">
+              <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+                {columns.map((column) => (
+                  <div key={column} className="contents">
+                    <dt className="text-sm text-gray-600">{curationColumnTitle(column)}</dt>
+                    <dd className="break-words">
+                      <Cell column={column} entry={entry} labels={labels} showQid={showQid} />
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              <EntryActions list={list} entry={entry} labels={labels} onEdit={() => onEdit(entry)} />
+            </article>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
 export default function CurationEntries({ list, entries, q, ordering, showQid }: Props) {
   const updateQuery = useUpdateQuery();
   const [editing, setEditing] = useState<CurationEntry | "new" | null>(null);
-  const columns = displayedCurationColumns(list.columns);
   const { labels, results } = entries;
 
   return (
@@ -176,57 +244,7 @@ export default function CurationEntries({ list, entries, q, ordering, showQid }:
         {q && ` pour « ${q} »`}
       </p>
       {results.length > 0 && (
-        <>
-          <div className="hidden overflow-x-auto md:block">
-            <table className="w-full text-left">
-              <thead>
-                <tr>
-                  {columns.map((column) => (
-                    <th key={column} className="p-2 text-sm font-medium text-gray-600">
-                      {curationColumnTitle(column)}
-                    </th>
-                  ))}
-                  <th className="p-2">
-                    <span className="sr-only">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((entry) => (
-                  <tr key={entry.uuid} className="align-top border-t">
-                    {columns.map((column) => (
-                      <td key={column} className="p-2">
-                        <Cell column={column} entry={entry} labels={labels} showQid={showQid} />
-                      </td>
-                    ))}
-                    <td className="p-2">
-                      <EntryActions list={list} entry={entry} labels={labels} onEdit={() => setEditing(entry)} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <ul className="flex flex-col gap-3 md:hidden">
-            {results.map((entry) => (
-              <li key={entry.uuid}>
-                <article className="flex flex-col gap-3 p-3 border rounded-lg">
-                  <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
-                    {columns.map((column) => (
-                      <div key={column} className="contents">
-                        <dt className="text-sm text-gray-600">{curationColumnTitle(column)}</dt>
-                        <dd className="break-words">
-                          <Cell column={column} entry={entry} labels={labels} showQid={showQid} />
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                  <EntryActions list={list} entry={entry} labels={labels} onEdit={() => setEditing(entry)} />
-                </article>
-              </li>
-            ))}
-          </ul>
-        </>
+        <CurationEntryRows list={list} results={results} labels={labels} showQid={showQid} onEdit={setEditing} />
       )}
       <Pagination
         currentPage={entries.page}

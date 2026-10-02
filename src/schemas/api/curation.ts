@@ -38,6 +38,13 @@ export const CurationEntriesPageSchema = z.object({
 
 export type CurationEntriesPage = z.infer<typeof CurationEntriesPageSchema>;
 
+export const CurationRulesSchema = z.object({
+  results: z.array(CurationEntrySchema.extend({ listName: z.string() })),
+  labels: z.record(z.string()),
+});
+
+export type CurationRules = z.infer<typeof CurationRulesSchema>;
+
 export const CURATION_ORDERINGS = ["key", "-updated_on"] as const;
 export type CurationOrdering = (typeof CURATION_ORDERINGS)[number];
 

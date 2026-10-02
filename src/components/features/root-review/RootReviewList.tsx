@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { Button } from "@behindthemusictree/ui";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
+import { curationGenreHref } from "@components/features/curation/GenreRef";
 import type { UnacceptedRoot } from "@schemas/api/genre-unaccepted-roots";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
@@ -33,6 +35,11 @@ function UnacceptedRootRow({ root }: { root: UnacceptedRoot }) {
           >
             {root.wikidataId}
           </a>
+        )}
+        {root.wikidataId && (
+          <Link href={curationGenreHref(root.wikidataId)} className="underline">
+            Règles de curation
+          </Link>
         )}
         <Button onClick={() => mutate({ genres: [{ uuid: root.uuid }] })} disabled={isPending}>
           Accept as root

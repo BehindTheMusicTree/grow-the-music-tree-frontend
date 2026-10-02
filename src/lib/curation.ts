@@ -5,6 +5,7 @@ import { getGrowApiUpstreamBaseUrl } from "@lib/grow-api-upstream-url";
 import {
   CurationEntriesPageSchema,
   CurationListsSchema,
+  CurationRulesSchema,
   type CurationList,
   type CurationOrdering,
 } from "@schemas/api/curation";
@@ -37,4 +38,10 @@ export async function fetchCurationEntries(
   if (q) query.set("q", q);
   const response = await fetchAsAdmin(`curation/${encodeURIComponent(listName)}/entries/?${query}`);
   return response.ok ? CurationEntriesPageSchema.parse(await response.json()) : null;
+}
+
+export async function fetchCurationRules(itemId: string) {
+  const response = await fetchAsAdmin(`curation/rules/?${new URLSearchParams({ item_id: itemId })}`);
+  if (!response.ok) throw new Error(`Failed to fetch curation rules of ${itemId}: ${response.status}`);
+  return CurationRulesSchema.parse(await response.json());
 }
