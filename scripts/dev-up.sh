@@ -12,6 +12,9 @@
 # or `status=error reason=…`. The same lines are also written to .dev-up.status.
 set -uo pipefail
 
+repo_root="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
+exec > >(tee "$repo_root/.dev-up.status")
+
 port=""
 restore="auto"
 while [[ $# -gt 0 ]]; do
@@ -23,8 +26,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-repo_root="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
-exec > >(tee "$repo_root/.dev-up.status")
 main_root="$(dirname "$(git -C "$repo_root" rev-parse --path-format=absolute --git-common-dir)")"
 api_dir="${GROW_API_DIR:-$(dirname "$main_root")/grow-the-music-tree-api}"
 echo "repo_root=$repo_root"
