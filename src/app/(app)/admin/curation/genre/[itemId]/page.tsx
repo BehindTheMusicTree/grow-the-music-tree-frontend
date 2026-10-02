@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import Page from "@components/ui/Page";
 import CurationBanner from "@components/features/curation/CurationBanner";
 import CurationGenreRules from "@components/features/curation/CurationGenreRules";
+import CurationHistory from "@components/features/curation/CurationHistory";
 import { auth } from "@lib/auth";
-import { fetchCurationLists, fetchCurationRules } from "@lib/curation";
+import { fetchCurationHistory, fetchCurationLists, fetchCurationRules } from "@lib/curation";
 import { ITEM_ID_PATTERN } from "@schemas/api/curation";
 
 type Props = { params: Promise<{ itemId: string }> };
@@ -15,7 +17,11 @@ export default async function CurationGenrePage({ params }: Props) {
   const itemId = decodeURIComponent((await params).itemId);
   if (!ITEM_ID_PATTERN.test(itemId)) notFound();
 
-  const [lists, rules] = await Promise.all([fetchCurationLists(), fetchCurationRules(itemId)]);
+  const [lists, rules, history] = await Promise.all([
+    fetchCurationLists(),
+    fetchCurationRules(itemId),
+    fetchCurationHistory({ itemId }, { page: 1, pageSize: 5 }),
+  ]);
   const name = rules.labels[itemId];
 
   return (
@@ -31,6 +37,15 @@ export default async function CurationGenrePage({ params }: Props) {
           )}
         </p>
         <CurationGenreRules itemId={itemId} lists={lists} rules={rules} />
+        <section className="flex flex-col gap-3">
+          <h2 className="text-lg font-semibold">Dernières modifications</h2>
+          <CurationHistory items={history?.results ?? []} />
+          {history && history.overallTotal > history.results.length && (
+            <Link href={`/admin/curation/history?${new URLSearchParams({ item_id: itemId })}`} className="underline">
+              Tout l&apos;historique
+            </Link>
+          )}
+        </section>
       </div>
     </Page>
   );

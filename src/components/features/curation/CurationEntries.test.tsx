@@ -93,6 +93,14 @@ describe("CurationEntries", () => {
     expect(mutateMock).toHaveBeenCalledWith(null);
   });
 
+  it("links an entry to its history", () => {
+    renderEntries();
+    expect(within(screen.getByRole("table")).getByRole("link", { name: "Historique de Palaeo" })).toHaveAttribute(
+      "href",
+      "/admin/curation/history?list=main_parent&entry=11111111-1111-1111-1111-111111111111",
+    );
+  });
+
   it("picks a genre by name, filling its QID and label", () => {
     searchResultsMock.mockReturnValue({
       results: [
