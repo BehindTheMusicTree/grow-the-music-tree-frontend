@@ -14,6 +14,9 @@ set -uo pipefail
 
 repo_root="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
 exec > >(tee "$repo_root/.dev-up.status")
+tee_pid=$!
+# Wait for tee so .dev-up.status is complete when the script returns.
+trap 'exec >&-; wait "$tee_pid"' EXIT
 
 port=""
 restore="auto"
