@@ -97,6 +97,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Changed
 
 - **Player panel**: the player (video + track list) is now a dark panel at the top right of the tree view, matching the genre details panel (280px, under the header, clear of the zoom controls). Its header shows the current track title, the track-list toggle, and a close button; closing keeps playback running and the panel reopens on the next track.
+- **Genre details panel**: tracks now show a play/pause button on hover, left of the title (always visible on the current track); clicking the row text no longer starts playback (app-kit 8.4.0).
 
 ## [3.5.0] - 2026-10-01
 
