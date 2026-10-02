@@ -100,6 +100,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Genre details panel**: tracks now show a play/pause button on hover, left of the title (always visible on the current track); clicking the row text no longer starts playback (app-kit 8.4.0).
 - **Genre tree**: loads faster, since the full canonical playlist list is now fetched as parallel 100-item pages (grow-api's max) instead of one page after another (app-kit 8.4.1).
 
+### Fixed
+
+- **Genre tree**: if one page of the canonical playlist list comes back empty, the tree now shows a clear load error instead of crashing with a `TypeError` (app-kit 8.4.2).
+
 ## [3.5.0] - 2026-10-01
 
 ### Added
