@@ -10,7 +10,7 @@ vi.mock("@hooks/useIsAdmin", () => ({
   useIsAdmin: () => useIsAdminMock(),
 }));
 
-const useListFullGenrePlaylistsMock = vi.fn(() => ({ data: { results: [] }, isLoading: false }));
+const useListFullGenrePlaylistsMock = vi.fn(() => ({ data: [], isLoading: false }));
 
 vi.mock("@lib/site-urls", () => ({
   getGrowBackendBaseUrl: () => "/api/grow-proxy",
@@ -57,7 +57,7 @@ function renderGenreTreePage({ forcePopCore = false }: { forcePopCore?: boolean 
 describe("GenreTreePage", () => {
   afterEach(() => {
     cleanup();
-    useListFullGenrePlaylistsMock.mockReturnValue({ data: { results: [] }, isLoading: false });
+    useListFullGenrePlaylistsMock.mockReturnValue({ data: [], isLoading: false });
     hasMainstreamPopRootMock.mockReturnValue(true);
     useIsAdminMock.mockReturnValue(false);
   });
@@ -91,7 +91,7 @@ describe("GenreTreePage", () => {
   });
 
   it("throws once loading finishes and the tree has no Mainstream Pop root", async () => {
-    useListFullGenrePlaylistsMock.mockReturnValue({ data: { results: [] }, isLoading: false });
+    useListFullGenrePlaylistsMock.mockReturnValue({ data: [], isLoading: false });
     hasMainstreamPopRootMock.mockReturnValue(false);
     // Swallow React's console.error noise from the thrown render error in this test only.
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
