@@ -9,7 +9,7 @@ interface PlayerProps {
   className?: string;
 }
 
-const iconButtonClassName = "flex h-6 w-6 shrink-0 items-center justify-center rounded-md hover:bg-white/10";
+const iconButtonClassName = "flex h-6 w-6 shrink-0 items-center justify-center p-0 rounded-md hover:bg-white/10";
 
 export default function Player({ className }: PlayerProps) {
   const { playerTrackObject } = usePlayer();
