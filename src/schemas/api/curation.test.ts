@@ -6,6 +6,7 @@ const list = {
   keyColumns: ["item_id"],
   columns: ["item_id", "reason", "exclude_other_parents"],
   description: "",
+  count: 0,
 };
 
 describe("buildCurationRowSchema", () => {

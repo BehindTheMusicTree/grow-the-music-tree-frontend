@@ -3,7 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import CurationPage from "./page";
 
 const authMock = vi.fn();
-const redirectMock = vi.fn(() => {
+const redirectMock = vi.fn<(url: string) => never>(() => {
   throw new Error("NEXT_REDIRECT");
 });
 const fetchListsMock = vi.fn();

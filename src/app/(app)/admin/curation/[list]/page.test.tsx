@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import CurationListPage from "./page";
 
 const authMock = vi.fn();
-const redirectMock = vi.fn(() => {
+const redirectMock = vi.fn<(url: string) => never>(() => {
   throw new Error("NEXT_REDIRECT");
 });
 const notFoundMock = vi.fn(() => {
