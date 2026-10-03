@@ -105,6 +105,7 @@ export default function GenreTreePage() {
         getBackendBaseUrl={getBackendBaseUrl}
         viewMode={viewMode}
         readOnly={!isAdmin}
+        controlsOrientation="horizontal"
         renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
       />
     </Page>
