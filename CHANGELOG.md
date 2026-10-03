@@ -111,6 +111,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Genre tree**: if one page of the canonical playlist list comes back empty, the tree now shows a clear load error instead of crashing with a `TypeError` (app-kit 8.4.2).
 - **Genre tree**: no more 502s on `/api/grow-proxy/genre-playlists` when loading the tree. Page requests now go out at most 4 at a time instead of all 17 at once; the burst was OOM-killing the server (app-kit 8.4.3).
+- **Player panel**: the track-list toggle and close buttons in the header now show their icons. A global `button` padding rule was squeezing them out.
 
 ## [3.5.0] - 2026-10-01
 
