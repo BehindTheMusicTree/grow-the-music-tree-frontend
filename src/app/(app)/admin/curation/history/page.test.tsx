@@ -37,7 +37,7 @@ describe("CurationHistoryPage", () => {
     expect(fetchHistoryMock).not.toHaveBeenCalled();
   });
 
-  it.each([{ list: "nope" }, { entry: "not-a-uuid" }, { item_id: "rock" }])("is not found for %o", async (params) => {
+  it.each<Record<string, string>>([{ list: "nope" }, { entry: "not-a-uuid" }, { item_id: "rock" }])("is not found for %o", async (params) => {
     await expect(CurationHistoryPage(props(params))).rejects.toThrow("NEXT_NOT_FOUND");
     expect(fetchHistoryMock).not.toHaveBeenCalled();
   });
