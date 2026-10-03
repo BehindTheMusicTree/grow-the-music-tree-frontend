@@ -114,6 +114,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Genre tree**: no more 502s on `/api/grow-proxy/genre-playlists` when loading the tree. Page requests now go out at most 4 at a time instead of all 17 at once; the burst was OOM-killing the server (app-kit 8.4.3).
 - **Player panel**: the track-list toggle and close buttons in the header now show their icons. A global `button` padding rule was squeezing them out.
 
+### Performance
+
+- **Genre tree**: loads in one request instead of ~18 paginated ones (app-kit 9.0.0). The full canonical playlist list now comes from grow-api's cached `genre-playlists/tree/` endpoint (grow-api 11.1.0+).
+
 ## [3.5.0] - 2026-10-01
 
 ### Added
