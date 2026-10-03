@@ -10,5 +10,6 @@ export function toPlayerTrack(track: YoutubeTrackDetailed): YoutubePlayerTrack {
     youtubeVideoId: track.youtubeVideoId,
     title: track.title,
     artists: track.artists?.map((artist) => ({ name: artist.name })),
+    unplayableReason: track.youtubeUnplayableReason,
   };
 }
