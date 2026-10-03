@@ -10,7 +10,10 @@ vi.mock("@hooks/useIsAdmin", () => ({
   useIsAdmin: () => useIsAdminMock(),
 }));
 
-const useListFullGenrePlaylistsMock = vi.fn(() => ({ data: [], isLoading: false }));
+const useListFullGenrePlaylistsMock = vi.fn<() => { data: unknown[] | undefined; isLoading: boolean }>(() => ({
+  data: [],
+  isLoading: false,
+}));
 
 vi.mock("@lib/site-urls", () => ({
   getGrowBackendBaseUrl: () => "/api/grow-proxy",

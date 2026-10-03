@@ -14,10 +14,11 @@ styled with Tailwind. Talks to the TheMusicTreeAPI backend.
 ## Commands
 
 - `pnpm dev` — dev server (Turbopack)
-- `pnpm build` — production build (also the closest thing to a typecheck)
+- `pnpm build` — production build
+- `pnpm typecheck` — `tsc --noEmit` over everything, test files included (`next build` skips them)
 - `pnpm lint` — ESLint (flat config, `eslint.config.mjs`)
 - `pnpm test` — Vitest run; `pnpm test:watch` / `pnpm test:coverage` for iterating
-- Validation before calling anything done: `pnpm lint && pnpm build && pnpm test`
+- Validation before calling anything done: `pnpm lint && pnpm typecheck && pnpm build && pnpm test`
 
 ## Structure
 

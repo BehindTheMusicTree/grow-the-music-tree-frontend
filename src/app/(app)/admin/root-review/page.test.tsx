@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import RootReviewPage from "./page";
 
 const authMock = vi.fn();
-const redirectMock = vi.fn(() => {
+const redirectMock = vi.fn<(url: string) => never>(() => {
   throw new Error("NEXT_REDIRECT");
 });
 const fetchRootsMock = vi.fn();
