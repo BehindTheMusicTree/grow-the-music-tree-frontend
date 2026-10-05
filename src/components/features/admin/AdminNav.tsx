@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/admin/curation/history", label: "Historique" },
   { href: "/admin/genre-review", label: "Genre review" },
   { href: "/admin/root-review", label: "Root review" },
+  { href: "/admin/imports", label: "Imports" },
 ];
 
 export default function AdminNav() {

@@ -16,6 +16,14 @@ describe("AdminNav", () => {
     expect(screen.getByRole("link", { name: "Historique" })).not.toHaveAttribute("aria-current");
   });
 
+  it("links to the imports page", () => {
+    pathname = "/admin/imports";
+    render(<AdminNav />);
+
+    expect(screen.getByRole("link", { name: "Imports" })).toHaveAttribute("href", "/admin/imports");
+    expect(screen.getByRole("link", { name: "Imports" })).toHaveAttribute("aria-current", "page");
+  });
+
   it("marks only the most specific section", () => {
     pathname = "/admin/curation/history";
     render(<AdminNav />);
