@@ -106,6 +106,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Genre tree**: loads faster, since the full canonical playlist list is now fetched as parallel 100-item pages (grow-api's max) instead of one page after another (app-kit 8.4.1).
 - **Genre tree outline view**: the genre details panel now opens on the left, and the list shifts right so it stays visible (app-kit 8.4.4).
 - **Genre tree**: the zoom/fit controls are now laid out horizontally (app-kit 8.5.0).
+- **Genre tree**: branches are drawn at 1/6 of the height of the genre they lead to, instead of hairlines, in every view (app-kit 9.1.1).
 - **Dev**: `scripts/dev-up.sh` also writes its `key=value` result lines to `.dev-up.status` (git-ignored), so the last run's outcome can be read back if the terminal output is lost.
 - **CI**: a new `pnpm typecheck` step (`next typegen && tsc --noEmit`) type-checks test files too, which `next build` skips; the test type errors it surfaced are fixed.
 
