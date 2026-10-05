@@ -111,6 +111,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Player panel**: with the track list open, the panel now fills the available height instead of shrinking to fit a short list.
 - **Player**: YouTube videos that can't be played (embedding disabled, error 150; private; removed; still processing; region-blocked) are flagged instead of breaking playback. They show greyed out with their reason in the genre details panel and the track-list sidebar, can't be played, and auto-advance skips them; a YouTube error during playback moves on to the next playable track (app-kit 9.1.0). Uses grow-api's `youtubeUnplayableReason`; until grow-api sends it, every track stays playable.
 - **Genre tree**: clicking inside the genre details panel no longer pans the tree underneath it (app-kit 9.0.1).
 - **Genre tree**: if one page of the canonical playlist list comes back empty, the tree now shows a clear load error instead of crashing with a `TypeError` (app-kit 8.4.2).
