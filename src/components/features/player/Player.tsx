@@ -26,7 +26,7 @@ export default function Player({ className }: PlayerProps) {
   // capped 164px above the bottom to clear the tree's zoom controls.
   return (
     <div
-      className={`fixed right-3 top-[60px] z-40 flex max-h-[calc(100vh-224px)] w-[280px] flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 text-zinc-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)] ${!playerTrackObject || dismissed ? "hidden" : ""} ${className ?? ""}`}
+      className={`fixed right-3 top-[60px] z-40 flex max-h-[calc(100vh-224px)] w-[280px] flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 text-zinc-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)] ${isTrackListSidebarVisible ? "h-[calc(100vh-224px)]" : ""} ${!playerTrackObject || dismissed ? "hidden" : ""} ${className ?? ""}`}
     >
       <div className="flex shrink-0 items-center justify-between gap-2 border-b border-zinc-800 py-2.5 pl-3.5 pr-2">
         <span className="min-w-0 truncate text-sm font-semibold">{track?.title}</span>
