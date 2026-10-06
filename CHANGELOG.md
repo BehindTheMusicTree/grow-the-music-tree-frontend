@@ -94,6 +94,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Curation**: title the new `genre_precedence` list « Priorité entre genres MusicBrainz » under « Matching des chansons ».
+
 ## [3.6.1] - 2026-10-06
 
 ### Security
