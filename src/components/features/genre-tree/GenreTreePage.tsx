@@ -59,15 +59,20 @@ export default function GenreTreePage() {
   );
 
   const canShowPopCore = useMemo(
-    () =>
-      hasMainstreamPopRoot(
-        (genrePlaylists ?? []).map((genrePlaylist) => ({
-          id: genrePlaylist.uuid,
-          parentId: genrePlaylist.parent?.uuid ?? null,
-          name: genrePlaylist.name,
-          itemCount: genrePlaylist.tracksCount,
-        })),
-      ),
+    () => {
+      const all = genrePlaylists ?? [];
+      const unacceptedRootUuids = new Set(all.filter((gp) => gp.isUnacceptedRoot).map((gp) => gp.uuid));
+      return hasMainstreamPopRoot(
+        all
+          .filter((gp) => !gp.isUnacceptedRoot && !unacceptedRootUuids.has(gp.root.uuid))
+          .map((genrePlaylist) => ({
+            id: genrePlaylist.uuid,
+            parentId: genrePlaylist.parent?.uuid ?? null,
+            name: genrePlaylist.name,
+            itemCount: genrePlaylist.tracksCount,
+          })),
+      );
+    },
     [genrePlaylists],
   );
 

@@ -109,6 +109,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Genre tree**: the zoom/fit controls are now laid out horizontally (app-kit 8.5.0).
 - **Genre tree**: branches are drawn at 1/6 of the height of the genre they lead to, instead of hairlines, in the tree and wheel views (app-kit 9.1.1).
 - **Genre tree**: Genreless no longer appears in the wheel views; the outline lists it apart from the genre tree (app-kit 9.2.0).
+- **Genre tree**: top-level genres created by an import and not yet accepted in Root review are hidden, with their subtrees, from the wheel, pop-core and outline views; the stacked view still shows them. The pop-core/outline toggle also ignores them when looking for the Mainstream Pop root (app-kit 9.3.0; requires grow-api's `isUnacceptedRoot`).
 - **Dev**: `scripts/dev-up.sh` also writes its `key=value` result lines to `.dev-up.status` (git-ignored), so the last run's outcome can be read back if the terminal output is lost.
 - **CI**: a new `pnpm typecheck` step (`next typegen && tsc --noEmit`) type-checks test files too, which `next build` skips; the test type errors it surfaced are fixed.
 
