@@ -94,6 +94,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.6.1] - 2026-10-06
+
 ### Security
 
 - **Dependencies**: bump `next` and `eslint-config-next` 16.2.3 → 16.3.8 (fixes App Router Server Components DoS, RSC cache poisoning, middleware-bypass and SSRF advisories), `sharp` 0.34.5 → 0.35.5, and `vitest`/`@vitest/ui`/`@vitest/coverage-v8` 3.2.4 → 3.2.7 (Vitest UI arbitrary file read), and `postcss` 8.5.3 → 8.5.23. Dedupes the lockfile so `nanoid`, `postcss`, `browserslist` and `source-map-js` resolve only to patched versions. Still open: `tinypool` 1.x (pinned by vitest 3; its fixes need vitest 4) and dev-only `brace-expansion`/`braces` under eslint.
