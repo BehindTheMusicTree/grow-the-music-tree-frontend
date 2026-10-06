@@ -94,6 +94,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.6.0] - 2026-10-06
+
 ### Changed
 
 - **Admin curation**: admin pages share a nav (Curation, Genre review, Root review). The curation index groups the 18 lists by intent (Racines, Parenté, Exclusions, Libellés, Régional, Matching des chansons) under readable French titles with their entry counts; a list the frontend doesn't map yet shows under "Non classées". Requires grow-api's per-list `count`.
