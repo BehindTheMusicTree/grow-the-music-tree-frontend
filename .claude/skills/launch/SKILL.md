@@ -14,7 +14,8 @@ Run from the repo root (any worktree):
 Map args: a port → `--port <n>` (omit it to get the first free port in 3000–3009), `restore` → `--restore`
 (wipes the local DB), `no-restore` → `--no-restore`. The default restores prod data only when the local DB is empty.
 
-Trust its `key=value` output and don't re-verify with `curl`/`lsof`:
+Trust its `key=value` output and don't re-verify with `curl`/`lsof`. If the output is lost, read
+`.dev-up.status` at the repo root, which holds the last run's lines:
 
 - `status=ok` → give the user `web_url` (always `localhost`, never `127.0.0.1`, or Google sign-in fails).
 - Surface `api_warning` (the API checkout isn't on an up-to-date `main`/`develop`, so migrations or endpoints may
@@ -23,6 +24,8 @@ Trust its `key=value` output and don't re-verify with `curl`/`lsof`:
   elsewhere (e.g. staging). Ask whether to remove that override, or to run plain `pnpm dev` against it deliberately.
 - `reason=port-in-use` → rerun without `--port`, or with another port.
 - Other `error` → relay the reason and `log_tail`.
+- No `status=` line (in the output or `.dev-up.status`) → the run was cut off or is still going (e.g. waiting for
+  the web server); don't report a URL from a bare `pid=`. Check `.dev-up.log`, then rerun.
 
 ## Troubleshooting
 

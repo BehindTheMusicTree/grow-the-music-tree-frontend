@@ -9,8 +9,14 @@
 # override with GROW_API_DIR.
 #
 # Prints key=value lines; the final line is always `status=ok`, `status=blocked reason=…`
-# or `status=error reason=…`.
+# or `status=error reason=…`. The same lines are also written to .dev-up.status.
 set -uo pipefail
+
+repo_root="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
+exec > >(tee "$repo_root/.dev-up.status")
+tee_pid=$!
+# Wait for tee (polled: bash 3.2 can't `wait` on a process substitution) so .dev-up.status is complete when the script returns.
+trap 'exec >&-; while kill -0 "$tee_pid" 2>/dev/null; do sleep 0.05; done' EXIT
 
 port=""
 restore="auto"
@@ -23,7 +29,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-repo_root="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
 main_root="$(dirname "$(git -C "$repo_root" rev-parse --path-format=absolute --git-common-dir)")"
 api_dir="${GROW_API_DIR:-$(dirname "$main_root")/grow-the-music-tree-api}"
 echo "repo_root=$repo_root"

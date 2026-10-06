@@ -22,6 +22,7 @@ function makeGenrePlaylist(uuid: string, name: string, parent: { uuid: string; n
     parent,
     root: parent ?? { uuid, name },
     tracksCount: 1,
+    isUnacceptedRoot: false,
     criteria: { uuid: uuid.replace(/.$/, "f"), name },
     createdOn: "2026-01-01T00:00:00.000Z",
     updatedOn: null,
@@ -63,15 +64,7 @@ describe("GenreTreePage zoom controls", () => {
       vi.fn(async (input: RequestInfo | URL) => {
         const url = String(input);
         if (url.includes("genre-playlists")) {
-          return jsonResponse({
-            overallTotal: genrePlaylists.length,
-            next: null,
-            previous: null,
-            results: genrePlaylists,
-            page: 1,
-            pageSize: genrePlaylists.length,
-            totalPages: 1,
-          });
+          return jsonResponse(genrePlaylists);
         }
         return jsonResponse({});
       }),
@@ -86,8 +79,9 @@ describe("GenreTreePage zoom controls", () => {
   it("floats the pop-core zoom controls in the bottom-right wrapper, out of the actions row", async () => {
     renderGenreTreePage("pop-core");
 
+    // The lazily imported wheel can take over findBy*'s 1 s default to mount when the full suite runs in parallel.
     for (const name of ["Zoom in", "Zoom out", "Fit to frame"]) {
-      const button = await screen.findByRole("button", { name });
+      const button = await screen.findByRole("button", { name }, { timeout: 5000 });
       expect(button.closest(".gtv-wheel-floating-controls")).not.toBeNull();
       expect(button.closest(".actions-container")).toBeNull();
     }

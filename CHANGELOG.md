@@ -94,6 +94,40 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.6.0] - 2026-10-06
+
+### Changed
+
+- **Admin curation**: admin pages share a nav (Curation, Genre review, Root review). The curation index groups the 18 lists by intent (Racines, Parenté, Exclusions, Libellés, Régional, Matching des chansons) under readable French titles with their entry counts; a list the frontend doesn't map yet shows under "Non classées". Requires grow-api's per-list `count`.
+- **Admin curation list editor**: a list page shows genre names instead of QIDs (an "Afficher les QID" toggle shows them), French column titles, a search box, sorting by key or last edit, and stacked cards on mobile. Adding or editing an entry opens a form (full screen on mobile) with a genre picker that searches canonical genres by name, or takes a QID / `LOCAL:slug` typed as is. Requires grow-api's `q`/`ordering` filters and `labels` on the entries endpoint.
+- **Admin curation genre rules**: `/admin/curation/genre/<QID or LOCAL:slug>` lists every curation rule about a genre, grouped by list, with edit buttons and an "Ajouter une règle pour ce genre" form prefilled with the genre. Reach it from the curation index's genre search, from any genre shown in a list, or from the "Règles de curation" link on genre-review and root-review cards. Requires grow-api's `curation/rules/` endpoint.
+- **Admin curation history**: `/admin/curation/history` (in the admin nav as "Historique") lists every curation edit, newest first: date, author ("pipeline" for automated runs), action, list, and the changed columns as old → new. It filters by list, entry (each row's "Historique" link) or genre; a genre's rules page shows its 5 latest edits. Requires grow-api's `curation/history/` endpoint.
+- **Admin imports**: `/admin/imports` (in the admin nav as "Imports") shows the latest pipeline import of each kind (canonical tree, regional tree, songs, unresolved genre tags) with how long ago it ran, its timestamp and counts ("never" until a kind is first imported), and the paginated import history, filterable by kind. Requires grow-api's `pipeline/imports/` endpoints.
+- **Admin curation sync status**: the curation pages replace the static "next pipeline run" banner with when the pipeline last applied the lists and how many edits are still pending; entries edited since that run carry an "En attente" badge.
+- **Player panel**: the player (video + track list) is now a dark panel at the top right of the tree view, matching the genre details panel (280px, under the header, clear of the zoom controls). Its header shows the current track title, the track-list toggle, and a close button; closing keeps playback running and the panel reopens on the next track.
+- **Genre details panel**: tracks now show a play/pause button on hover, left of the title (always visible on the current track); clicking the row text no longer starts playback (app-kit 8.4.0).
+- **Genre tree**: loads faster, since the full canonical playlist list is now fetched as parallel 100-item pages (grow-api's max) instead of one page after another (app-kit 8.4.1).
+- **Genre tree outline view**: the genre details panel now opens on the left, and the list shifts right so it stays visible (app-kit 8.4.4).
+- **Genre tree**: the zoom/fit controls are now laid out horizontally (app-kit 8.5.0).
+- **Genre tree**: branches are drawn at 1/6 of the height of the genre they lead to, instead of hairlines, in the tree and wheel views (app-kit 9.1.1).
+- **Genre tree**: Genreless no longer appears in the wheel views; the outline lists it apart from the genre tree (app-kit 9.2.0).
+- **Genre tree**: top-level genres created by an import and not yet accepted in Root review are hidden, with their subtrees, from the wheel, pop-core and outline views; the stacked view still shows them. The pop-core/outline toggle also ignores them when looking for the Mainstream Pop root (app-kit 9.3.0; requires grow-api's `isUnacceptedRoot`).
+- **Dev**: `scripts/dev-up.sh` also writes its `key=value` result lines to `.dev-up.status` (git-ignored), so the last run's outcome can be read back if the terminal output is lost.
+- **CI**: a new `pnpm typecheck` step (`next typegen && tsc --noEmit`) type-checks test files too, which `next build` skips; the test type errors it surfaced are fixed.
+
+### Fixed
+
+- **Player panel**: with the track list open, the panel now fills the available height instead of shrinking to fit a short list.
+- **Player**: YouTube videos that can't be played (embedding disabled, error 150; private; removed; still processing; region-blocked) are flagged instead of breaking playback. They show greyed out with their reason in the genre details panel and the track-list sidebar, can't be played, and auto-advance skips them; a YouTube error during playback moves on to the next playable track (app-kit 9.1.0). Uses grow-api's `youtubeUnplayableReason`; until grow-api sends it, every track stays playable.
+- **Genre tree**: clicking inside the genre details panel no longer pans the tree underneath it (app-kit 9.0.1).
+- **Genre tree**: if one page of the canonical playlist list comes back empty, the tree now shows a clear load error instead of crashing with a `TypeError` (app-kit 8.4.2).
+- **Genre tree**: no more 502s on `/api/grow-proxy/genre-playlists` when loading the tree. Page requests now go out at most 4 at a time instead of all 17 at once; the burst was OOM-killing the server (app-kit 8.4.3).
+- **Player panel**: the track-list toggle and close buttons in the header now show their icons. A global `button` padding rule was squeezing them out.
+
+### Performance
+
+- **Genre tree**: loads in one request instead of ~18 paginated ones (app-kit 9.0.0). The full canonical playlist list now comes from grow-api's cached `genre-playlists/tree/` endpoint (grow-api 11.1.0+).
+
 ## [3.5.0] - 2026-10-01
 
 ### Added
@@ -101,6 +135,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Curation admin** (`/admin/curation`, linked from `/admin`): lists grow-api's pipeline curation lists, and `/admin/curation/<list>` is a generic table editor (add, edit, delete rows) driven by each list's registry columns, with `exclude_other_parents` as a checkbox and API validation errors shown inline under the row. A banner notes that changes apply on the next pipeline run.
 - The `/api/grow-proxy` route now forwards `PATCH`.
 - **Genre panel tracks**: bumped `@behindthemusictree/app-kit` to 8.3.0. The genre details panel lists the genre playlist's tracks with infinite scroll, and clicking one plays the genre playlist starting from that track.
+- Bumped `@behindthemusictree/app-kit` to 8.3.1: the genre panel's track rows no longer pick up the global `button` styles (dark rounded blocks with unreadable text).
 
 ### Changed
 

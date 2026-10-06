@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { Button } from "@behindthemusictree/ui";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
+import { curationGenreHref } from "@components/features/curation/GenreRef";
 import type { GenreNameConflictGroup } from "@schemas/api/genre-name-conflicts";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
@@ -50,6 +52,11 @@ function GenreConflictGroupCard({ group }: { group: GenreNameConflictGroup }) {
               >
                 {genre.wikidataId}
               </a>
+            )}
+            {genre.wikidataId && (
+              <Link href={curationGenreHref(genre.wikidataId)} className="underline">
+                Règles de curation
+              </Link>
             )}
             {genre.hasNameConflict && <span className="text-sm text-amber-600">flagged</span>}
           </div>

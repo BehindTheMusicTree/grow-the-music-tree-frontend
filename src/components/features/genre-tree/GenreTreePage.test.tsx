@@ -10,7 +10,10 @@ vi.mock("@hooks/useIsAdmin", () => ({
   useIsAdmin: () => useIsAdminMock(),
 }));
 
-const useListFullGenrePlaylistsMock = vi.fn(() => ({ data: { results: [] }, isLoading: false }));
+const useListFullGenrePlaylistsMock = vi.fn<() => { data: unknown[] | undefined; isLoading: boolean }>(() => ({
+  data: [],
+  isLoading: false,
+}));
 
 vi.mock("@lib/site-urls", () => ({
   getGrowBackendBaseUrl: () => "/api/grow-proxy",
@@ -20,11 +23,11 @@ vi.mock("@behindthemusictree/app-kit/popup", () => ({
   usePopup: () => ({ showPopup: vi.fn(), hidePopup: vi.fn() }),
 }));
 
-const hasMainstreamPopRootMock = vi.fn(() => true);
+const hasMainstreamPopRootMock = vi.fn<(nodes: { id: string }[]) => boolean>(() => true);
 
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   useListFullGenrePlaylists: () => useListFullGenrePlaylistsMock(),
-  hasMainstreamPopRoot: () => hasMainstreamPopRootMock(),
+  hasMainstreamPopRoot: (nodes: { id: string }[]) => hasMainstreamPopRootMock(nodes),
   GenreTreeView: (props: { readOnly: boolean; getBackendBaseUrl: () => string; viewMode: string }) => (
     <div data-testid="genre-tree-view" data-readonly={String(props.readOnly)} data-viewmode={props.viewMode}>
       {props.getBackendBaseUrl()}
@@ -57,7 +60,7 @@ function renderGenreTreePage({ forcePopCore = false }: { forcePopCore?: boolean 
 describe("GenreTreePage", () => {
   afterEach(() => {
     cleanup();
-    useListFullGenrePlaylistsMock.mockReturnValue({ data: { results: [] }, isLoading: false });
+    useListFullGenrePlaylistsMock.mockReturnValue({ data: [], isLoading: false });
     hasMainstreamPopRootMock.mockReturnValue(true);
     useIsAdminMock.mockReturnValue(false);
   });
@@ -91,7 +94,7 @@ describe("GenreTreePage", () => {
   });
 
   it("throws once loading finishes and the tree has no Mainstream Pop root", async () => {
-    useListFullGenrePlaylistsMock.mockReturnValue({ data: { results: [] }, isLoading: false });
+    useListFullGenrePlaylistsMock.mockReturnValue({ data: [], isLoading: false });
     hasMainstreamPopRootMock.mockReturnValue(false);
     // Swallow React's console.error noise from the thrown render error in this test only.
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -110,5 +113,28 @@ describe("GenreTreePage", () => {
     renderGenreTreePage({ forcePopCore: true });
 
     expect(await screen.findByTestId("genre-tree-view")).toBeInTheDocument();
+  });
+
+  it("ignores unaccepted roots and their subtrees when checking for a Mainstream Pop root", async () => {
+    const row = (uuid: string, rootUuid: string, isUnacceptedRoot = false) => ({
+      uuid,
+      name: uuid,
+      parent: uuid === rootUuid ? null : { uuid: rootUuid },
+      root: { uuid: rootUuid },
+      tracksCount: 1,
+      isUnacceptedRoot,
+    });
+    useListFullGenrePlaylistsMock.mockReturnValue({
+      data: [row("pop", "pop"), row("pop-child", "pop"), row("new", "new", true), row("new-child", "new")],
+      isLoading: false,
+    });
+
+    renderGenreTreePage();
+
+    await screen.findByTestId("genre-tree-view");
+    expect(hasMainstreamPopRootMock).toHaveBeenLastCalledWith([
+      expect.objectContaining({ id: "pop" }),
+      expect.objectContaining({ id: "pop-child" }),
+    ]);
   });
 });

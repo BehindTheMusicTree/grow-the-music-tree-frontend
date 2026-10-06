@@ -7,7 +7,6 @@ import { usePopup } from "@behindthemusictree/app-kit/popup";
 import {
   useListFullGenrePlaylists,
   CriteriaMinimum,
-  CriteriaPlaylistSimple,
   hasMainstreamPopRoot,
   GenreTreeViewSkeleton,
 } from "@behindthemusictree/app-kit/genre-tree";
@@ -60,16 +59,21 @@ export default function GenreTreePage() {
   );
 
   const canShowPopCore = useMemo(
-    () =>
-      hasMainstreamPopRoot(
-        ((genrePlaylists?.results ?? []) as CriteriaPlaylistSimple[]).map((genrePlaylist) => ({
-          id: genrePlaylist.uuid,
-          parentId: genrePlaylist.parent?.uuid ?? null,
-          name: genrePlaylist.name,
-          itemCount: genrePlaylist.tracksCount,
-        })),
-      ),
-    [genrePlaylists?.results],
+    () => {
+      const all = genrePlaylists ?? [];
+      const unacceptedRootUuids = new Set(all.filter((gp) => gp.isUnacceptedRoot).map((gp) => gp.uuid));
+      return hasMainstreamPopRoot(
+        all
+          .filter((gp) => !gp.isUnacceptedRoot && !unacceptedRootUuids.has(gp.root.uuid))
+          .map((genrePlaylist) => ({
+            id: genrePlaylist.uuid,
+            parentId: genrePlaylist.parent?.uuid ?? null,
+            name: genrePlaylist.name,
+            itemCount: genrePlaylist.tracksCount,
+          })),
+      );
+    },
+    [genrePlaylists],
   );
 
   useEffect(() => {
@@ -105,6 +109,7 @@ export default function GenreTreePage() {
         getBackendBaseUrl={getBackendBaseUrl}
         viewMode={viewMode}
         readOnly={!isAdmin}
+        controlsOrientation="horizontal"
         renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
       />
     </Page>
