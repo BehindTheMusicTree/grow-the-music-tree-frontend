@@ -97,6 +97,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Added
 
 - **Curation**: title the new `genre_precedence` list « Priorité entre genres MusicBrainz » under « Matching des chansons ».
+- **Tracks**: imported songs show a « View on MusicBrainz » link to their MusicBrainz recording in the track list and genre playlist (app-kit 9.4.0; requires grow-api's `musicbrainzRecordingId`).
 
 ### Fixed
 
