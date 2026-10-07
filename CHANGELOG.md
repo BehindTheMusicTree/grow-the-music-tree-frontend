@@ -101,6 +101,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Fixed
 
 - **API**: a dropped connection now shows the network-error popup in every browser instead of « Service temporarily unavailable » (app-kit 9.3.2).
+- **API**: a request built wrong on our side (e.g. invalid header) now surfaces as a client error instead of the network-error popup, and is not retried (app-kit 9.3.3).
 
 ## [3.6.1] - 2026-10-06
 
