@@ -98,6 +98,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Curation**: title the new `genre_precedence` list « Priorité entre genres MusicBrainz » under « Matching des chansons ».
 
+### Fixed
+
+- **API**: a dropped connection now shows the network-error popup in every browser instead of « Service temporarily unavailable » (app-kit 9.3.2).
+
 ## [3.6.1] - 2026-10-06
 
 ### Security
