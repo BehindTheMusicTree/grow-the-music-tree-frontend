@@ -35,6 +35,9 @@ The portfolio website content lives in **[the-music-tree-frontend](https://githu
 **What the application does:**  
 GrowTheMusicTree is a web platform that allows users to explore and understand musical genres through an interactive, community-driven genre tree map, and to participate in genre classifications.
 
+**Objective:**  
+TheMusicTree is the system; BTMT (BehindTheMusicTree) is the team building it. It is a genre tree first, to explore and listen to, and it also aims to be a reference classifying all music: the backend ([grow-the-music-tree-api](https://github.com/BehindTheMusicTree/grow-the-music-tree-api)) holds every MusicBrainz song, including songs without a genre or video, so users can later link genreless songs to a genre. The tree view shows only songs that have both a genre and a YouTube video.
+
 **Target users:**  
 Music enthusiasts, researchers, and the general public interested in understanding music taxonomy and discovering new genres.
 
