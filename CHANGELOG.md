@@ -103,6 +103,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Curation**: title the new `genre_precedence` list « Priorité entre genres MusicBrainz » under « Matching des chansons ».
 - **Tracks**: imported songs show a « View on MusicBrainz » link to their MusicBrainz recording in the track list and genre playlist (app-kit 9.4.0; requires grow-api's `musicbrainzRecordingId`).
 
+### Documentation
+
+- **Docs**: README and CLAUDE.md state TheMusicTree's objective (genre tree to explore and listen to, and a reference classifying all MusicBrainz songs) and the BTMT vs TheMusicTree naming.
+
 ### Fixed
 
 - **API**: a dropped connection now shows the network-error popup in every browser instead of « Service temporarily unavailable » (app-kit 9.3.2).
