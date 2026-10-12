@@ -100,6 +100,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Curation**: « Appliquer la curation » button on `/admin/curation` launches a curation run (limited pipeline stages) and follows it with a progress bar polled every 5 s (queued, per-stage, song upload n/N, applied, failed, already applied by the nightly run); requires grow-api's `curation/apply/` endpoints.
 - **Curation**: title the new `genre_precedence` list « Priorité entre genres MusicBrainz » under « Matching des chansons ».
 - **Tracks**: imported songs show a « View on MusicBrainz » link to their MusicBrainz recording in the track list and genre playlist (app-kit 9.4.0; requires grow-api's `musicbrainzRecordingId`).
 

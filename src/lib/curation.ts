@@ -1,6 +1,7 @@
 import "server-only";
 import { fetchAsAdmin } from "@lib/admin-fetch";
 import {
+  CurationApplyRequestSchema,
   CurationEntriesPageSchema,
   CurationHistoryPageSchema,
   CurationListsSchema,
@@ -54,4 +55,11 @@ export async function fetchCurationStatus() {
   const response = await fetchAsAdmin("curation/status/");
   if (!response.ok) throw new Error(`Failed to fetch curation status: ${response.status}`);
   return CurationStatusSchema.parse(await response.json());
+}
+
+/** Null when no curation run was ever requested. */
+export async function fetchLatestCurationApply() {
+  const response = await fetchAsAdmin("curation/apply/latest/");
+  if (!response.ok) throw new Error(`Failed to fetch the latest curation run: ${response.status}`);
+  return response.status === 204 ? null : CurationApplyRequestSchema.parse(await response.json());
 }
