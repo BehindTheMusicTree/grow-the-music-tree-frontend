@@ -94,6 +94,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Genre tree**: each root genre now has a fixed color (Blues/Rock red, Reggae/Dub green, Disco/Funk violet, hip-hop gold, electronic blue, classical brown, jazz mustard…) instead of a hashed one, so no two roots share a color. Bumps `@behindthemusictree/app-kit` to 9.5.0.
+
 ## [3.7.1] - 2026-10-12
 
 ### Changed
