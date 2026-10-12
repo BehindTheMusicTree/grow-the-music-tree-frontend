@@ -10,7 +10,7 @@ describe("CurationStatus", () => {
 
     const status = screen.getByRole("status");
     expect(status).toHaveTextContent(/dernier run du pipeline appliqué le 1 oct\. 2026,? 14:30/i);
-    expect(status).toHaveTextContent("3 modifications en attente, appliquées au prochain run ou via le bouton ci-dessous.");
+    expect(status).toHaveTextContent("3 modifications en attente, appliquées au prochain run ou via « Appliquer la curation » ci-dessous.");
   });
 
   it("says when no run was recorded and nothing is pending", () => {
