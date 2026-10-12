@@ -40,9 +40,11 @@ describe("PipelineRunPanel", () => {
     cleanup();
     latest = null;
     vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("launches either kind when no run is active", () => {
+    vi.spyOn(window, "confirm").mockReturnValue(true);
     render(<PipelineRunPanel pendingCount={2} initialRequest={null} />);
 
     fireEvent.click(curationButton());
@@ -51,6 +53,16 @@ describe("PipelineRunPanel", () => {
     expect(mutateMock.mock.calls).toEqual([["curation"], ["full"]]);
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Annuler" })).not.toBeInTheDocument();
+  });
+
+  it("does not launch a full ingestion when the confirmation is declined", () => {
+    vi.spyOn(window, "confirm").mockReturnValue(false);
+    render(<PipelineRunPanel pendingCount={2} initialRequest={null} />);
+
+    fireEvent.click(fullButton());
+
+    expect(window.confirm).toHaveBeenCalledWith("Lancer une ingestion complète ? Le run dure plusieurs heures.");
+    expect(mutateMock).not.toHaveBeenCalled();
   });
 
   it("disables only the curation when nothing is pending", () => {
