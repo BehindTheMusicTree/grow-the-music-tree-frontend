@@ -8,6 +8,7 @@ const mutateMock = vi.fn();
 let latest: CurationApplyRequest | null = null;
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: refreshMock }) }));
+vi.mock("@tanstack/react-query", () => ({ useQueryClient: () => ({ setQueryData: vi.fn() }) }));
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api/grow-proxy" }));
 vi.mock("@behindthemusictree/app-kit/transport", () => ({
   useFetchWrapper: () => ({ fetch: vi.fn() }),

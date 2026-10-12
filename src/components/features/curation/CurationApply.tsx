@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { Button } from "@behindthemusictree/ui";
 import { useFetchWrapper, useQueryWithParse, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
@@ -9,6 +10,7 @@ import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { CURATION_APPLY_STAGES, CurationApplyRequestSchema, type CurationApplyRequest } from "@schemas/api/curation";
 
 const POLL_INTERVAL_MS = 5000;
+const LATEST_QUERY_KEY = ["curationApply", "latest"];
 
 const STAGE_LABELS: Record<(typeof CURATION_APPLY_STAGES)[number], string> = {
   fetching_rules: "Récupération des règles",
@@ -56,10 +58,12 @@ type Props = { pendingCount: number; initialRequest: CurationApplyRequest | null
 /** Launches a curation run (limited pipeline stages) and follows its progress. */
 export default function CurationApply({ pendingCount, initialRequest }: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
+  // skipGlobalError: the wrapper would otherwise resolve a failed poll to null, ending the progress tracking.
   const { data: request = null, refetch } = useQueryWithParse({
-    queryKey: ["curationApply", "latest"],
-    queryFn: () => fetch("curation/apply/latest/", true, false),
+    queryKey: LATEST_QUERY_KEY,
+    queryFn: () => fetch("curation/apply/latest/", true, false, {}, undefined, false, true),
     schema: CurationApplyRequestSchema.nullable(),
     context: "CurationApply",
     initialData: initialRequest,
@@ -68,8 +72,13 @@ export default function CurationApply({ pendingCount, initialRequest }: Props) {
   const { mutate, formErrors, isPending } = useValidatedMutation({
     inputSchema: z.undefined(),
     outputSchema: CurationApplyRequestSchema,
-    mutationFn: () => fetch("curation/apply/", true, false, { method: "POST" }),
-    onSuccess: () => refetch(),
+    mutationFn: () => fetch("curation/apply/", true, false, { method: "POST" }, undefined, false, true),
+    onSuccess: (created) => queryClient.setQueryData(LATEST_QUERY_KEY, created),
+    // 409 (another run is active) or 400 (the nightly applied everything meanwhile): show the up-to-date state.
+    onError: () => {
+      refetch();
+      router.refresh();
+    },
   });
 
   const wasActive = useRef(isActive(request));
