@@ -45,6 +45,7 @@ export const CURATION_GROUPS: { title: string; lists: Record<string, string> }[]
     lists: {
       genre_alias: "Alias de genres MusicBrainz",
       accepted_non_genre_tags: "Tags MusicBrainz ignorés",
+      genre_precedence: "Priorité entre genres MusicBrainz",
     },
   },
 ];

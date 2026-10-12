@@ -20,6 +20,7 @@ const REGISTRY = [
   "accepted_non_genre_tags",
   "canonical_genre_pop_side",
   "genre_alias",
+  "genre_precedence",
   "regional_secondary_parents",
 ];
 

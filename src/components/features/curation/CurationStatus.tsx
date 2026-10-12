@@ -25,7 +25,7 @@ export default function CurationStatus({ status }: { status: Status }) {
       )}
       {pendingCount === 0
         ? "Aucune modification en attente."
-        : `${pendingCount} modification${pendingCount > 1 ? "s" : ""} en attente, appliquée${pendingCount > 1 ? "s" : ""} au prochain run.`}
+        : `${pendingCount} modification${pendingCount > 1 ? "s" : ""} en attente, appliquée${pendingCount > 1 ? "s" : ""} au prochain run ou via « Appliquer la curation » ci-dessous.`}
     </p>
   );
 }

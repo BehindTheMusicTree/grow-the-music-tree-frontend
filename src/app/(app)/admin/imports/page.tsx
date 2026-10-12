@@ -2,8 +2,11 @@ import { notFound, redirect } from "next/navigation";
 import Page from "@components/ui/Page";
 import ImportRunHistory from "@components/features/import-runs/ImportRunHistory";
 import LatestImportRuns from "@components/features/import-runs/LatestImportRuns";
+import PipelineRunPanel from "@components/features/pipeline-runs/PipelineRunPanel";
 import { auth } from "@lib/auth";
+import { fetchCurationStatus } from "@lib/curation";
 import { fetchImportRuns, fetchLatestImportRuns } from "@lib/import-runs";
+import { fetchLatestPipelineRun } from "@lib/pipeline-runs";
 import { ImportKindSchema } from "@schemas/api/import-runs";
 
 type Props = { searchParams: Promise<{ kind?: string; page?: string }> };
@@ -17,12 +20,18 @@ export default async function ImportsPage({ searchParams }: Props) {
   if (kindParam !== undefined && !kind) notFound();
   const page = pageParam && /^[1-9]\d{0,5}$/.test(pageParam) ? Number(pageParam) : 1;
 
-  const [latest, history] = await Promise.all([fetchLatestImportRuns(), fetchImportRuns(page, kind)]);
+  const [latest, history, curationStatus, latestRun] = await Promise.all([
+    fetchLatestImportRuns(),
+    fetchImportRuns(page, kind),
+    fetchCurationStatus(),
+    fetchLatestPipelineRun(),
+  ]);
   if (!history) redirect(kind ? `/admin/imports?kind=${kind}` : "/admin/imports");
 
   return (
     <Page title="Imports" dataPage="admin-imports">
       <div className="flex flex-col gap-6 p-4">
+        <PipelineRunPanel pendingCount={curationStatus.pendingCount} initialRequest={latestRun} />
         <section aria-labelledby="latest-imports" className="flex flex-col gap-2">
           <h2 id="latest-imports" className="font-semibold">
             Latest imports

@@ -14,6 +14,8 @@ vi.mock("@lib/curation", () => ({
   fetchCurationLists: () => fetchListsMock(),
   fetchCurationStatus: async () => ({ appliedExportOn: null, pendingCount: 0 }),
 }));
+vi.mock("@lib/pipeline-runs", () => ({ fetchLatestPipelineRun: async () => null }));
+vi.mock("@components/features/pipeline-runs/PipelineRunPanel", () => ({ default: () => null }));
 vi.mock("@components/features/curation/CurationGenreSearch", () => ({ default: () => null }));
 
 const list = (name: string, count: number) => ({ name, keyColumns: [], columns: [], description: "", count });

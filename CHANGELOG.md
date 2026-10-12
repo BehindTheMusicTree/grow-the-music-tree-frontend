@@ -94,11 +94,36 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.7.0] - 2026-10-12
+
+### CI
+
+- Deploys: bumped `trigger-coolify-deploy` to v4.4.0 — a Coolify deployment stuck past an hour is cancelled (its build container force-stopped over SSH) instead of blocking every later deploy, and a failed or cancelled deploy posts an alert to the env's Discord status-alerts channel
+
+### Added
+
+- **Pipeline runs**: a pipeline runs panel on `/admin/curation` and `/admin/imports` launches a curation run (« Appliquer la curation », disabled with no pending edit) or a full ingestion (« Lancer une ingestion complète »), follows the run with a per-kind stage progress bar polled every 5 s (queued, per-stage, song upload n/N, applied/done, failed, already applied by the nightly run, cancelled, expired after 30 min without heartbeat) and cancels a queued or running run (« Annuler » → « Annulation demandée… »; a song merge already started finishes); requires grow-api's `pipeline/runs/` endpoints.
+- **Curation**: title the new `genre_precedence` list « Priorité entre genres MusicBrainz » under « Matching des chansons ».
+- **Tracks**: imported songs show a « View on MusicBrainz » link to their MusicBrainz recording in the track list and genre playlist (app-kit 9.4.0; requires grow-api's `musicbrainzRecordingId`).
+
+### Documentation
+
+- **Docs**: README and CLAUDE.md state TheMusicTree's objective (genre tree to explore and listen to, and a reference classifying all MusicBrainz songs) and the BTMT vs TheMusicTree naming.
+
+### Fixed
+
+- **API**: a dropped connection now shows the network-error popup in every browser instead of « Service temporarily unavailable » (app-kit 9.3.2).
+- **API**: a request built wrong on our side (e.g. invalid header) now surfaces as a client error instead of the network-error popup, and is not retried (app-kit 9.3.3).
+
 ## [3.6.1] - 2026-10-06
 
 ### Security
 
 - **Dependencies**: bump `next` and `eslint-config-next` 16.2.3 → 16.3.8 (fixes App Router Server Components DoS, RSC cache poisoning, middleware-bypass and SSRF advisories), `sharp` 0.34.5 → 0.35.5, and `vitest`/`@vitest/ui`/`@vitest/coverage-v8` 3.2.4 → 3.2.7 (Vitest UI arbitrary file read), and `postcss` 8.5.3 → 8.5.23. Dedupes the lockfile so `nanoid`, `postcss`, `browserslist` and `source-map-js` resolve only to patched versions. Still open: `tinypool` 1.x (pinned by vitest 3; its fixes need vitest 4) and dev-only `brace-expansion`/`braces` under eslint.
+
+### Fixed
+
+- **API**: bump `@behindthemusictree/app-kit` 9.3.0 → 9.3.1 so GET/HEAD requests retry twice on network-level failures (e.g. `ERR_CONNECTION_CLOSED` from a stale browser↔Cloudflare connection) instead of surfacing the connectivity popup.
 
 ## [3.6.0] - 2026-10-06
 
