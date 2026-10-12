@@ -78,30 +78,6 @@ export const CurationStatusSchema = z.object({
 
 export type CurationStatus = z.infer<typeof CurationStatusSchema>;
 
-export const CURATION_APPLY_STAGES = [
-  "fetching_rules",
-  "building_genres",
-  "matching_songs",
-  "importing_tree",
-  "uploading_songs",
-  "merging_songs",
-] as const;
-
-export const CurationApplyRequestSchema = z.object({
-  uuid: z.string().uuid(),
-  /** `superseded`: the nightly run applied every edit before this request ran. */
-  status: z.enum(["queued", "running", "succeeded", "failed", "superseded"]),
-  stage: z.enum(CURATION_APPLY_STAGES).nullable(),
-  stageCurrent: z.number().nullable(),
-  stageTotal: z.number().nullable(),
-  error: z.string().nullable(),
-  requestedOn: z.string(),
-  startedOn: z.string().nullable(),
-  finishedOn: z.string().nullable(),
-});
-
-export type CurationApplyRequest = z.infer<typeof CurationApplyRequestSchema>;
-
 export const CURATION_ORDERINGS = ["key", "-updated_on"] as const;
 export type CurationOrdering = (typeof CURATION_ORDERINGS)[number];
 

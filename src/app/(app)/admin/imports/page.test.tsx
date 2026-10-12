@@ -20,6 +20,8 @@ vi.mock("@lib/import-runs", () => ({
   fetchLatestImportRuns: () => fetchLatestMock(),
   fetchImportRuns: (...args: unknown[]) => fetchRunsMock(...args),
 }));
+vi.mock("@lib/curation", () => ({ fetchCurationStatus: async () => ({ appliedExportOn: null, pendingCount: 0 }) }));
+vi.mock("@lib/pipeline-runs", () => ({ fetchLatestPipelineRun: async () => null }));
 
 const props = (params: { kind?: string; page?: string }) => ({ searchParams: Promise.resolve(params) });
 
