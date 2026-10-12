@@ -94,6 +94,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.7.0] - 2026-10-12
+
 ### CI
 
 - Deploys: bumped `trigger-coolify-deploy` to v4.4.0 — a Coolify deployment stuck past an hour is cancelled (its build container force-stopped over SSH) instead of blocking every later deploy, and a failed or cancelled deploy posts an alert to the env's Discord status-alerts channel
