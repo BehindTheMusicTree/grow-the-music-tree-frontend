@@ -94,6 +94,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.7.1] - 2026-10-12
+
 ### Changed
 
 - **Pipeline runs**: « Lancer une ingestion complète » asks for confirmation before starting the multi-hour run.
