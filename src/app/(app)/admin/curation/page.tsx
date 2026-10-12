@@ -2,22 +2,28 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import Page from "@components/ui/Page";
 import CurationStatus from "@components/features/curation/CurationStatus";
+import CurationApply from "@components/features/curation/CurationApply";
 import CurationGenreSearch from "@components/features/curation/CurationGenreSearch";
 import { auth } from "@lib/auth";
-import { fetchCurationLists, fetchCurationStatus } from "@lib/curation";
+import { fetchCurationLists, fetchCurationStatus, fetchLatestCurationApply } from "@lib/curation";
 import { curationListTitle, groupCurationLists } from "@lib/curationGroups";
 
 export default async function CurationPage() {
   const session = await auth();
   if (!session || session.error) redirect("/admin");
 
-  const [lists, status] = await Promise.all([fetchCurationLists(), fetchCurationStatus()]);
+  const [lists, status, latestApply] = await Promise.all([
+    fetchCurationLists(),
+    fetchCurationStatus(),
+    fetchLatestCurationApply(),
+  ]);
   const groups = groupCurationLists(lists);
 
   return (
     <Page title="Curation" dataPage="admin-curation">
       <div className="flex flex-col gap-6 p-4">
         <CurationStatus status={status} />
+        <CurationApply pendingCount={status.pendingCount} initialRequest={latestApply} />
         <CurationGenreSearch />
         {groups.map((group) => (
           <section key={group.title} aria-labelledby={`curation-group-${group.title}`}>
