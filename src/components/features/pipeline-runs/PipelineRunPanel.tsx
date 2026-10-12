@@ -131,7 +131,12 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
         >
           Appliquer la curation
         </Button>
-        <Button onClick={() => launch.mutate("full")} disabled={active || launch.isPending}>
+        <Button
+          onClick={() =>
+            window.confirm("Lancer une ingestion complète ? Le run dure plusieurs heures.") && launch.mutate("full")
+          }
+          disabled={active || launch.isPending}
+        >
           Lancer une ingestion complète
         </Button>
         {request && active && (
