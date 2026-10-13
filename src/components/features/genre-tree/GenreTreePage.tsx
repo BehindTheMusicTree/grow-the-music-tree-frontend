@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, type ComponentProps } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, type ComponentProps } from "react";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -47,42 +47,20 @@ const GenreTreeView = dynamic(
 
 const ZOOM_PARAM = "zoom";
 
-type ZoomableGenreTreeViewProps = Omit<
-  ComponentProps<typeof GenreTreeView>,
-  "focusGenreUuid" | "onFocusGenreChange"
-> & {
-  genrePlaylists: ReturnType<typeof useListFullGenrePlaylists>["data"];
-};
+type ZoomableGenreTreeViewProps = Omit<ComponentProps<typeof GenreTreeView>, "focusGenreUuid" | "onFocusGenreChange">;
 
 // Reads `?zoom=` in its own component so only this subtree bails out to client rendering
 // (useSearchParams needs a Suspense boundary when the route is prerendered).
-function ZoomableGenreTreeView({ genrePlaylists, ...viewProps }: ZoomableGenreTreeViewProps) {
+function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const zoom = searchParams.get(ZOOM_PARAM);
   const isPopCore = viewProps.viewMode === "pop-core";
-
-  // The nodes GenreTreeView's pop-core wheel renders (accepted roots' subtrees, minus criteria-less
-  // playlists), minus those with several pop children: genre-tree-view throws on any other focus id.
-  const popCoreUuids = useMemo(() => {
-    const all = genrePlaylists ?? [];
-    const unacceptedRootUuids = new Set(all.filter((gp) => gp.isUnacceptedRoot).map((gp) => gp.uuid));
-    const visible = all.filter(
-      (gp) => gp.criteria && !gp.isUnacceptedRoot && !unacceptedRootUuids.has(gp.root.uuid),
-    );
-    const popChildCounts = new Map<string, number>();
-    visible.forEach((gp) => {
-      if (gp.parent && gp.criteria?.side === "pop") {
-        popChildCounts.set(gp.parent.uuid, (popChildCounts.get(gp.parent.uuid) ?? 0) + 1);
-      }
-    });
-    return new Set(visible.filter((gp) => (popChildCounts.get(gp.uuid) ?? 0) <= 1).map((gp) => gp.uuid));
-  }, [genrePlaylists]);
-
-  const focusGenreUuid = isPopCore && zoom && popCoreUuids.has(zoom) ? zoom : null;
-  // While the list is (re)loading the param can't be judged yet, so it is kept, not passed.
-  const isZoomStale = zoom !== null && (!isPopCore || (genrePlaylists !== undefined && !popCoreUuids.has(zoom)));
+  // The `?zoom=` value the user last pressed a pointer or key under. GenreTreeView resets a zoom it
+  // can't render with onFocusGenreChange(null) from an effect, before any input under that zoom;
+  // that reset must replace the param, or browser back would land on the rejected zoom again.
+  const zoomAtLastInputRef = useRef<string | null | undefined>(undefined);
 
   const hrefWithZoom = useCallback(
     (uuid: string | null) => {
@@ -96,19 +74,29 @@ function ZoomableGenreTreeView({ genrePlaylists, ...viewProps }: ZoomableGenreTr
   );
 
   useEffect(() => {
-    if (isZoomStale) router.replace(hrefWithZoom(null), { scroll: false });
-  }, [isZoomStale, hrefWithZoom, router]);
+    if (zoom !== null && !isPopCore) router.replace(hrefWithZoom(null), { scroll: false });
+  }, [zoom, isPopCore, hrefWithZoom, router]);
 
   const handleFocusGenreChange = useCallback(
-    (uuid: string | null) => router.push(hrefWithZoom(uuid), { scroll: false }),
-    [hrefWithZoom, router],
+    (uuid: string | null) => {
+      const href = hrefWithZoom(uuid);
+      if (uuid === null && zoomAtLastInputRef.current !== zoom) router.replace(href, { scroll: false });
+      else router.push(href, { scroll: false });
+    },
+    [zoom, hrefWithZoom, router],
   );
 
+  const recordInput = () => {
+    zoomAtLastInputRef.current = zoom;
+  };
+
   return (
-    <GenreTreeView
-      {...viewProps}
-      {...(isPopCore && { focusGenreUuid, onFocusGenreChange: handleFocusGenreChange })}
-    />
+    <div className="contents" onPointerDownCapture={recordInput} onKeyDownCapture={recordInput}>
+      <GenreTreeView
+        {...viewProps}
+        {...(isPopCore && { focusGenreUuid: zoom, onFocusGenreChange: handleFocusGenreChange })}
+      />
+    </div>
   );
 }
 
@@ -172,7 +160,6 @@ export default function GenreTreePage() {
     <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
       <Suspense fallback={<GenreTreeViewLoadingFallback />}>
         <ZoomableGenreTreeView
-          genrePlaylists={genrePlaylists}
           scope="reference"
           handleGenreCreationAction={showCriteriaCreationPopup}
           handleGenreRenameAction={showGenreRenamePopup}
