@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Pagination, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@behindthemusictree/ui";
 import { AbsoluteTime } from "@components/features/import-runs/importedOn";
 import { IMPORT_KIND_LABELS, ImportKindSchema, type ImportKind, type ImportRunsPage } from "@schemas/api/import-runs";
@@ -8,11 +8,14 @@ import { IMPORT_KIND_LABELS, ImportKindSchema, type ImportKind, type ImportRunsP
 export default function ImportRunHistory({ runs, kind }: { runs: ImportRunsPage; kind?: ImportKind }) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   function navigate(nextKind: ImportKind | undefined, page: number) {
-    const query = new URLSearchParams();
+    const query = new URLSearchParams(searchParams);
     if (nextKind) query.set("kind", nextKind);
+    else query.delete("kind");
     if (page > 1) query.set("page", String(page));
+    else query.delete("page");
     const search = query.toString();
     router.push(`${pathname}${search ? `?${search}` : ""}`);
   }

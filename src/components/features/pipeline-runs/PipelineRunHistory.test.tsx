@@ -36,7 +36,14 @@ const RUNS: PipelineRunsPage = {
   results: [
     run({ kind: "curation", trigger: "manual", requestedBy: "admin@example.com", status: "running", finishedOn: null }),
     run({}),
-    run({ kind: "curation", trigger: "manual", status: "queued", startedOn: null, finishedOn: null }),
+    run({
+      kind: "curation",
+      trigger: "manual",
+      status: "queued",
+      requestedOn: "2026-10-12T06:30:00Z",
+      startedOn: null,
+      finishedOn: null,
+    }),
   ],
 };
 
@@ -54,7 +61,7 @@ describe("PipelineRunHistory", () => {
     expect(rows.map((row) => row.textContent)).toEqual([
       "12 Oct 2026, 04:00CurationManuel · admin@example.comEn cours—",
       "12 Oct 2026, 04:00Ingestion complèteNightlyRéussi3 h 12 min",
-      "—CurationManuelEn file d'attente—",
+      "12 Oct 2026, 08:30CurationManuelEn file d'attente—",
     ]);
   });
 
