@@ -126,6 +126,24 @@ describe("PipelineRunPanel", () => {
     expect(screen.queryByRole("button", { name: "Annuler" })).not.toBeInTheDocument();
   });
 
+  it("refreshes the page when a run is launched and when it starts, not on first render or re-polls", () => {
+    latest = request({ uuid: "22222222-2222-2222-2222-222222222222", status: "succeeded" });
+    const { rerender } = render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+    expect(refreshMock).not.toHaveBeenCalled();
+
+    latest = request({ status: "queued" });
+    rerender(<PipelineRunPanel pendingCount={1} initialRequest={null} />);
+    expect(refreshMock).toHaveBeenCalledOnce();
+
+    latest = request({ status: "running", stage: "fetching_rules" });
+    rerender(<PipelineRunPanel pendingCount={1} initialRequest={null} />);
+    expect(refreshMock).toHaveBeenCalledTimes(2);
+
+    latest = request({ status: "running", stage: "importing_tree" });
+    rerender(<PipelineRunPanel pendingCount={1} initialRequest={null} />);
+    expect(refreshMock).toHaveBeenCalledTimes(2);
+  });
+
   it.each([
     [{ trigger: "scheduled" as const }, "Nightly"],
     [{ requestedBy: "admin@example.com" }, "Manuel · admin@example.com"],
