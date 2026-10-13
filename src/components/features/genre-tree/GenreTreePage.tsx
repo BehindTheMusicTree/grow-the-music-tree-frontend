@@ -73,6 +73,12 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
     [pathname, searchParams],
   );
 
+  // Runs after GenreTreeView's own effects, so a reset fired on landing on a zoom (including via
+  // browser back) still sees the previous zoom here and is treated as a rejection.
+  useEffect(() => {
+    zoomAtLastInputRef.current = undefined;
+  }, [zoom]);
+
   useEffect(() => {
     if (zoom !== null && !isPopCore) router.replace(hrefWithZoom(null), { scroll: false });
   }, [zoom, isPopCore, hrefWithZoom, router]);

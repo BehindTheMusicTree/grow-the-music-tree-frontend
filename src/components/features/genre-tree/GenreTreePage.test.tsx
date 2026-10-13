@@ -196,6 +196,31 @@ describe("GenreTreePage", () => {
       expect(routerPushMock).not.toHaveBeenCalled();
     });
 
+    it("replaces a zoom rejected on landing back on it, even after earlier input under it", async () => {
+      searchParams = new URLSearchParams("zoom=rock");
+      const tree = () => (
+        <GenreTreeViewModeProvider>
+          <ForcePopCoreViewMode />
+          <GenreTreePage />
+        </GenreTreeViewModeProvider>
+      );
+      const { rerender } = render(tree());
+
+      const allGenres = await screen.findByRole("button", { name: "All genres" });
+      fireEvent.pointerDown(allGenres);
+      fireEvent.click(allGenres);
+      expect(routerPushMock).toHaveBeenLastCalledWith("/", { scroll: false });
+
+      searchParams = new URLSearchParams();
+      rerender(tree());
+      searchParams = new URLSearchParams("zoom=rock");
+      rerender(tree());
+
+      fireEvent.click(screen.getByRole("button", { name: "All genres" }));
+      expect(routerReplaceMock).toHaveBeenLastCalledWith("/", { scroll: false });
+      expect(routerPushMock).toHaveBeenCalledTimes(1);
+    });
+
     it("passes no focus props outside pop-core and drops ?zoom=", async () => {
       searchParams = new URLSearchParams("zoom=rock");
 
