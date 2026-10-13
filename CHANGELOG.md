@@ -102,6 +102,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Genre tree (pop-core)**: the genre tree component now decides on its own whether a `?zoom=` genre can be shown; the page no longer duplicates that check. An unknown or non-zoomable genre in the URL is still dropped (without a new history entry), and a search pick outside the current zoom now refocuses the circle. Bumps `@behindthemusictree/app-kit` to 9.7.1.
 - **Genre tree**: each root genre now has a fixed color (Blues/Rock red, Reggae/Dub green, Disco/Funk violet, hip-hop gold, electronic blue, classical brown, jazz mustard…) instead of a hashed one, so no two roots share a color. Bumps `@behindthemusictree/app-kit` to 9.5.0.
 
 ### Fixed
