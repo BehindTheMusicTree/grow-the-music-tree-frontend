@@ -37,7 +37,7 @@ export default function PipelineRunHistory({ runs }: { runs: PipelineRunsPage })
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Démarré le</TableHead>
+              <TableHead>Date</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Origine</TableHead>
               <TableHead>Statut</TableHead>

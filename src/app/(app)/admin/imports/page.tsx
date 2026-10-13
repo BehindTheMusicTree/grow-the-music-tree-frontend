@@ -31,11 +31,11 @@ export default async function ImportsPage({ searchParams }: Props) {
     fetchLatestPipelineRun(),
     fetchPipelineRuns(runsPage),
   ]);
-  if (!history) redirect(kind ? `/admin/imports?kind=${kind}` : "/admin/imports");
-  if (!runs) {
+  if (!history || !runs) {
     const query = new URLSearchParams();
     if (kind) query.set("kind", kind);
-    if (page > 1) query.set("page", String(page));
+    if (history && page > 1) query.set("page", String(page));
+    if (runs && runsPage > 1) query.set("runsPage", String(runsPage));
     redirect(`/admin/imports${query.size ? `?${query}` : ""}`);
   }
 
