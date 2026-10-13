@@ -12,8 +12,8 @@ import {
   TrackListProvider,
   libraryEndpoints,
   libraryQueryKeys,
-  YoutubeTrackDetailed,
-  YoutubeTrackDetailedSchema,
+  RecordingDetailed,
+  RecordingDetailedSchema,
 } from "@behindthemusictree/app-kit/genre-tree";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { toPlayerTrack } from "@lib/player-track";
@@ -31,8 +31,8 @@ function useLoadTrack(getBackendBaseUrl: () => string): (trackId: string) => Pro
 
   return useCallback(
     async (trackId: string): Promise<PlayerTrack> => {
-      const track = await fetch<YoutubeTrackDetailed>(
-        libraryEndpoints[PLAYER_SCOPE].youtube.detail(trackId),
+      const track = await fetch<RecordingDetailed>(
+        libraryEndpoints[PLAYER_SCOPE].recordings.detail(trackId),
         true,
         false,
       );
@@ -54,9 +54,9 @@ function AppProviders({ children }: ProvidersProps) {
         <TrackListSidebarVisibilityProvider>
           <TrackListProvider
             getBackendBaseUrl={getGrowBackendBaseUrl}
-            schema={YoutubeTrackDetailedSchema}
-            listEndpoint={() => libraryEndpoints[PLAYER_SCOPE].youtube.list()}
-            listQueryKey={(page) => libraryQueryKeys[PLAYER_SCOPE].youtube.list(page)}
+            schema={RecordingDetailedSchema}
+            listEndpoint={() => libraryEndpoints[PLAYER_SCOPE].recordings.list()}
+            listQueryKey={(page) => libraryQueryKeys[PLAYER_SCOPE].recordings.list(page)}
           >
             {children}
           </TrackListProvider>
