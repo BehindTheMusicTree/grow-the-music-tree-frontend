@@ -63,16 +63,21 @@ function ZoomableGenreTreeView({ genrePlaylists, ...viewProps }: ZoomableGenreTr
   const zoom = searchParams.get(ZOOM_PARAM);
   const isPopCore = viewProps.viewMode === "pop-core";
 
-  // Exactly the nodes GenreTreeView's pop-core wheel renders: accepted roots' subtrees, minus
-  // criteria-less playlists. genre-tree-view throws on any other focus id.
+  // The nodes GenreTreeView's pop-core wheel renders (accepted roots' subtrees, minus criteria-less
+  // playlists), minus those with several pop children: genre-tree-view throws on any other focus id.
   const popCoreUuids = useMemo(() => {
     const all = genrePlaylists ?? [];
     const unacceptedRootUuids = new Set(all.filter((gp) => gp.isUnacceptedRoot).map((gp) => gp.uuid));
-    return new Set(
-      all
-        .filter((gp) => gp.criteria && !gp.isUnacceptedRoot && !unacceptedRootUuids.has(gp.root.uuid))
-        .map((gp) => gp.uuid),
+    const visible = all.filter(
+      (gp) => gp.criteria && !gp.isUnacceptedRoot && !unacceptedRootUuids.has(gp.root.uuid),
     );
+    const popChildCounts = new Map<string, number>();
+    visible.forEach((gp) => {
+      if (gp.parent && gp.criteria?.side === "pop") {
+        popChildCounts.set(gp.parent.uuid, (popChildCounts.get(gp.parent.uuid) ?? 0) + 1);
+      }
+    });
+    return new Set(visible.filter((gp) => (popChildCounts.get(gp.uuid) ?? 0) <= 1).map((gp) => gp.uuid));
   }, [genrePlaylists]);
 
   const focusGenreUuid = isPopCore && zoom && popCoreUuids.has(zoom) ? zoom : null;

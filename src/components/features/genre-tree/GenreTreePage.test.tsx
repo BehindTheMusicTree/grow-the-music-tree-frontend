@@ -73,14 +73,22 @@ function ForceWheelViewMode() {
   return null;
 }
 
-const playlistRow = (uuid: string, rootUuid: string, { isUnacceptedRoot = false, criteria = true } = {}) => ({
+const playlistRow = (
+  uuid: string,
+  rootUuid: string,
+  {
+    isUnacceptedRoot = false,
+    criteria = true,
+    side,
+  }: { isUnacceptedRoot?: boolean; criteria?: boolean; side?: "pop" } = {},
+) => ({
   uuid,
   name: uuid,
   parent: uuid === rootUuid ? null : { uuid: rootUuid },
   root: { uuid: rootUuid },
   tracksCount: 1,
   isUnacceptedRoot,
-  criteria: criteria ? { uuid: `${uuid}-criteria` } : null,
+  criteria: criteria ? { uuid: `${uuid}-criteria`, side } : null,
 });
 
 /** Forces the provider's view mode to "pop-core" on mount, mirroring what clicking the
@@ -189,6 +197,8 @@ describe("GenreTreePage", () => {
   describe("zoom", () => {
     const zoomPlaylists = [
       playlistRow("pop", "pop"),
+      playlistRow("dance-pop", "pop", { side: "pop" }),
+      playlistRow("synth-pop", "pop", { side: "pop" }),
       playlistRow("rock", "rock"),
       playlistRow("pop-rock", "rock"),
       playlistRow("genreless", "rock", { criteria: false }),
@@ -206,7 +216,7 @@ describe("GenreTreePage", () => {
       expect(routerReplaceMock).not.toHaveBeenCalled();
     });
 
-    it.each(["unknown", "genreless", "new-child"])(
+    it.each(["unknown", "genreless", "new-child", "pop"])(
       "replaces ?zoom=%s away without ever passing it down",
       async (zoom) => {
         useListFullGenrePlaylistsMock.mockReturnValue({ data: zoomPlaylists, isLoading: false });
