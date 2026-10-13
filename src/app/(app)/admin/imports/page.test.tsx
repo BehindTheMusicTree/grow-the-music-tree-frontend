@@ -55,9 +55,9 @@ describe("ImportsPage", () => {
     authMock.mockResolvedValue({});
     fetchRunsMock.mockResolvedValue(null);
 
-    await expect(ImportsPage(props({ kind: "songs", page: "9" }))).rejects.toThrow("NEXT_REDIRECT");
+    await expect(ImportsPage(props({ kind: "songs", page: "9", runsPage: "3" }))).rejects.toThrow("NEXT_REDIRECT");
     expect(fetchRunsMock).toHaveBeenCalledWith(9, "songs");
-    expect(redirectMock).toHaveBeenCalledWith("/admin/imports?kind=songs");
+    expect(redirectMock).toHaveBeenCalledWith("/admin/imports?kind=songs&runsPage=3");
   });
 
   it("redirects past the last page of pipeline runs, keeping the import history's params", async () => {

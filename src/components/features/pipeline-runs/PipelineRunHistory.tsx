@@ -37,7 +37,7 @@ export default function PipelineRunHistory({ runs }: { runs: PipelineRunsPage })
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Démarré le</TableHead>
+              <TableHead>Date</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Origine</TableHead>
               <TableHead>Statut</TableHead>
@@ -47,7 +47,9 @@ export default function PipelineRunHistory({ runs }: { runs: PipelineRunsPage })
           <TableBody>
             {runs.results.map((run) => (
               <TableRow key={run.uuid}>
-                <TableCell>{run.startedOn ? <AbsoluteTime iso={run.startedOn} /> : "—"}</TableCell>
+                <TableCell>
+                  <AbsoluteTime iso={run.startedOn ?? run.requestedOn} />
+                </TableCell>
                 <TableCell>{KIND_LABELS[run.kind]}</TableCell>
                 <TableCell>{originOf(run)}</TableCell>
                 <TableCell>{STATUS_LABELS[run.status]}</TableCell>
