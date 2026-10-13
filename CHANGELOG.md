@@ -108,6 +108,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Fixed
 
 - **Pipeline runs**: the admin imports run history follows the live run — a launched run shows up right away as queued, then as running, instead of only once it has finished.
+- **Genre tree**: genre panels list their tracks again instead of « — » — a MusicBrainz recording without a YouTube video no longer fails the whole page; it is listed as « No video available » and can't be played, and play-all starts on the first recording with a video. Bumps `@behindthemusictree/app-kit` to 10.0.0 (Recording schema). Needs grow-api's `library/recordings/` endpoints.
 
 ## [3.7.1] - 2026-10-12
 
