@@ -96,6 +96,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Genre tree (pop-core)**: zoom into a root genre from its detail panel — the circle then shows only that genre's subtree, with its pop-side child (e.g. Pop rock for Rock) in the center, or the genre itself without the white disc when it has none; ring genres can be zoomed into again. The zoom lives in `?zoom=<uuid>`, so it survives a reload and can be shared; the canvas back button and browser Back go up one level, and an unknown or hidden genre in the URL is dropped. Bumps `@behindthemusictree/app-kit` to 9.7.0.
 - **Genre tree (pop-core)**: once zoomed in, the current root genre's name is shown in an empty spot on the tree, map-style, so you always know which sector you're in. It follows the zoom and is re-placed when you pan away or zoom too far in or out. Bumps `@behindthemusictree/app-kit` to 9.6.0.
 - **Pipeline runs**: the admin imports page shows who started the current run (« Nightly », or « Manuel » with the requesting admin) and how long it took or has been running, plus a paginated history of past runs (kind, origin, status, date — start, or request for a run that never started —, duration) whose page is kept when paging, filtering or overshooting the import history. Needs grow-api 12.4.0.
 
