@@ -94,6 +94,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Pipeline runs**: the admin imports page shows who started the current run (« Nightly », or « Manuel » with the requesting admin) and how long it took or has been running, plus a paginated history of past runs (kind, origin, status, start, duration). Needs grow-api 12.4.0.
+
 ### Changed
 
 - **Genre tree**: each root genre now has a fixed color (Blues/Rock red, Reggae/Dub green, Disco/Funk violet, hip-hop gold, electronic blue, classical brown, jazz mustard…) instead of a hashed one, so no two roots share a color. Bumps `@behindthemusictree/app-kit` to 9.5.0.

@@ -24,6 +24,9 @@ export const PIPELINE_RUN_STAGES: Record<PipelineRunKind, readonly PipelineRunSt
 export const PipelineRunRequestSchema = z.object({
   uuid: z.string().uuid(),
   kind: z.enum(PIPELINE_RUN_KINDS),
+  trigger: z.enum(["manual", "scheduled"]),
+  /** Requesting admin's email; null for a scheduled run, or a manual run older than this field. */
+  requestedBy: z.string().nullable(),
   /** `superseded` (curation only): the nightly run applied every edit first. `expired`: no heartbeat for 30 min. */
   status: z.enum(["queued", "running", "succeeded", "failed", "superseded", "cancelled", "expired"]),
   stage: z.enum(FULL_STAGES).nullable(),
@@ -38,3 +41,14 @@ export const PipelineRunRequestSchema = z.object({
 });
 
 export type PipelineRunRequest = z.infer<typeof PipelineRunRequestSchema>;
+
+// Not app-kit's PaginatedResponseSchema: app-kit's barrels create React contexts at import,
+// which breaks the server components that fetch this.
+export const PipelineRunsPageSchema = z.object({
+  overallTotal: z.number(),
+  page: z.number(),
+  totalPages: z.number(),
+  results: z.array(PipelineRunRequestSchema),
+});
+
+export type PipelineRunsPage = z.infer<typeof PipelineRunsPageSchema>;
