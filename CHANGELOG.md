@@ -101,6 +101,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Pipeline runs**: the admin imports run history follows the live run — a launched run shows up right away as queued, then as running, instead of only once it has finished.
 - **Genre tree**: each root genre now has a fixed color (Blues/Rock red, Reggae/Dub green, Disco/Funk violet, hip-hop gold, electronic blue, classical brown, jazz mustard…) instead of a hashed one, so no two roots share a color. Bumps `@behindthemusictree/app-kit` to 9.5.0.
 
 ## [3.7.1] - 2026-10-12

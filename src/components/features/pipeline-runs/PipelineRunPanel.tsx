@@ -132,12 +132,15 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
     onError,
   });
 
-  const wasActive = useRef(isActive(request));
+  const runKey = request && `${request.uuid}:${request.status}`;
+  const lastRunKey = useRef(runKey);
   useEffect(() => {
-    // Refreshes the server-rendered counts (pending curation edits, latest imports) once the run lands.
-    if (wasActive.current && !isActive(request)) router.refresh();
-    wasActive.current = isActive(request);
-  }, [request, router]);
+    // Refreshes the server-rendered run history and counts (pending curation edits, latest imports) on every
+    // launch and status change, so the history follows the live run instead of catching up once it lands.
+    if (lastRunKey.current === runKey) return;
+    lastRunKey.current = runKey;
+    router.refresh();
+  }, [runKey, router]);
 
   const active = isActive(request);
   const progress = request && progressOf(request);
