@@ -6,6 +6,12 @@ import GenreTreePage from "./GenreTreePage";
 import { GenreTreeViewModeProvider, useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import type { GenreTreeViewMode } from "@behindthemusictree/app-kit/genre-tree";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 vi.mock("@hooks/useIsAdmin", () => ({ useIsAdmin: () => false }));
 
 vi.mock("@lib/site-urls", () => ({
