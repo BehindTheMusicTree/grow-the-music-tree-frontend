@@ -96,6 +96,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Genre tree (pop-core)**: once zoomed in, the current root genre's name is shown in an empty spot on the tree, map-style, so you always know which sector you're in. It follows the zoom and is re-placed when you pan away or zoom too far in or out. Bumps `@behindthemusictree/app-kit` to 9.6.0.
 - **Pipeline runs**: the admin imports page shows who started the current run (« Nightly », or « Manuel » with the requesting admin) and how long it took or has been running, plus a paginated history of past runs (kind, origin, status, date — start, or request for a run that never started —, duration) whose page is kept when paging, filtering or overshooting the import history. Needs grow-api 12.4.0.
 
 ### Changed
