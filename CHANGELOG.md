@@ -94,6 +94,15 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Artist page**: the track list can be sorted by title or by album year (newest first); the queue follows the chosen order.
+
+### Changed
+
+- **Artist page**: « Play all » and playing a track now queue all of the artist's playable tracks, not just the current page. Bumps `@behindthemusictree/app-kit` to 11.0.0. Needs grow-api 12.8.0.
+- **Artist links**: placeholder artists (Various Artists, [unknown]…) are shown as plain names instead of links to an empty page.
+
 ## [3.8.0] - 2026-10-14
 
 ### Added
