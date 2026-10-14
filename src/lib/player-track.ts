@@ -13,7 +13,7 @@ export function toPlayerTrack(recording: RecordingDetailed): YoutubePlayerTrack 
     kind: "youtube",
     youtubeVideoId: recording.youtubeVideo.id,
     title: recording.title,
-    artists: recording.artists?.map((artist) => ({ name: artist.name })),
+    artists: recording.artists?.map((artist) => ({ uuid: artist.uuid, name: artist.name })),
     unplayableReason: recording.youtubeVideo.unplayableReason,
   };
 }

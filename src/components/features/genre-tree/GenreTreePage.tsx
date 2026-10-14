@@ -15,6 +15,7 @@ import {
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
+import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
@@ -159,6 +160,7 @@ export default function GenreTreePage() {
           readOnly={!isAdmin}
           controlsOrientation="horizontal"
           renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
+          renderArtistLink={renderArtistLink}
         />
       </Suspense>
     </Page>

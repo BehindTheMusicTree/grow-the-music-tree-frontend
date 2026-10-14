@@ -7,7 +7,7 @@ const recording = {
   uuid: "recording-1",
   youtubeVideo: { id: "abc123", unplayableReason: null },
   title: "Song",
-  artists: [{ name: "Artist" }],
+  artists: [{ uuid: "artist-1", name: "Artist" }],
 } as unknown as RecordingDetailed;
 
 describe("toPlayerTrack", () => {
@@ -17,7 +17,7 @@ describe("toPlayerTrack", () => {
       kind: "youtube",
       youtubeVideoId: "abc123",
       title: "Song",
-      artists: [{ name: "Artist" }],
+      artists: [{ uuid: "artist-1", name: "Artist" }],
       unplayableReason: null,
     });
   });
