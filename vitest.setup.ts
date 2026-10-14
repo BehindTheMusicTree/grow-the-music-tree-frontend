@@ -12,4 +12,6 @@ beforeEach(() => {
     setItem: (key: string, value: string) => store.set(key, value),
     removeItem: (key: string) => store.delete(key),
   });
+  // happy-dom under Vitest 4 exposes no window.confirm, so vi.spyOn(window, "confirm") has nothing to wrap.
+  vi.stubGlobal("confirm", () => false);
 });

@@ -10,7 +10,10 @@ function MembershipList({ title, memberships }: { title: string; memberships: Ar
       <h3 className="text-sm font-medium uppercase tracking-wide text-gray-500">{title}</h3>
       <ul className="flex flex-col gap-1">
         {memberships.map((membership, index) => {
-          const details = [formatYears(membership.beginYear, membership.endYear, membership.ended), ...membership.roles];
+          const details = [
+            formatYears(membership.beginYear, membership.endYear, membership.ended),
+            ...membership.roles,
+          ];
           const detailsText = details.filter(Boolean).join(" · ");
           return (
             // A member can have several periods in the same group.
