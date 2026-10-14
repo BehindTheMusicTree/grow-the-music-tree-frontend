@@ -110,6 +110,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Genre tree**: playing a recording from a genre's detail panel starts on that recording and queues the rest of the playlist after it in one request, instead of walking the playlist page by page; a recording that isn't in the playlist now shows an error instead of silently playing the first track, and the panel's recordings refresh after the genre is edited. Bumps `@behindthemusictree/app-kit` to 10.4.1. Needs grow-api with `tracks?from=<track uuid>` support.
 - **Pipeline runs**: the admin imports run history follows the live run — a launched run shows up right away as queued, then as running, instead of only once it has finished.
 - **Genre tree**: genre panels list their tracks again instead of « — » — a MusicBrainz recording without a YouTube video no longer fails the whole page; it is listed as « No video available » and can't be played, and play-all starts on the first recording with a video. Bumps `@behindthemusictree/app-kit` to 10.0.0 (Recording schema). Needs grow-api's `library/recordings/` endpoints.
 
