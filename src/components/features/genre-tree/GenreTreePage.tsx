@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useRef, type ComponentProps } from "react";
+import { Suspense, useCallback, useEffect, useMemo, type ComponentProps } from "react";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -8,6 +8,7 @@ import { usePopup } from "@behindthemusictree/app-kit/popup";
 import {
   useListFullGenrePlaylists,
   CriteriaMinimum,
+  type FocusChangeReason,
   hasMainstreamPopRoot,
   GenreTreeViewSkeleton,
 } from "@behindthemusictree/app-kit/genre-tree";
@@ -57,10 +58,6 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
   const searchParams = useSearchParams();
   const zoom = searchParams.get(ZOOM_PARAM);
   const isPopCore = viewProps.viewMode === "pop-core";
-  // The `?zoom=` value the user last pressed a pointer or key under. GenreTreeView resets a zoom it
-  // can't render with onFocusGenreChange(null) from an effect, before any input under that zoom;
-  // that reset must replace the param, or browser back would land on the rejected zoom again.
-  const zoomAtLastInputRef = useRef<string | null | undefined>(undefined);
 
   const hrefWithZoom = useCallback(
     (uuid: string | null) => {
@@ -73,36 +70,24 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
     [pathname, searchParams],
   );
 
-  // Runs after GenreTreeView's own effects, so a reset fired on landing on a zoom (including via
-  // browser back) still sees the previous zoom here and is treated as a rejection.
-  useEffect(() => {
-    zoomAtLastInputRef.current = undefined;
-  }, [zoom]);
-
   useEffect(() => {
     if (zoom !== null && !isPopCore) router.replace(hrefWithZoom(null), { scroll: false });
   }, [zoom, isPopCore, hrefWithZoom, router]);
 
   const handleFocusGenreChange = useCallback(
-    (uuid: string | null) => {
+    (uuid: string | null, reason: FocusChangeReason) => {
       const href = hrefWithZoom(uuid);
-      if (uuid === null && zoomAtLastInputRef.current !== zoom) router.replace(href, { scroll: false });
+      // A rejected zoom must not stay in history, or browser back would land on it again.
+      if (reason === "rejected") router.replace(href, { scroll: false });
       else router.push(href, { scroll: false });
     },
-    [zoom, hrefWithZoom, router],
+    [hrefWithZoom, router],
   );
 
-  const recordInput = () => {
-    zoomAtLastInputRef.current = zoom;
-  };
-
-  return (
-    <div className="contents" onPointerDownCapture={recordInput} onKeyDownCapture={recordInput}>
-      <GenreTreeView
-        {...viewProps}
-        {...(isPopCore && { focusGenreUuid: zoom, onFocusGenreChange: handleFocusGenreChange })}
-      />
-    </div>
+  return isPopCore ? (
+    <GenreTreeView {...viewProps} focusGenreUuid={zoom} onFocusGenreChange={handleFocusGenreChange} />
+  ) : (
+    <GenreTreeView {...viewProps} />
   );
 }
 

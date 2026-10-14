@@ -43,7 +43,7 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
     getBackendBaseUrl: () => string;
     viewMode: string;
     focusGenreUuid?: string | null;
-    onFocusGenreChange?: (uuid: string | null) => void;
+    onFocusGenreChange?: (uuid: string | null, reason: string) => void;
   }) => (
     <div
       data-testid="genre-tree-view"
@@ -54,8 +54,9 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
       {props.getBackendBaseUrl()}
       {props.onFocusGenreChange && (
         <>
-          <button onClick={() => props.onFocusGenreChange?.("rock")}>Zoom in</button>
-          <button onClick={() => props.onFocusGenreChange?.(null)}>All genres</button>
+          <button onClick={() => props.onFocusGenreChange?.("rock", "zoom-in")}>Zoom in</button>
+          <button onClick={() => props.onFocusGenreChange?.(null, "back")}>All genres</button>
+          <button onClick={() => props.onFocusGenreChange?.(null, "rejected")}>Reject zoom</button>
         </>
       )}
     </div>
@@ -186,39 +187,14 @@ describe("GenreTreePage", () => {
       expect(routerReplaceMock).not.toHaveBeenCalled();
     });
 
-    it("replaces ?zoom= away when the view rejects it before any user input", async () => {
+    it("replaces ?zoom= away when the view rejects it", async () => {
       searchParams = new URLSearchParams("zoom=unknown&other=1");
 
       renderGenreTreePage({ forcePopCore: true });
 
-      fireEvent.click(await screen.findByRole("button", { name: "All genres" }));
+      fireEvent.click(await screen.findByRole("button", { name: "Reject zoom" }));
       expect(routerReplaceMock).toHaveBeenCalledWith("/?other=1", { scroll: false });
       expect(routerPushMock).not.toHaveBeenCalled();
-    });
-
-    it("replaces a zoom rejected on landing back on it, even after earlier input under it", async () => {
-      searchParams = new URLSearchParams("zoom=rock");
-      const tree = () => (
-        <GenreTreeViewModeProvider>
-          <ForcePopCoreViewMode />
-          <GenreTreePage />
-        </GenreTreeViewModeProvider>
-      );
-      const { rerender } = render(tree());
-
-      const allGenres = await screen.findByRole("button", { name: "All genres" });
-      fireEvent.pointerDown(allGenres);
-      fireEvent.click(allGenres);
-      expect(routerPushMock).toHaveBeenLastCalledWith("/", { scroll: false });
-
-      searchParams = new URLSearchParams();
-      rerender(tree());
-      searchParams = new URLSearchParams("zoom=rock");
-      rerender(tree());
-
-      fireEvent.click(screen.getByRole("button", { name: "All genres" }));
-      expect(routerReplaceMock).toHaveBeenLastCalledWith("/", { scroll: false });
-      expect(routerPushMock).toHaveBeenCalledTimes(1);
     });
 
     it("passes no focus props outside pop-core and drops ?zoom=", async () => {
@@ -242,14 +218,10 @@ describe("GenreTreePage", () => {
 
       renderGenreTreePage({ forcePopCore: true });
 
-      const zoomIn = await screen.findByRole("button", { name: "Zoom in" });
-      fireEvent.pointerDown(zoomIn);
-      fireEvent.click(zoomIn);
+      fireEvent.click(await screen.findByRole("button", { name: "Zoom in" }));
       expect(routerPushMock).toHaveBeenLastCalledWith("/?zoom=rock&other=1", { scroll: false });
 
-      const allGenres = screen.getByRole("button", { name: "All genres" });
-      fireEvent.pointerDown(allGenres);
-      fireEvent.click(allGenres);
+      fireEvent.click(screen.getByRole("button", { name: "All genres" }));
       expect(routerPushMock).toHaveBeenLastCalledWith("/?other=1", { scroll: false });
       expect(routerReplaceMock).not.toHaveBeenCalled();
     });
