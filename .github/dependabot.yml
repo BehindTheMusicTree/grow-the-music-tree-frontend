@@ -1,0 +1,17 @@
+version: 2
+registries:
+  github-packages:
+    type: npm-registry
+    url: https://npm.pkg.github.com
+    token: ${{secrets.GH_PACKAGES_TOKEN_READ}}
+    replaces-base: false
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: develop
+    registries:
+      - github-packages
+    schedule:
+      interval: weekly
+    # Security updates only: 0 disables routine version-bump PRs.
+    open-pull-requests-limit: 0
