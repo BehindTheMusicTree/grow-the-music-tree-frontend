@@ -94,6 +94,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.8.0] - 2026-10-14
+
 ### Added
 
 - **Artist page**: `/artists/<uuid>` shows an artist's type, country and active years, links (official site, Wikipedia, Spotify, MusicBrainz…), current and past members (or the groups they belong to), discography grouped into albums, EPs, singles, live and compilations, and a paginated track list with play-all. Artist names in the genre tree and the player link to it. Bumps `@behindthemusictree/app-kit` to 10.4.0. Needs grow-api 12.6.0, app-kit 10.4.0.
