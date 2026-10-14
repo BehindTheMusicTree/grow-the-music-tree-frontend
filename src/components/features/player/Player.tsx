@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ListMusic, X } from "lucide-react";
 import { usePlayer, PlayerVideoSurface } from "@behindthemusictree/app-kit/player";
 import { TrackListSidebar, useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
+import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 
 interface PlayerProps {
   className?: string;
@@ -51,7 +52,7 @@ export default function Player({ className }: PlayerProps) {
           </span>
         )}
       </div>
-      {isTrackListSidebarVisible && <TrackListSidebar layout="inline" className="min-h-0 flex-1" />}
+      {isTrackListSidebarVisible && <TrackListSidebar layout="inline" className="min-h-0 flex-1" renderArtistLink={renderArtistLink} />}
     </div>
   );
 }
