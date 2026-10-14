@@ -94,6 +94,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Security
+
+- Resolve open Dependabot alerts: bump `@sentry/nextjs` to 10.76.2 and `vitest`, `@vitest/ui`, `@vitest/coverage-v8` to 4.1.11, and add scoped `pnpm.overrides` for `brace-expansion`, `postcss-selector-parser`, `uuid`, `undici`, `js-yaml` and `esbuild`.
+
 ## [3.8.0] - 2026-10-14
 
 ### Added
