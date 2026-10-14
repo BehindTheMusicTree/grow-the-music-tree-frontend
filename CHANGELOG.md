@@ -102,6 +102,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Genre tree**: a genre's detail panel now lists all of its recordings (including those without a video or that can't be played), while its playlist — the player queue and track count — holds only playable ones; playing from the panel goes through the playlist. Bumps `@behindthemusictree/app-kit` to 10.2.0.
+- **Player**: the loaded recording's details are now validated against the recording schema, so a malformed backend response fails loudly instead of reaching the player.
 - **Genre tree (pop-core)**: the genre tree component now decides on its own whether a `?zoom=` genre can be shown; the page no longer duplicates that check. An unknown or non-zoomable genre in the URL is still dropped (without a new history entry), and a search pick outside the current zoom now refocuses the circle. Bumps `@behindthemusictree/app-kit` to 9.7.1.
 - **Genre tree (pop-core)**: the page now learns from the genre tree component why the zoom changed, instead of guessing it from the last click or key press: a rejected `?zoom=` is replaced away (no new history entry), and every other zoom change adds one. Bumps `@behindthemusictree/app-kit` to 10.1.0.
 - **Genre tree**: each root genre now has a fixed color (Blues/Rock red, Reggae/Dub green, Disco/Funk violet, hip-hop gold, electronic blue, classical brown, jazz mustard…) instead of a hashed one, so no two roots share a color. Bumps `@behindthemusictree/app-kit` to 9.5.0.
