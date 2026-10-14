@@ -9,11 +9,12 @@ function MembershipList({ title, memberships }: { title: string; memberships: Ar
     <div className="flex flex-col gap-1">
       <h3 className="text-sm font-medium uppercase tracking-wide text-gray-500">{title}</h3>
       <ul className="flex flex-col gap-1">
-        {memberships.map((membership) => {
+        {memberships.map((membership, index) => {
           const details = [formatYears(membership.beginYear, membership.endYear, membership.ended), ...membership.roles];
           const detailsText = details.filter(Boolean).join(" · ");
           return (
-            <li key={membership.artist.uuid}>
+            // A member can have several periods in the same group.
+            <li key={`${membership.artist.uuid}-${index}`}>
               <span className="font-medium text-gray-900">{renderArtistLink(membership.artist)}</span>
               {detailsText && <span className="text-gray-600"> — {detailsText}</span>}
             </li>

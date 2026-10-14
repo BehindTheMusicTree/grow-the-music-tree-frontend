@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type MouseEvent } from "react";
+import { keepPreviousData } from "@tanstack/react-query";
 import { Play } from "lucide-react";
 import { Pagination } from "@behindthemusictree/ui";
 import { usePlayer } from "@behindthemusictree/app-kit/player";
@@ -33,6 +34,7 @@ export default function ArtistTracks({ artist }: { artist: { uuid: string; name:
         page,
       }),
     schema: RecordingPageSchema,
+    placeholderData: keepPreviousData,
     context: "ArtistTracks",
   });
 
@@ -41,10 +43,10 @@ export default function ArtistTracks({ artist }: { artist: { uuid: string; name:
   const play = (startUuid: string) =>
     playNewTrackList(playable, startUuid, { type: "artist", uuid: artist.uuid, name: artist.name }, "reference");
 
-  // TrackItem's own play button plays from whatever list is active; a click on a track that isn't
+  // TrackItem's own play control (`.track-position-play-pause`, a div) plays from whatever list is active; a click on a track that isn't
   // loaded yet must queue this artist's list instead.
   const handleRowClickCapture = (event: MouseEvent, recording: RecordingDetailed) => {
-    if (!(event.target instanceof Element) || !event.target.closest("button")) return;
+    if (!(event.target instanceof Element) || !event.target.closest(".track-position-play-pause")) return;
     if (playerTrackObject?.track.id === recording.uuid) return;
     event.stopPropagation();
     play(recording.uuid);

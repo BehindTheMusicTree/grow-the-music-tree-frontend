@@ -35,12 +35,14 @@ function socialLabel(url: string): string {
 
 export default function ArtistLinks({ artist }: { artist: ArtistDetailed }) {
   const links = artist.links.map(({ kind, url }) => ({
+    key: `${kind}-${url}`,
     url,
     Icon: LINK_KINDS[kind].Icon,
     label: kind === "social" ? socialLabel(url) : LINK_KINDS[kind].label,
   }));
   if (artist.musicbrainzArtistId) {
     links.push({
+      key: "musicbrainz",
       url: `https://musicbrainz.org/artist/${artist.musicbrainzArtistId}`,
       Icon: SiMusicbrainz,
       label: "MusicBrainz",
@@ -51,8 +53,8 @@ export default function ArtistLinks({ artist }: { artist: ArtistDetailed }) {
   return (
     <ArtistSection title="Links">
       <ul className="flex flex-wrap gap-2">
-        {links.map(({ url, Icon, label }) => (
-          <li key={url}>
+        {links.map(({ key, url, Icon, label }) => (
+          <li key={key}>
             <a
               href={url}
               target="_blank"
