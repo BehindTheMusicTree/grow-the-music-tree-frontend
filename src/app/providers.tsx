@@ -12,7 +12,6 @@ import {
   TrackListProvider,
   libraryEndpoints,
   libraryQueryKeys,
-  RecordingDetailed,
   RecordingDetailedSchema,
 } from "@behindthemusictree/app-kit/genre-tree";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -31,15 +30,11 @@ function useLoadTrack(getBackendBaseUrl: () => string): (trackId: string) => Pro
 
   return useCallback(
     async (trackId: string): Promise<PlayerTrack> => {
-      const track = await fetch<RecordingDetailed>(
-        libraryEndpoints[PLAYER_SCOPE].recordings.detail(trackId),
-        true,
-        false,
-      );
-      if (!track) {
+      const response = await fetch(libraryEndpoints[PLAYER_SCOPE].recordings.detail(trackId), true, false);
+      if (!response) {
         throw new Error(`Failed to load track ${trackId}`);
       }
-      return toPlayerTrack(track);
+      return toPlayerTrack(RecordingDetailedSchema.parse(response));
     },
     [fetch],
   );
