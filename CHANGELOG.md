@@ -101,6 +101,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Changed
 
 - **Artist page**: « Play all » and playing a track now queue all of the artist's playable tracks, not just the current page. Bumps `@behindthemusictree/app-kit` to 11.0.0. Needs grow-api 12.8.0.
+- **Genre tree**: the node actions (Play, Add, overflow menu) now live in the info panel instead of hover toolbars, and the « Toolbar » toggle is gone. Bumps `@behindthemusictree/app-kit` to 11.1.0 (genre-tree-view 2.0.0).
 - **Artist links**: placeholder artists (Various Artists, [unknown]…) are shown as plain names instead of links to an empty page.
 
 ## [3.8.0] - 2026-10-14
