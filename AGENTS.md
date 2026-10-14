@@ -6,8 +6,10 @@ Tailwind. Talks to the grow-the-music-tree-api backend.
 TheMusicTree is the system; BTMT (BehindTheMusicTree) is the team building it. It is
 a genre tree first, to explore and listen to, and also aims to be a reference
 classifying all music: the backend holds every MusicBrainz song, including songs
-without a genre or video, so users can later link genreless songs to a genre. The
-tree view shows only songs that have both a genre and a YouTube video.
+without a genre or video, so users can later link genreless songs to a genre. A genre's
+detail panel lists all its recordings (primary-descendant subtree included), playable or
+not; genre playlists and the tracklist hold only playable ones (`youtube_video_id` set and
+no `youtube_unplayable_reason`).
 
 ## Stack
 
