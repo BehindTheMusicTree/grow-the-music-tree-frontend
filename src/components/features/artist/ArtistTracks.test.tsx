@@ -18,7 +18,7 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   RecordingDetailedSchema: null,
   libraryEndpoints: { reference: { recordings: { list: () => "library/recordings/" } } },
   recordingUnplayableReason: (recording: { youtubeVideo: unknown }) => (recording.youtubeVideo ? null : "No video"),
-  useTrackList: () => ({ playNewTrackList: playNewTrackListMock }),
+  useTrackList: () => ({ playNewTrackListFromArtist: playNewTrackListMock }),
   TrackItem: ({ track, position }: { track: { title: string }; position: number }) => (
     <div role="button" className="track-position-play-pause">
       {position}. {track.title}
@@ -27,7 +27,11 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
 }));
 
 const ARTIST = { uuid: "11111111-1111-1111-1111-111111111111", name: "Band" };
-const recording = (uuid: string, title: string, youtubeVideo: unknown = { id: "yt" }) => ({ uuid, title, youtubeVideo });
+const recording = (uuid: string, title: string, youtubeVideo: unknown = { id: "yt" }) => ({
+  uuid,
+  title,
+  youtubeVideo,
+});
 
 function renderTracks() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -61,9 +65,9 @@ describe("ArtistTracks", () => {
     expect(await screen.findByRole("button", { name: "2. Song 2" })).toBeInTheDocument();
   });
 
-  it("plays all playable tracks, or the clicked one, as an artist list", async () => {
+  it("plays the artist's full list in the current ordering, from the start or the clicked track", async () => {
     fetchMock.mockResolvedValue({
-      results: [recording("r1", "No Video", null), recording("r2", "Good"), recording("r3", "Also Good")],
+      results: [recording("r1", "No Video", null), recording("r2", "Good")],
       page: 1,
       pageSize: 100,
       totalPages: 1,
@@ -71,11 +75,25 @@ describe("ArtistTracks", () => {
     renderTracks();
 
     fireEvent.click(await screen.findByRole("button", { name: "Play all" }));
-    const playable = [expect.objectContaining({ uuid: "r2" }), expect.objectContaining({ uuid: "r3" })];
-    const origin = { type: "artist", uuid: ARTIST.uuid, name: ARTIST.name };
-    expect(playNewTrackListMock).toHaveBeenLastCalledWith(playable, "r2", origin, "reference");
+    expect(playNewTrackListMock).toHaveBeenLastCalledWith(ARTIST, "reference", {
+      ordering: "title",
+      startRecordingUuid: undefined,
+    });
 
-    fireEvent.click(screen.getByRole("button", { name: "3. Also Good" }));
-    expect(playNewTrackListMock).toHaveBeenLastCalledWith(playable, "r3", origin, "reference");
+    fireEvent.click(screen.getByRole("button", { name: "Year" }));
+    fireEvent.click(await screen.findByRole("button", { name: "2. Good" }));
+    expect(playNewTrackListMock).toHaveBeenLastCalledWith(ARTIST, "reference", {
+      ordering: "-albumYear",
+      startRecordingUuid: "r2",
+    });
+    expect(fetchMock).toHaveBeenLastCalledWith("library/recordings/", true, false, undefined, {
+      artist: ARTIST.uuid,
+      ordering: "-albumYear",
+      page: 1,
+    });
+
+    playNewTrackListMock.mockClear();
+    fireEvent.click(screen.getByRole("button", { name: "1. No Video" }));
+    expect(playNewTrackListMock).not.toHaveBeenCalled();
   });
 });
