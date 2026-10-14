@@ -10,6 +10,7 @@ const notFoundMock = vi.fn<() => never>(() => {
 });
 const fetchLatestMock = vi.fn();
 const fetchRunsMock = vi.fn();
+const fetchPipelineRunsMock = vi.fn();
 
 vi.mock("@lib/auth", () => ({ auth: () => authMock() }));
 vi.mock("next/navigation", () => ({
@@ -21,12 +22,19 @@ vi.mock("@lib/import-runs", () => ({
   fetchImportRuns: (...args: unknown[]) => fetchRunsMock(...args),
 }));
 vi.mock("@lib/curation", () => ({ fetchCurationStatus: async () => ({ appliedExportOn: null, pendingCount: 0 }) }));
-vi.mock("@lib/pipeline-runs", () => ({ fetchLatestPipelineRun: async () => null }));
+vi.mock("@lib/pipeline-runs", () => ({
+  fetchLatestPipelineRun: async () => null,
+  fetchPipelineRuns: (...args: unknown[]) => fetchPipelineRunsMock(...args),
+}));
 
-const props = (params: { kind?: string; page?: string }) => ({ searchParams: Promise.resolve(params) });
+const EMPTY_PAGE = { overallTotal: 0, page: 1, totalPages: 1, results: [] };
+const props = (params: { kind?: string; page?: string; runsPage?: string }) => ({ searchParams: Promise.resolve(params) });
 
 describe("ImportsPage", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    fetchPipelineRunsMock.mockResolvedValue(EMPTY_PAGE);
+  });
 
   it.each([null, { error: "RefreshTokenError" }])("redirects to /admin when not signed in (%o)", async (session) => {
     authMock.mockResolvedValue(session);
@@ -47,8 +55,18 @@ describe("ImportsPage", () => {
     authMock.mockResolvedValue({});
     fetchRunsMock.mockResolvedValue(null);
 
-    await expect(ImportsPage(props({ kind: "songs", page: "9" }))).rejects.toThrow("NEXT_REDIRECT");
+    await expect(ImportsPage(props({ kind: "songs", page: "9", runsPage: "3" }))).rejects.toThrow("NEXT_REDIRECT");
     expect(fetchRunsMock).toHaveBeenCalledWith(9, "songs");
-    expect(redirectMock).toHaveBeenCalledWith("/admin/imports?kind=songs");
+    expect(redirectMock).toHaveBeenCalledWith("/admin/imports?kind=songs&runsPage=3");
+  });
+
+  it("redirects past the last page of pipeline runs, keeping the import history's params", async () => {
+    authMock.mockResolvedValue({});
+    fetchRunsMock.mockResolvedValue(EMPTY_PAGE);
+    fetchPipelineRunsMock.mockResolvedValue(null);
+
+    await expect(ImportsPage(props({ kind: "songs", page: "2", runsPage: "7" }))).rejects.toThrow("NEXT_REDIRECT");
+    expect(fetchPipelineRunsMock).toHaveBeenCalledWith(7);
+    expect(redirectMock).toHaveBeenCalledWith("/admin/imports?kind=songs&page=2");
   });
 });

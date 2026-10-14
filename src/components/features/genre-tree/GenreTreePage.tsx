@@ -1,18 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { Suspense, useCallback, useEffect, useMemo, type ComponentProps } from "react";
 import dynamic from "next/dynamic";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
 import {
   useListFullGenrePlaylists,
   CriteriaMinimum,
+  type FocusChangeReason,
   hasMainstreamPopRoot,
   GenreTreeViewSkeleton,
 } from "@behindthemusictree/app-kit/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
+import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
@@ -43,6 +46,51 @@ const GenreTreeView = dynamic(
   () => import("@behindthemusictree/app-kit/genre-tree").then((mod) => mod.GenreTreeView),
   { ssr: false, loading: () => <GenreTreeViewLoadingFallback /> },
 );
+
+const ZOOM_PARAM = "zoom";
+
+type ZoomableGenreTreeViewProps = Omit<ComponentProps<typeof GenreTreeView>, "focusGenreUuid" | "onFocusGenreChange">;
+
+// Reads `?zoom=` in its own component so only this subtree bails out to client rendering
+// (useSearchParams needs a Suspense boundary when the route is prerendered).
+function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const zoom = searchParams.get(ZOOM_PARAM);
+  const isPopCore = viewProps.viewMode === "pop-core";
+
+  const hrefWithZoom = useCallback(
+    (uuid: string | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (uuid) params.set(ZOOM_PARAM, uuid);
+      else params.delete(ZOOM_PARAM);
+      const query = params.toString();
+      return query ? `${pathname}?${query}` : pathname;
+    },
+    [pathname, searchParams],
+  );
+
+  useEffect(() => {
+    if (zoom !== null && !isPopCore) router.replace(hrefWithZoom(null), { scroll: false });
+  }, [zoom, isPopCore, hrefWithZoom, router]);
+
+  const handleFocusGenreChange = useCallback(
+    (uuid: string | null, reason: FocusChangeReason) => {
+      const href = hrefWithZoom(uuid);
+      // A rejected zoom must not stay in history, or browser back would land on it again.
+      if (reason === "rejected") router.replace(href, { scroll: false });
+      else router.push(href, { scroll: false });
+    },
+    [hrefWithZoom, router],
+  );
+
+  return isPopCore ? (
+    <GenreTreeView {...viewProps} focusGenreUuid={zoom} onFocusGenreChange={handleFocusGenreChange} />
+  ) : (
+    <GenreTreeView {...viewProps} />
+  );
+}
 
 export default function GenreTreePage() {
   const getBackendBaseUrl = getGrowBackendBaseUrl;
@@ -102,16 +150,19 @@ export default function GenreTreePage() {
 
   return (
     <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
-      <GenreTreeView
-        scope="reference"
-        handleGenreCreationAction={showCriteriaCreationPopup}
-        handleGenreRenameAction={showGenreRenamePopup}
-        getBackendBaseUrl={getBackendBaseUrl}
-        viewMode={viewMode}
-        readOnly={!isAdmin}
-        controlsOrientation="horizontal"
-        renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
-      />
+      <Suspense fallback={<GenreTreeViewLoadingFallback />}>
+        <ZoomableGenreTreeView
+          scope="reference"
+          handleGenreCreationAction={showCriteriaCreationPopup}
+          handleGenreRenameAction={showGenreRenamePopup}
+          getBackendBaseUrl={getBackendBaseUrl}
+          viewMode={viewMode}
+          readOnly={!isAdmin}
+          controlsOrientation="horizontal"
+          renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
+          renderArtistLink={renderArtistLink}
+        />
+      </Suspense>
     </Page>
   );
 }

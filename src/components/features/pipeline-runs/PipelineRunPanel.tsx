@@ -1,28 +1,24 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { Button } from "@behindthemusictree/ui";
 import { useFetchWrapper, useQueryWithParse, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
+import { formatDuration } from "@components/features/import-runs/importedOn";
+import { KIND_LABELS, originOf } from "@components/features/pipeline-runs/labels";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import {
   PIPELINE_RUN_KINDS,
   PIPELINE_RUN_STAGES,
   PipelineRunRequestSchema,
-  type PipelineRunKind,
   type PipelineRunRequest,
   type PipelineRunStage,
 } from "@schemas/api/pipeline-runs";
 
 const POLL_INTERVAL_MS = 5000;
 const LATEST_QUERY_KEY = ["pipelineRuns", "latest"];
-
-const KIND_LABELS: Record<PipelineRunKind, string> = {
-  curation: "Curation",
-  full: "Ingestion complète",
-};
 
 const STAGE_LABELS: Record<PipelineRunStage, string> = {
   fetching_rules: "Récupération des règles",
@@ -73,6 +69,30 @@ function labelOf({ kind, status, stage, stageCurrent, stageTotal, error }: Pipel
   }
 }
 
+/** Current time, ticking every second while `ticking`; null on the server so hydration matches. */
+function useNow(ticking: boolean) {
+  const subscribe = useCallback(
+    (onTick: () => void) => {
+      if (!ticking) return () => {};
+      const id = setInterval(onTick, 1000);
+      return () => clearInterval(id);
+    },
+    [ticking],
+  );
+  return useSyncExternalStore(
+    subscribe,
+    () => Math.floor(Date.now() / 1000) * 1000,
+    () => null,
+  );
+}
+
+function durationOf({ status, startedOn, finishedOn }: PipelineRunRequest, now: number | null) {
+  if (!startedOn || status === "queued") return null;
+  if (finishedOn) return `en ${formatDuration(startedOn, finishedOn)}`;
+  if (status === "running" && now !== null) return `depuis ${formatDuration(startedOn, now)}`;
+  return null;
+}
+
 type Props = { pendingCount: number; initialRequest: PipelineRunRequest | null };
 
 /** Launches a curation run or a full ingestion, follows its progress and cancels it. */
@@ -112,15 +132,20 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
     onError,
   });
 
-  const wasActive = useRef(isActive(request));
+  const runKey = request && `${request.uuid}:${request.status}`;
+  const lastRunKey = useRef(runKey);
   useEffect(() => {
-    // Refreshes the server-rendered counts (pending curation edits, latest imports) once the run lands.
-    if (wasActive.current && !isActive(request)) router.refresh();
-    wasActive.current = isActive(request);
-  }, [request, router]);
+    // Refreshes the server-rendered run history and counts (pending curation edits, latest imports) on every
+    // launch and status change, so the history follows the live run instead of catching up once it lands.
+    if (lastRunKey.current === runKey) return;
+    lastRunKey.current = runKey;
+    router.refresh();
+  }, [runKey, router]);
 
   const active = isActive(request);
   const progress = request && progressOf(request);
+  const now = useNow(request?.status === "running");
+  const duration = request && durationOf(request, now);
 
   return (
     <section className="flex flex-col gap-2" aria-label="Runs du pipeline">
@@ -152,6 +177,10 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
           )}
           <p aria-live="polite" className={request.status === "failed" ? "text-red-600" : "text-gray-700"}>
             {KIND_LABELS[request.kind]} : {labelOf(request)}
+          </p>
+          <p className="text-sm text-gray-600">
+            {originOf(request)}
+            {duration && ` · ${duration}`}
           </p>
           {request.status === "running" && request.stage === "merging_songs" && (
             <p className="text-sm text-gray-600">Une annulation laisse la fusion déjà commencée aller à son terme.</p>

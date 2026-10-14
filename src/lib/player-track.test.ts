@@ -1,31 +1,37 @@
 import { describe, expect, it } from "vitest";
-import { YoutubeTrackDetailed } from "@behindthemusictree/app-kit/genre-tree";
+import { RecordingDetailed } from "@behindthemusictree/app-kit/genre-tree";
 
 import { toPlayerTrack } from "@lib/player-track";
 
-const track = {
-  uuid: "track-1",
-  youtubeVideoId: "abc123",
+const recording = {
+  uuid: "recording-1",
+  youtubeVideo: { id: "abc123", unplayableReason: null },
   title: "Song",
-  artists: [{ name: "Artist" }],
-  youtubeUnplayableReason: null,
-} as unknown as YoutubeTrackDetailed;
+  artists: [{ uuid: "artist-1", name: "Artist" }],
+} as unknown as RecordingDetailed;
 
 describe("toPlayerTrack", () => {
-  it("maps a playable track with a null unplayableReason", () => {
-    expect(toPlayerTrack(track)).toEqual({
-      id: "track-1",
+  it("maps a playable recording with a null unplayableReason", () => {
+    expect(toPlayerTrack(recording)).toEqual({
+      id: "recording-1",
       kind: "youtube",
       youtubeVideoId: "abc123",
       title: "Song",
-      artists: [{ name: "Artist" }],
+      artists: [{ uuid: "artist-1", name: "Artist" }],
       unplayableReason: null,
     });
   });
 
-  it("carries youtubeUnplayableReason over so the player skips the track", () => {
-    expect(toPlayerTrack({ ...track, youtubeUnplayableReason: "not_embeddable" }).unplayableReason).toBe(
-      "not_embeddable",
+  it("carries the video's unplayableReason over so the player skips the track", () => {
+    expect(
+      toPlayerTrack({ ...recording, youtubeVideo: { id: "abc123", unplayableReason: "not_embeddable" } })
+        .unplayableReason,
+    ).toBe("not_embeddable");
+  });
+
+  it("throws on a recording without a YouTube video", () => {
+    expect(() => toPlayerTrack({ ...recording, youtubeVideo: null })).toThrow(
+      "Recording recording-1 has no YouTube video",
     );
   });
 });

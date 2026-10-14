@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, act } from "@testing-library/react";
 import type { PipelineRunRequest } from "@schemas/api/pipeline-runs";
 import PipelineRunPanel from "./PipelineRunPanel";
 
@@ -19,6 +19,8 @@ vi.mock("@behindthemusictree/app-kit/transport", () => ({
 const request = (overrides: Partial<PipelineRunRequest>): PipelineRunRequest => ({
   uuid: "11111111-1111-1111-1111-111111111111",
   kind: "curation",
+  trigger: "manual",
+  requestedBy: null,
   status: "running",
   stage: null,
   stageCurrent: null,
@@ -41,6 +43,7 @@ describe("PipelineRunPanel", () => {
     latest = null;
     vi.clearAllMocks();
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it("launches either kind when no run is active", () => {
@@ -121,5 +124,64 @@ describe("PipelineRunPanel", () => {
 
     expect(refreshMock).toHaveBeenCalledOnce();
     expect(screen.queryByRole("button", { name: "Annuler" })).not.toBeInTheDocument();
+  });
+
+  it("refreshes the page when a run is launched and when it starts, not on first render or re-polls", () => {
+    latest = request({ uuid: "22222222-2222-2222-2222-222222222222", status: "succeeded" });
+    const { rerender } = render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+    expect(refreshMock).not.toHaveBeenCalled();
+
+    latest = request({ status: "queued" });
+    rerender(<PipelineRunPanel pendingCount={1} initialRequest={null} />);
+    expect(refreshMock).toHaveBeenCalledOnce();
+
+    latest = request({ status: "running", stage: "fetching_rules" });
+    rerender(<PipelineRunPanel pendingCount={1} initialRequest={null} />);
+    expect(refreshMock).toHaveBeenCalledTimes(2);
+
+    latest = request({ status: "running", stage: "importing_tree" });
+    rerender(<PipelineRunPanel pendingCount={1} initialRequest={null} />);
+    expect(refreshMock).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([
+    [{ trigger: "scheduled" as const }, "Nightly"],
+    [{ requestedBy: "admin@example.com" }, "Manuel · admin@example.com"],
+    [{}, "Manuel"],
+  ])("shows the origin %o", (overrides, origin) => {
+    latest = request(overrides);
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.getByText(origin)).toBeInTheDocument();
+  });
+
+  it("shows no duration while queued", () => {
+    latest = request({ status: "queued" });
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.getByText("Manuel")).toBeInTheDocument();
+  });
+
+  it("shows how long a finished run took", () => {
+    latest = request({
+      status: "succeeded",
+      startedOn: "2026-10-12T10:00:00Z",
+      finishedOn: "2026-10-12T12:05:00Z",
+    });
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.getByText("Manuel · en 2 h 05 min")).toBeInTheDocument();
+  });
+
+  it("counts up while the run is going", () => {
+    vi.useFakeTimers({ now: Date.parse("2026-10-12T10:03:00Z") });
+    latest = request({ trigger: "scheduled", startedOn: "2026-10-12T10:00:00Z" });
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.getByText("Nightly · depuis 3 min")).toBeInTheDocument();
+
+    act(() => vi.advanceTimersByTime(60_000));
+
+    expect(screen.getByText("Nightly · depuis 4 min")).toBeInTheDocument();
   });
 });

@@ -94,6 +94,29 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.8.0] - 2026-10-14
+
+### Added
+
+- **Artist page**: `/artists/<uuid>` shows an artist's type, country and active years, links (official site, Wikipedia, Spotify, MusicBrainz…), current and past members (or the groups they belong to), discography grouped into albums, EPs, singles, live and compilations, and a paginated track list with play-all. Artist names in the genre tree and the player link to it. Bumps `@behindthemusictree/app-kit` to 10.4.0. Needs grow-api 12.6.0, app-kit 10.4.0.
+- **Genre tree (pop-core)**: zoom into a root genre from its detail panel — the circle then shows only that genre's subtree, with its pop-side child (e.g. Pop rock for Rock) in the center, or the genre itself without the white disc when it has none; ring genres can be zoomed into again. The zoom lives in `?zoom=<uuid>`, so it survives a reload and can be shared; the canvas back button goes up one level, browser Back returns to the previous zoom, and an unknown or hidden genre in the URL (or one the circle can't center, with several pop-side children) is dropped. Bumps `@behindthemusictree/app-kit` to 9.7.0.
+- **Genre tree (pop-core)**: once zoomed in, the current root genre's name is shown in an empty spot on the tree, map-style, so you always know which sector you're in. It follows the zoom and is re-placed when you pan away or zoom too far in or out. Bumps `@behindthemusictree/app-kit` to 9.6.0.
+- **Pipeline runs**: the admin imports page shows who started the current run (« Nightly », or « Manuel » with the requesting admin) and how long it took or has been running, plus a paginated history of past runs (kind, origin, status, date — start, or request for a run that never started —, duration) whose page is kept when paging, filtering or overshooting the import history. Needs grow-api 12.4.0.
+
+### Changed
+
+- **Genre tree**: a genre's detail panel now lists all of its recordings (including those without a video or that can't be played), while its playlist — the player queue and track count — holds only playable ones; playing from the panel goes through the playlist. Bumps `@behindthemusictree/app-kit` to 10.2.0.
+- **Player**: the loaded recording's details are now validated against the recording schema, so a malformed backend response fails loudly instead of reaching the player.
+- **Genre tree (pop-core)**: the genre tree component now decides on its own whether a `?zoom=` genre can be shown; the page no longer duplicates that check. An unknown or non-zoomable genre in the URL is still dropped (without a new history entry), and a search pick outside the current zoom now refocuses the circle. Bumps `@behindthemusictree/app-kit` to 9.7.1.
+- **Genre tree (pop-core)**: the page now learns from the genre tree component why the zoom changed, instead of guessing it from the last click or key press: a rejected `?zoom=` is replaced away (no new history entry), and every other zoom change adds one. Bumps `@behindthemusictree/app-kit` to 10.1.0.
+- **Genre tree**: each root genre now has a fixed color (Blues/Rock red, Reggae/Dub green, Disco/Funk violet, hip-hop gold, electronic blue, classical brown, jazz mustard…) instead of a hashed one, so no two roots share a color. Bumps `@behindthemusictree/app-kit` to 9.5.0.
+
+### Fixed
+
+- **Genre tree**: playing a recording from a genre's detail panel starts on that recording and queues the rest of the playlist after it in one request, instead of walking the playlist page by page; a recording that isn't in the playlist now shows an error instead of silently playing the first track, and the panel's recordings refresh after the genre is edited. Bumps `@behindthemusictree/app-kit` to 10.4.1. Needs grow-api with `tracks?from=<track uuid>` support.
+- **Pipeline runs**: the admin imports run history follows the live run — a launched run shows up right away as queued, then as running, instead of only once it has finished.
+- **Genre tree**: genre panels list their tracks again instead of « — » — a MusicBrainz recording without a YouTube video no longer fails the whole page; it is listed as « No video available » and can't be played, and play-all starts on the first recording with a video. Bumps `@behindthemusictree/app-kit` to 10.0.0 (Recording schema). Needs grow-api's `library/recordings/` endpoints.
+
 ## [3.7.1] - 2026-10-12
 
 ### Changed

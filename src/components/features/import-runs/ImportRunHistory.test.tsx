@@ -4,7 +4,12 @@ import ImportRunHistory from "./ImportRunHistory";
 import type { ImportRunsPage } from "@schemas/api/import-runs";
 
 const pushMock = vi.fn();
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push: pushMock }), usePathname: () => "/admin/imports" }));
+let search = "";
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: pushMock }),
+  usePathname: () => "/admin/imports",
+  useSearchParams: () => new URLSearchParams(search),
+}));
 
 const RUNS: ImportRunsPage = {
   overallTotal: 120,
@@ -20,6 +25,7 @@ describe("ImportRunHistory", () => {
   afterEach(() => {
     cleanup();
     pushMock.mockClear();
+    search = "";
   });
 
   it("lists runs newest first", () => {
@@ -38,6 +44,17 @@ describe("ImportRunHistory", () => {
     fireEvent.click(screen.getByRole("button", { name: "2" }));
 
     expect(pushMock).toHaveBeenCalledWith("/admin/imports?kind=songs&page=2");
+  });
+
+  it("keeps the pipeline run history's page when paginating or filtering", () => {
+    search = "runsPage=3&kind=songs";
+    render(<ImportRunHistory runs={RUNS} kind="songs" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "2" }));
+    expect(pushMock).toHaveBeenLastCalledWith("/admin/imports?runsPage=3&kind=songs&page=2");
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Kind" }), { target: { value: "" } });
+    expect(pushMock).toHaveBeenLastCalledWith("/admin/imports?runsPage=3");
   });
 
   it("filters by kind from the first page", () => {
