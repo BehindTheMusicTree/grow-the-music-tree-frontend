@@ -94,6 +94,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.9.1] - 2026-10-15
+
 ### Fixed
 
 - Bump `@behindthemusictree/app-kit` to 11.2.0: the genre detail panel pages recordings without a total count, so clicking a genre with a huge subtree no longer 500s on a backend timeout. The `Tracks` title shows no count.
