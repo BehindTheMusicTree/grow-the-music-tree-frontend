@@ -94,6 +94,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.9.2] - 2026-10-15
+
 ### Fixed
 
 - Bump `@behindthemusictree/app-kit` to 11.3.0: the genre detail panel pages recordings by keyset cursor (needs grow-api >= 12.10.0), so big genres such as Blues rock list their tracks again; a failed load shows an error with Retry instead of "—".
