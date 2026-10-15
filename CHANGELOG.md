@@ -94,6 +94,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- Bump `@behindthemusictree/app-kit` to 11.3.1: clicking a root genre's name in the tree now selects the root, like clicking its chip.
+
 ## [3.9.2] - 2026-10-15
 
 ### Fixed
