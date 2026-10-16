@@ -21,7 +21,7 @@ export type PipelineRunStage = (typeof FULL_STAGES)[number];
 export const PIPELINE_RUN_STAGES: Record<PipelineRunKind, readonly PipelineRunStage[]> = {
   full: FULL_STAGES,
   sync: ["importing_tree", "uploading_songs", "merging_songs", "uploading_artists", "merging_artists"],
-  curation: ["fetching_rules", "building_genres", "matching_songs", "importing_tree", "uploading_songs", "merging_songs"],
+  curation: ["fetching_rules", "building_genres", "matching_songs", "importing_tree", "uploading_songs", "merging_songs", "uploading_artists", "merging_artists"],
 };
 
 export const PipelineRunRequestSchema = z.object({
