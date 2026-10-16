@@ -35,6 +35,7 @@ const request = (overrides: Partial<PipelineRunRequest>): PipelineRunRequest => 
 });
 
 const curationButton = () => screen.getByRole("button", { name: "Appliquer la curation" });
+const syncButton = () => screen.getByRole("button", { name: "Réimporter le dernier Gold" });
 const fullButton = () => screen.getByRole("button", { name: "Lancer une ingestion complète" });
 
 describe("PipelineRunPanel", () => {
@@ -46,14 +47,15 @@ describe("PipelineRunPanel", () => {
     vi.useRealTimers();
   });
 
-  it("launches either kind when no run is active", () => {
+  it("launches every kind when no run is active", () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     render(<PipelineRunPanel pendingCount={2} initialRequest={null} />);
 
     fireEvent.click(curationButton());
     fireEvent.click(fullButton());
+    fireEvent.click(syncButton());
 
-    expect(mutateMock.mock.calls).toEqual([["curation"], ["full"]]);
+    expect(mutateMock.mock.calls).toEqual([["curation"], ["full"], ["sync"]]);
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Annuler" })).not.toBeInTheDocument();
   });
@@ -81,7 +83,7 @@ describe("PipelineRunPanel", () => {
 
     expect(curationButton()).toBeDisabled();
     expect(fullButton()).toBeDisabled();
-    expect(screen.getByRole("progressbar")).toHaveAttribute("value", String((7 + 1 / 4) / 9));
+    expect(screen.getByRole("progressbar")).toHaveAttribute("value", String((7 + 1 / 4) / 11));
     expect(screen.getByText("Ingestion complète : Envoi des morceaux (1/4)")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
@@ -103,6 +105,9 @@ describe("PipelineRunPanel", () => {
     [{ kind: "full" as const, stage: "ingesting_wikidata" as const }, "Ingestion complète : Ingestion Wikidata"],
     [{ status: "succeeded" as const }, "Curation : Appliquée"],
     [{ kind: "full" as const, status: "succeeded" as const }, "Ingestion complète : Terminée"],
+    [{ kind: "sync" as const, stage: "uploading_artists" as const }, "Réimport du dernier Gold : Envoi des artistes"],
+    [{ kind: "sync" as const, stage: "merging_artists" as const }, "Réimport du dernier Gold : Fusion des artistes"],
+    [{ kind: "sync" as const, status: "succeeded" as const }, "Réimport du dernier Gold : Réimportée"],
     [{ status: "failed" as const, error: "Bronze manquant" }, "Curation : Échec : Bronze manquant"],
     [{ status: "superseded" as const }, "Curation : Déjà appliquée par le run nightly"],
     [{ status: "cancelled" as const }, "Curation : Annulée"],
