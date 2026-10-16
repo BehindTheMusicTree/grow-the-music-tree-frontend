@@ -3,6 +3,7 @@ import type { PipelineRunKind, PipelineRunRequest } from "@schemas/api/pipeline-
 export const KIND_LABELS: Record<PipelineRunKind, string> = {
   curation: "Curation",
   full: "Ingestion complète",
+  sync: "Réimport du dernier Gold",
 };
 
 export function originOf({ trigger, requestedBy }: Pick<PipelineRunRequest, "trigger" | "requestedBy">) {

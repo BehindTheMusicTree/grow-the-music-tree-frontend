@@ -94,6 +94,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- Admins can launch a `sync` pipeline run ("Réimporter le dernier Gold") that replays the last complete Gold into grow (needs grow-api >= 12.11.0).
+- Pipeline runs show the `uploading_artists` and `merging_artists` stages.
+
 ## [3.9.2] - 2026-10-15
 
 ### Fixed

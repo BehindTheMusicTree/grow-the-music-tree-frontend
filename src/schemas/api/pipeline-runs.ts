@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const PIPELINE_RUN_KINDS = ["curation", "full"] as const;
+export const PIPELINE_RUN_KINDS = ["curation", "full", "sync"] as const;
 export type PipelineRunKind = (typeof PIPELINE_RUN_KINDS)[number];
 
 const FULL_STAGES = [
@@ -13,11 +13,14 @@ const FULL_STAGES = [
   "importing_tree",
   "uploading_songs",
   "merging_songs",
+  "uploading_artists",
+  "merging_artists",
 ] as const;
 export type PipelineRunStage = (typeof FULL_STAGES)[number];
 
 export const PIPELINE_RUN_STAGES: Record<PipelineRunKind, readonly PipelineRunStage[]> = {
   full: FULL_STAGES,
+  sync: ["importing_tree", "uploading_songs", "merging_songs", "uploading_artists", "merging_artists"],
   curation: ["fetching_rules", "building_genres", "matching_songs", "importing_tree", "uploading_songs", "merging_songs"],
 };
 
