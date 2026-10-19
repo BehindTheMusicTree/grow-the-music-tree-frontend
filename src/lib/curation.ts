@@ -4,6 +4,7 @@ import {
   CurationEntriesPageSchema,
   CurationHistoryPageSchema,
   CurationListsSchema,
+  CurationReviewItemsSchema,
   CurationRulesSchema,
   CurationStatusSchema,
   type CurationList,
@@ -54,4 +55,10 @@ export async function fetchCurationStatus() {
   const response = await fetchAsAdmin("curation/status/");
   if (!response.ok) throw new Error(`Failed to fetch curation status: ${response.status}`);
   return CurationStatusSchema.parse(await response.json());
+}
+
+export async function fetchCurationReview() {
+  const response = await fetchAsAdmin("curation/review/");
+  if (!response.ok) throw new Error(`Failed to fetch curation review: ${response.status}`);
+  return CurationReviewItemsSchema.parse(await response.json());
 }
