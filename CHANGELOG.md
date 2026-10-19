@@ -97,6 +97,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Added
 
 - Admins can launch a `sync` pipeline run ("Réimporter le dernier Gold") that replays the last complete Gold into grow (needs grow-api >= 12.11.0).
+- Admins get a "Curation à revoir" page listing curated Wikidata items the pipeline could not remap (merge conflict, deleted, outside the tree) (needs grow-api >= 12.12.0).
 - Pipeline runs show the `uploading_artists` and `merging_artists` stages.
 
 ### Fixed
