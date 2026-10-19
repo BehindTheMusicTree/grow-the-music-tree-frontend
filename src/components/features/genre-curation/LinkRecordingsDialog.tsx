@@ -90,8 +90,7 @@ export default function LinkRecordingsDialog({ genre, onClose }: { genre: Curate
       okButtonText={`Link ${checked.size || ""}`.trim()}
       okButtonDisabled={checked.size === 0 || isPending}
       onOk={() => {
-        mutate({ recordings: Array.from(checked), genre: genre.uuid });
-        onClose();
+        mutate({ recordings: Array.from(checked), genre: genre.uuid }, { onSuccess: onClose });
       }}
       onCancel={onClose}
       onClose={onClose}

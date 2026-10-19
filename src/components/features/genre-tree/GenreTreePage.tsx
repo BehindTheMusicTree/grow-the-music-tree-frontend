@@ -108,6 +108,7 @@ export default function GenreTreePage() {
   const { showPopup, hidePopup } = usePopup();
   const [editMode, setEditMode] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   // Shares the react-query cache with GenreTreeView's internal fetch (same queryKey), so this
   // doesn't trigger an extra network request. Used only to compute whether the "pop-core" view
@@ -175,19 +176,31 @@ export default function GenreTreePage() {
         onEditModeChange: handleEditModeChange,
         expanded,
         onExpandedChange: setExpanded,
+        selectedNodeId,
+        onSelectedNodeIdChange: setSelectedNodeId,
         renderTitleEditor: (node: { id: string }) => {
           const criteria = criteriaByPlaylist.get(node.id)?.criteria;
-          return criteria ? <GenreNameEditor genre={criteria} /> : null;
+          return criteria ? <GenreNameEditor key={criteria.uuid} genre={criteria} /> : null;
         },
         renderParentsEditor: (node: { id: string }) => {
           const playlist = criteriaByPlaylist.get(node.id);
           return playlist?.criteria ? (
-            <GenreParentsEditor genre={{ uuid: playlist.criteria.uuid, parentName: playlist.parent?.name ?? null }} />
+            <GenreParentsEditor
+              key={playlist.criteria.uuid}
+              genre={{ uuid: playlist.criteria.uuid, parent: playlist.parent ?? null }}
+            />
           ) : null;
         },
         renderDangerZone: (node: { id: string }) => {
-          const criteria = criteriaByPlaylist.get(node.id)?.criteria;
-          return criteria ? <GenreDangerZone genre={criteria} /> : null;
+          const playlist = criteriaByPlaylist.get(node.id);
+          return playlist?.criteria ? (
+            <GenreDangerZone
+              key={playlist.criteria.uuid}
+              genre={playlist.criteria}
+              onAliased={(targetUuid) => setSelectedNodeId(targetUuid)}
+              onRemoved={() => setSelectedNodeId(playlist.parent?.uuid ?? null)}
+            />
+          ) : null;
         },
         renderSummary: (overview: ComponentProps<typeof GenreSummaryEditor>["overview"]) => (
           <GenreSummaryEditor overview={overview} />

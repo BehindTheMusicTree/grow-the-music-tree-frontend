@@ -29,6 +29,7 @@ export function useSecondaryParent() {
       queryClient.setQueryData(secondaryParentsKey(uuid), (current: { uuid: string; name: string }[] | undefined) =>
         add ? [...(current ?? []), parent] : (current ?? []).filter((entry) => entry.uuid !== parent.uuid),
       );
+      return [secondaryParentsKey(uuid)];
     },
     undo: (input) => ({ ...input, add: !input.add }),
     message: ({ parent, add }) => (add ? `Also under ${parent.name}` : `Removed from ${parent.name}`),

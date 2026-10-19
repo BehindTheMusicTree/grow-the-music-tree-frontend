@@ -1,11 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import type { TrackBase } from "@behindthemusictree/app-kit/genre-tree";
 import { useGenreCuration } from "@components/features/genre-curation/GenreCurationProvider";
 
 export default function RecordingCheckbox({ recording, index }: { recording: TrackBase; index: number }) {
   const { selected, toggle, registerRow } = useGenreCuration();
-  registerRow(index, recording.uuid);
+  useEffect(() => registerRow(index, recording.uuid), [registerRow, index, recording.uuid]);
   return (
     <input
       type="checkbox"

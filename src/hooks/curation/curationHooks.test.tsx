@@ -8,6 +8,7 @@ import { useAssignRecordingGenre } from "@hooks/curation/useAssignRecordingGenre
 import { useEssentialTracks } from "@hooks/curation/useEssentialTracks";
 import { useExcludeGenre } from "@hooks/curation/useExcludeGenre";
 import { useSecondaryParent, secondaryParentsKey } from "@hooks/curation/useSecondaryParent";
+import { useUpdateGenreName } from "@hooks/curation/useUpdateGenreName";
 import { useUpdateGenreSummary } from "@hooks/curation/useUpdateGenreSummary";
 import { useUpdateRecordingVideo } from "@hooks/curation/useUpdateRecordingVideo";
 
@@ -38,7 +39,7 @@ async function run<T extends { mutate: (input: never) => void }>(hook: { current
 describe("curation hooks", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    fetchMock.mockResolvedValue({ uuid: "g1", previous: [{ uuid: "r1", genre: "old" }] });
+    fetchMock.mockResolvedValue({ uuid: "g1", previous: [{ uuid: "r1", genre: "old", undoable: true }] });
   });
 
   it("aliases a genre", async () => {
@@ -108,13 +109,51 @@ describe("curation hooks", () => {
   it("offers no undo when moved recordings came from several genres", async () => {
     fetchMock.mockResolvedValue({
       previous: [
-        { uuid: "r1", genre: "a" },
-        { uuid: "r2", genre: "b" },
+        { uuid: "r1", genre: "a", undoable: true },
+        { uuid: "r2", genre: "b", undoable: true },
       ],
     });
     const { result } = setup(() => useAssignRecordingGenre("moved"));
     const [, options] = await run(result, { recordings: ["r1", "r2"], genre: "g2" });
     expect(options.action).toBeUndefined();
+  });
+
+  it("offers no undo when a previous genre cannot be restored", async () => {
+    fetchMock.mockResolvedValue({ previous: [{ uuid: "r1", genre: "old", undoable: false }] });
+    const { result } = setup(() => useAssignRecordingGenre("moved"));
+    const [, options] = await run(result, { recordings: ["r1"], genre: "g2" });
+    expect(options.action).toBeUndefined();
+  });
+
+  it("removes unlinked recordings from every genre list but leaves moves to invalidation", async () => {
+    const prefix = libraryQueryKeys.reference.recordings.all[0];
+    const key = [prefix, "/api", "genre", "old"];
+    fetchMock.mockImplementation(() => new Promise(() => undefined));
+
+    const unlink = setup(() => useAssignRecordingGenre("unlinked"));
+    unlink.queryClient.setQueryData(key, { pages: [{ tracks: [{ uuid: "r1" }, { uuid: "r2" }], total: 2 }] });
+    act(() => unlink.result.current.mutate({ recordings: ["r1"], genre: null }));
+    await waitFor(() =>
+      expect(unlink.queryClient.getQueryData(key)).toEqual({ pages: [{ tracks: [{ uuid: "r2" }], total: 1 }] }),
+    );
+
+    const move = setup(() => useAssignRecordingGenre("moved"));
+    const original = { pages: [{ tracks: [{ uuid: "r1" }], total: 1 }] };
+    move.queryClient.setQueryData(key, original);
+    act(() => move.result.current.mutate({ recordings: ["r1"], genre: "g2" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(move.queryClient.getQueryData(key)).toBe(original);
+  });
+
+  it("renames a genre optimistically and undoes the name", async () => {
+    fetchMock.mockResolvedValue({ uuid: "g1" });
+    const { result, queryClient } = setup(useUpdateGenreName);
+    queryClient.setQueryData(genreQueryKeys.reference.overview("g1"), { name: "Folk" });
+    const [message, options] = await run(result, { uuid: "g1", name: "Folk rock", previous: "Folk" });
+    expect(message).toBe("Renamed to Folk rock");
+    act(() => options.action?.onClick());
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(JSON.parse(fetchMock.mock.calls[1][3].body)).toEqual({ name: "Folk" });
   });
 
   it("updates a recording video and undoes it", async () => {
@@ -125,6 +164,9 @@ describe("curation hooks", () => {
     const previous = { youtubeVideoId: null, youtubeUnplayableReason: null };
     const [message, options] = await run(result, { uuid: "r1", video, previous });
     expect(message).toBe("Video updated");
+    const cached = queryClient.getQueryData([prefix, "/api", "genre", "g1"]) as { pages: { tracks: { uuid: string; youtubeVideoId?: string }[] }[] };
+    expect(cached.pages[0].tracks[0].youtubeVideoId).toBe("abc");
+    expect(cached.pages[0].tracks[1].youtubeVideoId).toBeUndefined();
     act(() => options.action?.onClick());
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(JSON.parse(fetchMock.mock.calls[1][3].body)).toEqual(previous);

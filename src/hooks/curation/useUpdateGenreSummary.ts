@@ -11,9 +11,9 @@ export function useUpdateGenreSummary() {
     request: (fetch, { uuid, summary }) =>
       fetch(`genres/${uuid}/`, true, false, { method: "PUT", body: JSON.stringify({ summary }) }),
     optimistic: (queryClient, { uuid, summary }) => {
-      queryClient.setQueryData(genreQueryKeys.reference.overview(uuid), (data: CriteriaOverview | undefined) =>
-        data ? { ...data, summary } : data,
-      );
+      const key = genreQueryKeys.reference.overview(uuid);
+      queryClient.setQueryData(key, (data: CriteriaOverview | undefined) => (data ? { ...data, summary } : data));
+      return [key];
     },
     undo: ({ uuid, summary, previous }) => ({ uuid, summary: previous, previous: summary }),
     message: () => "Summary saved",

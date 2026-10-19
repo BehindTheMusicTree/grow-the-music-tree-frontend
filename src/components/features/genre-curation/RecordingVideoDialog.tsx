@@ -40,8 +40,7 @@ export default function RecordingVideoDialog({ recording, onClose }: Props) {
           }}
           isPending={isPending}
           onSave={(video, previous) => {
-            mutate({ uuid: recording.uuid, video, previous });
-            onClose();
+            mutate({ uuid: recording.uuid, video, previous }, { onSuccess: onClose });
           }}
           onCancel={onClose}
         />
