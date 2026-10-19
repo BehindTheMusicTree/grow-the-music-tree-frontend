@@ -19,7 +19,18 @@ interface Genre {
   wikidataId?: string | null;
 }
 
-function AliasPopup({ genre, onClose }: { genre: Genre; onClose: () => void }) {
+interface PopupProps {
+  genre: Genre;
+  onClose: () => void;
+}
+
+interface DangerZoneProps {
+  genre: Genre;
+  onAliased?: (targetUuid: string) => void;
+  onRemoved?: () => void;
+}
+
+function AliasPopup({ genre, onClose, onAliased }: PopupProps & Pick<DangerZoneProps, "onAliased">) {
   const [target, setTarget] = useState<{ uuid: string; name: string } | null>(null);
   const preview = useAliasPreview(genre.uuid, target?.uuid ?? null);
   const { mutate, isPending } = useAliasGenre();
@@ -36,8 +47,15 @@ function AliasPopup({ genre, onClose }: { genre: Genre; onClose: () => void }) {
       okButtonDisabled={!target || !preview.data || isPending}
       onOk={() => {
         if (!target) return;
-        mutate({ uuid: genre.uuid, target: target.uuid });
-        onClose();
+        mutate(
+          { uuid: genre.uuid, target: target.uuid },
+          {
+            onSuccess: () => {
+              onClose();
+              onAliased?.(target.uuid);
+            },
+          },
+        );
       }}
       onCancel={onClose}
       onClose={onClose}
@@ -61,7 +79,7 @@ function AliasPopup({ genre, onClose }: { genre: Genre; onClose: () => void }) {
   );
 }
 
-function ExcludePopup({ genre, onClose }: { genre: Genre; onClose: () => void }) {
+function ExcludePopup({ genre, onClose, onRemoved }: PopupProps & Pick<DangerZoneProps, "onRemoved">) {
   const [category, setCategory] = useState<ExcludeCategory>("theme");
   const { mutate, isPending } = useExcludeGenre();
 
@@ -76,8 +94,15 @@ function ExcludePopup({ genre, onClose }: { genre: Genre; onClose: () => void })
       okButtonText="Exclude"
       okButtonDisabled={isPending}
       onOk={() => {
-        mutate({ uuid: genre.uuid, category });
-        onClose();
+        mutate(
+          { uuid: genre.uuid, category },
+          {
+            onSuccess: () => {
+              onClose();
+              onRemoved?.();
+            },
+          },
+        );
       }}
       onCancel={onClose}
       onClose={onClose}
@@ -100,7 +125,7 @@ function ExcludePopup({ genre, onClose }: { genre: Genre; onClose: () => void })
   );
 }
 
-function DeletePopup({ genre, onClose }: { genre: Genre; onClose: () => void }) {
+function DeletePopup({ genre, onClose, onRemoved }: PopupProps & Pick<DangerZoneProps, "onRemoved">) {
   const { mutate, isPending, formErrors } = useDeleteGenre("reference", getGrowBackendBaseUrl);
 
   return (
@@ -113,7 +138,17 @@ function DeletePopup({ genre, onClose }: { genre: Genre; onClose: () => void }) 
       showCancelButton
       okButtonText="Delete"
       okButtonDisabled={isPending}
-      onOk={() => mutate({ uuid: genre.uuid }, { onSuccess: onClose })}
+      onOk={() =>
+        mutate(
+          { uuid: genre.uuid },
+          {
+            onSuccess: () => {
+              onClose();
+              onRemoved?.();
+            },
+          },
+        )
+      }
       onCancel={onClose}
       onClose={onClose}
     >
@@ -127,21 +162,21 @@ function DeletePopup({ genre, onClose }: { genre: Genre; onClose: () => void }) 
   );
 }
 
-export default function GenreDangerZone({ genre }: { genre: Genre }) {
+export default function GenreDangerZone({ genre, onAliased, onRemoved }: DangerZoneProps) {
   const { openDialog } = useGenreCuration();
   const button = "px-3 py-1 text-sm text-red-600 border border-red-300 rounded cursor-pointer hover:bg-red-50";
 
   return (
     <div className="flex flex-wrap gap-2">
       {!genre.wikidataId && (
-        <button type="button" className={button} onClick={() => openDialog((close) => <AliasPopup genre={genre} onClose={close} />)}>
+        <button type="button" className={button} onClick={() => openDialog((close) => <AliasPopup genre={genre} onClose={close} onAliased={onAliased} />)}>
           Alias of…
         </button>
       )}
-      <button type="button" className={button} onClick={() => openDialog((close) => <ExcludePopup genre={genre} onClose={close} />)}>
+      <button type="button" className={button} onClick={() => openDialog((close) => <ExcludePopup genre={genre} onClose={close} onRemoved={onRemoved} />)}>
         Exclude…
       </button>
-      <button type="button" className={button} onClick={() => openDialog((close) => <DeletePopup genre={genre} onClose={close} />)}>
+      <button type="button" className={button} onClick={() => openDialog((close) => <DeletePopup genre={genre} onClose={close} onRemoved={onRemoved} />)}>
         Delete
       </button>
     </div>

@@ -31,7 +31,10 @@ function setup() {
         inputSchema: Schema,
         outputSchema: z.object({ previous: z.string() }),
         request: (fetch, input) => fetch("x/", true, false, { body: input.value }),
-        optimistic: (client, input) => client.setQueryData<string>(KEY, input.value),
+        optimistic: (client, input) => {
+          client.setQueryData<string>(KEY, input.value);
+          return [KEY];
+        },
         undo: (_input, output) => ({ value: output.previous }),
         message: (input) => `set ${input.value}`,
       }),
@@ -69,5 +72,21 @@ describe("useCurationMutation", () => {
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(fetchMock.mock.calls[1][3]).toEqual({ body: "original" });
+  });
+
+  it("does not restore keys it did not touch when a mutation fails", async () => {
+    const other = ["referenceRecordings", "/api", "genre", "g2"];
+    fetchMock.mockImplementation(async () => {
+      throw new Error("boom");
+    });
+    const { queryClient, hook } = setup();
+    queryClient.setQueryData(other, "original");
+
+    act(() => hook.result.current.mutate({ value: "changed" }));
+    queryClient.setQueryData(other, "newer");
+
+    await waitFor(() => expect(toastError).toHaveBeenCalledWith("boom"));
+    expect(queryClient.getQueryData(KEY)).toBe("original");
+    expect(queryClient.getQueryData(other)).toBe("newer");
   });
 });

@@ -14,9 +14,9 @@ export function useEssentialTracks() {
         body: JSON.stringify({ essentialTracks: tracks.map((track) => track.uuid) }),
       }),
     optimistic: (queryClient, { uuid, tracks }) => {
-      queryClient.setQueryData(genreQueryKeys.reference.overview(uuid), (data: CriteriaOverview | undefined) =>
-        data ? { ...data, essentialTracks: tracks } : data,
-      );
+      const key = genreQueryKeys.reference.overview(uuid);
+      queryClient.setQueryData(key, (data: CriteriaOverview | undefined) => (data ? { ...data, essentialTracks: tracks } : data));
+      return [key];
     },
     undo: ({ uuid, tracks, previous }) => ({ uuid, tracks: previous, previous: tracks }),
     message: () => "Essential tracks updated",

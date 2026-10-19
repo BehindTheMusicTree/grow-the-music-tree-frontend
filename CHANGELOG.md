@@ -100,6 +100,20 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - The genre panel is the admin curation tool: an Edit/Done toggle opens it fullscreen (collapsible to a side panel with the expand button or Escape) to rename, reparent, add secondary parents, edit the summary, reorder essential tracks, link/move/unlink recordings (single or bulk, shift+click range), edit a recording's YouTube video, and alias, exclude or delete a genre. Each action saves immediately with an Undo toast (needs grow-api >= 12.13.0).
 
+### Changed
+
+- Renaming a genre or changing its main parent now has an Undo toast. Alias, Exclude and Delete are confirmed in a dialog and have no Undo. Unlinking a single recording asks for confirmation.
+- A move on the genre panel no longer removes the recording optimistically (only an unlink does); the list refreshes after the server answers. A move that cannot be undone (the previous genre has no Wikidata id) shows no Undo (needs grow-api >= 12.14.0).
+- `@behindthemusictree/app-kit` 11.5.0; `sonner` is pinned to 2.0.8.
+
+### Fixed
+
+- Curation dialogs (move, unlink, link, video) stay open when the server rejects the change; after Alias, Exclude or Delete the panel selects the alias target or the main parent.
+- Editing a recording's video updates every cached genre list, not just the open one.
+- A failed optimistic update only restores the lists it changed, so it can no longer overwrite a newer edit.
+- Switching genre while editing no longer renames or reparents the previous one, and the summary is not overwritten while being typed.
+- Shift+click range selection ignores rows that are no longer in the list.
+
 ## [3.11.0] - 2026-10-19
 
 ### Added

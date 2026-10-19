@@ -13,7 +13,7 @@ interface GenreCurationContextValue {
   setGenre: (genre: CuratedGenre) => void;
   selected: ReadonlySet<string>;
   toggle: (uuid: string, index: number, range: boolean) => void;
-  registerRow: (index: number, uuid: string) => void;
+  registerRow: (index: number, uuid: string) => () => void;
   clearSelection: () => void;
   openDialog: (render: (close: () => void) => ReactNode) => void;
 }
@@ -52,6 +52,9 @@ export function GenreCurationProvider({ children }: { children: ReactNode }) {
 
   const registerRow = useCallback((index: number, uuid: string) => {
     rows.current[index] = uuid;
+    return () => {
+      if (rows.current[index] === uuid) delete rows.current[index];
+    };
   }, []);
 
   const toggle = useCallback((uuid: string, index: number, range: boolean) => {

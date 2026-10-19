@@ -13,7 +13,8 @@ const m = vi.hoisted(() => ({
   alias: vi.fn(),
   exclude: vi.fn(),
   del: vi.fn(),
-  update: vi.fn(),
+  name: vi.fn(),
+  parent: vi.fn(),
   secondary: vi.fn(),
   summary: vi.fn(),
   essential: vi.fn(),
@@ -36,7 +37,6 @@ vi.mock("@tanstack/react-query", () => ({ skipToken: Symbol("skip"), useQuery: (
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   genreQueryKeys: { reference: { overview: (uuid: string) => ["overview", uuid] } },
   useDeleteGenre: () => ({ mutate: m.del, isPending: false, formErrors: [{ message: "nope" }] }),
-  useUpdateGenre: () => ({ mutate: m.update, formErrors: [{ message: "bad name" }] }),
 }));
 vi.mock("@behindthemusictree/app-kit/popup", () => ({
   BasePopup: ({ title, children, onOk, okButtonText, okButtonDisabled }: {
@@ -68,6 +68,8 @@ vi.mock("@hooks/curation/useAliasGenre", () => ({
 }));
 vi.mock("@hooks/curation/useExcludeGenre", () => ({ useExcludeGenre: () => ({ mutate: m.exclude, isPending: false }) }));
 vi.mock("@hooks/curation/useEssentialTracks", () => ({ useEssentialTracks: () => ({ mutate: m.essential, isPending: false }) }));
+vi.mock("@hooks/curation/useUpdateGenreName", () => ({ useUpdateGenreName: () => ({ mutate: m.name }) }));
+vi.mock("@hooks/curation/useUpdateGenreParent", () => ({ useUpdateGenreParent: () => ({ mutate: m.parent }) }));
 vi.mock("@hooks/curation/useUpdateGenreSummary", () => ({ useUpdateGenreSummary: () => ({ mutate: m.summary }) }));
 vi.mock("@hooks/curation/useSecondaryParent", () => ({
   useSecondaryParent: () => ({ mutate: m.secondary }),
@@ -100,7 +102,12 @@ describe("genre curation actions", () => {
     fireEvent.click(screen.getByRole("button", { name: "Target genre" }));
     fireEvent.click(screen.getByRole("button", { name: "Move" }));
 
-    expect(m.assign).toHaveBeenCalledWith({ recordings: ["r1", "r2"], genre: "t1" });
+    const [input, options] = m.assign.mock.calls[0];
+    expect(input).toEqual({ recordings: ["r1", "r2"], genre: "t1" });
+    expect(onDone).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+
+    options.onSuccess();
     expect(onDone).toHaveBeenCalled();
     expect(onClose).toHaveBeenCalled();
   });
@@ -111,43 +118,67 @@ describe("genre curation actions", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Unlink" }));
 
-    expect(m.assign).toHaveBeenCalledWith({ recordings: ["r1"], genre: null });
+    const [input, options] = m.assign.mock.calls[0];
+    expect(input).toEqual({ recordings: ["r1"], genre: null });
+    expect(onClose).not.toHaveBeenCalled();
+
+    options.onSuccess();
     expect(onClose).toHaveBeenCalled();
   });
 
   it("merges a genre into its alias target after previewing", () => {
     m.aliasPreview.current = { recordings: 1, essentialTracks: 2, children: 3 };
-    render(<GenreDangerZone genre={{ uuid: "g1", name: "Folk" }} />);
+    const onAliased = vi.fn();
+    render(<GenreDangerZone genre={{ uuid: "g1", name: "Folk" }} onAliased={onAliased} />);
     fireEvent.click(screen.getByRole("button", { name: "Alias of…" }));
     const close = openedDialog();
 
     fireEvent.click(screen.getByRole("button", { name: "Target genre" }));
     fireEvent.click(screen.getByRole("button", { name: "Merge" }));
 
-    expect(m.alias).toHaveBeenCalledWith({ uuid: "g1", target: "t1" });
+    const [input, options] = m.alias.mock.calls[0];
+    expect(input).toEqual({ uuid: "g1", target: "t1" });
+    expect(close).not.toHaveBeenCalled();
+
+    options.onSuccess();
     expect(close).toHaveBeenCalled();
+    expect(onAliased).toHaveBeenCalledWith("t1");
   });
 
   it("excludes a genre with the chosen category", () => {
-    render(<GenreDangerZone genre={{ uuid: "g1", name: "Folk" }} />);
+    const onRemoved = vi.fn();
+    render(<GenreDangerZone genre={{ uuid: "g1", name: "Folk" }} onRemoved={onRemoved} />);
     fireEvent.click(screen.getByRole("button", { name: "Exclude…" }));
-    openedDialog();
+    const close = openedDialog();
 
     fireEvent.change(screen.getByRole("combobox"), { target: { value: "duplicate" } });
     fireEvent.click(screen.getByRole("button", { name: "Exclude" }));
 
-    expect(m.exclude).toHaveBeenCalledWith({ uuid: "g1", category: "duplicate" });
+    const [input, options] = m.exclude.mock.calls[0];
+    expect(input).toEqual({ uuid: "g1", category: "duplicate" });
+    expect(onRemoved).not.toHaveBeenCalled();
+
+    options.onSuccess();
+    expect(close).toHaveBeenCalled();
+    expect(onRemoved).toHaveBeenCalled();
   });
 
   it("deletes a genre and shows form errors", () => {
-    render(<GenreDangerZone genre={{ uuid: "g1", name: "Folk" }} />);
+    const onRemoved = vi.fn();
+    render(<GenreDangerZone genre={{ uuid: "g1", name: "Folk" }} onRemoved={onRemoved} />);
     fireEvent.click(screen.getByRole("button", { name: "Delete" }));
     const close = openedDialog();
 
     expect(screen.getByRole("alert")).toHaveTextContent("nope");
     fireEvent.click(screen.getAllByRole("button", { name: "Delete" })[1]);
 
-    expect(m.del).toHaveBeenCalledWith({ uuid: "g1" }, { onSuccess: close });
+    const [input, options] = m.del.mock.calls[0];
+    expect(input).toEqual({ uuid: "g1" });
+    expect(onRemoved).not.toHaveBeenCalled();
+
+    options.onSuccess();
+    expect(close).toHaveBeenCalled();
+    expect(onRemoved).toHaveBeenCalled();
   });
 
   it("renames on Enter and restores on Escape", () => {
@@ -156,8 +187,7 @@ describe("genre curation actions", () => {
 
     fireEvent.change(input, { target: { value: "Folk rock" } });
     fireEvent.keyDown(input, { key: "Enter" });
-    expect(m.update).toHaveBeenCalledWith({ uuid: "g1", data: { name: "Folk rock" } });
-    expect(screen.getByRole("alert")).toHaveTextContent("bad name");
+    expect(m.name).toHaveBeenCalledWith({ uuid: "g1", name: "Folk rock", previous: "Folk" });
 
     fireEvent.keyDown(input, { key: "Escape" });
     expect(input).toHaveValue("Folk");
@@ -177,10 +207,14 @@ describe("genre curation actions", () => {
   });
 
   it("edits main and secondary parents", () => {
-    render(<GenreParentsEditor genre={{ uuid: "g1", parentName: "Roots" }} />);
+    render(<GenreParentsEditor genre={{ uuid: "g1", parent: { uuid: "p1", name: "Roots" } }} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Main parent" }));
-    expect(m.update).toHaveBeenCalledWith({ uuid: "g1", data: { parent: "t1" } });
+    expect(m.parent).toHaveBeenCalledWith({
+      uuid: "g1",
+      parent: { uuid: "t1", name: "Target" },
+      previous: { uuid: "p1", name: "Roots" },
+    });
 
     fireEvent.click(screen.getByRole("button", { name: "+ Add secondary parent" }));
     expect(m.secondary).toHaveBeenCalledWith({ uuid: "g1", parent: { uuid: "t1", name: "Target" }, add: true });
@@ -202,7 +236,11 @@ describe("genre curation actions", () => {
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Unlink Song from this genre" }));
-    expect(m.assign).toHaveBeenCalledWith({ recordings: ["r1"], genre: null });
+    expect(m.assign).not.toHaveBeenCalled();
+    const close = openedDialog();
+    fireEvent.click(screen.getByRole("button", { name: "Unlink" }));
+    expect(m.assign.mock.calls[0][0]).toEqual({ recordings: ["r1"], genre: null });
+    expect(close).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Move Song to another genre" }));
     expect(m.dialog.current).not.toBeNull();

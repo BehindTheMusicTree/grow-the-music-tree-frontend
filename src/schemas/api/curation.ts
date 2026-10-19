@@ -141,7 +141,7 @@ export const AssignRecordingGenreInputSchema = z.object({
 export type AssignRecordingGenreInput = z.infer<typeof AssignRecordingGenreInputSchema>;
 
 export const AssignRecordingGenreOutputSchema = z.object({
-  previous: z.array(z.object({ uuid: z.string(), genre: z.string().nullable() })),
+  previous: z.array(z.object({ uuid: z.string(), genre: z.string().nullable(), undoable: z.boolean() })),
 });
 export type AssignRecordingGenreOutput = z.infer<typeof AssignRecordingGenreOutputSchema>;
 
@@ -213,6 +213,15 @@ export const UpdateGenreSummaryInputSchema = z.object({
   previous: z.string().nullable(),
 });
 export type UpdateGenreSummaryInput = z.infer<typeof UpdateGenreSummaryInputSchema>;
+export const UpdateGenreNameInputSchema = z.object({ uuid: z.string(), name: z.string(), previous: z.string() });
+export type UpdateGenreNameInput = z.infer<typeof UpdateGenreNameInputSchema>;
+const ParentSchema = z.object({ uuid: z.string(), name: z.string() });
+export const UpdateGenreParentInputSchema = z.object({
+  uuid: z.string(),
+  parent: ParentSchema,
+  previous: ParentSchema.nullable(),
+});
+export type UpdateGenreParentInput = z.infer<typeof UpdateGenreParentInputSchema>;
 export const UpdateGenreOutputSchema = UuidOutputSchema;
 
 const EssentialTrackSchema = z.object({

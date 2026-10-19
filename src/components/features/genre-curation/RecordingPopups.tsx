@@ -27,9 +27,15 @@ export function MoveRecordingsPopup({ recordings, onClose, onDone }: PopupProps)
       okButtonDisabled={!target || isPending}
       onOk={() => {
         if (!target) return;
-        mutate({ recordings, genre: target.uuid });
-        onDone?.();
-        onClose();
+        mutate(
+          { recordings, genre: target.uuid },
+          {
+            onSuccess: () => {
+              onDone?.();
+              onClose();
+            },
+          },
+        );
       }}
       onCancel={onClose}
       onClose={onClose}
@@ -58,9 +64,15 @@ export function UnlinkRecordingsPopup({ recordings, onClose, onDone }: PopupProp
       okButtonText="Unlink"
       okButtonDisabled={isPending}
       onOk={() => {
-        mutate({ recordings, genre: null });
-        onDone?.();
-        onClose();
+        mutate(
+          { recordings, genre: null },
+          {
+            onSuccess: () => {
+              onDone?.();
+              onClose();
+            },
+          },
+        );
       }}
       onCancel={onClose}
       onClose={onClose}

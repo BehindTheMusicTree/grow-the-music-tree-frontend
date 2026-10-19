@@ -1,6 +1,6 @@
 "use client";
 
-import { useQueryClient, type QueryClient, type QueryKey } from "@tanstack/react-query";
+import { hashKey, useQueryClient, type QueryClient, type QueryKey } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { z } from "zod";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
@@ -15,7 +15,7 @@ interface CurationMutationConfig<I extends z.ZodTypeAny, O extends z.ZodTypeAny>
   inputSchema: I;
   outputSchema: O;
   request: (fetch: Fetch, input: z.infer<I>) => Promise<unknown>;
-  optimistic?: (queryClient: QueryClient, input: z.infer<I>) => void;
+  optimistic?: (queryClient: QueryClient, input: z.infer<I>) => QueryKey[];
   undo?: (input: z.infer<I>, output: z.infer<O>) => z.infer<I> | null;
   message: (input: z.infer<I>) => string;
 }
@@ -33,8 +33,8 @@ export function useCurationMutation<I extends z.ZodTypeAny, O extends z.ZodTypeA
     onMutate: async (input: z.infer<I>) => {
       await queryClient.cancelQueries({ predicate: (query) => isCurationQuery(query.queryKey) });
       const snapshot = queryClient.getQueriesData({ predicate: (query) => isCurationQuery(query.queryKey) });
-      config.optimistic?.(queryClient, input);
-      return { snapshot };
+      const touched = new Set((config.optimistic?.(queryClient, input) ?? []).map((key) => hashKey(key)));
+      return { snapshot: snapshot.filter(([key]) => touched.has(hashKey(key))) };
     },
     onError: (error: Error, _input: z.infer<I>, context?: { snapshot: [QueryKey, unknown][] }) => {
       context?.snapshot.forEach(([key, data]) => queryClient.setQueryData<unknown>(key, data));

@@ -3,16 +3,14 @@
 import { skipToken, useQuery } from "@tanstack/react-query";
 import { genreQueryKeys, type CriteriaOverview, type TrackBase } from "@behindthemusictree/app-kit/genre-tree";
 import { useGenreCuration } from "@components/features/genre-curation/GenreCurationProvider";
-import { MoveRecordingsPopup } from "@components/features/genre-curation/RecordingPopups";
+import { MoveRecordingsPopup, UnlinkRecordingsPopup } from "@components/features/genre-curation/RecordingPopups";
 import RecordingVideoDialog from "@components/features/genre-curation/RecordingVideoDialog";
-import { useAssignRecordingGenre } from "@hooks/curation/useAssignRecordingGenre";
 import { useEssentialTracks } from "@hooks/curation/useEssentialTracks";
 
 const BUTTON = "px-1 cursor-pointer hover:bg-gray-100 rounded disabled:opacity-50";
 
 export default function RecordingRowActions({ recording }: { recording: TrackBase }) {
   const { genre, openDialog } = useGenreCuration();
-  const unlink = useAssignRecordingGenre("unlinked");
   const essential = useEssentialTracks();
   const { data: overview } = useQuery<CriteriaOverview>({
     queryKey: genreQueryKeys.reference.overview(genre?.uuid ?? ""),
@@ -54,8 +52,7 @@ export default function RecordingRowActions({ recording }: { recording: TrackBas
       <button
         type="button"
         aria-label={`Unlink ${recording.title} from this genre`}
-        disabled={unlink.isPending}
-        onClick={() => unlink.mutate({ recordings: [recording.uuid], genre: null })}
+        onClick={() => openDialog((close) => <UnlinkRecordingsPopup recordings={[recording.uuid]} onClose={close} />)}
         className={BUTTON}
       >
         ✕
