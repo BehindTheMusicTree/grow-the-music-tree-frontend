@@ -96,6 +96,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- The genre panel is the admin curation tool: an Edit/Done toggle opens it fullscreen (collapsible to a side panel with the expand button or Escape) to rename, reparent, add secondary parents, edit the summary, reorder essential tracks, link/move/unlink recordings (single or bulk, shift+click range), edit a recording's YouTube video, and alias, exclude or delete a genre. Each action saves immediately with an Undo toast (needs grow-api >= 12.13.0).
+
 ## [3.11.0] - 2026-10-19
 
 ### Added

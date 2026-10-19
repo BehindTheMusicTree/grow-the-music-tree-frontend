@@ -16,6 +16,7 @@ export default defineConfig({
   },
   test: {
     environment: "happy-dom",
+    environmentOptions: { happyDOM: { settings: { disableIframePageLoading: true } } },
     setupFiles: ["./vitest.setup.ts"],
     env: { NEXT_PUBLIC_CONTACT_EMAIL: "test@example.com" },
     include: ["**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],

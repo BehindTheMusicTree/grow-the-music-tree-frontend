@@ -131,3 +131,112 @@ export const CurationReviewItemsSchema = z.array(
 );
 
 export type CurationReviewItem = z.infer<typeof CurationReviewItemsSchema>[number];
+
+const UuidOutputSchema = z.object({ uuid: z.string() });
+
+export const AssignRecordingGenreInputSchema = z.object({
+  recordings: z.array(z.string()).min(1),
+  genre: z.string().nullable(),
+});
+export type AssignRecordingGenreInput = z.infer<typeof AssignRecordingGenreInputSchema>;
+
+export const AssignRecordingGenreOutputSchema = z.object({
+  previous: z.array(z.object({ uuid: z.string(), genre: z.string().nullable() })),
+});
+export type AssignRecordingGenreOutput = z.infer<typeof AssignRecordingGenreOutputSchema>;
+
+const VideoSchema = z.object({
+  youtubeVideoId: z.string().max(32).nullable(),
+  youtubeUnplayableReason: z.string().nullable(),
+});
+export type RecordingVideo = z.infer<typeof VideoSchema>;
+
+export const UpdateRecordingVideoInputSchema = z.object({
+  uuid: z.string(),
+  video: VideoSchema,
+  previous: VideoSchema,
+});
+export type UpdateRecordingVideoInput = z.infer<typeof UpdateRecordingVideoInputSchema>;
+
+export const RecordingVideoDetailSchema = z.object({
+  uuid: z.string(),
+  youtubeVideoId: z.string().nullable().optional(),
+  youtubeUnplayableReason: z.string().nullable().optional(),
+});
+
+export const SecondaryParentInputSchema = z.object({
+  uuid: z.string(),
+  parent: z.object({ uuid: z.string(), name: z.string() }),
+  add: z.boolean(),
+});
+export type SecondaryParentInput = z.infer<typeof SecondaryParentInputSchema>;
+export const SecondaryParentOutputSchema = UuidOutputSchema;
+
+export const GenreTreeRowsSchema = z.array(
+  z.object({
+    criteria: z
+      .object({
+        uuid: z.string(),
+        secondaryParents: z.array(z.object({ uuid: z.string(), name: z.string() })),
+      })
+      .nullable(),
+  }),
+);
+
+export const AliasGenreInputSchema = z.object({ uuid: z.string(), target: z.string() });
+export type AliasGenreInput = z.infer<typeof AliasGenreInputSchema>;
+export const AliasGenreOutputSchema = UuidOutputSchema;
+export const AliasPreviewSchema = z.object({
+  recordings: z.number(),
+  essentialTracks: z.number(),
+  children: z.number(),
+});
+
+// Mirrors grow-api's EXCLUDED_GENRE_LISTS keys.
+export const EXCLUDE_CATEGORIES = {
+  theme: "Theme",
+  technique: "Technique",
+  out_of_scope: "Out of scope",
+  duplicate: "Duplicate",
+} as const;
+export type ExcludeCategory = keyof typeof EXCLUDE_CATEGORIES;
+export const ExcludeGenreInputSchema = z.object({
+  uuid: z.string(),
+  category: z.enum(["theme", "technique", "out_of_scope", "duplicate"]),
+});
+export type ExcludeGenreInput = z.infer<typeof ExcludeGenreInputSchema>;
+export const ExcludeGenreOutputSchema = UuidOutputSchema;
+
+export const UpdateGenreSummaryInputSchema = z.object({
+  uuid: z.string(),
+  summary: z.string().nullable(),
+  previous: z.string().nullable(),
+});
+export type UpdateGenreSummaryInput = z.infer<typeof UpdateGenreSummaryInputSchema>;
+export const UpdateGenreOutputSchema = UuidOutputSchema;
+
+const EssentialTrackSchema = z.object({
+  uuid: z.string(),
+  title: z.string(),
+  artists: z.array(z.object({ uuid: z.string(), name: z.string() })).nullish(),
+});
+export type EssentialTrack = z.infer<typeof EssentialTrackSchema>;
+export const UpdateEssentialTracksInputSchema = z.object({
+  uuid: z.string(),
+  tracks: z.array(EssentialTrackSchema),
+  previous: z.array(EssentialTrackSchema),
+});
+export type UpdateEssentialTracksInput = z.infer<typeof UpdateEssentialTracksInputSchema>;
+
+export const LinkCandidateSchema = z.object({
+  uuid: z.string(),
+  title: z.string(),
+  artists: z.array(z.object({ uuid: z.string(), name: z.string() })).nullish(),
+  genre: z.object({ uuid: z.string(), name: z.string() }).nullish(),
+});
+export type LinkCandidate = z.infer<typeof LinkCandidateSchema>;
+export const LinkSuggestionsSchema = z.array(LinkCandidateSchema);
+export const RecordingSearchSchema = z.object({
+  results: z.array(LinkCandidateSchema),
+  next: z.string().nullable(),
+});
