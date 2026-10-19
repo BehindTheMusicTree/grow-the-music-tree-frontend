@@ -30,7 +30,11 @@ const STAGE_LABELS: Record<PipelineRunStage, string> = {
   importing_tree: "Import de l'arbre",
   uploading_songs: "Envoi des morceaux",
   merging_songs: "Fusion des morceaux",
+  uploading_artists: "Envoi des artistes",
+  merging_artists: "Fusion des artistes",
 };
+
+const UPLOAD_STAGES: readonly PipelineRunStage[] = ["uploading_songs", "uploading_artists"];
 
 const isActive = (request: PipelineRunRequest | null | undefined) =>
   request?.status === "queued" || request?.status === "running";
@@ -42,7 +46,7 @@ function progressOf({ kind, status, stage, stageCurrent, stageTotal }: PipelineR
   if (status !== "running") return null;
   const stages = PIPELINE_RUN_STAGES[kind];
   const index = stage ? stages.indexOf(stage) : 0;
-  const sub = stage === "uploading_songs" && stageCurrent !== null && stageTotal ? stageCurrent / stageTotal : 0;
+  const sub = stage && UPLOAD_STAGES.includes(stage) && stageCurrent !== null && stageTotal ? stageCurrent / stageTotal : 0;
   return (index + sub) / stages.length;
 }
 
@@ -52,12 +56,12 @@ function labelOf({ kind, status, stage, stageCurrent, stageTotal, error }: Pipel
       return "En file d'attente";
     case "running": {
       const label = STAGE_LABELS[stage ?? "fetching_rules"];
-      return stage === "uploading_songs" && stageCurrent !== null && stageTotal !== null
+      return stage && UPLOAD_STAGES.includes(stage) && stageCurrent !== null && stageTotal !== null
         ? `${label} (${stageCurrent}/${stageTotal})`
         : label;
     }
     case "succeeded":
-      return kind === "curation" ? "Appliquée" : "Terminée";
+      return kind === "curation" ? "Appliquée" : kind === "sync" ? "Réimportée" : "Terminée";
     case "failed":
       return `Échec : ${error ?? "erreur inconnue"}`;
     case "superseded":
@@ -95,7 +99,7 @@ function durationOf({ status, startedOn, finishedOn }: PipelineRunRequest, now: 
 
 type Props = { pendingCount: number; initialRequest: PipelineRunRequest | null };
 
-/** Launches a curation run or a full ingestion, follows its progress and cancels it. */
+/** Launches a curation run, a full ingestion or a Gold sync, follows its progress and cancels it. */
 export default function PipelineRunPanel({ pendingCount, initialRequest }: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -164,6 +168,9 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
         >
           Lancer une ingestion complète
         </Button>
+        <Button onClick={() => launch.mutate("sync")} disabled={active || launch.isPending}>
+          Réimporter le dernier Gold
+        </Button>
         {request && active && (
           <Button onClick={() => cancel.mutate(request.uuid)} disabled={request.cancelRequested || cancel.isPending}>
             {request.cancelRequested ? "Annulation demandée…" : "Annuler"}
@@ -182,7 +189,7 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
             {originOf(request)}
             {duration && ` · ${duration}`}
           </p>
-          {request.status === "running" && request.stage === "merging_songs" && (
+          {request.status === "running" && (request.stage === "merging_songs" || request.stage === "merging_artists") && (
             <p className="text-sm text-gray-600">Une annulation laisse la fusion déjà commencée aller à son terme.</p>
           )}
         </div>
