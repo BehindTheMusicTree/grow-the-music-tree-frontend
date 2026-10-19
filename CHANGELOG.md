@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.10.0 - 2026-10-19](#3100---2026-10-19)
 - [3.2.0 - 2026-09-28](#320---2026-09-28)
 - [3.1.0 - 2026-09-28](#310---2026-09-28)
 - [3.0.2 - 2026-09-28](#302---2026-09-28)
@@ -93,6 +94,17 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [3.10.0] - 2026-10-19
+
+### Added
+
+- Admins can launch a `sync` pipeline run ("Réimporter le dernier Gold") that replays the last complete Gold into grow (needs grow-api >= 12.11.0).
+- Pipeline runs show the `uploading_artists` and `merging_artists` stages.
+
+### Fixed
+
+- Bump `@behindthemusictree/app-kit` to 11.3.1: clicking a root genre's name in the tree now selects the root, like clicking its chip.
 
 ## [3.9.2] - 2026-10-15
 
