@@ -44,6 +44,10 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
     viewMode: string;
     focusGenreUuid?: string | null;
     onFocusGenreChange?: (uuid: string | null, reason: string) => void;
+    editMode?: boolean;
+    onEditModeChange?: (on: boolean) => void;
+    expanded?: boolean;
+    onExpandedChange?: (on: boolean) => void;
   }) => (
     <div
       data-testid="genre-tree-view"
@@ -52,6 +56,13 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
       data-focus={props.focusGenreUuid === undefined ? "absent" : String(props.focusGenreUuid)}
     >
       {props.getBackendBaseUrl()}
+      {props.onEditModeChange && (
+        <>
+          <button onClick={() => props.onEditModeChange?.(!props.editMode)}>{props.editMode ? "Done" : "Edit"}</button>
+          <button onClick={() => props.onExpandedChange?.(false)}>Collapse</button>
+          <span data-testid="panel-state" data-edit={String(props.editMode)} data-expanded={String(props.expanded)} />
+        </>
+      )}
       {props.onFocusGenreChange && (
         <>
           <button onClick={() => props.onFocusGenreChange?.("rock", "zoom-in")}>Zoom in</button>
@@ -120,6 +131,27 @@ describe("GenreTreePage", () => {
 
     const view = await screen.findByTestId("genre-tree-view");
     expect(view.dataset.readonly).toBe("false");
+  });
+
+  it("offers no Edit button to non-admins", async () => {
+    renderGenreTreePage();
+
+    await screen.findByTestId("genre-tree-view");
+    expect(screen.queryByRole("button", { name: "Edit" })).not.toBeInTheDocument();
+  });
+
+  it("expands the panel on Edit and keeps edit mode when collapsed", async () => {
+    useIsAdminMock.mockReturnValue(true);
+    renderGenreTreePage();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Edit" }));
+    expect(screen.getByTestId("panel-state").dataset).toMatchObject({ edit: "true", expanded: "true" });
+
+    fireEvent.click(screen.getByRole("button", { name: "Collapse" }));
+    expect(screen.getByTestId("panel-state").dataset).toMatchObject({ edit: "true", expanded: "false" });
+
+    fireEvent.click(screen.getByRole("button", { name: "Done" }));
+    expect(screen.getByTestId("panel-state").dataset).toMatchObject({ edit: "false", expanded: "false" });
   });
 
   it("keeps the pop-core view mode (radial wheel skeleton) while genre playlists are still loading", async () => {

@@ -11,7 +11,7 @@ type Props = {
   value: string;
   /** What the input shows first, e.g. the genre's name rather than its QID. */
   defaultText: string;
-  onChange: (itemId: string, name?: string) => void;
+  onChange: (itemId: string, name?: string, uuid?: string) => void;
 };
 
 /** Finds a canonical genre by name, or takes a QID / LOCAL:<slug> typed as is. */
@@ -35,10 +35,10 @@ export default function GenrePicker({ label, value, defaultText, onChange }: Pro
   );
   const expanded = open && options.length > 0;
 
-  const pick = (genre: { name: string; wikidataId: string }) => {
+  const pick = (genre: { uuid: string; name: string; wikidataId: string }) => {
     setText(genre.name);
     setOpen(false);
-    onChange(genre.wikidataId, genre.name);
+    onChange(genre.wikidataId, genre.name, genre.uuid);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

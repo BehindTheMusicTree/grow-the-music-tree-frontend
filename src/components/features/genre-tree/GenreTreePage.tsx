@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, type ComponentProps } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState, type ComponentProps } from "react";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -14,6 +14,15 @@ import {
 } from "@behindthemusictree/app-kit/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
+import { GenreCurationProvider } from "@components/features/genre-curation/GenreCurationProvider";
+import GenreDangerZone from "@components/features/genre-curation/GenreDangerZone";
+import GenreNameEditor from "@components/features/genre-curation/GenreNameEditor";
+import GenreParentsEditor from "@components/features/genre-curation/GenreParentsEditor";
+import GenreSummaryEditor from "@components/features/genre-curation/GenreSummaryEditor";
+import EssentialTracksEditor from "@components/features/genre-curation/EssentialTracksEditor";
+import RecordingCheckbox from "@components/features/genre-curation/RecordingCheckbox";
+import RecordingRowActions from "@components/features/genre-curation/RecordingRowActions";
+import SelectionBar from "@components/features/genre-curation/SelectionBar";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 import Page from "@components/ui/Page";
@@ -97,6 +106,8 @@ export default function GenreTreePage() {
   const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
   const isAdmin = useIsAdmin();
   const { showPopup, hidePopup } = usePopup();
+  const [editMode, setEditMode] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   // Shares the react-query cache with GenreTreeView's internal fetch (same queryKey), so this
   // doesn't trigger an extra network request. Used only to compute whether the "pop-core" view
@@ -138,6 +149,16 @@ export default function GenreTreePage() {
     throw new Error(`Cannot show "${viewMode}" view: the loaded genre tree has no "Mainstream Pop" root`);
   }
 
+  const criteriaByPlaylist = useMemo(
+    () => new Map((genrePlaylists ?? []).map((genrePlaylist) => [genrePlaylist.uuid, genrePlaylist])),
+    [genrePlaylists],
+  );
+
+  const handleEditModeChange = useCallback((on: boolean) => {
+    setEditMode(on);
+    setExpanded(on);
+  }, []);
+
   const showCriteriaCreationPopup = useCallback(
     (parent: CriteriaMinimum | null = null) => showPopup(<GenreCreationPopup parent={parent} onClose={hidePopup} />),
     [hidePopup, showPopup],
@@ -148,8 +169,45 @@ export default function GenreTreePage() {
     [hidePopup, showPopup],
   );
 
+  const curation = isAdmin
+    ? {
+        editMode,
+        onEditModeChange: handleEditModeChange,
+        expanded,
+        onExpandedChange: setExpanded,
+        renderTitleEditor: (node: { id: string }) => {
+          const criteria = criteriaByPlaylist.get(node.id)?.criteria;
+          return criteria ? <GenreNameEditor genre={criteria} /> : null;
+        },
+        renderParentsEditor: (node: { id: string }) => {
+          const playlist = criteriaByPlaylist.get(node.id);
+          return playlist?.criteria ? (
+            <GenreParentsEditor genre={{ uuid: playlist.criteria.uuid, parentName: playlist.parent?.name ?? null }} />
+          ) : null;
+        },
+        renderDangerZone: (node: { id: string }) => {
+          const criteria = criteriaByPlaylist.get(node.id)?.criteria;
+          return criteria ? <GenreDangerZone genre={criteria} /> : null;
+        },
+        renderSummary: (overview: ComponentProps<typeof GenreSummaryEditor>["overview"]) => (
+          <GenreSummaryEditor overview={overview} />
+        ),
+        renderEssentialTracks: (overview: ComponentProps<typeof EssentialTracksEditor>["overview"]) => (
+          <EssentialTracksEditor overview={overview} />
+        ),
+        renderRecordingLeading: (recording: ComponentProps<typeof RecordingCheckbox>["recording"], index: number) => (
+          <RecordingCheckbox recording={recording} index={index} />
+        ),
+        renderRecordingActions: (recording: ComponentProps<typeof RecordingRowActions>["recording"]) => (
+          <RecordingRowActions recording={recording} />
+        ),
+        renderTracksToolbar: () => <SelectionBar />,
+      }
+    : {};
+
   return (
     <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
+      <GenreCurationProvider>
       <Suspense fallback={<GenreTreeViewLoadingFallback />}>
         <ZoomableGenreTreeView
           scope="reference"
@@ -161,8 +219,10 @@ export default function GenreTreePage() {
           controlsOrientation="horizontal"
           renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
           renderArtistLink={renderArtistLink}
+          {...curation}
         />
       </Suspense>
+      </GenreCurationProvider>
     </Page>
   );
 }
