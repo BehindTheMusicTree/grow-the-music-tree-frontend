@@ -113,3 +113,21 @@ export function toCurationRow(list: CurationList, row: CurationEntry["row"]): Cu
 export const CanonicalGenreSearchSchema = z.object({
   results: z.array(z.object({ uuid: z.string().uuid(), name: z.string(), wikidataId: z.string().nullable() })),
 });
+
+export const CurationReviewReasonSchema = z.enum(["redirect_conflict", "missing", "not_in_tree"]);
+
+export type CurationReviewReason = z.infer<typeof CurationReviewReasonSchema>;
+
+export const CurationReviewItemsSchema = z.array(
+  z.object({
+    list: z.string(),
+    key: z.string(),
+    column: z.string(),
+    itemId: z.string(),
+    reason: CurationReviewReasonSchema,
+    target: z.string().nullable(),
+    reportedOn: z.string(),
+  }),
+);
+
+export type CurationReviewItem = z.infer<typeof CurationReviewItemsSchema>[number];
