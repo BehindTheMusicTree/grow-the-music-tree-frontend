@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.12.0 - 2026-10-20](#3120---2026-10-20)
 - [3.11.0 - 2026-10-19](#3110---2026-10-19)
 - [3.10.0 - 2026-10-19](#3100---2026-10-19)
 - [3.2.0 - 2026-09-28](#320---2026-09-28)
@@ -95,6 +96,33 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [3.12.0] - 2026-10-20
+
+### Added
+
+- The genre panel shows the genre's English Wikidata short description under its name and a "Source: Wikipedia" link under the summary (app-kit 11.6.0; needs grow-api returning `description` and `summarySourceUrl`).
+
+- `/admin/curation-review` explains each dropped curated item: a sentence built from the pipeline's evidence (what the item is now, when it changed), a "Règle" column naming the dropped rule when it is not the row's own item (e.g. main parent of a genre), and Wikidata page/history links on the QID. Rows reported before the upgrade get a generic sentence per reason (needs grow-api with curation review evidence).
+
+- The genre panel is the admin curation tool: an Edit/Done toggle opens it fullscreen (collapsible to a side panel with the expand button or Escape) to rename, reparent, add secondary parents, edit the summary, reorder essential tracks, link/move/unlink recordings (single or bulk, shift+click range), edit a recording's YouTube video, and alias, exclude or delete a genre. Each action saves immediately with an Undo toast (needs grow-api >= 12.13.0).
+
+### Changed
+
+- About opens as a panel over the genre-tree map (`/?about`) instead of a separate page; `/about` redirects there. Opening it closes the genre detail panel, and selecting a genre closes it.
+- Renaming a genre or changing its main parent now has an Undo toast. Alias, Exclude and Delete are confirmed in a dialog and have no Undo. Unlinking a single recording asks for confirmation.
+- A move on the genre panel no longer removes the recording optimistically (only an unlink does); the list refreshes after the server answers. A move that cannot be undone (the previous genre has no Wikidata id) shows no Undo (needs grow-api >= 12.14.0).
+- `@behindthemusictree/app-kit` 11.7.0; `sonner` is pinned to 2.0.8.
+
+### Fixed
+
+- Opening About keeps the current genre zoom (`/?zoom=…&about`).
+- Curation dialogs (move, unlink, link, video) stay open when the server rejects the change; after Alias, Exclude or Delete the panel selects the alias target or the main parent.
+- Editing a recording's video updates every cached genre list, not just the open one.
+- A failed optimistic update only restores the lists it changed, so it can no longer overwrite a newer edit.
+- Switching genre while editing no longer renames or reparents the previous one, and the summary is not overwritten while being typed.
+- Shift+click range selection ignores rows that are no longer in the list.
+- `/admin/curation-review` no longer shows false explanations: a merged item's facts are attributed to its target, the "indigène de" sentence only appears when the statement is really missing, an item still typed as music genre says so, and a rule merged into its own item is called self-referencing (conflict lists use their French title).
 
 ## [3.11.0] - 2026-10-19
 

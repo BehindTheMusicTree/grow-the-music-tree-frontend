@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, type ComponentProps } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState, type ComponentProps } from "react";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -14,6 +14,16 @@ import {
 } from "@behindthemusictree/app-kit/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
+import { GenreCurationProvider } from "@components/features/genre-curation/GenreCurationProvider";
+import GenreDangerZone from "@components/features/genre-curation/GenreDangerZone";
+import GenreNameEditor from "@components/features/genre-curation/GenreNameEditor";
+import GenreParentsEditor from "@components/features/genre-curation/GenreParentsEditor";
+import GenreSummaryEditor from "@components/features/genre-curation/GenreSummaryEditor";
+import EssentialTracksEditor from "@components/features/genre-curation/EssentialTracksEditor";
+import RecordingCheckbox from "@components/features/genre-curation/RecordingCheckbox";
+import RecordingRowActions from "@components/features/genre-curation/RecordingRowActions";
+import SelectionBar from "@components/features/genre-curation/SelectionBar";
+import AboutContent from "@components/features/about/AboutContent";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 import Page from "@components/ui/Page";
@@ -48,6 +58,7 @@ const GenreTreeView = dynamic(
 );
 
 const ZOOM_PARAM = "zoom";
+const ABOUT_PARAM = "about";
 
 type ZoomableGenreTreeViewProps = Omit<ComponentProps<typeof GenreTreeView>, "focusGenreUuid" | "onFocusGenreChange">;
 
@@ -58,6 +69,8 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const zoom = searchParams.get(ZOOM_PARAM);
+  const about = searchParams.has(ABOUT_PARAM);
+  const { onSelectedNodeIdChange } = viewProps;
   const isPopCore = viewProps.viewMode === "pop-core";
 
   const hrefWithZoom = useCallback(
@@ -75,6 +88,31 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
     if (zoom !== null && !isPopCore) router.replace(hrefWithZoom(null), { scroll: false });
   }, [zoom, isPopCore, hrefWithZoom, router]);
 
+  const closeAbout = useCallback(
+    (method: "push" | "replace" = "push") => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete(ABOUT_PARAM);
+    const query = params.toString();
+      router[method](query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [pathname, searchParams, router],
+  );
+
+  useEffect(() => {
+    if (about) onSelectedNodeIdChange?.(null);
+  }, [about, onSelectedNodeIdChange]);
+
+  const handleSelectedNodeIdChange = useCallback(
+    (id: string | null) => {
+      onSelectedNodeIdChange?.(id);
+      if (id !== null && about) closeAbout("replace");
+    },
+    [about, closeAbout, onSelectedNodeIdChange],
+  );
+
+  const overlayPanel = about ? { title: "About", content: <AboutContent />, onClose: () => closeAbout() } : undefined;
+  const sharedProps = { ...viewProps, onSelectedNodeIdChange: handleSelectedNodeIdChange, overlayPanel };
+
   const handleFocusGenreChange = useCallback(
     (uuid: string | null, reason: FocusChangeReason) => {
       const href = hrefWithZoom(uuid);
@@ -86,9 +124,9 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
   );
 
   return isPopCore ? (
-    <GenreTreeView {...viewProps} focusGenreUuid={zoom} onFocusGenreChange={handleFocusGenreChange} />
+    <GenreTreeView {...sharedProps} focusGenreUuid={zoom} onFocusGenreChange={handleFocusGenreChange} />
   ) : (
-    <GenreTreeView {...viewProps} />
+    <GenreTreeView {...sharedProps} />
   );
 }
 
@@ -97,6 +135,9 @@ export default function GenreTreePage() {
   const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
   const isAdmin = useIsAdmin();
   const { showPopup, hidePopup } = usePopup();
+  const [editMode, setEditMode] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   // Shares the react-query cache with GenreTreeView's internal fetch (same queryKey), so this
   // doesn't trigger an extra network request. Used only to compute whether the "pop-core" view
@@ -138,6 +179,16 @@ export default function GenreTreePage() {
     throw new Error(`Cannot show "${viewMode}" view: the loaded genre tree has no "Mainstream Pop" root`);
   }
 
+  const criteriaByPlaylist = useMemo(
+    () => new Map((genrePlaylists ?? []).map((genrePlaylist) => [genrePlaylist.uuid, genrePlaylist])),
+    [genrePlaylists],
+  );
+
+  const handleEditModeChange = useCallback((on: boolean) => {
+    setEditMode(on);
+    setExpanded(on);
+  }, []);
+
   const showCriteriaCreationPopup = useCallback(
     (parent: CriteriaMinimum | null = null) => showPopup(<GenreCreationPopup parent={parent} onClose={hidePopup} />),
     [hidePopup, showPopup],
@@ -148,8 +199,55 @@ export default function GenreTreePage() {
     [hidePopup, showPopup],
   );
 
+  const curation = isAdmin
+    ? {
+        editMode,
+        onEditModeChange: handleEditModeChange,
+        expanded,
+        onExpandedChange: setExpanded,
+        renderTitleEditor: (node: { id: string }) => {
+          const criteria = criteriaByPlaylist.get(node.id)?.criteria;
+          return criteria ? <GenreNameEditor key={criteria.uuid} genre={criteria} /> : null;
+        },
+        renderParentsEditor: (node: { id: string }) => {
+          const playlist = criteriaByPlaylist.get(node.id);
+          return playlist?.criteria ? (
+            <GenreParentsEditor
+              key={playlist.criteria.uuid}
+              genre={{ uuid: playlist.criteria.uuid, parent: playlist.parent ?? null }}
+            />
+          ) : null;
+        },
+        renderDangerZone: (node: { id: string }) => {
+          const playlist = criteriaByPlaylist.get(node.id);
+          return playlist?.criteria ? (
+            <GenreDangerZone
+              key={playlist.criteria.uuid}
+              genre={playlist.criteria}
+              onAliased={(targetUuid) => setSelectedNodeId(targetUuid)}
+              onRemoved={() => setSelectedNodeId(playlist.parent?.uuid ?? null)}
+            />
+          ) : null;
+        },
+        renderSummary: (overview: ComponentProps<typeof GenreSummaryEditor>["overview"]) => (
+          <GenreSummaryEditor overview={overview} />
+        ),
+        renderEssentialTracks: (overview: ComponentProps<typeof EssentialTracksEditor>["overview"]) => (
+          <EssentialTracksEditor overview={overview} />
+        ),
+        renderRecordingLeading: (recording: ComponentProps<typeof RecordingCheckbox>["recording"], index: number) => (
+          <RecordingCheckbox recording={recording} index={index} />
+        ),
+        renderRecordingActions: (recording: ComponentProps<typeof RecordingRowActions>["recording"]) => (
+          <RecordingRowActions recording={recording} />
+        ),
+        renderTracksToolbar: () => <SelectionBar />,
+      }
+    : {};
+
   return (
     <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
+      <GenreCurationProvider>
       <Suspense fallback={<GenreTreeViewLoadingFallback />}>
         <ZoomableGenreTreeView
           scope="reference"
@@ -158,11 +256,15 @@ export default function GenreTreePage() {
           getBackendBaseUrl={getBackendBaseUrl}
           viewMode={viewMode}
           readOnly={!isAdmin}
+          selectedNodeId={selectedNodeId}
+          onSelectedNodeIdChange={setSelectedNodeId}
           controlsOrientation="horizontal"
           renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
           renderArtistLink={renderArtistLink}
+          {...curation}
         />
       </Suspense>
+      </GenreCurationProvider>
     </Page>
   );
 }
