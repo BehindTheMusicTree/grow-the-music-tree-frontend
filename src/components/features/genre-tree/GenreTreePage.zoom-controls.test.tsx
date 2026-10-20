@@ -13,6 +13,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@hooks/useIsAdmin", () => ({ useIsAdmin: () => false }));
+vi.mock("@contexts/PlayerPanelProvider", () => ({ usePlayerPanel: () => ({ isVisible: false, dismiss: vi.fn() }) }));
 
 vi.mock("@lib/site-urls", () => ({
   getGrowBackendBaseUrl: () => "/api/grow-proxy",

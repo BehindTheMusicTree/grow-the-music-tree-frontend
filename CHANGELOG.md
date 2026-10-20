@@ -99,7 +99,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
-- The About panel stops where the tracklist panel begins, shown or not (`@behindthemusictree/app-kit` 11.8.0).
+- The About panel stops where the player panel begins while it is visible, and extends to the right edge otherwise (`@behindthemusictree/app-kit` 11.8.0).
 
 ## [3.12.0] - 2026-10-20
 

@@ -13,6 +13,7 @@ import AutoAdvance from "@components/features/player/AutoAdvance";
 
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
 
+import { PlayerPanelProvider } from "@contexts/PlayerPanelProvider";
 import { GenreTreeViewModeProvider } from "@contexts/GenreTreeViewModeProvider";
 
 export default function AppContent({ children }: { children: ReactNode }) {
@@ -40,6 +41,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
   });
 
   return (
+    <PlayerPanelProvider>
     <GenreTreeViewModeProvider>
       <div className="app col h-screen">
         <AppHeader />
@@ -62,5 +64,6 @@ export default function AppContent({ children }: { children: ReactNode }) {
         {activePopup}
       </div>
     </GenreTreeViewModeProvider>
+    </PlayerPanelProvider>
   );
 }

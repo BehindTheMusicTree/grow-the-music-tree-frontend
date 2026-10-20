@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import Player from "./Player";
+import { PlayerPanelProvider } from "@contexts/PlayerPanelProvider";
 
 const usePlayerMock = vi.fn();
 const toggleTrackListSidebarMock = vi.fn();
@@ -23,6 +24,12 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   ),
 }));
 
+const renderPlayer = () => (
+  <PlayerPanelProvider>
+    <Player />
+  </PlayerPanelProvider>
+);
+
 describe("Player", () => {
   afterEach(() => {
     cleanup();
@@ -33,7 +40,7 @@ describe("Player", () => {
     isTrackListSidebarVisibleMock.mockReturnValue(false);
     usePlayerMock.mockReturnValue({ playerTrackObject: null });
 
-    const { container } = render(<Player />);
+    const { container } = render(renderPlayer());
 
     expect(container.firstChild).toHaveClass("hidden");
   });
@@ -42,7 +49,7 @@ describe("Player", () => {
     isTrackListSidebarVisibleMock.mockReturnValue(false);
     usePlayerMock.mockReturnValue({ playerTrackObject: { loadError: undefined } });
 
-    const { container } = render(<Player />);
+    const { container } = render(renderPlayer());
 
     expect(container.firstChild).not.toHaveClass("hidden");
     expect(screen.getByTestId("player-video-surface")).toBeInTheDocument();
@@ -55,7 +62,7 @@ describe("Player", () => {
     isTrackListSidebarVisibleMock.mockReturnValue(false);
     usePlayerMock.mockReturnValue({ playerTrackObject: { loadError: "Video unavailable" } });
 
-    render(<Player />);
+    render(renderPlayer());
 
     expect(screen.getByText("Video unavailable")).toBeInTheDocument();
   });
@@ -64,7 +71,7 @@ describe("Player", () => {
     isTrackListSidebarVisibleMock.mockReturnValue(true);
     usePlayerMock.mockReturnValue({ playerTrackObject: { loadError: undefined } });
 
-    const { container } = render(<Player />);
+    const { container } = render(renderPlayer());
 
     expect(container.firstChild).toHaveClass("h-[calc(100vh-224px)]");
     expect(screen.getByRole("button", { name: "Hide track list" })).toBeInTheDocument();
@@ -76,7 +83,7 @@ describe("Player", () => {
     isTrackListSidebarVisibleMock.mockReturnValue(false);
     usePlayerMock.mockReturnValue({ playerTrackObject: { track: { id: "a", title: "Song A" } } });
 
-    const { container, rerender } = render(<Player />);
+    const { container, rerender } = render(renderPlayer());
     expect(screen.getByText("Song A")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Close player" }));
 
@@ -84,7 +91,7 @@ describe("Player", () => {
     expect(screen.getByTestId("player-video-surface")).toBeInTheDocument();
 
     usePlayerMock.mockReturnValue({ playerTrackObject: { track: { id: "b", title: "Song B" } } });
-    rerender(<Player />);
+    rerender(renderPlayer());
 
     expect(container.firstChild).not.toHaveClass("hidden");
   });

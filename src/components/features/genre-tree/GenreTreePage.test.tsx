@@ -14,6 +14,12 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => searchParams,
 }));
 
+const isPlayerPanelVisibleMock = vi.fn(() => false);
+
+vi.mock("@contexts/PlayerPanelProvider", () => ({
+  usePlayerPanel: () => ({ isVisible: isPlayerPanelVisibleMock(), dismiss: vi.fn() }),
+}));
+
 const useIsAdminMock = vi.fn(() => false);
 
 vi.mock("@hooks/useIsAdmin", () => ({
@@ -121,6 +127,7 @@ describe("GenreTreePage", () => {
     useListFullGenrePlaylistsMock.mockReturnValue({ data: [], isLoading: false });
     hasMainstreamPopRootMock.mockReturnValue(true);
     useIsAdminMock.mockReturnValue(false);
+    isPlayerPanelVisibleMock.mockReturnValue(false);
     searchParams = new URLSearchParams();
     routerPushMock.mockReset();
     routerReplaceMock.mockReset();
@@ -135,12 +142,19 @@ describe("GenreTreePage", () => {
     expect(screen.getByRole("heading", { name: "Genre Tree" })).toBeInTheDocument();
   });
 
-  it("keeps the overlay panel clear of the tracklist panel on the right", async () => {
+  it("keeps the overlay panel clear of the player panel while it is visible", async () => {
+    isPlayerPanelVisibleMock.mockReturnValue(true);
     renderGenreTreePage();
 
     const bounds = await screen.findByTestId("genre-tree-overlay-bounds");
     expect(bounds).toHaveClass("[--gtv-overlay-panel-right:304px]");
     expect(bounds).toContainElement(await screen.findByTestId("genre-tree-view"));
+  });
+
+  it("lets the overlay panel extend to the right edge when the player panel is hidden", async () => {
+    renderGenreTreePage();
+
+    expect(await screen.findByTestId("genre-tree-overlay-bounds")).not.toHaveClass("[--gtv-overlay-panel-right:304px]");
   });
 
   it("renders the genre tree editable when signed in as admin", async () => {
