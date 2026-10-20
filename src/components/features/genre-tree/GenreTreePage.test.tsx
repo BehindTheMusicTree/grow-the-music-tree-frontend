@@ -135,6 +135,14 @@ describe("GenreTreePage", () => {
     expect(screen.getByRole("heading", { name: "Genre Tree" })).toBeInTheDocument();
   });
 
+  it("keeps the overlay panel clear of the tracklist panel on the right", async () => {
+    renderGenreTreePage();
+
+    const bounds = await screen.findByTestId("genre-tree-overlay-bounds");
+    expect(bounds).toHaveClass("[--gtv-overlay-panel-right:304px]");
+    expect(bounds).toContainElement(await screen.findByTestId("genre-tree-view"));
+  });
+
   it("renders the genre tree editable when signed in as admin", async () => {
     useIsAdminMock.mockReturnValue(true);
 
