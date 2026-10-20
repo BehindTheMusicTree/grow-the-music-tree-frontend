@@ -35,6 +35,13 @@ describe("AppHeader view toggle", () => {
     expect(screen.getByRole("link", { name: "About" })).toHaveAttribute("href", "/?about");
   });
 
+  it("keeps other params when opening About", () => {
+    searchParams = new URLSearchParams("zoom=rock");
+    renderHeader(true);
+
+    expect(screen.getByRole("link", { name: "About" })).toHaveAttribute("href", "/?zoom=rock&about");
+  });
+
   it("toggles About closed, keeping other params, when it is open", () => {
     searchParams = new URLSearchParams("about&zoom=rock");
     renderHeader(true);
