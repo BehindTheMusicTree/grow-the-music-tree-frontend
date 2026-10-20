@@ -1,6 +1,7 @@
 import Link from "next/link";
 import GenreRef from "@components/features/curation/GenreRef";
 import { curationColumnTitle } from "@lib/curationColumns";
+import { curationListTitle } from "@lib/curationGroups";
 import type { CurationReviewEvidence, CurationReviewItem, CurationReviewReason } from "@schemas/api/curation";
 
 const REASON_LABELS: Record<CurationReviewReason, string> = {
@@ -23,21 +24,40 @@ function joinLabels(items: NonNullable<CurationReviewEvidence["instanceOf"]>) {
   return items.map(({ id, label }) => `« ${label ?? id} »`).join(", ");
 }
 
-function explain({ list, reason, evidence }: Pick<CurationReviewItem, "list" | "reason" | "evidence">) {
+const MUSIC_GENRE_QID = "Q188451";
+
+function explain({
+  key,
+  column,
+  reason,
+  target,
+  evidence,
+}: Pick<CurationReviewItem, "key" | "column" | "reason" | "target" | "evidence">) {
+  if (reason === "redirect_conflict" && column !== "item_id" && target === key)
+    return "Fusionné vers l'élément porteur de la règle lui-même (règle auto-référente).";
   if (!evidence) return FALLBACK_EXPLANATIONS[reason];
   const { modified, instanceOf, subclassOf, hasIndigenousTo, conflictList } = evidence;
   if (reason === "missing") return FALLBACK_EXPLANATIONS.missing;
   if (reason === "redirect_conflict") {
     return conflictList
-      ? `Fusionné vers un élément déjà présent dans la liste ${conflictList}.`
+      ? `Fusionné vers un élément déjà présent dans la liste ${curationListTitle(conflictList)}.`
       : FALLBACK_EXPLANATIONS.redirect_conflict;
   }
-  const sentences = [
-    list === "indigenous_to_exclusions" || hasIndigenousTo === false
-      ? "Plus d'« indigène de » (P2341)"
-      : "Plus une instance de « genre musical »",
-  ];
-  if (modified) sentences[0] += ` (modifié le ${DATE_FORMAT.format(new Date(modified))})`;
+  const redirected = Boolean(target);
+  const lead = redirected ? `Fusionné vers « ${evidence.label ?? target} », qui ` : "";
+  if (instanceOf?.some(({ id }) => id === MUSIC_GENRE_QID))
+    return `${lead}${redirected ? "est toujours" : "Toujours"} un genre musical sur Wikidata : absent de l'arbre lors du dernier run (modification récente ou rang de déclaration)`;
+  const lost =
+    hasIndigenousTo === false
+      ? redirected
+        ? "n'a plus d'« indigène de » (P2341)"
+        : "Plus d'« indigène de » (P2341)"
+      : redirected
+        ? "n'est plus une instance de « genre musical »"
+        : "Plus une instance de « genre musical »";
+  const sentences = [`${lead}${lost}`];
+  if (modified)
+    sentences[0] += ` (${redirected ? "cible modifiée" : "modifié"} le ${DATE_FORMAT.format(new Date(modified))})`;
   sentences[0] += ".";
   const now = [
     instanceOf?.length && `instance de ${joinLabels(instanceOf)}`,
@@ -80,7 +100,7 @@ export default function CurationReviewList({ items }: { items: CurationReviewIte
               </Link>
             </td>
             <td className="pr-4">
-              <GenreRef id={itemId} label={evidence?.label} showQid={false} />
+              <GenreRef id={itemId} label={target ? undefined : evidence?.label} showQid={false} />
               <span className="flex gap-2 text-xs">
                 <a
                   href={`${WIKIDATA_URL}${itemId}`}
@@ -104,10 +124,10 @@ export default function CurationReviewList({ items }: { items: CurationReviewIte
             </td>
             <td className="pr-4">
               <p>{REASON_LABELS[reason]}</p>
-              <p className="text-sm text-gray-600">{explain({ list, reason, evidence })}</p>
+              <p className="text-sm text-gray-600">{explain({ key, column, reason, target, evidence })}</p>
             </td>
             <td className="pr-4">{column !== "item_id" && <Rule rowKey={key} column={column} />}</td>
-            <td>{target && <GenreRef id={target} showQid={false} />}</td>
+            <td>{target && <GenreRef id={target} label={evidence?.label} showQid={false} />}</td>
           </tr>
         ))}
       </tbody>

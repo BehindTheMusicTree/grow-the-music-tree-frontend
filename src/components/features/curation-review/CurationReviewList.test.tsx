@@ -96,7 +96,9 @@ describe("CurationReviewList", () => {
     );
 
     expect(screen.getByText("L'élément n'existe plus sur Wikidata.")).toBeInTheDocument();
-    expect(screen.getByText("Fusionné vers un élément déjà présent dans la liste theme_genres.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Fusionné vers un élément déjà présent dans la liste Thèmes (pas des genres)."),
+    ).toBeInTheDocument();
   });
 
   it("explains an indigenous exclusion that lost its P2341", () => {
@@ -116,6 +118,98 @@ describe("CurationReviewList", () => {
     );
 
     expect(screen.getByText("Plus d'« indigène de » (P2341).")).toBeInTheDocument();
+  });
+
+  it("attributes a redirected item's evidence to its target", () => {
+    render(
+      <CurationReviewList
+        items={[
+          {
+            ...base,
+            list: "genre_roots",
+            itemId: "Q1",
+            reason: "not_in_tree",
+            target: "Q2",
+            evidence: { label: "Cible rock", modified: "2026-10-12T10:00:00+00:00" },
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        "Fusionné vers « Cible rock », qui n'est plus une instance de « genre musical » (cible modifiée le 12/10/2026).",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Cible rock" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Q1" })).toBeInTheDocument();
+  });
+
+  it("uses the genre sentence when an indigenous exclusion still has P2341", () => {
+    render(
+      <CurationReviewList
+        items={[
+          {
+            ...base,
+            list: "indigenous_to_exclusions",
+            itemId: "Q1",
+            reason: "not_in_tree",
+            target: null,
+            evidence: { hasIndigenousTo: true },
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Plus une instance de « genre musical ».")).toBeInTheDocument();
+    expect(screen.queryByText(/P2341/)).not.toBeInTheDocument();
+  });
+
+  it("says an item is still a music genre instead of claiming it lost the type", () => {
+    render(
+      <CurationReviewList
+        items={[
+          {
+            ...base,
+            list: "genre_roots",
+            itemId: "Q1",
+            reason: "not_in_tree",
+            target: null,
+            evidence: { instanceOf: [{ id: "Q188451", label: "genre musical" }] },
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        "Toujours un genre musical sur Wikidata : absent de l'arbre lors du dernier run (modification récente ou rang de déclaration)",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("flags a parent merged into its own item as self-referencing", () => {
+    render(
+      <CurationReviewList
+        items={[
+          {
+            ...base,
+            key: "Q10",
+            column: "parent_item_id",
+            list: "main_parent",
+            itemId: "Q99",
+            reason: "redirect_conflict",
+            target: "Q10",
+            evidence: { conflictList: "main_parent" },
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByText("Fusionné vers l'élément porteur de la règle lui-même (règle auto-référente)."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/déjà présent/)).not.toBeInTheDocument();
   });
 
   it("links the QID to Wikidata and its history in a new tab", () => {
