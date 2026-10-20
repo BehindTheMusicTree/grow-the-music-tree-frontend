@@ -45,10 +45,11 @@ function AboutButton() {
   closedParams.delete("about");
   const closedQuery = closedParams.toString();
   const closedHref = closedQuery ? `${pathname}?${closedQuery}` : pathname;
+  const openHref = pathname === "/" && closedQuery ? `/?${closedQuery}&about` : ABOUT_HREF;
 
   return (
     <Link
-      href={isOpen ? closedHref : ABOUT_HREF}
+      href={isOpen ? closedHref : openHref}
       prefetch={false}
       className="flex shrink-0 items-center justify-center rounded-full bg-black/70 p-2 text-gray-100 shadow-lg backdrop-blur transition-colors duration-200 hover:text-white"
       aria-label="About"

@@ -113,6 +113,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- Opening About keeps the current genre zoom (`/?zoom=…&about`).
 - Curation dialogs (move, unlink, link, video) stay open when the server rejects the change; after Alias, Exclude or Delete the panel selects the alias target or the main parent.
 - Editing a recording's video updates every cached genre list, not just the open one.
 - A failed optimistic update only restores the lists it changed, so it can no longer overwrite a newer edit.
