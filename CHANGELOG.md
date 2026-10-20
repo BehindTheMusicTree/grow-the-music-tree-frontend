@@ -97,6 +97,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- The About panel stops where the tracklist panel begins, shown or not (`@behindthemusictree/app-kit` 11.8.0).
+
 ## [3.12.0] - 2026-10-20
 
 ### Added

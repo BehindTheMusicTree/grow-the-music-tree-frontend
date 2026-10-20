@@ -248,6 +248,8 @@ export default function GenreTreePage() {
   return (
     <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
       <GenreCurationProvider>
+      {/* Player's panel is right-3 + w-[280px]; the overlay panel stops 12px short of it (12 + 280 + 12). */}
+      <div className="contents [--gtv-overlay-panel-right:304px]" data-testid="genre-tree-overlay-bounds">
       <Suspense fallback={<GenreTreeViewLoadingFallback />}>
         <ZoomableGenreTreeView
           scope="reference"
@@ -264,6 +266,7 @@ export default function GenreTreePage() {
           {...curation}
         />
       </Suspense>
+      </div>
       </GenreCurationProvider>
     </Page>
   );
