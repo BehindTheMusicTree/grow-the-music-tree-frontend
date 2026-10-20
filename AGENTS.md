@@ -41,11 +41,11 @@ no `youtube_unplayable_reason`).
 
 ## Conventions (canonical sources — read these, this file only highlights traps)
 
-@CONTRIBUTING.md
 @docs/STYLE_GUIDE.md
 @docs/testing.md
-@docs/VERSIONING.md
-@docs/SEMVER_GUIDE.md
+
+Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONING.md`,
+`docs/SEMVER_GUIDE.md` when doing branch/PR/release work.
 
 ## Critical rules agents get wrong here
 
