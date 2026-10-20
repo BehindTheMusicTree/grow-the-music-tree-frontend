@@ -2,14 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Suspense } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import { CircleDot, Info, List } from "lucide-react";
 import { TheMusicTreeMarkLink } from "@behindthemusictree/brand/components";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { getAudiometaUrl } from "@lib/site-urls";
 import { MenuGroup } from "./MenuGroup";
-import { PATHS as ROUTE_PATHS } from "@lib/constants/routes";
+import { ABOUT_HREF } from "@lib/constants/routes";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 
 const SHOW_AUDIOMETA_MENU_ITEM = false;
@@ -35,6 +36,28 @@ const menuGroup = [
       ]
     : []),
 ];
+
+function AboutButton() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const isOpen = searchParams.has("about");
+  const closedParams = new URLSearchParams(searchParams.toString());
+  closedParams.delete("about");
+  const closedQuery = closedParams.toString();
+  const closedHref = closedQuery ? `${pathname}?${closedQuery}` : pathname;
+
+  return (
+    <Link
+      href={isOpen ? closedHref : ABOUT_HREF}
+      prefetch={false}
+      className="flex shrink-0 items-center justify-center rounded-full bg-black/70 p-2 text-gray-100 shadow-lg backdrop-blur transition-colors duration-200 hover:text-white"
+      aria-label="About"
+      aria-pressed={isOpen}
+    >
+      <Info className="h-5 w-5" aria-hidden />
+    </Link>
+  );
+}
 
 interface AppHeaderProps {
   className?: string;
@@ -76,14 +99,9 @@ export default function AppHeader({ className }: AppHeaderProps) {
           {isOutline ? <CircleDot className="h-5 w-5" aria-hidden /> : <List className="h-5 w-5" aria-hidden />}
         </button>
       )}
-      <Link
-        href={ROUTE_PATHS.ABOUT}
-        prefetch={false}
-        className="flex shrink-0 items-center justify-center rounded-full bg-black/70 p-2 text-gray-100 shadow-lg backdrop-blur transition-colors duration-200 hover:text-white"
-        aria-label="About"
-      >
-        <Info className="h-5 w-5" aria-hidden />
-      </Link>
+      <Suspense fallback={null}>
+        <AboutButton />
+      </Suspense>
       <div className="flex shrink-0 items-center justify-center rounded-full bg-white/90 p-2 shadow-lg backdrop-blur">
         <TheMusicTreeMarkLink imageStyle={{ height: 20, width: "auto" }} />
       </div>

@@ -102,6 +102,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- About opens as a panel over the genre-tree map (`/?about`) instead of a separate page; `/about` redirects there. Opening it closes the genre detail panel, and selecting a genre closes it.
 - Renaming a genre or changing its main parent now has an Undo toast. Alias, Exclude and Delete are confirmed in a dialog and have no Undo. Unlinking a single recording asks for confirmation.
 - A move on the genre panel no longer removes the recording optimistically (only an unlink does); the list refreshes after the server answers. A move that cannot be undone (the previous genre has no Wikidata id) shows no Undo (needs grow-api >= 12.14.0).
 - `@behindthemusictree/app-kit` 11.5.0; `sonner` is pinned to 2.0.8.
