@@ -115,6 +115,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - A failed optimistic update only restores the lists it changed, so it can no longer overwrite a newer edit.
 - Switching genre while editing no longer renames or reparents the previous one, and the summary is not overwritten while being typed.
 - Shift+click range selection ignores rows that are no longer in the list.
+- `/admin/curation-review` no longer shows false explanations: a merged item's facts are attributed to its target, the "indigène de" sentence only appears when the statement is really missing, an item still typed as music genre says so, and a rule merged into its own item is called self-referencing (conflict lists use their French title).
 
 ## [3.11.0] - 2026-10-19
 
