@@ -45,7 +45,7 @@ function explain({
   }
   const redirected = Boolean(target);
   const lead = redirected ? `Fusionné vers « ${evidence.label ?? target} », qui ` : "";
-  if (instanceOf?.some(({ id }) => id === MUSIC_GENRE_QID))
+  if (hasIndigenousTo !== false && instanceOf?.some(({ id }) => id === MUSIC_GENRE_QID))
     return `${lead}${redirected ? "est toujours" : "Toujours"} un genre musical sur Wikidata : absent de l'arbre lors du dernier run (modification récente ou rang de déclaration)`;
   const lost =
     hasIndigenousTo === false

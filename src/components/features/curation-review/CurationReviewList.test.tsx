@@ -165,6 +165,26 @@ describe("CurationReviewList", () => {
     expect(screen.queryByText(/P2341/)).not.toBeInTheDocument();
   });
 
+  it("reports a lost P2341 even when the item is still a music genre", () => {
+    render(
+      <CurationReviewList
+        items={[
+          {
+            ...base,
+            list: "indigenous_to_exclusions",
+            itemId: "Q1",
+            reason: "not_in_tree",
+            target: null,
+            evidence: { hasIndigenousTo: false, instanceOf: [{ id: "Q188451", label: "genre musical" }] },
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText(/Plus d'« indigène de » \(P2341\)\./)).toBeInTheDocument();
+    expect(screen.queryByText(/Toujours un genre musical/)).not.toBeInTheDocument();
+  });
+
   it("says an item is still a music genre instead of claiming it lost the type", () => {
     render(
       <CurationReviewList
