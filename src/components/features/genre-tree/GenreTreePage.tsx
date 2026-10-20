@@ -28,6 +28,7 @@ import GenreHistory from "@components/features/genre-tree/GenreHistory";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
+import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
@@ -134,6 +135,7 @@ export default function GenreTreePage() {
   const getBackendBaseUrl = getGrowBackendBaseUrl;
   const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
   const isAdmin = useIsAdmin();
+  const { isVisible: isPlayerPanelVisible } = usePlayerPanel();
   const { showPopup, hidePopup } = usePopup();
   const [editMode, setEditMode] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -249,7 +251,10 @@ export default function GenreTreePage() {
     <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
       <GenreCurationProvider>
       {/* Player's panel is right-3 + w-[280px]; the overlay panel stops 12px short of it (12 + 280 + 12). */}
-      <div className="contents [--gtv-overlay-panel-right:304px]" data-testid="genre-tree-overlay-bounds">
+      <div
+        className={isPlayerPanelVisible ? "contents [--gtv-overlay-panel-right:304px]" : "contents"}
+        data-testid="genre-tree-overlay-bounds"
+      >
       <Suspense fallback={<GenreTreeViewLoadingFallback />}>
         <ZoomableGenreTreeView
           scope="reference"
