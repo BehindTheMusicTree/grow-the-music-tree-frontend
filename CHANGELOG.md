@@ -98,6 +98,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- The genre panel shows the genre's English Wikidata short description under its name and a "Source: Wikipedia" link under the summary (app-kit 11.6.0; needs grow-api returning `description` and `summarySourceUrl`).
+
 - `/admin/curation-review` explains each dropped curated item: a sentence built from the pipeline's evidence (what the item is now, when it changed), a "Règle" column naming the dropped rule when it is not the row's own item (e.g. main parent of a genre), and Wikidata page/history links on the QID. Rows reported before the upgrade get a generic sentence per reason (needs grow-api with curation review evidence).
 
 - The genre panel is the admin curation tool: an Edit/Done toggle opens it fullscreen (collapsible to a side panel with the expand button or Escape) to rename, reparent, add secondary parents, edit the summary, reorder essential tracks, link/move/unlink recordings (single or bulk, shift+click range), edit a recording's YouTube video, and alias, exclude or delete a genre. Each action saves immediately with an Undo toast (needs grow-api >= 12.13.0).
