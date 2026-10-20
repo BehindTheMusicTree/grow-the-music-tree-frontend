@@ -175,7 +175,7 @@ describe("GenreTreePage", () => {
 
     fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
 
-    expect(routerPushMock).toHaveBeenCalledWith("/", { scroll: false });
+    expect(routerReplaceMock).toHaveBeenCalledWith("/", { scroll: false });
   });
 
   it("offers no Edit button to non-admins", async () => {

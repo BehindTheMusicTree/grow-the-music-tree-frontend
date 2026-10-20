@@ -88,12 +88,15 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
     if (zoom !== null && !isPopCore) router.replace(hrefWithZoom(null), { scroll: false });
   }, [zoom, isPopCore, hrefWithZoom, router]);
 
-  const closeAbout = useCallback(() => {
+  const closeAbout = useCallback(
+    (method: "push" | "replace" = "push") => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete(ABOUT_PARAM);
     const query = params.toString();
-    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
-  }, [pathname, searchParams, router]);
+      router[method](query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [pathname, searchParams, router],
+  );
 
   useEffect(() => {
     if (about) onSelectedNodeIdChange?.(null);
@@ -102,12 +105,12 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
   const handleSelectedNodeIdChange = useCallback(
     (id: string | null) => {
       onSelectedNodeIdChange?.(id);
-      if (id !== null && about) closeAbout();
+      if (id !== null && about) closeAbout("replace");
     },
     [about, closeAbout, onSelectedNodeIdChange],
   );
 
-  const overlayPanel = about ? { title: "About", content: <AboutContent />, onClose: closeAbout } : undefined;
+  const overlayPanel = about ? { title: "About", content: <AboutContent />, onClose: () => closeAbout() } : undefined;
   const sharedProps = { ...viewProps, onSelectedNodeIdChange: handleSelectedNodeIdChange, overlayPanel };
 
   const handleFocusGenreChange = useCallback(
