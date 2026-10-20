@@ -98,6 +98,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- The genre panel shows the genre's English Wikidata short description under its name and a "Source: Wikipedia" link under the summary (app-kit 11.6.0; needs grow-api returning `description` and `summarySourceUrl`).
+
+- `/admin/curation-review` explains each dropped curated item: a sentence built from the pipeline's evidence (what the item is now, when it changed), a "Règle" column naming the dropped rule when it is not the row's own item (e.g. main parent of a genre), and Wikidata page/history links on the QID. Rows reported before the upgrade get a generic sentence per reason (needs grow-api with curation review evidence).
+
 - The genre panel is the admin curation tool: an Edit/Done toggle opens it fullscreen (collapsible to a side panel with the expand button or Escape) to rename, reparent, add secondary parents, edit the summary, reorder essential tracks, link/move/unlink recordings (single or bulk, shift+click range), edit a recording's YouTube video, and alias, exclude or delete a genre. Each action saves immediately with an Undo toast (needs grow-api >= 12.13.0).
 
 ### Changed
@@ -114,6 +118,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - A failed optimistic update only restores the lists it changed, so it can no longer overwrite a newer edit.
 - Switching genre while editing no longer renames or reparents the previous one, and the summary is not overwritten while being typed.
 - Shift+click range selection ignores rows that are no longer in the list.
+- `/admin/curation-review` no longer shows false explanations: a merged item's facts are attributed to its target, the "indigène de" sentence only appears when the statement is really missing, an item still typed as music genre says so, and a rule merged into its own item is called self-referencing (conflict lists use their French title).
 
 ## [3.11.0] - 2026-10-19
 

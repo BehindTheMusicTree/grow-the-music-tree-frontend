@@ -118,6 +118,19 @@ export const CurationReviewReasonSchema = z.enum(["redirect_conflict", "missing"
 
 export type CurationReviewReason = z.infer<typeof CurationReviewReasonSchema>;
 
+const EvidenceItemSchema = z.object({ id: z.string(), label: z.string().nullable() });
+
+export const CurationReviewEvidenceSchema = z.object({
+  label: z.string().optional(),
+  modified: z.string().optional(),
+  instanceOf: z.array(EvidenceItemSchema).optional(),
+  subclassOf: z.array(EvidenceItemSchema).optional(),
+  hasIndigenousTo: z.boolean().optional(),
+  conflictList: z.string().optional(),
+});
+
+export type CurationReviewEvidence = z.infer<typeof CurationReviewEvidenceSchema>;
+
 export const CurationReviewItemsSchema = z.array(
   z.object({
     list: z.string(),
@@ -127,6 +140,7 @@ export const CurationReviewItemsSchema = z.array(
     reason: CurationReviewReasonSchema,
     target: z.string().nullable(),
     reportedOn: z.string(),
+    evidence: CurationReviewEvidenceSchema.nullish(),
   }),
 );
 
