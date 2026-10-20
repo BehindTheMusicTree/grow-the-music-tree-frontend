@@ -1,4 +1,5 @@
+export const ABOUT_HREF = "/?about";
+
 export const PATHS = {
-  ABOUT: "/about",
   ARTIST: (uuid: string) => `/artists/${uuid}`,
 };

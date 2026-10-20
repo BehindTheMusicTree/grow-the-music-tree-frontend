@@ -23,6 +23,7 @@ import EssentialTracksEditor from "@components/features/genre-curation/Essential
 import RecordingCheckbox from "@components/features/genre-curation/RecordingCheckbox";
 import RecordingRowActions from "@components/features/genre-curation/RecordingRowActions";
 import SelectionBar from "@components/features/genre-curation/SelectionBar";
+import AboutContent from "@components/features/about/AboutContent";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 import Page from "@components/ui/Page";
@@ -57,6 +58,7 @@ const GenreTreeView = dynamic(
 );
 
 const ZOOM_PARAM = "zoom";
+const ABOUT_PARAM = "about";
 
 type ZoomableGenreTreeViewProps = Omit<ComponentProps<typeof GenreTreeView>, "focusGenreUuid" | "onFocusGenreChange">;
 
@@ -67,6 +69,8 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const zoom = searchParams.get(ZOOM_PARAM);
+  const about = searchParams.has(ABOUT_PARAM);
+  const { onSelectedNodeIdChange } = viewProps;
   const isPopCore = viewProps.viewMode === "pop-core";
 
   const hrefWithZoom = useCallback(
@@ -84,6 +88,31 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
     if (zoom !== null && !isPopCore) router.replace(hrefWithZoom(null), { scroll: false });
   }, [zoom, isPopCore, hrefWithZoom, router]);
 
+  const closeAbout = useCallback(
+    (method: "push" | "replace" = "push") => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete(ABOUT_PARAM);
+    const query = params.toString();
+      router[method](query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [pathname, searchParams, router],
+  );
+
+  useEffect(() => {
+    if (about) onSelectedNodeIdChange?.(null);
+  }, [about, onSelectedNodeIdChange]);
+
+  const handleSelectedNodeIdChange = useCallback(
+    (id: string | null) => {
+      onSelectedNodeIdChange?.(id);
+      if (id !== null && about) closeAbout("replace");
+    },
+    [about, closeAbout, onSelectedNodeIdChange],
+  );
+
+  const overlayPanel = about ? { title: "About", content: <AboutContent />, onClose: () => closeAbout() } : undefined;
+  const sharedProps = { ...viewProps, onSelectedNodeIdChange: handleSelectedNodeIdChange, overlayPanel };
+
   const handleFocusGenreChange = useCallback(
     (uuid: string | null, reason: FocusChangeReason) => {
       const href = hrefWithZoom(uuid);
@@ -95,9 +124,9 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
   );
 
   return isPopCore ? (
-    <GenreTreeView {...viewProps} focusGenreUuid={zoom} onFocusGenreChange={handleFocusGenreChange} />
+    <GenreTreeView {...sharedProps} focusGenreUuid={zoom} onFocusGenreChange={handleFocusGenreChange} />
   ) : (
-    <GenreTreeView {...viewProps} />
+    <GenreTreeView {...sharedProps} />
   );
 }
 
@@ -176,8 +205,6 @@ export default function GenreTreePage() {
         onEditModeChange: handleEditModeChange,
         expanded,
         onExpandedChange: setExpanded,
-        selectedNodeId,
-        onSelectedNodeIdChange: setSelectedNodeId,
         renderTitleEditor: (node: { id: string }) => {
           const criteria = criteriaByPlaylist.get(node.id)?.criteria;
           return criteria ? <GenreNameEditor key={criteria.uuid} genre={criteria} /> : null;
@@ -229,6 +256,8 @@ export default function GenreTreePage() {
           getBackendBaseUrl={getBackendBaseUrl}
           viewMode={viewMode}
           readOnly={!isAdmin}
+          selectedNodeId={selectedNodeId}
+          onSelectedNodeIdChange={setSelectedNodeId}
           controlsOrientation="horizontal"
           renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
           renderArtistLink={renderArtistLink}

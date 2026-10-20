@@ -4,7 +4,9 @@ import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import AppHeader from "./AppHeader";
 import { GenreTreeViewModeProvider, useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
+let searchParams = new URLSearchParams();
+
+vi.mock("next/navigation", () => ({ usePathname: () => "/", useSearchParams: () => searchParams }));
 
 function CanShowPopCore({ value }: { value: boolean }) {
   const { setCanShowPopCore } = useGenreTreeViewMode();
@@ -24,6 +26,22 @@ function renderHeader(canShowPopCore: boolean) {
 describe("AppHeader view toggle", () => {
   afterEach(() => {
     cleanup();
+    searchParams = new URLSearchParams();
+  });
+
+  it("links the About button to /?about", () => {
+    renderHeader(true);
+
+    expect(screen.getByRole("link", { name: "About" })).toHaveAttribute("href", "/?about");
+  });
+
+  it("toggles About closed, keeping other params, when it is open", () => {
+    searchParams = new URLSearchParams("about&zoom=rock");
+    renderHeader(true);
+
+    const link = screen.getByRole("link", { name: "About" });
+    expect(link).toHaveAttribute("href", "/?zoom=rock");
+    expect(link).toHaveAttribute("aria-pressed", "true");
   });
 
   it("switches between outline and wheel views", () => {
