@@ -40,7 +40,7 @@ function GenreTreeViewLoadingFallback() {
 
   return (
     <div className="relative flex h-full flex-col">
-      <div className="actions-container absolute left-3 top-3 z-30 flex justify-start">
+      <div className="actions-container absolute left-5 top-5 z-30 flex justify-start">
         <div className="flex justify-start" />
       </div>
       <GenreTreeViewSkeleton viewMode={viewMode} />
