@@ -2,7 +2,8 @@
 
 import { ListMusic, X } from "lucide-react";
 import { usePlayer, PlayerVideoSurface } from "@behindthemusictree/app-kit/player";
-import { TrackListSidebar, useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
+import { useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
+import { TrackListSidebar } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 

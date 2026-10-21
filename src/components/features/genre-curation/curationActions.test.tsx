@@ -38,7 +38,7 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   genreQueryKeys: { reference: { overview: (uuid: string) => ["overview", uuid] } },
   useDeleteGenre: () => ({ mutate: m.del, isPending: false, formErrors: [{ message: "nope" }] }),
 }));
-vi.mock("@behindthemusictree/app-kit/popup", () => ({
+vi.mock("@behindthemusictree/app-kit-ui/popup", () => ({
   BasePopup: ({ title, children, onOk, okButtonText, okButtonDisabled }: {
     title: string;
     children: ReactNode;

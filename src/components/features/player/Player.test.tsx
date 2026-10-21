@@ -19,6 +19,8 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
     toggleTrackListSidebar: toggleTrackListSidebarMock,
     isTrackListSidebarVisible: isTrackListSidebarVisibleMock(),
   }),
+}));
+vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
   TrackListSidebar: ({ layout, className }: { layout?: string; className?: string }) => (
     <div data-testid="track-list-sidebar" data-layout={layout} className={className} />
   ),

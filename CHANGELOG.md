@@ -97,6 +97,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- Bump `@behindthemusictree/app-kit` to 13.0.0 and add `@behindthemusictree/app-kit-ui` 13.0.0, which now provides the styled popups, genre tree, track list sidebar and `genre-tree/styles.css`.
+- The genre tree page hides the display-options group with `showDisplayOptions={false}`; the `globals.css` overrides for `GenreTreeView` margin and options are removed.
+
 ## [3.13.0] - 2026-10-21
 
 ### Fixed

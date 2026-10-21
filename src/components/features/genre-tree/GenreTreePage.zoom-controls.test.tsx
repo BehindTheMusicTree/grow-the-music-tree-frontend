@@ -4,7 +4,7 @@ import { render, screen, cleanup } from "@testing-library/react";
 import Providers from "@app/providers";
 import GenreTreePage from "./GenreTreePage";
 import { GenreTreeViewModeProvider, useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
-import type { GenreTreeViewMode } from "@behindthemusictree/app-kit/genre-tree";
+import type { GenreTreeViewMode } from "@behindthemusictree/app-kit-ui/genre-tree";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),

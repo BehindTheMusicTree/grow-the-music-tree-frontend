@@ -1,7 +1,7 @@
 "use client";
 
 import { ComponentProps } from "react";
-import { NetworkErrorPopup as AppKitNetworkErrorPopup } from "@behindthemusictree/app-kit/popup";
+import { NetworkErrorPopup as AppKitNetworkErrorPopup } from "@behindthemusictree/app-kit-ui/popup";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 
 type NetworkErrorPopupProps = Omit<ComponentProps<typeof AppKitNetworkErrorPopup>, "topOffset">;

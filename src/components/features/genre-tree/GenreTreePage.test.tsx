@@ -44,6 +44,9 @@ const hasMainstreamPopRootMock = vi.fn<(nodes: { id: string }[]) => boolean>(() 
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   useListFullGenrePlaylists: () => useListFullGenrePlaylistsMock(),
   hasMainstreamPopRoot: (nodes: { id: string }[]) => hasMainstreamPopRootMock(nodes),
+}));
+
+vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
   GenreTreeView: (props: {
     readOnly: boolean;
     getBackendBaseUrl: () => string;

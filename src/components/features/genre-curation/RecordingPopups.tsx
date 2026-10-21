@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BasePopup } from "@behindthemusictree/app-kit/popup";
+import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import GenrePicker from "@components/features/curation/GenrePicker";
 import { useAssignRecordingGenre } from "@hooks/curation/useAssignRecordingGenre";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
