@@ -103,6 +103,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- The About panel is rewritten around TheMusicTree: a short pitch, what you can do, what's next, an open-source section and data credits (Wikidata, MusicBrainz, YouTube); the API link now points at `grow-the-music-tree-api`.
 - The About panel stops where the player panel begins while it is visible, and extends to the right edge otherwise (`@behindthemusictree/app-kit` 11.8.0).
 
 ## [3.12.0] - 2026-10-20
