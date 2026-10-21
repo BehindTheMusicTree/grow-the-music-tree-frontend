@@ -97,6 +97,19 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.13.0] - 2026-10-21
+
+### Fixed
+
+- `/favicon.ico` serves the brand icon instead of answering 404.
+
+### Changed
+
+- The About panel is rewritten around TheMusicTree: a short pitch, what you can do, what's next, an open-source section and data credits (Wikidata, MusicBrainz, YouTube); the API link now points at `grow-the-music-tree-api`.
+- The About panel stops where the player panel begins while it is visible, and extends to the right edge otherwise (`@behindthemusictree/app-kit` 11.8.0).
+- `@behindthemusictree/app-kit` 12.0.0 and `@behindthemusictree/ui` 0.2.0: `ui` is now a peer dependency of app-kit, so the app owns the single installed copy.
+
+
 ## [3.12.0] - 2026-10-20
 
 ### Added
