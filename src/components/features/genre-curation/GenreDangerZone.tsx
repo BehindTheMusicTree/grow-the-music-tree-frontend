@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useDeleteGenre } from "@behindthemusictree/app-kit/genre-tree";
-import { BasePopup } from "@behindthemusictree/app-kit/popup";
+import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import GenrePicker from "@components/features/curation/GenrePicker";
 import { useGenreCuration } from "@components/features/genre-curation/GenreCurationProvider";
 import { useAliasGenre, useAliasPreview } from "@hooks/curation/useAliasGenre";

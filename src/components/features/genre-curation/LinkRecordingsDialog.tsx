@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { BasePopup } from "@behindthemusictree/app-kit/popup";
+import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { useFetchWrapper } from "@behindthemusictree/app-kit/transport";
 import { RingLoader } from "@behindthemusictree/ui";
 import { useAssignRecordingGenre } from "@hooks/curation/useAssignRecordingGenre";

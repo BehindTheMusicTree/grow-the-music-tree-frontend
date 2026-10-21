@@ -1,7 +1,7 @@
 "use client";
 
 import { ComponentProps } from "react";
-import { InternalErrorPopup as AppKitInternalErrorPopup } from "@behindthemusictree/app-kit/popup";
+import { InternalErrorPopup as AppKitInternalErrorPopup } from "@behindthemusictree/app-kit-ui/popup";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { publicEnv } from "@lib/env";
 

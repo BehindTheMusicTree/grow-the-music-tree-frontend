@@ -19,6 +19,8 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   libraryEndpoints: { reference: { recordings: { list: () => "library/recordings/" } } },
   recordingUnplayableReason: (recording: { youtubeVideo: unknown }) => (recording.youtubeVideo ? null : "No video"),
   useTrackList: () => ({ playNewTrackListFromArtist: playNewTrackListMock }),
+}));
+vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
   TrackItem: ({ track, position }: { track: { title: string }; position: number }) => (
     <div role="button" className="track-position-play-pause">
       {position}. {track.title}

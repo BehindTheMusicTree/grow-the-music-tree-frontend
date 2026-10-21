@@ -5,14 +5,8 @@ import { keepPreviousData } from "@tanstack/react-query";
 import { Play } from "lucide-react";
 import { Pagination } from "@behindthemusictree/ui";
 import { usePlayer } from "@behindthemusictree/app-kit/player";
-import {
-  RecordingDetailedSchema,
-  TrackItem,
-  libraryEndpoints,
-  recordingUnplayableReason,
-  useTrackList,
-  type RecordingDetailed,
-} from "@behindthemusictree/app-kit/genre-tree";
+import { RecordingDetailedSchema, libraryEndpoints, recordingUnplayableReason, useTrackList, type RecordingDetailed } from "@behindthemusictree/app-kit/genre-tree";
+import { TrackItem } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { PaginatedResponseSchema, useFetchWrapper, useQueryWithParse } from "@behindthemusictree/app-kit/transport";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import ArtistSection from "./ArtistSection";

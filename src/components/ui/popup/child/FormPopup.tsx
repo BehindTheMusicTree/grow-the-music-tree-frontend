@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@behindthemusictree/ui";
-import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
+import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit-ui/popup";
 import { ReactNode } from "react";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 
