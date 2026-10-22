@@ -97,6 +97,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.14.0] - 2026-10-22
+
 ### Added
 
 - Admin page « À affiner » lists recordings attached to an umbrella genre, each with a picker to give it a precise sub-genre.
