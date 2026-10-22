@@ -97,6 +97,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- Umbrella genres are marked in the genre tree (italic labels, badge in the info panel and search results), via app-kit 13.4.0.
+
 ## [3.14.0] - 2026-10-22
 
 ### Added
