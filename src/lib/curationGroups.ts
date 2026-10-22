@@ -3,7 +3,8 @@ export const CURATION_GROUPS: { title: string; lists: Record<string, string> }[]
     title: "Racines",
     lists: {
       accepted_canonical_roots: "Racines canoniques acceptées",
-      umbrella_canonical_genres: "Genres « parapluie » canoniques",
+      non_stylistic_genres: "Appellations non stylistiques",
+      umbrella_genres: "Genres parapluie (à affiner)",
       canonical_genre_pop_side: "Côté pop des racines",
     },
   },
@@ -45,7 +46,7 @@ export const CURATION_GROUPS: { title: string; lists: Record<string, string> }[]
     lists: {
       genre_alias: "Alias de genres MusicBrainz",
       accepted_non_genre_tags: "Tags MusicBrainz ignorés",
-      genre_precedence: "Priorité entre genres MusicBrainz",
+      genre_precedence: "Priorité entre genres",
     },
   },
 ];

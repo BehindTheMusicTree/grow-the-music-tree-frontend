@@ -42,6 +42,7 @@ export function MoveRecordingsPopup({ recordings, onClose, onDone }: PopupProps)
     >
       <GenrePicker
         label="Target genre"
+        excludeUmbrellas
         value={target?.name ?? ""}
         defaultText=""
         onChange={(_itemId, name, uuid) => setTarget(uuid && name ? { uuid, name } : null)}

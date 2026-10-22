@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/admin/curation-review", label: "Curation à revoir" },
   { href: "/admin/genre-review", label: "Genre review" },
   { href: "/admin/root-review", label: "Root review" },
+  { href: "/admin/to-refine", label: "À affiner" },
   { href: "/admin/imports", label: "Imports" },
 ];
 

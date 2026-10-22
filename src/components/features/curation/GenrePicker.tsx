@@ -12,10 +12,12 @@ type Props = {
   /** What the input shows first, e.g. the genre's name rather than its QID. */
   defaultText: string;
   onChange: (itemId: string, name?: string, uuid?: string) => void;
+  /** Umbrella genres cannot hold recordings directly, so assignment targets leave them out. */
+  excludeUmbrellas?: boolean;
 };
 
 /** Finds a canonical genre by name, or takes a QID / LOCAL:<slug> typed as is. */
-export default function GenrePicker({ label, value, defaultText, onChange }: Props) {
+export default function GenrePicker({ label, value, defaultText, onChange, excludeUmbrellas = false }: Props) {
   const id = useId();
   const [text, setText] = useState(defaultText);
   const [open, setOpen] = useState(false);
@@ -31,7 +33,8 @@ export default function GenrePicker({ label, value, defaultText, onChange }: Pro
     enabled: open && search.length >= 2 && !isItemId,
   });
   const options = (data?.results ?? []).filter(
-    (genre): genre is typeof genre & { wikidataId: string } => genre.wikidataId !== null,
+    (genre): genre is typeof genre & { wikidataId: string } =>
+      genre.wikidataId !== null && !(excludeUmbrellas && genre.isUmbrella),
   );
   const expanded = open && options.length > 0;
 
