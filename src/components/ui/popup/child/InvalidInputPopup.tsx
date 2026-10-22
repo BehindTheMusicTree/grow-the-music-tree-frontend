@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertCircle } from "lucide-react";
-import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
+import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit-ui/popup";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 
 type InvalidInputPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable"> & {

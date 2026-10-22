@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useCallback } from "react";
-import type { GenreTreeViewMode } from "@behindthemusictree/app-kit/genre-tree";
+import type { GenreTreeViewMode } from "@behindthemusictree/app-kit-ui/genre-tree";
 
 interface GenreTreeViewModeContextValue {
   viewMode: GenreTreeViewMode;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
+import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit-ui/popup";
 import { CriteriaMinimum, useCreateGenre } from "@behindthemusictree/app-kit/genre-tree";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";

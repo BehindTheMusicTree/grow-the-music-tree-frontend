@@ -3,7 +3,7 @@
 import { useId, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
-import { BasePopup } from "@behindthemusictree/app-kit/popup";
+import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import GenrePicker from "@components/features/curation/GenrePicker";
 import { BANNER_HEIGHT } from "@lib/constants/layout";

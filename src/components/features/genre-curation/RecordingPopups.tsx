@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BasePopup } from "@behindthemusictree/app-kit/popup";
+import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import GenrePicker from "@components/features/curation/GenrePicker";
 import { useAssignRecordingGenre } from "@hooks/curation/useAssignRecordingGenre";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
@@ -42,6 +42,7 @@ export function MoveRecordingsPopup({ recordings, onClose, onDone }: PopupProps)
     >
       <GenrePicker
         label="Target genre"
+        excludeUmbrellas
         value={target?.name ?? ""}
         defaultText=""
         onChange={(_itemId, name, uuid) => setTarget(uuid && name ? { uuid, name } : null)}

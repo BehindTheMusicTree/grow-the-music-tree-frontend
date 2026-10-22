@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit/popup";
+import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit-ui/popup";
 import { Image as ImageIcon } from "lucide-react";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 

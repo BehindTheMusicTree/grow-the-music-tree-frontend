@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { YOUTUBE_UNPLAYABLE_REASON_LABELS } from "@behindthemusictree/app-kit/genre-tree";
-import { BasePopup } from "@behindthemusictree/app-kit/popup";
+import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { useFetchWrapper } from "@behindthemusictree/app-kit/transport";
 import { RingLoader } from "@behindthemusictree/ui";
 import { useUpdateRecordingVideo } from "@hooks/curation/useUpdateRecordingVideo";

@@ -5,13 +5,8 @@ import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
-import {
-  useListFullGenrePlaylists,
-  CriteriaMinimum,
-  type FocusChangeReason,
-  hasMainstreamPopRoot,
-  GenreTreeViewSkeleton,
-} from "@behindthemusictree/app-kit/genre-tree";
+import { useListFullGenrePlaylists, CriteriaMinimum, hasMainstreamPopRoot } from "@behindthemusictree/app-kit/genre-tree";
+import { GenreTreeViewSkeleton, type FocusChangeReason } from "@behindthemusictree/app-kit-ui/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import { GenreCurationProvider } from "@components/features/genre-curation/GenreCurationProvider";
@@ -45,7 +40,7 @@ function GenreTreeViewLoadingFallback() {
 
   return (
     <div className="relative flex h-full flex-col">
-      <div className="actions-container absolute left-3 top-3 z-30 flex justify-start">
+      <div className="actions-container absolute left-5 top-5 z-30 flex justify-start">
         <div className="flex justify-start" />
       </div>
       <GenreTreeViewSkeleton viewMode={viewMode} />
@@ -54,7 +49,7 @@ function GenreTreeViewLoadingFallback() {
 }
 
 const GenreTreeView = dynamic(
-  () => import("@behindthemusictree/app-kit/genre-tree").then((mod) => mod.GenreTreeView),
+  () => import("@behindthemusictree/app-kit-ui/genre-tree").then((mod) => mod.GenreTreeView),
   { ssr: false, loading: () => <GenreTreeViewLoadingFallback /> },
 );
 
@@ -112,7 +107,7 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
   );
 
   const overlayPanel = about ? { title: "About", content: <AboutContent />, onClose: () => closeAbout() } : undefined;
-  const sharedProps = { ...viewProps, onSelectedNodeIdChange: handleSelectedNodeIdChange, overlayPanel };
+  const sharedProps = { ...viewProps, onSelectedNodeIdChange: handleSelectedNodeIdChange, overlayPanel, showDisplayOptions: false };
 
   const handleFocusGenreChange = useCallback(
     (uuid: string | null, reason: FocusChangeReason) => {

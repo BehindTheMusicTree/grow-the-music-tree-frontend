@@ -97,6 +97,26 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.14.0] - 2026-10-22
+
+### Added
+
+- Admin page « À affiner » lists recordings attached to an umbrella genre, each with a picker to give it a precise sub-genre.
+- Curation list `umbrella_genres` (« Genres parapluie »), and an « Prioritaire sur » column title for the QID-keyed `genre_precedence`.
+
+### Changed
+
+- Curation list `umbrella_canonical_genres` is now `non_stylistic_genres` (« Appellations non stylistiques »).
+- The Move recordings picker no longer offers umbrella genres, which grow refuses as assignment targets.
+
+### Changed
+
+- Bump `@behindthemusictree/app-kit` to 13.0.0 and add `@behindthemusictree/app-kit-ui` 13.0.0, which now provides the styled popups, genre tree, track list sidebar and `genre-tree/styles.css`.
+- The genre tree page hides the display-options group with `showDisplayOptions={false}`; the `globals.css` overrides for `GenreTreeView` margin and options are removed.
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 13.1.0: the genre search bar sits inside the detail panel header (Google Maps style), and pop-core zoom navigation is one breadcrumb centred at the top of the wheel instead of a top-left bar under the search bar. The loading fallback's actions container moves to `left-5 top-5` to match.
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 13.2.0: the detail panel header no longer repeats the genre name shown in the search bar, the colored header scrolls with the panel, and a hovered wheel label takes its node's color.
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 13.3.0: the genre search field holds the Zoom in and Play/Pause buttons for the selected genre, replacing the detail panel's own.
+
 ## [3.13.0] - 2026-10-21
 
 ### Fixed

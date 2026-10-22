@@ -2,6 +2,7 @@ const COLUMN_TITLES: Record<string, string> = {
   item_id: "Genre",
   item_label: "Nom du genre",
   reason: "Raison",
+  over_item_id: "Prioritaire sur",
   parent_item_id: "Parent",
   parent_id: "Parent",
   parent_label: "Nom du parent",
