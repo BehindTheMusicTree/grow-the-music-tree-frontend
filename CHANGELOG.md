@@ -97,6 +97,16 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- Admin page « À affiner » lists recordings attached to an umbrella genre, each with a picker to give it a precise sub-genre.
+- Curation list `umbrella_genres` (« Genres parapluie »), and an « Prioritaire sur » column title for the QID-keyed `genre_precedence`.
+
+### Changed
+
+- Curation list `umbrella_canonical_genres` is now `non_stylistic_genres` (« Appellations non stylistiques »).
+- The Move recordings picker no longer offers umbrella genres, which grow refuses as assignment targets.
+
 ### Changed
 
 - Bump `@behindthemusictree/app-kit` to 13.0.0 and add `@behindthemusictree/app-kit-ui` 13.0.0, which now provides the styled popups, genre tree, track list sidebar and `genre-tree/styles.css`.

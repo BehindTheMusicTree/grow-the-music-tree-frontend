@@ -111,7 +111,14 @@ export function toCurationRow(list: CurationList, row: CurationEntry["row"]): Cu
 }
 
 export const CanonicalGenreSearchSchema = z.object({
-  results: z.array(z.object({ uuid: z.string().uuid(), name: z.string(), wikidataId: z.string().nullable() })),
+  results: z.array(
+    z.object({
+      uuid: z.string().uuid(),
+      name: z.string(),
+      wikidataId: z.string().nullable(),
+      isUmbrella: z.boolean().optional(),
+    }),
+  ),
 });
 
 export const CurationReviewReasonSchema = z.enum(["redirect_conflict", "missing", "not_in_tree"]);
