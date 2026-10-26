@@ -9,6 +9,10 @@ const formErrorsMock = vi.fn((): { field: string; message: string }[] => []);
 const searchResultsMock = vi.fn(() => ({ results: [] as { id: string; label: string }[] }));
 let searchParams = new URLSearchParams();
 
+vi.mock("@tanstack/react-query", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@tanstack/react-query")>()),
+  useInfiniteQuery: () => ({ data: undefined, isFetching: false, hasNextPage: false }),
+}));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: replaceMock, push: pushMock, refresh: vi.fn() }),
   usePathname: () => "/admin/curation/main_parent",

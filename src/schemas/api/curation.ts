@@ -137,6 +137,8 @@ export const CanonicalGenreSearchSchema = z.object({
       isUmbrella: z.boolean().optional(),
     }),
   ),
+  page: z.number().int(),
+  totalPages: z.number().int(),
 });
 
 export const CurationReviewReasonSchema = z.enum(["redirect_conflict", "missing", "not_in_tree"]);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useFetchWrapper, useQueryWithParse } from "@behindthemusictree/app-kit/transport";
 import { useDebouncedValue } from "@hooks/useDebouncedValue";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -37,12 +38,13 @@ export default function GenrePicker({
   const search = useDebouncedValue(text.trim(), 250);
   const isItemId = ITEM_ID_PATTERN.test(search);
   const enabled = open && search.length >= 2 && !isItemId;
-  const genres = useQueryWithParse({
+  const genres = useInfiniteQuery({
     queryKey: ["curationGenrePicker", search],
-    queryFn: () => fetch("genres/", true, false, {}, { name: search, pageSize: 10 }),
-    schema: CanonicalGenreSearchSchema,
-    context: "GenrePicker",
     enabled: enabled && !catalog,
+    initialPageParam: 1,
+    queryFn: async ({ pageParam }) =>
+      CanonicalGenreSearchSchema.parse(await fetch("genres/", true, false, {}, { name: search, pageSize: 10, page: pageParam })),
+    getNextPageParam: (last) => (last.page < last.totalPages ? last.page + 1 : undefined),
   });
   const items = useQueryWithParse({
     queryKey: ["curationItemPicker", search],
@@ -54,12 +56,16 @@ export default function GenrePicker({
   const isFetching = genres.isFetching || items.isFetching;
   const options: Option[] = catalog
     ? (items.data?.results ?? []).map((item) => ({ key: item.id, name: item.label, itemId: item.id }))
-    : (genres.data?.results ?? []).flatMap((genre) =>
+    : (genres.data?.pages.flatMap((page) => page.results) ?? []).flatMap((genre) =>
         genre.wikidataId === null || (excludeUmbrellas && genre.isUmbrella)
           ? []
           : [{ key: genre.uuid, name: genre.name, itemId: genre.wikidataId, uuid: genre.uuid }],
       );
   const expanded = open && options.length > 0;
+  const canLoadMore = !catalog && genres.hasNextPage && !genres.isFetchingNextPage;
+  const loadMore = () => {
+    if (canLoadMore) void genres.fetchNextPage();
+  };
 
   const pick = (option: Option) => {
     setText(option.name);
@@ -73,6 +79,10 @@ export default function GenrePicker({
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       const step = event.key === "ArrowDown" ? 1 : -1;
+      if (step === 1 && active === options.length - 1 && canLoadMore) {
+        loadMore();
+        return;
+      }
       setActive((active + step + options.length) % options.length);
     } else if (event.key === "Enter") {
       event.preventDefault();
@@ -111,29 +121,48 @@ export default function GenrePicker({
         {isFetching && " · recherche…"}
       </p>
       {expanded && (
-        <ul
-          id={`${id}-listbox`}
-          role="listbox"
-          aria-label={label}
-          className="absolute top-full z-10 w-full max-h-60 overflow-y-auto bg-white border rounded-md shadow-lg"
-        >
-          {options.map((option, index) => (
-            <li
-              key={option.key}
-              id={`${id}-option-${index}`}
-              role="option"
-              aria-selected={index === active}
+        <div className="absolute top-full z-10 w-full bg-white border rounded-md shadow-lg">
+          <ul
+            id={`${id}-listbox`}
+            role="listbox"
+            aria-label={label}
+            onScroll={(event) => {
+              const list = event.currentTarget;
+              if (list.scrollHeight - list.scrollTop - list.clientHeight < 24) loadMore();
+            }}
+            className="max-h-60 overflow-y-auto"
+          >
+            {options.map((option, index) => (
+              <li
+                key={option.key}
+                id={`${id}-option-${index}`}
+                role="option"
+                aria-selected={index === active}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  pick(option);
+                }}
+                className="flex justify-between gap-2 px-3 py-2 cursor-pointer aria-selected:bg-gray-100 hover:bg-gray-100"
+              >
+                <span>{option.name}</span>
+                <span className="font-mono text-xs text-gray-500">{option.itemId}</span>
+              </li>
+            ))}
+          </ul>
+          {!catalog && genres.hasNextPage && (
+            <button
+              type="button"
+              disabled={genres.isFetchingNextPage}
               onMouseDown={(event) => {
                 event.preventDefault();
-                pick(option);
+                loadMore();
               }}
-              className="flex justify-between gap-2 px-3 py-2 cursor-pointer aria-selected:bg-gray-100 hover:bg-gray-100"
+              className="w-full px-3 py-2 text-sm text-left text-gray-600 border-t cursor-pointer hover:bg-gray-100 disabled:opacity-50"
             >
-              <span>{option.name}</span>
-              <span className="font-mono text-xs text-gray-500">{option.itemId}</span>
-            </li>
-          ))}
-        </ul>
+              {genres.isFetchingNextPage ? "Chargement…" : "Plus de résultats…"}
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
