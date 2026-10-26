@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.17.0 - 2026-10-26](#3170---2026-10-26)
 - [3.16.0 - 2026-10-26](#3160---2026-10-26)
 - [3.15.1 - 2026-10-26](#3151---2026-10-26)
 - [3.15.0 - 2026-10-22](#3150---2026-10-22)
@@ -101,10 +102,13 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.17.0] - 2026-10-26
+
 ### Changed
 
 - **Recording renamed to Song**: bumps `@behindthemusictree/app-kit` and `app-kit-ui` to 17.0.0 (needs grow-api >= 13.2.0). The app calls `library/songs`, sends `essentialSongs` and `songs` (assign-genre), and reads the `songs` / `essentialSongs` alias counts. Its own `Recording*` identifiers, files and query keys are now `Song*` (`SongRowActions`, `SongPopups`, `SongVideoDialog`, `LinkSongsDialog`, `useAssignSongGenre`, `ArtistSongs`, `EssentialSongsEditor`). MusicBrainz recording names are unchanged. No behavior change.
 - Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 16.1.0: segmented view-mode toggle and brand-token dark track sidebar. Removed the unused `trackListName` and `144` Tailwind keys.
+
 
 ## [3.16.0] - 2026-10-26
 
