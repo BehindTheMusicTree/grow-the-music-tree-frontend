@@ -10,6 +10,15 @@ const PublicEnvSchema = z.object({
   NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: sampleRate(0.1),
   NEXT_PUBLIC_SENTRY_REPLAY_SESSION_SAMPLE_RATE: sampleRate(0.1),
   NEXT_PUBLIC_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: sampleRate(1.0),
+  NEXT_PUBLIC_UMAMI_WEBSITE_ID: z.string().uuid().optional(),
+  NEXT_PUBLIC_UMAMI_ORIGIN: z
+    .string()
+    .url()
+    .transform((value) => new URL(value).origin)
+    .optional(),
+}).refine((env) => Boolean(env.NEXT_PUBLIC_UMAMI_WEBSITE_ID) === Boolean(env.NEXT_PUBLIC_UMAMI_ORIGIN), {
+  message: "NEXT_PUBLIC_UMAMI_WEBSITE_ID and NEXT_PUBLIC_UMAMI_ORIGIN must be set together",
+  path: ["NEXT_PUBLIC_UMAMI_WEBSITE_ID"],
 });
 
 // Each var is referenced literally: Next only inlines `process.env.NEXT_PUBLIC_*` into client
@@ -22,6 +31,8 @@ const parsed = PublicEnvSchema.safeParse({
   NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE || undefined,
   NEXT_PUBLIC_SENTRY_REPLAY_SESSION_SAMPLE_RATE: process.env.NEXT_PUBLIC_SENTRY_REPLAY_SESSION_SAMPLE_RATE || undefined,
   NEXT_PUBLIC_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE: process.env.NEXT_PUBLIC_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE || undefined,
+  NEXT_PUBLIC_UMAMI_WEBSITE_ID: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID || undefined,
+  NEXT_PUBLIC_UMAMI_ORIGIN: process.env.NEXT_PUBLIC_UMAMI_ORIGIN || undefined,
 });
 
 if (!parsed.success) {

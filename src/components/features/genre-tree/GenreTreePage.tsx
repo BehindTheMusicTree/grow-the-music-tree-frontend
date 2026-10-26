@@ -26,6 +26,7 @@ import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
+import { trackEvent } from "@lib/analytics";
 
 // Reads viewMode from context (rather than receiving it as a prop) because next/dynamic's
 // `loading` render prop isn't passed the wrapped component's own props — this renders before
@@ -101,6 +102,7 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
   const handleSelectedNodeIdChange = useCallback(
     (id: string | null) => {
       onSelectedNodeIdChange?.(id);
+      if (id !== null) trackEvent("genre_select");
       if (id !== null && about) closeAbout("replace");
     },
     [about, closeAbout, onSelectedNodeIdChange],
