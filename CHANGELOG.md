@@ -69,6 +69,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Artist search**: a header search box finds artists by name or alias (accent- and typo-tolerant) and opens their page. The curation genre picker now shares its combobox with it (`ui/Combobox`). Requires grow-api `GET artists/search/`.
 - **Genre Tree Visualization**: Added interactive D3.js-based genre tree component
   - Includes unit tests for tree layout calculations and node interactions
   - Supports zoom, pan, and node expansion/collapse
