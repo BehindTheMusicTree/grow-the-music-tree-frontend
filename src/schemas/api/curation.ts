@@ -175,31 +175,31 @@ export type CurationReviewItem = z.infer<typeof CurationReviewItemsSchema>[numbe
 
 const UuidOutputSchema = z.object({ uuid: z.string() });
 
-export const AssignRecordingGenreInputSchema = z.object({
-  recordings: z.array(z.string()).min(1),
+export const AssignSongGenreInputSchema = z.object({
+  songs: z.array(z.string()).min(1),
   genre: z.string().nullable(),
 });
-export type AssignRecordingGenreInput = z.infer<typeof AssignRecordingGenreInputSchema>;
+export type AssignSongGenreInput = z.infer<typeof AssignSongGenreInputSchema>;
 
-export const AssignRecordingGenreOutputSchema = z.object({
+export const AssignSongGenreOutputSchema = z.object({
   previous: z.array(z.object({ uuid: z.string(), genre: z.string().nullable(), undoable: z.boolean() })),
 });
-export type AssignRecordingGenreOutput = z.infer<typeof AssignRecordingGenreOutputSchema>;
+export type AssignSongGenreOutput = z.infer<typeof AssignSongGenreOutputSchema>;
 
 const VideoSchema = z.object({
   youtubeVideoId: z.string().max(32).nullable(),
   youtubeUnplayableReason: z.string().nullable(),
 });
-export type RecordingVideo = z.infer<typeof VideoSchema>;
+export type SongVideo = z.infer<typeof VideoSchema>;
 
-export const UpdateRecordingVideoInputSchema = z.object({
+export const UpdateSongVideoInputSchema = z.object({
   uuid: z.string(),
   video: VideoSchema,
   previous: VideoSchema,
 });
-export type UpdateRecordingVideoInput = z.infer<typeof UpdateRecordingVideoInputSchema>;
+export type UpdateSongVideoInput = z.infer<typeof UpdateSongVideoInputSchema>;
 
-export const RecordingVideoDetailSchema = z.object({
+export const SongVideoDetailSchema = z.object({
   uuid: z.string(),
   youtubeVideoId: z.string().nullable().optional(),
   youtubeUnplayableReason: z.string().nullable().optional(),
@@ -228,8 +228,8 @@ export const AliasGenreInputSchema = z.object({ uuid: z.string(), target: z.stri
 export type AliasGenreInput = z.infer<typeof AliasGenreInputSchema>;
 export const AliasGenreOutputSchema = UuidOutputSchema;
 export const AliasPreviewSchema = z.object({
-  recordings: z.number(),
-  essentialTracks: z.number(),
+  songs: z.number(),
+  essentialSongs: z.number(),
   children: z.number(),
 });
 
@@ -265,18 +265,18 @@ export const UpdateGenreParentInputSchema = z.object({
 export type UpdateGenreParentInput = z.infer<typeof UpdateGenreParentInputSchema>;
 export const UpdateGenreOutputSchema = UuidOutputSchema;
 
-const EssentialTrackSchema = z.object({
+const EssentialSongSchema = z.object({
   uuid: z.string(),
   title: z.string(),
   artists: z.array(z.object({ uuid: z.string(), name: z.string() })).nullish(),
 });
-export type EssentialTrack = z.infer<typeof EssentialTrackSchema>;
-export const UpdateEssentialTracksInputSchema = z.object({
+export type EssentialSong = z.infer<typeof EssentialSongSchema>;
+export const UpdateEssentialSongsInputSchema = z.object({
   uuid: z.string(),
-  tracks: z.array(EssentialTrackSchema),
-  previous: z.array(EssentialTrackSchema),
+  tracks: z.array(EssentialSongSchema),
+  previous: z.array(EssentialSongSchema),
 });
-export type UpdateEssentialTracksInput = z.infer<typeof UpdateEssentialTracksInputSchema>;
+export type UpdateEssentialSongsInput = z.infer<typeof UpdateEssentialSongsInputSchema>;
 
 export const LinkCandidateSchema = z.object({
   uuid: z.string(),
@@ -286,7 +286,7 @@ export const LinkCandidateSchema = z.object({
 });
 export type LinkCandidate = z.infer<typeof LinkCandidateSchema>;
 export const LinkSuggestionsSchema = z.array(LinkCandidateSchema);
-export const RecordingSearchSchema = z.object({
+export const SongSearchSchema = z.object({
   results: z.array(LinkCandidateSchema),
   next: z.string().nullable(),
 });

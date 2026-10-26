@@ -5,13 +5,13 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { useFetchWrapper } from "@behindthemusictree/app-kit/transport";
 import { RingLoader } from "@behindthemusictree/ui";
-import { useAssignRecordingGenre } from "@hooks/curation/useAssignRecordingGenre";
+import { useAssignSongGenre } from "@hooks/curation/useAssignSongGenre";
 import { useDebouncedValue } from "@hooks/useDebouncedValue";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import {
   LinkSuggestionsSchema,
-  RecordingSearchSchema,
+  SongSearchSchema,
   type LinkCandidate,
 } from "@schemas/api/curation";
 import type { CuratedGenre } from "@components/features/genre-curation/GenreCurationProvider";
@@ -45,28 +45,28 @@ function CandidateRow({
   );
 }
 
-export default function LinkRecordingsDialog({ genre, onClose }: { genre: CuratedGenre; onClose: () => void }) {
+export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenre; onClose: () => void }) {
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
   const [tab, setTab] = useState<Tab>("suggested");
   const [text, setText] = useState("");
   const [genreless, setGenreless] = useState(true);
   const [checked, setChecked] = useState<ReadonlySet<string>>(new Set());
   const query = useDebouncedValue(text.trim(), 300);
-  const { mutate, isPending } = useAssignRecordingGenre(`linked to ${genre.name}`);
+  const { mutate, isPending } = useAssignSongGenre(`linked to ${genre.name}`);
 
   const suggestions = useQuery({
-    queryKey: ["referenceRecordings", "linkSuggestions", genre.uuid],
+    queryKey: ["referenceSongs", "linkSuggestions", genre.uuid],
     enabled: tab === "suggested",
     queryFn: async () =>
       LinkSuggestionsSchema.parse(await fetch(`genres/${genre.uuid}/link-suggestions/`, true, false)),
   });
   const search = useInfiniteQuery({
-    queryKey: ["referenceRecordings", "linkSearch", query, genreless],
+    queryKey: ["referenceSongs", "linkSearch", query, genreless],
     enabled: tab === "search" && query.length >= 2,
     initialPageParam: "",
     queryFn: async ({ pageParam }) =>
-      RecordingSearchSchema.parse(
-        await fetch("library/recordings/search/", true, false, {}, { q: query, genreless, cursor: pageParam }),
+      SongSearchSchema.parse(
+        await fetch("library/songs/search/", true, false, {}, { q: query, genreless, cursor: pageParam }),
       ),
     getNextPageParam: (last) => last.next ?? undefined,
   });
@@ -90,7 +90,7 @@ export default function LinkRecordingsDialog({ genre, onClose }: { genre: Curate
       okButtonText={`Link ${checked.size || ""}`.trim()}
       okButtonDisabled={checked.size === 0 || isPending}
       onOk={() => {
-        mutate({ recordings: Array.from(checked), genre: genre.uuid }, { onSuccess: onClose });
+        mutate({ songs: Array.from(checked), genre: genre.uuid }, { onSuccess: onClose });
       }}
       onCancel={onClose}
       onClose={onClose}

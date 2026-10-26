@@ -14,7 +14,7 @@ type Props = {
   /** What the input shows first, e.g. the genre's name rather than its QID. */
   defaultText: string;
   onChange: (itemId: string, name?: string, uuid?: string) => void;
-  /** Umbrella genres cannot hold recordings directly, so assignment targets leave them out. */
+  /** Umbrella genres cannot hold songs directly, so assignment targets leave them out. */
   excludeUmbrellas?: boolean;
   /** Searches every known Wikidata item, pruned ones included, instead of the canonical genres. */
   catalog?: boolean;

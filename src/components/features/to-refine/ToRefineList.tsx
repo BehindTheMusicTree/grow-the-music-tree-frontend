@@ -6,32 +6,32 @@ import { keepPreviousData } from "@tanstack/react-query";
 import { Pagination } from "@behindthemusictree/ui";
 import { PaginatedResponseSchema, useFetchWrapper, useQueryWithParse } from "@behindthemusictree/app-kit/transport";
 import GenrePicker from "@components/features/curation/GenrePicker";
-import { useAssignRecordingGenre } from "@hooks/curation/useAssignRecordingGenre";
+import { useAssignSongGenre } from "@hooks/curation/useAssignSongGenre";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
-const ToRefineRecordingSchema = z.object({
+const ToRefineSongSchema = z.object({
   uuid: z.string().uuid(),
   title: z.string(),
   genre: z.object({ name: z.string() }).nullable(),
 });
 
-type ToRefineRecording = z.infer<typeof ToRefineRecordingSchema>;
+type ToRefineSong = z.infer<typeof ToRefineSongSchema>;
 
-const ToRefinePageSchema = PaginatedResponseSchema(ToRefineRecordingSchema);
+const ToRefinePageSchema = PaginatedResponseSchema(ToRefineSongSchema);
 
-function ToRefineRow({ recording }: { recording: ToRefineRecording }) {
+function ToRefineRow({ song }: { song: ToRefineSong }) {
   const [target, setTarget] = useState<{ uuid: string; name: string } | null>(null);
-  const { mutate, isPending } = useAssignRecordingGenre("refined");
+  const { mutate, isPending } = useAssignSongGenre("refined");
 
   return (
     <li className="flex flex-wrap items-end gap-4 rounded-md border p-4">
       <div className="flex min-w-48 flex-col">
-        <span className="font-medium">{recording.title}</span>
-        <span className="text-sm text-gray-600">{recording.genre?.name}</span>
+        <span className="font-medium">{song.title}</span>
+        <span className="text-sm text-gray-600">{song.genre?.name}</span>
       </div>
       <div className="min-w-64 flex-1">
         <GenrePicker
-          label={`Sous-genre de ${recording.title}`}
+          label={`Sous-genre de ${song.title}`}
           value={target?.name ?? ""}
           defaultText=""
           excludeUmbrellas
@@ -42,7 +42,7 @@ function ToRefineRow({ recording }: { recording: ToRefineRecording }) {
         type="button"
         className="rounded border bg-white px-3 py-2 text-sm hover:bg-gray-100 disabled:opacity-50"
         disabled={!target || isPending}
-        onClick={() => target && mutate({ recordings: [recording.uuid], genre: target.uuid })}
+        onClick={() => target && mutate({ songs: [song.uuid], genre: target.uuid })}
       >
         Affiner
       </button>
@@ -54,8 +54,8 @@ export default function ToRefineList() {
   const [page, setPage] = useState(1);
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
   const { data, isPending, isError } = useQueryWithParse({
-    queryKey: ["toRefineRecordings", page],
-    queryFn: () => fetch("library/recordings/", true, false, undefined, { genreIsUmbrella: true, page }),
+    queryKey: ["toRefineSongs", page],
+    queryFn: () => fetch("library/songs/", true, false, undefined, { genreIsUmbrella: true, page }),
     schema: ToRefinePageSchema,
     placeholderData: keepPreviousData,
     context: "ToRefineList",
@@ -68,8 +68,8 @@ export default function ToRefineList() {
   return (
     <div className="flex flex-col gap-4">
       <ul className="flex flex-col gap-3">
-        {data.results.map((recording) => (
-          <ToRefineRow key={recording.uuid} recording={recording} />
+        {data.results.map((song) => (
+          <ToRefineRow key={song.uuid} song={song} />
         ))}
       </ul>
       <Pagination currentPage={page} totalPages={data.totalPages} onPageChange={setPage} />

@@ -18,7 +18,7 @@ Shows one artist from the reference library: type, country, active years, extern
 ## Data
 
 - Artist detail from the grow API `artists/<uuid>/`, fetched server-side (`fetchArtist` in `src/lib/artist.ts`); an unknown uuid renders the 404 page
-- Tracks from `library/recordings/?artist=<uuid>&ordering=title`, fetched client-side one page at a time (`ArtistTracks`)
+- Tracks from `library/songs/?artist=<uuid>&ordering=title`, fetched client-side one page at a time (`ArtistSongs`)
 - Discography is grouped from each release's primary and secondary types: live and compilation secondary types win over the primary type
 
 ## Environment Variables

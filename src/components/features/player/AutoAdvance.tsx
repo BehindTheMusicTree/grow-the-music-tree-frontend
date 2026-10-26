@@ -2,18 +2,18 @@
 
 import { useEffect } from "react";
 import { usePlayer } from "@behindthemusictree/app-kit/player";
-import { useTrackList, RecordingDetailed } from "@behindthemusictree/app-kit/genre-tree";
+import { useTrackList, SongDetailed } from "@behindthemusictree/app-kit/genre-tree";
 import { toPlayerTrack } from "@lib/player-track";
 
 export default function AutoAdvance() {
   const { handleNextTrack, setOnTrackEnd } = usePlayer();
-  const { trackList, selectedTrack, setSelectedTrack } = useTrackList<RecordingDetailed>();
+  const { trackList, selectedTrack, setSelectedTrack } = useTrackList<SongDetailed>();
 
   useEffect(() => {
     const handleTrackEnd = () => {
       // Auto-advance to next track if available
       if (trackList && selectedTrack) {
-        handleNextTrack(trackList.tracks.filter((recording) => recording.youtubeVideo).map(toPlayerTrack), toPlayerTrack(selectedTrack), (track) => {
+        handleNextTrack(trackList.tracks.filter((song) => song.youtubeVideo).map(toPlayerTrack), toPlayerTrack(selectedTrack), (track) => {
           const found = trackList.tracks.find((t) => t.uuid === track.id) ?? null;
           setSelectedTrack(found);
         });
