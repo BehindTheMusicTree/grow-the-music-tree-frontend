@@ -55,13 +55,13 @@ export default function ArtistTracks({ artist }: { artist: { uuid: string; name:
   };
 
   return (
-    <ArtistSection title="Tracks">
+    <ArtistSection title="Songs">
       {isPending ? (
         <div className="h-14 animate-pulse rounded bg-gray-200" aria-busy="true" />
       ) : isError ? (
-        <p className="text-red-600">Could not load tracks.</p>
+        <p className="text-red-600">Could not load songs.</p>
       ) : data.results.length === 0 ? (
-        <p className="text-gray-600">No tracks yet.</p>
+        <p className="text-gray-600">No songs yet.</p>
       ) : (
         <>
           <div className="flex flex-wrap items-center gap-4">
@@ -73,7 +73,7 @@ export default function ArtistTracks({ artist }: { artist: { uuid: string; name:
               <Play className="h-4 w-4" aria-hidden="true" />
               Play all
             </button>
-            <div role="group" aria-label="Sort tracks by" className="flex gap-1 text-sm">
+            <div role="group" aria-label="Sort songs by" className="flex gap-1 text-sm">
               {SORTS.map((sort) => (
                 <button
                   key={sort.ordering}

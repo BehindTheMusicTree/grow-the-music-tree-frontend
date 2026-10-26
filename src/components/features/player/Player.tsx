@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { ListMusic, X } from "lucide-react";
 import { usePlayer, PlayerVideoSurface } from "@behindthemusictree/app-kit/player";
 import { useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
 import { TrackListSidebar } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
+import { trackEvent } from "@lib/analytics";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 
 interface PlayerProps {
@@ -18,13 +20,18 @@ export default function Player({ className }: PlayerProps) {
   const { toggleTrackListSidebar, isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const { isVisible, dismiss } = usePlayerPanel();
   const track = playerTrackObject?.track;
+  const trackId = track?.id;
+
+  useEffect(() => {
+    if (trackId) trackEvent("track_play");
+  }, [trackId]);
 
   // Hidden via CSS, never unmounted, so the video keeps playing while the panel is closed.
   // Geometry mirrors the genre-tree-view info panel: 60px top (under the header), 280px wide,
-  // capped 164px above the bottom to clear the tree's zoom controls.
+  // capped 56px above the bottom to clear the tree's zoom controls.
   return (
     <div
-      className={`fixed right-3 top-[60px] z-40 flex max-h-[calc(100vh-224px)] w-[280px] flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 text-zinc-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)] ${isTrackListSidebarVisible ? "h-[calc(100vh-224px)]" : ""} ${isVisible ? "" : "hidden"} ${className ?? ""}`}
+      className={`fixed right-3 top-[60px] z-40 flex max-h-[calc(100vh-116px)] w-[280px] flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 text-zinc-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)] ${isTrackListSidebarVisible ? "h-[calc(100vh-116px)]" : ""} ${isVisible ? "" : "hidden"} ${className ?? ""}`}
     >
       <div className="flex shrink-0 items-center justify-between gap-2 border-b border-zinc-800 py-2.5 pl-3.5 pr-2">
         <span className="min-w-0 truncate text-sm font-semibold">{track?.title}</span>
@@ -32,7 +39,7 @@ export default function Player({ className }: PlayerProps) {
           <button
             onClick={toggleTrackListSidebar}
             className={iconButtonClassName}
-            aria-label={isTrackListSidebarVisible ? "Hide track list" : "Show track list"}
+            aria-label={isTrackListSidebarVisible ? "Hide song list" : "Show song list"}
           >
             <ListMusic size={16} />
           </button>

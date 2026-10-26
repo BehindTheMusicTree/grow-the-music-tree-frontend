@@ -65,6 +65,8 @@ jobs:
             NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}
             NEXT_PUBLIC_AUDIOMETA_URL=https://${{ vars.AUDIOMETA_FRONT_SUBDOMAIN }}${{ env.HOST_SUFFIX }}.${{ vars.DOMAIN_NAME }}
             NEXT_PUBLIC_SENTRY_IS_ACTIVE=true
+            NEXT_PUBLIC_UMAMI_WEBSITE_ID=${{ github.ref == 'refs/heads/main' && vars.UMAMI_WEBSITE_ID || '' }}
+            NEXT_PUBLIC_UMAMI_ORIGIN=${{ github.ref == 'refs/heads/main' && vars.UMAMI_ORIGIN || '' }}
           secrets: |
             GH_PACKAGES_TOKEN_READ=${{ secrets.GH_PACKAGES_TOKEN_READ }}
           tags: ${{ steps.meta.outputs.tags }}

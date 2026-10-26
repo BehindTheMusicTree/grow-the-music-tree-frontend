@@ -14,7 +14,7 @@ export default function EssentialTracksEditor({ overview }: { overview: Criteria
     mutate({ uuid: overview.uuid, tracks: next, previous: tracks });
   };
 
-  if (tracks.length === 0) return <p className="text-sm text-gray-500">No essential tracks yet. Use ☆ on a recording.</p>;
+  if (tracks.length === 0) return <p className="text-sm text-gray-500">No essential songs yet. Use ☆ on a song.</p>;
 
   return (
     <ol className="flex flex-col gap-1">

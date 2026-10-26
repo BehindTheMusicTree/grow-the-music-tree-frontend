@@ -1,15 +1,21 @@
 import { z } from "zod";
 
-// Mirrors grow-api's grow/curation/lists.py; the registry response doesn't carry column kinds.
-export const ITEM_ID_COLUMNS = new Set(["item_id", "parent_item_id", "overview_item_id", "parent_id"]);
 export const ITEM_ID_PATTERN = /^(Q\d+|LOCAL:[a-z0-9-]+)$/;
-export const BOOL_COLUMNS = new Set(["exclude_other_parents"]);
+
+export const CurationColumnSpecSchema = z.object({
+  name: z.string(),
+  kind: z.enum(["item_id", "bool", "text"]),
+  optional: z.boolean(),
+});
+
+export type CurationColumnSpec = z.infer<typeof CurationColumnSpecSchema>;
 
 export const CurationListsSchema = z.array(
   z.object({
     name: z.string(),
     keyColumns: z.array(z.string()),
     columns: z.array(z.string()),
+    columnSpecs: z.array(CurationColumnSpecSchema),
     description: z.string(),
     count: z.number(),
   }),
@@ -62,6 +68,7 @@ export const CurationHistoryPageSchema = z.object({
       entry: z.string().uuid(),
     }),
   ),
+  labels: z.record(z.string()),
 });
 
 export type CurationHistoryPage = z.infer<typeof CurationHistoryPageSchema>;
@@ -83,22 +90,29 @@ export type CurationOrdering = (typeof CURATION_ORDERINGS)[number];
 
 export type CurationRow = Record<string, string>;
 
+function buildColumnSchema({ kind, optional }: CurationColumnSpec, isKey: boolean) {
+  if (kind === "bool") return z.enum(["true", ""]);
+  const value = z.string().trim();
+  const filled = optional ? value : value.min(1, "Required");
+  const keyed = isKey ? filled.regex(/^[^\t]*$/, "Must not contain a tab") : filled;
+  if (kind !== "item_id") return keyed;
+  const message = "Must be a Wikidata QID (Q123) or a LOCAL:<slug> id";
+  return optional
+    ? keyed.refine((id) => id === "" || ITEM_ID_PATTERN.test(id), message)
+    : keyed.regex(ITEM_ID_PATTERN, message);
+}
+
 export function buildCurationRowSchema(list: CurationList): z.ZodType<CurationRow> {
   return z.object(
     Object.fromEntries(
-      list.columns.map((column) => {
-        if (BOOL_COLUMNS.has(column)) return [column, z.enum(["true", ""])];
-        const value = z.string().trim().min(1, "Required");
-        const required = list.keyColumns.includes(column) ? value.regex(/^[^\t]*$/, "Must not contain a tab") : value;
-        return [
-          column,
-          ITEM_ID_COLUMNS.has(column)
-            ? required.regex(ITEM_ID_PATTERN, "Must be a Wikidata QID (Q123) or a LOCAL:<slug> id")
-            : required,
-        ];
-      }),
+      list.columnSpecs.map((spec) => [spec.name, buildColumnSchema(spec, list.keyColumns.includes(spec.name))]),
     ),
   ) as z.ZodType<CurationRow>;
+}
+
+/** The column kind of `column` in `list`, text when unknown. */
+export function curationColumnKind(list: CurationList, column: string): CurationColumnSpec["kind"] {
+  return list.columnSpecs.find((spec) => spec.name === column)?.kind ?? "text";
 }
 
 export function toCurationRow(list: CurationList, row: CurationEntry["row"]): CurationRow {
@@ -110,6 +124,10 @@ export function toCurationRow(list: CurationList, row: CurationEntry["row"]): Cu
   );
 }
 
+export const CurationItemSearchSchema = z.object({
+  results: z.array(z.object({ id: z.string(), label: z.string() })),
+});
+
 export const CanonicalGenreSearchSchema = z.object({
   results: z.array(
     z.object({
@@ -119,6 +137,8 @@ export const CanonicalGenreSearchSchema = z.object({
       isUmbrella: z.boolean().optional(),
     }),
   ),
+  page: z.number().int(),
+  totalPages: z.number().int(),
 });
 
 export const CurationReviewReasonSchema = z.enum(["redirect_conflict", "missing", "not_in_tree"]);

@@ -5,7 +5,12 @@ import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
-import { useListFullGenrePlaylists, CriteriaMinimum, hasMainstreamPopRoot } from "@behindthemusictree/app-kit/genre-tree";
+import {
+  useListFullGenrePlaylists,
+  CriteriaMinimum,
+  hasMainstreamPopRoot,
+  type ArtistSearchResult,
+} from "@behindthemusictree/app-kit/genre-tree";
 import { GenreTreeViewSkeleton, type FocusChangeReason } from "@behindthemusictree/app-kit-ui/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
@@ -25,7 +30,9 @@ import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
+import { PATHS } from "@lib/constants/routes";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
+import { trackEvent } from "@lib/analytics";
 
 // Reads viewMode from context (rather than receiving it as a prop) because next/dynamic's
 // `loading` render prop isn't passed the wrapped component's own props — this renders before
@@ -56,7 +63,10 @@ const GenreTreeView = dynamic(
 const ZOOM_PARAM = "zoom";
 const ABOUT_PARAM = "about";
 
-type ZoomableGenreTreeViewProps = Omit<ComponentProps<typeof GenreTreeView>, "focusGenreUuid" | "onFocusGenreChange">;
+type ZoomableGenreTreeViewProps = Omit<
+  ComponentProps<typeof GenreTreeView>,
+  "focusGenreUuid" | "onFocusGenreChange" | "artistSearch" | "onArtistSelect" | "artistSearchBaseUrl"
+>;
 
 // Reads `?zoom=` in its own component so only this subtree bails out to client rendering
 // (useSearchParams needs a Suspense boundary when the route is prerendered).
@@ -101,13 +111,20 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
   const handleSelectedNodeIdChange = useCallback(
     (id: string | null) => {
       onSelectedNodeIdChange?.(id);
+      if (id !== null) trackEvent("genre_select");
       if (id !== null && about) closeAbout("replace");
     },
     [about, closeAbout, onSelectedNodeIdChange],
   );
 
   const overlayPanel = about ? { title: "About", content: <AboutContent />, onClose: () => closeAbout() } : undefined;
-  const sharedProps = { ...viewProps, onSelectedNodeIdChange: handleSelectedNodeIdChange, overlayPanel, showDisplayOptions: false };
+  const sharedProps = {
+    ...viewProps,
+    onSelectedNodeIdChange: handleSelectedNodeIdChange,
+    overlayPanel,
+    showDisplayOptions: false,
+    onArtistSelect: (artist: ArtistSearchResult) => router.push(PATHS.ARTIST(artist.uuid)),
+  };
 
   const handleFocusGenreChange = useCallback(
     (uuid: string | null, reason: FocusChangeReason) => {

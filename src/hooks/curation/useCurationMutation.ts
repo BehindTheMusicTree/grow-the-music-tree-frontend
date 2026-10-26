@@ -18,6 +18,7 @@ interface CurationMutationConfig<I extends z.ZodTypeAny, O extends z.ZodTypeAny>
   optimistic?: (queryClient: QueryClient, input: z.infer<I>) => QueryKey[];
   undo?: (input: z.infer<I>, output: z.infer<O>) => z.infer<I> | null;
   message: (input: z.infer<I>) => string;
+  pendingLabel: (input: z.infer<I>) => string;
 }
 
 export function useCurationMutation<I extends z.ZodTypeAny, O extends z.ZodTypeAny>(
@@ -30,6 +31,7 @@ export function useCurationMutation<I extends z.ZodTypeAny, O extends z.ZodTypeA
     inputSchema: config.inputSchema,
     outputSchema: config.outputSchema,
     mutationFn: (input: z.infer<I>) => config.request(fetch, input),
+    meta: { pendingLabel: (input: unknown) => config.pendingLabel(input as z.infer<I>) },
     onMutate: async (input: z.infer<I>) => {
       await queryClient.cancelQueries({ predicate: (query) => isCurationQuery(query.queryKey) });
       const snapshot = queryClient.getQueriesData({ predicate: (query) => isCurationQuery(query.queryKey) });

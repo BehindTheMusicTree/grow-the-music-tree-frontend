@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.16.0 - 2026-10-26](#3160---2026-10-26)
 - [3.15.1 - 2026-10-26](#3151---2026-10-26)
 - [3.15.0 - 2026-10-22](#3150---2026-10-22)
 - [3.12.0 - 2026-10-20](#3120---2026-10-20)
@@ -69,6 +70,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Artist search**: a header search box finds artists by name or alias (accent- and typo-tolerant) and opens their page. The curation genre picker now shares its combobox with it (`ui/Combobox`). Requires grow-api `GET artists/search/`.
 - **Genre Tree Visualization**: Added interactive D3.js-based genre tree component
   - Includes unit tests for tree layout calculations and node interactions
   - Supports zoom, pan, and node expansion/collapse
@@ -98,6 +100,35 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [3.16.0] - 2026-10-26
+
+### Changed
+
+- **One "Search" bar**: artists are searched in the genre tree's search bar (bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 16.0.0), which lists matching genres and artists in two groups; picking an artist opens its page. The separate header artist box is removed.
+- **"Songs" everywhere in the UI**: the app supplies its track noun to app-kit through `TrackNounProvider` ("song"/"songs"), and its own strings (player, curation, artist page, about) say "song(s)" instead of "recording(s)" / "track(s)". Bumps app-kit and app-kit-ui to 15.0.0.
+
+### Fixed
+
+- **Extended player panel reaches the zoom controls**: the player's track list no longer stops ~160px above the genre tree's zoom controls; it now extends down to just above them.
+
+### Added
+
+- **Blocking overlay**: while a write runs (move, link, rename, merge, exclude, bulk recording edits, tree drag-reparent…) the whole app, popups and toasts are inert and Escape is ignored. It shows what is happening, then "Refreshing tree…", and an elapsed time after 3 s. A mutation opts out with `meta.blocking: false`.
+- **Genre picker**: "Plus de résultats…" button, scrolling to the end of the list and ArrowDown on the last option load the next page of matches, so genres past the first 10 (e.g. "Techno") can be picked. Includes tests.
+- **Analytics**: Self-hosted Umami (cookieless), loaded in production only through the `/stats` rewrites so ad blockers don't drop hits. Signed-in admins are excluded. Tracks `genre_select` and `track_play`.
+  - Needs `NEXT_PUBLIC_UMAMI_WEBSITE_ID` and `NEXT_PUBLIC_UMAMI_ORIGIN` at build time, set together or not at all.
+  - Includes unit tests for `trackEvent` and the `Analytics` component.
+
+### Changed
+
+- **`dev-up.sh` pins its API target**: a staging `GROW_API_ORIGIN` left in `.env.local` no longer blocks startup; the script forces the local API (reported as `ignored_origin_override`). New `--staging` flag starts the app against read-only staging without the local API.
+- Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 13.5.0: genre create/update/delete stay pending until the tree has refetched. The create and rename popups ignore a second submit while saving.
+- **Curation names are resolved, not typed**: the admin curation forms no longer ask for a genre or parent name next to its QID (no more "Nom du genre : Required"). Names come from the API's `labels` maps, which now also cover the history. A name is typed only when creating a new node (`label`, "Nom (nouvel item)").
+  - Form fields and validation follow the API's `columnSpecs` (kind, optional) instead of frontend-side column lists.
+  - The curation genre picker searches every known Wikidata item (`curation/items/`), pruned ones included. Genre assignment pickers still search canonical genres.
+  - Requires grow-api with the `columnSpecs` list metadata and the `labels` history map.
+
 
 ## [3.15.1] - 2026-10-26
 

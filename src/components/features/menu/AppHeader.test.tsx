@@ -6,7 +6,12 @@ import { GenreTreeViewModeProvider, useGenreTreeViewMode } from "@contexts/Genre
 
 let searchParams = new URLSearchParams();
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/", useSearchParams: () => searchParams }));
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/",
+  useSearchParams: () => searchParams,
+  useRouter: () => ({ push: vi.fn() }),
+}));
+vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api", getAudiometaUrl: () => "" }));
 
 function CanShowPopCore({ value }: { value: boolean }) {
   const { setCanShowPopCore } = useGenreTreeViewMode();

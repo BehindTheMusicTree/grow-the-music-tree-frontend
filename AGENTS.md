@@ -76,7 +76,7 @@ Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONIN
   Installing requires a GitHub PAT with `read:packages` for `@behindthemusictree/*`.
 - **Dev backend**: `.env` targets a local grow-api (`http://127.0.0.1:8001`) — start it with
   `docker compose up -d` in `../grow-the-music-tree-api`, check `curl 127.0.0.1:8001/health/`;
-  staging is a read-only opt-in via `.env.local` and rejects dev-client tokens.
+  staging is a read-only opt-in via `./scripts/dev-up.sh --staging` and rejects dev-client tokens.
 - **Admin sign-in locally**: use the dev Google client, and give the local grow-api the same
   `GOOGLE_OAUTH_CLIENT_ID` plus your `ADMIN_GOOGLE_SUB`. Open `http://localhost:<3000–3009>` (what `pnpm dev`
   prints), never `127.0.0.1`, or Google returns `redirect_uri_mismatch`. See

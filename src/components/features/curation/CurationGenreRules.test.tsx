@@ -2,6 +2,10 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, within } from "@testing-library/react";
 import CurationGenreRules from "./CurationGenreRules";
 
+vi.mock("@tanstack/react-query", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@tanstack/react-query")>()),
+  useInfiniteQuery: () => ({ data: undefined, isFetching: false, hasNextPage: false }),
+}));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn(), push: vi.fn(), refresh: vi.fn() }),
   usePathname: () => "/admin/curation/genre/Q1",
@@ -17,15 +21,27 @@ vi.mock("@behindthemusictree/app-kit/transport", () => ({
 const mainParent = {
   name: "main_parent",
   keyColumns: ["item_id"],
-  columns: ["item_id", "item_label", "reason", "parent_item_id"],
+  columns: ["item_id", "reason", "parent_item_id"],
+  columnSpecs: [
+    { name: "item_id", kind: "item_id" as const, optional: false },
+    { name: "reason", kind: "text" as const, optional: false },
+    { name: "parent_item_id", kind: "item_id" as const, optional: false },
+  ],
   description: "",
   count: 1,
 };
-const capitalized = { name: "capitalized_words", keyColumns: ["word"], columns: ["word"], description: "", count: 0 };
+const capitalized = {
+  name: "capitalized_words",
+  keyColumns: ["word"],
+  columns: ["word"],
+  columnSpecs: [{ name: "word", kind: "text" as const, optional: false }],
+  description: "",
+  count: 0,
+};
 const rule = {
   listName: "main_parent",
   uuid: "11111111-1111-1111-1111-111111111111",
-  row: { item_id: "Q2", item_label: "Pala", reason: "Because", parent_item_id: "Q1" },
+  row: { item_id: "Q2", reason: "Because", parent_item_id: "Q1" },
   createdOn: "2026-10-01T00:00:00Z",
   updatedOn: null,
 };
@@ -56,13 +72,22 @@ describe("CurationGenreRules", () => {
   });
 
   it("says when no rule concerns the genre, and adds one prefilled with it", () => {
-    render(<CurationGenreRules itemId="Q1" lists={[capitalized, mainParent]} rules={{ results: [], labels: {} }} appliedExportOn={null} />);
+    render(
+      <CurationGenreRules
+        itemId="Q1"
+        lists={[capitalized, mainParent]}
+        rules={{ results: [], labels: {} }}
+        appliedExportOn={null}
+      />,
+    );
 
     expect(screen.getByText(/aucune règle/i)).toBeInTheDocument();
     const select = screen.getByRole("combobox", { name: "Ajouter une règle pour ce genre" });
-    expect(within(select).getAllByRole("option").map((option) => option.textContent)).toEqual([
-      "Parent principal imposé",
-    ]);
+    expect(
+      within(select)
+        .getAllByRole("option")
+        .map((option) => option.textContent),
+    ).toEqual(["Parent principal imposé"]);
 
     fireEvent.click(screen.getByRole("button", { name: "Ajouter" }));
 

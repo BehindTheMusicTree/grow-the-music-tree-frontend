@@ -15,7 +15,7 @@ const FEATURES = [
     Icon: Compass,
     title: "Explore",
     description:
-      "Navigate the genre tree and open any genre to see its summary, its essential tracks and every recording in its branch.",
+      "Navigate the genre tree and open any genre to see its summary, its essential songs and every song in its branch.",
   },
   {
     Icon: Headphones,

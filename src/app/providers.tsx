@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient, useFetchWrapper, ConnectivityErrorProvider, Scope } from "@behindthemusictree/app-kit/transport";
 import { SessionProvider } from "@behindthemusictree/app-kit/auth";
 import { SessionProvider as AuthSessionProvider } from "next-auth/react";
+import { TrackNounProvider } from "@behindthemusictree/app-kit/track-noun";
 import { PopupProvider } from "@behindthemusictree/app-kit/popup";
 import { PlayerProvider, PlayerTrack } from "@behindthemusictree/app-kit/player";
 import {
@@ -67,7 +68,9 @@ export default function Providers({ children }: ProvidersProps) {
       <QueryClientProvider client={queryClient}>
         <ConnectivityErrorProvider>
           <SessionProvider>
-            <AppProviders>{children}</AppProviders>
+            <TrackNounProvider singular="song" plural="songs">
+              <AppProviders>{children}</AppProviders>
+            </TrackNounProvider>
           </SessionProvider>
         </ConnectivityErrorProvider>
       </QueryClientProvider>

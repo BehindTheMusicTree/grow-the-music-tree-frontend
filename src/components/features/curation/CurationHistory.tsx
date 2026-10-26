@@ -1,8 +1,13 @@
 import Link from "next/link";
 import GenreRef from "@components/features/curation/GenreRef";
-import { PAIRED_LABEL_COLUMNS, curationColumnTitle, displayedCurationColumns } from "@lib/curationColumns";
+import { curationColumnTitle } from "@lib/curationColumns";
 import { curationListTitle } from "@lib/curationGroups";
-import { BOOL_COLUMNS, CurationSnapshotSchema, ITEM_ID_COLUMNS, type CurationHistoryItem } from "@schemas/api/curation";
+import {
+  CurationSnapshotSchema,
+  curationColumnKind,
+  type CurationHistoryItem,
+  type CurationList,
+} from "@schemas/api/curation";
 
 type Snapshot = Record<string, string | boolean | null>;
 
@@ -18,12 +23,15 @@ function parseSnapshot(value: string | null): Snapshot {
   return value === null ? {} : CurationSnapshotSchema.parse(JSON.parse(value));
 }
 
-function Value({ column, snapshot }: { column: string; snapshot: Snapshot }) {
+type Context = { lists: CurationList[]; labels: Record<string, string> };
+
+function Value({ column, snapshot, lists, labels }: Context & { column: string; snapshot: Snapshot }) {
   const value = snapshot[column];
-  if (BOOL_COLUMNS.has(column)) return value === true || value === "true" ? "Oui" : "Non";
-  if (ITEM_ID_COLUMNS.has(column) && typeof value === "string" && value) {
-    const paired = snapshot[PAIRED_LABEL_COLUMNS[column]];
-    return <GenreRef id={value} label={typeof paired === "string" ? paired : undefined} showQid />;
+  const list = lists.find((candidate) => candidate.name === snapshot.list_name);
+  const kind = list ? curationColumnKind(list, column) : "text";
+  if (kind === "bool") return value === true || value === "true" ? "Oui" : "Non";
+  if (kind === "item_id" && typeof value === "string" && value) {
+    return <GenreRef id={value} label={labels[value]} showQid />;
   }
   return value || "—";
 }
@@ -32,15 +40,11 @@ function changedColumns(item: CurationHistoryItem, before: Snapshot, after: Snap
   const columns = Array.from(new Set([...Object.keys(before), ...Object.keys(after)])).filter(
     (column) => column !== "list_name",
   );
-  if (item.action !== "updated") return displayedCurationColumns(columns);
-  const changed = columns.filter((column) => String(before[column] ?? "") !== String(after[column] ?? ""));
-  // A genre change carries its new name along; the name only gets a line of its own when it changed alone.
-  return changed.filter(
-    (column) => !Object.entries(PAIRED_LABEL_COLUMNS).some(([id, label]) => label === column && changed.includes(id)),
-  );
+  if (item.action !== "updated") return columns;
+  return columns.filter((column) => String(before[column] ?? "") !== String(after[column] ?? ""));
 }
 
-function HistoryItem({ item }: { item: CurationHistoryItem }) {
+function HistoryItem({ item, lists, labels }: Context & { item: CurationHistoryItem }) {
   const before = parseSnapshot(item.oldValue);
   const after = parseSnapshot(item.newValue);
   const listName = after.list_name ?? before.list_name;
@@ -71,15 +75,15 @@ function HistoryItem({ item }: { item: CurationHistoryItem }) {
               {item.action === "updated" ? (
                 <>
                   <del className="text-gray-500">
-                    <Value column={column} snapshot={before} />
+                    <Value column={column} snapshot={before} lists={lists} labels={labels} />
                   </del>
                   <span aria-hidden>→</span>
                   <ins className="no-underline">
-                    <Value column={column} snapshot={after} />
+                    <Value column={column} snapshot={after} lists={lists} labels={labels} />
                   </ins>
                 </>
               ) : (
-                <Value column={column} snapshot={shown} />
+                <Value column={column} snapshot={shown} lists={lists} labels={labels} />
               )}
             </dd>
           </div>
@@ -89,13 +93,13 @@ function HistoryItem({ item }: { item: CurationHistoryItem }) {
   );
 }
 
-export default function CurationHistory({ items }: { items: CurationHistoryItem[] }) {
+export default function CurationHistory({ items, lists, labels }: Context & { items: CurationHistoryItem[] }) {
   if (items.length === 0) return <p className="text-gray-600">Aucune modification enregistrée.</p>;
   return (
     <ol className="flex flex-col gap-3">
       {items.map((item) => (
         <li key={item.uuid}>
-          <HistoryItem item={item} />
+          <HistoryItem item={item} lists={lists} labels={labels} />
         </li>
       ))}
     </ol>

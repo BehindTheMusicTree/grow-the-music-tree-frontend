@@ -6,9 +6,13 @@ const replaceMock = vi.fn();
 const pushMock = vi.fn();
 const mutateMock = vi.fn();
 const formErrorsMock = vi.fn((): { field: string; message: string }[] => []);
-const searchResultsMock = vi.fn(() => ({ results: [] as { uuid: string; name: string; wikidataId: string | null }[] }));
+const searchResultsMock = vi.fn(() => ({ results: [] as { id: string; label: string }[] }));
 let searchParams = new URLSearchParams();
 
+vi.mock("@tanstack/react-query", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@tanstack/react-query")>()),
+  useInfiniteQuery: () => ({ data: undefined, isFetching: false, hasNextPage: false }),
+}));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: replaceMock, push: pushMock, refresh: vi.fn() }),
   usePathname: () => "/admin/curation/main_parent",
@@ -27,13 +31,19 @@ vi.mock("@behindthemusictree/app-kit/transport", () => ({
 const list = {
   name: "main_parent",
   keyColumns: ["item_id"],
-  columns: ["item_id", "item_label", "reason", "parent_item_id", "exclude_other_parents"],
+  columns: ["item_id", "reason", "parent_item_id", "exclude_other_parents"],
+  columnSpecs: [
+    { name: "item_id", kind: "item_id" as const, optional: false },
+    { name: "reason", kind: "text" as const, optional: false },
+    { name: "parent_item_id", kind: "item_id" as const, optional: false },
+    { name: "exclude_other_parents", kind: "bool" as const, optional: false },
+  ],
   description: "Forced main parent.",
   count: 1,
 };
 const entry = {
   uuid: "11111111-1111-1111-1111-111111111111",
-  row: { item_id: "Q1", item_label: "Pala", reason: "Because", parent_item_id: "Q2", exclude_other_parents: true },
+  row: { item_id: "Q1", reason: "Because", parent_item_id: "Q2", exclude_other_parents: true },
   createdOn: "2026-10-01T00:00:00Z",
   updatedOn: null,
 };
@@ -121,11 +131,11 @@ describe("CurationEntries", () => {
     );
   });
 
-  it("picks a genre by name, filling its QID and label", () => {
+  it("picks an item by name, filling its QID only", () => {
     searchResultsMock.mockReturnValue({
       results: [
-        { uuid: "22222222-2222-2222-2222-222222222222", name: "Jazz", wikidataId: "Q8341" },
-        { uuid: "33333333-3333-3333-3333-333333333333", name: "Jazzy", wikidataId: null },
+        { id: "Q8341", label: "Jazz" },
+        { id: "LOCAL:jazz-fusion", label: "Jazz fusion" },
       ],
     });
     renderEntries();
@@ -134,14 +144,15 @@ describe("CurationEntries", () => {
 
     fireEvent.change(dialog.getByRole("combobox", { name: "Genre" }), { target: { value: "jaz" } });
     act(() => vi.advanceTimersByTime(250));
-    expect(dialog.getAllByRole("option")).toHaveLength(1);
-    fireEvent.mouseDown(dialog.getByRole("option", { name: /Jazz/ }));
+    expect(dialog.getAllByRole("option")).toHaveLength(2);
+    fireEvent.mouseDown(dialog.getByRole("option", { name: /Q8341/ }));
     expect(dialog.getByText("QID : Q8341")).toBeInTheDocument();
 
     fireEvent.click(dialog.getByRole("button", { name: "Enregistrer" }));
     expect(mutateMock).toHaveBeenCalledWith({
-      row: expect.objectContaining({ item_id: "Q8341", item_label: "Jazz" }),
+      row: expect.objectContaining({ item_id: "Q8341" }),
     });
+    expect(mutateMock.mock.calls[0][0].row).not.toHaveProperty("item_label");
   });
 
   it("takes a QID typed as is and opens existing entries on their names", () => {

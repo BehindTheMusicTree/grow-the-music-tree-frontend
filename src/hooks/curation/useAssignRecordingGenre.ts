@@ -28,6 +28,7 @@ export function useAssignRecordingGenre(label: string) {
       const genres = Array.from(new Set(output.previous.map((entry) => entry.genre)));
       return genres.length === 1 ? { recordings: input.recordings, genre: genres[0] } : null;
     },
-    message: (input) => `${input.recordings.length} recording${input.recordings.length > 1 ? "s" : ""} ${label}`,
+    message: (input) => `${input.recordings.length} song${input.recordings.length > 1 ? "s" : ""} ${label}`,
+    pendingLabel: (input) => `Updating ${input.recordings.length} song${input.recordings.length > 1 ? "s" : ""}…`,
   });
 }

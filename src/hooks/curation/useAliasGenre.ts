@@ -23,5 +23,6 @@ export function useAliasGenre() {
     request: (fetch, { uuid, target }) =>
       fetch(`genres/${uuid}/alias-of/`, true, false, { method: "POST", body: JSON.stringify({ target }) }),
     message: () => "Genre merged into its alias target",
+    pendingLabel: () => "Merging genre…",
   });
 }

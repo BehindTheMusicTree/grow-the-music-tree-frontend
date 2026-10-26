@@ -19,6 +19,7 @@ export function useEssentialTracks() {
       return [key];
     },
     undo: ({ uuid, tracks, previous }) => ({ uuid, tracks: previous, previous: tracks }),
-    message: () => "Essential tracks updated",
+    message: () => "Essential songs updated",
+    pendingLabel: () => "Saving essential songs…",
   });
 }

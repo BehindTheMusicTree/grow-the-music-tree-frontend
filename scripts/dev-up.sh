@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Start the local grow-api (restoring prod data when its DB is empty) and the Next.js dev server.
 #
-#   dev-up.sh [--port <n>] [--restore|--no-restore]
+#   dev-up.sh [--port <n>] [--restore|--no-restore] [--staging]
 #
 # Without --port, picks the first free port in 3000-3009 (the range the dev Google OAuth client allows).
 # --restore forces a fresh prod restore (wipes the local DB); --no-restore never restores.
+# --staging skips the local API and points the app at read-only staging (admin sign-in unavailable).
 # The API checkout is resolved as a sibling of the main checkout (works from any worktree);
 # override with GROW_API_DIR.
 #
@@ -20,11 +21,13 @@ trap 'exec >&-; while kill -0 "$tee_pid" 2>/dev/null; do sleep 0.05; done' EXIT
 
 port=""
 restore="auto"
+target="local"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --port) port="${2:?--port requires a value}"; shift 2 ;;
     --restore) restore="force"; shift ;;
     --no-restore) restore="skip"; shift ;;
+    --staging) target="staging"; shift ;;
     *) echo "status=error reason=unknown-arg-$1"; exit 1 ;;
   esac
 done
@@ -33,7 +36,7 @@ main_root="$(dirname "$(git -C "$repo_root" rev-parse --path-format=absolute --g
 api_dir="${GROW_API_DIR:-$(dirname "$main_root")/grow-the-music-tree-api}"
 echo "repo_root=$repo_root"
 echo "api_dir=$api_dir"
-if [[ ! -f "$api_dir/docker-compose.yml" ]]; then
+if [[ "$target" == "local" && ! -f "$api_dir/docker-compose.yml" ]]; then
   echo "status=error reason=api-repo-not-found"
   exit 1
 fi
@@ -50,56 +53,65 @@ if [[ ! -f "$env_local" ]]; then
 fi
 
 api_url="http://127.0.0.1:8001"
+staging_url="https://grow-api-staging.themusictree.org"
 read_origin() { grep -E '^GROW_API_ORIGIN=' "$1" 2>/dev/null | tail -1 | cut -d= -f2- | sed -E 's/[[:space:]]+#.*//' | tr -d "\"' "; }
-# Next.js precedence: shell env > .env.development.local > .env.local
-origin="${GROW_API_ORIGIN:-$(read_origin "$repo_root/.env.development.local")}"
-origin="${origin:-$(read_origin "$env_local")}"
-origin="${origin%/}"
-if [[ -n "$origin" && "$origin" != "$api_url" && "$origin" != "http://localhost:8001" ]]; then
-  echo "status=blocked reason=api-origin-overridden origin=$origin"
-  exit 1
+echo "target=$target"
+if [[ "$target" == "local" ]]; then
+  # Shell env outranks every .env* file in Next.js, so exporting it below pins the target regardless of file overrides.
+  file_origin="$(read_origin "$repo_root/.env.development.local")"
+  file_origin="${file_origin:-$(read_origin "$env_local")}"
+  file_origin="${file_origin%/}"
+  if [[ -n "$file_origin" && "$file_origin" != "$api_url" && "$file_origin" != "http://localhost:8001" ]]; then
+    echo "ignored_origin_override=$file_origin"
+  fi
+  export GROW_API_ORIGIN="$api_url"
+else
+  export GROW_API_ORIGIN="$staging_url"
+  echo "signin=disabled hint=staging-rejects-dev-client-tokens"
 fi
 
-api_branch="$(git -C "$api_dir" rev-parse --abbrev-ref HEAD)"
-echo "api_branch=$api_branch"
-echo "api_commit=$(git -C "$api_dir" rev-parse --short HEAD)"
-echo "api_dirty=$([[ -n "$(git -C "$api_dir" status --porcelain)" ]] && echo 1 || echo 0)"
-api_behind="$(git -C "$api_dir" rev-list --count 'HEAD..@{u}' 2>/dev/null || echo 0)"
-echo "api_behind_upstream=$api_behind"
-if [[ "$api_branch" != "main" && "$api_branch" != "develop" ]] || (( api_behind > 0 )); then
-  echo "api_warning=api-checkout-not-on-up-to-date-main-or-develop"
-fi
+if [[ "$target" == "local" ]]; then
+  api_branch="$(git -C "$api_dir" rev-parse --abbrev-ref HEAD)"
+  echo "api_branch=$api_branch"
+  echo "api_commit=$(git -C "$api_dir" rev-parse --short HEAD)"
+  echo "api_dirty=$([[ -n "$(git -C "$api_dir" status --porcelain)" ]] && echo 1 || echo 0)"
+  api_behind="$(git -C "$api_dir" rev-list --count 'HEAD..@{u}' 2>/dev/null || echo 0)"
+  echo "api_behind_upstream=$api_behind"
+  if [[ "$api_branch" != "main" && "$api_branch" != "develop" ]] || (( api_behind > 0 )); then
+    echo "api_warning=api-checkout-not-on-up-to-date-main-or-develop"
+  fi
 
-compose=(docker compose --project-directory "$api_dir")
-if ! "${compose[@]}" up -d --wait >/dev/null 2>&1 || ! curl -sf "$api_url/health/" >/dev/null; then
-  echo "status=error reason=api-unhealthy log_tail=$("${compose[@]}" logs --tail 20 api 2>&1 | tr '\n' '|')"
-  exit 1
-fi
-echo "api_health=ok"
-
-count_genres() {
-  local n
-  # shellcheck disable=SC2016 # expanded inside the db container
-  n="$("${compose[@]}" exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select count(*) from grow_genre"')" \
-    && [[ "$n" =~ ^[0-9]+$ ]] && echo "$n"
-}
-genres="$(count_genres)" || { echo "status=error reason=genre-count-failed"; exit 1; }
-restored=0
-if [[ "$restore" == "force" || ( "$restore" == "auto" && "$genres" == "0" ) ]]; then
-  if ! RCLONE_CONFIG="$HOME/.config/rclone/gtmt-backup.conf" R2_BACKUP_BUCKET_NAME=btmt-backups \
-    "$api_dir/scripts/restore-prod-db.sh" >&2; then
-    echo "status=error reason=restore-failed"
+  compose=(docker compose --project-directory "$api_dir")
+  if ! "${compose[@]}" up -d --wait >/dev/null 2>&1 || ! curl -sf "$api_url/health/" >/dev/null; then
+    echo "status=error reason=api-unhealthy log_tail=$("${compose[@]}" logs --tail 20 api 2>&1 | tr '\n' '|')"
     exit 1
   fi
-  restored=1
-  genres="$(count_genres)" || { echo "status=error reason=genre-count-failed"; exit 1; }
-fi
-echo "restored=$restored"
-echo "genres=$genres"
+  echo "api_health=ok"
 
-if ! grep -qE '^GOOGLE_OAUTH_CLIENT_ID=.+' "$api_dir/.env" 2>/dev/null \
-  || ! grep -qE '^ADMIN_GOOGLE_SUB=.+' "$api_dir/.env" 2>/dev/null; then
-  echo "signin=disabled hint=docs/frontend-auth.md#setup"
+  count_genres() {
+    local n
+    # shellcheck disable=SC2016 # expanded inside the db container
+    n="$("${compose[@]}" exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select count(*) from grow_genre"')" \
+      && [[ "$n" =~ ^[0-9]+$ ]] && echo "$n"
+  }
+  genres="$(count_genres)" || { echo "status=error reason=genre-count-failed"; exit 1; }
+  restored=0
+  if [[ "$restore" == "force" || ( "$restore" == "auto" && "$genres" == "0" ) ]]; then
+    if ! RCLONE_CONFIG="$HOME/.config/rclone/gtmt-backup.conf" R2_BACKUP_BUCKET_NAME=btmt-backups \
+      "$api_dir/scripts/restore-prod-db.sh" >&2; then
+      echo "status=error reason=restore-failed"
+      exit 1
+    fi
+    restored=1
+    genres="$(count_genres)" || { echo "status=error reason=genre-count-failed"; exit 1; }
+  fi
+  echo "restored=$restored"
+  echo "genres=$genres"
+
+  if ! grep -qE '^GOOGLE_OAUTH_CLIENT_ID=.+' "$api_dir/.env" 2>/dev/null \
+    || ! grep -qE '^ADMIN_GOOGLE_SUB=.+' "$api_dir/.env" 2>/dev/null; then
+    echo "signin=disabled hint=docs/frontend-auth.md#setup"
+  fi
 fi
 
 port_in_use() { lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1; }
@@ -133,6 +145,6 @@ until curl -sf -o /dev/null "$web_url"; do
 done
 
 echo "log_file=$log_file"
-echo "api_url=$api_url"
+echo "api_url=$GROW_API_ORIGIN"
 echo "web_url=$web_url"
 echo "status=ok"
