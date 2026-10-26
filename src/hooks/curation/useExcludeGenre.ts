@@ -10,5 +10,6 @@ export function useExcludeGenre() {
     request: (fetch, { uuid, category }) =>
       fetch(`genres/${uuid}/exclude/`, true, false, { method: "POST", body: JSON.stringify({ category }) }),
     message: () => "Genre excluded",
+    pendingLabel: () => "Excluding genre…",
   });
 }

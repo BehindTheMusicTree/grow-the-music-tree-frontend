@@ -33,5 +33,6 @@ export function useSecondaryParent() {
     },
     undo: (input) => ({ ...input, add: !input.add }),
     message: ({ parent, add }) => (add ? `Also under ${parent.name}` : `Removed from ${parent.name}`),
+    pendingLabel: ({ parent, add }) => (add ? `Adding under ${parent.name}…` : `Removing from ${parent.name}…`),
   });
 }

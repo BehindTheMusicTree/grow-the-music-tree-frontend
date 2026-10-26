@@ -14,9 +14,12 @@ type GenreRenamePopupProps = {
 // Owns its mutation: showPopup stores a frozen element, so formErrors passed as props would never update.
 export default function GenreRenamePopup({ onClose, genre }: GenreRenamePopupProps) {
   const [name, setName] = useState(genre.name);
-  const { mutate, formErrors } = useUpdateGenre("reference", getGrowBackendBaseUrl);
+  const { mutate, isPending, formErrors } = useUpdateGenre("reference", getGrowBackendBaseUrl);
 
-  const submit = () => mutate({ uuid: genre.uuid, data: { name } }, { onSuccess: onClose });
+  const submit = () => {
+    if (isPending) return;
+    mutate({ uuid: genre.uuid, data: { name } }, { onSuccess: onClose });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -36,6 +39,7 @@ export default function GenreRenamePopup({ onClose, genre }: GenreRenamePopupPro
       showCancelButton
       okButtonText="Save"
       cancelButtonText="Cancel"
+      okButtonDisabled={isPending}
       onOk={submit}
       onCancel={onClose}
       onClose={onClose}
