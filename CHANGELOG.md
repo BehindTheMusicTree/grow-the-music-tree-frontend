@@ -113,6 +113,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **`dev-up.sh` pins its API target**: a staging `GROW_API_ORIGIN` left in `.env.local` no longer blocks startup; the script forces the local API (reported as `ignored_origin_override`). New `--staging` flag starts the app against read-only staging without the local API.
 - Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 13.5.0: genre create/update/delete stay pending until the tree has refetched. The create and rename popups ignore a second submit while saving.
 - **Curation names are resolved, not typed**: the admin curation forms no longer ask for a genre or parent name next to its QID (no more "Nom du genre : Required"). Names come from the API's `labels` maps, which now also cover the history. A name is typed only when creating a new node (`label`, "Nom (nouvel item)").
   - Form fields and validation follow the API's `columnSpecs` (kind, optional) instead of frontend-side column lists.
