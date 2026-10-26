@@ -69,8 +69,8 @@ function AliasPopup({ genre, onClose, onAliased }: PopupProps & Pick<DangerZoneP
         />
         {preview.data && (
           <p>
-            Moves {preview.data.recordings} recording{preview.data.recordings === 1 ? "" : "s"},{" "}
-            {preview.data.essentialTracks} essential track{preview.data.essentialTracks === 1 ? "" : "s"} and{" "}
+            Moves {preview.data.recordings} song{preview.data.recordings === 1 ? "" : "s"},{" "}
+            {preview.data.essentialTracks} essential song{preview.data.essentialTracks === 1 ? "" : "s"} and{" "}
             {preview.data.children} child genre{preview.data.children === 1 ? "" : "s"} to {target?.name}.
           </p>
         )}

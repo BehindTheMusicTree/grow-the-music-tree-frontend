@@ -251,7 +251,7 @@ describe("genre curation actions", () => {
     m.overview.current = { essentialTracks: [{ uuid: "r1", title: "Song" }] };
     render(<RecordingRowActions recording={{ uuid: "r1", title: "Song", artists: [] } as never} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Remove Song from essential tracks" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove Song from essential songs" }));
 
     expect(m.essential).toHaveBeenCalledWith({ uuid: "g1", previous: [{ uuid: "r1", title: "Song" }], tracks: [] });
   });

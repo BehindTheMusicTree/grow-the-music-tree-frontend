@@ -33,7 +33,7 @@ export default function RecordingRowActions({ recording }: { recording: TrackBas
     <span className="flex items-center gap-1">
       <button
         type="button"
-        aria-label={isEssential ? `Remove ${recording.title} from essential tracks` : `Mark ${recording.title} essential`}
+        aria-label={isEssential ? `Remove ${recording.title} from essential songs` : `Mark ${recording.title} essential`}
         aria-pressed={isEssential}
         disabled={!overview || essential.isPending}
         onClick={toggleEssential}

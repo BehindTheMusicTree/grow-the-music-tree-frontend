@@ -18,7 +18,7 @@ export default function SelectionBar() {
           className={BUTTON}
           onClick={() => openDialog((close) => <LinkRecordingsDialog genre={genre} onClose={close} />)}
         >
-          + Link recordings
+          + Link songs
         </button>
       )}
       {recordings.length > 0 && (
