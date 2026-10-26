@@ -17,5 +17,6 @@ export function useUpdateGenreSummary() {
     },
     undo: ({ uuid, summary, previous }) => ({ uuid, summary: previous, previous: summary }),
     message: () => "Summary saved",
+    pendingLabel: () => "Saving summary…",
   });
 }

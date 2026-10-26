@@ -29,5 +29,6 @@ export function useAssignRecordingGenre(label: string) {
       return genres.length === 1 ? { recordings: input.recordings, genre: genres[0] } : null;
     },
     message: (input) => `${input.recordings.length} recording${input.recordings.length > 1 ? "s" : ""} ${label}`,
+    pendingLabel: (input) => `Updating ${input.recordings.length} recording${input.recordings.length > 1 ? "s" : ""}…`,
   });
 }

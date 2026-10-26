@@ -33,5 +33,6 @@ export function useUpdateRecordingVideo() {
     },
     undo: ({ uuid, video, previous }) => ({ uuid, video: previous, previous: video }),
     message: () => "Video updated",
+    pendingLabel: () => "Updating video…",
   });
 }
