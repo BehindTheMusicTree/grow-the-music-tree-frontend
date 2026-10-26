@@ -82,7 +82,7 @@ export default function LinkRecordingsDialog({ genre, onClose }: { genre: Curate
 
   return (
     <BasePopup
-      title={`Link recordings to ${genre.name}`}
+      title={`Link songs to ${genre.name}`}
       topOffset={BANNER_HEIGHT}
       isDismissable
       showOkButton
@@ -114,7 +114,7 @@ export default function LinkRecordingsDialog({ genre, onClose }: { genre: Curate
           <div className="flex flex-col gap-2">
             <input
               type="search"
-              aria-label="Search recordings"
+              aria-label="Search songs"
               value={text}
               onChange={(event) => setText(event.target.value)}
               className="w-full px-3 py-2 border rounded-md"

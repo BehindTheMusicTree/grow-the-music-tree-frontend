@@ -39,7 +39,7 @@ export default function Player({ className }: PlayerProps) {
           <button
             onClick={toggleTrackListSidebar}
             className={iconButtonClassName}
-            aria-label={isTrackListSidebarVisible ? "Hide track list" : "Show track list"}
+            aria-label={isTrackListSidebarVisible ? "Hide song list" : "Show song list"}
           >
             <ListMusic size={16} />
           </button>

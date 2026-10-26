@@ -84,15 +84,15 @@ describe("curation hooks", () => {
     queryClient.setQueryData(genreQueryKeys.reference.overview("g1"), { essentialTracks: [] });
     const track = { uuid: "t1", title: "T" };
     const [message, options] = await run(result, { uuid: "g1", tracks: [track], previous: [] });
-    expect(message).toBe("Essential tracks updated");
+    expect(message).toBe("Essential songs updated");
     act(() => options.action?.onClick());
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(JSON.parse(fetchMock.mock.calls[1][3].body)).toEqual({ essentialTracks: [] });
   });
 
   it.each([
-    [1, "1 recording moved"],
-    [2, "2 recordings moved"],
+    [1, "1 song moved"],
+    [2, "2 songs moved"],
   ])("assigns %s recording(s) and undoes the move", async (count, expected) => {
     const { result, queryClient } = setup(() => useAssignRecordingGenre("moved"));
     const prefix = libraryQueryKeys.reference.recordings.all[0];

@@ -100,6 +100,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **"Songs" everywhere in the UI**: the app supplies its track noun to app-kit through `TrackNounProvider` ("song"/"songs"), and its own strings (player, curation, artist page, about) say "song(s)" instead of "recording(s)" / "track(s)". Bumps app-kit and app-kit-ui to 15.0.0.
+
 ### Fixed
 
 - **Extended player panel reaches the zoom controls**: the player's track list no longer stops ~160px above the genre tree's zoom controls; it now extends down to just above them.

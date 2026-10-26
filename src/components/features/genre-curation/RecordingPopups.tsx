@@ -18,7 +18,7 @@ export function MoveRecordingsPopup({ recordings, onClose, onDone }: PopupProps)
 
   return (
     <BasePopup
-      title={`Move ${recordings.length} recording${recordings.length > 1 ? "s" : ""} to…`}
+      title={`Move ${recordings.length} song${recordings.length > 1 ? "s" : ""} to…`}
       topOffset={BANNER_HEIGHT}
       isDismissable
       showOkButton
@@ -56,7 +56,7 @@ export function UnlinkRecordingsPopup({ recordings, onClose, onDone }: PopupProp
 
   return (
     <BasePopup
-      title="Unlink recordings"
+      title="Unlink songs"
       type="warning"
       topOffset={BANNER_HEIGHT}
       isDismissable
@@ -79,7 +79,7 @@ export function UnlinkRecordingsPopup({ recordings, onClose, onDone }: PopupProp
       onClose={onClose}
     >
       <p>
-        {recordings.length} recording{recordings.length > 1 ? "s" : ""} will lose their genre.
+        {recordings.length} song{recordings.length > 1 ? "s" : ""} will lose their genre.
       </p>
     </BasePopup>
   );
