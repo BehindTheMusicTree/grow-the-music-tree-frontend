@@ -99,6 +99,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- **Extended player panel reaches the zoom controls**: the player's track list no longer stops ~160px above the genre tree's zoom controls; it now extends down to just above them.
+
 ### Added
 
 - **Blocking overlay**: while a write runs (move, link, rename, merge, exclude, bulk recording edits, tree drag-reparent…) the whole app, popups and toasts are inert and Escape is ignored. It shows what is happening, then "Refreshing tree…", and an elapsed time after 3 s. A mutation opts out with `meta.blocking: false`.
