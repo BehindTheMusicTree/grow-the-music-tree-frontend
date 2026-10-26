@@ -98,6 +98,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- A failed genre edit (e.g. a server error when reparenting) now rolls back the change and shows the real error instead of an "Output validation failed" Zod error, via app-kit 13.4.1.
+
 ## [3.15.0] - 2026-10-22
 
 ### Added
