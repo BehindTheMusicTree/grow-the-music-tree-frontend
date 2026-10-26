@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.17.1 - 2026-10-26](#3171---2026-10-26)
 - [3.17.0 - 2026-10-26](#3170---2026-10-26)
 - [3.16.0 - 2026-10-26](#3160---2026-10-26)
 - [3.15.1 - 2026-10-26](#3151---2026-10-26)
@@ -101,6 +102,13 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [3.17.1] - 2026-10-26
+
+### Changed
+
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 17.1.1: genre counts are no longer inflated (genre-tree-view 4.0.0 treats `itemCount` as a subtree total).
+
 
 ## [3.17.0] - 2026-10-26
 
