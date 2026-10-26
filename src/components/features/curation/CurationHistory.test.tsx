@@ -14,23 +14,40 @@ const item = (overrides: Partial<CurationHistoryItem>): CurationHistoryItem => (
   ...overrides,
 });
 
+const mainParent = {
+  name: "main_parent",
+  keyColumns: ["item_id"],
+  columns: ["item_id", "parent_id", "reason", "exclude_other_parents"],
+  columnSpecs: [
+    { name: "item_id", kind: "item_id" as const, optional: false },
+    { name: "parent_id", kind: "item_id" as const, optional: false },
+    { name: "reason", kind: "text" as const, optional: false },
+    { name: "exclude_other_parents", kind: "bool" as const, optional: false },
+  ],
+  description: "",
+  count: 0,
+};
+const labels = { Q1: "Rock", Q2: "Pop", Q3: "Jazz" };
+
 const snapshot = (row: Record<string, string | boolean>) => JSON.stringify({ list_name: "main_parent", ...row });
 
 describe("CurationHistory", () => {
   afterEach(cleanup);
 
   it("says when nothing was recorded", () => {
-    render(<CurationHistory items={[]} />);
+    render(<CurationHistory items={[]} lists={[mainParent]} labels={labels} />);
     expect(screen.getByText("Aucune modification enregistrée.")).toBeInTheDocument();
   });
 
   it("shows only the changed columns of an update, old then new", () => {
     render(
       <CurationHistory
+        lists={[mainParent]}
+        labels={labels}
         items={[
           item({
-            oldValue: snapshot({ item_id: "Q1", item_label: "Rock", parent_id: "Q2", parent_label: "Pop", reason: "x" }),
-            newValue: snapshot({ item_id: "Q1", item_label: "Rock", parent_id: "Q3", parent_label: "Jazz", reason: "x" }),
+            oldValue: snapshot({ item_id: "Q1", parent_id: "Q2", reason: "x" }),
+            newValue: snapshot({ item_id: "Q1", parent_id: "Q3", reason: "x" }),
           }),
         ]}
       />,
@@ -41,17 +58,18 @@ describe("CurationHistory", () => {
     expect(screen.getByRole("deletion")).toHaveTextContent("Pop");
     expect(screen.getByRole("insertion")).toHaveTextContent("Jazz");
     expect(screen.queryByText("Raison")).not.toBeInTheDocument();
-    expect(screen.queryByText("Nom du parent")).not.toBeInTheDocument();
   });
 
   it("credits the pipeline and shows a deleted row's old values", () => {
     render(
       <CurationHistory
+        lists={[mainParent]}
+        labels={labels}
         items={[
           item({
             action: "deleted",
             actorPseudo: null,
-            oldValue: snapshot({ item_id: "Q1", item_label: "Rock", exclude_other_parents: true }),
+            oldValue: snapshot({ item_id: "Q1", exclude_other_parents: true }),
           }),
         ]}
       />,
