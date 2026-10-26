@@ -1,7 +1,7 @@
 import path from "path";
 import type { NextConfig } from "next";
-import "./src/lib/env";
 import { version } from "./package.json";
+import { publicEnv } from "./src/lib/env";
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -10,6 +10,14 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@behindthemusictree/assets"],
   reactStrictMode: false,
   productionBrowserSourceMaps: true,
+  async rewrites() {
+    const origin = publicEnv.NEXT_PUBLIC_UMAMI_ORIGIN;
+    if (!origin) return [];
+    return [
+      { source: "/stats/script.js", destination: `${origin}/script.js` },
+      { source: "/stats/api/send", destination: `${origin}/api/send` },
+    ];
+  },
   turbopack: {
     root: path.resolve(__dirname),
     resolveAlias: {

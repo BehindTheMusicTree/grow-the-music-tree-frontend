@@ -37,6 +37,8 @@ These are the `NEXT_PUBLIC_*` `ARG`s declared in the [`Dockerfile`](../Dockerfil
 | `NEXT_PUBLIC_CONTACT_EMAIL`    | `CONTACT_EMAIL` |
 | `NEXT_PUBLIC_AUDIOMETA_URL`    | `https://<AUDIOMETA_FRONT_SUBDOMAIN>[-staging].<DOMAIN_NAME>` (`-staging` on `develop`) |
 | `NEXT_PUBLIC_SENTRY_IS_ACTIVE` | `true` |
+| `NEXT_PUBLIC_UMAMI_WEBSITE_ID` | `UMAMI_WEBSITE_ID` on `main`, empty elsewhere (analytics off) |
+| `NEXT_PUBLIC_UMAMI_ORIGIN`     | `UMAMI_ORIGIN` on `main`, empty elsewhere; both Umami vars must be set together |
 
 ## 5. Local build against the Dockerfile
 

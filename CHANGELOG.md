@@ -99,6 +99,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Analytics**: Self-hosted Umami (cookieless), loaded in production only through the `/stats` rewrites so ad blockers don't drop hits. Signed-in admins are excluded. Tracks `genre_select` and `track_play`.
+  - Needs `NEXT_PUBLIC_UMAMI_WEBSITE_ID` and `NEXT_PUBLIC_UMAMI_ORIGIN` at build time, set together or not at all.
+  - Includes unit tests for `trackEvent` and the `Analytics` component.
+
 ### Changed
 
 - **Curation names are resolved, not typed**: the admin curation forms no longer ask for a genre or parent name next to its QID (no more "Nom du genre : Required"). Names come from the API's `labels` maps, which now also cover the history. A name is typed only when creating a new node (`label`, "Nom (nouvel item)").

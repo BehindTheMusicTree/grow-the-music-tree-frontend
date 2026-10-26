@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { ListMusic, X } from "lucide-react";
 import { usePlayer, PlayerVideoSurface } from "@behindthemusictree/app-kit/player";
 import { useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
 import { TrackListSidebar } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
+import { trackEvent } from "@lib/analytics";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 
 interface PlayerProps {
@@ -18,6 +20,11 @@ export default function Player({ className }: PlayerProps) {
   const { toggleTrackListSidebar, isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const { isVisible, dismiss } = usePlayerPanel();
   const track = playerTrackObject?.track;
+  const trackId = track?.id;
+
+  useEffect(() => {
+    if (trackId) trackEvent("track_play");
+  }, [trackId]);
 
   // Hidden via CSS, never unmounted, so the video keeps playing while the panel is closed.
   // Geometry mirrors the genre-tree-view info panel: 60px top (under the header), 280px wide,
