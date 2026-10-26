@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.16.0 - 2026-10-26](#3160---2026-10-26)
 - [3.15.1 - 2026-10-26](#3151---2026-10-26)
 - [3.15.0 - 2026-10-22](#3150---2026-10-22)
 - [3.12.0 - 2026-10-20](#3120---2026-10-20)
@@ -100,6 +101,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.16.0] - 2026-10-26
+
 ### Changed
 
 - **One "Search" bar**: artists are searched in the genre tree's search bar (bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 16.0.0), which lists matching genres and artists in two groups; picking an artist opens its page. The separate header artist box is removed.
@@ -125,6 +128,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Form fields and validation follow the API's `columnSpecs` (kind, optional) instead of frontend-side column lists.
   - The curation genre picker searches every known Wikidata item (`curation/items/`), pruned ones included. Genre assignment pickers still search canonical genres.
   - Requires grow-api with the `columnSpecs` list metadata and the `labels` history map.
+
 
 ## [3.15.1] - 2026-10-26
 
