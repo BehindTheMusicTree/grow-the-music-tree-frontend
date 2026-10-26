@@ -101,6 +101,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 16.1.0: segmented view-mode toggle and brand-token dark track sidebar. Removed the unused `trackListName` and `144` Tailwind keys.
+
 ## [3.16.0] - 2026-10-26
 
 ### Changed

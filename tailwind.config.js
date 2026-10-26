@@ -31,7 +31,6 @@ const config = {
       },
       maxWidth: {
         xl: "44rem",
-        trackListName: "440px",
       },
       scale: {
         120: "1.2",
@@ -51,7 +50,6 @@ const config = {
         menuitem: "45px",
       },
       width: {
-        144: "50rem",
         playingbar: "5px",
         menuitem: "45px",
       },
