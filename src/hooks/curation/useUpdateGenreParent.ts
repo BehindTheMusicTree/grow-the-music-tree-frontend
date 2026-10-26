@@ -11,5 +11,6 @@ export function useUpdateGenreParent() {
       fetch(`genres/${uuid}/`, true, false, { method: "PUT", body: JSON.stringify({ parent: parent.uuid }) }),
     undo: ({ uuid, parent, previous }) => (previous ? { uuid, parent: previous, previous: parent } : null),
     message: ({ parent }) => `Moved under ${parent.name}`,
+    pendingLabel: ({ parent }) => `Moving under ${parent.name}…`,
   });
 }

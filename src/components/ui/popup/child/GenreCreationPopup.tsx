@@ -14,9 +14,12 @@ type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon
 // Owns its mutation: showPopup stores a frozen element, so formErrors passed as props would never update.
 export default function GenreCreationPopup({ onClose, parent, ...rest }: GenreCreationPopupProps) {
   const [name, setName] = useState("");
-  const { mutate, formErrors } = useCreateGenre("reference", getGrowBackendBaseUrl);
+  const { mutate, isPending, formErrors } = useCreateGenre("reference", getGrowBackendBaseUrl);
 
-  const submit = () => mutate({ name, parent: parent?.uuid || undefined }, { onSuccess: onClose });
+  const submit = () => {
+    if (isPending) return;
+    mutate({ name, parent: parent?.uuid || undefined }, { onSuccess: onClose });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -38,6 +41,7 @@ export default function GenreCreationPopup({ onClose, parent, ...rest }: GenreCr
       showCancelButton
       okButtonText="Save"
       cancelButtonText="Cancel"
+      okButtonDisabled={isPending}
       onOk={submit}
       onCancel={onClose}
       children={

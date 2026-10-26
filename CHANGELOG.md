@@ -99,8 +99,13 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- **Extended player panel reaches the zoom controls**: the player's track list no longer stops ~160px above the genre tree's zoom controls; it now extends down to just above them.
+
 ### Added
 
+- **Blocking overlay**: while a write runs (move, link, rename, merge, exclude, bulk recording edits, tree drag-reparent…) the whole app, popups and toasts are inert and Escape is ignored. It shows what is happening, then "Refreshing tree…", and an elapsed time after 3 s. A mutation opts out with `meta.blocking: false`.
 - **Genre picker**: "Plus de résultats…" button, scrolling to the end of the list and ArrowDown on the last option load the next page of matches, so genres past the first 10 (e.g. "Techno") can be picked. Includes tests.
 - **Analytics**: Self-hosted Umami (cookieless), loaded in production only through the `/stats` rewrites so ad blockers don't drop hits. Signed-in admins are excluded. Tracks `genre_select` and `track_play`.
   - Needs `NEXT_PUBLIC_UMAMI_WEBSITE_ID` and `NEXT_PUBLIC_UMAMI_ORIGIN` at build time, set together or not at all.
@@ -108,6 +113,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 13.5.0: genre create/update/delete stay pending until the tree has refetched. The create and rename popups ignore a second submit while saving.
 - **Curation names are resolved, not typed**: the admin curation forms no longer ask for a genre or parent name next to its QID (no more "Nom du genre : Required"). Names come from the API's `labels` maps, which now also cover the history. A name is typed only when creating a new node (`label`, "Nom (nouvel item)").
   - Form fields and validation follow the API's `columnSpecs` (kind, optional) instead of frontend-side column lists.
   - The curation genre picker searches every known Wikidata item (`curation/items/`), pruned ones included. Genre assignment pickers still search canonical genres.

@@ -37,6 +37,7 @@ function setup() {
         },
         undo: (_input, output) => ({ value: output.previous }),
         message: (input) => `set ${input.value}`,
+        pendingLabel: (input) => `Setting ${input.value}…`,
       }),
     { wrapper },
   );
@@ -88,5 +89,30 @@ describe("useCurationMutation", () => {
     await waitFor(() => expect(toastError).toHaveBeenCalledWith("boom"));
     expect(queryClient.getQueryData(KEY)).toBe("original");
     expect(queryClient.getQueryData(other)).toBe("newer");
+  });
+
+  it("exposes the pending label as mutation meta", async () => {
+    fetchMock.mockResolvedValue({ previous: "original" });
+    const { queryClient, hook } = setup();
+
+    act(() => hook.result.current.mutate({ value: "changed" }));
+
+    const [mutation] = queryClient.getMutationCache().getAll();
+    expect(mutation.meta?.pendingLabel?.({ value: "changed" })).toBe("Setting changed…");
+    await waitFor(() => expect(hook.result.current.isSuccess).toBe(true));
+  });
+
+  it("stays pending until the invalidation refetch finishes", async () => {
+    fetchMock.mockResolvedValue({ previous: "original" });
+    const { queryClient, hook } = setup();
+    let finishRefetch: () => void = () => {};
+    vi.spyOn(queryClient, "invalidateQueries").mockReturnValue(new Promise<void>((resolve) => (finishRefetch = resolve)));
+
+    act(() => hook.result.current.mutate({ value: "changed" }));
+
+    await waitFor(() => expect(toastSuccess).toHaveBeenCalled());
+    expect(hook.result.current.isPending).toBe(true);
+    await act(async () => finishRefetch());
+    await waitFor(() => expect(hook.result.current.isPending).toBe(false));
   });
 });

@@ -17,5 +17,6 @@ export function useUpdateGenreName() {
     },
     undo: ({ uuid, name, previous }) => ({ uuid, name: previous, previous: name }),
     message: ({ name }) => `Renamed to ${name}`,
+    pendingLabel: ({ name }) => `Renaming to ${name}…`,
   });
 }
