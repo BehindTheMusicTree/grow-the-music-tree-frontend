@@ -8,7 +8,7 @@ import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
 type Fetch = ReturnType<typeof useFetchWrapper>["fetch"];
 
-const CURATION_QUERY_ROOTS = new Set(["referenceRecordings", "referenceGenres", "referenceGenrePlaylists"]);
+const CURATION_QUERY_ROOTS = new Set(["referenceSongs", "referenceGenres", "referenceGenrePlaylists"]);
 const isCurationQuery = (key: QueryKey) => typeof key[0] === "string" && CURATION_QUERY_ROOTS.has(key[0]);
 
 interface CurationMutationConfig<I extends z.ZodTypeAny, O extends z.ZodTypeAny> {

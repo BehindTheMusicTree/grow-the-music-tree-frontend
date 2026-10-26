@@ -2,14 +2,14 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import type { TrackBase } from "@behindthemusictree/app-kit/genre-tree";
 import { GenreCurationProvider } from "./GenreCurationProvider";
-import RecordingCheckbox from "./RecordingCheckbox";
+import SongCheckbox from "./SongCheckbox";
 import SelectionBar from "./SelectionBar";
 
 vi.mock("@behindthemusictree/app-kit/popup", () => ({
   usePopup: () => ({ showPopup: vi.fn(), hidePopup: vi.fn() }),
 }));
-vi.mock("./LinkRecordingsDialog", () => ({ default: () => null }));
-vi.mock("./RecordingPopups", () => ({ MoveRecordingsPopup: () => null, UnlinkRecordingsPopup: () => null }));
+vi.mock("./LinkSongsDialog", () => ({ default: () => null }));
+vi.mock("./SongPopups", () => ({ MoveSongsPopup: () => null, UnlinkSongsPopup: () => null }));
 
 const tracks = ["A", "B", "C", "D"].map((title) => ({ uuid: title, title }) as unknown as TrackBase);
 
@@ -17,7 +17,7 @@ function renderBar() {
   render(
     <GenreCurationProvider>
       {tracks.map((track, index) => (
-        <RecordingCheckbox key={track.uuid} recording={track} index={index} />
+        <SongCheckbox key={track.uuid} song={track} index={index} />
       ))}
       <SelectionBar />
     </GenreCurationProvider>,

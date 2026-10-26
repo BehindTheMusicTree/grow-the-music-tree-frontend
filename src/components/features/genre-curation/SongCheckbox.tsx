@@ -4,16 +4,16 @@ import { useEffect } from "react";
 import type { TrackBase } from "@behindthemusictree/app-kit/genre-tree";
 import { useGenreCuration } from "@components/features/genre-curation/GenreCurationProvider";
 
-export default function RecordingCheckbox({ recording, index }: { recording: TrackBase; index: number }) {
+export default function SongCheckbox({ song, index }: { song: TrackBase; index: number }) {
   const { selected, toggle, registerRow } = useGenreCuration();
-  useEffect(() => registerRow(index, recording.uuid), [registerRow, index, recording.uuid]);
+  useEffect(() => registerRow(index, song.uuid), [registerRow, index, song.uuid]);
   return (
     <input
       type="checkbox"
-      aria-label={`Select ${recording.title}`}
-      checked={selected.has(recording.uuid)}
+      aria-label={`Select ${song.title}`}
+      checked={selected.has(song.uuid)}
       readOnly
-      onClick={(event) => toggle(recording.uuid, index, event.shiftKey)}
+      onClick={(event) => toggle(song.uuid, index, event.shiftKey)}
       className="cursor-pointer"
     />
   );

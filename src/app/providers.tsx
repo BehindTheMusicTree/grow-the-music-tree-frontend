@@ -13,7 +13,7 @@ import {
   TrackListProvider,
   libraryEndpoints,
   libraryQueryKeys,
-  RecordingDetailedSchema,
+  SongDetailedSchema,
 } from "@behindthemusictree/app-kit/genre-tree";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { toPlayerTrack } from "@lib/player-track";
@@ -31,11 +31,11 @@ function useLoadTrack(getBackendBaseUrl: () => string): (trackId: string) => Pro
 
   return useCallback(
     async (trackId: string): Promise<PlayerTrack> => {
-      const response = await fetch(libraryEndpoints[PLAYER_SCOPE].recordings.detail(trackId), true, false);
+      const response = await fetch(libraryEndpoints[PLAYER_SCOPE].songs.detail(trackId), true, false);
       if (!response) {
         throw new Error(`Failed to load track ${trackId}`);
       }
-      return toPlayerTrack(RecordingDetailedSchema.parse(response));
+      return toPlayerTrack(SongDetailedSchema.parse(response));
     },
     [fetch],
   );
@@ -50,9 +50,9 @@ function AppProviders({ children }: ProvidersProps) {
         <TrackListSidebarVisibilityProvider>
           <TrackListProvider
             getBackendBaseUrl={getGrowBackendBaseUrl}
-            schema={RecordingDetailedSchema}
-            listEndpoint={() => libraryEndpoints[PLAYER_SCOPE].recordings.list()}
-            listQueryKey={(page) => libraryQueryKeys[PLAYER_SCOPE].recordings.list(page)}
+            schema={SongDetailedSchema}
+            listEndpoint={() => libraryEndpoints[PLAYER_SCOPE].songs.list()}
+            listQueryKey={(page) => libraryQueryKeys[PLAYER_SCOPE].songs.list(page)}
           >
             {children}
           </TrackListProvider>

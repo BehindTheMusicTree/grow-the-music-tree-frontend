@@ -19,9 +19,9 @@ import GenreDangerZone from "@components/features/genre-curation/GenreDangerZone
 import GenreNameEditor from "@components/features/genre-curation/GenreNameEditor";
 import GenreParentsEditor from "@components/features/genre-curation/GenreParentsEditor";
 import GenreSummaryEditor from "@components/features/genre-curation/GenreSummaryEditor";
-import EssentialTracksEditor from "@components/features/genre-curation/EssentialTracksEditor";
-import RecordingCheckbox from "@components/features/genre-curation/RecordingCheckbox";
-import RecordingRowActions from "@components/features/genre-curation/RecordingRowActions";
+import EssentialSongsEditor from "@components/features/genre-curation/EssentialSongsEditor";
+import SongCheckbox from "@components/features/genre-curation/SongCheckbox";
+import SongRowActions from "@components/features/genre-curation/SongRowActions";
 import SelectionBar from "@components/features/genre-curation/SelectionBar";
 import AboutContent from "@components/features/about/AboutContent";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
@@ -246,14 +246,14 @@ export default function GenreTreePage() {
         renderSummary: (overview: ComponentProps<typeof GenreSummaryEditor>["overview"]) => (
           <GenreSummaryEditor overview={overview} />
         ),
-        renderEssentialTracks: (overview: ComponentProps<typeof EssentialTracksEditor>["overview"]) => (
-          <EssentialTracksEditor overview={overview} />
+        renderEssentialTracks: (overview: ComponentProps<typeof EssentialSongsEditor>["overview"]) => (
+          <EssentialSongsEditor overview={overview} />
         ),
-        renderRecordingLeading: (recording: ComponentProps<typeof RecordingCheckbox>["recording"], index: number) => (
-          <RecordingCheckbox recording={recording} index={index} />
+        renderSongLeading: (song: ComponentProps<typeof SongCheckbox>["song"], index: number) => (
+          <SongCheckbox song={song} index={index} />
         ),
-        renderRecordingActions: (recording: ComponentProps<typeof RecordingRowActions>["recording"]) => (
-          <RecordingRowActions recording={recording} />
+        renderSongActions: (song: ComponentProps<typeof SongRowActions>["song"]) => (
+          <SongRowActions song={song} />
         ),
         renderTracksToolbar: () => <SelectionBar />,
       }

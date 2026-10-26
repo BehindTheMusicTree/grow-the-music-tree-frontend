@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import ArtistTracks from "./ArtistTracks";
+import ArtistSongs from "./ArtistSongs";
 
 const fetchMock = vi.fn();
 const playNewTrackListMock = vi.fn();
@@ -15,9 +15,9 @@ vi.mock("@behindthemusictree/app-kit/transport", () => ({
 }));
 vi.mock("@behindthemusictree/app-kit/player", () => ({ usePlayer: () => ({ playerTrackObject: null }) }));
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
-  RecordingDetailedSchema: null,
-  libraryEndpoints: { reference: { recordings: { list: () => "library/recordings/" } } },
-  recordingUnplayableReason: (recording: { youtubeVideo: unknown }) => (recording.youtubeVideo ? null : "No video"),
+  SongDetailedSchema: null,
+  libraryEndpoints: { reference: { songs: { list: () => "library/songs/" } } },
+  songUnplayableReason: (song: { youtubeVideo: unknown }) => (song.youtubeVideo ? null : "No video"),
   useTrackList: () => ({ playNewTrackListFromArtist: playNewTrackListMock }),
 }));
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
@@ -29,7 +29,7 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
 }));
 
 const ARTIST = { uuid: "11111111-1111-1111-1111-111111111111", name: "Band" };
-const recording = (uuid: string, title: string, youtubeVideo: unknown = { id: "yt" }) => ({
+const song = (uuid: string, title: string, youtubeVideo: unknown = { id: "yt" }) => ({
   uuid,
   title,
   youtubeVideo,
@@ -39,25 +39,25 @@ function renderTracks() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={client}>
-      <ArtistTracks artist={ARTIST} />
+      <ArtistSongs artist={ARTIST} />
     </QueryClientProvider>,
   );
 }
 
-describe("ArtistTracks", () => {
+describe("ArtistSongs", () => {
   afterEach(() => {
     cleanup();
     vi.clearAllMocks();
   });
 
-  it("fetches the artist's recordings page by page", async () => {
+  it("fetches the artist's songs page by page", async () => {
     fetchMock.mockImplementation((_endpoint, _fromBackend, _auth, _options, { page }) =>
-      Promise.resolve({ results: [recording(`r${page}`, `Song ${page}`)], page, pageSize: 1, totalPages: 2 }),
+      Promise.resolve({ results: [song(`r${page}`, `Song ${page}`)], page, pageSize: 1, totalPages: 2 }),
     );
     renderTracks();
 
     expect(await screen.findByRole("button", { name: "1. Song 1" })).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledWith("library/recordings/", true, false, undefined, {
+    expect(fetchMock).toHaveBeenCalledWith("library/songs/", true, false, undefined, {
       artist: ARTIST.uuid,
       ordering: "title",
       page: 1,
@@ -69,7 +69,7 @@ describe("ArtistTracks", () => {
 
   it("plays the artist's full list in the current ordering, from the start or the clicked track", async () => {
     fetchMock.mockResolvedValue({
-      results: [recording("r1", "No Video", null), recording("r2", "Good")],
+      results: [song("r1", "No Video", null), song("r2", "Good")],
       page: 1,
       pageSize: 100,
       totalPages: 1,
@@ -79,16 +79,16 @@ describe("ArtistTracks", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Play all" }));
     expect(playNewTrackListMock).toHaveBeenLastCalledWith(ARTIST, "reference", {
       ordering: "title",
-      startRecordingUuid: undefined,
+      startSongUuid: undefined,
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Year" }));
     fireEvent.click(await screen.findByRole("button", { name: "2. Good" }));
     expect(playNewTrackListMock).toHaveBeenLastCalledWith(ARTIST, "reference", {
       ordering: "-albumYear",
-      startRecordingUuid: "r2",
+      startSongUuid: "r2",
     });
-    expect(fetchMock).toHaveBeenLastCalledWith("library/recordings/", true, false, undefined, {
+    expect(fetchMock).toHaveBeenLastCalledWith("library/songs/", true, false, undefined, {
       artist: ARTIST.uuid,
       ordering: "-albumYear",
       page: 1,

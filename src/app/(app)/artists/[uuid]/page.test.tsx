@@ -9,7 +9,7 @@ const notFoundMock = vi.fn<() => never>(() => {
 
 vi.mock("@lib/artist", () => ({ fetchArtist: (uuid: string) => fetchArtistMock(uuid) }));
 vi.mock("next/navigation", () => ({ notFound: () => notFoundMock() }));
-vi.mock("@components/features/artist/ArtistTracks", () => ({ default: () => <p>Tracks list</p> }));
+vi.mock("@components/features/artist/ArtistSongs", () => ({ default: () => <p>Tracks list</p> }));
 
 const UUID = "11111111-1111-1111-1111-111111111111";
 const params = Promise.resolve({ uuid: UUID });

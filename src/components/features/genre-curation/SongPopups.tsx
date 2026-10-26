@@ -3,22 +3,22 @@
 import { useState } from "react";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import GenrePicker from "@components/features/curation/GenrePicker";
-import { useAssignRecordingGenre } from "@hooks/curation/useAssignRecordingGenre";
+import { useAssignSongGenre } from "@hooks/curation/useAssignSongGenre";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 
 interface PopupProps {
-  recordings: string[];
+  songs: string[];
   onClose: () => void;
   onDone?: () => void;
 }
 
-export function MoveRecordingsPopup({ recordings, onClose, onDone }: PopupProps) {
+export function MoveSongsPopup({ songs, onClose, onDone }: PopupProps) {
   const [target, setTarget] = useState<{ uuid: string; name: string } | null>(null);
-  const { mutate, isPending } = useAssignRecordingGenre("moved");
+  const { mutate, isPending } = useAssignSongGenre("moved");
 
   return (
     <BasePopup
-      title={`Move ${recordings.length} song${recordings.length > 1 ? "s" : ""} to…`}
+      title={`Move ${songs.length} song${songs.length > 1 ? "s" : ""} to…`}
       topOffset={BANNER_HEIGHT}
       isDismissable
       showOkButton
@@ -28,7 +28,7 @@ export function MoveRecordingsPopup({ recordings, onClose, onDone }: PopupProps)
       onOk={() => {
         if (!target) return;
         mutate(
-          { recordings, genre: target.uuid },
+          { songs, genre: target.uuid },
           {
             onSuccess: () => {
               onDone?.();
@@ -51,8 +51,8 @@ export function MoveRecordingsPopup({ recordings, onClose, onDone }: PopupProps)
   );
 }
 
-export function UnlinkRecordingsPopup({ recordings, onClose, onDone }: PopupProps) {
-  const { mutate, isPending } = useAssignRecordingGenre("unlinked");
+export function UnlinkSongsPopup({ songs, onClose, onDone }: PopupProps) {
+  const { mutate, isPending } = useAssignSongGenre("unlinked");
 
   return (
     <BasePopup
@@ -66,7 +66,7 @@ export function UnlinkRecordingsPopup({ recordings, onClose, onDone }: PopupProp
       okButtonDisabled={isPending}
       onOk={() => {
         mutate(
-          { recordings, genre: null },
+          { songs, genre: null },
           {
             onSuccess: () => {
               onDone?.();
@@ -79,7 +79,7 @@ export function UnlinkRecordingsPopup({ recordings, onClose, onDone }: PopupProp
       onClose={onClose}
     >
       <p>
-        {recordings.length} song{recordings.length > 1 ? "s" : ""} will lose their genre.
+        {songs.length} song{songs.length > 1 ? "s" : ""} will lose their genre.
       </p>
     </BasePopup>
   );
