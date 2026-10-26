@@ -103,6 +103,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 17.2.0: songs without a YouTube video show a crossed-out YouTube icon instead of the "No video available" text.
+
 ## [3.17.1] - 2026-10-26
 
 ### Changed
