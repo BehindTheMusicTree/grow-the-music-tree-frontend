@@ -1,11 +1,11 @@
 "use client";
 
 import type { CriteriaOverview } from "@behindthemusictree/app-kit/genre-tree";
-import { useEssentialTracks } from "@hooks/curation/useEssentialTracks";
+import { useEssentialSongs } from "@hooks/curation/useEssentialSongs";
 
-export default function EssentialTracksEditor({ overview }: { overview: CriteriaOverview }) {
-  const { mutate, isPending } = useEssentialTracks();
-  const tracks = overview.essentialTracks ?? [];
+export default function EssentialSongsEditor({ overview }: { overview: CriteriaOverview }) {
+  const { mutate, isPending } = useEssentialSongs();
+  const tracks = overview.essentialSongs ?? [];
 
   const move = (from: number, to: number) => {
     if (to < 0 || to >= tracks.length) return;

@@ -101,6 +101,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Recording renamed to Song**: bumps `@behindthemusictree/app-kit` and `app-kit-ui` to 17.0.0 (needs grow-api >= 13.2.0). The app calls `library/songs`, sends `essentialSongs` and `songs` (assign-genre), and reads the `songs` / `essentialSongs` alias counts. Its own `Recording*` identifiers, files and query keys are now `Song*` (`SongRowActions`, `SongPopups`, `SongVideoDialog`, `LinkSongsDialog`, `useAssignSongGenre`, `ArtistSongs`, `EssentialSongsEditor`). MusicBrainz recording names are unchanged. No behavior change.
+
 ## [3.16.0] - 2026-10-26
 
 ### Changed

@@ -6,41 +6,41 @@ import { YOUTUBE_UNPLAYABLE_REASON_LABELS } from "@behindthemusictree/app-kit/ge
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { useFetchWrapper } from "@behindthemusictree/app-kit/transport";
 import { RingLoader } from "@behindthemusictree/ui";
-import { useUpdateRecordingVideo } from "@hooks/curation/useUpdateRecordingVideo";
+import { useUpdateSongVideo } from "@hooks/curation/useUpdateSongVideo";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
-import { RecordingVideoDetailSchema } from "@schemas/api/curation";
+import { SongVideoDetailSchema } from "@schemas/api/curation";
 import { extractYoutubeId } from "@utils/youtubeId";
 
 interface Props {
-  recording: { uuid: string; title: string };
+  song: { uuid: string; title: string };
   onClose: () => void;
 }
 
-export default function RecordingVideoDialog({ recording, onClose }: Props) {
+export default function SongVideoDialog({ song, onClose }: Props) {
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
   const { data, isLoading } = useQuery({
-    queryKey: ["referenceRecordings", "detail", recording.uuid],
+    queryKey: ["referenceSongs", "detail", song.uuid],
     queryFn: async () =>
-      RecordingVideoDetailSchema.parse(await fetch(`library/recordings/${recording.uuid}/`, true, false)),
+      SongVideoDetailSchema.parse(await fetch(`library/songs/${song.uuid}/`, true, false)),
   });
-  const { mutate, isPending } = useUpdateRecordingVideo();
+  const { mutate, isPending } = useUpdateSongVideo();
 
   return (
-    <BasePopup title={`Video for ${recording.title}`} topOffset={BANNER_HEIGHT} isDismissable onClose={onClose}>
+    <BasePopup title={`Video for ${song.title}`} topOffset={BANNER_HEIGHT} isDismissable onClose={onClose}>
       {isLoading || !data ? (
         <RingLoader />
       ) : (
         <VideoForm
           key={data.uuid}
-          recordingUuid={recording.uuid}
+          songUuid={song.uuid}
           current={{
             youtubeVideoId: data.youtubeVideoId ?? null,
             youtubeUnplayableReason: data.youtubeUnplayableReason ?? null,
           }}
           isPending={isPending}
           onSave={(video, previous) => {
-            mutate({ uuid: recording.uuid, video, previous }, { onSuccess: onClose });
+            mutate({ uuid: song.uuid, video, previous }, { onSuccess: onClose });
           }}
           onCancel={onClose}
         />
@@ -50,7 +50,7 @@ export default function RecordingVideoDialog({ recording, onClose }: Props) {
 }
 
 interface VideoFormProps {
-  recordingUuid: string;
+  songUuid: string;
   current: { youtubeVideoId: string | null; youtubeUnplayableReason: string | null };
   isPending: boolean;
   onSave: (

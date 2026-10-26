@@ -3,37 +3,37 @@
 import { skipToken, useQuery } from "@tanstack/react-query";
 import { genreQueryKeys, type CriteriaOverview, type TrackBase } from "@behindthemusictree/app-kit/genre-tree";
 import { useGenreCuration } from "@components/features/genre-curation/GenreCurationProvider";
-import { MoveRecordingsPopup, UnlinkRecordingsPopup } from "@components/features/genre-curation/RecordingPopups";
-import RecordingVideoDialog from "@components/features/genre-curation/RecordingVideoDialog";
-import { useEssentialTracks } from "@hooks/curation/useEssentialTracks";
+import { MoveSongsPopup, UnlinkSongsPopup } from "@components/features/genre-curation/SongPopups";
+import SongVideoDialog from "@components/features/genre-curation/SongVideoDialog";
+import { useEssentialSongs } from "@hooks/curation/useEssentialSongs";
 
 const BUTTON = "px-1 cursor-pointer hover:bg-gray-100 rounded disabled:opacity-50";
 
-export default function RecordingRowActions({ recording }: { recording: TrackBase }) {
+export default function SongRowActions({ song }: { song: TrackBase }) {
   const { genre, openDialog } = useGenreCuration();
-  const essential = useEssentialTracks();
+  const essential = useEssentialSongs();
   const { data: overview } = useQuery<CriteriaOverview>({
     queryKey: genreQueryKeys.reference.overview(genre?.uuid ?? ""),
     queryFn: skipToken,
   });
   if (!genre) return null;
 
-  const current = overview?.essentialTracks ?? [];
-  const isEssential = current.some((track) => track.uuid === recording.uuid);
+  const current = overview?.essentialSongs ?? [];
+  const isEssential = current.some((track) => track.uuid === song.uuid);
   const toggleEssential = () =>
     essential.mutate({
       uuid: genre.uuid,
       previous: current,
       tracks: isEssential
-        ? current.filter((track) => track.uuid !== recording.uuid)
-        : [...current, { uuid: recording.uuid, title: recording.title, artists: recording.artists }],
+        ? current.filter((track) => track.uuid !== song.uuid)
+        : [...current, { uuid: song.uuid, title: song.title, artists: song.artists }],
     });
 
   return (
     <span className="flex items-center gap-1">
       <button
         type="button"
-        aria-label={isEssential ? `Remove ${recording.title} from essential songs` : `Mark ${recording.title} essential`}
+        aria-label={isEssential ? `Remove ${song.title} from essential songs` : `Mark ${song.title} essential`}
         aria-pressed={isEssential}
         disabled={!overview || essential.isPending}
         onClick={toggleEssential}
@@ -43,24 +43,24 @@ export default function RecordingRowActions({ recording }: { recording: TrackBas
       </button>
       <button
         type="button"
-        aria-label={`Move ${recording.title} to another genre`}
-        onClick={() => openDialog((close) => <MoveRecordingsPopup recordings={[recording.uuid]} onClose={close} />)}
+        aria-label={`Move ${song.title} to another genre`}
+        onClick={() => openDialog((close) => <MoveSongsPopup songs={[song.uuid]} onClose={close} />)}
         className={BUTTON}
       >
         ⇄
       </button>
       <button
         type="button"
-        aria-label={`Unlink ${recording.title} from this genre`}
-        onClick={() => openDialog((close) => <UnlinkRecordingsPopup recordings={[recording.uuid]} onClose={close} />)}
+        aria-label={`Unlink ${song.title} from this genre`}
+        onClick={() => openDialog((close) => <UnlinkSongsPopup songs={[song.uuid]} onClose={close} />)}
         className={BUTTON}
       >
         ✕
       </button>
       <button
         type="button"
-        aria-label={`Edit video of ${recording.title}`}
-        onClick={() => openDialog((close) => <RecordingVideoDialog recording={recording} onClose={close} />)}
+        aria-label={`Edit video of ${song.title}`}
+        onClick={() => openDialog((close) => <SongVideoDialog song={song} onClose={close} />)}
         className={BUTTON}
       >
         ▶

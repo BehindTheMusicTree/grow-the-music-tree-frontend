@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-import { VideoForm } from "./RecordingVideoDialog";
+import { VideoForm } from "./SongVideoDialog";
 
 const current = { youtubeVideoId: null, youtubeUnplayableReason: null };
 
 function setup() {
   const onSave = vi.fn();
-  render(<VideoForm recordingUuid="r1" current={current} isPending={false} onSave={onSave} onCancel={vi.fn()} />);
+  render(<VideoForm songUuid="r1" current={current} isPending={false} onSave={onSave} onCancel={vi.fn()} />);
   return onSave;
 }
 

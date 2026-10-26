@@ -5,14 +5,14 @@ import { keepPreviousData } from "@tanstack/react-query";
 import { Play } from "lucide-react";
 import { Pagination } from "@behindthemusictree/ui";
 import { usePlayer } from "@behindthemusictree/app-kit/player";
-import { RecordingDetailedSchema, libraryEndpoints, recordingUnplayableReason, useTrackList, type RecordingDetailed } from "@behindthemusictree/app-kit/genre-tree";
+import { SongDetailedSchema, libraryEndpoints, songUnplayableReason, useTrackList, type SongDetailed } from "@behindthemusictree/app-kit/genre-tree";
 import { TrackItem } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { PaginatedResponseSchema, useFetchWrapper, useQueryWithParse } from "@behindthemusictree/app-kit/transport";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import ArtistSection from "./ArtistSection";
 import { renderArtistLink } from "./renderArtistLink";
 
-const RecordingPageSchema = PaginatedResponseSchema(RecordingDetailedSchema);
+const SongPageSchema = PaginatedResponseSchema(SongDetailedSchema);
 
 const SORTS = [
   { ordering: "title", label: "Title" },
@@ -20,38 +20,38 @@ const SORTS = [
 ] as const;
 type Ordering = (typeof SORTS)[number]["ordering"];
 
-export default function ArtistTracks({ artist }: { artist: { uuid: string; name: string } }) {
+export default function ArtistSongs({ artist }: { artist: { uuid: string; name: string } }) {
   const [page, setPage] = useState(1);
   const [ordering, setOrdering] = useState<Ordering>("title");
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
-  const { playNewTrackListFromArtist } = useTrackList<RecordingDetailed>();
+  const { playNewTrackListFromArtist } = useTrackList<SongDetailed>();
   const { playerTrackObject } = usePlayer();
   const { data, isPending, isError } = useQueryWithParse({
-    queryKey: ["referenceRecordings", "artist", artist.uuid, ordering, page],
+    queryKey: ["referenceSongs", "artist", artist.uuid, ordering, page],
     queryFn: () =>
-      fetch(libraryEndpoints.reference.recordings.list(), true, false, undefined, {
+      fetch(libraryEndpoints.reference.songs.list(), true, false, undefined, {
         artist: artist.uuid,
         ordering,
         page,
       }),
-    schema: RecordingPageSchema,
+    schema: SongPageSchema,
     placeholderData: keepPreviousData,
-    context: "ArtistTracks",
+    context: "ArtistSongs",
   });
 
-  const play = (startRecordingUuid?: string) =>
+  const play = (startSongUuid?: string) =>
     playNewTrackListFromArtist({ uuid: artist.uuid, name: artist.name }, "reference", {
       ordering,
-      startRecordingUuid,
+      startSongUuid,
     });
 
   // TrackItem's own play control (`.track-position-play-pause`, a div) plays from whatever list is active; a click on a track that isn't
   // loaded yet must queue this artist's list instead.
-  const handleRowClickCapture = (event: MouseEvent, recording: RecordingDetailed) => {
+  const handleRowClickCapture = (event: MouseEvent, song: SongDetailed) => {
     if (!(event.target instanceof Element) || !event.target.closest(".track-position-play-pause")) return;
-    if (playerTrackObject?.track.id === recording.uuid || recordingUnplayableReason(recording) !== null) return;
+    if (playerTrackObject?.track.id === song.uuid || songUnplayableReason(song) !== null) return;
     event.stopPropagation();
-    void play(recording.uuid);
+    void play(song.uuid);
   };
 
   return (
@@ -91,10 +91,10 @@ export default function ArtistTracks({ artist }: { artist: { uuid: string; name:
             </div>
           </div>
           <ul className="overflow-hidden rounded-lg bg-zinc-950">
-            {data.results.map((recording, index) => (
-              <li key={recording.uuid} onClickCapture={(event) => handleRowClickCapture(event, recording)}>
+            {data.results.map((song, index) => (
+              <li key={song.uuid} onClickCapture={(event) => handleRowClickCapture(event, song)}>
                 <TrackItem
-                  track={recording}
+                  track={song}
                   position={(page - 1) * data.pageSize + index + 1}
                   renderArtistLink={renderArtistLink}
                 />

@@ -5,7 +5,7 @@ import ArtistHeader from "@components/features/artist/ArtistHeader";
 import ArtistLinks from "@components/features/artist/ArtistLinks";
 import ArtistMembers from "@components/features/artist/ArtistMembers";
 import ArtistDiscography from "@components/features/artist/ArtistDiscography";
-import ArtistTracks from "@components/features/artist/ArtistTracks";
+import ArtistSongs from "@components/features/artist/ArtistSongs";
 import { fetchArtist } from "@lib/artist";
 
 type ArtistPageProps = { params: Promise<{ uuid: string }> };
@@ -27,7 +27,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
         <ArtistMembers title="Members" memberships={artist.members} />
         <ArtistMembers title="Member of" memberships={artist.memberOf} />
         <ArtistDiscography albums={artist.albums} />
-        {artist.tracksCount > 0 && <ArtistTracks artist={{ uuid: artist.uuid, name: artist.name }} />}
+        {artist.tracksCount > 0 && <ArtistSongs artist={{ uuid: artist.uuid, name: artist.name }} />}
       </div>
     </Page>
   );

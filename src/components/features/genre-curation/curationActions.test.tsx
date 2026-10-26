@@ -5,8 +5,8 @@ import GenreDangerZone from "./GenreDangerZone";
 import GenreNameEditor from "./GenreNameEditor";
 import GenreParentsEditor from "./GenreParentsEditor";
 import GenreSummaryEditor from "./GenreSummaryEditor";
-import RecordingRowActions from "./RecordingRowActions";
-import { MoveRecordingsPopup, UnlinkRecordingsPopup } from "./RecordingPopups";
+import SongRowActions from "./SongRowActions";
+import { MoveSongsPopup, UnlinkSongsPopup } from "./SongPopups";
 
 const m = vi.hoisted(() => ({
   assign: vi.fn(),
@@ -61,13 +61,13 @@ vi.mock("@components/features/curation/GenrePicker", () => ({
     </button>
   ),
 }));
-vi.mock("@hooks/curation/useAssignRecordingGenre", () => ({ useAssignRecordingGenre: () => ({ mutate: m.assign, isPending: false }) }));
+vi.mock("@hooks/curation/useAssignSongGenre", () => ({ useAssignSongGenre: () => ({ mutate: m.assign, isPending: false }) }));
 vi.mock("@hooks/curation/useAliasGenre", () => ({
   useAliasGenre: () => ({ mutate: m.alias, isPending: false }),
   useAliasPreview: () => ({ data: m.aliasPreview.current }),
 }));
 vi.mock("@hooks/curation/useExcludeGenre", () => ({ useExcludeGenre: () => ({ mutate: m.exclude, isPending: false }) }));
-vi.mock("@hooks/curation/useEssentialTracks", () => ({ useEssentialTracks: () => ({ mutate: m.essential, isPending: false }) }));
+vi.mock("@hooks/curation/useEssentialSongs", () => ({ useEssentialSongs: () => ({ mutate: m.essential, isPending: false }) }));
 vi.mock("@hooks/curation/useUpdateGenreName", () => ({ useUpdateGenreName: () => ({ mutate: m.name }) }));
 vi.mock("@hooks/curation/useUpdateGenreParent", () => ({ useUpdateGenreParent: () => ({ mutate: m.parent }) }));
 vi.mock("@hooks/curation/useUpdateGenreSummary", () => ({ useUpdateGenreSummary: () => ({ mutate: m.summary }) }));
@@ -75,7 +75,7 @@ vi.mock("@hooks/curation/useSecondaryParent", () => ({
   useSecondaryParent: () => ({ mutate: m.secondary }),
   useSecondaryParents: () => ({ data: [{ uuid: "s1", name: "Blues" }] }),
 }));
-vi.mock("./RecordingVideoDialog", () => ({ default: () => null }));
+vi.mock("./SongVideoDialog", () => ({ default: () => null }));
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api" }));
 
 function openedDialog() {
@@ -93,17 +93,17 @@ describe("genre curation actions", () => {
   });
   afterEach(cleanup);
 
-  it("moves recordings once a target is picked", () => {
+  it("moves songs once a target is picked", () => {
     const onClose = vi.fn();
     const onDone = vi.fn();
-    render(<MoveRecordingsPopup recordings={["r1", "r2"]} onClose={onClose} onDone={onDone} />);
+    render(<MoveSongsPopup songs={["r1", "r2"]} onClose={onClose} onDone={onDone} />);
 
     expect(screen.getByRole("button", { name: "Move" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "Target genre" }));
     fireEvent.click(screen.getByRole("button", { name: "Move" }));
 
     const [input, options] = m.assign.mock.calls[0];
-    expect(input).toEqual({ recordings: ["r1", "r2"], genre: "t1" });
+    expect(input).toEqual({ songs: ["r1", "r2"], genre: "t1" });
     expect(onDone).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();
 
@@ -112,14 +112,14 @@ describe("genre curation actions", () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it("unlinks recordings", () => {
+  it("unlinks songs", () => {
     const onClose = vi.fn();
-    render(<UnlinkRecordingsPopup recordings={["r1"]} onClose={onClose} />);
+    render(<UnlinkSongsPopup songs={["r1"]} onClose={onClose} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Unlink" }));
 
     const [input, options] = m.assign.mock.calls[0];
-    expect(input).toEqual({ recordings: ["r1"], genre: null });
+    expect(input).toEqual({ songs: ["r1"], genre: null });
     expect(onClose).not.toHaveBeenCalled();
 
     options.onSuccess();
@@ -127,7 +127,7 @@ describe("genre curation actions", () => {
   });
 
   it("merges a genre into its alias target after previewing", () => {
-    m.aliasPreview.current = { recordings: 1, essentialTracks: 2, children: 3 };
+    m.aliasPreview.current = { songs: 1, essentialSongs: 2, children: 3 };
     const onAliased = vi.fn();
     render(<GenreDangerZone genre={{ uuid: "g1", name: "Folk" }} onAliased={onAliased} />);
     fireEvent.click(screen.getByRole("button", { name: "Alias of…" }));
@@ -224,9 +224,9 @@ describe("genre curation actions", () => {
   });
 
   it("toggles essential tracks, unlinks and opens dialogs from a row", () => {
-    m.overview.current = { essentialTracks: [{ uuid: "r2", title: "Other" }] };
-    const recording = { uuid: "r1", title: "Song", artists: [] } as never;
-    render(<RecordingRowActions recording={recording} />);
+    m.overview.current = { essentialSongs: [{ uuid: "r2", title: "Other" }] };
+    const song = { uuid: "r1", title: "Song", artists: [] } as never;
+    render(<SongRowActions song={song} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Mark Song essential" }));
     expect(m.essential).toHaveBeenCalledWith({
@@ -239,7 +239,7 @@ describe("genre curation actions", () => {
     expect(m.assign).not.toHaveBeenCalled();
     const close = openedDialog();
     fireEvent.click(screen.getByRole("button", { name: "Unlink" }));
-    expect(m.assign.mock.calls[0][0]).toEqual({ recordings: ["r1"], genre: null });
+    expect(m.assign.mock.calls[0][0]).toEqual({ songs: ["r1"], genre: null });
     expect(close).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Move Song to another genre" }));
@@ -248,8 +248,8 @@ describe("genre curation actions", () => {
   });
 
   it("removes an already essential track", () => {
-    m.overview.current = { essentialTracks: [{ uuid: "r1", title: "Song" }] };
-    render(<RecordingRowActions recording={{ uuid: "r1", title: "Song", artists: [] } as never} />);
+    m.overview.current = { essentialSongs: [{ uuid: "r1", title: "Song" }] };
+    render(<SongRowActions song={{ uuid: "r1", title: "Song", artists: [] } as never} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Remove Song from essential songs" }));
 

@@ -8,7 +8,7 @@ a genre tree first, to explore and listen to, and also aims to be a reference
 classifying all music: the genre tree comes from Wikidata's music-genre taxonomy, and the
 backend holds every MusicBrainz song (both prepared by `the-music-tree-pipelines`), including songs
 without a genre or video, so users can later link genreless songs to a genre. A genre's
-detail panel lists all its recordings (primary-descendant subtree included), playable or
+detail panel lists all its songs (primary-descendant subtree included), playable or
 not; genre playlists and the tracklist hold only playable ones (`youtube_video_id` set and
 no `youtube_unplayable_reason`).
 

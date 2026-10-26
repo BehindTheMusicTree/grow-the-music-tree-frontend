@@ -16,7 +16,7 @@ vi.mock("@behindthemusictree/app-kit/transport", () => ({
   useValidatedMutation: (options: Parameters<typeof useMutation>[0]) => useMutation(options),
 }));
 
-const KEY = ["referenceRecordings", "/api", "genre", "g1"];
+const KEY = ["referenceSongs", "/api", "genre", "g1"];
 const Schema = z.object({ value: z.string() });
 
 function setup() {
@@ -76,7 +76,7 @@ describe("useCurationMutation", () => {
   });
 
   it("does not restore keys it did not touch when a mutation fails", async () => {
-    const other = ["referenceRecordings", "/api", "genre", "g2"];
+    const other = ["referenceSongs", "/api", "genre", "g2"];
     fetchMock.mockImplementation(async () => {
       throw new Error("boom");
     });
