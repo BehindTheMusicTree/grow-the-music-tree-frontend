@@ -101,6 +101,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Genre picker**: "Plus de résultats…" button, scrolling to the end of the list and ArrowDown on the last option load the next page of matches, so genres past the first 10 (e.g. "Techno") can be picked. Includes tests.
 - **Analytics**: Self-hosted Umami (cookieless), loaded in production only through the `/stats` rewrites so ad blockers don't drop hits. Signed-in admins are excluded. Tracks `genre_select` and `track_play`.
   - Needs `NEXT_PUBLIC_UMAMI_WEBSITE_ID` and `NEXT_PUBLIC_UMAMI_ORIGIN` at build time, set together or not at all.
   - Includes unit tests for `trackEvent` and the `Analytics` component.

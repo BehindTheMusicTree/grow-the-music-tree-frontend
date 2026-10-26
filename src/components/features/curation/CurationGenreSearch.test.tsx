@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CurationGenreSearch from "./CurationGenreSearch";
 
 const pushMock = vi.fn();
@@ -13,7 +14,11 @@ vi.mock("@behindthemusictree/app-kit/transport", () => ({
 
 describe("CurationGenreSearch", () => {
   it("opens the rules page of the chosen genre", () => {
-    render(<CurationGenreSearch />);
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <CurationGenreSearch />
+      </QueryClientProvider>,
+    );
     const submit = screen.getByRole("button", { name: "Voir les règles" });
     expect(submit).toBeDisabled();
 
