@@ -12,10 +12,6 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api", getAudiometaUrl: () => "" }));
-vi.mock("@behindthemusictree/app-kit/transport", () => ({
-  useFetchWrapper: () => ({ fetch: vi.fn() }),
-  useQueryWithParse: () => ({ data: undefined, isFetching: false, isError: false }),
-}));
 
 function CanShowPopCore({ value }: { value: boolean }) {
   const { setCanShowPopCore } = useGenreTreeViewMode();

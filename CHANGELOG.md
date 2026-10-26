@@ -102,6 +102,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **One "Search" bar**: artists are searched in the genre tree's search bar (bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 16.0.0), which lists matching genres and artists in two groups; picking an artist opens its page. The separate header artist box is removed.
 - **"Songs" everywhere in the UI**: the app supplies its track noun to app-kit through `TrackNounProvider` ("song"/"songs"), and its own strings (player, curation, artist page, about) say "song(s)" instead of "recording(s)" / "track(s)". Bumps app-kit and app-kit-ui to 15.0.0.
 
 ### Fixed

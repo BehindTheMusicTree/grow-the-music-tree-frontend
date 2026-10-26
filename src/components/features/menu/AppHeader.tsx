@@ -9,7 +9,6 @@ import { TheMusicTreeMarkLink } from "@behindthemusictree/brand/components";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { getAudiometaUrl } from "@lib/site-urls";
-import ArtistSearch from "@components/features/search/ArtistSearch";
 import { MenuGroup } from "./MenuGroup";
 import { ABOUT_HREF } from "@lib/constants/routes";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
@@ -83,7 +82,6 @@ export default function AppHeader({ className }: AppHeaderProps) {
         </div>
         <h1 className="hidden truncate text-lg font-bold text-gray-100 xl:block xl:text-xl">{APP_NAME}</h1>
       </Link>
-      <ArtistSearch />
       {menuGroup.length > 0 && (
         <nav
           aria-label="Main navigation"
