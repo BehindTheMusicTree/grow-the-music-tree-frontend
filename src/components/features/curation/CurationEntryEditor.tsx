@@ -7,12 +7,10 @@ import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import GenrePicker from "@components/features/curation/GenrePicker";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
-import { PAIRED_LABEL_COLUMNS, curationColumnTitle } from "@lib/curationColumns";
+import { curationColumnTitle } from "@lib/curationColumns";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import {
-  BOOL_COLUMNS,
   CurationEntrySchema,
-  ITEM_ID_COLUMNS,
   buildCurationRowSchema,
   toCurationRow,
   type CurationEntry,
@@ -40,8 +38,7 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
   const { mutate, formErrors, isPending } = useValidatedMutation({
     inputSchema,
     outputSchema: CurationEntrySchema,
-    mutationFn: (data) =>
-      fetch(path, true, false, { method: entry ? "PATCH" : "POST", body: JSON.stringify(data) }),
+    mutationFn: (data) => fetch(path, true, false, { method: entry ? "PATCH" : "POST", body: JSON.stringify(data) }),
     onSuccess: () => {
       router.refresh();
       onClose();
@@ -50,15 +47,6 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
 
   const submit = () => mutate({ row });
   const set = (column: string, value: string) => setRow((current) => ({ ...current, [column]: value }));
-
-  const pickGenre = (column: string, itemId: string, name?: string) => {
-    const paired = PAIRED_LABEL_COLUMNS[column];
-    setRow((current) => ({
-      ...current,
-      [column]: itemId,
-      ...(name && paired && list.columns.includes(paired) ? { [paired]: name } : {}),
-    }));
-  };
 
   return (
     <BasePopup
@@ -82,21 +70,21 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
         }}
         className="flex flex-col gap-4"
       >
-        {list.columns.map((column) => {
+        {list.columnSpecs.map(({ name: column, kind }) => {
           const title = curationColumnTitle(column);
-          if (ITEM_ID_COLUMNS.has(column)) {
-            const paired = PAIRED_LABEL_COLUMNS[column];
+          if (kind === "item_id") {
             return (
               <GenrePicker
                 key={column}
                 label={title}
                 value={row[column]}
-                defaultText={labels[row[column]] || (paired ? row[paired] : "") || row[column]}
-                onChange={(itemId, name) => pickGenre(column, itemId, name)}
+                defaultText={labels[row[column]] || row[column]}
+                onChange={(itemId) => set(column, itemId)}
+                catalog
               />
             );
           }
-          if (BOOL_COLUMNS.has(column)) {
+          if (kind === "bool") {
             return (
               <label key={column} className="flex items-center gap-2 text-sm font-medium text-gray-700">
                 <input

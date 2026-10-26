@@ -40,7 +40,7 @@ export default async function CurationGenrePage({ params }: Props) {
         <CurationGenreRules itemId={itemId} lists={lists} rules={rules} appliedExportOn={status.appliedExportOn} />
         <section className="flex flex-col gap-3">
           <h2 className="text-lg font-semibold">Dernières modifications</h2>
-          <CurationHistory items={history?.results ?? []} />
+          <CurationHistory items={history?.results ?? []} lists={lists} labels={history?.labels ?? {}} />
           {history && history.overallTotal > history.results.length && (
             <Link href={`/admin/curation/history?${new URLSearchParams({ item_id: itemId })}`} className="underline">
               Tout l&apos;historique

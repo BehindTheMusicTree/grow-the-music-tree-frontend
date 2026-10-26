@@ -5,10 +5,9 @@ import Link from "next/link";
 import { Button } from "@behindthemusictree/ui";
 import { CurationEntryRows } from "@components/features/curation/CurationEntries";
 import CurationEntryEditor from "@components/features/curation/CurationEntryEditor";
-import { PAIRED_LABEL_COLUMNS } from "@lib/curationColumns";
 import { curationListTitle } from "@lib/curationGroups";
 import {
-  ITEM_ID_COLUMNS,
+  curationColumnKind,
   type CurationEntry,
   type CurationList,
   type CurationRow,
@@ -21,7 +20,7 @@ type Editing = { list: CurationList; entry?: CurationEntry; initialRow?: Curatio
 
 /** The id column a new entry of `list` keys its genre by, if the list is keyed by a genre at all. */
 function genreKeyColumn(list: CurationList) {
-  return list.keyColumns.find((column) => ITEM_ID_COLUMNS.has(column));
+  return list.keyColumns.find((column) => curationColumnKind(list, column) === "item_id");
 }
 
 export default function CurationGenreRules({ itemId, lists, rules, appliedExportOn }: Props) {
@@ -37,10 +36,7 @@ export default function CurationGenreRules({ itemId, lists, rules, appliedExport
     const list = addable.find((candidate) => candidate.name === addTo);
     if (!list) return;
     const column = genreKeyColumn(list)!;
-    const paired = PAIRED_LABEL_COLUMNS[column];
-    const initialRow: CurationRow = { [column]: itemId };
-    if (paired && labels[itemId]) initialRow[paired] = labels[itemId];
-    setEditing({ list, initialRow });
+    setEditing({ list, initialRow: { [column]: itemId } });
   };
 
   return (

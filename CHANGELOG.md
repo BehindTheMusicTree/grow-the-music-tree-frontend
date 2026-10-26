@@ -98,6 +98,13 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Curation names are resolved, not typed**: the admin curation forms no longer ask for a genre or parent name next to its QID (no more "Nom du genre : Required"). Names come from the API's `labels` maps, which now also cover the history. A name is typed only when creating a new node (`label`, "Nom (nouvel item)").
+  - Form fields and validation follow the API's `columnSpecs` (kind, optional) instead of frontend-side column lists.
+  - The curation genre picker searches every known Wikidata item (`curation/items/`), pruned ones included. Genre assignment pickers still search canonical genres.
+  - Requires grow-api with the `columnSpecs` list metadata and the `labels` history map.
+
 ## [3.15.0] - 2026-10-22
 
 ### Added

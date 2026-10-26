@@ -6,7 +6,12 @@ import CurationStatus from "@components/features/curation/CurationStatus";
 import CurationHistory from "@components/features/curation/CurationHistory";
 import GenreRef from "@components/features/curation/GenreRef";
 import { auth } from "@lib/auth";
-import { fetchCurationHistory, fetchCurationLists, fetchCurationStatus, type CurationHistoryFilter } from "@lib/curation";
+import {
+  fetchCurationHistory,
+  fetchCurationLists,
+  fetchCurationStatus,
+  type CurationHistoryFilter,
+} from "@lib/curation";
 import { curationListTitle } from "@lib/curationGroups";
 import { ITEM_ID_PATTERN } from "@schemas/api/curation";
 
@@ -30,7 +35,8 @@ export default async function CurationHistoryPage({ searchParams }: Props) {
   if (!session || session.error) redirect("/admin");
 
   const { list, entry, item_id: itemId, page: pageParam } = await searchParams;
-  if (list && !(await fetchCurationLists()).some((candidate) => candidate.name === list)) notFound();
+  const lists = await fetchCurationLists();
+  if (list && !lists.some((candidate) => candidate.name === list)) notFound();
   if (entry && !z.string().uuid().safeParse(entry).success) notFound();
   if (itemId && !ITEM_ID_PATTERN.test(itemId)) notFound();
   const filter = { list, entry, itemId };
@@ -60,7 +66,7 @@ export default async function CurationHistoryPage({ searchParams }: Props) {
         <p className="text-sm text-gray-600">
           {history.overallTotal} modification{history.overallTotal > 1 ? "s" : ""}
         </p>
-        <CurationHistory items={history.results} />
+        <CurationHistory items={history.results} lists={lists} labels={history.labels} />
         {history.totalPages > 1 && (
           <nav aria-label="Pagination" className="flex items-center justify-center gap-4">
             {history.page > 1 && (
