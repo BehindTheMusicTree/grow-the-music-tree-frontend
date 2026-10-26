@@ -10,11 +10,10 @@ import CurationEntryEditor from "@components/features/curation/CurationEntryEdit
 import { isPendingCurationEntry } from "@components/features/curation/CurationStatus";
 import GenreRef from "@components/features/curation/GenreRef";
 import { useDebouncedValue } from "@hooks/useDebouncedValue";
-import { PAIRED_LABEL_COLUMNS, curationColumnTitle, displayedCurationColumns } from "@lib/curationColumns";
+import { curationColumnTitle } from "@lib/curationColumns";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import {
-  BOOL_COLUMNS,
-  ITEM_ID_COLUMNS,
+  curationColumnKind,
   type CurationEntriesPage,
   type CurationEntry,
   type CurationList,
@@ -46,21 +45,23 @@ function useUpdateQuery() {
 }
 
 function Cell({
+  list,
   column,
   entry,
   labels,
   showQid,
 }: {
+  list: CurationList;
   column: string;
   entry: CurationEntry;
   labels: Record<string, string>;
   showQid: boolean;
 }) {
   const value = entry.row[column];
-  if (BOOL_COLUMNS.has(column)) return value ? "Oui" : "Non";
-  if (ITEM_ID_COLUMNS.has(column) && typeof value === "string" && value) {
-    const paired = entry.row[PAIRED_LABEL_COLUMNS[column]];
-    return <GenreRef id={value} label={labels[value] || (typeof paired === "string" ? paired : "")} showQid={showQid} />;
+  const kind = curationColumnKind(list, column);
+  if (kind === "bool") return value ? "Oui" : "Non";
+  if (kind === "item_id" && typeof value === "string" && value) {
+    return <GenreRef id={value} label={labels[value]} showQid={showQid} />;
   }
   return value;
 }
@@ -136,7 +137,12 @@ function EntryActions({
   );
 }
 
-function Toolbar({ q, ordering, showQid, onAdd }: Omit<Props, "list" | "entries" | "appliedExportOn"> & { onAdd: () => void }) {
+function Toolbar({
+  q,
+  ordering,
+  showQid,
+  onAdd,
+}: Omit<Props, "list" | "entries" | "appliedExportOn"> & { onAdd: () => void }) {
   const updateQuery = useUpdateQuery();
   const [text, setText] = useState(q);
   const search = useDebouncedValue(text.trim(), 300);
@@ -162,7 +168,9 @@ function Toolbar({ q, ordering, showQid, onAdd }: Omit<Props, "list" | "entries"
         Trier par
         <select
           value={ordering}
-          onChange={(event) => updateQuery({ ordering: event.target.value === "key" ? null : event.target.value, page: null })}
+          onChange={(event) =>
+            updateQuery({ ordering: event.target.value === "key" ? null : event.target.value, page: null })
+          }
           className="px-3 py-2 font-normal border rounded-md"
         >
           <option value="key">Clé</option>
@@ -197,7 +205,7 @@ export function CurationEntryRows({
   appliedExportOn: string | null;
   onEdit: (entry: CurationEntry) => void;
 }) {
-  const columns = displayedCurationColumns(list.columns);
+  const columns = list.columns;
   return (
     <>
       <div className="hidden overflow-x-auto md:block">
@@ -219,7 +227,7 @@ export function CurationEntryRows({
               <tr key={entry.uuid} className="align-top border-t">
                 {columns.map((column) => (
                   <td key={column} className="p-2">
-                    <Cell column={column} entry={entry} labels={labels} showQid={showQid} />
+                    <Cell list={list} column={column} entry={entry} labels={labels} showQid={showQid} />
                   </td>
                 ))}
                 <td className="p-2">
@@ -245,18 +253,18 @@ export function CurationEntryRows({
                   <div key={column} className="contents">
                     <dt className="text-sm text-gray-600">{curationColumnTitle(column)}</dt>
                     <dd className="break-words">
-                      <Cell column={column} entry={entry} labels={labels} showQid={showQid} />
+                      <Cell list={list} column={column} entry={entry} labels={labels} showQid={showQid} />
                     </dd>
                   </div>
                 ))}
               </dl>
               <EntryActions
-                    list={list}
-                    entry={entry}
-                    labels={labels}
-                    pending={isPendingCurationEntry(entry, appliedExportOn)}
-                    onEdit={() => onEdit(entry)}
-                  />
+                list={list}
+                entry={entry}
+                labels={labels}
+                pending={isPendingCurationEntry(entry, appliedExportOn)}
+                onEdit={() => onEdit(entry)}
+              />
             </article>
           </li>
         ))}

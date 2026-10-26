@@ -20,7 +20,7 @@ export default function CurationGenreSearch() {
       className="flex flex-wrap items-end gap-3"
     >
       <div className="flex-1 min-w-48">
-        <GenrePicker label="Règles d'un genre" value={itemId} defaultText="" onChange={setItemId} />
+        <GenrePicker label="Règles d'un genre" value={itemId} defaultText="" onChange={setItemId} catalog />
       </div>
       <Button type="submit" disabled={!itemId}>
         Voir les règles
