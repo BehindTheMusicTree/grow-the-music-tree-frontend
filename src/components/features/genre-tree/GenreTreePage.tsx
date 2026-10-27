@@ -28,7 +28,6 @@ import GenreHistory from "@components/features/genre-tree/GenreHistory";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
-import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
 import { PATHS } from "@lib/constants/routes";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -117,7 +116,9 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
     [about, closeAbout, onSelectedNodeIdChange],
   );
 
-  const overlayPanel = about ? { title: "About", content: <AboutContent />, onClose: () => closeAbout() } : undefined;
+  const overlayPanel = about
+    ? { title: "TheMusicTree", content: <AboutContent onClose={() => closeAbout()} />, onClose: () => closeAbout() }
+    : undefined;
   const sharedProps = {
     ...viewProps,
     onSelectedNodeIdChange: handleSelectedNodeIdChange,
@@ -147,7 +148,6 @@ export default function GenreTreePage() {
   const getBackendBaseUrl = getGrowBackendBaseUrl;
   const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
   const isAdmin = useIsAdmin();
-  const { isVisible: isPlayerPanelVisible } = usePlayerPanel();
   const { showPopup, hidePopup } = usePopup();
   const [editMode, setEditMode] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -262,9 +262,9 @@ export default function GenreTreePage() {
   return (
     <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
       <GenreCurationProvider>
-      {/* Player's panel is right-3 + w-[280px]; the overlay panel stops 12px short of it (12 + 280 + 12). */}
+      {/* The overlay panel sits between the 280px detail panel and the player's panel (right-3 + w-[360px]); left clears 12 + 280 + 12, right 12 + 360 + 12. */}
       <div
-        className={isPlayerPanelVisible ? "contents [--gtv-overlay-panel-right:304px]" : "contents"}
+        className="contents [&_.actions-container]:left-[21px] [&_.actions-container]:top-[21px] [&_.genre-search]:w-[262px] [&_.genre-search_input]:h-[40px] [&_.gtv-info-panel--overlay]:left-[304px] [&_.gtv-info-panel--overlay]:[--gtv-info-panel-header-inset:0px] [--gtv-overlay-panel-right:384px]"
         data-testid="genre-tree-overlay-bounds"
       >
       <Suspense fallback={<GenreTreeViewLoadingFallback />}>
