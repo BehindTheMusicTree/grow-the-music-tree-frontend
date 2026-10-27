@@ -105,6 +105,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.1.0: the artist search list keeps the previous results while the next ones load instead of going blank on each keystroke.
 - Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.0.0: songs without a YouTube video show a crossed-out YouTube icon instead of the "No video available" text, and the shared buttons no longer depend on a global `button` rule.
 
 ### Fixed
