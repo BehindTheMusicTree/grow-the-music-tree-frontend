@@ -103,6 +103,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- Creating a genre now centers the tree on it and opens its detail panel.
+
 ### Changed
 
 - Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.4.1: the player panel is back to 22.5rem and follows the brand layout tokens.
