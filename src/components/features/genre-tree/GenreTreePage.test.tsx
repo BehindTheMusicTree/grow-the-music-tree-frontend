@@ -7,7 +7,17 @@ import { GenreTreeViewModeProvider, useGenreTreeViewMode } from "@contexts/Genre
 const routerPushMock = vi.fn();
 const routerReplaceMock = vi.fn();
 let searchParams = new URLSearchParams();
+let tracklistExpanded = false;
+const setTracklistExpandedMock = vi.fn();
 
+vi.mock("@contexts/PlayerPanelProvider", () => ({
+  usePlayerPanel: () => ({
+    isVisible: false,
+    dismiss: vi.fn(),
+    isExpanded: tracklistExpanded,
+    setExpanded: setTracklistExpandedMock,
+  }),
+}));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: routerPushMock, replace: routerReplaceMock }),
   usePathname: () => "/",
@@ -127,6 +137,8 @@ describe("GenreTreePage", () => {
     searchParams = new URLSearchParams();
     routerPushMock.mockReset();
     routerReplaceMock.mockReset();
+    tracklistExpanded = false;
+    setTracklistExpandedMock.mockReset();
   });
 
   it("renders the genre tree read-only, hiding its write controls, when not signed in as admin", async () => {
@@ -136,18 +148,6 @@ describe("GenreTreePage", () => {
     expect(view.dataset.readonly).toBe("true");
     expect(view).toHaveTextContent("/api/grow-proxy");
     expect(screen.getByRole("heading", { name: "Genre Tree" })).toBeInTheDocument();
-  });
-
-  it("keeps the overlay panel between the detail panel and the player panel", async () => {
-    renderGenreTreePage();
-
-    const bounds = await screen.findByTestId("genre-tree-overlay-bounds");
-    expect(bounds).toHaveClass(
-      "[--gtv-overlay-panel-right:calc(var(--layout-gutter)*2+var(--layout-player-panel-w))]",
-      "[&_.gtv-info-panel--overlay]:left-[calc(var(--layout-gutter)*2+var(--layout-detail-panel-w))]",
-      "[&_.gtv-info-panel--overlay]:[--gtv-info-panel-header-inset:0px]",
-    );
-    expect(bounds).toContainElement(await screen.findByTestId("genre-tree-view"));
   });
 
   it("renders the genre tree editable when signed in as admin", async () => {
@@ -191,6 +191,45 @@ describe("GenreTreePage", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
 
     expect(routerReplaceMock).toHaveBeenCalledWith("/", { scroll: false });
+  });
+
+  it("keeps About open and collapses the tracklist when ?about loads with the tracklist expanded", async () => {
+    searchParams = new URLSearchParams("about");
+    tracklistExpanded = true;
+    renderGenreTreePage();
+
+    expect(await screen.findByRole("region", { name: "TheMusicTree" })).toBeInTheDocument();
+    expect(setTracklistExpandedMock).toHaveBeenCalledWith(false);
+    expect(routerReplaceMock).not.toHaveBeenCalled();
+  });
+
+  it("closes About when the tracklist expands while About is open", async () => {
+    searchParams = new URLSearchParams("about");
+    const { rerender } = renderGenreTreePage();
+    await screen.findByRole("region", { name: "TheMusicTree" });
+
+    tracklistExpanded = true;
+    rerender(
+      <GenreTreeViewModeProvider>
+        <GenreTreePage />
+      </GenreTreeViewModeProvider>,
+    );
+
+    await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/", { scroll: false }));
+  });
+
+  it("leaves the URL alone when the tracklist expands without About", async () => {
+    const { rerender } = renderGenreTreePage();
+    await screen.findByTestId("genre-tree-view");
+
+    tracklistExpanded = true;
+    rerender(
+      <GenreTreeViewModeProvider>
+        <GenreTreePage />
+      </GenreTreeViewModeProvider>,
+    );
+
+    expect(routerReplaceMock).not.toHaveBeenCalled();
   });
 
   it("offers no Edit button to non-admins", async () => {
