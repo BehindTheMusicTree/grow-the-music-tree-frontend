@@ -106,6 +106,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Changed
 
 - The About page is a centered column between the detail panel and the player panel (header titled "TheMusicTree", with a "TheMusicTree" button that closes it), the player panel is 360px wide, and the search bar sits 8px from every edge of the genre info panel header.
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.2.1: the Play/Focus action band no longer has doubled vertical padding above and below its icons.
 - Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.1.0: the artist search list keeps the previous results while the next ones load instead of going blank on each keystroke.
 - Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.0.0: songs without a YouTube video show a crossed-out YouTube icon instead of the "No video available" text, and the shared buttons no longer depend on a global `button` rule.
 
