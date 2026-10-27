@@ -110,6 +110,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Fixed
 
 - Buttons without their own background (artist sort pills, link-songs tabs, genre picker "more results", danger-zone buttons, video dialog actions, essential-songs reorder arrows, parent chip remove) no longer render with a dark fill and extra padding from a leftover global `button` rule, which is removed from `globals.css`.
+- Links without their own color class inherit the surrounding text color instead of the Vite template's purple; the unused template classes (`.card`, `.read-the-docs`, `.logo`) are removed from `globals.css`.
 
 ## [3.17.1] - 2026-10-26
 
