@@ -103,6 +103,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Shareable genre tree URLs**: the selected genre (`?genre=`), the pop-core zoom frame (`?zoom=`) and the pan/zoom position (`?view=x,y,scale`) now live in the URL, so a copied link reopens the tree where it was. Selecting and zooming add history entries; panning only replaces the current one. Unknown genres and malformed views are dropped from the URL; switching view mode drops `view`. Requires `app-kit` 19.1.0.
+
 ## [3.18.0] - 2026-10-27
 
 ### Added
