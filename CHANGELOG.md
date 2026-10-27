@@ -106,6 +106,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Added
 
 - Creating a genre now centers the tree on it and opens its detail panel.
+- The genre detail panel can be hidden and shown from a Maps-style edge tab, which also extends it for admins.
+
+### Changed
+
+- The detail panel is 408px wide with 16px corners and a 48px search pill; the song list panel hides and extends from an edge tab, and hiding it leaves only the video.
+- Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 19.0.0 and `brand` to 12.5.0.
 
 ### Changed
 
