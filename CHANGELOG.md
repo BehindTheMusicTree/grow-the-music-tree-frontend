@@ -103,6 +103,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.18.0] - 2026-10-27
+
 ### Added
 
 - Creating a genre now centers the tree on it and opens its detail panel.
