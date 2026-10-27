@@ -142,11 +142,11 @@ describe("GenreTreePage", () => {
     renderGenreTreePage();
 
     const bounds = await screen.findByTestId("genre-tree-overlay-bounds");
-    expect(bounds).toHaveClass("[--gtv-overlay-panel-right:384px]", "[&_.gtv-info-panel--overlay]:left-[304px]", "[&_.gtv-info-panel--overlay]:[--gtv-info-panel-header-inset:0px]",
-      "[&_.actions-container]:left-[21px]",
-      "[&_.actions-container]:top-[21px]",
-      "[&_.genre-search]:w-[262px]",
-      "[&_.genre-search_input]:h-[40px]");
+    expect(bounds).toHaveClass(
+      "[--gtv-overlay-panel-right:calc(var(--layout-gutter)*2+var(--layout-player-panel-w))]",
+      "[&_.gtv-info-panel--overlay]:left-[calc(var(--layout-gutter)*2+var(--layout-detail-panel-w))]",
+      "[&_.gtv-info-panel--overlay]:[--gtv-info-panel-header-inset:0px]",
+    );
     expect(bounds).toContainElement(await screen.findByTestId("genre-tree-view"));
   });
 

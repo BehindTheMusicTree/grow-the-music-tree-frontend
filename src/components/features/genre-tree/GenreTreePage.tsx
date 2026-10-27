@@ -262,9 +262,9 @@ export default function GenreTreePage() {
   return (
     <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
       <GenreCurationProvider>
-      {/* The overlay panel sits between the 280px detail panel and the player's panel (right-3 + w-[360px]); left clears 12 + 280 + 12, right 12 + 360 + 12. */}
+      {/* The overlay panel sits between the detail panel and the player's panel; each side clears gutter + panel width + gutter. */}
       <div
-        className="contents [&_.actions-container]:left-[21px] [&_.actions-container]:top-[21px] [&_.genre-search]:w-[262px] [&_.genre-search_input]:h-[40px] [&_.gtv-info-panel--overlay]:left-[304px] [&_.gtv-info-panel--overlay]:[--gtv-info-panel-header-inset:0px] [--gtv-overlay-panel-right:384px]"
+        className="contents [&_.gtv-info-panel--overlay]:left-[calc(var(--layout-gutter)*2+var(--layout-detail-panel-w))] [&_.gtv-info-panel--overlay]:[--gtv-info-panel-header-inset:0px] [--gtv-overlay-panel-right:calc(var(--layout-gutter)*2+var(--layout-player-panel-w))]"
         data-testid="genre-tree-overlay-bounds"
       >
       <Suspense fallback={<GenreTreeViewLoadingFallback />}>
