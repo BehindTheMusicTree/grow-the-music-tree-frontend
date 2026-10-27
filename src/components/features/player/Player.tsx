@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { ListMusic, X } from "lucide-react";
-import { usePlayer, PlayerVideoSurface } from "@behindthemusictree/app-kit/player";
-import { useTrackListSidebarVisibility } from "@behindthemusictree/app-kit/genre-tree";
-import { TrackListSidebar } from "@behindthemusictree/app-kit-ui/genre-tree";
+import { usePlayer } from "@behindthemusictree/app-kit/player";
+import { PlayerPanel } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import { trackEvent } from "@lib/analytics";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
@@ -13,49 +11,14 @@ interface PlayerProps {
   className?: string;
 }
 
-const iconButtonClassName = "flex h-6 w-6 shrink-0 items-center justify-center p-0 rounded-md hover:bg-white/10";
-
 export default function Player({ className }: PlayerProps) {
   const { playerTrackObject } = usePlayer();
-  const { toggleTrackListSidebar, isTrackListSidebarVisible } = useTrackListSidebarVisibility();
   const { isVisible, dismiss } = usePlayerPanel();
-  const track = playerTrackObject?.track;
-  const trackId = track?.id;
+  const trackId = playerTrackObject?.track?.id;
 
   useEffect(() => {
     if (trackId) trackEvent("track_play");
   }, [trackId]);
 
-  // Hidden via CSS, never unmounted, so the video keeps playing while the panel is closed.
-  // Sits under the header, capped 3.5rem above the bottom to clear the tree's zoom controls.
-  return (
-    <div
-      className={`fixed right-gutter top-header z-40 flex max-h-[calc(100vh-var(--layout-header-h)-3.5rem)] w-player-panel flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 text-zinc-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)] ${isTrackListSidebarVisible ? "h-[calc(100vh-var(--layout-header-h)-3.5rem)]" : ""} ${isVisible ? "" : "hidden"} ${className ?? ""}`}
-    >
-      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-zinc-800 py-2.5 pl-3.5 pr-2">
-        <span className="min-w-0 truncate text-sm font-semibold">{track?.title}</span>
-        <div className="flex shrink-0 items-center gap-1">
-          <button
-            onClick={toggleTrackListSidebar}
-            className={iconButtonClassName}
-            aria-label={isTrackListSidebarVisible ? "Hide song list" : "Show song list"}
-          >
-            <ListMusic size={16} />
-          </button>
-          <button onClick={dismiss} className={iconButtonClassName} aria-label="Close player">
-            <X size={16} />
-          </button>
-        </div>
-      </div>
-      <div className="relative w-full shrink-0">
-        <PlayerVideoSurface className="aspect-video w-full bg-black" />
-        {playerTrackObject?.loadError && (
-          <span className="absolute bottom-2 left-2 right-2 text-xs text-red-400 text-overflow">
-            {playerTrackObject.loadError}
-          </span>
-        )}
-      </div>
-      {isTrackListSidebarVisible && <TrackListSidebar layout="inline" className="min-h-0 flex-1" renderArtistLink={renderArtistLink} />}
-    </div>
-  );
+  return <PlayerPanel className={className} isVisible={isVisible} onClose={dismiss} renderArtistLink={renderArtistLink} />;
 }

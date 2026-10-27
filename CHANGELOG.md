@@ -105,6 +105,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.4.0: the player panel (with its extend-to-detail-panel toggle) now comes from app-kit-ui's `PlayerPanel`, the song-list genre badges sit flush right, and the zoom controls are horizontal by default so the tree no longer overrides them.
 - Add a spacing rule (`.claude/rules/spacing.md`, `docs/STYLE_GUIDE.md`): Tailwind scale or brand tokens, no `em` or arbitrary px.
 - **One spacing system**: the `:root { font-size: 14px }` override is removed, so the app renders on the browser's default 16px root (about 14% larger; it follows the browser font setting). Tailwind uses the `@behindthemusictree/brand` preset (`gutter`, `header`, `detail-panel`, `player-panel` sizes), and the player panel and the About column are positioned from the brand `--layout-*` tokens instead of px overrides. Bumps `@behindthemusictree/app-kit` and `app-kit-ui` to 18.3.0 and `@behindthemusictree/brand` to 12.2.0, which size everything in rem.
 - The About page is a centered column between the detail panel and the player panel (header titled "TheMusicTree", with a "TheMusicTree" button that closes it), the player panel is 360px wide, and the search bar sits 8px from every edge of the genre info panel header.
