@@ -63,6 +63,8 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
     onExpandedChange?: (on: boolean) => void;
     selectedNodeId?: string | null;
     onSelectedNodeIdChange?: (id: string | null) => void;
+    defaultViewport?: { x: number; y: number; zoom: number };
+    onViewportChange?: (viewport: { x: number; y: number; zoom: number }) => void;
     overlayPanel?: { title: string; content: React.ReactNode; onClose: () => void };
   }) => (
     <div
@@ -73,6 +75,8 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
     >
       {props.getBackendBaseUrl()}
       <span data-testid="selected-node">{String(props.selectedNodeId ?? "none")}</span>
+      <span data-testid="default-viewport">{JSON.stringify(props.defaultViewport ?? null)}</span>
+      <button onClick={() => props.onViewportChange?.({ x: 10.04, y: -20, zoom: 0.5 })}>Pan</button>
       <button onClick={() => props.onSelectedNodeIdChange?.("rock")}>Select genre</button>
       {props.overlayPanel && (
         <section aria-label={props.overlayPanel.title}>
@@ -159,20 +163,12 @@ describe("GenreTreePage", () => {
     expect(view.dataset.readonly).toBe("false");
   });
 
-  it("shows the About panel on ?about and clears the selection", async () => {
-    const { rerender } = renderGenreTreePage();
-    fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
-    expect(screen.getByTestId("selected-node")).toHaveTextContent("rock");
-
-    searchParams = new URLSearchParams("about");
-    rerender(
-      <GenreTreeViewModeProvider>
-        <GenreTreePage />
-      </GenreTreeViewModeProvider>,
-    );
+  it("clears the selected genre from the URL when the About panel opens", async () => {
+    searchParams = new URLSearchParams("genre=rock&about");
+    renderGenreTreePage();
 
     expect(await screen.findByRole("region", { name: "TheMusicTree" })).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByTestId("selected-node")).toHaveTextContent("none"));
+    await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/?about=", { scroll: false }));
   });
 
   it("removes ?about when the About panel is closed", async () => {
@@ -190,7 +186,7 @@ describe("GenreTreePage", () => {
 
     fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
 
-    expect(routerReplaceMock).toHaveBeenCalledWith("/", { scroll: false });
+    expect(routerPushMock).toHaveBeenCalledWith("/?genre=rock", { scroll: false });
   });
 
   it("keeps About open and collapses the tracklist when ?about loads with the tracklist expanded", async () => {
@@ -354,6 +350,108 @@ describe("GenreTreePage", () => {
 
       fireEvent.click(screen.getByRole("button", { name: "All genres" }));
       expect(routerPushMock).toHaveBeenLastCalledWith("/?other=1", { scroll: false });
+      expect(routerReplaceMock).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("genre and viewport URL state", () => {
+    it("reads the selected genre from ?genre=", async () => {
+      searchParams = new URLSearchParams("genre=rock");
+
+      renderGenreTreePage();
+
+      expect(await screen.findByTestId("selected-node")).toHaveTextContent("rock");
+    });
+
+    it("pushes ?genre= when the user selects a genre", async () => {
+      searchParams = new URLSearchParams("other=1");
+
+      renderGenreTreePage();
+
+      fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
+      expect(routerPushMock).toHaveBeenCalledWith("/?other=1&genre=rock", { scroll: false });
+    });
+
+    it("seeds the view from ?view= on load", async () => {
+      searchParams = new URLSearchParams("view=12.5,-3,0.75");
+
+      renderGenreTreePage();
+
+      expect(await screen.findByTestId("default-viewport")).toHaveTextContent('{"x":12.5,"y":-3,"zoom":0.75}');
+    });
+
+    it("replaces a malformed ?view= away without seeding", async () => {
+      searchParams = new URLSearchParams("view=1,2");
+
+      renderGenreTreePage();
+
+      await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/", { scroll: false }));
+      expect(screen.getByTestId("default-viewport")).toHaveTextContent("null");
+    });
+
+    it("replaces ?view= with the rounded viewport when the view moves", async () => {
+      renderGenreTreePage();
+
+      fireEvent.click(await screen.findByRole("button", { name: "Pan" }));
+      expect(routerReplaceMock).toHaveBeenCalledWith("/?view=10.0%2C-20.0%2C0.50", { scroll: false });
+      expect(routerPushMock).not.toHaveBeenCalled();
+    });
+
+    it("skips the write when the view already matches ?view=", async () => {
+      searchParams = new URLSearchParams("view=10.0,-20.0,0.50");
+
+      renderGenreTreePage();
+
+      fireEvent.click(await screen.findByRole("button", { name: "Pan" }));
+      expect(routerReplaceMock).not.toHaveBeenCalled();
+    });
+
+    it("drops ?view= when the user zooms into a frame", async () => {
+      searchParams = new URLSearchParams("view=1,2,1");
+
+      renderGenreTreePage({ forcePopCore: true });
+
+      fireEvent.click(await screen.findByRole("button", { name: "Zoom in" }));
+      expect(routerPushMock).toHaveBeenLastCalledWith("/?zoom=rock", { scroll: false });
+    });
+
+    it("drops ?view= and the seed when the view mode changes", async () => {
+      searchParams = new URLSearchParams("view=1,2,1");
+
+      render(
+        <GenreTreeViewModeProvider>
+          <ForceWheelViewMode />
+          <GenreTreePage />
+        </GenreTreeViewModeProvider>,
+      );
+
+      await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/", { scroll: false }));
+      expect(screen.getByTestId("default-viewport")).toHaveTextContent("null");
+    });
+
+    it("replaces an unknown ?genre= away once the genre playlists have loaded", async () => {
+      searchParams = new URLSearchParams("genre=ghost&other=1");
+      useListFullGenrePlaylistsMock.mockReturnValue({ data: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }], isLoading: false });
+
+      renderGenreTreePage();
+
+      await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/?other=1", { scroll: false }));
+    });
+
+    it("keeps a known ?genre= and waits for the playlists before judging it", async () => {
+      searchParams = new URLSearchParams("genre=rock");
+      useListFullGenrePlaylistsMock.mockReturnValue({ data: undefined, isLoading: true });
+
+      const { rerender } = renderGenreTreePage();
+      await screen.findByTestId("genre-tree-view");
+      expect(routerReplaceMock).not.toHaveBeenCalled();
+
+      useListFullGenrePlaylistsMock.mockReturnValue({ data: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }], isLoading: false });
+      rerender(
+        <GenreTreeViewModeProvider>
+          <GenreTreePage />
+        </GenreTreeViewModeProvider>,
+      );
       expect(routerReplaceMock).not.toHaveBeenCalled();
     });
   });
