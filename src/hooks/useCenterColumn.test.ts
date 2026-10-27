@@ -50,4 +50,25 @@ describe("useCenterColumn", () => {
     expect(closeAbout).toHaveBeenCalledOnce();
     expect(setDetailExpanded).toHaveBeenCalledWith(false);
   });
+
+  it("does not touch About when a panel expands while About is closed", () => {
+    const { rerender, closeAbout } = setup();
+    rerender({ detailExpanded: true });
+    rerender({ detailExpanded: false, tracklistExpanded: true });
+    expect(closeAbout).not.toHaveBeenCalled();
+  });
+
+  it("keeps About open when it is already open on mount with the tracklist expanded", () => {
+    const { closeAbout, setTracklistExpanded } = setup({ about: true, tracklistExpanded: true });
+    expect(setTracklistExpanded).toHaveBeenCalledWith(false);
+    expect(closeAbout).not.toHaveBeenCalled();
+  });
+
+  it("does nothing on re-renders without a surface opening", () => {
+    const { rerender, closeAbout, setDetailExpanded, setTracklistExpanded } = setup({ tracklistExpanded: true });
+    rerender({ tracklistExpanded: true });
+    expect(closeAbout).not.toHaveBeenCalled();
+    expect(setDetailExpanded).not.toHaveBeenCalled();
+    expect(setTracklistExpanded).not.toHaveBeenCalled();
+  });
 });

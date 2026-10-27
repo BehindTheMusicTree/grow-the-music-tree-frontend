@@ -9,27 +9,27 @@ interface CenterColumnSurfaces {
   setTracklistExpanded: (expanded: boolean) => void;
 }
 
-/** The center column holds one surface at a time: the About panel, the expanded detail panel or the expanded tracklist. Whichever opens last closes the others. */
+/** The center column holds one surface at a time: the About panel, the expanded detail panel or the expanded tracklist. Whichever opens last closes the others; an About already open on mount counts as the latest. */
 export function useCenterColumn(surfaces: CenterColumnSurfaces) {
   const latest = useRef(surfaces);
   latest.current = surfaces;
   const { about, detailExpanded, tracklistExpanded } = surfaces;
+  const prev = useRef({ about: false, detailExpanded, tracklistExpanded });
 
   useEffect(() => {
-    if (!about) return;
-    latest.current.setDetailExpanded(false);
-    latest.current.setTracklistExpanded(false);
-  }, [about]);
+    const before = prev.current;
+    prev.current = { about, detailExpanded, tracklistExpanded };
+    const { closeAbout, setDetailExpanded, setTracklistExpanded } = latest.current;
 
-  useEffect(() => {
-    if (!detailExpanded) return;
-    latest.current.closeAbout();
-    latest.current.setTracklistExpanded(false);
-  }, [detailExpanded]);
-
-  useEffect(() => {
-    if (!tracklistExpanded) return;
-    latest.current.closeAbout();
-    latest.current.setDetailExpanded(false);
-  }, [tracklistExpanded]);
+    if (about && !before.about) {
+      setDetailExpanded(false);
+      setTracklistExpanded(false);
+    } else if (detailExpanded && !before.detailExpanded) {
+      if (about) closeAbout();
+      setTracklistExpanded(false);
+    } else if (tracklistExpanded && !before.tracklistExpanded) {
+      if (about) closeAbout();
+      setDetailExpanded(false);
+    }
+  }, [about, detailExpanded, tracklistExpanded]);
 }
