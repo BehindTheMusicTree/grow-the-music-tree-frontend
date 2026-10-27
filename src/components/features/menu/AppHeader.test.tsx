@@ -40,6 +40,12 @@ describe("AppHeader view toggle", () => {
     expect(screen.getByRole("link", { name: "About" })).toHaveAttribute("href", "/?about");
   });
 
+  it("links to the genealogy page", () => {
+    renderHeader(true);
+
+    expect(screen.getByRole("link", { name: "Genealogy" })).toHaveAttribute("href", "/genealogy");
+  });
+
   it("keeps other params when opening About", () => {
     searchParams = new URLSearchParams("zoom=rock");
     renderHeader(true);

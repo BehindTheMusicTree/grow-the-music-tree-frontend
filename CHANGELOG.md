@@ -106,15 +106,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Added
 
 - Creating a genre now centers the tree on it and opens its detail panel.
+- **Genealogy page** (`/genealogy`, linked from the header): draws the pipeline's genealogy of music traditions (band fragments, lanes, successions, traditions and their lineage/association links) on a zoomable SVG with a sticky piecewise year axis. Clicking a tradition that is in the genre tree opens the tree on it.
+- Curation forms validate the `tradition_id`, `entity_id` and `int` column kinds grow-api now emits.
 - The genre detail panel can be hidden and shown from a Maps-style edge tab, which also extends it for admins.
 
 ### Changed
 
 - The detail panel is 408px wide with 16px corners and a 48px search pill; the song list panel hides and extends from an edge tab, and hiding it leaves only the video.
 - Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 19.0.0 and `brand` to 12.5.0.
-
-### Changed
-
 - **Three-column layout**: the genre tree uses `placement="regions"` (left detail panel, center About, right player panel). About starts below the header so it no longer runs under the account pill, and the player panel gets an expand toggle that spans center + right. Only one of About, expanded detail and expanded tracklist is open at a time (the last opened wins). The header row and the player panel share the right column (brand's `--layout-right-w`), with one gutter between them. Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.5.2 and `brand` to 12.4.0.
 - Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.4.1: the player panel is back to 22.5rem and follows the brand layout tokens.
 - Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.4.0: the player panel (with its extend-to-detail-panel toggle) now comes from app-kit-ui's `PlayerPanel`, the song-list genre badges sit flush right, and the zoom controls are horizontal by default so the tree no longer overrides them.

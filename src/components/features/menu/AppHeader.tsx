@@ -4,13 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { CircleDot, Info, List } from "lucide-react";
+import { CircleDot, Info, List, Network } from "lucide-react";
 import { TheMusicTreeMarkLink } from "@behindthemusictree/brand/components";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { getAudiometaUrl } from "@lib/site-urls";
 import { MenuGroup } from "./MenuGroup";
-import { ABOUT_HREF } from "@lib/constants/routes";
+import { ABOUT_HREF, GENEALOGY_HREF } from "@lib/constants/routes";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 
 const SHOW_AUDIOMETA_MENU_ITEM = false;
@@ -100,6 +100,15 @@ export default function AppHeader({ className }: AppHeaderProps) {
           {isOutline ? <CircleDot className="h-5 w-5" aria-hidden /> : <List className="h-5 w-5" aria-hidden />}
         </button>
       )}
+      <Link
+        href={GENEALOGY_HREF}
+        prefetch={false}
+        className="flex shrink-0 items-center justify-center rounded-full bg-black/70 p-2 text-gray-100 shadow-lg backdrop-blur transition-colors duration-200 hover:text-white"
+        aria-label="Genealogy"
+        aria-current={pathname === GENEALOGY_HREF ? "page" : undefined}
+      >
+        <Network className="h-5 w-5" aria-hidden />
+      </Link>
       <Suspense fallback={null}>
         <AboutButton />
       </Suspense>
