@@ -103,6 +103,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- Creating a genre now centers the tree on it and opens its detail panel.
+
 ### Changed
 
 - **Three-column layout**: the genre tree uses `placement="regions"` (left detail panel, center About, right player panel). About starts below the header so it no longer runs under the account pill, and the player panel gets an expand toggle that spans center + right. Only one of About, expanded detail and expanded tracklist is open at a time (the last opened wins). The header row and the player panel share the right column (brand's `--layout-right-w`), with one gutter between them. Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.5.2 and `brand` to 12.4.0.

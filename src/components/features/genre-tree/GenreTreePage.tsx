@@ -218,7 +218,8 @@ export default function GenreTreePage() {
   }, []);
 
   const showCriteriaCreationPopup = useCallback(
-    (parent: CriteriaMinimum | null = null) => showPopup(<GenreCreationPopup parent={parent} onClose={hidePopup} />),
+    (parent: CriteriaMinimum | null = null) =>
+      showPopup(<GenreCreationPopup parent={parent} onClose={hidePopup} onCreated={setSelectedNodeId} />),
     [hidePopup, showPopup],
   );
 
