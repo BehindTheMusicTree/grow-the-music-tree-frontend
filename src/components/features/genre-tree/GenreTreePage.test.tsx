@@ -454,5 +454,20 @@ describe("GenreTreePage", () => {
       );
       expect(routerReplaceMock).not.toHaveBeenCalled();
     });
+
+    it("does not strip a genre selected after the list loaded, before it refetches", async () => {
+      useListFullGenrePlaylistsMock.mockReturnValue({ data: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }], isLoading: false });
+
+      const { rerender } = renderGenreTreePage();
+      await screen.findByTestId("genre-tree-view");
+
+      searchParams = new URLSearchParams("genre=just-created");
+      rerender(
+        <GenreTreeViewModeProvider>
+          <GenreTreePage />
+        </GenreTreeViewModeProvider>,
+      );
+      expect(routerReplaceMock).not.toHaveBeenCalled();
+    });
   });
 });

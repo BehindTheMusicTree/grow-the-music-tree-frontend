@@ -36,6 +36,9 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
   // Mount-only seed: the library ignores later changes, and later URL writes must not feed back.
   const [defaultViewport, setDefaultViewport] = useState(() => parseViewport(view));
   const previousViewMode = useRef(viewMode);
+  // Only the genre present when the list first loads is validated: later selections (a just-created genre)
+  // can legitimately precede the refetch.
+  const genreValidated = useRef(false);
 
   const navigate = useCallback(
     (mutate: (params: URLSearchParams) => void, method: "push" | "replace") => {
@@ -88,7 +91,8 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
 
     const stripView = modeChanged && view !== null;
     const stripZoom = zoom !== null && viewMode !== "pop-core";
-    const stripGenre = genre !== null && genreIds !== undefined && !genreIds.has(genre);
+    const stripGenre = !genreValidated.current && genre !== null && genreIds !== undefined && !genreIds.has(genre);
+    if (genreIds !== undefined) genreValidated.current = true;
     const malformedView = view !== null && parseViewport(view) === undefined;
     if (!stripView && !stripZoom && !stripGenre && !malformedView) return;
     navigate((params) => {
