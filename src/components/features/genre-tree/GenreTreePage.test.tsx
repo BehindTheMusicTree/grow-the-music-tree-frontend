@@ -8,6 +8,9 @@ const routerPushMock = vi.fn();
 const routerReplaceMock = vi.fn();
 let searchParams = new URLSearchParams();
 
+vi.mock("@contexts/PlayerPanelProvider", () => ({
+  usePlayerPanel: () => ({ isVisible: false, dismiss: vi.fn(), isExpanded: false, setExpanded: vi.fn() }),
+}));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: routerPushMock, replace: routerReplaceMock }),
   usePathname: () => "/",
@@ -136,18 +139,6 @@ describe("GenreTreePage", () => {
     expect(view.dataset.readonly).toBe("true");
     expect(view).toHaveTextContent("/api/grow-proxy");
     expect(screen.getByRole("heading", { name: "Genre Tree" })).toBeInTheDocument();
-  });
-
-  it("keeps the overlay panel between the detail panel and the player panel", async () => {
-    renderGenreTreePage();
-
-    const bounds = await screen.findByTestId("genre-tree-overlay-bounds");
-    expect(bounds).toHaveClass(
-      "[--gtv-overlay-panel-right:calc(var(--layout-gutter)*2+var(--layout-player-panel-w))]",
-      "[&_.gtv-info-panel--overlay]:left-[calc(var(--layout-gutter)*2+var(--layout-detail-panel-w))]",
-      "[&_.gtv-info-panel--overlay]:[--gtv-info-panel-header-inset:0px]",
-    );
-    expect(bounds).toContainElement(await screen.findByTestId("genre-tree-view"));
   });
 
   it("renders the genre tree editable when signed in as admin", async () => {
