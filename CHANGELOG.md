@@ -105,7 +105,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
-- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 17.2.0: songs without a YouTube video show a crossed-out YouTube icon instead of the "No video available" text.
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.0.0: songs without a YouTube video show a crossed-out YouTube icon instead of the "No video available" text, and the shared buttons no longer depend on a global `button` rule.
+
+### Fixed
+
+- Buttons without their own background (artist sort pills, link-songs tabs, genre picker "more results", danger-zone buttons, video dialog actions, essential-songs reorder arrows, parent chip remove) no longer render with a dark fill and extra padding from a leftover global `button` rule, which is removed from `globals.css`.
 
 ## [3.17.1] - 2026-10-26
 
