@@ -57,7 +57,7 @@ describe("Player", () => {
     expect(screen.getByTestId("player-video-surface")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Show song list" })).toBeInTheDocument();
     expect(screen.queryByTestId("track-list-sidebar")).not.toBeInTheDocument();
-    expect(container.firstChild).not.toHaveClass("h-[calc(100vh-116px)]");
+    expect(container.firstChild).not.toHaveClass("h-[calc(100vh-var(--layout-header-h)-3.5rem)]");
   });
 
   it("shows the load error when the active track failed to load", () => {
@@ -75,7 +75,7 @@ describe("Player", () => {
 
     const { container } = render(renderPlayer());
 
-    expect(container.firstChild).toHaveClass("h-[calc(100vh-116px)]");
+    expect(container.firstChild).toHaveClass("h-[calc(100vh-var(--layout-header-h)-3.5rem)]");
     expect(screen.getByRole("button", { name: "Hide song list" })).toBeInTheDocument();
     const sidebar = screen.getByTestId("track-list-sidebar");
     expect(sidebar).toHaveAttribute("data-layout", "inline");
