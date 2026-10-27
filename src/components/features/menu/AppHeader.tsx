@@ -70,17 +70,17 @@ export default function AppHeader({ className }: AppHeaderProps) {
   const isOutline = viewMode === "outline";
 
   return (
-    <div className={`fixed top-3 right-3 z-50 flex items-center gap-2 ${className ?? ""}`}>
+    <div className={`fixed top-gutter right-gutter z-50 flex h-header w-right-column items-center justify-end gap-2 ${className ?? ""}`}>
       <Link
         href="/"
         prefetch={false}
-        className="flex shrink-0 items-center gap-2 rounded-full bg-black/70 py-1.5 pl-1.5 pr-1.5 shadow-lg backdrop-blur xl:gap-3 xl:pr-4"
+        className="flex shrink-0 items-center gap-2 rounded-full bg-black/70 py-1.5 pl-1.5 pr-1.5 shadow-lg backdrop-blur xl:min-w-0 xl:flex-1 xl:pr-3"
         aria-label={`${APP_NAME} home`}
       >
         <div className="shrink-0">
           <Image src={logo} alt="" width={40} height={40} className="h-auto w-9" aria-hidden priority />
         </div>
-        <h1 className="hidden truncate text-lg font-bold text-gray-100 xl:block xl:text-xl">{APP_NAME}</h1>
+        <h1 className="hidden truncate text-base font-bold text-gray-100 xl:block">{APP_NAME}</h1>
       </Link>
       {menuGroup.length > 0 && (
         <nav

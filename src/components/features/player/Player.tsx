@@ -13,12 +13,21 @@ interface PlayerProps {
 
 export default function Player({ className }: PlayerProps) {
   const { playerTrackObject } = usePlayer();
-  const { isVisible, dismiss } = usePlayerPanel();
+  const { isVisible, dismiss, isExpanded, setExpanded } = usePlayerPanel();
   const trackId = playerTrackObject?.track?.id;
 
   useEffect(() => {
     if (trackId) trackEvent("track_play");
   }, [trackId]);
 
-  return <PlayerPanel className={className} isVisible={isVisible} onClose={dismiss} renderArtistLink={renderArtistLink} />;
+  return (
+    <PlayerPanel
+      className={className}
+      isVisible={isVisible}
+      onClose={dismiss}
+      expanded={isExpanded}
+      onExpandedChange={setExpanded}
+      renderArtistLink={renderArtistLink}
+    />
+  );
 }

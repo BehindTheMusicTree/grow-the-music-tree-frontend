@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, cleanup } from "@testing-library/react";
+import { render, cleanup, fireEvent, screen } from "@testing-library/react";
 import Player from "./Player";
 import { PlayerPanelProvider } from "@contexts/PlayerPanelProvider";
 
@@ -10,8 +10,21 @@ vi.mock("@behindthemusictree/app-kit/player", () => ({
   usePlayer: () => usePlayerMock(),
 }));
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
-  PlayerPanel: ({ isVisible }: { isVisible: boolean }) => (
-    <div data-testid="player-panel" className={isVisible ? "" : "hidden"} />
+  PlayerPanel: ({
+    isVisible,
+    expanded,
+    onExpandedChange,
+  }: {
+    isVisible: boolean;
+    expanded: boolean;
+    onExpandedChange: (expanded: boolean) => void;
+  }) => (
+    <button
+      data-testid="player-panel"
+      className={isVisible ? "" : "hidden"}
+      aria-expanded={expanded}
+      onClick={() => onExpandedChange(!expanded)}
+    />
   ),
 }));
 vi.mock("@lib/analytics", () => ({ trackEvent: trackEventMock }));
@@ -38,5 +51,15 @@ describe("Player", () => {
     usePlayerMock.mockReturnValue({ playerTrackObject: null });
     render(renderPlayer());
     expect(trackEventMock).not.toHaveBeenCalled();
+  });
+
+  it("passes the expanded state through to the panel and updates it on toggle", () => {
+    usePlayerMock.mockReturnValue({ playerTrackObject: { track: { id: "a" } } });
+    render(renderPlayer());
+    const panel = screen.getByTestId("player-panel");
+    expect(panel).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(panel);
+    expect(panel).toHaveAttribute("aria-expanded", "true");
   });
 });

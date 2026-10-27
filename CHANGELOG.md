@@ -109,6 +109,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Three-column layout**: the genre tree uses `placement="regions"` (left detail panel, center About, right player panel). About starts below the header so it no longer runs under the account pill, and the player panel gets an expand toggle that spans center + right. Only one of About, expanded detail and expanded tracklist is open at a time (the last opened wins). The header row and the player panel share the right column (brand's `--layout-right-w`), with one gutter between them. Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.5.2 and `brand` to 12.4.0.
 - Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.4.1: the player panel is back to 22.5rem and follows the brand layout tokens.
 - Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.4.0: the player panel (with its extend-to-detail-panel toggle) now comes from app-kit-ui's `PlayerPanel`, the song-list genre badges sit flush right, and the zoom controls are horizontal by default so the tree no longer overrides them.
 - Add a spacing rule (`.claude/rules/spacing.md`, `docs/STYLE_GUIDE.md`): Tailwind scale or brand tokens, no `em` or arbitrary px.
