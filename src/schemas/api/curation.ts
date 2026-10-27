@@ -1,10 +1,20 @@
 import { z } from "zod";
 
 export const ITEM_ID_PATTERN = /^(Q\d+|LOCAL:[a-z0-9-]+)$/;
+const TRADITION_ID_PATTERN = /^Q\d+$/;
+const ENTITY_ID_PATTERN = /^([a-z]{4}[0-9]{4}|Q\d+)$/;
+const INT_PATTERN = /^-?\d+$/;
+
+const PATTERN_KINDS = {
+  item_id: { pattern: ITEM_ID_PATTERN, message: "Must be a Wikidata QID (Q123) or a LOCAL:<slug> id" },
+  tradition_id: { pattern: TRADITION_ID_PATTERN, message: "Must be a Wikidata QID (Q123)" },
+  entity_id: { pattern: ENTITY_ID_PATTERN, message: "Must be a Glottocode (abcd1234) or a Wikidata QID (Q123)" },
+  int: { pattern: INT_PATTERN, message: "Must be a whole number" },
+} as const;
 
 export const CurationColumnSpecSchema = z.object({
   name: z.string(),
-  kind: z.enum(["item_id", "bool", "text"]),
+  kind: z.enum(["item_id", "tradition_id", "entity_id", "int", "bool", "text"]),
   optional: z.boolean(),
 });
 
@@ -95,11 +105,11 @@ function buildColumnSchema({ kind, optional }: CurationColumnSpec, isKey: boolea
   const value = z.string().trim();
   const filled = optional ? value : value.min(1, "Required");
   const keyed = isKey ? filled.regex(/^[^\t]*$/, "Must not contain a tab") : filled;
-  if (kind !== "item_id") return keyed;
-  const message = "Must be a Wikidata QID (Q123) or a LOCAL:<slug> id";
+  if (kind === "text") return keyed;
+  const { pattern, message } = PATTERN_KINDS[kind];
   return optional
-    ? keyed.refine((id) => id === "" || ITEM_ID_PATTERN.test(id), message)
-    : keyed.regex(ITEM_ID_PATTERN, message);
+    ? keyed.refine((entry) => entry === "" || pattern.test(entry), message)
+    : keyed.regex(pattern, message);
 }
 
 export function buildCurationRowSchema(list: CurationList): z.ZodType<CurationRow> {

@@ -106,6 +106,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Added
 
 - Creating a genre now centers the tree on it and opens its detail panel.
+- **Genealogy page** (`/genealogy`, linked from the header): draws the pipeline's genealogy of music traditions (band fragments, lanes, successions, traditions and their lineage/association links) on a zoomable SVG with a sticky piecewise year axis. Clicking a tradition that is in the genre tree opens the tree on it.
+- Curation forms validate the `tradition_id`, `entity_id` and `int` column kinds grow-api now emits.
 
 ### Changed
 
