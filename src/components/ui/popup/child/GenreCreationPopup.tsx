@@ -8,17 +8,26 @@ import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
 type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable" | "onClose"> & {
   onClose: () => void;
+  onCreated: (nodeId: string) => void;
   parent?: CriteriaMinimum | null;
 };
 
 // Owns its mutation: showPopup stores a frozen element, so formErrors passed as props would never update.
-export default function GenreCreationPopup({ onClose, parent, ...rest }: GenreCreationPopupProps) {
+export default function GenreCreationPopup({ onClose, onCreated, parent, ...rest }: GenreCreationPopupProps) {
   const [name, setName] = useState("");
   const { mutate, isPending, formErrors } = useCreateGenre("reference", getGrowBackendBaseUrl);
 
   const submit = () => {
     if (isPending) return;
-    mutate({ name, parent: parent?.uuid || undefined }, { onSuccess: onClose });
+    mutate(
+      { name, parent: parent?.uuid || undefined },
+      {
+        onSuccess: (genre) => {
+          onClose();
+          onCreated(genre.criteriaPlaylist.uuid);
+        },
+      },
+    );
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

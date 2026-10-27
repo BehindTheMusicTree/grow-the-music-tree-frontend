@@ -23,12 +23,13 @@ import EssentialSongsEditor from "@components/features/genre-curation/EssentialS
 import SongCheckbox from "@components/features/genre-curation/SongCheckbox";
 import SongRowActions from "@components/features/genre-curation/SongRowActions";
 import SelectionBar from "@components/features/genre-curation/SelectionBar";
+import { useCenterColumn } from "@hooks/useCenterColumn";
+import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import AboutContent from "@components/features/about/AboutContent";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
-import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
 import { PATHS } from "@lib/constants/routes";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -76,7 +77,14 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
   const searchParams = useSearchParams();
   const zoom = searchParams.get(ZOOM_PARAM);
   const about = searchParams.has(ABOUT_PARAM);
-  const { onSelectedNodeIdChange } = viewProps;
+  const {
+    selectedNodeId,
+    onSelectedNodeIdChange,
+    expanded: detailExpanded = false,
+    onExpandedChange: setDetailExpanded,
+  } = viewProps;
+  const [detailCollapsed, setDetailCollapsed] = useState(false);
+  const { isExpanded: tracklistExpanded, setExpanded: setTracklistExpanded } = usePlayerPanel();
   const isPopCore = viewProps.viewMode === "pop-core";
 
   const hrefWithZoom = useCallback(
@@ -104,6 +112,31 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
     [pathname, searchParams, router],
   );
 
+  const collapseDetail = useCallback((expanded: boolean) => setDetailExpanded?.(expanded), [setDetailExpanded]);
+  useCenterColumn({
+    about,
+    closeAbout: () => closeAbout("replace"),
+    detailExpanded,
+    setDetailExpanded: collapseDetail,
+    tracklistExpanded,
+    setTracklistExpanded,
+  });
+
+  useEffect(() => {
+    setDetailCollapsed(false);
+  }, [selectedNodeId]);
+
+  // The brand layout tokens derive the center column, header and extended player from this variable.
+  const isDetailHidden = detailCollapsed || !selectedNodeId;
+  useEffect(() => {
+    if (!isDetailHidden) return undefined;
+    const root = document.documentElement;
+    root.style.setProperty("--layout-left-w", "0px");
+    return () => {
+      root.style.removeProperty("--layout-left-w");
+    };
+  }, [isDetailHidden]);
+
   useEffect(() => {
     if (about) onSelectedNodeIdChange?.(null);
   }, [about, onSelectedNodeIdChange]);
@@ -117,11 +150,16 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
     [about, closeAbout, onSelectedNodeIdChange],
   );
 
-  const overlayPanel = about ? { title: "About", content: <AboutContent />, onClose: () => closeAbout() } : undefined;
+  const overlayPanel = about
+    ? { title: "TheMusicTree", content: <AboutContent onClose={() => closeAbout()} />, onClose: () => closeAbout() }
+    : undefined;
   const sharedProps = {
     ...viewProps,
     onSelectedNodeIdChange: handleSelectedNodeIdChange,
     overlayPanel,
+    collapsed: detailCollapsed,
+    onCollapsedChange: setDetailCollapsed,
+    placement: "regions" as const,
     showDisplayOptions: false,
     onArtistSelect: (artist: ArtistSearchResult) => router.push(PATHS.ARTIST(artist.uuid)),
   };
@@ -147,7 +185,6 @@ export default function GenreTreePage() {
   const getBackendBaseUrl = getGrowBackendBaseUrl;
   const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
   const isAdmin = useIsAdmin();
-  const { isVisible: isPlayerPanelVisible } = usePlayerPanel();
   const { showPopup, hidePopup } = usePopup();
   const [editMode, setEditMode] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -204,7 +241,8 @@ export default function GenreTreePage() {
   }, []);
 
   const showCriteriaCreationPopup = useCallback(
-    (parent: CriteriaMinimum | null = null) => showPopup(<GenreCreationPopup parent={parent} onClose={hidePopup} />),
+    (parent: CriteriaMinimum | null = null) =>
+      showPopup(<GenreCreationPopup parent={parent} onClose={hidePopup} onCreated={setSelectedNodeId} />),
     [hidePopup, showPopup],
   );
 
@@ -262,11 +300,6 @@ export default function GenreTreePage() {
   return (
     <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
       <GenreCurationProvider>
-      {/* Player's panel is right-3 + w-[280px]; the overlay panel stops 12px short of it (12 + 280 + 12). */}
-      <div
-        className={isPlayerPanelVisible ? "contents [--gtv-overlay-panel-right:304px]" : "contents"}
-        data-testid="genre-tree-overlay-bounds"
-      >
       <Suspense fallback={<GenreTreeViewLoadingFallback />}>
         <ZoomableGenreTreeView
           scope="reference"
@@ -277,13 +310,11 @@ export default function GenreTreePage() {
           readOnly={!isAdmin}
           selectedNodeId={selectedNodeId}
           onSelectedNodeIdChange={setSelectedNodeId}
-          controlsOrientation="horizontal"
           renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
           renderArtistLink={renderArtistLink}
           {...curation}
         />
       </Suspense>
-      </div>
       </GenreCurationProvider>
     </Page>
   );

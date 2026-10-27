@@ -1,0 +1,149 @@
+{
+  "columns": [
+    {
+      "id": "Q750",
+      "lanes": [
+        {
+          "label": "Bolivia",
+          "endYear": 1950,
+          "entityId": "Q750",
+          "startYear": 1825
+        }
+      ],
+      "position": 21
+    },
+    {
+      "id": "Q45",
+      "lanes": [
+        {
+          "label": "Portugal",
+          "endYear": 1950,
+          "entityId": "Q45",
+          "startYear": 868
+        }
+      ],
+      "position": 29
+    },
+    {
+      "id": "Q34",
+      "lanes": [
+        {
+          "label": "Sweden",
+          "endYear": 1950,
+          "entityId": "Q34",
+          "startYear": 900
+        }
+      ],
+      "position": 67
+    },
+    {
+      "id": "Q12536",
+      "lanes": [
+        {
+          "label": "Abbasid Caliphate",
+          "endYear": 1258,
+          "entityId": "Q12536",
+          "startYear": 750
+        },
+        {
+          "label": "Ottoman Empire",
+          "endYear": 1922,
+          "entityId": "Q12560",
+          "startYear": 1299
+        }
+      ],
+      "position": 96
+    },
+    {
+      "id": "Q252",
+      "lanes": [
+        {
+          "label": "Indonesia",
+          "endYear": 1950,
+          "entityId": "Q252",
+          "startYear": 1945
+        }
+      ],
+      "position": 130
+    }
+  ],
+  "bands": [
+    {
+      "label": "France",
+      "endYear": 1950,
+      "entityId": "Q142",
+      "fragment": 0,
+      "startYear": 481,
+      "endPosition": 43,
+      "startPosition": 43
+    }
+  ],
+  "successions": [
+    {
+      "successorId": "Q12560",
+      "predecessorId": "Q12536"
+    }
+  ],
+  "traditions": [
+    {
+      "end": 1950,
+      "label": "nacional-canconetismo",
+      "start": 868,
+      "anchorId": "Q45",
+      "wikidataId": "Q10335288",
+      "inCanonicalTree": true
+    },
+    {
+      "end": 1950,
+      "label": "tanzhammer-pop",
+      "start": 900,
+      "anchorId": "Q34",
+      "wikidataId": "Q104602773",
+      "inCanonicalTree": true
+    },
+    {
+      "end": 1950,
+      "label": "sikuris de italaque",
+      "start": 1825,
+      "anchorId": "Q750",
+      "wikidataId": "Q100307135",
+      "inCanonicalTree": false
+    },
+    {
+      "end": 1950,
+      "label": "gamelan mandolin",
+      "start": 1945,
+      "anchorId": "Q252",
+      "wikidataId": "Q100348626",
+      "inCanonicalTree": false
+    },
+    {
+      "end": 1950,
+      "label": "Taizé song",
+      "start": 481,
+      "anchorId": "Q142",
+      "wikidataId": "Q101525913",
+      "inCanonicalTree": false
+    },
+    {
+      "end": 1950,
+      "label": "Sepolcro",
+      "start": 1700,
+      "anchorId": null,
+      "wikidataId": "Q105762622",
+      "inCanonicalTree": false
+    }
+  ],
+  "traditionLinks": [
+    {
+      "sourceId": "Q10335288",
+      "targetId": "Q104602773",
+      "kind": "lineage"
+    },
+    {
+      "sourceId": "Q100307135",
+      "targetId": "Q100348626",
+      "kind": "association"
+    }
+  ]
+}

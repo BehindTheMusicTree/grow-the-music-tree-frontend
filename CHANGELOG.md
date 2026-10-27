@@ -103,6 +103,34 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.18.0] - 2026-10-27
+
+### Added
+
+- Creating a genre now centers the tree on it and opens its detail panel.
+- **Genealogy page** (`/genealogy`, linked from the header): draws the pipeline's genealogy of music traditions (band fragments, lanes, successions, traditions and their lineage/association links) on a zoomable SVG with a sticky piecewise year axis. Clicking a tradition that is in the genre tree opens the tree on it.
+- Curation forms validate the `tradition_id`, `entity_id` and `int` column kinds grow-api now emits.
+- The genre detail panel can be hidden and shown from a Maps-style edge tab, which also extends it for admins.
+
+### Changed
+
+- The detail panel is 408px wide with 16px corners and a 48px search pill; the song list panel hides and extends from an edge tab, and hiding it leaves only the video.
+- Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 19.0.0 and `brand` to 12.5.0.
+- **Three-column layout**: the genre tree uses `placement="regions"` (left detail panel, center About, right player panel). About starts below the header so it no longer runs under the account pill, and the player panel gets an expand toggle that spans center + right. Only one of About, expanded detail and expanded tracklist is open at a time (the last opened wins). The header row and the player panel share the right column (brand's `--layout-right-w`), with one gutter between them. Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.5.2 and `brand` to 12.4.0.
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.4.1: the player panel is back to 22.5rem and follows the brand layout tokens.
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.4.0: the player panel (with its extend-to-detail-panel toggle) now comes from app-kit-ui's `PlayerPanel`, the song-list genre badges sit flush right, and the zoom controls are horizontal by default so the tree no longer overrides them.
+- Add a spacing rule (`.claude/rules/spacing.md`, `docs/STYLE_GUIDE.md`): Tailwind scale or brand tokens, no `em` or arbitrary px.
+- **One spacing system**: the `:root { font-size: 14px }` override is removed, so the app renders on the browser's default 16px root (about 14% larger; it follows the browser font setting). Tailwind uses the `@behindthemusictree/brand` preset (`gutter`, `header`, `detail-panel`, `player-panel` sizes), and the player panel and the About column are positioned from the brand `--layout-*` tokens instead of px overrides. Bumps `@behindthemusictree/app-kit` and `app-kit-ui` to 18.3.0 and `@behindthemusictree/brand` to 12.2.0, which size everything in rem.
+- The About page is a centered column between the detail panel and the player panel (header titled "TheMusicTree", with a "TheMusicTree" button that closes it), the player panel is 360px wide, and the search bar sits 8px from every edge of the genre info panel header.
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.2.1: the Play/Focus action band no longer has doubled vertical padding above and below its icons.
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.1.0: the artist search list keeps the previous results while the next ones load instead of going blank on each keystroke.
+- Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 18.0.0: songs without a YouTube video show a crossed-out YouTube icon instead of the "No video available" text, and the shared buttons no longer depend on a global `button` rule.
+
+### Fixed
+
+- Buttons without their own background (artist sort pills, link-songs tabs, genre picker "more results", danger-zone buttons, video dialog actions, essential-songs reorder arrows, parent chip remove) no longer render with a dark fill and extra padding from a leftover global `button` rule, which is removed from `globals.css`.
+- Links without their own color class inherit the surrounding text color instead of the Vite template's purple; the unused template classes (`.card`, `.read-the-docs`, `.logo`) are removed from `globals.css`.
+
 ## [3.17.1] - 2026-10-26
 
 ### Changed

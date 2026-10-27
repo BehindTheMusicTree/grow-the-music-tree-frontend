@@ -71,6 +71,8 @@ Example:
 </button>
 ```
 
+**Spacing:** the root font size stays at the browser default (16px). Use the Tailwind scale or the brand preset tokens (`gutter`, `header`, `detail-panel`, `player-panel`); no `em` spacing, no arbitrary px except fixed geometry. See `.claude/rules/spacing.md`.
+
 **Common patterns:**
 
 | Concept         | Tailwind classes |

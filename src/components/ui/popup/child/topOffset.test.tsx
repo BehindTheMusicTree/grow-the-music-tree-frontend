@@ -32,7 +32,7 @@ const popups: Array<[string, () => React.ReactElement]> = [
     ),
   ],
   ["NetworkErrorPopup", () => <NetworkErrorPopup />],
-  ["GenreCreationPopup", () => <GenreCreationPopup onClose={vi.fn()} />],
+  ["GenreCreationPopup", () => <GenreCreationPopup onClose={vi.fn()} onCreated={vi.fn()} />],
   ["InternalErrorPopup", () => <InternalErrorPopup errorCode={ErrorCode.CLIENT_INTERNAL_ERROR} />],
   ["InvalidInputPopup", () => <InvalidInputPopup details={{ message: "Invalid input" }} />],
 ];

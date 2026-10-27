@@ -1,8 +1,11 @@
+import brandPreset from "@behindthemusictree/brand/tailwind-preset";
+
 /** @type {import('tailwindcss').Config} */
 
 const playerHeight = "56px";
 const bannerHeight = "64px";
 const config = {
+  presets: [brandPreset],
   content: [
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",

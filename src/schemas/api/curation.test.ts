@@ -65,6 +65,44 @@ describe("buildCurationRowSchema", () => {
   });
 });
 
+describe("buildCurationRowSchema kinds", () => {
+  const kindSchema = (kind: "tradition_id" | "entity_id" | "int", optional = false) =>
+    buildCurationRowSchema({
+      ...list,
+      keyColumns: [],
+      columns: ["value"],
+      columnSpecs: [{ name: "value", kind, optional }],
+    });
+
+  it.each([
+    ["tradition_id", "Q123", true],
+    ["tradition_id", "LOCAL:blues", false],
+    ["tradition_id", "abcd1234", false],
+    ["entity_id", "abcd1234", true],
+    ["entity_id", "Q42", true],
+    ["entity_id", "abc1234", false],
+    ["entity_id", "LOCAL:blues", false],
+    ["int", "1950", true],
+    ["int", "-300", true],
+    ["int", "19.5", false],
+    ["int", "abc", false],
+  ] as const)("%s accepts %s: %s", (kind, value, accepted) => {
+    expect(kindSchema(kind).safeParse({ value }).success).toBe(accepted);
+  });
+
+  it("lets an optional int stay blank but checks it when filled", () => {
+    const schema = kindSchema("int", true);
+
+    expect(schema.safeParse({ value: "" }).success).toBe(true);
+    expect(schema.safeParse({ value: "-12" }).success).toBe(true);
+    expect(schema.safeParse({ value: "x" }).success).toBe(false);
+  });
+
+  it("requires a non-optional int", () => {
+    expect(kindSchema("int").safeParse({ value: "" }).success).toBe(false);
+  });
+});
+
 describe("toCurationRow", () => {
   it('maps booleans to "true"/"" and fills missing columns', () => {
     expect(toCurationRow(list, { item_id: "Q1", exclude_other_parents: false })).toEqual({

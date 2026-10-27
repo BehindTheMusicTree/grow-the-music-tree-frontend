@@ -7,7 +7,7 @@ import { MoveSongsPopup, UnlinkSongsPopup } from "@components/features/genre-cur
 import SongVideoDialog from "@components/features/genre-curation/SongVideoDialog";
 import { useEssentialSongs } from "@hooks/curation/useEssentialSongs";
 
-const BUTTON = "px-1 cursor-pointer hover:bg-gray-100 rounded disabled:opacity-50";
+const BUTTON = "bg-transparent px-1 py-0 text-[length:inherit] leading-none cursor-pointer hover:bg-gray-100 rounded disabled:opacity-50";
 
 export default function SongRowActions({ song }: { song: TrackBase }) {
   const { genre, openDialog } = useGenreCuration();
