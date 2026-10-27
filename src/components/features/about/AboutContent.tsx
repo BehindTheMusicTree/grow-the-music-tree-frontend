@@ -47,16 +47,22 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
   );
 }
 
-export default function AboutContent() {
+export default function AboutContent({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex flex-col gap-10 w-full max-w-2xl py-8 mx-auto">
       <header className="flex flex-col items-center gap-3 text-center">
         <AboutTheMusicTreeLockup />
-        <h1 className="text-3xl font-semibold tracking-tight text-gray-900">TheMusicTree</h1>
         <p className="text-lg font-medium text-gray-700">The map of the world&apos;s music.</p>
         <p className="max-w-xl text-base leading-relaxed text-gray-600">
           Explore how genres branch out, listen as you go, and help build a reference that aims to classify every song.
         </p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-4 py-2 font-medium bg-blue-600 text-white rounded transition-colors hover:bg-blue-700"
+        >
+          TheMusicTree
+        </button>
       </header>
 
       <section aria-label="What you can do" className="grid gap-6 sm:grid-cols-3">
