@@ -277,7 +277,6 @@ export default function GenreTreePage() {
           readOnly={!isAdmin}
           selectedNodeId={selectedNodeId}
           onSelectedNodeIdChange={setSelectedNodeId}
-          controlsOrientation="horizontal"
           renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
           renderArtistLink={renderArtistLink}
           {...curation}
