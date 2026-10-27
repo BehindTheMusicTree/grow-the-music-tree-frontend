@@ -77,7 +77,13 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
   const searchParams = useSearchParams();
   const zoom = searchParams.get(ZOOM_PARAM);
   const about = searchParams.has(ABOUT_PARAM);
-  const { onSelectedNodeIdChange, expanded: detailExpanded = false, onExpandedChange: setDetailExpanded } = viewProps;
+  const {
+    selectedNodeId,
+    onSelectedNodeIdChange,
+    expanded: detailExpanded = false,
+    onExpandedChange: setDetailExpanded,
+  } = viewProps;
+  const [detailCollapsed, setDetailCollapsed] = useState(false);
   const { isExpanded: tracklistExpanded, setExpanded: setTracklistExpanded } = usePlayerPanel();
   const isPopCore = viewProps.viewMode === "pop-core";
 
@@ -117,6 +123,21 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
   });
 
   useEffect(() => {
+    setDetailCollapsed(false);
+  }, [selectedNodeId]);
+
+  // The brand layout tokens derive the center column, header and extended player from this variable.
+  const isDetailHidden = detailCollapsed || !selectedNodeId;
+  useEffect(() => {
+    if (!isDetailHidden) return undefined;
+    const root = document.documentElement;
+    root.style.setProperty("--layout-left-w", "0px");
+    return () => {
+      root.style.removeProperty("--layout-left-w");
+    };
+  }, [isDetailHidden]);
+
+  useEffect(() => {
     if (about) onSelectedNodeIdChange?.(null);
   }, [about, onSelectedNodeIdChange]);
 
@@ -136,6 +157,8 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
     ...viewProps,
     onSelectedNodeIdChange: handleSelectedNodeIdChange,
     overlayPanel,
+    collapsed: detailCollapsed,
+    onCollapsedChange: setDetailCollapsed,
     placement: "regions" as const,
     showDisplayOptions: false,
     onArtistSelect: (artist: ArtistSearchResult) => router.push(PATHS.ARTIST(artist.uuid)),
