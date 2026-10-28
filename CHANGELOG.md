@@ -117,6 +117,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - The artist panel now matches the genre panel: content is inset to the panel edge, facts show as a Type / Country / Active list, and Discography, Members and Songs are collapsible sections divided like the genre panel, using brand colours so dark mode works. Bumped `@behindthemusictree/ui` to 0.5.0 (`PanelSection`, `FieldList`, `Chip`).
 - Artist panel sections are now separated the same way as in the genre panel: every section, Discography included, has one divider above it, and links sit in the fields list under Type / Country / Active. Bumped `@behindthemusictree/ui` to 0.6.0.
 
+### Fixed
+
+- Local `pnpm test` and `pnpm lint` no longer pick up code in `.claude/worktrees/` (which mixed two React copies and failed 100+ tests), and the pop-core zoom-controls test no longer times out under a full parallel run.
+
 ## [3.18.0] - 2026-10-27
 
 ### Added
