@@ -113,6 +113,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- pnpm is pinned to 10.33.2 through `package.json`'s `packageManager`, which local pnpm, CI and the Docker build all read, and the dependency overrides move to `pnpm-workspace.yaml`. A newer global pnpm (11+) no longer drops the overrides and rewrites `pnpm-lock.yaml`.
 - Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 22.0.0 and `@behindthemusictree/ui` to 0.7.0. The artist panel now comes from app-kit's `GenreTreeView` (`artistUuid` / `onArtistUuidChange`); the frontend's own artist panel components are removed. Selecting a genre no longer drops `?artist=`.
 - The right column (header row and player panel) is now as wide as the detail panel (25.5rem). Bumped `@behindthemusictree/brand` to 12.6.0.
 - Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 20.0.0. Genre and genre-playlist UUIDs are branded types now; ids coming from the tree view are parsed at the boundary.
