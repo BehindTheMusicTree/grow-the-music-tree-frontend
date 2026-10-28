@@ -58,7 +58,6 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
         if (id) {
           params.set(GENRE_PARAM, id);
           params.delete(ABOUT_PARAM);
-          params.delete(ARTIST_PARAM);
         } else params.delete(GENRE_PARAM);
       }, method),
     [navigate],
