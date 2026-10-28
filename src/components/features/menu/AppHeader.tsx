@@ -77,10 +77,10 @@ export default function AppHeader({ className }: AppHeaderProps) {
         className="flex shrink-0 items-center gap-2 rounded-full bg-black/70 py-1.5 pl-1.5 pr-1.5 shadow-lg backdrop-blur xl:min-w-0 xl:flex-1 xl:pr-3"
         aria-label={`${APP_NAME} home`}
       >
-        <div className="shrink-0">
-          <Image src={logo} alt="" width={40} height={40} className="h-auto w-9" aria-hidden priority />
+        <div className="flex h-9 flex-wrap items-center gap-x-2 overflow-hidden xl:min-w-0 xl:flex-1">
+          <Image src={logo} alt="" width={40} height={40} className="h-auto w-9 shrink-0" aria-hidden priority />
+          <h1 className="hidden whitespace-nowrap text-base font-bold text-gray-100 xl:block">{APP_NAME}</h1>
         </div>
-        <h1 className="hidden truncate text-base font-bold text-gray-100 xl:block">{APP_NAME}</h1>
       </Link>
       {menuGroup.length > 0 && (
         <nav
