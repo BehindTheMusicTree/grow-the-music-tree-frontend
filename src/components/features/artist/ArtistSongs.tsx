@@ -3,13 +3,12 @@
 import { useState, type MouseEvent } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { Play } from "lucide-react";
-import { Pagination } from "@behindthemusictree/ui";
+import { Pagination, PanelSection, Skeleton } from "@behindthemusictree/ui";
 import { usePlayer } from "@behindthemusictree/app-kit/player";
 import { SongDetailedSchema, libraryEndpoints, songUnplayableReason, useTrackList, type SongDetailed } from "@behindthemusictree/app-kit/genre-tree";
 import { TrackItem } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { PaginatedResponseSchema, useFetchWrapper, useQueryWithParse } from "@behindthemusictree/app-kit/transport";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
-import ArtistSection from "./ArtistSection";
 import { renderArtistLink } from "./renderArtistLink";
 
 const SongPageSchema = PaginatedResponseSchema(SongDetailedSchema);
@@ -55,25 +54,25 @@ export default function ArtistSongs({ artist }: { artist: { uuid: string; name: 
   };
 
   return (
-    <ArtistSection title="Songs">
+    <PanelSection title="Songs">
       {isPending ? (
-        <div className="h-14 animate-pulse rounded bg-gray-200" aria-busy="true" />
+        <Skeleton className="h-14" aria-busy="true" />
       ) : isError ? (
         <p className="text-red-600">Could not load songs.</p>
       ) : data.results.length === 0 ? (
-        <p className="text-gray-600">No songs yet.</p>
+        <p className="text-[var(--color-text-muted)]">No songs yet.</p>
       ) : (
         <>
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
             <button
               type="button"
               onClick={() => void play()}
-              className="flex w-fit items-center gap-2 rounded-full bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 "
+              className="flex w-fit items-center gap-1.5 px-3 py-1 text-xs font-medium bg-gray-900 text-white rounded-full hover:bg-gray-700"
             >
-              <Play className="h-4 w-4" aria-hidden="true" />
+              <Play className="h-3.5 w-3.5" aria-hidden="true" />
               Play all
             </button>
-            <div role="group" aria-label="Sort songs by" className="flex gap-1 text-sm">
+            <div role="group" aria-label="Sort songs by" className="flex gap-1 text-xs">
               {SORTS.map((sort) => (
                 <button
                   key={sort.ordering}
@@ -83,14 +82,14 @@ export default function ArtistSongs({ artist }: { artist: { uuid: string; name: 
                     setOrdering(sort.ordering);
                     setPage(1);
                   }}
-                  className="rounded-full px-3 py-1 text-gray-700 hover:bg-gray-100 aria-pressed:bg-gray-900 aria-pressed:text-white"
+                  className="px-2.5 py-0.5 text-[var(--color-text)] rounded-full hover:bg-[var(--color-surface-muted)] aria-pressed:bg-gray-900 aria-pressed:text-white"
                 >
                   {sort.label}
                 </button>
               ))}
             </div>
           </div>
-          <ul className="overflow-hidden rounded-lg bg-zinc-950">
+          <ul className="overflow-hidden mb-2 bg-zinc-950 rounded-lg">
             {data.results.map((song, index) => (
               <li key={song.uuid} onClickCapture={(event) => handleRowClickCapture(event, song)}>
                 <TrackItem
@@ -104,6 +103,6 @@ export default function ArtistSongs({ artist }: { artist: { uuid: string; name: 
           <Pagination currentPage={page} totalPages={data.totalPages} onPageChange={setPage} />
         </>
       )}
-    </ArtistSection>
+    </PanelSection>
   );
 }

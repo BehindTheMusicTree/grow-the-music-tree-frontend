@@ -1,16 +1,16 @@
+import { FieldList } from "@behindthemusictree/ui";
 import type { ArtistDetailed } from "@schemas/api/artist";
 import { formatYears } from "./formatYears";
 
 const countryNames = new Intl.DisplayNames(["en"], { type: "region" });
 
 export default function ArtistHeader({ artist }: { artist: ArtistDetailed }) {
-  const years = formatYears(artist.beginYear, artist.endYear, artist.ended);
-  const facts = [
-    artist.type && artist.type.charAt(0).toUpperCase() + artist.type.slice(1),
-    artist.country && countryNames.of(artist.country),
-    years,
-  ].filter(Boolean);
+  const fields = [
+    { label: "Type", value: artist.type && artist.type.charAt(0).toUpperCase() + artist.type.slice(1) },
+    { label: "Country", value: artist.country && countryNames.of(artist.country) },
+    { label: "Active", value: formatYears(artist.beginYear, artist.endYear, artist.ended) },
+  ].filter((field): field is { label: string; value: string } => Boolean(field.value));
 
-  if (facts.length === 0) return null;
-  return <p className="text-gray-600">{facts.join(" · ")}</p>;
+  if (fields.length === 0) return null;
+  return <FieldList items={fields} />;
 }

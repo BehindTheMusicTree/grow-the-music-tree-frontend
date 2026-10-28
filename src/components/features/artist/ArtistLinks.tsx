@@ -10,8 +10,8 @@ import {
   SiWikipedia,
   SiYoutube,
 } from "react-icons/si";
+import { Chip } from "@behindthemusictree/ui";
 import type { ArtistDetailed, ArtistLink } from "@schemas/api/artist";
-import ArtistSection from "./ArtistSection";
 
 const LINK_KINDS: Record<ArtistLink["kind"], { label: string; Icon: ComponentType<{ className?: string }> }> = {
   official: { label: "Official website", Icon: Globe },
@@ -51,22 +51,14 @@ export default function ArtistLinks({ artist }: { artist: ArtistDetailed }) {
   if (links.length === 0) return null;
 
   return (
-    <ArtistSection title="Links">
-      <ul className="flex flex-wrap gap-2">
-        {links.map(({ key, url, Icon, label }) => (
-          <li key={key}>
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 rounded-md border border-gray-200 px-2.5 py-1 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-              {label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </ArtistSection>
+    <ul aria-label="Links" className="flex flex-wrap gap-1.5 px-6 pb-2.5">
+      {links.map(({ key, url, Icon, label }) => (
+        <li key={key}>
+          <Chip href={url} icon={<Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />}>
+            {label}
+          </Chip>
+        </li>
+      ))}
+    </ul>
   );
 }

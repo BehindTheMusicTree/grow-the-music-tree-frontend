@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, within } from "@testing-library/react";
 import { useArtistPanel } from "./useArtistPanel";
 
 type ArtistResult = { status: string; artist?: unknown };
@@ -69,7 +69,10 @@ describe("useArtistPanel", () => {
     render(<Harness uuid={UUID} />);
 
     const region = screen.getByRole("region", { name: "Band" });
-    expect(region).toHaveTextContent("Group · United Kingdom · 1994–present");
+    const terms = within(region).getAllByRole("term").map((term) => term.textContent);
+    const definitions = within(region).getAllByRole("definition").map((definition) => definition.textContent);
+    expect(terms).toEqual(["Type", "Country", "Active"]);
+    expect(definitions).toEqual(["Group", "United Kingdom", "1994–present"]);
     expect(region).toHaveTextContent("Songs list");
     expect(screen.getByRole("complementary", { name: "Extra" })).toHaveTextContent("First");
     expect(document.title).toBe("Band");

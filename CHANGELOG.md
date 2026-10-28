@@ -113,6 +113,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - The right column (header row and player panel) is now as wide as the detail panel (25.5rem). Bumped `@behindthemusictree/brand` to 12.6.0.
 - Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 20.0.0. Genre and genre-playlist UUIDs are branded types now; ids coming from the tree view are parsed at the boundary.
 - Every header button now has the header height (48px). On `/genealogy` the Genealogy button shows its label and the brand pill keeps only the logo; the brand name is never truncated.
+- The artist panel now matches the genre panel: content is inset to the panel edge, facts show as a Type / Country / Active list, and Discography, Members and Songs are collapsible sections divided like the genre panel, using brand colours so dark mode works. Bumped `@behindthemusictree/ui` to 0.5.0 (`PanelSection`, `FieldList`, `Chip`).
 
 ## [3.18.0] - 2026-10-27
 
