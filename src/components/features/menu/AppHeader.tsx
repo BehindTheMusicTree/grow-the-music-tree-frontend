@@ -68,18 +68,23 @@ export default function AppHeader({ className }: AppHeaderProps) {
   const pathname = usePathname();
   const { viewMode, setViewMode, canShowPopCore } = useGenreTreeViewMode();
   const isOutline = viewMode === "outline";
+  const isGenealogy = pathname === GENEALOGY_HREF;
 
   return (
     <div className={`fixed top-gutter right-gutter z-50 flex h-header w-right-column items-center justify-end gap-2 ${className ?? ""}`}>
       <Link
         href="/"
         prefetch={false}
-        className="flex shrink-0 items-center gap-2 rounded-full bg-black/70 py-1.5 pl-1.5 pr-1.5 shadow-lg backdrop-blur xl:min-w-0 xl:flex-1 xl:pr-3"
+        className="flex shrink-0 items-center gap-2 rounded-full bg-black/70 py-1.5 pl-1.5 pr-1.5 shadow-lg backdrop-blur xl:min-w-0 xl:pr-3"
         aria-label={`${APP_NAME} home`}
       >
-        <div className="flex h-9 flex-wrap items-center gap-x-2 overflow-hidden xl:min-w-0 xl:flex-1">
+        <div className="flex h-9 flex-wrap items-center gap-x-2 overflow-hidden xl:min-w-0">
           <Image src={logo} alt="" width={40} height={40} className="h-auto w-9 shrink-0" aria-hidden priority />
-          <h1 className="hidden whitespace-nowrap text-base font-bold text-gray-100 xl:block">{APP_NAME}</h1>
+          <h1
+            className={`whitespace-nowrap text-base font-bold text-gray-100 ${isGenealogy ? "sr-only" : "hidden xl:block"}`}
+          >
+            {APP_NAME}
+          </h1>
         </div>
       </Link>
       {menuGroup.length > 0 && (
@@ -103,11 +108,12 @@ export default function AppHeader({ className }: AppHeaderProps) {
       <Link
         href={GENEALOGY_HREF}
         prefetch={false}
-        className="flex shrink-0 items-center justify-center rounded-full bg-black/70 p-2 text-gray-100 shadow-lg backdrop-blur transition-colors duration-200 hover:text-white"
+        className={`flex shrink-0 items-center justify-center rounded-full bg-black/70 p-2 text-gray-100 shadow-lg backdrop-blur transition-colors duration-200 hover:text-white ${isGenealogy ? "xl:gap-2 xl:pr-3" : ""}`}
         aria-label="Genealogy"
-        aria-current={pathname === GENEALOGY_HREF ? "page" : undefined}
+        aria-current={isGenealogy ? "page" : undefined}
       >
         <Network className="h-5 w-5" aria-hidden />
+        {isGenealogy && <span className="hidden text-base font-bold xl:inline">Genealogy</span>}
       </Link>
       <Suspense fallback={null}>
         <AboutButton />

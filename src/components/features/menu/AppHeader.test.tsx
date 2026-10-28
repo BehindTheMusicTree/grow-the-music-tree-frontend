@@ -5,9 +5,10 @@ import AppHeader from "./AppHeader";
 import { GenreTreeViewModeProvider, useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 
 let searchParams = new URLSearchParams();
+let pathname = "/";
 
 vi.mock("next/navigation", () => ({
-  usePathname: () => "/",
+  usePathname: () => pathname,
   useSearchParams: () => searchParams,
   useRouter: () => ({ push: vi.fn() }),
 }));
@@ -32,6 +33,7 @@ describe("AppHeader view toggle", () => {
   afterEach(() => {
     cleanup();
     searchParams = new URLSearchParams();
+    pathname = "/";
   });
 
   it("links the About button to /?about", () => {
@@ -44,6 +46,24 @@ describe("AppHeader view toggle", () => {
     renderHeader(true);
 
     expect(screen.getByRole("link", { name: "Genealogy" })).toHaveAttribute("href", "/genealogy");
+  });
+
+  it("shows only the icon on the Genealogy link away from the genealogy page", () => {
+    renderHeader(true);
+
+    const link = screen.getByRole("link", { name: "Genealogy" });
+    expect(link).toHaveTextContent("");
+    expect(link).not.toHaveAttribute("aria-current");
+  });
+
+  it("shows the Genealogy label and keeps the brand heading for assistive tech on the genealogy page", () => {
+    pathname = "/genealogy";
+    renderHeader(true);
+
+    const link = screen.getByRole("link", { name: "Genealogy" });
+    expect(link).toHaveTextContent("Genealogy");
+    expect(link).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("heading", { name: "GrowTheMusicTree" })).toHaveClass("sr-only");
   });
 
   it("keeps other params when opening About", () => {
