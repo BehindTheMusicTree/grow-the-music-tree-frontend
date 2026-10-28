@@ -11,6 +11,7 @@ import { useSecondaryParent, secondaryParentsKey } from "@hooks/curation/useSeco
 import { useUpdateGenreName } from "@hooks/curation/useUpdateGenreName";
 import { useUpdateGenreSummary } from "@hooks/curation/useUpdateGenreSummary";
 import { useUpdateSongVideo } from "@hooks/curation/useUpdateSongVideo";
+import { makeGenreUuid } from "@behindthemusictree/app-kit/genre-tree/testing";
 
 const fetchMock = vi.fn();
 const toastSuccess = vi.fn();
@@ -71,8 +72,8 @@ describe("curation hooks", () => {
 
   it("updates the summary optimistically and undoes it", async () => {
     const { result, queryClient } = setup(useUpdateGenreSummary);
-    queryClient.setQueryData(genreQueryKeys.reference.overview("g1"), { summary: "old" });
-    const [message, options] = await run(result, { uuid: "g1", summary: "new", previous: "old" });
+    queryClient.setQueryData(genreQueryKeys.reference.overview(makeGenreUuid("g1")), { summary: "old" });
+    const [message, options] = await run(result, { uuid: makeGenreUuid("g1"), summary: "new", previous: "old" });
     expect(message).toBe("Summary saved");
     act(() => options.action?.onClick());
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
@@ -81,9 +82,9 @@ describe("curation hooks", () => {
 
   it("updates essential tracks optimistically and undoes them", async () => {
     const { result, queryClient } = setup(useEssentialSongs);
-    queryClient.setQueryData(genreQueryKeys.reference.overview("g1"), { essentialSongs: [] });
+    queryClient.setQueryData(genreQueryKeys.reference.overview(makeGenreUuid("g1")), { essentialSongs: [] });
     const track = { uuid: "t1", title: "T" };
-    const [message, options] = await run(result, { uuid: "g1", tracks: [track], previous: [] });
+    const [message, options] = await run(result, { uuid: makeGenreUuid("g1"), tracks: [track], previous: [] });
     expect(message).toBe("Essential songs updated");
     act(() => options.action?.onClick());
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
@@ -148,8 +149,8 @@ describe("curation hooks", () => {
   it("renames a genre optimistically and undoes the name", async () => {
     fetchMock.mockResolvedValue({ uuid: "g1" });
     const { result, queryClient } = setup(useUpdateGenreName);
-    queryClient.setQueryData(genreQueryKeys.reference.overview("g1"), { name: "Folk" });
-    const [message, options] = await run(result, { uuid: "g1", name: "Folk rock", previous: "Folk" });
+    queryClient.setQueryData(genreQueryKeys.reference.overview(makeGenreUuid("g1")), { name: "Folk" });
+    const [message, options] = await run(result, { uuid: makeGenreUuid("g1"), name: "Folk rock", previous: "Folk" });
     expect(message).toBe("Renamed to Folk rock");
     act(() => options.action?.onClick());
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));

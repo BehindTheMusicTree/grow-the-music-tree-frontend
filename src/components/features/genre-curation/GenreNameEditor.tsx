@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import type { GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
 import { useUpdateGenreName } from "@hooks/curation/useUpdateGenreName";
 
-export default function GenreNameEditor({ genre }: { genre: { uuid: string; name: string } }) {
+export default function GenreNameEditor({ genre }: { genre: { uuid: GenreUuid; name: string } }) {
   const [name, setName] = useState(genre.name);
   const { mutate } = useUpdateGenreName();
 

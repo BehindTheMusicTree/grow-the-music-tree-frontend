@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import GenreDangerZone from "./GenreDangerZone";
+import { makeGenreUuid } from "@behindthemusictree/app-kit/genre-tree/testing";
 
 vi.mock("./GenreCurationProvider", () => ({ useGenreCuration: () => ({ openDialog: vi.fn() }) }));
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({ useDeleteGenre: vi.fn() }));
@@ -14,7 +15,7 @@ describe("GenreDangerZone", () => {
   afterEach(cleanup);
 
   it("offers Alias of for genres without a wikidata id", () => {
-    render(<GenreDangerZone genre={{ uuid: "g", name: "Folk" }} />);
+    render(<GenreDangerZone genre={{ uuid: makeGenreUuid("g"), name: "Folk" }} />);
 
     expect(screen.getByRole("button", { name: "Alias of…" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Exclude…" })).toBeInTheDocument();
@@ -22,7 +23,7 @@ describe("GenreDangerZone", () => {
   });
 
   it("hides Alias of when the genre has a wikidata id", () => {
-    render(<GenreDangerZone genre={{ uuid: "g", name: "Folk", wikidataId: "Q1" }} />);
+    render(<GenreDangerZone genre={{ uuid: makeGenreUuid("g"), name: "Folk", wikidataId: "Q1" }} />);
 
     expect(screen.queryByRole("button", { name: "Alias of…" })).not.toBeInTheDocument();
   });

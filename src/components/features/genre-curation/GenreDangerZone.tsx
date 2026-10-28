@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useDeleteGenre } from "@behindthemusictree/app-kit/genre-tree";
+import { useDeleteGenre, type GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import GenrePicker from "@components/features/curation/GenrePicker";
 import { useGenreCuration } from "@components/features/genre-curation/GenreCurationProvider";
@@ -14,7 +14,7 @@ import { EXCLUDE_CATEGORIES } from "@schemas/api/curation";
 type ExcludeCategory = keyof typeof EXCLUDE_CATEGORIES;
 
 interface Genre {
-  uuid: string;
+  uuid: GenreUuid;
   name: string;
   wikidataId?: string | null;
 }

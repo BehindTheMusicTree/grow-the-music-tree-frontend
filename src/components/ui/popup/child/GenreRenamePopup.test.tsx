@@ -3,6 +3,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import GenreRenamePopup from "./GenreRenamePopup";
+import { makeGenreUuid } from "@behindthemusictree/app-kit/genre-tree/testing";
 
 const mutateMock = vi.fn();
 const formErrorsMock = vi.fn((): { field: string; message: string }[] => []);
@@ -12,7 +13,7 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   useUpdateGenre: () => ({ mutate: mutateMock, formErrors: formErrorsMock() }),
 }));
 
-const genre = { uuid: "00000000-0000-0000-0000-000000000000", name: "Rock" };
+const genre = { uuid: makeGenreUuid("00000000-0000-0000-0000-000000000000"), name: "Rock" };
 
 describe("GenreRenamePopup", () => {
   afterEach(() => {

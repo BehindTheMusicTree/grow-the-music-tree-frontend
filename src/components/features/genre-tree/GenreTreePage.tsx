@@ -9,6 +9,7 @@ import {
   useListFullGenrePlaylists,
   CriteriaMinimum,
   hasMainstreamPopRoot,
+  GenrePlaylistUuidSchema,
   type ArtistSearchResult,
 } from "@behindthemusictree/app-kit/genre-tree";
 import { GenreTreeViewSkeleton, type FocusChangeReason } from "@behindthemusictree/app-kit-ui/genre-tree";
@@ -251,6 +252,10 @@ function GenreTreePageContent() {
     () => new Map((genrePlaylists ?? []).map((genrePlaylist) => [genrePlaylist.uuid, genrePlaylist])),
     [genrePlaylists],
   );
+  const playlistForNode = useCallback(
+    (node: { id: string }) => criteriaByPlaylist.get(GenrePlaylistUuidSchema.parse(node.id)),
+    [criteriaByPlaylist],
+  );
 
   const handleEditModeChange = useCallback((on: boolean) => {
     setEditMode(on);
@@ -275,11 +280,11 @@ function GenreTreePageContent() {
         expanded,
         onExpandedChange: setExpanded,
         renderTitleEditor: (node: { id: string }) => {
-          const criteria = criteriaByPlaylist.get(node.id)?.criteria;
+          const criteria = playlistForNode(node)?.criteria;
           return criteria ? <GenreNameEditor key={criteria.uuid} genre={criteria} /> : null;
         },
         renderParentsEditor: (node: { id: string }) => {
-          const playlist = criteriaByPlaylist.get(node.id);
+          const playlist = playlistForNode(node);
           return playlist?.criteria ? (
             <GenreParentsEditor
               key={playlist.criteria.uuid}
@@ -288,7 +293,7 @@ function GenreTreePageContent() {
           ) : null;
         },
         renderDangerZone: (node: { id: string }) => {
-          const playlist = criteriaByPlaylist.get(node.id);
+          const playlist = playlistForNode(node);
           return playlist?.criteria ? (
             <GenreDangerZone
               key={playlist.criteria.uuid}
