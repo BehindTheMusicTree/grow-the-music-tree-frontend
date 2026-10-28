@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Skeleton } from "@behindthemusictree/ui";
 import { useArtist } from "@hooks/useArtist";
 import ArtistHeader from "./ArtistHeader";
+import ArtistPhoto from "./ArtistPhoto";
 import ArtistMembers from "./ArtistMembers";
 import ArtistDiscography from "./ArtistDiscography";
 import ArtistSongs from "./ArtistSongs";
@@ -67,6 +68,7 @@ export function useArtistPanel({ uuid, expanded, onExpandedChange, collapsed, on
         title: artist.name,
         content: (
           <>
+            {artist.image && <ArtistPhoto image={artist.image} name={artist.name} />}
             <ArtistHeader artist={artist} />
             <ArtistMembers title="Members" memberships={artist.members} />
             <ArtistMembers title="Member of" memberships={artist.memberOf} />

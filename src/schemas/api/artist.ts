@@ -24,6 +24,14 @@ export const ARTIST_LINK_KINDS = [
   "social",
 ] as const;
 
+export const ArtistImageSchema = z.object({
+  url: z.string().url(),
+  pageUrl: z.string().url(),
+  author: z.string().nullable(),
+  license: z.string(),
+  licenseUrl: z.string().url().nullable(),
+});
+
 export const ArtistDetailedSchema = z.object({
   uuid: z.string().uuid(),
   name: z.string(),
@@ -46,8 +54,10 @@ export const ArtistDetailedSchema = z.object({
     }),
   ),
   tracksCount: z.number().int(),
+  image: ArtistImageSchema.nullable(),
 });
 
+export type ArtistImage = z.infer<typeof ArtistImageSchema>;
 export type ArtistDetailed = z.infer<typeof ArtistDetailedSchema>;
 export type ArtistMembership = ArtistDetailed["members"][number];
 export type ArtistLink = ArtistDetailed["links"][number];
