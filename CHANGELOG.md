@@ -114,6 +114,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 20.0.0. Genre and genre-playlist UUIDs are branded types now; ids coming from the tree view are parsed at the boundary.
 - Every header button now has the header height (48px). On `/genealogy` the Genealogy button shows its label and the brand pill keeps only the logo; the brand name is never truncated.
 - The artist panel now matches the genre panel: content is inset to the panel edge, facts show as a Type / Country / Active list, and Discography, Members and Songs are collapsible sections divided like the genre panel, using brand colours so dark mode works. Bumped `@behindthemusictree/ui` to 0.5.0 (`PanelSection`, `FieldList`, `Chip`).
+- Artist panel sections are now separated the same way as in the genre panel: every section, Discography included, has one divider above it, and links sit in the fields list under Type / Country / Active. Bumped `@behindthemusictree/ui` to 0.6.0.
 
 ## [3.18.0] - 2026-10-27
 
