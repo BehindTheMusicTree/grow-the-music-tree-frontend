@@ -16,3 +16,14 @@ overrides:
   "esbuild@<0.28.1": "^0.28.1"
   "fast-uri@3": "^3.1.9"
   "zod@4": "^4.6.6"
+
+minimumReleaseAgeExclude:
+  - "@behindthemusictree/*"
+
+allowBuilds:
+  '@fortawesome/fontawesome-common-types': false
+  '@fortawesome/fontawesome-svg-core': false
+  '@fortawesome/free-solid-svg-icons': false
+  '@sentry/cli': false
+  esbuild: false
+  unrs-resolver: false
