@@ -109,8 +109,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Artists open as a panel over the genre tree** (`/?artist=<uuid>`) instead of a full page, compact first and expandable like the genre panel. Artist links from search, song rows and the player open it in place, and `/artists/<uuid>` redirects there. The panel expands, collapses behind the edge tab and closes on Escape; requires `app-kit` and `app-kit-ui` 20.0.0 (`genre-tree-view` 4.6.0).
 - **Artist panel shows the artist's Wikimedia Commons photo** above the facts, with its author and license credit linking to the Commons page and the license. Nothing is shown for artists without a photo. Requires the grow API's artist `image` field (grow #334/#335).
 
+- **Artist-filtered genre tree** (`/?artist=<uuid>`): picking an artist narrows the pop-core and outline views to the genres the artist has songs in (plus their ancestors and Mainstream Pop). The filter stays while genres are selected (`?artist=<uuid>&genre=<uuid>` scopes the genre panel to the artist), survives reload, and is cleared by the artist chip's x or by closing the artist panel. A first-load `genre` outside the artist's tree is dropped. Requires the grow API's `GET /v1/artists/<uuid>/genre-counts/` (grow #336).
+
 ### Changed
 
+- Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 22.0.0 and `@behindthemusictree/ui` to 0.7.0. The artist panel now comes from app-kit's `GenreTreeView` (`artistUuid` / `onArtistUuidChange`); the frontend's own artist panel components are removed. Selecting a genre no longer drops `?artist=`.
 - The right column (header row and player panel) is now as wide as the detail panel (25.5rem). Bumped `@behindthemusictree/brand` to 12.6.0.
 - Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 20.0.0. Genre and genre-playlist UUIDs are branded types now; ids coming from the tree view are parsed at the boundary.
 - Every header button now has the header height (48px). On `/genealogy` the Genealogy button shows its label and the brand pill keeps only the logo; the brand name is never truncated.

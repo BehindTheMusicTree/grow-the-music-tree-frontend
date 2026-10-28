@@ -1,6 +1,6 @@
 # Artist
 
-Route: `/?artist=<uuid>` (panel over the genre tree; `/artists/<uuid>` redirects there)
+Route: `/?artist=<uuid>` (the genre tree filtered to the artist's footprint, with the artist panel; `/artists/<uuid>` redirects there)
 Access: public, read-only
 
 ## Table of Contents
@@ -17,9 +17,10 @@ Shows one artist from the reference library: photo with its Commons credit, type
 
 ## Data
 
-- Artist detail from the grow API `artists/<uuid>/`, fetched client-side through `/api/grow-proxy` (`useArtist`, panel built by `useArtistPanel`); an unknown or malformed uuid shows "This artist does not exist." in the panel
-- `image` is a 500 px Wikimedia Commons thumbnail (or `null`), shown by `ArtistPhoto` with the author (falling back to "Wikimedia Commons") linking to the Commons page and the license, linked when `licenseUrl` is set
-- Tracks from `library/songs/?artist=<uuid>&ordering=title`, fetched client-side one page at a time (`ArtistSongs`)
+- Artist detail from the grow API `artists/<uuid>/`, fetched client-side through `/api/grow-proxy` (`useArtist`, panel built by app-kit's `GenreTreeView`); an unknown or malformed uuid shows "This artist does not exist." in the panel
+- `image` is a 500 px Wikimedia Commons thumbnail (or `null`), shown with the author (falling back to "Wikimedia Commons") linking to the Commons page and the license, linked when `licenseUrl` is set
+- Tracks from `library/songs/?artist=<uuid>&ordering=title`, fetched client-side one page at a time
+- The tree shows only the genres the artist has songs in (and their ancestors, plus Mainstream Pop), from `artists/<uuid>/genre-counts/`; the filter stays while a genre is selected (`?artist=<uuid>&genre=<uuid>` scopes the genre panel to the artist) and is cleared by the chip's x or by closing the artist panel
 - Discography is grouped from each release's primary and secondary types: live and compilation secondary types win over the primary type
 
 ## Environment Variables

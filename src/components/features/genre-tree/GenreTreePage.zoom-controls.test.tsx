@@ -12,7 +12,6 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-vi.mock("@components/features/artist/useArtistPanel", () => ({ useArtistPanel: () => undefined }));
 vi.mock("@hooks/useIsAdmin", () => ({ useIsAdmin: () => false }));
 vi.mock("@contexts/PlayerPanelProvider", () => ({ usePlayerPanel: () => ({ isVisible: false, dismiss: vi.fn(), isExpanded: false, setExpanded: vi.fn() }) }));
 
