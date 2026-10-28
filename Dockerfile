@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 FROM node:26-alpine AS builder
 WORKDIR /app
-RUN npm install -g pnpm@10.33.2
-COPY package.json pnpm-lock.yaml .npmrc ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+RUN npm install -g "$(node -p 'require("./package.json").packageManager')"
 RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
     --mount=type=secret,id=GH_PACKAGES_TOKEN_READ \
     if [ ! -s /run/secrets/GH_PACKAGES_TOKEN_READ ]; then \
