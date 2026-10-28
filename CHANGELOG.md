@@ -125,6 +125,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - Picking an artist while a genre is selected adds a single history entry instead of two, so browser back returns to the genre.
 - Local `pnpm test` and `pnpm lint` no longer pick up code in `.claude/worktrees/` (which mixed two React copies and failed 100+ tests), and the pop-core zoom-controls test no longer times out under a full parallel run.
 
+### Changed
+
+- **Node 26**: the app now builds and runs on Node 26 (Node 20 is end-of-life). `.nvmrc` pins the major, `engines.node` is `>=26 <27` with `engine-strict`, CI reads `.nvmrc`, and the `Dockerfile` uses `node:26-alpine` and installs pnpm with npm because Node 26 no longer bundles Corepack.
+
 ## [3.18.0] - 2026-10-27
 
 ### Added
