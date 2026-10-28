@@ -13,7 +13,7 @@ export default function SongRowActions({ song }: { song: TrackBase }) {
   const { genre, openDialog } = useGenreCuration();
   const essential = useEssentialSongs();
   const { data: overview } = useQuery<CriteriaOverview>({
-    queryKey: genreQueryKeys.reference.overview(genre?.uuid ?? ""),
+    queryKey: genre ? genreQueryKeys.reference.overview(genre.uuid) : ["genre-curation", "none"],
     queryFn: skipToken,
   });
   if (!genre) return null;

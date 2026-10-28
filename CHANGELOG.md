@@ -106,11 +106,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Added
 
 - **Shareable genre tree URLs**: the selected genre (`?genre=`), the pop-core zoom frame (`?zoom=`) and the pan/zoom position (`?view=x,y,scale`) now live in the URL, so a copied link reopens the tree where it was. Selecting and zooming add history entries; panning only replaces the current one. Unknown genres and malformed views are dropped from the URL; switching view mode drops `view`. Requires `app-kit` 19.1.0.
-- **Artists open as a panel over the genre tree** (`/?artist=<uuid>`) instead of a full page, compact first and expandable like the genre panel. Artist links from search, song rows and the player open it in place, and `/artists/<uuid>` redirects there. The expandable panel needs the `app-kit-ui` release that carries `genre-tree-view` 4.6.0.
+- **Artists open as a panel over the genre tree** (`/?artist=<uuid>`) instead of a full page, compact first and expandable like the genre panel. Artist links from search, song rows and the player open it in place, and `/artists/<uuid>` redirects there. The panel expands, collapses behind the edge tab and closes on Escape; requires `app-kit` and `app-kit-ui` 20.0.0 (`genre-tree-view` 4.6.0).
 
 ### Changed
 
 - The right column (header row and player panel) is now as wide as the detail panel (25.5rem). Bumped `@behindthemusictree/brand` to 12.6.0.
+- Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 20.0.0. Genre and genre-playlist UUIDs are branded types now; ids coming from the tree view are parsed at the boundary.
 - Every header button now has the header height (48px). On `/genealogy` the Genealogy button shows its label and the brand pill keeps only the logo; the brand name is never truncated.
 
 ## [3.18.0] - 2026-10-27

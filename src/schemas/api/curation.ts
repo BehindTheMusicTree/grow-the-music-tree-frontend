@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+// Mirrors app-kit's GenreUuidSchema: its genre-tree entry is client-only, and this module is also used server-side.
+const GenreUuidSchema = z.string().uuid().brand<"GenreUuid">();
+
 export const ITEM_ID_PATTERN = /^(Q\d+|LOCAL:[a-z0-9-]+)$/;
 const TRADITION_ID_PATTERN = /^Q\d+$/;
 const ENTITY_ID_PATTERN = /^([a-z]{4}[0-9]{4}|Q\d+)$/;
@@ -259,12 +262,12 @@ export type ExcludeGenreInput = z.infer<typeof ExcludeGenreInputSchema>;
 export const ExcludeGenreOutputSchema = UuidOutputSchema;
 
 export const UpdateGenreSummaryInputSchema = z.object({
-  uuid: z.string(),
+  uuid: GenreUuidSchema,
   summary: z.string().nullable(),
   previous: z.string().nullable(),
 });
 export type UpdateGenreSummaryInput = z.infer<typeof UpdateGenreSummaryInputSchema>;
-export const UpdateGenreNameInputSchema = z.object({ uuid: z.string(), name: z.string(), previous: z.string() });
+export const UpdateGenreNameInputSchema = z.object({ uuid: GenreUuidSchema, name: z.string(), previous: z.string() });
 export type UpdateGenreNameInput = z.infer<typeof UpdateGenreNameInputSchema>;
 const ParentSchema = z.object({ uuid: z.string(), name: z.string() });
 export const UpdateGenreParentInputSchema = z.object({
@@ -282,7 +285,7 @@ const EssentialSongSchema = z.object({
 });
 export type EssentialSong = z.infer<typeof EssentialSongSchema>;
 export const UpdateEssentialSongsInputSchema = z.object({
-  uuid: z.string(),
+  uuid: GenreUuidSchema,
   tracks: z.array(EssentialSongSchema),
   previous: z.array(EssentialSongSchema),
 });

@@ -11,6 +11,7 @@ import NetworkErrorPopup from "./NetworkErrorPopup";
 import GenreCreationPopup from "./GenreCreationPopup";
 import InternalErrorPopup from "./InternalErrorPopup";
 import InvalidInputPopup from "./InvalidInputPopup";
+import { makeGenreUuid } from "@behindthemusictree/app-kit/genre-tree/testing";
 
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api/grow-proxy" }));
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
@@ -18,7 +19,7 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   useCreateGenre: () => ({ mutate: vi.fn(), formErrors: [] }),
 }));
 
-const genre = { uuid: "00000000-0000-0000-0000-000000000000", name: "Rock" };
+const genre = { uuid: makeGenreUuid("00000000-0000-0000-0000-000000000000"), name: "Rock" };
 
 const popups: Array<[string, () => React.ReactElement]> = [
   ["GenreRenamePopup", () => <GenreRenamePopup onClose={vi.fn()} genre={genre} />],
