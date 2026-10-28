@@ -75,7 +75,7 @@ export default function AppHeader({ className }: AppHeaderProps) {
       <Link
         href="/"
         prefetch={false}
-        className="flex shrink-0 items-center gap-2 rounded-full bg-black/70 py-1.5 pl-1.5 pr-1.5 shadow-lg backdrop-blur xl:min-w-0 xl:pr-3"
+        className={`flex shrink-0 items-center gap-2 rounded-full bg-black/70 py-1.5 pl-1.5 pr-1.5 shadow-lg backdrop-blur xl:min-w-0 ${isGenealogy ? "" : "xl:pr-3"}`}
         aria-label={`${APP_NAME} home`}
       >
         <div className="flex h-9 flex-wrap items-center gap-x-2 overflow-hidden xl:min-w-0">
