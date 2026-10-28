@@ -43,6 +43,11 @@ vi.mock("@behindthemusictree/app-kit/popup", () => ({
   usePopup: () => ({ showPopup: vi.fn(), hidePopup: vi.fn() }),
 }));
 
+vi.mock("@components/features/artist/useArtistPanel", () => ({
+  useArtistPanel: ({ uuid, ...panel }: { uuid: string | null; expanded: boolean; onClose: () => void }) =>
+    uuid ? { ...panel, title: `Artist ${uuid}`, content: <span data-testid="artist-expanded">{String(panel.expanded)}</span> } : undefined,
+}));
+
 const hasMainstreamPopRootMock = vi.fn<(nodes: { id: string }[]) => boolean>(() => true);
 
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
@@ -65,7 +70,13 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
     onSelectedNodeIdChange?: (id: string | null) => void;
     defaultViewport?: { x: number; y: number; zoom: number };
     onViewportChange?: (viewport: { x: number; y: number; zoom: number }) => void;
-    overlayPanel?: { title: string; content: React.ReactNode; onClose: () => void };
+    overlayPanel?: {
+      title: string;
+      content: React.ReactNode;
+      onClose: () => void;
+      onExpandedChange?: (on: boolean) => void;
+    };
+    onArtistSelect?: (artist: { uuid: string; name: string }) => void;
   }) => (
     <div
       data-testid="genre-tree-view"
@@ -78,10 +89,14 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
       <span data-testid="default-viewport">{JSON.stringify(props.defaultViewport ?? null)}</span>
       <button onClick={() => props.onViewportChange?.({ x: 10.04, y: -20, zoom: 0.5 })}>Pan</button>
       <button onClick={() => props.onSelectedNodeIdChange?.("rock")}>Select genre</button>
+      <button onClick={() => props.onArtistSelect?.({ uuid: "band", name: "Band" })}>Pick artist</button>
       {props.overlayPanel && (
         <section aria-label={props.overlayPanel.title}>
           {props.overlayPanel.content}
           <button onClick={props.overlayPanel.onClose}>Close panel</button>
+          {props.overlayPanel.onExpandedChange && (
+            <button onClick={() => props.overlayPanel?.onExpandedChange?.(true)}>Expand panel</button>
+          )}
         </section>
       )}
       {props.onEditModeChange && (
@@ -226,6 +241,68 @@ describe("GenreTreePage", () => {
     );
 
     expect(routerReplaceMock).not.toHaveBeenCalled();
+  });
+
+  describe("artist panel", () => {
+    it("pushes ?artist= in place of the genre when an artist is picked from search", async () => {
+      searchParams = new URLSearchParams("genre=rock&zoom=pop");
+      renderGenreTreePage();
+
+      fireEvent.click(await screen.findByRole("button", { name: "Pick artist" }));
+
+      expect(routerPushMock).toHaveBeenCalledWith("/?zoom=pop&artist=band", { scroll: false });
+    });
+
+    it("shows the artist from ?artist= over the tree and removes it on close", async () => {
+      searchParams = new URLSearchParams("artist=band");
+      renderGenreTreePage();
+
+      expect(await screen.findByRole("region", { name: "Artist band" })).toBeInTheDocument();
+      fireEvent.click(screen.getByRole("button", { name: "Close panel" }));
+
+      expect(routerPushMock).toHaveBeenCalledWith("/", { scroll: false });
+    });
+
+    it("drops ?genre= when an artist link adds ?artist=", async () => {
+      searchParams = new URLSearchParams("genre=rock&artist=band");
+      renderGenreTreePage();
+
+      await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/?artist=band", { scroll: false }));
+    });
+
+    it("lets About replace the artist", async () => {
+      searchParams = new URLSearchParams("artist=band&about");
+      renderGenreTreePage();
+
+      expect(await screen.findByRole("region", { name: "TheMusicTree" })).toBeInTheDocument();
+      await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/?about=", { scroll: false }));
+    });
+
+    it("pushes ?genre= and drops ?artist= when a genre is selected", async () => {
+      searchParams = new URLSearchParams("artist=band");
+      renderGenreTreePage();
+
+      fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
+
+      expect(routerPushMock).toHaveBeenCalledWith("/?genre=rock", { scroll: false });
+    });
+
+    it("collapses the tracklist when the artist panel expands, and the panel when the tracklist expands", async () => {
+      searchParams = new URLSearchParams("artist=band");
+      const { rerender } = renderGenreTreePage();
+
+      fireEvent.click(await screen.findByRole("button", { name: "Expand panel" }));
+      expect(screen.getByTestId("artist-expanded")).toHaveTextContent("true");
+      expect(setTracklistExpandedMock).toHaveBeenCalledWith(false);
+
+      tracklistExpanded = true;
+      rerender(
+        <GenreTreeViewModeProvider>
+          <GenreTreePage />
+        </GenreTreeViewModeProvider>,
+      );
+      await waitFor(() => expect(screen.getByTestId("artist-expanded")).toHaveTextContent("false"));
+    });
   });
 
   it("offers no Edit button to non-admins", async () => {

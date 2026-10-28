@@ -1,7 +1,7 @@
 export const ABOUT_HREF = "/?about";
 
 export const PATHS = {
-  ARTIST: (uuid: string) => `/artists/${uuid}`,
+  ARTIST: (uuid: string) => `/?artist=${encodeURIComponent(uuid)}`,
 };
 
 export const GENEALOGY_HREF = "/genealogy";

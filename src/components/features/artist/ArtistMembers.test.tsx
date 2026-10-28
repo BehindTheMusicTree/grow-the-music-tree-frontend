@@ -24,7 +24,7 @@ describe("ArtistMembers", () => {
     );
 
     const currentList = within(screen.getByRole("heading", { name: "Current" }).parentElement!);
-    expect(currentList.getByRole("link", { name: "Alice" })).toHaveAttribute("href", `/artists/${current.artist.uuid}`);
+    expect(currentList.getByRole("link", { name: "Alice" })).toHaveAttribute("href", `/?artist=${current.artist.uuid}`);
     expect(currentList.getByText(/1994–present · vocals/)).toBeInTheDocument();
 
     const pastList = within(screen.getByRole("heading", { name: "Past" }).parentElement!);

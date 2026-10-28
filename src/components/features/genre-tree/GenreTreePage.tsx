@@ -29,10 +29,10 @@ import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import AboutContent from "@components/features/about/AboutContent";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
+import { useArtistPanel } from "@components/features/artist/useArtistPanel";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
-import { PATHS } from "@lib/constants/routes";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { trackEvent } from "@lib/analytics";
 
@@ -67,10 +67,12 @@ type ZoomableGenreTreeViewProps = Omit<
   "onSelectedNodeIdChange" | "focusGenreUuid" | "onFocusGenreChange" | "artistSearch" | "onArtistSelect" | "artistSearchBaseUrl"
 > & {
   setSelectedNodeId: (id: string | null, method?: "push" | "replace") => void;
+  artistUuid: string | null;
+  setArtistUuid: (uuid: string | null, method?: "push" | "replace") => void;
   focus?: { focusGenreUuid: string | null; onFocusGenreChange: (uuid: string | null, reason: FocusChangeReason) => void };
 };
 
-function ZoomableGenreTreeView({ setSelectedNodeId, focus, ...viewProps }: ZoomableGenreTreeViewProps) {
+function ZoomableGenreTreeView({ setSelectedNodeId, artistUuid, setArtistUuid, focus, ...viewProps }: ZoomableGenreTreeViewProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -93,11 +95,19 @@ function ZoomableGenreTreeView({ setSelectedNodeId, focus, ...viewProps }: Zooma
     [pathname, searchParams, router],
   );
 
-  const collapseDetail = useCallback((expanded: boolean) => setDetailExpanded?.(expanded), [setDetailExpanded]);
+  // Kept apart from the genre panel's state, which the tree owns for non-admins.
+  const [artistExpanded, setArtistExpanded] = useState(false);
+  const collapseDetail = useCallback(
+    (expanded: boolean) => {
+      setDetailExpanded?.(expanded);
+      setArtistExpanded(expanded);
+    },
+    [setDetailExpanded],
+  );
   useCenterColumn({
     about,
     closeAbout: () => closeAbout("replace"),
-    detailExpanded,
+    detailExpanded: detailExpanded || artistExpanded,
     setDetailExpanded: collapseDetail,
     tracklistExpanded,
     setTracklistExpanded,
@@ -105,10 +115,14 @@ function ZoomableGenreTreeView({ setSelectedNodeId, focus, ...viewProps }: Zooma
 
   useEffect(() => {
     setDetailCollapsed(false);
-  }, [selectedNodeId]);
+  }, [selectedNodeId, artistUuid]);
+
+  useEffect(() => {
+    setArtistExpanded(false);
+  }, [artistUuid]);
 
   // The brand layout tokens derive the center column, header and extended player from this variable.
-  const isDetailHidden = detailCollapsed || !selectedNodeId;
+  const isDetailHidden = detailCollapsed || (!selectedNodeId && !artistUuid);
   useEffect(() => {
     if (!isDetailHidden) return undefined;
     const root = document.documentElement;
@@ -118,9 +132,19 @@ function ZoomableGenreTreeView({ setSelectedNodeId, focus, ...viewProps }: Zooma
     };
   }, [isDetailHidden]);
 
+  // About and artist links only add their own param, so a stale genre or artist is dropped here.
   useEffect(() => {
-    if (about && selectedNodeId) setSelectedNodeId(null, "replace");
-  }, [about, selectedNodeId, setSelectedNodeId]);
+    if (about && artistUuid) setArtistUuid(null, "replace");
+    else if ((about || artistUuid) && selectedNodeId) setSelectedNodeId(null, "replace");
+  }, [about, artistUuid, selectedNodeId, setArtistUuid, setSelectedNodeId]);
+
+  const artistPanel = useArtistPanel({
+    uuid: artistUuid,
+    expanded: artistExpanded,
+    onExpandedChange: setArtistExpanded,
+    collapsed: detailCollapsed,
+    onClose: () => setArtistUuid(null),
+  });
 
   const handleSelectedNodeIdChange = useCallback(
     (id: string | null) => {
@@ -132,7 +156,7 @@ function ZoomableGenreTreeView({ setSelectedNodeId, focus, ...viewProps }: Zooma
 
   const overlayPanel = about
     ? { title: "TheMusicTree", content: <AboutContent onClose={() => closeAbout()} />, onClose: () => closeAbout() }
-    : undefined;
+    : artistPanel;
   const sharedProps = {
     ...viewProps,
     onSelectedNodeIdChange: handleSelectedNodeIdChange,
@@ -141,7 +165,7 @@ function ZoomableGenreTreeView({ setSelectedNodeId, focus, ...viewProps }: Zooma
     onCollapsedChange: setDetailCollapsed,
     placement: "regions" as const,
     showDisplayOptions: false,
-    onArtistSelect: (artist: ArtistSearchResult) => router.push(PATHS.ARTIST(artist.uuid)),
+    onArtistSelect: (artist: ArtistSearchResult) => setArtistUuid(artist.uuid),
   };
 
   return focus ? <GenreTreeView {...sharedProps} {...focus} /> : <GenreTreeView {...sharedProps} />;
@@ -180,8 +204,16 @@ function GenreTreePageContent() {
     () => (genrePlaylists ? new Set(genrePlaylists.map((genrePlaylist) => genrePlaylist.uuid)) : undefined),
     [genrePlaylists],
   );
-  const { selectedNodeId, setSelectedNodeId, focusGenreUuid, setFocus, defaultViewport, onViewportChange } =
-    useGenreTreeUrlState({ viewMode, genreIds });
+  const {
+    selectedNodeId,
+    setSelectedNodeId,
+    artistUuid,
+    setArtistUuid,
+    focusGenreUuid,
+    setFocus,
+    defaultViewport,
+    onViewportChange,
+  } = useGenreTreeUrlState({ viewMode, genreIds });
 
   const canShowPopCore = useMemo(
     () => {
@@ -292,6 +324,8 @@ function GenreTreePageContent() {
       readOnly={!isAdmin}
       selectedNodeId={selectedNodeId}
       setSelectedNodeId={setSelectedNodeId}
+      artistUuid={artistUuid}
+      setArtistUuid={setArtistUuid}
       focus={viewMode === "pop-core" ? { focusGenreUuid, onFocusGenreChange: setFocus } : undefined}
       defaultViewport={defaultViewport}
       onViewportChange={onViewportChange}
