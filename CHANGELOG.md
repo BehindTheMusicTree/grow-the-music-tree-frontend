@@ -130,6 +130,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Node 26**: the app now builds and runs on Node 26 (Node 20 is end-of-life). `.nvmrc` pins the major, `engines.node` is `>=26 <27` with `engine-strict`, CI reads `.nvmrc`, and the `Dockerfile` uses `node:26-alpine` and installs pnpm with npm because Node 26 no longer bundles Corepack.
 
+### Security
+
+- Patched the open Dependabot alerts: bumped `next`, `@sentry/nextjs`, `vitest` (and `@vitest/*`) and `happy-dom`, and updated the `pnpm-workspace.yaml` overrides for `vite`, `undici`, `fast-uri` and `zod` 4. `zod` 3 (required by app-kit) has no patched 3.x release and stays flagged.
+
 ## [3.18.0] - 2026-10-27
 
 ### Added
