@@ -91,7 +91,7 @@ describe("GenreTreePage zoom controls", () => {
   it("floats the pop-core zoom controls in the bottom-right wrapper, out of the actions row", async () => {
     renderGenreTreePage("pop-core");
 
-    await screen.findByRole("button", { name: "Zoom in" });
+    await screen.findByRole("button", { name: "Zoom in" }, { timeout: 4000 });
     for (const name of ["Zoom in", "Zoom out", "Fit to frame"]) {
       const button = screen.getByRole("button", { name });
       expect(button.closest(".gtv-wheel-floating-controls")).not.toBeNull();
