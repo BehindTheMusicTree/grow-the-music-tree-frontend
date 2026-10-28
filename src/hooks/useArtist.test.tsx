@@ -14,6 +14,28 @@ vi.mock("@behindthemusictree/app-kit/transport", async (importOriginal) => {
 });
 
 const UUID = "11111111-1111-1111-1111-111111111111";
+const artist = {
+  uuid: UUID,
+  name: "Band",
+  musicbrainzArtistId: null,
+  type: null,
+  country: null,
+  beginYear: null,
+  endYear: null,
+  ended: false,
+  links: [],
+  members: [],
+  memberOf: [],
+  albums: [],
+  tracksCount: 0,
+  image: {
+    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Band.jpg/500px-Band.jpg",
+    pageUrl: "https://commons.wikimedia.org/wiki/File:Band.jpg",
+    author: null,
+    license: "CC BY 2.0",
+    licenseUrl: "http://creativecommons.org/licenses/by/2.0",
+  },
+};
 
 function wrapper({ children }: { children: ReactNode }) {
   const client = new QueryClient({ defaultOptions: { queries: { retryDelay: 0 } } });
@@ -47,5 +69,15 @@ describe("useArtist", () => {
     await waitFor(() => expect(result.current).toEqual({ status: "not-found" }));
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(`artists/${UUID}/`, true, false, undefined, undefined, false, true);
+  });
+
+  it.each([
+    ["with", artist],
+    ["without", { ...artist, image: null }],
+  ])("parses an artist %s an image", async (_, payload) => {
+    fetchMock.mockResolvedValue(payload);
+    const { result } = renderHook(() => useArtist(UUID), { wrapper });
+
+    await waitFor(() => expect(result.current).toEqual({ status: "success", artist: payload }));
   });
 });

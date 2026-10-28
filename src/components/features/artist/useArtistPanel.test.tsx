@@ -23,6 +23,7 @@ const artist = {
   memberOf: [],
   albums: [{ uuid: "a1", name: "First", year: "1995", primaryType: "album", secondaryTypes: [] }],
   tracksCount: 3,
+  image: null,
 };
 
 function Harness({ uuid }: { uuid: string | null }) {
@@ -89,5 +90,26 @@ describe("useArtistPanel", () => {
     expect(region).toHaveTextContent("Songs list");
     expect(screen.getByRole("complementary", { name: "Extra" })).toHaveTextContent("First");
     expect(document.title).toBe("Band");
+  });
+
+  it("shows the artist photo when there is one", () => {
+    const image = {
+      url: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Band.jpg/500px-Band.jpg",
+      pageUrl: "https://commons.wikimedia.org/wiki/File:Band.jpg",
+      author: "Jane Doe",
+      license: "CC BY-SA 4.0",
+      licenseUrl: null,
+    };
+    useArtistMock.mockReturnValue({ status: "success", artist: { ...artist, image } });
+    render(<Harness uuid={UUID} />);
+
+    expect(screen.getByRole("img", { name: "Band" })).toBeInTheDocument();
+  });
+
+  it("shows no photo when the artist has none", () => {
+    useArtistMock.mockReturnValue({ status: "success", artist });
+    render(<Harness uuid={UUID} />);
+
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });
 });
