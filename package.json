@@ -2,6 +2,9 @@
   "name": "grow-the-music-tree",
   "private": true,
   "version": "3.18.0",
+  "engines": {
+    "node": ">=26 <27"
+  },
   "scripts": {
     "prepare": "git rev-parse --git-dir > /dev/null 2>&1 && git config core.hooksPath .githooks || true",
     "dev": "next dev --turbo --hostname localhost",

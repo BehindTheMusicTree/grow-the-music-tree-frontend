@@ -107,6 +107,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Shareable genre tree URLs**: the selected genre (`?genre=`), the pop-core zoom frame (`?zoom=`) and the pan/zoom position (`?view=x,y,scale`) now live in the URL, so a copied link reopens the tree where it was. Selecting and zooming add history entries; panning only replaces the current one. Unknown genres and malformed views are dropped from the URL; switching view mode drops `view`. Requires `app-kit` 19.1.0.
 
+### Changed
+
+- **Node 26**: the app now builds and runs on Node 26 (Node 20 is end-of-life). `.nvmrc` pins the major, `engines.node` is `>=26 <27` with `engine-strict`, CI reads `.nvmrc`, and the `Dockerfile` uses `node:26-alpine` and installs pnpm with npm because Node 26 no longer bundles Corepack.
+
 ## [3.18.0] - 2026-10-27
 
 ### Added
