@@ -1,5 +1,5 @@
 import type { ArtistAlbum } from "@schemas/api/artist";
-import ArtistSection from "./ArtistSection";
+import { PanelSection } from "@behindthemusictree/ui";
 
 const GROUPS = ["Albums", "EPs", "Singles", "Live", "Compilations", "Other"] as const;
 type Group = (typeof GROUPS)[number];
@@ -28,24 +28,26 @@ export default function ArtistDiscography({ albums }: { albums: ArtistAlbum[] })
   const sorted = [...albums].sort(byYear);
 
   return (
-    <ArtistSection title="Discography">
+    <PanelSection title="Discography">
       {GROUPS.map((group) => {
         const groupAlbums = sorted.filter((album) => discographyGroup(album) === group);
         if (groupAlbums.length === 0) return null;
         return (
-          <div key={group} className="flex flex-col gap-1">
-            <h3 className="text-sm font-medium uppercase tracking-wide text-gray-500">{group}</h3>
-            <ul className="flex flex-col gap-0.5">
+          <div key={group} className="mt-2.5 first:mt-0">
+            <h4 className="text-xs font-medium text-[var(--color-text-muted)]">{group}</h4>
+            <ul className="mt-0.5">
               {groupAlbums.map((album) => (
-                <li key={album.uuid} className="flex gap-3">
-                  <span className="w-10 shrink-0 tabular-nums text-gray-500">{album.year ?? "—"}</span>
-                  <span className="text-gray-900">{album.name}</span>
+                <li key={album.uuid} className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-2 py-0.5">
+                  <span className="tabular-nums text-[var(--color-text-muted)]">{album.year ?? "—"}</span>
+                  <span className="truncate text-[var(--color-text)]" title={album.name}>
+                    {album.name}
+                  </span>
                 </li>
               ))}
             </ul>
           </div>
         );
       })}
-    </ArtistSection>
+    </PanelSection>
   );
 }

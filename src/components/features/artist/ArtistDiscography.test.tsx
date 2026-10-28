@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup, within } from "@testing-library/react";
+import { render, screen, cleanup, within, fireEvent } from "@testing-library/react";
 import ArtistDiscography from "./ArtistDiscography";
 
 const album = (name: string, year: string | null, primaryType: string | null, secondaryTypes: string[] = []) => ({
@@ -38,5 +38,15 @@ describe("ArtistDiscography", () => {
     expect(group("EPs")).toEqual(["1996Tiny"]);
     expect(group("Singles")).toEqual(["—Hit Single"]);
     expect(screen.queryByRole("heading", { name: "Other" })).not.toBeInTheDocument();
+  });
+
+  it("collapses the section from its title button", () => {
+    render(<ArtistDiscography albums={[album("First", "1995", "album")]} />);
+
+    const toggle = screen.getByRole("button", { name: "Discography", expanded: true });
+    fireEvent.click(toggle);
+
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("heading", { name: "Albums" })).not.toBeInTheDocument();
   });
 });
