@@ -1,8 +1,11 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { useEffect } from "react";
-import { render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
+import { act, render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import GenreTreePage from "./GenreTreePage";
 import { GenreTreeViewModeProvider, useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
+
+// URL writes are batched into a microtask, so router assertions run after it.
+const flushNavigation = () => act(async () => {});
 
 const routerPushMock = vi.fn();
 const routerReplaceMock = vi.fn();
@@ -47,6 +50,7 @@ const hasMainstreamPopRootMock = vi.fn<(nodes: { id: string }[]) => boolean>(() 
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   useVisibleGenrePlaylists: (options: { artistUuid?: string | null }) => useVisibleGenrePlaylistsMock(options),
   hasMainstreamPopRoot: (nodes: { id: string }[]) => hasMainstreamPopRootMock(nodes),
+  useArtist: () => ({ status: "idle" }),
 }));
 
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
@@ -88,7 +92,14 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
       <span data-testid="default-viewport">{JSON.stringify(props.defaultViewport ?? null)}</span>
       <button onClick={() => props.onViewportChange?.({ x: 10.04, y: -20, zoom: 0.5 })}>Pan</button>
       <button onClick={() => props.onSelectedNodeIdChange?.("rock")}>Select genre</button>
-      <button onClick={() => props.onArtistUuidChange?.("band")}>Pick artist</button>
+      <button
+        onClick={() => {
+          if (props.selectedNodeId) props.onSelectedNodeIdChange?.(null);
+          props.onArtistUuidChange?.("band");
+        }}
+      >
+        Pick artist
+      </button>
       <button onClick={() => props.onArtistUuidChange?.(null)}>Clear artist</button>
       <button onClick={() => props.onArtistExpandedChange?.(true)}>Expand artist</button>
       {props.overlayPanel && (
@@ -193,6 +204,7 @@ describe("GenreTreePage", () => {
 
     fireEvent.click(await screen.findByRole("button", { name: "Close panel" }));
 
+    await flushNavigation();
     expect(routerPushMock).toHaveBeenCalledWith("/", { scroll: false });
   });
 
@@ -202,6 +214,7 @@ describe("GenreTreePage", () => {
 
     fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
 
+    await flushNavigation();
     expect(routerPushMock).toHaveBeenCalledWith("/?genre=rock", { scroll: false });
   });
 
@@ -212,6 +225,7 @@ describe("GenreTreePage", () => {
 
     expect(await screen.findByRole("region", { name: "TheMusicTree" })).toBeInTheDocument();
     expect(setTracklistExpandedMock).toHaveBeenCalledWith(false);
+    await flushNavigation();
     expect(routerReplaceMock).not.toHaveBeenCalled();
   });
 
@@ -241,6 +255,7 @@ describe("GenreTreePage", () => {
       </GenreTreeViewModeProvider>,
     );
 
+    await flushNavigation();
     expect(routerReplaceMock).not.toHaveBeenCalled();
   });
 
@@ -251,7 +266,9 @@ describe("GenreTreePage", () => {
 
       fireEvent.click(await screen.findByRole("button", { name: "Pick artist" }));
 
+      await flushNavigation();
       expect(routerPushMock).toHaveBeenCalledWith("/?zoom=pop&artist=band", { scroll: false });
+      expect(routerPushMock).toHaveBeenCalledTimes(1);
     });
 
     it("passes ?artist= to the tree and asks for the artist's visible tree", async () => {
@@ -282,6 +299,7 @@ describe("GenreTreePage", () => {
 
       fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
 
+      await flushNavigation();
       expect(routerPushMock).toHaveBeenCalledWith("/?artist=band&genre=rock", { scroll: false });
     });
 
@@ -294,6 +312,7 @@ describe("GenreTreePage", () => {
       renderGenreTreePage();
 
       expect(await screen.findByTestId("selected-node")).toHaveTextContent("rock");
+      await flushNavigation();
       expect(routerReplaceMock).not.toHaveBeenCalled();
     });
 
@@ -307,6 +326,7 @@ describe("GenreTreePage", () => {
 
       fireEvent.click(await screen.findByRole("button", { name: "Clear artist" }));
 
+      await flushNavigation();
       expect(routerPushMock).toHaveBeenCalledWith("/?genre=rock", { scroll: false });
     });
 
@@ -422,6 +442,7 @@ describe("GenreTreePage", () => {
       renderGenreTreePage({ forcePopCore: true });
 
       await waitFor(() => expect(screen.getByTestId("genre-tree-view").dataset.focus).toBe("pop-rock"));
+      await flushNavigation();
       expect(routerReplaceMock).not.toHaveBeenCalled();
     });
 
@@ -431,6 +452,7 @@ describe("GenreTreePage", () => {
       renderGenreTreePage({ forcePopCore: true });
 
       fireEvent.click(await screen.findByRole("button", { name: "Reject zoom" }));
+      await flushNavigation();
       expect(routerReplaceMock).toHaveBeenCalledWith("/?other=1", { scroll: false });
       expect(routerPushMock).not.toHaveBeenCalled();
     });
@@ -457,9 +479,11 @@ describe("GenreTreePage", () => {
       renderGenreTreePage({ forcePopCore: true });
 
       fireEvent.click(await screen.findByRole("button", { name: "Zoom in" }));
+      await flushNavigation();
       expect(routerPushMock).toHaveBeenLastCalledWith("/?zoom=rock&other=1", { scroll: false });
 
       fireEvent.click(screen.getByRole("button", { name: "All genres" }));
+      await flushNavigation();
       expect(routerPushMock).toHaveBeenLastCalledWith("/?other=1", { scroll: false });
       expect(routerReplaceMock).not.toHaveBeenCalled();
     });
@@ -480,6 +504,7 @@ describe("GenreTreePage", () => {
       renderGenreTreePage();
 
       fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
+      await flushNavigation();
       expect(routerPushMock).toHaveBeenCalledWith("/?other=1&genre=rock", { scroll: false });
     });
 
@@ -504,6 +529,7 @@ describe("GenreTreePage", () => {
       renderGenreTreePage();
 
       fireEvent.click(await screen.findByRole("button", { name: "Pan" }));
+      await flushNavigation();
       expect(routerReplaceMock).toHaveBeenCalledWith("/?view=10.0%2C-20.0%2C0.50", { scroll: false });
       expect(routerPushMock).not.toHaveBeenCalled();
     });
@@ -514,6 +540,7 @@ describe("GenreTreePage", () => {
       renderGenreTreePage();
 
       fireEvent.click(await screen.findByRole("button", { name: "Pan" }));
+      await flushNavigation();
       expect(routerReplaceMock).not.toHaveBeenCalled();
     });
 
@@ -523,6 +550,7 @@ describe("GenreTreePage", () => {
       renderGenreTreePage({ forcePopCore: true });
 
       fireEvent.click(await screen.findByRole("button", { name: "Zoom in" }));
+      await flushNavigation();
       expect(routerPushMock).toHaveBeenLastCalledWith("/?zoom=rock", { scroll: false });
     });
 
@@ -555,6 +583,7 @@ describe("GenreTreePage", () => {
 
       const { rerender } = renderGenreTreePage();
       await screen.findByTestId("genre-tree-view");
+      await flushNavigation();
       expect(routerReplaceMock).not.toHaveBeenCalled();
 
       useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }], isLoading: false });
@@ -563,6 +592,7 @@ describe("GenreTreePage", () => {
           <GenreTreePage />
         </GenreTreeViewModeProvider>,
       );
+      await flushNavigation();
       expect(routerReplaceMock).not.toHaveBeenCalled();
     });
 
@@ -578,6 +608,7 @@ describe("GenreTreePage", () => {
           <GenreTreePage />
         </GenreTreeViewModeProvider>,
       );
+      await flushNavigation();
       expect(routerReplaceMock).not.toHaveBeenCalled();
     });
   });

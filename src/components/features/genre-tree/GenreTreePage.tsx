@@ -10,6 +10,7 @@ import {
   CriteriaMinimum,
   hasMainstreamPopRoot,
   GenrePlaylistUuidSchema,
+  useArtist,
 } from "@behindthemusictree/app-kit/genre-tree";
 import { GenreTreeViewSkeleton, type FocusChangeReason } from "@behindthemusictree/app-kit-ui/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
@@ -145,6 +146,17 @@ function ZoomableGenreTreeView({ setSelectedNodeId, artistUuid, setArtistUuid, f
     if (about && artistUuid) setArtistUuid(null, "replace");
     else if (about && selectedNodeId) setSelectedNodeId(null, "replace");
   }, [about, artistUuid, selectedNodeId, setArtistUuid, setSelectedNodeId]);
+
+  const artist = useArtist(artistUuid, getGrowBackendBaseUrl);
+  const artistName = artist.status === "success" ? artist.artist.name : undefined;
+  useEffect(() => {
+    if (!artistName) return undefined;
+    const previous = document.title;
+    document.title = artistName;
+    return () => {
+      document.title = previous;
+    };
+  }, [artistName]);
 
   const handleSelectedNodeIdChange = useCallback(
     (id: string | null) => {

@@ -122,6 +122,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- Picking an artist while a genre is selected adds a single history entry instead of two, so browser back returns to the genre.
 - Local `pnpm test` and `pnpm lint` no longer pick up code in `.claude/worktrees/` (which mixed two React copies and failed 100+ tests), and the pop-core zoom-controls test no longer times out under a full parallel run.
 
 ## [3.18.0] - 2026-10-27

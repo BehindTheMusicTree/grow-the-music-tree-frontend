@@ -42,12 +42,25 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
   // can legitimately precede the refetch.
   const genreValidated = useRef(false);
 
+  // The tree reports some transitions as two calls in one handler (clear the genre, then open an artist).
+  // Applying them as one navigation keeps a single history entry.
+  const pending = useRef<{ mutations: ((params: URLSearchParams) => void)[]; method: "push" | "replace" } | null>(null);
   const navigate = useCallback(
     (mutate: (params: URLSearchParams) => void, method: "push" | "replace") => {
-      const params = new URLSearchParams(searchParams.toString());
-      mutate(params);
-      const query = params.toString();
-      router[method](query ? `${pathname}?${query}` : pathname, { scroll: false });
+      if (pending.current) {
+        pending.current.mutations.push(mutate);
+        if (method === "push") pending.current.method = "push";
+        return;
+      }
+      const batch = { mutations: [mutate], method };
+      pending.current = batch;
+      queueMicrotask(() => {
+        pending.current = null;
+        const params = new URLSearchParams(searchParams.toString());
+        batch.mutations.forEach((m) => m(params));
+        const query = params.toString();
+        router[batch.method](query ? `${pathname}?${query}` : pathname, { scroll: false });
+      });
     },
     [pathname, router, searchParams],
   );
