@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from "vitest";
 import { useEffect } from "react";
 import { render, screen, cleanup } from "@testing-library/react";
 import Providers from "@app/providers";
@@ -65,6 +65,10 @@ function renderGenreTreePage(viewMode: GenreTreeViewMode) {
 }
 
 describe("GenreTreePage zoom controls", () => {
+  beforeAll(async () => {
+    await import("@behindthemusictree/app-kit-ui/genre-tree");
+  });
+
   beforeEach(() => {
     vi.stubGlobal(
       "fetch",
@@ -86,9 +90,9 @@ describe("GenreTreePage zoom controls", () => {
   it("floats the pop-core zoom controls in the bottom-right wrapper, out of the actions row", async () => {
     renderGenreTreePage("pop-core");
 
-    // The lazily imported wheel can take over findBy*'s 1 s default to mount when the full suite runs in parallel.
+    await screen.findByRole("button", { name: "Zoom in" }, { timeout: 4000 });
     for (const name of ["Zoom in", "Zoom out", "Fit to frame"]) {
-      const button = await screen.findByRole("button", { name }, { timeout: 5000 });
+      const button = screen.getByRole("button", { name });
       expect(button.closest(".gtv-wheel-floating-controls")).not.toBeNull();
       expect(button.closest(".actions-container")).toBeNull();
     }

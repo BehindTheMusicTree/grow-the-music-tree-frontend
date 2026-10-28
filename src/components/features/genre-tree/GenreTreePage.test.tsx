@@ -33,10 +33,9 @@ vi.mock("@hooks/useIsAdmin", () => ({
   useIsAdmin: () => useIsAdminMock(),
 }));
 
-const useListFullGenrePlaylistsMock = vi.fn<() => { data: unknown[] | undefined; isLoading: boolean }>(() => ({
-  data: [],
-  isLoading: false,
-}));
+const useVisibleGenrePlaylistsMock = vi.fn<(options: { artistUuid?: string | null }) => { genrePlaylists: unknown[]; isLoading: boolean }>(
+  () => ({ genrePlaylists: [], isLoading: false }),
+);
 
 vi.mock("@lib/site-urls", () => ({
   getGrowBackendBaseUrl: () => "/api/grow-proxy",
@@ -49,7 +48,7 @@ vi.mock("@behindthemusictree/app-kit/popup", () => ({
 const hasMainstreamPopRootMock = vi.fn<(nodes: { id: string }[]) => boolean>(() => true);
 
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
-  useListFullGenrePlaylists: () => useListFullGenrePlaylistsMock(),
+  useVisibleGenrePlaylists: (options: { artistUuid?: string | null }) => useVisibleGenrePlaylistsMock(options),
   hasMainstreamPopRoot: (nodes: { id: string }[]) => hasMainstreamPopRootMock(nodes),
   useArtist: () => ({ status: "idle" }),
 }));
@@ -78,7 +77,7 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
     artistUuid?: string | null;
     onArtistUuidChange?: (uuid: string | null) => void;
     artistExpanded?: boolean;
-    onArtistExpandedChange?: (on: boolean) => void;
+    onArtistExpandedChange?: (expanded: boolean) => void;
   }) => (
     <div
       data-testid="genre-tree-view"
@@ -87,17 +86,12 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
       data-focus={props.focusGenreUuid === undefined ? "absent" : String(props.focusGenreUuid)}
     >
       {props.getBackendBaseUrl()}
+      <span data-testid="artist-filter">{String(props.artistUuid ?? "none")}</span>
+      <span data-testid="artist-expanded">{String(props.artistExpanded)}</span>
       <span data-testid="selected-node">{String(props.selectedNodeId ?? "none")}</span>
       <span data-testid="default-viewport">{JSON.stringify(props.defaultViewport ?? null)}</span>
       <button onClick={() => props.onViewportChange?.({ x: 10.04, y: -20, zoom: 0.5 })}>Pan</button>
-      <button
-        onClick={() => {
-          if (props.artistUuid) props.onArtistUuidChange?.(null);
-          props.onSelectedNodeIdChange?.("rock");
-        }}
-      >
-        Select genre
-      </button>
+      <button onClick={() => props.onSelectedNodeIdChange?.("rock")}>Select genre</button>
       <button
         onClick={() => {
           if (props.selectedNodeId) props.onSelectedNodeIdChange?.(null);
@@ -106,13 +100,8 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
       >
         Pick artist
       </button>
-      {props.artistUuid && !props.overlayPanel && (
-        <section aria-label={`Artist ${props.artistUuid}`}>
-          <span data-testid="artist-expanded">{String(props.artistExpanded)}</span>
-          <button onClick={() => props.onArtistUuidChange?.(null)}>Clear search</button>
-          <button onClick={() => props.onArtistExpandedChange?.(true)}>Expand panel</button>
-        </section>
-      )}
+      <button onClick={() => props.onArtistUuidChange?.(null)}>Clear artist</button>
+      <button onClick={() => props.onArtistExpandedChange?.(true)}>Expand artist</button>
       {props.overlayPanel && (
         <section aria-label={props.overlayPanel.title}>
           {props.overlayPanel.content}
@@ -173,7 +162,7 @@ function renderGenreTreePage({ forcePopCore = false }: { forcePopCore?: boolean 
 describe("GenreTreePage", () => {
   afterEach(() => {
     cleanup();
-    useListFullGenrePlaylistsMock.mockReturnValue({ data: [], isLoading: false });
+    useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [], isLoading: false });
     hasMainstreamPopRootMock.mockReturnValue(true);
     useIsAdminMock.mockReturnValue(false);
     searchParams = new URLSearchParams();
@@ -266,35 +255,79 @@ describe("GenreTreePage", () => {
       </GenreTreeViewModeProvider>,
     );
 
+    await flushNavigation();
     expect(routerReplaceMock).not.toHaveBeenCalled();
   });
 
-  describe("artist panel", () => {
-    it("pushes ?artist= in place of the genre when an artist is picked from search", async () => {
+  describe("artist filter", () => {
+    it("pushes ?artist= in place of the genre when an artist is picked", async () => {
       searchParams = new URLSearchParams("genre=rock&zoom=pop");
       renderGenreTreePage();
 
       fireEvent.click(await screen.findByRole("button", { name: "Pick artist" }));
 
-      await waitFor(() => expect(routerPushMock).toHaveBeenCalledWith("/?zoom=pop&artist=band", { scroll: false }));
+      await flushNavigation();
+      expect(routerPushMock).toHaveBeenCalledWith("/?zoom=pop&artist=band", { scroll: false });
       expect(routerPushMock).toHaveBeenCalledTimes(1);
     });
 
-    it("shows the artist from ?artist= over the tree and removes it when the search is cleared", async () => {
+    it("passes ?artist= to the tree and asks for the artist's visible tree", async () => {
       searchParams = new URLSearchParams("artist=band");
       renderGenreTreePage();
 
-      expect(await screen.findByRole("region", { name: "Artist band" })).toBeInTheDocument();
-      fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
-
-      await waitFor(() => expect(routerPushMock).toHaveBeenCalledWith("/", { scroll: false }));
+      expect(await screen.findByTestId("artist-filter")).toHaveTextContent("band");
+      expect(useVisibleGenrePlaylistsMock).toHaveBeenLastCalledWith(expect.objectContaining({ artistUuid: "band" }));
     });
 
-    it("drops ?genre= when an artist link adds ?artist=", async () => {
-      searchParams = new URLSearchParams("genre=rock&artist=band");
+    it("allows the pop-core view with the artist's pruned tree", async () => {
+      searchParams = new URLSearchParams("artist=band");
+      useVisibleGenrePlaylistsMock.mockReturnValue({
+        genrePlaylists: [{ uuid: "pop", name: "Mainstream Pop", root: { uuid: "pop" } }],
+        isLoading: false,
+      });
+
+      renderGenreTreePage({ forcePopCore: true });
+
+      const view = await screen.findByTestId("genre-tree-view");
+      expect(view.dataset.viewmode).toBe("pop-core");
+      expect(hasMainstreamPopRootMock).toHaveBeenLastCalledWith([expect.objectContaining({ id: "pop" })]);
+    });
+
+    it("keeps ?artist= and adds ?genre= when a genre is selected", async () => {
+      searchParams = new URLSearchParams("artist=band");
       renderGenreTreePage();
 
-      await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/?artist=band", { scroll: false }));
+      fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
+
+      await flushNavigation();
+      expect(routerPushMock).toHaveBeenCalledWith("/?artist=band&genre=rock", { scroll: false });
+    });
+
+    it("keeps ?genre= alongside ?artist= on load", async () => {
+      searchParams = new URLSearchParams("genre=rock&artist=band");
+      useVisibleGenrePlaylistsMock.mockReturnValue({
+        genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }],
+        isLoading: false,
+      });
+      renderGenreTreePage();
+
+      expect(await screen.findByTestId("selected-node")).toHaveTextContent("rock");
+      await flushNavigation();
+      expect(routerReplaceMock).not.toHaveBeenCalled();
+    });
+
+    it("removes only ?artist= when the filter is cleared", async () => {
+      searchParams = new URLSearchParams("genre=rock&artist=band");
+      useVisibleGenrePlaylistsMock.mockReturnValue({
+        genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }],
+        isLoading: false,
+      });
+      renderGenreTreePage();
+
+      fireEvent.click(await screen.findByRole("button", { name: "Clear artist" }));
+
+      await flushNavigation();
+      expect(routerPushMock).toHaveBeenCalledWith("/?genre=rock", { scroll: false });
     });
 
     it("lets About replace the artist", async () => {
@@ -305,21 +338,11 @@ describe("GenreTreePage", () => {
       await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/?about=", { scroll: false }));
     });
 
-    it("pushes ?genre= and drops ?artist= when a genre is selected", async () => {
-      searchParams = new URLSearchParams("artist=band");
-      renderGenreTreePage();
-
-      fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
-
-      await waitFor(() => expect(routerPushMock).toHaveBeenCalledWith("/?genre=rock", { scroll: false }));
-      expect(routerPushMock).toHaveBeenCalledTimes(1);
-    });
-
     it("collapses the tracklist when the artist panel expands, and the panel when the tracklist expands", async () => {
       searchParams = new URLSearchParams("artist=band");
       const { rerender } = renderGenreTreePage();
 
-      fireEvent.click(await screen.findByRole("button", { name: "Expand panel" }));
+      fireEvent.click(await screen.findByRole("button", { name: "Expand artist" }));
       expect(screen.getByTestId("artist-expanded")).toHaveTextContent("true");
       expect(setTracklistExpandedMock).toHaveBeenCalledWith(false);
 
@@ -355,7 +378,7 @@ describe("GenreTreePage", () => {
   });
 
   it("keeps the pop-core view mode (radial wheel skeleton) while genre playlists are still loading", async () => {
-    useListFullGenrePlaylistsMock.mockReturnValue({ data: undefined, isLoading: true });
+    useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [], isLoading: true });
     hasMainstreamPopRootMock.mockReturnValue(false);
 
     renderGenreTreePage({ forcePopCore: true });
@@ -365,7 +388,10 @@ describe("GenreTreePage", () => {
   });
 
   it("throws once loading finishes and the tree has no Mainstream Pop root", async () => {
-    useListFullGenrePlaylistsMock.mockReturnValue({ data: [], isLoading: false });
+    useVisibleGenrePlaylistsMock.mockReturnValue({
+      genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }],
+      isLoading: false,
+    });
     hasMainstreamPopRootMock.mockReturnValue(false);
     // Swallow React's console.error noise from the thrown render error in this test only.
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -378,7 +404,7 @@ describe("GenreTreePage", () => {
   });
 
   it("does not blame a missing Mainstream Pop root when the genre playlists fetch failed", async () => {
-    useListFullGenrePlaylistsMock.mockReturnValue({ data: undefined, isLoading: false });
+    useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [], isLoading: false });
     hasMainstreamPopRootMock.mockReturnValue(false);
 
     renderGenreTreePage({ forcePopCore: true });
@@ -395,8 +421,8 @@ describe("GenreTreePage", () => {
       tracksCount: 1,
       isUnacceptedRoot,
     });
-    useListFullGenrePlaylistsMock.mockReturnValue({
-      data: [row("pop", "pop"), row("pop-child", "pop"), row("new", "new", true), row("new-child", "new")],
+    useVisibleGenrePlaylistsMock.mockReturnValue({
+      genrePlaylists: [row("pop", "pop"), row("pop-child", "pop"), row("new", "new", true), row("new-child", "new")],
       isLoading: false,
     });
 
@@ -544,7 +570,7 @@ describe("GenreTreePage", () => {
 
     it("replaces an unknown ?genre= away once the genre playlists have loaded", async () => {
       searchParams = new URLSearchParams("genre=ghost&other=1");
-      useListFullGenrePlaylistsMock.mockReturnValue({ data: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }], isLoading: false });
+      useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }], isLoading: false });
 
       renderGenreTreePage();
 
@@ -553,14 +579,14 @@ describe("GenreTreePage", () => {
 
     it("keeps a known ?genre= and waits for the playlists before judging it", async () => {
       searchParams = new URLSearchParams("genre=rock");
-      useListFullGenrePlaylistsMock.mockReturnValue({ data: undefined, isLoading: true });
+      useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [], isLoading: true });
 
       const { rerender } = renderGenreTreePage();
       await screen.findByTestId("genre-tree-view");
       await flushNavigation();
       expect(routerReplaceMock).not.toHaveBeenCalled();
 
-      useListFullGenrePlaylistsMock.mockReturnValue({ data: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }], isLoading: false });
+      useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }], isLoading: false });
       rerender(
         <GenreTreeViewModeProvider>
           <GenreTreePage />
@@ -571,7 +597,7 @@ describe("GenreTreePage", () => {
     });
 
     it("does not strip a genre selected after the list loaded, before it refetches", async () => {
-      useListFullGenrePlaylistsMock.mockReturnValue({ data: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }], isLoading: false });
+      useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }], isLoading: false });
 
       const { rerender } = renderGenreTreePage();
       await screen.findByTestId("genre-tree-view");

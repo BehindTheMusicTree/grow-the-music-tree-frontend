@@ -6,7 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
 import {
-  useListFullGenrePlaylists,
+  useVisibleGenrePlaylists,
   CriteriaMinimum,
   hasMainstreamPopRoot,
   GenrePlaylistUuidSchema,
@@ -25,7 +25,7 @@ import SongCheckbox from "@components/features/genre-curation/SongCheckbox";
 import SongRowActions from "@components/features/genre-curation/SongRowActions";
 import SelectionBar from "@components/features/genre-curation/SelectionBar";
 import { useCenterColumn } from "@hooks/useCenterColumn";
-import { ABOUT_PARAM, useGenreTreeUrlState } from "@hooks/useGenreTreeUrlState";
+import { ABOUT_PARAM, ARTIST_PARAM, useGenreTreeUrlState } from "@hooks/useGenreTreeUrlState";
 import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import AboutContent from "@components/features/about/AboutContent";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
@@ -64,7 +64,7 @@ const GenreTreeView = dynamic(
 
 type ZoomableGenreTreeViewProps = Omit<
   ComponentProps<typeof GenreTreeView>,
-  | "onSelectedNodeIdChange"
+  "onSelectedNodeIdChange"
   | "focusGenreUuid"
   | "onFocusGenreChange"
   | "artistSearch"
@@ -141,10 +141,10 @@ function ZoomableGenreTreeView({ setSelectedNodeId, artistUuid, setArtistUuid, f
     };
   }, [isDetailHidden]);
 
-  // About and artist links only add their own param, so a stale genre or artist is dropped here.
+  // The About link only adds its own param, so a stale genre or artist is dropped here.
   useEffect(() => {
     if (about && artistUuid) setArtistUuid(null, "replace");
-    else if ((about || artistUuid) && selectedNodeId) setSelectedNodeId(null, "replace");
+    else if (about && selectedNodeId) setSelectedNodeId(null, "replace");
   }, [about, artistUuid, selectedNodeId, setArtistUuid, setSelectedNodeId]);
 
   const artist = useArtist(artistUuid, getGrowBackendBaseUrl);
@@ -178,7 +178,7 @@ function ZoomableGenreTreeView({ setSelectedNodeId, artistUuid, setArtistUuid, f
     placement: "regions" as const,
     showDisplayOptions: false,
     artistUuid,
-    onArtistUuidChange: (uuid: string | null) => setArtistUuid(uuid),
+    onArtistUuidChange: setArtistUuid,
     artistExpanded,
     onArtistExpandedChange: setArtistExpanded,
   };
@@ -207,16 +207,22 @@ function GenreTreePageContent() {
   const [editMode, setEditMode] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
-  // Shares the react-query cache with GenreTreeView's internal fetch (same queryKey), so this
-  // doesn't trigger an extra network request. Used only to compute whether the "pop-core" view
-  // mode is available, so AppHeader can grey out its toggle button accordingly.
-  const { data: genrePlaylists, isLoading: isLoadingGenrePlaylists } = useListFullGenrePlaylists(
-    "reference",
-    getBackendBaseUrl,
-  );
+  // The visible tree depends on the URL's artist, and the URL state validates its genre against that tree.
+  const artistFilter = useSearchParams().get(ARTIST_PARAM);
 
+  // Shares the react-query cache with GenreTreeView's internal fetches (same queryKeys), so this
+  // doesn't trigger extra network requests. Also drives whether the "pop-core" view mode is
+  // available, so AppHeader can grey out its toggle button accordingly.
+  const { genrePlaylists, isLoading: isLoadingGenrePlaylists } = useVisibleGenrePlaylists({
+    scope: "reference",
+    getBackendBaseUrl,
+    artistUuid: artistFilter,
+  });
+
+  // Empty while loading or when the tree fetch failed; validating against it would drop a valid genre.
   const genreIds = useMemo(
-    () => (genrePlaylists ? new Set(genrePlaylists.map((genrePlaylist) => genrePlaylist.uuid)) : undefined),
+    () =>
+      genrePlaylists.length > 0 ? new Set(genrePlaylists.map((genrePlaylist) => genrePlaylist.uuid)) : undefined,
     [genrePlaylists],
   );
   const {
@@ -232,7 +238,7 @@ function GenreTreePageContent() {
 
   const canShowPopCore = useMemo(
     () => {
-      const all = genrePlaylists ?? [];
+      const all = genrePlaylists;
       const unacceptedRootUuids = new Set(all.filter((gp) => gp.isUnacceptedRoot).map((gp) => gp.uuid));
       return hasMainstreamPopRoot(
         all
@@ -256,14 +262,14 @@ function GenreTreePageContent() {
   if (
     (viewMode === "pop-core" || viewMode === "outline") &&
     !isLoadingGenrePlaylists &&
-    genrePlaylists &&
+    genrePlaylists.length > 0 &&
     !canShowPopCore
   ) {
     throw new Error(`Cannot show "${viewMode}" view: the loaded genre tree has no "Mainstream Pop" root`);
   }
 
   const criteriaByPlaylist = useMemo(
-    () => new Map((genrePlaylists ?? []).map((genrePlaylist) => [genrePlaylist.uuid, genrePlaylist])),
+    () => new Map(genrePlaylists.map((genrePlaylist) => [genrePlaylist.uuid, genrePlaylist])),
     [genrePlaylists],
   );
   const playlistForNode = useCallback(
