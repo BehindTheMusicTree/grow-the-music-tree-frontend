@@ -107,6 +107,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Shareable genre tree URLs**: the selected genre (`?genre=`), the pop-core zoom frame (`?zoom=`) and the pan/zoom position (`?view=x,y,scale`) now live in the URL, so a copied link reopens the tree where it was. Selecting and zooming add history entries; panning only replaces the current one. Unknown genres and malformed views are dropped from the URL; switching view mode drops `view`. Requires `app-kit` 19.1.0.
 
+### Changed
+
+- The right column (header row and player panel) is now as wide as the detail panel (25.5rem). Bumped `@behindthemusictree/brand` to 12.6.0.
+- Every header button now has the header height (48px). On `/genealogy` the Genealogy button shows its label and the brand pill keeps only the logo; the brand name is never truncated.
+
 ## [3.18.0] - 2026-10-27
 
 ### Added

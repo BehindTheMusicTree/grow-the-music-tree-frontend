@@ -19,7 +19,7 @@
   "dependencies": {
     "@behindthemusictree/app-kit": "19.1.0",
     "@behindthemusictree/app-kit-ui": "19.1.0",
-    "@behindthemusictree/brand": "12.5.0",
+    "@behindthemusictree/brand": "12.6.0",
     "@behindthemusictree/ui": "0.4.0",
     "@fortawesome/fontawesome-svg-core": "6.5.2",
     "@fortawesome/free-solid-svg-icons": "6.5.2",
