@@ -33,7 +33,14 @@ function socialLabel(url: string): string {
   }
 }
 
-export default function ArtistLinks({ artist }: { artist: ArtistDetailed }) {
+interface ArtistLinkItem {
+  key: string;
+  url: string;
+  Icon: ComponentType<{ className?: string }>;
+  label: string;
+}
+
+export function artistLinks(artist: ArtistDetailed): ArtistLinkItem[] {
   const links = artist.links.map(({ kind, url }) => ({
     key: `${kind}-${url}`,
     url,
@@ -48,10 +55,12 @@ export default function ArtistLinks({ artist }: { artist: ArtistDetailed }) {
       label: "MusicBrainz",
     });
   }
-  if (links.length === 0) return null;
+  return links;
+}
 
+export default function ArtistLinks({ links }: { links: ArtistLinkItem[] }) {
   return (
-    <ul aria-label="Links" className="flex flex-wrap gap-1.5 px-6 pb-2.5">
+    <ul className="flex flex-wrap gap-1.5">
       {links.map(({ key, url, Icon, label }) => (
         <li key={key}>
           <Chip href={url} icon={<Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />}>

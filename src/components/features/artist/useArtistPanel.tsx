@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { Skeleton } from "@behindthemusictree/ui";
 import { useArtist } from "@hooks/useArtist";
 import ArtistHeader from "./ArtistHeader";
-import ArtistLinks from "./ArtistLinks";
 import ArtistMembers from "./ArtistMembers";
 import ArtistDiscography from "./ArtistDiscography";
 import ArtistSongs from "./ArtistSongs";
@@ -56,7 +55,11 @@ export function useArtistPanel({ uuid, expanded, onExpandedChange, collapsed, on
         content: <p className="px-6 py-2.5 text-[var(--color-text-muted)]">This artist does not exist.</p>,
       };
     case "error":
-      return { ...panel, title: "Artist", content: <p className="px-6 py-2.5 text-red-600">Could not load this artist.</p> };
+      return {
+        ...panel,
+        title: "Artist",
+        content: <p className="px-6 py-2.5 text-red-600">Could not load this artist.</p>,
+      };
     case "success": {
       const { artist } = result;
       return {
@@ -65,7 +68,6 @@ export function useArtistPanel({ uuid, expanded, onExpandedChange, collapsed, on
         content: (
           <>
             <ArtistHeader artist={artist} />
-            <ArtistLinks artist={artist} />
             <ArtistMembers title="Members" memberships={artist.members} />
             <ArtistMembers title="Member of" memberships={artist.memberOf} />
             {artist.tracksCount > 0 && <ArtistSongs artist={{ uuid: artist.uuid, name: artist.name }} />}

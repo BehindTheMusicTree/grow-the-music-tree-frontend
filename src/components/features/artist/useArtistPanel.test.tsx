@@ -26,7 +26,13 @@ const artist = {
 };
 
 function Harness({ uuid }: { uuid: string | null }) {
-  const panel = useArtistPanel({ uuid, expanded: false, onExpandedChange: vi.fn(), collapsed: false, onClose: vi.fn() });
+  const panel = useArtistPanel({
+    uuid,
+    expanded: false,
+    onExpandedChange: vi.fn(),
+    collapsed: false,
+    onClose: vi.fn(),
+  });
   if (!panel) return <p>No panel</p>;
   return (
     <section aria-label={panel.title}>
@@ -69,10 +75,17 @@ describe("useArtistPanel", () => {
     render(<Harness uuid={UUID} />);
 
     const region = screen.getByRole("region", { name: "Band" });
-    const terms = within(region).getAllByRole("term").map((term) => term.textContent);
-    const definitions = within(region).getAllByRole("definition").map((definition) => definition.textContent);
-    expect(terms).toEqual(["Type", "Country", "Active"]);
-    expect(definitions).toEqual(["Group", "United Kingdom", "1994–present"]);
+    const terms = within(region)
+      .getAllByRole("term")
+      .map((term) => term.textContent);
+    const definitions = within(region)
+      .getAllByRole("definition")
+      .map((definition) => definition.textContent);
+    expect(terms).toEqual(["Type", "Country", "Active", "Links"]);
+    expect(definitions.slice(0, 3)).toEqual(["Group", "United Kingdom", "1994–present"]);
+    expect(
+      within(within(region).getAllByRole("definition")[3]).getByRole("link", { name: "MusicBrainz" }),
+    ).toHaveAttribute("href", "https://musicbrainz.org/artist/22222222-2222-2222-2222-222222222222");
     expect(region).toHaveTextContent("Songs list");
     expect(screen.getByRole("complementary", { name: "Extra" })).toHaveTextContent("First");
     expect(document.title).toBe("Band");
