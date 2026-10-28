@@ -10,7 +10,7 @@ import {
   CriteriaMinimum,
   hasMainstreamPopRoot,
   GenrePlaylistUuidSchema,
-  type ArtistSearchResult,
+  useArtist,
 } from "@behindthemusictree/app-kit/genre-tree";
 import { GenreTreeViewSkeleton, type FocusChangeReason } from "@behindthemusictree/app-kit-ui/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
@@ -30,7 +30,6 @@ import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import AboutContent from "@components/features/about/AboutContent";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
-import { useArtistPanel } from "@components/features/artist/useArtistPanel";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
@@ -65,7 +64,16 @@ const GenreTreeView = dynamic(
 
 type ZoomableGenreTreeViewProps = Omit<
   ComponentProps<typeof GenreTreeView>,
-  "onSelectedNodeIdChange" | "focusGenreUuid" | "onFocusGenreChange" | "artistSearch" | "onArtistSelect" | "artistSearchBaseUrl"
+  | "onSelectedNodeIdChange"
+  | "focusGenreUuid"
+  | "onFocusGenreChange"
+  | "artistSearch"
+  | "onArtistSelect"
+  | "artistSearchBaseUrl"
+  | "artistUuid"
+  | "onArtistUuidChange"
+  | "artistExpanded"
+  | "onArtistExpandedChange"
 > & {
   setSelectedNodeId: (id: string | null, method?: "push" | "replace") => void;
   artistUuid: string | null;
@@ -139,13 +147,16 @@ function ZoomableGenreTreeView({ setSelectedNodeId, artistUuid, setArtistUuid, f
     else if ((about || artistUuid) && selectedNodeId) setSelectedNodeId(null, "replace");
   }, [about, artistUuid, selectedNodeId, setArtistUuid, setSelectedNodeId]);
 
-  const artistPanel = useArtistPanel({
-    uuid: artistUuid,
-    expanded: artistExpanded,
-    onExpandedChange: setArtistExpanded,
-    collapsed: detailCollapsed,
-    onClose: () => setArtistUuid(null),
-  });
+  const artist = useArtist(artistUuid, getGrowBackendBaseUrl);
+  const artistName = artist.status === "success" ? artist.artist.name : undefined;
+  useEffect(() => {
+    if (!artistName) return undefined;
+    const previous = document.title;
+    document.title = artistName;
+    return () => {
+      document.title = previous;
+    };
+  }, [artistName]);
 
   const handleSelectedNodeIdChange = useCallback(
     (id: string | null) => {
@@ -157,7 +168,7 @@ function ZoomableGenreTreeView({ setSelectedNodeId, artistUuid, setArtistUuid, f
 
   const overlayPanel = about
     ? { title: "TheMusicTree", content: <AboutContent onClose={() => closeAbout()} />, onClose: () => closeAbout() }
-    : artistPanel;
+    : undefined;
   const sharedProps = {
     ...viewProps,
     onSelectedNodeIdChange: handleSelectedNodeIdChange,
@@ -166,7 +177,10 @@ function ZoomableGenreTreeView({ setSelectedNodeId, artistUuid, setArtistUuid, f
     onCollapsedChange: setDetailCollapsed,
     placement: "regions" as const,
     showDisplayOptions: false,
-    onArtistSelect: (artist: ArtistSearchResult) => setArtistUuid(artist.uuid),
+    artistUuid,
+    onArtistUuidChange: (uuid: string | null) => setArtistUuid(uuid),
+    artistExpanded,
+    onArtistExpandedChange: setArtistExpanded,
   };
 
   return focus ? <GenreTreeView {...sharedProps} {...focus} /> : <GenreTreeView {...sharedProps} />;

@@ -116,6 +116,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - Every header button now has the header height (48px). On `/genealogy` the Genealogy button shows its label and the brand pill keeps only the logo; the brand name is never truncated.
 - The artist panel now matches the genre panel: content is inset to the panel edge, facts show as a Type / Country / Active list, and Discography, Members and Songs are collapsible sections divided like the genre panel, using brand colours so dark mode works. Bumped `@behindthemusictree/ui` to 0.5.0 (`PanelSection`, `FieldList`, `Chip`).
 - Artist panel sections are now separated the same way as in the genre panel: every section, Discography included, has one divider above it, and links sit in the fields list under Type / Country / Active. Bumped `@behindthemusictree/ui` to 0.6.0.
+- The artist panel now behaves like the genre panel: the artist's name shows in the search field, whose ✕ closes the panel, and the panel has no header title or close button of its own. The panel is now app-kit's built-in artist panel; the frontend copy is removed. Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 21.0.0 and `@behindthemusictree/ui` to 0.7.0.
+
+### Fixed
+
+- Switching between a selected genre and an artist adds a single history entry instead of two, so browser back returns to the previous genre or artist.
 
 ## [3.18.0] - 2026-10-27
 
