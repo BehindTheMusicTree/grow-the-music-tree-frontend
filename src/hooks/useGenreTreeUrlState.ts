@@ -7,6 +7,7 @@ export const GENRE_PARAM = "genre";
 export const ZOOM_PARAM = "zoom";
 export const VIEW_PARAM = "view";
 export const ABOUT_PARAM = "about";
+export const ARTIST_PARAM = "artist";
 
 export function parseViewport(raw: string | null): GenreTreeViewport | undefined {
   if (!raw) return undefined;
@@ -33,6 +34,7 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
   const genre = searchParams.get(GENRE_PARAM);
   const zoom = searchParams.get(ZOOM_PARAM);
   const view = searchParams.get(VIEW_PARAM);
+  const artist = searchParams.get(ARTIST_PARAM);
   // Mount-only seed: the library ignores later changes, and later URL writes must not feed back.
   const [defaultViewport, setDefaultViewport] = useState(() => parseViewport(view));
   const previousViewMode = useRef(viewMode);
@@ -56,7 +58,20 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
         if (id) {
           params.set(GENRE_PARAM, id);
           params.delete(ABOUT_PARAM);
+          params.delete(ARTIST_PARAM);
         } else params.delete(GENRE_PARAM);
+      }, method),
+    [navigate],
+  );
+
+  const setArtistUuid = useCallback(
+    (uuid: string | null, method: "push" | "replace" = "push") =>
+      navigate((params) => {
+        if (uuid) {
+          params.set(ARTIST_PARAM, uuid);
+          params.delete(GENRE_PARAM);
+          params.delete(ABOUT_PARAM);
+        } else params.delete(ARTIST_PARAM);
       }, method),
     [navigate],
   );
@@ -102,5 +117,14 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
     }, "replace");
   }, [viewMode, view, zoom, genre, genreIds, navigate]);
 
-  return { selectedNodeId: genre, setSelectedNodeId, focusGenreUuid: zoom, setFocus, defaultViewport, onViewportChange };
+  return {
+    selectedNodeId: genre,
+    setSelectedNodeId,
+    artistUuid: artist,
+    setArtistUuid,
+    focusGenreUuid: zoom,
+    setFocus,
+    defaultViewport,
+    onViewportChange,
+  };
 }

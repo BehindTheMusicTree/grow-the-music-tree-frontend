@@ -106,6 +106,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Added
 
 - **Shareable genre tree URLs**: the selected genre (`?genre=`), the pop-core zoom frame (`?zoom=`) and the pan/zoom position (`?view=x,y,scale`) now live in the URL, so a copied link reopens the tree where it was. Selecting and zooming add history entries; panning only replaces the current one. Unknown genres and malformed views are dropped from the URL; switching view mode drops `view`. Requires `app-kit` 19.1.0.
+- **Artists open as a panel over the genre tree** (`/?artist=<uuid>`) instead of a full page, compact first and expandable like the genre panel. Artist links from search, song rows and the player open it in place, and `/artists/<uuid>` redirects there. The expandable panel needs the `app-kit-ui` release that carries `genre-tree-view` 4.6.0.
 
 ### Changed
 
