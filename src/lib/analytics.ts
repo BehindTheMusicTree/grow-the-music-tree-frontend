@@ -1,4 +1,4 @@
-export type AnalyticsEvent = "genre_select" | "track_play";
+export type AnalyticsEvent = "genre_select" | "track_play" | "tipeee_click";
 
 type EventData = Record<string, string | number | boolean>;
 
