@@ -107,6 +107,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Region map at `/map`**: a world map coloured by song count; click a country to drill into its regions, follow the breadcrumb back up, and overlay a cultural zone (e.g. Celtic nations) from the zone picker. Hovering a region shows its song and genre counts. Requires the grow API's region map endpoints (`/v1/regions/map/`). The grow proxy now keeps an upstream immutable `Cache-Control`, so map files are cached for good.
 - **Support on Tipeee**: the About page has a "Support TheMusicTree" section linking to the GrowTheMusicTree Tipeee page; clicks are counted in analytics (`tipeee_click`). Requires `brand` 12.8.0.
 
 ## [3.20.0] - 2026-10-29
