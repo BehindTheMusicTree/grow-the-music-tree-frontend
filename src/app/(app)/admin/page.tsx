@@ -5,7 +5,12 @@ import { auth, signIn, signOut } from "@lib/auth";
 import { fetchGenreNameConflictGroups } from "@lib/genre-name-conflicts";
 import { fetchUnacceptedRoots } from "@lib/genre-unaccepted-roots";
 
-export default async function AdminPage() {
+const SIGN_IN_ERRORS: Record<string, string> = {
+  AccessDenied: "This account isn't allowed to sign in. Only admin accounts can.",
+};
+
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const { error } = await searchParams;
   const session = await auth();
   const isSignedIn = !!session && !session.error;
   // A grow-api outage must not take down sign-in/sign-out: show the link without a count.
@@ -47,14 +52,21 @@ export default async function AdminPage() {
             </form>
           </>
         ) : (
-          <form
-            action={async () => {
-              "use server";
-              await signIn("google", { redirectTo: "/admin" });
-            }}
-          >
-            <Button type="submit">Sign in with Google</Button>
-          </form>
+          <>
+            {error && (
+              <p role="alert" className="text-red-600">
+                {SIGN_IN_ERRORS[error] ?? "Sign-in failed. Please try again."}
+              </p>
+            )}
+            <form
+              action={async () => {
+                "use server";
+                await signIn("google", { redirectTo: "/admin" });
+              }}
+            >
+              <Button type="submit">Sign in with Google</Button>
+            </form>
+          </>
         )}
       </div>
     </Page>

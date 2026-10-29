@@ -5,7 +5,7 @@ write access. There are no user accounts beyond that.
 
 ## Flow
 
-1. The admin opens the hidden `/admin` page (linked from nowhere) and clicks **Sign in with Google**.
+1. Anyone can click the header user button (**Sign in**), which starts the Google flow and returns to `/admin`. Non-admin accounts are rejected and land on `/admin?error=AccessDenied`, which shows an error message.
 2. [Auth.js v5](https://authjs.dev) (`next-auth@5`, config in [`src/lib/auth.ts`](../src/lib/auth.ts),
    handlers at `src/app/api/auth/[...nextauth]/route.ts`) runs the Google OAuth flow with
    `access_type=offline` and `prompt=consent`, so Google returns a refresh token.
@@ -41,7 +41,7 @@ grow-api verifies the ID token independently. Its errors: `401` with `details.co
 ## UI
 
 `useIsAdmin()` (`src/hooks/useIsAdmin.ts`) is true only for a signed-in session without an error.
-Write controls are hidden (not disabled) otherwise. Today that's the genre tree's add root, load
+The header `UserMenu` shows a sign-in button when signed out and an account dropdown (admin pages, Sign out) when signed in. Write controls are hidden (not disabled) otherwise. Today that's the genre tree's add root, load
 example tree, add child, rename and reparent controls, all gated by `GenreTreeView`'s `readOnly` prop.
 
 ## Setup

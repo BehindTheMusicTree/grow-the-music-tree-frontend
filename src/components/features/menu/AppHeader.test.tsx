@@ -7,6 +7,7 @@ import { GenreTreeViewModeProvider, useGenreTreeViewMode } from "@contexts/Genre
 let searchParams = new URLSearchParams();
 let pathname = "/";
 
+vi.mock("./UserMenu", () => ({ UserMenu: () => null }));
 vi.mock("next/navigation", () => ({
   usePathname: () => pathname,
   useSearchParams: () => searchParams,
