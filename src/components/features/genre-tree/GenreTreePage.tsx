@@ -17,8 +17,6 @@ import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import { GenreCurationProvider } from "@components/features/genre-curation/GenreCurationProvider";
 import GenreDangerZone from "@components/features/genre-curation/GenreDangerZone";
-import GenreNameEditor from "@components/features/genre-curation/GenreNameEditor";
-import GenreParentsEditor from "@components/features/genre-curation/GenreParentsEditor";
 import GenreSummaryEditor from "@components/features/genre-curation/GenreSummaryEditor";
 import EssentialSongsEditor from "@components/features/genre-curation/EssentialSongsEditor";
 import SongCheckbox from "@components/features/genre-curation/SongCheckbox";
@@ -204,7 +202,6 @@ function GenreTreePageContent() {
   const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
   const isAdmin = useIsAdmin();
   const { showPopup, hidePopup } = usePopup();
-  const [editMode, setEditMode] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
   // The visible tree depends on the URL's artist, and the URL state validates its genre against that tree.
@@ -279,11 +276,6 @@ function GenreTreePageContent() {
     [criteriaByPlaylist],
   );
 
-  const handleEditModeChange = useCallback((on: boolean) => {
-    setEditMode(on);
-    setExpanded(on);
-  }, []);
-
   const showCriteriaCreationPopup = useCallback(
     (parent: CriteriaMinimum | null = null) =>
       showPopup(<GenreCreationPopup parent={parent} onClose={hidePopup} onCreated={(id) => setSelectedNodeId(id)} />),
@@ -295,28 +287,11 @@ function GenreTreePageContent() {
     [hidePopup, showPopup],
   );
 
+  // `satisfies` because a JSX spread skips the excess-property check, which let removed slots linger unnoticed.
   const curation = isAdmin
-    ? {
-        editMode,
-        onEditModeChange: handleEditModeChange,
+    ? ({
         expanded,
         onExpandedChange: setExpanded,
-        renderTitleEditor: (node: { id: string }) => {
-          const criteria = playlistForNode(node)?.criteria;
-          return criteria ? <GenreNameEditor key={criteria.uuid} genre={criteria} /> : null;
-        },
-        renderParentsEditor: (node: { id: string }) => {
-          const playlist = playlistForNode(node);
-          if (!playlist?.criteria) return null;
-          // `playlist.parent` is the parent *playlist*; the genres endpoint needs the parent genre.
-          const parent = playlist.parent ? (criteriaByPlaylist.get(playlist.parent.uuid)?.criteria ?? null) : null;
-          return (
-            <GenreParentsEditor
-              key={playlist.criteria.uuid}
-              genre={{ uuid: playlist.criteria.uuid, parent: parent && { uuid: parent.uuid, name: parent.name } }}
-            />
-          );
-        },
         renderDangerZone: (node: { id: string }) => {
           const playlist = playlistForNode(node);
           return playlist?.criteria ? (
@@ -341,7 +316,7 @@ function GenreTreePageContent() {
           <SongRowActions song={song} />
         ),
         renderTracksToolbar: () => <SelectionBar />,
-      }
+      } satisfies Partial<ComponentProps<typeof GenreTreeView>>)
     : {};
 
   return (

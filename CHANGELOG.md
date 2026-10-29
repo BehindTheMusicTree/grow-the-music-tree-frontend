@@ -112,6 +112,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Node size toggle on the genre tree**: a toggle at the bottom left of the zoom controls sizes nodes by song count or by the summed YouTube views of a genre's songs. The choice lives in the URL (`?size=views`; songs is the default and leaves the URL clean), so a copied link keeps it. Requires `app-kit` and `app-kit-ui` 25.0.0 and the grow API's `viewsCount` (grow-the-music-tree-api 14.5+).
 
+### Removed
+
+- **Dead edit-mode panel**: the title and parents editors, the secondary-parent editor and the rename hook were no longer rendered since `app-kit` 25.0.0 removed the edit-mode slots. The "Parent" action-band popup is the only parent-change flow. The genre tree's extra props are now type-checked so a slot removed upstream fails `pnpm typecheck`.
+
 ## [3.19.0] - 2026-10-29
 
 ### Added

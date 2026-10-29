@@ -2,8 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { ReactNode } from "react";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import GenreDangerZone from "./GenreDangerZone";
-import GenreNameEditor from "./GenreNameEditor";
-import GenreParentsEditor from "./GenreParentsEditor";
 import GenreSummaryEditor from "./GenreSummaryEditor";
 import SongRowActions from "./SongRowActions";
 import { MoveSongsPopup, UnlinkSongsPopup } from "./SongPopups";
@@ -16,9 +14,6 @@ const m = vi.hoisted(() => ({
   alias: vi.fn(),
   exclude: vi.fn(),
   del: vi.fn(),
-  name: vi.fn(),
-  parent: vi.fn(),
-  secondary: vi.fn(),
   summary: vi.fn(),
   essential: vi.fn(),
   setGenre: vi.fn(),
@@ -71,13 +66,7 @@ vi.mock("@hooks/curation/useAliasGenre", () => ({
 }));
 vi.mock("@hooks/curation/useExcludeGenre", () => ({ useExcludeGenre: () => ({ mutate: m.exclude, isPending: false }) }));
 vi.mock("@hooks/curation/useEssentialSongs", () => ({ useEssentialSongs: () => ({ mutate: m.essential, isPending: false }) }));
-vi.mock("@hooks/curation/useUpdateGenreName", () => ({ useUpdateGenreName: () => ({ mutate: m.name }) }));
-vi.mock("@hooks/curation/useUpdateGenreParent", () => ({ useUpdateGenreParent: () => ({ mutate: m.parent }) }));
 vi.mock("@hooks/curation/useUpdateGenreSummary", () => ({ useUpdateGenreSummary: () => ({ mutate: m.summary }) }));
-vi.mock("@hooks/curation/useSecondaryParent", () => ({
-  useSecondaryParent: () => ({ mutate: m.secondary }),
-  useSecondaryParents: () => ({ data: [{ uuid: "s1", name: "Blues" }] }),
-}));
 vi.mock("./SongVideoDialog", () => ({ default: () => null }));
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api" }));
 
@@ -184,18 +173,6 @@ describe("genre curation actions", () => {
     expect(onRemoved).toHaveBeenCalled();
   });
 
-  it("renames on Enter and restores on Escape", () => {
-    render(<GenreNameEditor genre={{ uuid: G1, name: "Folk" }} />);
-    const input = screen.getByRole("textbox", { name: "Genre name" });
-
-    fireEvent.change(input, { target: { value: "Folk rock" } });
-    fireEvent.keyDown(input, { key: "Enter" });
-    expect(m.name).toHaveBeenCalledWith({ uuid: G1, name: "Folk rock", previous: "Folk" });
-
-    fireEvent.keyDown(input, { key: "Escape" });
-    expect(input).toHaveValue("Folk");
-  });
-
   it("saves the summary on blur only when changed", () => {
     render(<GenreSummaryEditor overview={{ uuid: "g1", name: "Folk", summary: "old" } as never} />);
     const area = screen.getByRole("textbox", { name: "Genre summary" });
@@ -207,24 +184,6 @@ describe("genre curation actions", () => {
     fireEvent.blur(area);
     expect(m.summary).toHaveBeenCalledWith({ uuid: "g1", summary: "new", previous: "old" });
     expect(m.setGenre).toHaveBeenCalledWith({ uuid: "g1", name: "Folk" });
-  });
-
-  it("edits main and secondary parents", () => {
-    const roots = { uuid: makeGenreUuid("p1"), name: "Roots" };
-    render(<GenreParentsEditor genre={{ uuid: G1, parent: roots }} />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Main parent" }));
-    expect(m.parent).toHaveBeenCalledWith({
-      uuid: G1,
-      parent: { uuid: "t1", name: "Target" },
-      previous: roots,
-    });
-
-    fireEvent.click(screen.getByRole("button", { name: "+ Add secondary parent" }));
-    expect(m.secondary).toHaveBeenCalledWith({ uuid: G1, parent: { uuid: "t1", name: "Target" }, add: true });
-
-    fireEvent.click(screen.getByRole("button", { name: "Remove secondary parent Blues" }));
-    expect(m.secondary).toHaveBeenCalledWith({ uuid: G1, parent: { uuid: "s1", name: "Blues" }, add: false });
   });
 
   it("toggles essential tracks, unlinks and opens dialogs from a row", () => {
