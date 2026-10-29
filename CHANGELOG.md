@@ -106,6 +106,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **app-kit 26.1.0**: `app-kit` and `app-kit-ui` move from 26.0.0 to 26.1.0.
+
+### Changed
+
 - **Genre tree stays in place while it updates**: switching the node size, filtering by an artist or reparenting a genre no longer swaps the tree for the loading skeleton; a busy indicator shows in the tree's controls instead, and the skeleton only appears on the first load. Reparenting closes its popup as soon as the change is saved. Requires `app-kit` and `app-kit-ui` 26.0.0.
 
 ### Added
