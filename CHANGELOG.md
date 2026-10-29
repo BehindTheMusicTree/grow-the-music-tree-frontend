@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.20.0 - 2026-10-29](#3200---2026-10-29)
 - [3.19.0 - 2026-10-29](#3190---2026-10-29)
 - [3.17.1 - 2026-10-26](#3171---2026-10-26)
 - [3.17.0 - 2026-10-26](#3170---2026-10-26)
@@ -104,6 +105,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.20.0] - 2026-10-29
+
 ### Changed
 
 - **Genre tree stays in place while it updates**: switching the node size, filtering by an artist or reparenting a genre no longer swaps the tree for the loading skeleton; a busy indicator shows in the tree's controls instead, and the skeleton only appears on the first load. Reparenting closes its popup as soon as the change is saved. Requires `app-kit` and `app-kit-ui` 26.0.0.
@@ -116,6 +119,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Removed
 
 - **Dead edit-mode panel**: the title and parents editors, the secondary-parent editor and the rename hook were no longer rendered since `app-kit` 25.0.0 removed the edit-mode slots. The "Parent" action-band popup is the only parent-change flow. The genre tree's extra props are now type-checked so a slot removed upstream fails `pnpm typecheck`.
+
 
 ## [3.19.0] - 2026-10-29
 
