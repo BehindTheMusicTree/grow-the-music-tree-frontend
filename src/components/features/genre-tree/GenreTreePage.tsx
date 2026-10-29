@@ -230,6 +230,8 @@ function GenreTreePageContent() {
     setSelectedNodeId,
     artistUuid,
     setArtistUuid,
+    sizeMetric,
+    setSizeMetric,
     focusGenreUuid,
     setFocus,
     defaultViewport,
@@ -354,6 +356,8 @@ function GenreTreePageContent() {
       setSelectedNodeId={setSelectedNodeId}
       artistUuid={artistUuid}
       setArtistUuid={setArtistUuid}
+      sizeMetric={sizeMetric}
+      onSizeMetricChange={setSizeMetric}
       focus={viewMode === "pop-core" ? { focusGenreUuid, onFocusGenreChange: setFocus } : undefined}
       defaultViewport={defaultViewport}
       onViewportChange={onViewportChange}
