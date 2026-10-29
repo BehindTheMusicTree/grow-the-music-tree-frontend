@@ -18,6 +18,8 @@ overrides:
 
 minimumReleaseAge: 1440
 
+confirmModulesPurge: false
+
 minimumReleaseAgeExclude:
   - "@behindthemusictree/*"
 

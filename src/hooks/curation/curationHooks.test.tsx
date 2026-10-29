@@ -7,8 +7,6 @@ import { useAliasGenre } from "@hooks/curation/useAliasGenre";
 import { useAssignSongGenre } from "@hooks/curation/useAssignSongGenre";
 import { useEssentialSongs } from "@hooks/curation/useEssentialSongs";
 import { useExcludeGenre } from "@hooks/curation/useExcludeGenre";
-import { useSecondaryParent, secondaryParentsKey } from "@hooks/curation/useSecondaryParent";
-import { useUpdateGenreName } from "@hooks/curation/useUpdateGenreName";
 import { useUpdateGenreSummary } from "@hooks/curation/useUpdateGenreSummary";
 import { useUpdateSongVideo } from "@hooks/curation/useUpdateSongVideo";
 import { makeGenreUuid } from "@behindthemusictree/app-kit/genre-tree/testing";
@@ -54,20 +52,6 @@ describe("curation hooks", () => {
     const { result } = setup(useExcludeGenre);
     const [message] = await run(result, { uuid: "g1", category: "theme" });
     expect(message).toBe("Genre excluded");
-  });
-
-  it.each([
-    [true, "Also under P", "POST"],
-    [false, "Removed from P", "DELETE"],
-  ])("secondary parent add=%s", async (add, expected, method) => {
-    const { result, queryClient } = setup(useSecondaryParent);
-    queryClient.setQueryData(secondaryParentsKey("g1"), [{ uuid: "p0", name: "Q" }]);
-    const [message, options] = await run(result, { uuid: "g1", parent: { uuid: "p", name: "P" }, add });
-    expect(message).toBe(expected);
-    expect(fetchMock.mock.calls[0][3]).toEqual({ method });
-    act(() => options.action?.onClick());
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
-    expect(fetchMock.mock.calls[1][3]).toEqual({ method: add ? "DELETE" : "POST" });
   });
 
   it("updates the summary optimistically and undoes it", async () => {
@@ -144,17 +128,6 @@ describe("curation hooks", () => {
     act(() => move.result.current.mutate({ songs: ["r1"], genre: "g2" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(move.queryClient.getQueryData(key)).toBe(original);
-  });
-
-  it("renames a genre optimistically and undoes the name", async () => {
-    fetchMock.mockResolvedValue({ uuid: "g1" });
-    const { result, queryClient } = setup(useUpdateGenreName);
-    queryClient.setQueryData(genreQueryKeys.reference.overview(makeGenreUuid("g1")), { name: "Folk" });
-    const [message, options] = await run(result, { uuid: makeGenreUuid("g1"), name: "Folk rock", previous: "Folk" });
-    expect(message).toBe("Renamed to Folk rock");
-    act(() => options.action?.onClick());
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
-    expect(JSON.parse(fetchMock.mock.calls[1][3].body)).toEqual({ name: "Folk" });
   });
 
   it("updates a song video and undoes it", async () => {

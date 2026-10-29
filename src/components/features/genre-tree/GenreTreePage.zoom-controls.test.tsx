@@ -29,6 +29,7 @@ function makeGenrePlaylist(uuid: string, name: string, parent: { uuid: string; n
     parent,
     root: parent ?? { uuid, name },
     tracksCount: 1,
+    viewsCount: 0,
     isUnacceptedRoot: false,
     criteria: { uuid: uuid.replace(/.$/, "f"), name },
     createdOn: "2026-01-01T00:00:00.000Z",

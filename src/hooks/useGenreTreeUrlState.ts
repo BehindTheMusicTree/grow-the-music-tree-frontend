@@ -8,6 +8,9 @@ export const ZOOM_PARAM = "zoom";
 export const VIEW_PARAM = "view";
 export const ABOUT_PARAM = "about";
 export const ARTIST_PARAM = "artist";
+export const SIZE_PARAM = "size";
+
+export type SizeMetric = "songs" | "views";
 
 export function parseViewport(raw: string | null): GenreTreeViewport | undefined {
   if (!raw) return undefined;
@@ -35,6 +38,7 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
   const zoom = searchParams.get(ZOOM_PARAM);
   const view = searchParams.get(VIEW_PARAM);
   const artist = searchParams.get(ARTIST_PARAM);
+  const sizeMetric: SizeMetric = searchParams.get(SIZE_PARAM) === "views" ? "views" : "songs";
   // Mount-only seed: the library ignores later changes, and later URL writes must not feed back.
   const [defaultViewport, setDefaultViewport] = useState(() => parseViewport(view));
   const previousViewMode = useRef(viewMode);
@@ -88,6 +92,15 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
     [navigate],
   );
 
+  const setSizeMetric = useCallback(
+    (metric: SizeMetric) =>
+      navigate((params) => {
+        if (metric === "views") params.set(SIZE_PARAM, metric);
+        else params.delete(SIZE_PARAM);
+      }, "replace"),
+    [navigate],
+  );
+
   const setFocus = useCallback(
     (uuid: string | null, reason: FocusChangeReason) =>
       navigate(
@@ -134,6 +147,8 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
     setSelectedNodeId,
     artistUuid: artist,
     setArtistUuid,
+    sizeMetric,
+    setSizeMetric,
     focusGenreUuid: zoom,
     setFocus,
     defaultViewport,

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.20.0 - 2026-10-29](#3200---2026-10-29)
 - [3.19.0 - 2026-10-29](#3190---2026-10-29)
 - [3.17.1 - 2026-10-26](#3171---2026-10-26)
 - [3.17.0 - 2026-10-26](#3170---2026-10-26)
@@ -104,6 +105,22 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.20.0] - 2026-10-29
+
+### Changed
+
+- **Genre tree stays in place while it updates**: switching the node size, filtering by an artist or reparenting a genre no longer swaps the tree for the loading skeleton; a busy indicator shows in the tree's controls instead, and the skeleton only appears on the first load. Reparenting closes its popup as soon as the change is saved. Requires `app-kit` and `app-kit-ui` 26.0.0.
+- **Undo after changing a genre's parent**: admins get a "Moved under …" toast with an Undo button that moves the genre back (not offered for a root genre). Requires `app-kit` and `app-kit-ui` 26.1.0.
+
+### Added
+
+- **Node size toggle on the genre tree**: a toggle at the bottom left of the zoom controls sizes nodes by song count or by the summed YouTube views of a genre's songs. The choice lives in the URL (`?size=views`; songs is the default and leaves the URL clean), so a copied link keeps it. Requires `app-kit` and `app-kit-ui` 25.0.0 and the grow API's `viewsCount` (grow-the-music-tree-api 14.5+).
+
+### Removed
+
+- **Dead edit-mode panel**: the title and parents editors, the secondary-parent editor and the rename hook were no longer rendered since `app-kit` 25.0.0 removed the edit-mode slots. The "Parent" action-band popup is the only parent-change flow. The genre tree's extra props are now type-checked so a slot removed upstream fails `pnpm typecheck`.
+
+
 ## [3.19.0] - 2026-10-29
 
 ### Added
@@ -129,6 +146,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- The `post-merge` / `post-checkout` hooks no longer abort with `ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY` after a pnpm major bump: `confirmModulesPurge: false` lets `pnpm install` rebuild `node_modules` without a prompt.
 - Picking an artist while a genre is selected adds a single history entry instead of two, so browser back returns to the genre.
 - Changing a genre's parent from the tree's action band no longer returns 404: it sends the genre UUID, not the genre-playlist UUID (app-kit-ui `ChangeParentPopup`, fixed by the app-kit 20.0.0 bump; production still ran 19.0.0). Undoing a main-parent change in the curation panel failed for the same reason and now sends the previous parent's genre UUID. Curation inputs for the main and secondary parents and the genre picker's results are now typed as `GenreUuid`, so a genre-playlist UUID no longer type-checks there.
 - Local `pnpm test` and `pnpm lint` no longer pick up code in `.claude/worktrees/` (which mixed two React copies and failed 100+ tests), and the pop-core zoom-controls test no longer times out under a full parallel run.
