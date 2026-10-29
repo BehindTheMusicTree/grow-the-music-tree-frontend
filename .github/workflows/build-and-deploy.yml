@@ -103,6 +103,19 @@ jobs:
     runs-on: ubuntu-latest
     environment: PROD
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read required grow-api version
+        id: grow-api
+        run: echo "min_version=$(jq -er .growApi.minVersion package.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Require prod grow-api at or above the version this release needs
+        uses: BehindTheMusicTree/github-workflows/.github/actions/check-api-version@v4.7.0
+        with:
+          health_url: https://grow-api.${{ vars.DOMAIN_NAME }}/health/
+          min_version: ${{ steps.grow-api.outputs.min_version }}
+
       - name: Trigger gtmt-front deploy
         uses: BehindTheMusicTree/github-workflows/.github/actions/trigger-coolify-deploy@v4.4.0
         with:

@@ -237,6 +237,7 @@ We follow **strict Git Flow** with the following branch structure:
 - Only bug fixes and release-related changes go into release branches
 - When ready, open a PR from `release/*` to `main` (no direct merge), then tag the release on `main` after the PR merge
 - After tagging, open a PR from `main` to `develop` for the required back-merge (no direct merge)
+- Release grow-api to prod first. A PR that consumes a new grow-api field bumps `growApi.minVersion` in `package.json` to the grow-api release that ships it; the `grow-api contract (prod)` check on PRs to `main` and the prod deploy job fail while prod is older
 
 #### Hotfix Branches (`hotfix/<name>`) _(For Maintainers)_
 
