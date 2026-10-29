@@ -218,14 +218,6 @@ export const SongVideoDetailSchema = z.object({
   youtubeUnplayableReason: z.string().nullable().optional(),
 });
 
-export const SecondaryParentInputSchema = z.object({
-  uuid: GenreUuidSchema,
-  parent: z.object({ uuid: GenreUuidSchema, name: z.string() }),
-  add: z.boolean(),
-});
-export type SecondaryParentInput = z.infer<typeof SecondaryParentInputSchema>;
-export const SecondaryParentOutputSchema = UuidOutputSchema;
-
 export const GenreTreeRowsSchema = z.array(
   z.object({
     criteria: z
@@ -267,8 +259,6 @@ export const UpdateGenreSummaryInputSchema = z.object({
   previous: z.string().nullable(),
 });
 export type UpdateGenreSummaryInput = z.infer<typeof UpdateGenreSummaryInputSchema>;
-export const UpdateGenreNameInputSchema = z.object({ uuid: GenreUuidSchema, name: z.string(), previous: z.string() });
-export type UpdateGenreNameInput = z.infer<typeof UpdateGenreNameInputSchema>;
 const ParentSchema = z.object({ uuid: GenreUuidSchema, name: z.string() });
 export const UpdateGenreParentInputSchema = z.object({
   uuid: GenreUuidSchema,
