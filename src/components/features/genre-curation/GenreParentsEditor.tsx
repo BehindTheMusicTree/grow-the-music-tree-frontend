@@ -1,11 +1,12 @@
 "use client";
 
+import type { GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
 import GenrePicker from "@components/features/curation/GenrePicker";
 import { useSecondaryParent, useSecondaryParents } from "@hooks/curation/useSecondaryParent";
 import { useUpdateGenreParent } from "@hooks/curation/useUpdateGenreParent";
 
 interface Props {
-  genre: { uuid: string; parent: { uuid: string; name: string } | null };
+  genre: { uuid: GenreUuid; parent: { uuid: GenreUuid; name: string } | null };
 }
 
 export default function GenreParentsEditor({ genre }: Props) {

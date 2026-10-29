@@ -210,13 +210,14 @@ describe("genre curation actions", () => {
   });
 
   it("edits main and secondary parents", () => {
-    render(<GenreParentsEditor genre={{ uuid: G1, parent: { uuid: "p1", name: "Roots" } }} />);
+    const roots = { uuid: makeGenreUuid("p1"), name: "Roots" };
+    render(<GenreParentsEditor genre={{ uuid: G1, parent: roots }} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Main parent" }));
     expect(m.parent).toHaveBeenCalledWith({
       uuid: G1,
       parent: { uuid: "t1", name: "Target" },
-      previous: { uuid: "p1", name: "Roots" },
+      previous: roots,
     });
 
     fireEvent.click(screen.getByRole("button", { name: "+ Add secondary parent" }));

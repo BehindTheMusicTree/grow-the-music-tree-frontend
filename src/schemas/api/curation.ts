@@ -144,7 +144,7 @@ export const CurationItemSearchSchema = z.object({
 export const CanonicalGenreSearchSchema = z.object({
   results: z.array(
     z.object({
-      uuid: z.string().uuid(),
+      uuid: GenreUuidSchema,
       name: z.string(),
       wikidataId: z.string().nullable(),
       isUmbrella: z.boolean().optional(),
@@ -219,8 +219,8 @@ export const SongVideoDetailSchema = z.object({
 });
 
 export const SecondaryParentInputSchema = z.object({
-  uuid: z.string(),
-  parent: z.object({ uuid: z.string(), name: z.string() }),
+  uuid: GenreUuidSchema,
+  parent: z.object({ uuid: GenreUuidSchema, name: z.string() }),
   add: z.boolean(),
 });
 export type SecondaryParentInput = z.infer<typeof SecondaryParentInputSchema>;
@@ -230,8 +230,8 @@ export const GenreTreeRowsSchema = z.array(
   z.object({
     criteria: z
       .object({
-        uuid: z.string(),
-        secondaryParents: z.array(z.object({ uuid: z.string(), name: z.string() })),
+        uuid: GenreUuidSchema,
+        secondaryParents: z.array(z.object({ uuid: GenreUuidSchema, name: z.string() })),
       })
       .nullable(),
   }),
@@ -269,9 +269,9 @@ export const UpdateGenreSummaryInputSchema = z.object({
 export type UpdateGenreSummaryInput = z.infer<typeof UpdateGenreSummaryInputSchema>;
 export const UpdateGenreNameInputSchema = z.object({ uuid: GenreUuidSchema, name: z.string(), previous: z.string() });
 export type UpdateGenreNameInput = z.infer<typeof UpdateGenreNameInputSchema>;
-const ParentSchema = z.object({ uuid: z.string(), name: z.string() });
+const ParentSchema = z.object({ uuid: GenreUuidSchema, name: z.string() });
 export const UpdateGenreParentInputSchema = z.object({
-  uuid: z.string(),
+  uuid: GenreUuidSchema,
   parent: ParentSchema,
   previous: ParentSchema.nullable(),
 });

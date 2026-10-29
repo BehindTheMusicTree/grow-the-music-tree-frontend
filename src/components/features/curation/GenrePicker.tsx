@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useFetchWrapper, useQueryWithParse } from "@behindthemusictree/app-kit/transport";
+import type { GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
 import Combobox from "@components/ui/Combobox";
 import { useDebouncedValue } from "@hooks/useDebouncedValue";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -13,14 +14,14 @@ type Props = {
   value: string;
   /** What the input shows first, e.g. the genre's name rather than its QID. */
   defaultText: string;
-  onChange: (itemId: string, name?: string, uuid?: string) => void;
+  onChange: (itemId: string, name?: string, uuid?: GenreUuid) => void;
   /** Umbrella genres cannot hold songs directly, so assignment targets leave them out. */
   excludeUmbrellas?: boolean;
   /** Searches every known Wikidata item, pruned ones included, instead of the canonical genres. */
   catalog?: boolean;
 };
 
-type Option = { key: string; name: string; itemId: string; uuid?: string };
+type Option = { key: string; name: string; itemId: string; uuid?: GenreUuid };
 
 /** Finds a canonical genre by name, or takes a QID / LOCAL:<slug> typed as is. */
 export default function GenrePicker({
