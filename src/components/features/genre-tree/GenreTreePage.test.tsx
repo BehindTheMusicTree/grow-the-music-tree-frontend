@@ -51,6 +51,11 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   useVisibleGenrePlaylists: (options: { artistUuid?: string | null }) => useVisibleGenrePlaylistsMock(options),
   hasMainstreamPopRoot: (nodes: { id: string }[]) => hasMainstreamPopRootMock(nodes),
   useArtist: () => ({ status: "idle" }),
+  GenrePlaylistUuidSchema: { parse: (value: string) => value },
+}));
+
+vi.mock("@components/features/genre-curation/GenreParentsEditor", () => ({
+  default: ({ genre }: { genre: unknown }) => <output aria-label="Parents editor">{JSON.stringify(genre)}</output>,
 }));
 
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
@@ -78,6 +83,7 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
     onArtistUuidChange?: (uuid: string | null) => void;
     artistExpanded?: boolean;
     onArtistExpandedChange?: (expanded: boolean) => void;
+    renderParentsEditor?: (node: { id: string }) => React.ReactNode;
   }) => (
     <div
       data-testid="genre-tree-view"
@@ -102,6 +108,7 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
       </button>
       <button onClick={() => props.onArtistUuidChange?.(null)}>Clear artist</button>
       <button onClick={() => props.onArtistExpandedChange?.(true)}>Expand artist</button>
+      {props.selectedNodeId && props.renderParentsEditor?.({ id: props.selectedNodeId })}
       {props.overlayPanel && (
         <section aria-label={props.overlayPanel.title}>
           {props.overlayPanel.content}
@@ -188,6 +195,30 @@ describe("GenreTreePage", () => {
 
     const view = await screen.findByTestId("genre-tree-view");
     expect(view.dataset.readonly).toBe("false");
+  });
+
+  it("gives the parents editor genre uuids, never genre-playlist uuids", async () => {
+    useIsAdminMock.mockReturnValue(true);
+    searchParams = new URLSearchParams("genre=dance-pop");
+    const genre = (playlist: string, name: string, parent: string | null) => ({
+      uuid: playlist,
+      name,
+      parent: parent && { uuid: parent, name: parent },
+      root: { uuid: "electronic" },
+      criteria: { uuid: `${playlist}-genre`, name, wikidataId: null },
+    });
+    useVisibleGenrePlaylistsMock.mockReturnValue({
+      genrePlaylists: [genre("electronic", "Core electronic", null), genre("dance-pop", "Dance-pop", "electronic")],
+      isLoading: false,
+    });
+
+    renderGenreTreePage();
+
+    const editor = await screen.findByRole("status", { name: "Parents editor" });
+    expect(JSON.parse(editor.textContent ?? "")).toEqual({
+      uuid: "dance-pop-genre",
+      parent: { uuid: "electronic-genre", name: "Core electronic" },
+    });
   });
 
   it("clears the selected genre from the URL when the About panel opens", async () => {

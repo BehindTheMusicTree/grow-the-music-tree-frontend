@@ -127,6 +127,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Fixed
 
 - Picking an artist while a genre is selected adds a single history entry instead of two, so browser back returns to the genre.
+- Changing a genre's parent from the tree's action band no longer returns 404: it sends the genre UUID, not the genre-playlist UUID (app-kit-ui `ChangeParentPopup`, fixed by the app-kit 20.0.0 bump; production still ran 19.0.0). Undoing a main-parent change in the curation panel failed for the same reason and now sends the previous parent's genre UUID. Curation inputs for the main and secondary parents and the genre picker's results are now typed as `GenreUuid`, so a genre-playlist UUID no longer type-checks there.
 - Local `pnpm test` and `pnpm lint` no longer pick up code in `.claude/worktrees/` (which mixed two React copies and failed 100+ tests), and the pop-core zoom-controls test no longer times out under a full parallel run.
 
 ### Changed

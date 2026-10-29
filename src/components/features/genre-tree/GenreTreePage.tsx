@@ -305,12 +305,15 @@ function GenreTreePageContent() {
         },
         renderParentsEditor: (node: { id: string }) => {
           const playlist = playlistForNode(node);
-          return playlist?.criteria ? (
+          if (!playlist?.criteria) return null;
+          // `playlist.parent` is the parent *playlist*; the genres endpoint needs the parent genre.
+          const parent = playlist.parent ? (criteriaByPlaylist.get(playlist.parent.uuid)?.criteria ?? null) : null;
+          return (
             <GenreParentsEditor
               key={playlist.criteria.uuid}
-              genre={{ uuid: playlist.criteria.uuid, parent: playlist.parent ?? null }}
+              genre={{ uuid: playlist.criteria.uuid, parent: parent && { uuid: parent.uuid, name: parent.name } }}
             />
-          ) : null;
+          );
         },
         renderDangerZone: (node: { id: string }) => {
           const playlist = playlistForNode(node);
