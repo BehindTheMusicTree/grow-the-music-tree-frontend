@@ -450,6 +450,7 @@ describe("GenreTreePage", () => {
       parent: uuid === rootUuid ? null : { uuid: rootUuid },
       root: { uuid: rootUuid },
       tracksCount: 1,
+      viewsCount: 0,
       isUnacceptedRoot,
     });
     useVisibleGenrePlaylistsMock.mockReturnValue({

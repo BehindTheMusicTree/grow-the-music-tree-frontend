@@ -118,3 +118,37 @@ describe("formatViewport", () => {
     expect(formatViewport({ x: 10.04, y: -20, zoom: 0.5 })).toBe("10.0,-20.0,0.50");
   });
 });
+
+describe("useGenreTreeUrlState size metric", () => {
+  beforeEach(() => {
+    pushMock.mockReset();
+    replaceMock.mockReset();
+    searchParams = new URLSearchParams();
+  });
+
+  it("defaults to songs and reads ?size=views", () => {
+    expect(renderState().result.current.sizeMetric).toBe("songs");
+    searchParams = new URLSearchParams("size=views");
+    expect(renderState().result.current.sizeMetric).toBe("views");
+  });
+
+  it("falls back to songs on an unknown ?size= value", () => {
+    searchParams = new URLSearchParams("size=bogus");
+    expect(renderState().result.current.sizeMetric).toBe("songs");
+  });
+
+  it("writes ?size=views and drops it for songs, keeping other params", async () => {
+    searchParams = new URLSearchParams("genre=rock");
+    const { result } = renderState();
+
+    result.current.setSizeMetric("views");
+    await flushNavigation();
+    expect(replaceMock).toHaveBeenCalledWith("/?genre=rock&size=views", { scroll: false });
+
+    searchParams = new URLSearchParams("genre=rock&size=views");
+    const second = renderState();
+    second.result.current.setSizeMetric("songs");
+    await flushNavigation();
+    expect(replaceMock).toHaveBeenLastCalledWith("/?genre=rock", { scroll: false });
+  });
+});
