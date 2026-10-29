@@ -292,11 +292,15 @@ function GenreTreePageContent() {
   const updateGenreParent = useUpdateGenreParent();
   const handleParentChanged = useCallback(
     ({ genre, from, to }: ParentChange) => {
-      const nameOf = (uuid: string) => genrePlaylists.find((genrePlaylist) => genrePlaylist.criteria?.uuid === uuid)?.name;
+      const nameOf = (uuid: string) =>
+        genrePlaylists.find((genrePlaylist) => genrePlaylist.criteria?.uuid === uuid)?.name;
       const toName = nameOf(to);
-      if (!toName) throw new Error(`Cannot name genre ${to} after a parent change`);
       const fromName = from ? nameOf(from) : undefined;
-      if (from && !fromName) throw new Error(`Cannot name genre ${from} after a parent change`);
+      // The move is already saved; a name missing from this page's filtered list only costs the Undo.
+      if (!toName) {
+        toast.success("Parent changed");
+        return;
+      }
       toast.success(`Moved under ${toName}`, {
         action:
           from && fromName

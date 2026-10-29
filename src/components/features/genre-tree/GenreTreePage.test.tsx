@@ -281,6 +281,14 @@ describe("GenreTreePage", () => {
       expect(toastSuccessMock.mock.calls[0][1].action).toBeUndefined();
     });
 
+    it("still confirms the move, without Undo, when the new parent is not in the loaded list", async () => {
+      useIsAdminMock.mockReturnValue(true);
+      renderGenreTreePage();
+      fireEvent.click(await screen.findByRole("button", { name: "Change parent" }));
+
+      expect(toastSuccessMock).toHaveBeenCalledWith("Parent changed");
+    });
+
     it("does not pass onParentChanged to a non-admin", async () => {
       renderGenreTreePage();
       await screen.findByTestId("genre-tree-view");
