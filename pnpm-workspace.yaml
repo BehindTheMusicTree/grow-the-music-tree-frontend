@@ -17,6 +17,8 @@ overrides:
   "fast-uri@3": "^3.1.9"
   "zod@4": "^4.6.6"
 
+confirmModulesPurge: false
+
 minimumReleaseAgeExclude:
   - "@behindthemusictree/*"
 
