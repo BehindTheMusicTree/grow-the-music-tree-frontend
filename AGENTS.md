@@ -32,7 +32,7 @@ no `youtube_unplayable_reason`).
 ## Structure
 
 - `src/app/` — App Router pages (route group `(app)/`)
-- `src/components/` — `ui/` (incl. `popup/`), `features/`
+- `src/components/` — `ui/` (incl. `popup/`; local, unrelated to the `@behindthemusictree/ui` package), `features/`
 - `src/api/domains/` — API client modules per domain
 - `src/hooks/`, `src/lib/`, `src/models/`, `src/schemas/`, `src/types/`, `src/utils/`
 - Tests are co-located next to source as `*.test.ts(x)` — no separate test dir
@@ -90,6 +90,7 @@ Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONIN
 ## Further docs
 
 - `docs/DEPLOYMENT.md`, `docs/frontend-auth.md`, `docs/DATA_ATTRIBUTES.md`, `docs/SEMANTIC_HTML.md`
+- Ecosystem map (which repo owns what, where UI changes go): `~/git/claude-config/CONVENTIONS.md` § Ecosystem
 
 ## graphify
 
