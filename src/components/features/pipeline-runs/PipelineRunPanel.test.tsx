@@ -17,7 +17,7 @@ vi.mock("@behindthemusictree/app-kit/transport", () => ({
 }));
 
 const request = (overrides: Partial<PipelineRunRequest>): PipelineRunRequest => ({
-  uuid: "11111111-1111-1111-1111-111111111111",
+  uuid: "11111111-1111-4111-8111-111111111111",
   kind: "curation",
   trigger: "manual",
   requestedBy: null,
@@ -132,7 +132,7 @@ describe("PipelineRunPanel", () => {
   });
 
   it("refreshes the page when a run is launched and when it starts, not on first render or re-polls", () => {
-    latest = request({ uuid: "22222222-2222-2222-2222-222222222222", status: "succeeded" });
+    latest = request({ uuid: "22222222-2222-4222-8222-222222222222", status: "succeeded" });
     const { rerender } = render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
     expect(refreshMock).not.toHaveBeenCalled();
 

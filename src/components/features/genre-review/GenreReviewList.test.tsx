@@ -13,17 +13,17 @@ vi.mock("@behindthemusictree/app-kit/transport", () => ({
 }));
 
 const canonical = {
-  uuid: "11111111-1111-1111-1111-111111111111",
+  uuid: "11111111-1111-4111-8111-111111111111",
   name: "Pub rock",
   wikidataId: "Q1431327",
   parent: null,
   hasNameConflict: false,
 };
 const flagged = {
-  uuid: "22222222-2222-2222-2222-222222222222",
+  uuid: "22222222-2222-4222-8222-222222222222",
   name: "Pub rock (Q16250593)",
   wikidataId: "Q16250593",
-  parent: { uuid: "33333333-3333-3333-3333-333333333333", name: "Rock" },
+  parent: { uuid: "33333333-3333-4333-8333-333333333333", name: "Rock" },
   hasNameConflict: true,
 };
 const groups = [{ name: "Pub rock", genres: [canonical, flagged] }];

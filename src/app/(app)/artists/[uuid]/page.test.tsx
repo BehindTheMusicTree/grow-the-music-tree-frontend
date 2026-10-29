@@ -9,7 +9,7 @@ vi.mock("next/navigation", () => ({ permanentRedirect: (url: string) => permanen
 
 describe("ArtistPage", () => {
   it("redirects to the artist panel on the genre tree", async () => {
-    const uuid = "11111111-1111-1111-1111-111111111111";
+    const uuid = "11111111-1111-4111-8111-111111111111";
     await expect(ArtistPage({ params: Promise.resolve({ uuid }) })).rejects.toThrow("NEXT_REDIRECT");
     expect(permanentRedirectMock).toHaveBeenCalledWith(`/?artist=${uuid}`);
   });

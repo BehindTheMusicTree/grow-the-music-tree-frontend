@@ -38,7 +38,7 @@ export type CurationList = z.infer<typeof CurationListsSchema>[number];
 
 export const CurationEntrySchema = z.object({
   uuid: z.string().uuid(),
-  row: z.record(z.union([z.string(), z.boolean()])),
+  row: z.record(z.string(), z.union([z.string(), z.boolean()])),
   createdOn: z.string(),
   updatedOn: z.string().nullable(),
 });
@@ -52,14 +52,14 @@ export const CurationEntriesPageSchema = z.object({
   page: z.number(),
   totalPages: z.number(),
   results: z.array(CurationEntrySchema),
-  labels: z.record(z.string()),
+  labels: z.record(z.string(), z.string()),
 });
 
 export type CurationEntriesPage = z.infer<typeof CurationEntriesPageSchema>;
 
 export const CurationRulesSchema = z.object({
   results: z.array(CurationEntrySchema.extend({ listName: z.string() })),
-  labels: z.record(z.string()),
+  labels: z.record(z.string(), z.string()),
 });
 
 export type CurationRules = z.infer<typeof CurationRulesSchema>;
@@ -81,14 +81,14 @@ export const CurationHistoryPageSchema = z.object({
       entry: z.string().uuid(),
     }),
   ),
-  labels: z.record(z.string()),
+  labels: z.record(z.string(), z.string()),
 });
 
 export type CurationHistoryPage = z.infer<typeof CurationHistoryPageSchema>;
 export type CurationHistoryItem = CurationHistoryPage["results"][number];
 
 /** A history snapshot's row; `list_name` sits next to the columns. */
-export const CurationSnapshotSchema = z.record(z.union([z.string(), z.boolean(), z.null()]));
+export const CurationSnapshotSchema = z.record(z.string(), z.union([z.string(), z.boolean(), z.null()]));
 
 export const CurationStatusSchema = z.object({
   /** When the pipeline last applied an export to the canonical tree; null before its first run. */

@@ -40,7 +40,7 @@ const capitalized = {
 };
 const rule = {
   listName: "main_parent",
-  uuid: "11111111-1111-1111-1111-111111111111",
+  uuid: "11111111-1111-4111-8111-111111111111",
   row: { item_id: "Q2", reason: "Because", parent_item_id: "Q1" },
   createdOn: "2026-10-01T00:00:00Z",
   updatedOn: null,
