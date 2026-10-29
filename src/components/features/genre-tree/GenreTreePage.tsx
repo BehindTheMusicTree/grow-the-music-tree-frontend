@@ -3,6 +3,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useState, type ComponentProps } from "react";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
 import {
@@ -12,7 +13,8 @@ import {
   GenrePlaylistUuidSchema,
   useArtist,
 } from "@behindthemusictree/app-kit/genre-tree";
-import { GenreTreeViewSkeleton, type FocusChangeReason } from "@behindthemusictree/app-kit-ui/genre-tree";
+import { GenreTreeViewSkeleton, type FocusChangeReason, type ParentChange } from "@behindthemusictree/app-kit-ui/genre-tree";
+import { useUpdateGenreParent } from "@hooks/curation/useUpdateGenreParent";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
 import { GenreCurationProvider } from "@components/features/genre-curation/GenreCurationProvider";
@@ -287,11 +289,42 @@ function GenreTreePageContent() {
     [hidePopup, showPopup],
   );
 
+  const updateGenreParent = useUpdateGenreParent();
+  const handleParentChanged = useCallback(
+    ({ genre, from, to }: ParentChange) => {
+      const nameOf = (uuid: string) =>
+        genrePlaylists.find((genrePlaylist) => genrePlaylist.criteria?.uuid === uuid)?.name;
+      const toName = nameOf(to);
+      const fromName = from ? nameOf(from) : undefined;
+      // The move is already saved; a name missing from this page's filtered list only costs the Undo.
+      if (!toName) {
+        toast.success("Parent changed");
+        return;
+      }
+      toast.success(`Moved under ${toName}`, {
+        action:
+          from && fromName
+            ? {
+                label: "Undo",
+                onClick: () =>
+                  updateGenreParent.mutate({
+                    uuid: genre,
+                    parent: { uuid: from, name: fromName },
+                    previous: { uuid: to, name: toName },
+                  }),
+              }
+            : undefined,
+      });
+    },
+    [genrePlaylists, updateGenreParent],
+  );
+
   // `satisfies` because a JSX spread skips the excess-property check, which let removed slots linger unnoticed.
   const curation = isAdmin
     ? ({
         expanded,
         onExpandedChange: setExpanded,
+        onParentChanged: handleParentChanged,
         renderDangerZone: (node: { id: string }) => {
           const playlist = playlistForNode(node);
           return playlist?.criteria ? (

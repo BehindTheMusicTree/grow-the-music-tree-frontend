@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { useEffect } from "react";
 import { act, render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
+import type { GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
 import type { GenreTreeViewProps } from "@behindthemusictree/app-kit-ui/genre-tree";
 import GenreTreePage from "./GenreTreePage";
 import { GenreTreeViewModeProvider, useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
@@ -27,6 +28,14 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/",
   useSearchParams: () => searchParams,
 }));
+
+const updateGenreParentMutateMock = vi.fn();
+const toastSuccessMock = vi.fn();
+
+vi.mock("@hooks/curation/useUpdateGenreParent", () => ({
+  useUpdateGenreParent: () => ({ mutate: updateGenreParentMutateMock }),
+}));
+vi.mock("sonner", () => ({ toast: { success: (...args: unknown[]) => toastSuccessMock(...args) } }));
 
 const useIsAdminMock = vi.fn(() => false);
 
@@ -79,6 +88,16 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
         Pick artist
       </button>
       <button onClick={() => props.onArtistUuidChange?.(null)}>Clear artist</button>
+      {props.onParentChanged && (
+        <>
+          <button onClick={() => props.onParentChanged?.({ genre: "criteria-dance-pop" as GenreUuid, from: "criteria-pop" as GenreUuid, to: "criteria-core" as GenreUuid })}>
+            Change parent
+          </button>
+          <button onClick={() => props.onParentChanged?.({ genre: "criteria-pop" as GenreUuid, from: null, to: "criteria-core" as GenreUuid })}>
+            Change root parent
+          </button>
+        </>
+      )}
       <button onClick={() => props.onArtistExpandedChange?.(true)}>Expand artist</button>
       {props.overlayPanel && (
         <section aria-label={props.overlayPanel.title}>
@@ -133,6 +152,8 @@ function renderGenreTreePage({ forcePopCore = false }: { forcePopCore?: boolean 
 describe("GenreTreePage", () => {
   afterEach(() => {
     cleanup();
+    toastSuccessMock.mockReset();
+    updateGenreParentMutateMock.mockReset();
     useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [], isLoading: false });
     hasMainstreamPopRootMock.mockReturnValue(true);
     useIsAdminMock.mockReturnValue(false);
@@ -228,6 +249,52 @@ describe("GenreTreePage", () => {
 
     await flushNavigation();
     expect(routerReplaceMock).not.toHaveBeenCalled();
+  });
+
+  describe("parent change undo", () => {
+    const playlists = [
+      { uuid: "playlist-pop", name: "Pop", root: { uuid: "playlist-pop" }, criteria: { uuid: "criteria-pop" } },
+      { uuid: "playlist-core", name: "Core electronic", root: { uuid: "playlist-pop" }, criteria: { uuid: "criteria-core" } },
+    ];
+
+    it("offers Undo that moves the genre back under its previous parent by criteria uuid", async () => {
+      useIsAdminMock.mockReturnValue(true);
+      useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: playlists, isLoading: false });
+      renderGenreTreePage();
+      fireEvent.click(await screen.findByRole("button", { name: "Change parent" }));
+
+      expect(toastSuccessMock).toHaveBeenCalledWith("Moved under Core electronic", expect.anything());
+      toastSuccessMock.mock.calls[0][1].action.onClick();
+      expect(updateGenreParentMutateMock).toHaveBeenCalledWith({
+        uuid: "criteria-dance-pop",
+        parent: { uuid: "criteria-pop", name: "Pop" },
+        previous: { uuid: "criteria-core", name: "Core electronic" },
+      });
+    });
+
+    it("offers no Undo when the genre was a root", async () => {
+      useIsAdminMock.mockReturnValue(true);
+      useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: playlists, isLoading: false });
+      renderGenreTreePage();
+      fireEvent.click(await screen.findByRole("button", { name: "Change root parent" }));
+
+      expect(toastSuccessMock.mock.calls[0][1].action).toBeUndefined();
+    });
+
+    it("still confirms the move, without Undo, when the new parent is not in the loaded list", async () => {
+      useIsAdminMock.mockReturnValue(true);
+      renderGenreTreePage();
+      fireEvent.click(await screen.findByRole("button", { name: "Change parent" }));
+
+      expect(toastSuccessMock).toHaveBeenCalledWith("Parent changed");
+    });
+
+    it("does not pass onParentChanged to a non-admin", async () => {
+      renderGenreTreePage();
+      await screen.findByTestId("genre-tree-view");
+
+      expect(screen.queryByRole("button", { name: "Change parent" })).toBeNull();
+    });
   });
 
   describe("artist filter", () => {
