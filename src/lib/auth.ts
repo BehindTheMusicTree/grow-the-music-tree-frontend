@@ -77,6 +77,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => ({
   secret: getServerEnv().AUTH_SECRET,
   useSecureCookies,
   session: { strategy: "jwt" },
+  pages: { error: "/admin" },
   providers: [
     Google({
       clientId: getServerEnv().AUTH_GOOGLE_ID,

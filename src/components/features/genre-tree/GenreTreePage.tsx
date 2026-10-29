@@ -6,10 +6,11 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
 import {
-  useListFullGenrePlaylists,
+  useVisibleGenrePlaylists,
   CriteriaMinimum,
   hasMainstreamPopRoot,
-  type ArtistSearchResult,
+  GenrePlaylistUuidSchema,
+  useArtist,
 } from "@behindthemusictree/app-kit/genre-tree";
 import { GenreTreeViewSkeleton, type FocusChangeReason } from "@behindthemusictree/app-kit-ui/genre-tree";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
@@ -24,6 +25,7 @@ import SongCheckbox from "@components/features/genre-curation/SongCheckbox";
 import SongRowActions from "@components/features/genre-curation/SongRowActions";
 import SelectionBar from "@components/features/genre-curation/SelectionBar";
 import { useCenterColumn } from "@hooks/useCenterColumn";
+import { ABOUT_PARAM, ARTIST_PARAM, useGenreTreeUrlState } from "@hooks/useGenreTreeUrlState";
 import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import AboutContent from "@components/features/about/AboutContent";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
@@ -31,7 +33,6 @@ import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
-import { PATHS } from "@lib/constants/routes";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { trackEvent } from "@lib/analytics";
 
@@ -61,46 +62,37 @@ const GenreTreeView = dynamic(
   { ssr: false, loading: () => <GenreTreeViewLoadingFallback /> },
 );
 
-const ZOOM_PARAM = "zoom";
-const ABOUT_PARAM = "about";
-
 type ZoomableGenreTreeViewProps = Omit<
   ComponentProps<typeof GenreTreeView>,
-  "focusGenreUuid" | "onFocusGenreChange" | "artistSearch" | "onArtistSelect" | "artistSearchBaseUrl"
->;
+  "onSelectedNodeIdChange"
+  | "focusGenreUuid"
+  | "onFocusGenreChange"
+  | "artistSearch"
+  | "onArtistSelect"
+  | "artistSearchBaseUrl"
+  | "artistUuid"
+  | "onArtistUuidChange"
+  | "artistExpanded"
+  | "onArtistExpandedChange"
+> & {
+  setSelectedNodeId: (id: string | null, method?: "push" | "replace") => void;
+  artistUuid: string | null;
+  setArtistUuid: (uuid: string | null, method?: "push" | "replace") => void;
+  focus?: { focusGenreUuid: string | null; onFocusGenreChange: (uuid: string | null, reason: FocusChangeReason) => void };
+};
 
-// Reads `?zoom=` in its own component so only this subtree bails out to client rendering
-// (useSearchParams needs a Suspense boundary when the route is prerendered).
-function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
+function ZoomableGenreTreeView({ setSelectedNodeId, artistUuid, setArtistUuid, focus, ...viewProps }: ZoomableGenreTreeViewProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const zoom = searchParams.get(ZOOM_PARAM);
   const about = searchParams.has(ABOUT_PARAM);
   const {
     selectedNodeId,
-    onSelectedNodeIdChange,
     expanded: detailExpanded = false,
     onExpandedChange: setDetailExpanded,
   } = viewProps;
   const [detailCollapsed, setDetailCollapsed] = useState(false);
   const { isExpanded: tracklistExpanded, setExpanded: setTracklistExpanded } = usePlayerPanel();
-  const isPopCore = viewProps.viewMode === "pop-core";
-
-  const hrefWithZoom = useCallback(
-    (uuid: string | null) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (uuid) params.set(ZOOM_PARAM, uuid);
-      else params.delete(ZOOM_PARAM);
-      const query = params.toString();
-      return query ? `${pathname}?${query}` : pathname;
-    },
-    [pathname, searchParams],
-  );
-
-  useEffect(() => {
-    if (zoom !== null && !isPopCore) router.replace(hrefWithZoom(null), { scroll: false });
-  }, [zoom, isPopCore, hrefWithZoom, router]);
 
   const closeAbout = useCallback(
     (method: "push" | "replace" = "push") => {
@@ -112,11 +104,19 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
     [pathname, searchParams, router],
   );
 
-  const collapseDetail = useCallback((expanded: boolean) => setDetailExpanded?.(expanded), [setDetailExpanded]);
+  // Kept apart from the genre panel's state, which the tree owns for non-admins.
+  const [artistExpanded, setArtistExpanded] = useState(false);
+  const collapseDetail = useCallback(
+    (expanded: boolean) => {
+      setDetailExpanded?.(expanded);
+      setArtistExpanded(expanded);
+    },
+    [setDetailExpanded],
+  );
   useCenterColumn({
     about,
     closeAbout: () => closeAbout("replace"),
-    detailExpanded,
+    detailExpanded: detailExpanded || artistExpanded,
     setDetailExpanded: collapseDetail,
     tracklistExpanded,
     setTracklistExpanded,
@@ -124,10 +124,14 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
 
   useEffect(() => {
     setDetailCollapsed(false);
-  }, [selectedNodeId]);
+  }, [selectedNodeId, artistUuid]);
+
+  useEffect(() => {
+    setArtistExpanded(false);
+  }, [artistUuid]);
 
   // The brand layout tokens derive the center column, header and extended player from this variable.
-  const isDetailHidden = detailCollapsed || !selectedNodeId;
+  const isDetailHidden = detailCollapsed || (!selectedNodeId && !artistUuid);
   useEffect(() => {
     if (!isDetailHidden) return undefined;
     const root = document.documentElement;
@@ -137,17 +141,29 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
     };
   }, [isDetailHidden]);
 
+  // The About link only adds its own param, so a stale genre or artist is dropped here.
   useEffect(() => {
-    if (about) onSelectedNodeIdChange?.(null);
-  }, [about, onSelectedNodeIdChange]);
+    if (about && artistUuid) setArtistUuid(null, "replace");
+    else if (about && selectedNodeId) setSelectedNodeId(null, "replace");
+  }, [about, artistUuid, selectedNodeId, setArtistUuid, setSelectedNodeId]);
+
+  const artist = useArtist(artistUuid, getGrowBackendBaseUrl);
+  const artistName = artist.status === "success" ? artist.artist.name : undefined;
+  useEffect(() => {
+    if (!artistName) return undefined;
+    const previous = document.title;
+    document.title = artistName;
+    return () => {
+      document.title = previous;
+    };
+  }, [artistName]);
 
   const handleSelectedNodeIdChange = useCallback(
     (id: string | null) => {
-      onSelectedNodeIdChange?.(id);
+      setSelectedNodeId(id);
       if (id !== null) trackEvent("genre_select");
-      if (id !== null && about) closeAbout("replace");
     },
-    [about, closeAbout, onSelectedNodeIdChange],
+    [setSelectedNodeId],
   );
 
   const overlayPanel = about
@@ -161,46 +177,68 @@ function ZoomableGenreTreeView(viewProps: ZoomableGenreTreeViewProps) {
     onCollapsedChange: setDetailCollapsed,
     placement: "regions" as const,
     showDisplayOptions: false,
-    onArtistSelect: (artist: ArtistSearchResult) => router.push(PATHS.ARTIST(artist.uuid)),
+    artistUuid,
+    onArtistUuidChange: setArtistUuid,
+    artistExpanded,
+    onArtistExpandedChange: setArtistExpanded,
   };
 
-  const handleFocusGenreChange = useCallback(
-    (uuid: string | null, reason: FocusChangeReason) => {
-      const href = hrefWithZoom(uuid);
-      // A rejected zoom must not stay in history, or browser back would land on it again.
-      if (reason === "rejected") router.replace(href, { scroll: false });
-      else router.push(href, { scroll: false });
-    },
-    [hrefWithZoom, router],
-  );
-
-  return isPopCore ? (
-    <GenreTreeView {...sharedProps} focusGenreUuid={zoom} onFocusGenreChange={handleFocusGenreChange} />
-  ) : (
-    <GenreTreeView {...sharedProps} />
-  );
+  return focus ? <GenreTreeView {...sharedProps} {...focus} /> : <GenreTreeView {...sharedProps} />;
 }
 
 export default function GenreTreePage() {
+  return (
+    <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
+      <GenreCurationProvider>
+        {/* useSearchParams needs a Suspense boundary when the route is prerendered. */}
+        <Suspense fallback={<GenreTreeViewLoadingFallback />}>
+          <GenreTreePageContent />
+        </Suspense>
+      </GenreCurationProvider>
+    </Page>
+  );
+}
+
+function GenreTreePageContent() {
   const getBackendBaseUrl = getGrowBackendBaseUrl;
   const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
   const isAdmin = useIsAdmin();
   const { showPopup, hidePopup } = usePopup();
   const [editMode, setEditMode] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
-  // Shares the react-query cache with GenreTreeView's internal fetch (same queryKey), so this
-  // doesn't trigger an extra network request. Used only to compute whether the "pop-core" view
-  // mode is available, so AppHeader can grey out its toggle button accordingly.
-  const { data: genrePlaylists, isLoading: isLoadingGenrePlaylists } = useListFullGenrePlaylists(
-    "reference",
+  // The visible tree depends on the URL's artist, and the URL state validates its genre against that tree.
+  const artistFilter = useSearchParams().get(ARTIST_PARAM);
+
+  // Shares the react-query cache with GenreTreeView's internal fetches (same queryKeys), so this
+  // doesn't trigger extra network requests. Also drives whether the "pop-core" view mode is
+  // available, so AppHeader can grey out its toggle button accordingly.
+  const { genrePlaylists, isLoading: isLoadingGenrePlaylists } = useVisibleGenrePlaylists({
+    scope: "reference",
     getBackendBaseUrl,
+    artistUuid: artistFilter,
+  });
+
+  // Empty while loading or when the tree fetch failed; validating against it would drop a valid genre.
+  const genreIds = useMemo(
+    () =>
+      genrePlaylists.length > 0 ? new Set(genrePlaylists.map((genrePlaylist) => genrePlaylist.uuid)) : undefined,
+    [genrePlaylists],
   );
+  const {
+    selectedNodeId,
+    setSelectedNodeId,
+    artistUuid,
+    setArtistUuid,
+    focusGenreUuid,
+    setFocus,
+    defaultViewport,
+    onViewportChange,
+  } = useGenreTreeUrlState({ viewMode, genreIds });
 
   const canShowPopCore = useMemo(
     () => {
-      const all = genrePlaylists ?? [];
+      const all = genrePlaylists;
       const unacceptedRootUuids = new Set(all.filter((gp) => gp.isUnacceptedRoot).map((gp) => gp.uuid));
       return hasMainstreamPopRoot(
         all
@@ -224,15 +262,19 @@ export default function GenreTreePage() {
   if (
     (viewMode === "pop-core" || viewMode === "outline") &&
     !isLoadingGenrePlaylists &&
-    genrePlaylists &&
+    genrePlaylists.length > 0 &&
     !canShowPopCore
   ) {
     throw new Error(`Cannot show "${viewMode}" view: the loaded genre tree has no "Mainstream Pop" root`);
   }
 
   const criteriaByPlaylist = useMemo(
-    () => new Map((genrePlaylists ?? []).map((genrePlaylist) => [genrePlaylist.uuid, genrePlaylist])),
+    () => new Map(genrePlaylists.map((genrePlaylist) => [genrePlaylist.uuid, genrePlaylist])),
     [genrePlaylists],
+  );
+  const playlistForNode = useCallback(
+    (node: { id: string }) => criteriaByPlaylist.get(GenrePlaylistUuidSchema.parse(node.id)),
+    [criteriaByPlaylist],
   );
 
   const handleEditModeChange = useCallback((on: boolean) => {
@@ -242,8 +284,8 @@ export default function GenreTreePage() {
 
   const showCriteriaCreationPopup = useCallback(
     (parent: CriteriaMinimum | null = null) =>
-      showPopup(<GenreCreationPopup parent={parent} onClose={hidePopup} onCreated={setSelectedNodeId} />),
-    [hidePopup, showPopup],
+      showPopup(<GenreCreationPopup parent={parent} onClose={hidePopup} onCreated={(id) => setSelectedNodeId(id)} />),
+    [hidePopup, setSelectedNodeId, showPopup],
   );
 
   const showGenreRenamePopup = useCallback(
@@ -258,26 +300,29 @@ export default function GenreTreePage() {
         expanded,
         onExpandedChange: setExpanded,
         renderTitleEditor: (node: { id: string }) => {
-          const criteria = criteriaByPlaylist.get(node.id)?.criteria;
+          const criteria = playlistForNode(node)?.criteria;
           return criteria ? <GenreNameEditor key={criteria.uuid} genre={criteria} /> : null;
         },
         renderParentsEditor: (node: { id: string }) => {
-          const playlist = criteriaByPlaylist.get(node.id);
-          return playlist?.criteria ? (
+          const playlist = playlistForNode(node);
+          if (!playlist?.criteria) return null;
+          // `playlist.parent` is the parent *playlist*; the genres endpoint needs the parent genre.
+          const parent = playlist.parent ? (criteriaByPlaylist.get(playlist.parent.uuid)?.criteria ?? null) : null;
+          return (
             <GenreParentsEditor
               key={playlist.criteria.uuid}
-              genre={{ uuid: playlist.criteria.uuid, parent: playlist.parent ?? null }}
+              genre={{ uuid: playlist.criteria.uuid, parent: parent && { uuid: parent.uuid, name: parent.name } }}
             />
-          ) : null;
+          );
         },
         renderDangerZone: (node: { id: string }) => {
-          const playlist = criteriaByPlaylist.get(node.id);
+          const playlist = playlistForNode(node);
           return playlist?.criteria ? (
             <GenreDangerZone
               key={playlist.criteria.uuid}
               genre={playlist.criteria}
               onAliased={(targetUuid) => setSelectedNodeId(targetUuid)}
-              onRemoved={() => setSelectedNodeId(playlist.parent?.uuid ?? null)}
+              onRemoved={() => setSelectedNodeId(playlist.parent?.uuid ?? null, "replace")}
             />
           ) : null;
         },
@@ -298,24 +343,23 @@ export default function GenreTreePage() {
     : {};
 
   return (
-    <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
-      <GenreCurationProvider>
-      <Suspense fallback={<GenreTreeViewLoadingFallback />}>
-        <ZoomableGenreTreeView
-          scope="reference"
-          handleGenreCreationAction={showCriteriaCreationPopup}
-          handleGenreRenameAction={showGenreRenamePopup}
-          getBackendBaseUrl={getBackendBaseUrl}
-          viewMode={viewMode}
-          readOnly={!isAdmin}
-          selectedNodeId={selectedNodeId}
-          onSelectedNodeIdChange={setSelectedNodeId}
-          renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
-          renderArtistLink={renderArtistLink}
-          {...curation}
-        />
-      </Suspense>
-      </GenreCurationProvider>
-    </Page>
+    <ZoomableGenreTreeView
+      scope="reference"
+      handleGenreCreationAction={showCriteriaCreationPopup}
+      handleGenreRenameAction={showGenreRenamePopup}
+      getBackendBaseUrl={getBackendBaseUrl}
+      viewMode={viewMode}
+      readOnly={!isAdmin}
+      selectedNodeId={selectedNodeId}
+      setSelectedNodeId={setSelectedNodeId}
+      artistUuid={artistUuid}
+      setArtistUuid={setArtistUuid}
+      focus={viewMode === "pop-core" ? { focusGenreUuid, onFocusGenreChange: setFocus } : undefined}
+      defaultViewport={defaultViewport}
+      onViewportChange={onViewportChange}
+      renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
+      renderArtistLink={renderArtistLink}
+      {...curation}
+    />
   );
 }

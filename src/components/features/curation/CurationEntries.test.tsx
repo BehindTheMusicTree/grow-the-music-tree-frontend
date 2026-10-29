@@ -42,7 +42,7 @@ const list = {
   count: 1,
 };
 const entry = {
-  uuid: "11111111-1111-1111-1111-111111111111",
+  uuid: "11111111-1111-4111-8111-111111111111",
   row: { item_id: "Q1", reason: "Because", parent_item_id: "Q2", exclude_other_parents: true },
   createdOn: "2026-10-01T00:00:00Z",
   updatedOn: null,
@@ -127,7 +127,7 @@ describe("CurationEntries", () => {
     renderEntries();
     expect(within(screen.getByRole("table")).getByRole("link", { name: "Historique de Palaeo" })).toHaveAttribute(
       "href",
-      "/admin/curation/history?list=main_parent&entry=11111111-1111-1111-1111-111111111111",
+      "/admin/curation/history?list=main_parent&entry=11111111-1111-4111-8111-111111111111",
     );
   });
 

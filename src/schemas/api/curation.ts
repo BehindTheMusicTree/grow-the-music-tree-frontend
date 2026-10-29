@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+// Mirrors app-kit's GenreUuidSchema: its genre-tree entry is client-only, and this module is also used server-side.
+const GenreUuidSchema = z.string().uuid().brand<"GenreUuid">();
+
 export const ITEM_ID_PATTERN = /^(Q\d+|LOCAL:[a-z0-9-]+)$/;
 const TRADITION_ID_PATTERN = /^Q\d+$/;
 const ENTITY_ID_PATTERN = /^([a-z]{4}[0-9]{4}|Q\d+)$/;
@@ -35,7 +38,7 @@ export type CurationList = z.infer<typeof CurationListsSchema>[number];
 
 export const CurationEntrySchema = z.object({
   uuid: z.string().uuid(),
-  row: z.record(z.union([z.string(), z.boolean()])),
+  row: z.record(z.string(), z.union([z.string(), z.boolean()])),
   createdOn: z.string(),
   updatedOn: z.string().nullable(),
 });
@@ -49,14 +52,14 @@ export const CurationEntriesPageSchema = z.object({
   page: z.number(),
   totalPages: z.number(),
   results: z.array(CurationEntrySchema),
-  labels: z.record(z.string()),
+  labels: z.record(z.string(), z.string()),
 });
 
 export type CurationEntriesPage = z.infer<typeof CurationEntriesPageSchema>;
 
 export const CurationRulesSchema = z.object({
   results: z.array(CurationEntrySchema.extend({ listName: z.string() })),
-  labels: z.record(z.string()),
+  labels: z.record(z.string(), z.string()),
 });
 
 export type CurationRules = z.infer<typeof CurationRulesSchema>;
@@ -78,14 +81,14 @@ export const CurationHistoryPageSchema = z.object({
       entry: z.string().uuid(),
     }),
   ),
-  labels: z.record(z.string()),
+  labels: z.record(z.string(), z.string()),
 });
 
 export type CurationHistoryPage = z.infer<typeof CurationHistoryPageSchema>;
 export type CurationHistoryItem = CurationHistoryPage["results"][number];
 
 /** A history snapshot's row; `list_name` sits next to the columns. */
-export const CurationSnapshotSchema = z.record(z.union([z.string(), z.boolean(), z.null()]));
+export const CurationSnapshotSchema = z.record(z.string(), z.union([z.string(), z.boolean(), z.null()]));
 
 export const CurationStatusSchema = z.object({
   /** When the pipeline last applied an export to the canonical tree; null before its first run. */
@@ -141,7 +144,7 @@ export const CurationItemSearchSchema = z.object({
 export const CanonicalGenreSearchSchema = z.object({
   results: z.array(
     z.object({
-      uuid: z.string().uuid(),
+      uuid: GenreUuidSchema,
       name: z.string(),
       wikidataId: z.string().nullable(),
       isUmbrella: z.boolean().optional(),
@@ -216,8 +219,8 @@ export const SongVideoDetailSchema = z.object({
 });
 
 export const SecondaryParentInputSchema = z.object({
-  uuid: z.string(),
-  parent: z.object({ uuid: z.string(), name: z.string() }),
+  uuid: GenreUuidSchema,
+  parent: z.object({ uuid: GenreUuidSchema, name: z.string() }),
   add: z.boolean(),
 });
 export type SecondaryParentInput = z.infer<typeof SecondaryParentInputSchema>;
@@ -227,8 +230,8 @@ export const GenreTreeRowsSchema = z.array(
   z.object({
     criteria: z
       .object({
-        uuid: z.string(),
-        secondaryParents: z.array(z.object({ uuid: z.string(), name: z.string() })),
+        uuid: GenreUuidSchema,
+        secondaryParents: z.array(z.object({ uuid: GenreUuidSchema, name: z.string() })),
       })
       .nullable(),
   }),
@@ -259,16 +262,16 @@ export type ExcludeGenreInput = z.infer<typeof ExcludeGenreInputSchema>;
 export const ExcludeGenreOutputSchema = UuidOutputSchema;
 
 export const UpdateGenreSummaryInputSchema = z.object({
-  uuid: z.string(),
+  uuid: GenreUuidSchema,
   summary: z.string().nullable(),
   previous: z.string().nullable(),
 });
 export type UpdateGenreSummaryInput = z.infer<typeof UpdateGenreSummaryInputSchema>;
-export const UpdateGenreNameInputSchema = z.object({ uuid: z.string(), name: z.string(), previous: z.string() });
+export const UpdateGenreNameInputSchema = z.object({ uuid: GenreUuidSchema, name: z.string(), previous: z.string() });
 export type UpdateGenreNameInput = z.infer<typeof UpdateGenreNameInputSchema>;
-const ParentSchema = z.object({ uuid: z.string(), name: z.string() });
+const ParentSchema = z.object({ uuid: GenreUuidSchema, name: z.string() });
 export const UpdateGenreParentInputSchema = z.object({
-  uuid: z.string(),
+  uuid: GenreUuidSchema,
   parent: ParentSchema,
   previous: ParentSchema.nullable(),
 });
@@ -282,7 +285,7 @@ const EssentialSongSchema = z.object({
 });
 export type EssentialSong = z.infer<typeof EssentialSongSchema>;
 export const UpdateEssentialSongsInputSchema = z.object({
-  uuid: z.string(),
+  uuid: GenreUuidSchema,
   tracks: z.array(EssentialSongSchema),
   previous: z.array(EssentialSongSchema),
 });

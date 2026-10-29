@@ -1,10 +1,11 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
+import type { GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
 import { usePopup } from "@behindthemusictree/app-kit/popup";
 
 export interface CuratedGenre {
-  uuid: string;
+  uuid: GenreUuid;
   name: string;
 }
 

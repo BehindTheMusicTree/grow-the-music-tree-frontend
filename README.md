@@ -136,8 +136,8 @@ cp .env.example .env.local
 
 ### Prerequisites
 
-- Node.js 20 (see [`.nvmrc`](.nvmrc))
-- pnpm (`corepack enable && corepack prepare pnpm@10.33.2 --activate`, matching the Dockerfile and CI)
+- Node.js 26 (see [`.nvmrc`](.nvmrc))
+- pnpm: the version pinned in `package.json`'s `packageManager` (also used by the Dockerfile and CI). Any global pnpm 10+ switches to it automatically
 - A [GitHub PAT](https://github.com/settings/tokens) with `read:packages` (and org access) — [`.npmrc`](.npmrc) pulls `@behindthemusictree/*` packages from GitHub Packages
 - Docker (optional, for containerized builds)
 

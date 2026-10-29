@@ -127,7 +127,7 @@ cd grow-the-music-tree-frontend
 
 #### Prerequisites
 
-- **Node.js 20.x or higher**
+- **Node.js 26** (see `.nvmrc`)
 - **npm** (comes with Node.js)
 - **Git**
 

@@ -90,14 +90,14 @@ See [docs/frontend-auth.md](docs/frontend-auth.md).
 
 ## Build/deploy
 
-Multi-stage `Dockerfile`: a `builder` stage (`node:20-alpine`, pnpm, `pnpm build` against
+Multi-stage `Dockerfile`: a `builder` stage (`node:26-alpine`, pnpm, `pnpm build` against
 `output: "standalone"`) and a slim `runner` stage that copies only the standalone output and runs
 `node server.js`. Full Coolify build/runtime env var setup is in
 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md); the one constraint that lives only in the Dockerfile's
 comments and is easy to regress:
 
 - **`apk add curl` in the `runner` stage** — Coolify's post-deploy healthcheck runs `curl`/`wget`
-  *inside* the container against `/health`; plain `node:20-alpine` ships neither, so without this
+  *inside* the container against `/health`; plain `node:26-alpine` ships neither, so without this
   the healthcheck always fails and Coolify rolls the deploy back. Installed with a 3-attempt retry
   to ride out transient Alpine mirror/TLS blips.
 - **`ENV HOSTNAME=0.0.0.0` in the `runner` stage** — Docker auto-sets `$HOSTNAME` to the container

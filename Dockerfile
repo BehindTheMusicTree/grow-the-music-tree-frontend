@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
-FROM node:20-alpine AS builder
+FROM node:26-alpine AS builder
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@10.33.2 --activate
-COPY package.json pnpm-lock.yaml .npmrc ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+RUN npm install -g "$(node -p 'require("./package.json").packageManager')"
 RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
     --mount=type=secret,id=GH_PACKAGES_TOKEN_READ \
     if [ ! -s /run/secrets/GH_PACKAGES_TOKEN_READ ]; then \
@@ -29,7 +29,7 @@ ENV NEXT_PUBLIC_CONTACT_EMAIL=$NEXT_PUBLIC_CONTACT_EMAIL \
 COPY . .
 RUN pnpm build
 
-FROM node:20-alpine AS runner
+FROM node:26-alpine AS runner
 WORKDIR /app
 # Coolify's post-deploy healthcheck runs curl/wget inside the container; alpine ships neither
 # reliably (no curl at all), so without this the healthcheck always fails and Coolify rolls back.

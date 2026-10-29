@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.19.0 - 2026-10-29](#3190---2026-10-29)
 - [3.17.1 - 2026-10-26](#3171---2026-10-26)
 - [3.17.0 - 2026-10-26](#3170---2026-10-26)
 - [3.16.0 - 2026-10-26](#3160---2026-10-26)
@@ -102,6 +103,43 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [3.19.0] - 2026-10-29
+
+### Added
+
+- **Shareable genre tree URLs**: the selected genre (`?genre=`), the pop-core zoom frame (`?zoom=`) and the pan/zoom position (`?view=x,y,scale`) now live in the URL, so a copied link reopens the tree where it was. Selecting and zooming add history entries; panning only replaces the current one. Unknown genres and malformed views are dropped from the URL; switching view mode drops `view`. Requires `app-kit` 19.1.0.
+- **Artists open as a panel over the genre tree** (`/?artist=<uuid>`) instead of a full page, compact first and expandable like the genre panel. Artist links from search, song rows and the player open it in place, and `/artists/<uuid>` redirects there. The panel expands, collapses behind the edge tab and closes on Escape; requires `app-kit` and `app-kit-ui` 20.0.0 (`genre-tree-view` 4.6.0).
+- **Artist panel shows the artist's Wikimedia Commons photo** above the facts, with its author and license credit linking to the Commons page and the license. Nothing is shown for artists without a photo. Requires the grow API's artist `image` field (grow #334/#335).
+
+- **Artist-filtered genre tree** (`/?artist=<uuid>`): picking an artist narrows the pop-core and outline views to the genres the artist has songs in (plus their ancestors and Mainstream Pop). The filter stays while genres are selected (`?artist=<uuid>&genre=<uuid>` scopes the genre panel to the artist), survives reload, and is cleared by the artist chip's x or by closing the artist panel. A first-load `genre` outside the artist's tree is dropped. Requires the grow API's `GET /v1/artists/<uuid>/genre-counts/` (grow #336).
+
+### Changed
+
+- **zod 4**: `zod` moves from 3.24.3 to 4.6.7, closing the open zod advisory, and `@behindthemusictree/app-kit` and `app-kit-ui` to 24.0.1 (zod 4 schemas across the hook boundary). `z.record` takes explicit key and value schemas, the `zod@4` override is dropped, and test UUID fixtures are RFC 9562 valid because `.uuid()` is now strict. `pnpm-workspace.yaml` sets `minimumReleaseAge: 1440` explicitly (the pnpm 11 default, unchanged).
+- `@sentry/nextjs` rolls back from 10.78.0 to 10.77.1. 10.78.0 was published less than a day before it landed, so pnpm 11's `minimumReleaseAge` rejected its 14 `@sentry/*` lockfile entries and failed `pnpm install` in CI. The lockfile is re-resolved, so a few transitive dependencies move to newer patch versions.
+- pnpm moves to 11.5.2 (`packageManager`). pnpm 11 rejects packages published less than a day ago and blocks dependency build scripts by default, so `pnpm-workspace.yaml` exempts `@behindthemusictree/*` from `minimumReleaseAge` and sets `allowBuilds: false` for the six dependencies with install scripts (fontawesome, `@sentry/cli`, `esbuild`, `unrs-resolver`), which pnpm 10 never ran either. The lockfile is unchanged.
+- pnpm is pinned to 10.33.2 through `package.json`'s `packageManager`, which local pnpm, CI and the Docker build all read, and the dependency overrides move to `pnpm-workspace.yaml`. A newer global pnpm (11+) no longer drops the overrides and rewrites `pnpm-lock.yaml`.
+- Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 22.0.0 and `@behindthemusictree/ui` to 0.7.0. The artist panel now comes from app-kit's `GenreTreeView` (`artistUuid` / `onArtistUuidChange`); the frontend's own artist panel components are removed. Selecting a genre no longer drops `?artist=`.
+- The right column (header row and player panel) is now as wide as the detail panel (25.5rem). Bumped `@behindthemusictree/brand` to 12.6.0.
+- Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 20.0.0. Genre and genre-playlist UUIDs are branded types now; ids coming from the tree view are parsed at the boundary.
+- Every header button now has the header height (48px). On `/genealogy` the Genealogy button shows its label and the brand pill keeps only the logo; the brand name is never truncated.
+- The artist panel now matches the genre panel: content is inset to the panel edge, facts show as a Type / Country / Active list, and Discography, Members and Songs are collapsible sections divided like the genre panel, using brand colours so dark mode works. Bumped `@behindthemusictree/ui` to 0.5.0 (`PanelSection`, `FieldList`, `Chip`).
+- Artist panel sections are now separated the same way as in the genre panel: every section, Discography included, has one divider above it, and links sit in the fields list under Type / Country / Active. Bumped `@behindthemusictree/ui` to 0.6.0.
+
+### Fixed
+
+- Picking an artist while a genre is selected adds a single history entry instead of two, so browser back returns to the genre.
+- Changing a genre's parent from the tree's action band no longer returns 404: it sends the genre UUID, not the genre-playlist UUID (app-kit-ui `ChangeParentPopup`, fixed by the app-kit 20.0.0 bump; production still ran 19.0.0). Undoing a main-parent change in the curation panel failed for the same reason and now sends the previous parent's genre UUID. Curation inputs for the main and secondary parents and the genre picker's results are now typed as `GenreUuid`, so a genre-playlist UUID no longer type-checks there.
+- Local `pnpm test` and `pnpm lint` no longer pick up code in `.claude/worktrees/` (which mixed two React copies and failed 100+ tests), and the pop-core zoom-controls test no longer times out under a full parallel run.
+
+### Changed
+
+- **Node 26**: the app now builds and runs on Node 26 (Node 20 is end-of-life). `.nvmrc` pins the major, `engines.node` is `>=26 <27` with `engine-strict`, CI reads `.nvmrc`, and the `Dockerfile` uses `node:26-alpine` and installs pnpm with npm because Node 26 no longer bundles Corepack.
+
+### Security
+
+- Patched the open Dependabot alerts: bumped `next`, `@sentry/nextjs`, `vitest` (and `@vitest/*`) and `happy-dom`, and updated the `pnpm-workspace.yaml` overrides for `vite`, `undici`, `fast-uri` and `zod` 4. `zod` 3 (required by app-kit) has no patched 3.x release and stays flagged.
 
 ## [3.18.0] - 2026-10-27
 
