@@ -125,6 +125,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- The `post-merge` / `post-checkout` hooks no longer abort with `ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY` after a pnpm major bump: `confirmModulesPurge: false` lets `pnpm install` rebuild `node_modules` without a prompt.
 - Picking an artist while a genre is selected adds a single history entry instead of two, so browser back returns to the genre.
 - Local `pnpm test` and `pnpm lint` no longer pick up code in `.claude/worktrees/` (which mixed two React copies and failed 100+ tests), and the pop-core zoom-controls test no longer times out under a full parallel run.
 
