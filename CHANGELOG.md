@@ -104,6 +104,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Genre tree stays in place while it updates**: switching the node size, filtering by an artist or reparenting a genre no longer swaps the tree for the loading skeleton; a busy indicator shows in the tree's controls instead, and the skeleton only appears on the first load. Reparenting closes its popup as soon as the change is saved. Requires `app-kit` and `app-kit-ui` 26.0.0.
+
 ### Added
 
 - **Node size toggle on the genre tree**: a toggle at the bottom left of the zoom controls sizes nodes by song count or by the summed YouTube views of a genre's songs. The choice lives in the URL (`?size=views`; songs is the default and leaves the URL clean), so a copied link keeps it. Requires `app-kit` and `app-kit-ui` 25.0.0 and the grow API's `viewsCount` (grow-the-music-tree-api 14.5+).
