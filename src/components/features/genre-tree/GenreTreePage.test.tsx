@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { useEffect } from "react";
 import { act, render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
+import type { GenreTreeViewProps } from "@behindthemusictree/app-kit-ui/genre-tree";
 import GenreTreePage from "./GenreTreePage";
 import { GenreTreeViewModeProvider, useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 
@@ -54,37 +55,8 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   GenrePlaylistUuidSchema: { parse: (value: string) => value },
 }));
 
-vi.mock("@components/features/genre-curation/GenreParentsEditor", () => ({
-  default: ({ genre }: { genre: unknown }) => <output aria-label="Parents editor">{JSON.stringify(genre)}</output>,
-}));
-
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
-  GenreTreeView: (props: {
-    readOnly: boolean;
-    getBackendBaseUrl: () => string;
-    viewMode: string;
-    focusGenreUuid?: string | null;
-    onFocusGenreChange?: (uuid: string | null, reason: string) => void;
-    editMode?: boolean;
-    onEditModeChange?: (on: boolean) => void;
-    expanded?: boolean;
-    onExpandedChange?: (on: boolean) => void;
-    selectedNodeId?: string | null;
-    onSelectedNodeIdChange?: (id: string | null) => void;
-    defaultViewport?: { x: number; y: number; zoom: number };
-    onViewportChange?: (viewport: { x: number; y: number; zoom: number }) => void;
-    overlayPanel?: {
-      title: string;
-      content: React.ReactNode;
-      onClose: () => void;
-      onExpandedChange?: (on: boolean) => void;
-    };
-    artistUuid?: string | null;
-    onArtistUuidChange?: (uuid: string | null) => void;
-    artistExpanded?: boolean;
-    onArtistExpandedChange?: (expanded: boolean) => void;
-    renderParentsEditor?: (node: { id: string }) => React.ReactNode;
-  }) => (
+  GenreTreeView: (props: GenreTreeViewProps) => (
     <div
       data-testid="genre-tree-view"
       data-readonly={String(props.readOnly)}
@@ -108,7 +80,6 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
       </button>
       <button onClick={() => props.onArtistUuidChange?.(null)}>Clear artist</button>
       <button onClick={() => props.onArtistExpandedChange?.(true)}>Expand artist</button>
-      {props.selectedNodeId && props.renderParentsEditor?.({ id: props.selectedNodeId })}
       {props.overlayPanel && (
         <section aria-label={props.overlayPanel.title}>
           {props.overlayPanel.content}
@@ -117,13 +88,6 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
             <button onClick={() => props.overlayPanel?.onExpandedChange?.(true)}>Expand panel</button>
           )}
         </section>
-      )}
-      {props.onEditModeChange && (
-        <>
-          <button onClick={() => props.onEditModeChange?.(!props.editMode)}>{props.editMode ? "Done" : "Edit"}</button>
-          <button onClick={() => props.onExpandedChange?.(false)}>Collapse</button>
-          <span data-testid="panel-state" data-edit={String(props.editMode)} data-expanded={String(props.expanded)} />
-        </>
       )}
       {props.onFocusGenreChange && (
         <>
@@ -195,30 +159,6 @@ describe("GenreTreePage", () => {
 
     const view = await screen.findByTestId("genre-tree-view");
     expect(view.dataset.readonly).toBe("false");
-  });
-
-  it("gives the parents editor genre uuids, never genre-playlist uuids", async () => {
-    useIsAdminMock.mockReturnValue(true);
-    searchParams = new URLSearchParams("genre=dance-pop");
-    const genre = (playlist: string, name: string, parent: string | null) => ({
-      uuid: playlist,
-      name,
-      parent: parent && { uuid: parent, name: parent },
-      root: { uuid: "electronic" },
-      criteria: { uuid: `${playlist}-genre`, name, wikidataId: null },
-    });
-    useVisibleGenrePlaylistsMock.mockReturnValue({
-      genrePlaylists: [genre("electronic", "Core electronic", null), genre("dance-pop", "Dance-pop", "electronic")],
-      isLoading: false,
-    });
-
-    renderGenreTreePage();
-
-    const editor = await screen.findByRole("status", { name: "Parents editor" });
-    expect(JSON.parse(editor.textContent ?? "")).toEqual({
-      uuid: "dance-pop-genre",
-      parent: { uuid: "electronic-genre", name: "Core electronic" },
-    });
   });
 
   it("clears the selected genre from the URL when the About panel opens", async () => {
@@ -385,27 +325,6 @@ describe("GenreTreePage", () => {
       );
       await waitFor(() => expect(screen.getByTestId("artist-expanded")).toHaveTextContent("false"));
     });
-  });
-
-  it("offers no Edit button to non-admins", async () => {
-    renderGenreTreePage();
-
-    await screen.findByTestId("genre-tree-view");
-    expect(screen.queryByRole("button", { name: "Edit" })).not.toBeInTheDocument();
-  });
-
-  it("expands the panel on Edit and keeps edit mode when collapsed", async () => {
-    useIsAdminMock.mockReturnValue(true);
-    renderGenreTreePage();
-
-    fireEvent.click(await screen.findByRole("button", { name: "Edit" }));
-    expect(screen.getByTestId("panel-state").dataset).toMatchObject({ edit: "true", expanded: "true" });
-
-    fireEvent.click(screen.getByRole("button", { name: "Collapse" }));
-    expect(screen.getByTestId("panel-state").dataset).toMatchObject({ edit: "true", expanded: "false" });
-
-    fireEvent.click(screen.getByRole("button", { name: "Done" }));
-    expect(screen.getByTestId("panel-state").dataset).toMatchObject({ edit: "false", expanded: "false" });
   });
 
   it("keeps the pop-core view mode (radial wheel skeleton) while genre playlists are still loading", async () => {
