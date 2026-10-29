@@ -108,6 +108,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Added
 
 - **Support on Tipeee**: the About page has a "Support TheMusicTree" section linking to the GrowTheMusicTree Tipeee page; clicks are counted in analytics (`tipeee_click`). Requires `brand` 12.8.0.
+- **grow-api release gate**: `package.json` `growApi.minVersion` records the grow-api release this front needs. PRs to `main` and the prod deploy job fail unless prod grow-api's `/health/` reports at least that version, so a front release can't ship ahead of its API.
 
 ## [3.20.0] - 2026-10-29
 
