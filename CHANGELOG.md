@@ -107,6 +107,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Changed
 
 - **Genre tree stays in place while it updates**: switching the node size, filtering by an artist or reparenting a genre no longer swaps the tree for the loading skeleton; a busy indicator shows in the tree's controls instead, and the skeleton only appears on the first load. Reparenting closes its popup as soon as the change is saved. Requires `app-kit` and `app-kit-ui` 26.0.0.
+- **Undo after changing a genre's parent**: admins get a "Moved under …" toast with an Undo button that moves the genre back (not offered for a root genre). Requires `app-kit` and `app-kit-ui` 26.1.0.
 
 ### Added
 
