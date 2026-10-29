@@ -105,6 +105,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Region map at `/map`**: a world map coloured by song count; click a country to drill into its regions, follow the breadcrumb back up, and overlay a cultural zone (e.g. Celtic nations) from the zone picker. Hovering a region shows its song and genre counts. Requires the grow API's region map endpoints (`/v1/regions/map/`). The grow proxy now keeps an upstream immutable `Cache-Control`, so map files are cached for good.
+
 ## [3.20.0] - 2026-10-29
 
 ### Changed

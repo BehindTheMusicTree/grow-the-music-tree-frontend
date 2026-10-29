@@ -7,3 +7,5 @@ export const PATHS = {
 export const GENEALOGY_HREF = "/genealogy";
 
 export const ADMIN_HREF = "/admin";
+
+export const REGION_MAP_HREF = "/map";

@@ -36,10 +36,13 @@ async function forward(request: NextRequest, path: string[]): Promise<NextRespon
   });
 
   const etag = upstreamResponse.headers.get("etag");
+  const upstreamCacheControl = upstreamResponse.headers.get("cache-control");
+  // An immutable upstream body (content-addressed) is cached for good; any other ETag body is revalidated with
+  // If-None-Match on every fetch. Content-Encoding is not forwarded: fetch has already inflated the body.
+  const cacheControl = upstreamCacheControl?.includes("immutable") ? upstreamCacheControl : "private, no-cache";
   const headers: Record<string, string> = {
     "Content-Type": upstreamResponse.headers.get("content-type") ?? "application/json",
-    // Makes the browser keep the body and revalidate it with If-None-Match on every fetch.
-    ...(etag ? { ETag: etag, "Cache-Control": "private, no-cache" } : {}),
+    ...(etag ? { ETag: etag, "Cache-Control": cacheControl } : {}),
   };
 
   if (upstreamResponse.status === 304) {
