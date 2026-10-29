@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import fixture from "@schemas/api/region-map.fixture.json";
 import { RegionMapIndexSchema, type RegionFeatureCollection } from "@schemas/api/region-map";
 import RegionMapChart from "./RegionMapChart";
@@ -68,5 +68,38 @@ describe("RegionMapChart", () => {
 
     expect(onRegionClick).toHaveBeenCalledTimes(2);
     expect(onRegionClick.mock.calls[0][0].id).toBe("Q142");
+  });
+
+  it("exposes regions as buttons, marks the selected leaf as pressed, and shows details on keyboard focus", () => {
+    const { container } = render(
+      <RegionMapChart
+        level={collection([
+          ["Q142", 0],
+          ["Q183", 2],
+        ])}
+        zone={undefined}
+        regions={regions}
+        selectedId="Q183"
+        onRegionClick={vi.fn()}
+      />,
+    );
+    const germany = screen.getByRole("button", { name: "Germany · 0 songs · 0 genres" });
+
+    expect(screen.getByRole("group", { name: "Region map" })).toBeTruthy();
+    expect(screen.getAllByRole("button")).toHaveLength(2);
+    expect(germany.getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByRole("button", { name: /^France/ }).hasAttribute("aria-pressed")).toBe(false);
+
+    // A 480×560 box letterboxes the 960×560 viewBox at half scale, 140px from the top.
+    vi.spyOn(container.querySelector("svg")!, "getBoundingClientRect").mockReturnValue(
+      DOMRect.fromRect({ width: 480, height: 560 }),
+    );
+    fireEvent.focus(germany);
+    const tooltip = container.querySelector<HTMLElement>("[data-tooltip]")!;
+    expect(tooltip.textContent).toBe("Germany · 0 songs · 0 genres");
+    expect(parseFloat(tooltip.style.left)).toBeCloseTo((2 + 2 / 3) * 320 * 0.5 + 12);
+    expect(parseFloat(tooltip.style.top)).toBeCloseTo(140 + (120 + (2 / 3) * 320) * 0.5 + 12);
+    fireEvent.blur(germany);
+    expect(container.querySelector("[data-tooltip]")).toBeNull();
   });
 });

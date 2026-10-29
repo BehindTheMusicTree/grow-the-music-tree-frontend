@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type KeyboardEvent } from "react";
+import { useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { geoIdentity, geoPath, interpolateYlGnBu, scaleSequentialSqrt } from "d3";
 import type { Region, RegionFeature, RegionFeatureCollection } from "@schemas/api/region-map";
 
@@ -20,6 +20,7 @@ type Props = {
 
 export default function RegionMapChart({ level, zone, regions, selectedId, onRegionClick }: Props) {
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
   // Planar, not spherical: shapely output carries no guaranteed ring winding, which d3's spherical clipping needs.
   const path = useMemo(() => geoPath(geoIdentity().reflectY(true).fitSize([WIDTH, HEIGHT], level)), [level]);
   const color = useMemo(() => {
@@ -28,9 +29,21 @@ export default function RegionMapChart({ level, zone, regions, selectedId, onReg
   }, [level, regions]);
 
   const describe = (region: Region) => `${region.name} · ${region.songCount} songs · ${region.genreCount} genres`;
-  const showTooltip = (event: { clientX: number; clientY: number; currentTarget: Element }, text: string) => {
-    const box = event.currentTarget.closest("svg")?.getBoundingClientRect();
-    setTooltip({ x: event.clientX - (box?.left ?? 0) + 12, y: event.clientY - (box?.top ?? 0) + 12, text });
+  const placeTooltip = (point: { clientX: number; clientY: number } | { viewBox: [number, number] }, text: string) => {
+    const box = svgRef.current?.getBoundingClientRect();
+    if (!box) return;
+    if ("clientX" in point) {
+      setTooltip({ x: point.clientX - box.left + 12, y: point.clientY - box.top + 12, text });
+      return;
+    }
+    // The viewBox is fitted with the default xMidYMid meet: uniform scale, centred on the spare axis.
+    const scale = Math.min(box.width / WIDTH, box.height / HEIGHT);
+    const [x, y] = point.viewBox;
+    setTooltip({
+      x: (box.width - WIDTH * scale) / 2 + x * scale + 12,
+      y: (box.height - HEIGHT * scale) / 2 + y * scale + 12,
+      text,
+    });
   };
   const onKeyDown = (event: KeyboardEvent, region: Region) => {
     if (event.key !== "Enter" && event.key !== " ") return;
@@ -53,17 +66,26 @@ export default function RegionMapChart({ level, zone, regions, selectedId, onReg
         role="button"
         tabIndex={0}
         aria-label={describe(region)}
+        aria-pressed={region.drillable ? undefined : selectedId === feature.id}
         onClick={() => onRegionClick(region)}
         onKeyDown={(event) => onKeyDown(event, region)}
-        onMouseMove={(event) => showTooltip(event, describe(region))}
+        onMouseMove={(event) => placeTooltip(event, describe(region))}
         onMouseLeave={() => setTooltip(null)}
+        onFocus={() => placeTooltip({ viewBox: path.centroid(feature) }, describe(region))}
+        onBlur={() => setTooltip(null)}
       />
     );
   };
 
   return (
     <div className="relative h-full w-full">
-      <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="h-full w-full" role="img" aria-label="Region map">
+      <svg
+        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        className="h-full w-full"
+        role="group"
+        aria-label="Region map"
+        ref={svgRef}
+      >
         <g data-layer="regions">{level.features.map(renderRegion)}</g>
         {zone && (
           <g data-layer="zone" pointerEvents="none">
@@ -84,6 +106,8 @@ export default function RegionMapChart({ level, zone, regions, selectedId, onReg
       </svg>
       {tooltip && (
         <div
+          aria-hidden
+          data-tooltip
           className="pointer-events-none absolute rounded bg-black/80 px-2 py-1 text-sm text-white"
           style={{ left: tooltip.x, top: tooltip.y }}
         >

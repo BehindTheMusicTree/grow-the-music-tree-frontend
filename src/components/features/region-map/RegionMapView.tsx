@@ -80,6 +80,11 @@ export default function RegionMapView() {
             </select>
           </label>
         )}
+        {zone.isError && (
+          <p className="text-sm text-red-600" role="alert">
+            Could not load this zone.
+          </p>
+        )}
         {selected && (
           <p className="text-sm" aria-live="polite">
             <span className="font-semibold">{selected.name}</span>: {selected.songCount} songs, {selected.genreCount}{" "}
@@ -94,6 +99,7 @@ export default function RegionMapView() {
           <Skeleton />
         ) : (
           <RegionMapChart
+            key={levelId}
             level={level.data}
             zone={zone.data}
             regions={regions}
