@@ -105,6 +105,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Support on Tipeee**: the About page has a "Support TheMusicTree" section linking to the GrowTheMusicTree Tipeee page; clicks are counted in analytics (`tipeee_click`). Requires `brand` 12.8.0.
+
 ## [3.20.0] - 2026-10-29
 
 ### Changed
