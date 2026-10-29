@@ -113,11 +113,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
-<<<<<<< HEAD
 - **zod 4**: `zod` moves from 3.24.3 to 4.6.7, closing the open zod advisory, and `@behindthemusictree/app-kit` and `app-kit-ui` to 24.0.1 (zod 4 schemas across the hook boundary). `z.record` takes explicit key and value schemas, the `zod@4` override is dropped, and test UUID fixtures are RFC 9562 valid because `.uuid()` is now strict. `pnpm-workspace.yaml` sets `minimumReleaseAge: 1440` explicitly (the pnpm 11 default, unchanged).
-=======
 - `@sentry/nextjs` rolls back from 10.78.0 to 10.77.1. 10.78.0 was published less than a day before it landed, so pnpm 11's `minimumReleaseAge` rejected its 14 `@sentry/*` lockfile entries and failed `pnpm install` in CI. The lockfile is re-resolved, so a few transitive dependencies move to newer patch versions.
->>>>>>> origin/develop
 - pnpm moves to 11.5.2 (`packageManager`). pnpm 11 rejects packages published less than a day ago and blocks dependency build scripts by default, so `pnpm-workspace.yaml` exempts `@behindthemusictree/*` from `minimumReleaseAge` and sets `allowBuilds: false` for the six dependencies with install scripts (fontawesome, `@sentry/cli`, `esbuild`, `unrs-resolver`), which pnpm 10 never ran either. The lockfile is unchanged.
 - pnpm is pinned to 10.33.2 through `package.json`'s `packageManager`, which local pnpm, CI and the Docker build all read, and the dependency overrides move to `pnpm-workspace.yaml`. A newer global pnpm (11+) no longer drops the overrides and rewrites `pnpm-lock.yaml`.
 - Bumped `@behindthemusictree/app-kit` and `app-kit-ui` to 22.0.0 and `@behindthemusictree/ui` to 0.7.0. The artist panel now comes from app-kit's `GenreTreeView` (`artistUuid` / `onArtistUuidChange`); the frontend's own artist panel components are removed. Selecting a genre no longer drops `?artist=`.
