@@ -71,7 +71,7 @@ describe("RegionMapChart", () => {
   });
 
   it("exposes regions as buttons, marks the selected leaf as pressed, and shows details on keyboard focus", () => {
-    render(
+    const { container } = render(
       <RegionMapChart
         level={collection([
           ["Q142", 0],
@@ -90,9 +90,16 @@ describe("RegionMapChart", () => {
     expect(germany.getAttribute("aria-pressed")).toBe("true");
     expect(screen.getByRole("button", { name: /^France/ }).hasAttribute("aria-pressed")).toBe(false);
 
+    // A 480×560 box letterboxes the 960×560 viewBox at half scale, 140px from the top.
+    vi.spyOn(container.querySelector("svg")!, "getBoundingClientRect").mockReturnValue(
+      DOMRect.fromRect({ width: 480, height: 560 }),
+    );
     fireEvent.focus(germany);
-    expect(screen.getByRole("tooltip").textContent).toBe("Germany · 0 songs · 0 genres");
+    const tooltip = container.querySelector<HTMLElement>("[data-tooltip]")!;
+    expect(tooltip.textContent).toBe("Germany · 0 songs · 0 genres");
+    expect(parseFloat(tooltip.style.left)).toBeCloseTo((2 + 2 / 3) * 320 * 0.5 + 12);
+    expect(parseFloat(tooltip.style.top)).toBeCloseTo(140 + (120 + (2 / 3) * 320) * 0.5 + 12);
     fireEvent.blur(germany);
-    expect(screen.queryByRole("tooltip")).toBeNull();
+    expect(container.querySelector("[data-tooltip]")).toBeNull();
   });
 });

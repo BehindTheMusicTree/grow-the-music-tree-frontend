@@ -106,7 +106,8 @@ export default function RegionMapChart({ level, zone, regions, selectedId, onReg
       </svg>
       {tooltip && (
         <div
-          role="tooltip"
+          aria-hidden
+          data-tooltip
           className="pointer-events-none absolute rounded bg-black/80 px-2 py-1 text-sm text-white"
           style={{ left: tooltip.x, top: tooltip.y }}
         >
