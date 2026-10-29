@@ -20,8 +20,8 @@
     "postversion": "node scripts/update-changelog-release.mjs && git add CHANGELOG.md && git commit --amend --no-edit && (v=$(node -p \"require('./package.json').version\"); git tag -d v$v 2>/dev/null; git tag v$v) && node scripts/delete-test-dev-tags.mjs"
   },
   "dependencies": {
-    "@behindthemusictree/app-kit": "22.0.0",
-    "@behindthemusictree/app-kit-ui": "22.0.0",
+    "@behindthemusictree/app-kit": "24.0.1",
+    "@behindthemusictree/app-kit-ui": "24.0.1",
     "@behindthemusictree/brand": "12.6.0",
     "@behindthemusictree/ui": "0.8.0",
     "@fortawesome/fontawesome-svg-core": "6.5.2",
@@ -50,7 +50,7 @@
     "sonner": "2.0.8",
     "tailwind-merge": "3.2.0",
     "uuid": "10.0.0",
-    "zod": "3.24.3"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "5.72.2",

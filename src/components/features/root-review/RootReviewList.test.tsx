@@ -12,7 +12,7 @@ vi.mock("@behindthemusictree/app-kit/transport", () => ({
   useValidatedMutation: () => ({ mutate: mutateMock, formErrors: formErrorsMock(), isPending: false }),
 }));
 
-const pala = { uuid: "11111111-1111-1111-1111-111111111111", name: "Pala", wikidataId: "Q15724583" };
+const pala = { uuid: "11111111-1111-4111-8111-111111111111", name: "Pala", wikidataId: "Q15724583" };
 
 describe("RootReviewList", () => {
   afterEach(() => {

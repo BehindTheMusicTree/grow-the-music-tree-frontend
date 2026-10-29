@@ -20,7 +20,7 @@ vi.mock("@behindthemusictree/app-kit/transport", () => ({
   }) => useQuery({ ...options, queryFn: async () => schema.parse(await queryFn()) }),
 }));
 
-const GENRE_UUID = "11111111-1111-1111-1111-111111111111";
+const GENRE_UUID = "11111111-1111-4111-8111-111111111111";
 
 function renderHistory() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
