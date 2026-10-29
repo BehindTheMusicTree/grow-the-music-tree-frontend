@@ -5,13 +5,14 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { CircleDot, Info, List, Network } from "lucide-react";
-import { TheMusicTreeMarkLink } from "@behindthemusictree/brand/components";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { getAudiometaUrl } from "@lib/site-urls";
 import { MenuGroup } from "./MenuGroup";
 import { ABOUT_HREF, GENEALOGY_HREF } from "@lib/constants/routes";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
+import { iconPillClassName } from "./iconPillClassName";
+import { UserMenu } from "./UserMenu";
 
 const SHOW_AUDIOMETA_MENU_ITEM = false;
 
@@ -36,9 +37,6 @@ const menuGroup = [
       ]
     : []),
 ];
-
-const iconPillClassName =
-  "flex h-full aspect-square shrink-0 items-center justify-center rounded-full bg-black/70 text-gray-100 shadow-lg backdrop-blur transition-colors duration-200 hover:text-white";
 
 function AboutButton() {
   const pathname = usePathname();
@@ -121,9 +119,7 @@ export default function AppHeader({ className }: AppHeaderProps) {
       <Suspense fallback={null}>
         <AboutButton />
       </Suspense>
-      <div className="flex h-full shrink-0 items-center justify-center rounded-full bg-white/90 px-3 shadow-lg backdrop-blur">
-        <TheMusicTreeMarkLink imageStyle={{ height: 20, width: "auto" }} />
-      </div>
+      <UserMenu />
     </div>
   );
 }

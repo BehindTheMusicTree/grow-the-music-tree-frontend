@@ -5,3 +5,5 @@ export const PATHS = {
 };
 
 export const GENEALOGY_HREF = "/genealogy";
+
+export const ADMIN_HREF = "/admin";
