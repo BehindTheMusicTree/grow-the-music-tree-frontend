@@ -22,7 +22,7 @@
   "dependencies": {
     "@behindthemusictree/app-kit": "26.1.0",
     "@behindthemusictree/app-kit-ui": "26.1.0",
-    "@behindthemusictree/brand": "12.6.0",
+    "@behindthemusictree/brand": "12.8.0",
     "@behindthemusictree/ui": "0.8.0",
     "@fortawesome/fontawesome-svg-core": "6.5.2",
     "@fortawesome/free-solid-svg-icons": "6.5.2",
