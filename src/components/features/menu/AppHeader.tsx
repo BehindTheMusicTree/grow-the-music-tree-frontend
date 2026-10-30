@@ -75,7 +75,7 @@ export default function AppHeader({ className }: AppHeaderProps) {
 
   return (
     <div
-      className={`fixed top-gutter right-gutter z-50 flex h-header w-right-column items-center justify-end gap-2 ${className ?? ""}`}
+      className={`fixed top-gutter right-gutter z-50 flex h-header w-right-column max-md:left-gutter max-md:w-auto items-center justify-end gap-2 ${className ?? ""}`}
     >
       <Link
         href="/"
