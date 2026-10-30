@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { linkVertical, select, zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from "d3";
 import { ZoomControls } from "@behindthemusictree/ui";
+import { useIsAdmin } from "@hooks/useIsAdmin";
 import type { Genealogy, GenealogyLane, GenealogyTradition } from "@schemas/api/genealogy";
 import { formatSpan, formatYear } from "./format";
 import { anchorPosition, AXIS_WIDTH, buildAnchorIndex, COLUMN_WIDTH, columnX, TOP_MARGIN } from "./geometry";
@@ -27,6 +28,7 @@ type Props = {
 };
 
 export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
+  const isAdmin = useIsAdmin();
   const svgRef = useRef<SVGSVGElement>(null);
   const behaviorRef = useRef<ZoomBehavior<SVGSVGElement, unknown> | null>(null);
   const fittedRef = useRef(false);
@@ -288,7 +290,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
         </g>
       </svg>
 
-      {unplacedCount > 0 && (
+      {isAdmin && unplacedCount > 0 && (
         <p className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded bg-white/90 px-2 py-1 text-xs text-slate-600 shadow">
           {unplacedCount} traditions without a place are not shown
         </p>
