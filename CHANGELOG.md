@@ -110,11 +110,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Region map at `/map`**: a world map coloured by song count; click a country to drill into its regions, follow the breadcrumb back up, and overlay a cultural zone (e.g. Celtic nations) from the zone picker. Hovering or keyboard-focusing a region shows its song and genre counts, and regions are announced to screen readers. A zone that fails to load shows an error while the map stays usable. Requires the grow API's region map endpoints (`/v1/regions/map/`). The grow proxy now keeps an upstream immutable `Cache-Control`, so map files are cached for good.
 - **Support on Tipeee**: the About page has a "Support TheMusicTree" section linking to the GrowTheMusicTree Tipeee page; clicks are counted in analytics (`tipeee_click`). Requires `brand` 12.8.0.
 - **grow-api release gate**: `package.json` `growApi.minVersion` records the grow-api release this front needs. PRs to `main` and the prod deploy job fail unless prod grow-api's `/health/` reports at least that version, so a front release can't ship ahead of its API.
-- **Pop/Core side toggle**: the genre info panel's Admin actions have "Make pop" / "Make core" on a root's direct children. "Make pop" is disabled, with a tooltip naming the current pop child, when the root already has one. Requires `app-kit` and `app-kit-ui` 27.1.0 and a grow API that accepts `side` on genre updates.
+- **Pop/Core side toggle**: the genre info panel's Admin actions have "Make pop" / "Make core" on a root's direct children. "Make pop" is disabled, with a tooltip naming the current pop child, when the root already has one. Requires `app-kit` and `app-kit-ui` 27.1.0 and grow-api 14.7.0 (`growApi.minVersion`).
 
 ### Changed
 
-- **Pop-side curation columns**: the `canonical_genre_pop_side` list shows its new `root_item_id` / `pop_child_item_id` columns as "Racine" / "Enfant pop". Requires grow-api with the item-id keyed pop-side list.
+- **Pop-side curation columns**: the `canonical_genre_pop_side` list shows its new `root_item_id` / `pop_child_item_id` columns as "Racine" / "Enfant pop". Requires grow-api 14.7.0.
 
 - **Genre tree on phones**: the header spans the screen width under 768px, and the search bar sits full width below it with the view-mode, Rotation and Add root controls in one scrolling row; buttons, search results and chips are at least 44px tall on touch screens; zoom buttons are hidden on touch screens (pinch and double-tap instead); the genre info panel opens as a bottom sheet; the page no longer scrolls sideways (`body` uses `100%` width and `100dvh` height). Requires `app-kit` and `app-kit-ui` 27.0.0 and `ui` 0.10.0.
 
