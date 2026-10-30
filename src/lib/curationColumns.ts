@@ -13,8 +13,8 @@ const COLUMN_TITLES: Record<string, string> = {
   display_label: "Libellé affiché",
   musicbrainz_genre_name: "Genre MusicBrainz",
   wikidata_genre_name: "Genre Wikidata",
-  root_genre_name: "Racine",
-  pop_child_genre_name: "Enfant pop",
+  root_item_id: "Racine",
+  pop_child_item_id: "Enfant pop",
 };
 
 export function curationColumnTitle(column: string): string {
