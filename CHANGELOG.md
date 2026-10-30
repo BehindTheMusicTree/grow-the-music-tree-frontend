@@ -111,6 +111,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Support on Tipeee**: the About page has a "Support TheMusicTree" section linking to the GrowTheMusicTree Tipeee page; clicks are counted in analytics (`tipeee_click`). Requires `brand` 12.8.0.
 - **grow-api release gate**: `package.json` `growApi.minVersion` records the grow-api release this front needs. PRs to `main` and the prod deploy job fail unless prod grow-api's `/health/` reports at least that version, so a front release can't ship ahead of its API.
 
+### Changed
+
+- **Genre tree on phones**: the header spans the screen width under 768px, and the search bar sits full width below it with the view-mode, Rotation and Add root controls in one scrolling row; buttons, search results and chips are at least 44px tall on touch screens; zoom buttons are hidden on touch screens (pinch and double-tap instead); the genre info panel opens as a bottom sheet; the page no longer scrolls sideways (`body` uses `100%` width and `100dvh` height). Requires `app-kit` and `app-kit-ui` 27.0.0 and `ui` 0.10.0.
+
 ## [3.20.0] - 2026-10-29
 
 ### Changed
