@@ -295,6 +295,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
       )}
       <ZoomControls
         className="absolute bottom-3 right-3 z-10"
+        orientation="horizontal"
         onZoomIn={() => zoomBy(ZOOM_STEP)}
         onZoomOut={() => zoomBy(1 / ZOOM_STEP)}
         onFit={() => fit(true)}
