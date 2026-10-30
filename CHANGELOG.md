@@ -113,6 +113,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Pop-side curation columns**: the `canonical_genre_pop_side` list shows its new `root_item_id` / `pop_child_item_id` columns as "Racine" / "Enfant pop". Requires grow-api with the item-id keyed pop-side list.
+
 - **Genre tree on phones**: the header spans the screen width under 768px, and the search bar sits full width below it with the view-mode, Rotation and Add root controls in one scrolling row; buttons, search results and chips are at least 44px tall on touch screens; zoom buttons are hidden on touch screens (pinch and double-tap instead); the genre info panel opens as a bottom sheet; the page no longer scrolls sideways (`body` uses `100%` width and `100dvh` height). Requires `app-kit` and `app-kit-ui` 27.0.0 and `ui` 0.10.0.
 
 ## [3.20.0] - 2026-10-29
