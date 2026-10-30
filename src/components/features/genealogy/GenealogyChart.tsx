@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { linkVertical, select, zoom, zoomIdentity, type ZoomTransform } from "d3";
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { linkVertical, select, zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from "d3";
+import { ZoomControls } from "@behindthemusictree/ui";
 import type { Genealogy, GenealogyLane, GenealogyTradition } from "@schemas/api/genealogy";
+import { formatSpan, formatYear } from "./format";
 import { anchorPosition, AXIS_WIDTH, buildAnchorIndex, COLUMN_WIDTH, columnX, TOP_MARGIN } from "./geometry";
 import { createYearScale, YEAR_MAX, YEAR_MIN, yearTicks } from "./yearScale";
 
@@ -14,17 +16,22 @@ const ARROW_ID = "genealogy-arrow";
 
 type Tooltip = { x: number; y: number; text: string };
 
-const formatYear = (year: number | null) => (year === null ? "?" : year < 0 ? `${-year} BCE` : String(year));
-const formatSpan = (start: number | null, end: number | null) => `${formatYear(start)} – ${formatYear(end)}`;
+const ZOOM_STEP = 1.4;
+const ZOOM_DURATION = 200;
+const FIT_PADDING = 24;
 
 type Props = {
   data: Genealogy;
-  onOpenInTree: (wikidataId: string) => void;
+  selectedId: string | null;
+  onSelect: (wikidataId: string) => void;
 };
 
-export default function GenealogyChart({ data, onOpenInTree }: Props) {
+export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const behaviorRef = useRef<ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+  const fittedRef = useRef(false);
   const [transform, setTransform] = useState<ZoomTransform>(zoomIdentity);
+  const [minZoom, setMinZoom] = useState(MIN_ZOOM);
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
   const yearScale = useMemo(createYearScale, []);
   const ticks = useMemo(yearTicks, []);
@@ -51,17 +58,71 @@ export default function GenealogyChart({ data, onOpenInTree }: Props) {
   const markerById = useMemo(() => new Map(markers.map((marker) => [marker.tradition.wikidataId, marker])), [markers]);
   const unplacedCount = data.traditions.length - markers.length;
 
+  const fit = useCallback(
+    (animate: boolean) => {
+      const svg = svgRef.current;
+      const behavior = behaviorRef.current;
+      if (!svg || !behavior || svg.clientWidth === 0 || svg.clientHeight === 0) return false;
+      const lastPosition = Math.max(
+        ...data.columns.map(({ position }) => position),
+        ...data.bands.map(({ endPosition }) => endPosition),
+      );
+      const x0 = AXIS_WIDTH;
+      const x1 = columnX(lastPosition) + COLUMN_WIDTH / 2;
+      const y0 = TOP_MARGIN;
+      const y1 = TOP_MARGIN + yearScale(YEAR_MAX);
+      const availableWidth = svg.clientWidth - AXIS_WIDTH - 2 * FIT_PADDING;
+      const availableHeight = svg.clientHeight - 2 * FIT_PADDING;
+      const k = Math.min(availableWidth / (x1 - x0), availableHeight / (y1 - y0));
+      const next = zoomIdentity
+        .translate(
+          AXIS_WIDTH + FIT_PADDING + (availableWidth - k * (x1 - x0)) / 2 - k * x0,
+          FIT_PADDING + (availableHeight - k * (y1 - y0)) / 2 - k * y0,
+        )
+        .scale(k);
+      const floor = Math.min(MIN_ZOOM, k);
+      behavior.scaleExtent([floor, MAX_ZOOM]);
+      setMinZoom(floor);
+      const selection = select(svg);
+      if (animate) selection.transition().duration(ZOOM_DURATION).call(behavior.transform, next);
+      else selection.call(behavior.transform, next);
+      return true;
+    },
+    [data.columns, data.bands, yearScale],
+  );
+
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
     const behavior = zoom<SVGSVGElement, unknown>()
       .scaleExtent([MIN_ZOOM, MAX_ZOOM])
       .on("zoom", (event: { transform: ZoomTransform }) => setTransform(event.transform));
+    behaviorRef.current = behavior;
     select(svg).call(behavior);
     return () => {
       select(svg).on(".zoom", null);
+      behaviorRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const fitOnce = () => {
+      if (!fittedRef.current && fit(false)) fittedRef.current = true;
+    };
+    fitOnce();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(fitOnce);
+    observer.observe(svg);
+    return () => observer.disconnect();
+  }, [fit]);
+
+  const zoomBy = (factor: number) => {
+    const svg = svgRef.current;
+    const behavior = behaviorRef.current;
+    if (svg && behavior) select(svg).transition().duration(ZOOM_DURATION).call(behavior.scaleBy, factor);
+  };
 
   const showTooltip = (event: { clientX: number; clientY: number }, text: string) => {
     const box = svgRef.current?.getBoundingClientRect();
@@ -69,13 +130,10 @@ export default function GenealogyChart({ data, onOpenInTree }: Props) {
   };
   const hideTooltip = () => setTooltip(null);
 
-  const openTradition = ({ wikidataId, inCanonicalTree }: GenealogyTradition) => {
-    if (inCanonicalTree) onOpenInTree(wikidataId);
-  };
-  const onMarkerKeyDown = (event: KeyboardEvent, tradition: GenealogyTradition) => {
+  const onMarkerKeyDown = (event: KeyboardEvent, { wikidataId }: GenealogyTradition) => {
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
-    openTradition(tradition);
+    onSelect(wikidataId);
   };
 
   return (
@@ -186,20 +244,22 @@ export default function GenealogyChart({ data, onOpenInTree }: Props) {
 
           <g data-layer="traditions">
             {markers.map(({ tradition, x, y }) => {
-              const canOpen = tradition.inCanonicalTree;
+              const selected = tradition.wikidataId === selectedId;
               return (
                 <circle
                   key={tradition.wikidataId}
                   data-tradition={tradition.wikidataId}
-                  data-in-tree={canOpen}
+                  data-in-tree={tradition.inCanonicalTree}
                   cx={x}
                   cy={y}
-                  r={MARKER_RADIUS}
-                  className={canOpen ? "cursor-pointer fill-emerald-600 stroke-white" : "fill-amber-500 stroke-white"}
-                  role={canOpen ? "link" : undefined}
-                  tabIndex={canOpen ? 0 : undefined}
-                  aria-label={canOpen ? `${tradition.label}, open in the genre tree` : undefined}
-                  onClick={() => openTradition(tradition)}
+                  r={selected ? MARKER_RADIUS + 2 : MARKER_RADIUS}
+                  strokeWidth={selected ? 2 : 1}
+                  className={`cursor-pointer ${tradition.inCanonicalTree ? "fill-emerald-600" : "fill-amber-500"} ${selected ? "stroke-slate-900" : "stroke-white"}`}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={tradition.label}
+                  aria-pressed={selected}
+                  onClick={() => onSelect(tradition.wikidataId)}
                   onKeyDown={(event) => onMarkerKeyDown(event, tradition)}
                   onMouseMove={(event) =>
                     showTooltip(event, `${tradition.label} · ${formatSpan(tradition.start, tradition.end)}`)
@@ -229,10 +289,18 @@ export default function GenealogyChart({ data, onOpenInTree }: Props) {
       </svg>
 
       {unplacedCount > 0 && (
-        <p className="pointer-events-none absolute bottom-2 right-3 rounded bg-white/90 px-2 py-1 text-xs text-slate-600">
+        <p className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded bg-white/90 px-2 py-1 text-xs text-slate-600 shadow">
           {unplacedCount} traditions without a place are not shown
         </p>
       )}
+      <ZoomControls
+        className="absolute bottom-3 right-3 z-10"
+        onZoomIn={() => zoomBy(ZOOM_STEP)}
+        onZoomOut={() => zoomBy(1 / ZOOM_STEP)}
+        onFit={() => fit(true)}
+        canZoomIn={transform.k < MAX_ZOOM}
+        canZoomOut={transform.k > minZoom}
+      />
       {tooltip && (
         <div
           role="tooltip"
