@@ -111,16 +111,6 @@ export default function AppHeader({ className }: AppHeaderProps) {
         </button>
       )}
       <Link
-        href={GENEALOGY_HREF}
-        prefetch={false}
-        className={`${iconPillClassName} ${isGenealogy ? "xl:aspect-auto xl:gap-2 xl:px-3" : ""}`}
-        aria-label="Genealogy"
-        aria-current={isGenealogy ? "page" : undefined}
-      >
-        <Network className="h-5 w-5" aria-hidden />
-        {isGenealogy && <span className="hidden text-base font-bold xl:inline">Genealogy</span>}
-      </Link>
-      <Link
         href={REGION_MAP_HREF}
         prefetch={false}
         className={`${iconPillClassName} ${isRegionMap ? "xl:aspect-auto xl:gap-2 xl:px-3" : ""}`}
@@ -129,6 +119,16 @@ export default function AppHeader({ className }: AppHeaderProps) {
       >
         <MapIcon className="h-5 w-5" aria-hidden />
         {isRegionMap && <span className="hidden text-base font-bold xl:inline">Map</span>}
+      </Link>
+      <Link
+        href={GENEALOGY_HREF}
+        prefetch={false}
+        className={`${iconPillClassName} ${isGenealogy ? "xl:aspect-auto xl:gap-2 xl:px-3" : ""}`}
+        aria-label="Genealogy"
+        aria-current={isGenealogy ? "page" : undefined}
+      >
+        <Network className="h-5 w-5" aria-hidden />
+        {isGenealogy && <span className="hidden text-base font-bold xl:inline">Genealogy</span>}
       </Link>
       <Suspense fallback={null}>
         <AboutButton />
