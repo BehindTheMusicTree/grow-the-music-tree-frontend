@@ -42,8 +42,7 @@ no `youtube_unplayable_reason`).
 
 ## Conventions (canonical sources — read these, this file only highlights traps)
 
-@docs/STYLE_GUIDE.md
-@docs/testing.md
+Read `docs/STYLE_GUIDE.md` and `docs/testing.md` before relevant implementation or test changes.
 
 Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONING.md`,
 `docs/SEMVER_GUIDE.md` when doing branch/PR/release work.
@@ -90,17 +89,13 @@ Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONIN
 ## Further docs
 
 - `docs/DEPLOYMENT.md`, `docs/frontend-auth.md`, `docs/DATA_ATTRIBUTES.md`, `docs/SEMANTIC_HTML.md`
-- Ecosystem map (which repo owns what, where UI changes go): `~/git/claude-config/CONVENTIONS.md` § Ecosystem
+- Ecosystem and ownership: consult the project documentation and the relevant package sources.
 
-## graphify
+## Scoped project rules
 
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
-
-Rules:
-- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
-- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
-- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+Before working on `src/**/*.ts` or `src/**/*.tsx`, read `.agents/rules/api-responses.md`.
+Before working on `src/**/*.tsx` or `src/**/*.css`, read `.agents/rules/spacing.md`.
+Claude `paths:` metadata is not a Codex loader. Graphify can be used when installed and useful.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

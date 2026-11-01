@@ -4,7 +4,7 @@ Context for GitHub Copilot (Chat, coding agent, and PR code review) working in t
 
 ## Project
 
-Next.js (App Router) + React + TypeScript frontend for Behind The Music Tree, styled with Tailwind CSS. It talks to [TheMusicTreeAPI](https://github.com/BehindTheMusicTree/bodzify-api-django) backend.
+Next.js (App Router) + React + TypeScript frontend for Behind The Music Tree, styled with Tailwind CSS. It talks to [grow-the-music-tree-api](https://github.com/BehindTheMusicTree/grow-the-music-tree-api) backend.
 
 ## Conventions
 
@@ -25,6 +25,6 @@ Full conventions live in the canonical sources below — read them before review
 
 ## Validation
 
-- `npm run lint`
-- `npm run build`
-- `npm run test`
+- `pnpm lint`
+- `pnpm build`
+- `pnpm test`
