@@ -2,7 +2,7 @@
 # to GHCR, keeping Docker builds off the CPU-bound VPS. NEXT_PUBLIC_* vars are inlined at build time,
 # so develop and main each build their own image (`staging` / `prod` tag), which Coolify deploys.
 # Requires org-level vars CONTACT_EMAIL, AUDIOMETA_FRONT_SUBDOMAIN, COOLIFY_API_SUBDOMAIN, DOMAIN_NAME,
-# SERVER_HOST and org-level secrets COOLIFY_API_TOKEN, GH_PACKAGES_TOKEN_READ (private
+# DEPLOY_SSH_HOST, APP_ORIGIN_IP and org-level secrets COOLIFY_API_TOKEN, GH_PACKAGES_TOKEN_READ (private
 # @behindthemusictree packages; GITHUB_TOKEN can't read another repo's packages).
 name: Build and deploy
 
@@ -89,12 +89,12 @@ jobs:
           coolify_subdomain: ${{ vars.COOLIFY_API_SUBDOMAIN }}
           domain: ${{ vars.DOMAIN_NAME }}
           coolify_api_token: ${{ secrets.COOLIFY_API_TOKEN }}
-          server_host: ${{ vars.SERVER_HOST }}
+          server_host: ${{ vars.DEPLOY_SSH_HOST }}
           server_deploy_username: ${{ secrets.SERVER_DEPLOY_USERNAME }}
           server_deploy_ssh_private_key: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL_STATUS_ALERTS }}
           health_check_path: /health
-          health_check_origin_ip: ${{ vars.SERVER_HOST }}
+          health_check_origin_ip: ${{ vars.APP_ORIGIN_IP }}
 
   deploy-prod:
     name: Deploy (prod)
@@ -110,11 +110,17 @@ jobs:
         id: grow-api
         run: echo "min_version=$(jq -er .growApi.minVersion package.json)" >> "$GITHUB_OUTPUT"
 
+      - name: Require production origin
+        env:
+          ORIGIN_IP: ${{ vars.APP_ORIGIN_IP }}
+        run: test -n "$ORIGIN_IP" || { echo '::error::APP_ORIGIN_IP is required'; exit 1; }
+
       - name: Require prod grow-api at or above the version this release needs
-        uses: BehindTheMusicTree/github-workflows/.github/actions/check-api-version@v4.7.0
+        uses: BehindTheMusicTree/github-workflows/.github/actions/check-api-version@v4.9.0
         with:
           health_url: https://grow-api.${{ vars.DOMAIN_NAME }}/health/
           min_version: ${{ steps.grow-api.outputs.min_version }}
+          origin_ip: ${{ vars.APP_ORIGIN_IP }}
 
       - name: Trigger gtmt-front deploy
         uses: BehindTheMusicTree/github-workflows/.github/actions/trigger-coolify-deploy@v4.4.0
@@ -124,9 +130,9 @@ jobs:
           coolify_subdomain: ${{ vars.COOLIFY_API_SUBDOMAIN }}
           domain: ${{ vars.DOMAIN_NAME }}
           coolify_api_token: ${{ secrets.COOLIFY_API_TOKEN }}
-          server_host: ${{ vars.SERVER_HOST }}
+          server_host: ${{ vars.DEPLOY_SSH_HOST }}
           server_deploy_username: ${{ secrets.SERVER_DEPLOY_USERNAME }}
           server_deploy_ssh_private_key: ${{ secrets.SERVER_DEPLOY_SSH_PRIVATE_KEY }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL_STATUS_ALERTS_PROD }}
           health_check_path: /health
-          health_check_origin_ip: ${{ vars.SERVER_HOST }}
+          health_check_origin_ip: ${{ vars.APP_ORIGIN_IP }}
