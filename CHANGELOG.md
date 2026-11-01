@@ -135,6 +135,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### CI
 
+- Check the production API version through its origin and monitor the public health endpoint separately.
+
 - **PR labeler**: `.cursor/**` no longer maps to the `infrastructure` label.
 
 

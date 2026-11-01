@@ -114,8 +114,14 @@ jobs:
         id: grow-api
         run: echo "min_version=$(jq -er .growApi.minVersion package.json)" >> "$GITHUB_OUTPUT"
 
+      - name: Require production origin
+        env:
+          ORIGIN_IP: ${{ vars.SERVER_HOST }}
+        run: test -n "$ORIGIN_IP" || { echo '::error::SERVER_HOST is required'; exit 1; }
+
       - name: Require prod grow-api at or above the version this release needs
-        uses: BehindTheMusicTree/github-workflows/.github/actions/check-api-version@v4.7.0
+        uses: BehindTheMusicTree/github-workflows/.github/actions/check-api-version@v4.9.0
         with:
           health_url: https://grow-api.${{ vars.DOMAIN_NAME }}/health/
           min_version: ${{ steps.grow-api.outputs.min_version }}
+          origin_ip: ${{ vars.SERVER_HOST }}

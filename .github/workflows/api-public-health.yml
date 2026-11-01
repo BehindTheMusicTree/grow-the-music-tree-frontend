@@ -1,0 +1,52 @@
+name: Public grow-api health
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+  pull_request:
+    branches: [release/3.21.0]
+
+permissions:
+  contents: read
+
+jobs:
+  compare-routes:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compare public and origin responses
+        env:
+          DOMAIN: ${{ vars.DOMAIN_NAME }}
+          ORIGIN: ${{ vars.SERVER_HOST }}
+          BUILD_HOST: ${{ vars.SERVER_HOST_BUILD_STAGING }}
+        run: |
+          set -eu
+          test -n "$DOMAIN" && test -n "$ORIGIN"
+          if [ -n "$BUILD_HOST" ] && [ "$ORIGIN" = "$BUILD_HOST" ]; then
+            echo '::error::Production origin matches build server'
+            exit 1
+          fi
+          host="grow-api.$DOMAIN"
+          for route in public origin; do
+            headers="$(mktemp)"
+            if [ "$route" = origin ]; then
+              status="$(curl -sS --noproxy "$host" --resolve "$host:443:$ORIGIN" --max-time 15 -o /dev/null -D "$headers" -w '%{http_code}' "https://$host/health/")"
+            else
+              status="$(curl -sS --max-time 15 -o /dev/null -D "$headers" -w '%{http_code}' "https://$host/health/")"
+            fi
+            echo "$route HTTP $status"
+            awk 'BEGIN { IGNORECASE=1 } /^(content-type|cf-ray|cf-mitigated):/ { print }' "$headers"
+            rm -f "$headers"
+          done
+
+  public-health:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check public health endpoint
+        env:
+          DOMAIN: ${{ vars.DOMAIN_NAME }}
+        run: |
+          test -n "$DOMAIN" || exit 1
+          curl --fail --silent --show-error --max-time 15 --output /dev/null "https://grow-api.$DOMAIN/health/"
