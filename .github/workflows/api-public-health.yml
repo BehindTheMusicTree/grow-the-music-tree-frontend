@@ -18,7 +18,7 @@ jobs:
       - name: Compare public and origin responses
         env:
           DOMAIN: ${{ vars.DOMAIN_NAME }}
-          ORIGIN: ${{ vars.SERVER_HOST }}
+          ORIGIN: ${{ vars.APP_ORIGIN_IP }}
         run: |
           set -eu
           test -n "$DOMAIN" && test -n "$ORIGIN"
@@ -43,7 +43,7 @@ jobs:
         with:
           health_url: https://grow-api.${{ vars.DOMAIN_NAME }}/health/
           min_version: ${{ steps.version.outputs.minimum }}
-          origin_ip: ${{ vars.SERVER_HOST }}
+          origin_ip: ${{ vars.APP_ORIGIN_IP }}
 
   public-health:
     if: github.event_name != 'pull_request'
