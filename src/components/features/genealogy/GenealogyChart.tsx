@@ -3,9 +3,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { linkVertical, select, zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from "d3";
 import { ZoomControls } from "@behindthemusictree/ui";
+import { useIsAdmin } from "@hooks/useIsAdmin";
 import type { Genealogy, GenealogyLane, GenealogyTradition } from "@schemas/api/genealogy";
+import GenealogyColumnHeader from "./GenealogyColumnHeader";
 import { formatSpan, formatYear } from "./format";
-import { anchorPosition, AXIS_WIDTH, buildAnchorIndex, COLUMN_WIDTH, columnX, TOP_MARGIN } from "./geometry";
+import { anchorPosition, AXIS_WIDTH, buildAnchorIndex, COLUMN_WIDTH, columnX, HEADER_HEIGHT, TOP_MARGIN } from "./geometry";
 import { createYearScale, YEAR_MAX, YEAR_MIN, yearTicks } from "./yearScale";
 
 const LANE_WIDTH = 8;
@@ -27,12 +29,14 @@ type Props = {
 };
 
 export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
+  const isAdmin = useIsAdmin();
   const svgRef = useRef<SVGSVGElement>(null);
   const behaviorRef = useRef<ZoomBehavior<SVGSVGElement, unknown> | null>(null);
   const fittedRef = useRef(false);
   const [transform, setTransform] = useState<ZoomTransform>(zoomIdentity);
   const [minZoom, setMinZoom] = useState(MIN_ZOOM);
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
+  const [width, setWidth] = useState(0);
   const yearScale = useMemo(createYearScale, []);
   const ticks = useMemo(yearTicks, []);
   const anchors = useMemo(() => buildAnchorIndex(data), [data]);
@@ -72,12 +76,12 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
       const y0 = TOP_MARGIN;
       const y1 = TOP_MARGIN + yearScale(YEAR_MAX);
       const availableWidth = svg.clientWidth - AXIS_WIDTH - 2 * FIT_PADDING;
-      const availableHeight = svg.clientHeight - 2 * FIT_PADDING;
+      const availableHeight = svg.clientHeight - HEADER_HEIGHT - 2 * FIT_PADDING;
       const k = Math.min(availableWidth / (x1 - x0), availableHeight / (y1 - y0));
       const next = zoomIdentity
         .translate(
           AXIS_WIDTH + FIT_PADDING + (availableWidth - k * (x1 - x0)) / 2 - k * x0,
-          FIT_PADDING + (availableHeight - k * (y1 - y0)) / 2 - k * y0,
+          HEADER_HEIGHT + FIT_PADDING + (availableHeight - k * (y1 - y0)) / 2 - k * y0,
         )
         .scale(k);
       const floor = Math.min(MIN_ZOOM, k);
@@ -109,6 +113,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
     const svg = svgRef.current;
     if (!svg) return;
     const fitOnce = () => {
+      setWidth(svg.clientWidth);
       if (!fittedRef.current && fit(false)) fittedRef.current = true;
     };
     fitOnce();
@@ -271,6 +276,8 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
           </g>
         </g>
 
+        <GenealogyColumnHeader columns={data.columns} regions={data.regions} transform={transform} width={width} />
+
         <g data-layer="year-axis" pointerEvents="none">
           <rect x={0} y={0} width={AXIS_WIDTH} height="100%" className="fill-white" />
           {ticks.map((year) => (
@@ -288,7 +295,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
         </g>
       </svg>
 
-      {unplacedCount > 0 && (
+      {isAdmin && unplacedCount > 0 && (
         <p className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded bg-white/90 px-2 py-1 text-xs text-slate-600 shadow">
           {unplacedCount} traditions without a place are not shown
         </p>

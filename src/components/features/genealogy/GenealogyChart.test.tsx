@@ -5,9 +5,15 @@ import { GenealogySchema } from "@schemas/api/genealogy";
 import GenealogyChart from "./GenealogyChart";
 import { anchorPosition, buildAnchorIndex } from "./geometry";
 
+const mocks = vi.hoisted(() => ({ isAdmin: true }));
+vi.mock("@hooks/useIsAdmin", () => ({ useIsAdmin: () => mocks.isAdmin }));
+
 const data = GenealogySchema.parse(fixture);
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  mocks.isAdmin = true;
+});
 
 function renderChart(selectedId: string | null = null, onSelect = vi.fn()) {
   const { container } = render(<GenealogyChart data={data} selectedId={selectedId} onSelect={onSelect} />);
@@ -20,6 +26,13 @@ describe("GenealogyChart", () => {
 
     expect(container.querySelectorAll("[data-tradition]")).toHaveLength(5);
     expect(screen.getByText("1 traditions without a place are not shown")).toBeTruthy();
+  });
+
+  it("hides the unplaced count from non-admins", () => {
+    mocks.isAdmin = false;
+    renderChart();
+
+    expect(screen.queryByText("1 traditions without a place are not shown")).toBeNull();
   });
 
   it("draws the band fragments, then the lanes, after each other", () => {
@@ -81,7 +94,8 @@ describe("GenealogyChart", () => {
 
 describe("anchorPosition", () => {
   const index = buildAnchorIndex({
-    columns: [{ id: "c", position: 3, lanes: [{ entityId: "Q1", label: "L", startYear: null, endYear: 1950 }] }],
+    columns: [{ id: "c", position: 3, regionId: "r", lanes: [{ entityId: "Q1", label: "L", startYear: null, endYear: 1950 }] }],
+    regions: [{ id: "r", label: "R", startPosition: 3, endPosition: 3 }],
     bands: [
       { entityId: "Q2", label: "B", fragment: 0, startPosition: 0, endPosition: 1, startYear: null, endYear: 1000 },
       { entityId: "Q2", label: "B", fragment: 1, startPosition: 6, endPosition: 8, startYear: 1001, endYear: 1950 },
