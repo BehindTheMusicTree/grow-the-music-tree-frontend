@@ -116,6 +116,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- Header labels animate when navigating, and genre and artist details provide shareable links.
+
 - Updated app-kit and app-kit-ui to version 28.
 
 - Removed two unused bindings so lint runs without warnings.

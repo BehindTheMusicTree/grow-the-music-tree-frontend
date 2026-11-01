@@ -13,7 +13,7 @@ import {
   GenrePlaylistUuidSchema,
   useArtist,
 } from "@behindthemusictree/app-kit/genre-tree";
-import { GenreTreeViewSkeleton, type FocusChangeReason, type ParentChange } from "@behindthemusictree/app-kit-ui/genre-tree";
+import { GenreTreeViewSkeleton, type FocusChangeReason, type ParentChange, type GenreTreeShareTarget } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { useUpdateGenreParent } from "@hooks/curation/useUpdateGenreParent";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
@@ -25,7 +25,7 @@ import SongCheckbox from "@components/features/genre-curation/SongCheckbox";
 import SongRowActions from "@components/features/genre-curation/SongRowActions";
 import SelectionBar from "@components/features/genre-curation/SelectionBar";
 import { useCenterColumn } from "@hooks/useCenterColumn";
-import { ABOUT_PARAM, ARTIST_PARAM, useGenreTreeUrlState } from "@hooks/useGenreTreeUrlState";
+import { ABOUT_PARAM, ARTIST_PARAM, GENRE_PARAM, useGenreTreeUrlState } from "@hooks/useGenreTreeUrlState";
 import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import AboutContent from "@components/features/about/AboutContent";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
@@ -85,6 +85,23 @@ function ZoomableGenreTreeView({ setSelectedNodeId, artistUuid, setArtistUuid, f
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const getShareUrl = useCallback(
+    (target: GenreTreeShareTarget) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (target.kind === "genre") {
+        params.set(GENRE_PARAM, target.genrePlaylistUuid);
+        params.delete(ARTIST_PARAM);
+        if (target.artistUuid) params.set(ARTIST_PARAM, target.artistUuid);
+      } else {
+        params.set(ARTIST_PARAM, target.uuid);
+        params.delete(GENRE_PARAM);
+      }
+      params.delete(ABOUT_PARAM);
+      const query = params.toString();
+      return query ? `${pathname}?${query}` : pathname;
+    },
+    [pathname, searchParams],
+  );
   const about = searchParams.has(ABOUT_PARAM);
   const {
     selectedNodeId,
@@ -181,6 +198,7 @@ function ZoomableGenreTreeView({ setSelectedNodeId, artistUuid, setArtistUuid, f
     onArtistUuidChange: setArtistUuid,
     artistExpanded,
     onArtistExpandedChange: setArtistExpanded,
+    getShareUrl,
   };
 
   return focus ? <GenreTreeView {...sharedProps} {...focus} /> : <GenreTreeView {...sharedProps} />;
