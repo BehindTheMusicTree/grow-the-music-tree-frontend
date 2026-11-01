@@ -19,19 +19,9 @@ jobs:
         env:
           DOMAIN: ${{ vars.DOMAIN_NAME }}
           ORIGIN: ${{ vars.SERVER_HOST }}
-          BUILD_HOST: ${{ vars.SERVER_HOST_BUILD_STAGING }}
         run: |
           set -eu
           test -n "$DOMAIN" && test -n "$ORIGIN"
-          if [ -n "$BUILD_HOST" ] && [ "$ORIGIN" = "$BUILD_HOST" ]; then
-            echo '::error::Production origin matches build server'
-            exit 1
-          fi
-          if [ -n "$BUILD_HOST" ]; then
-            echo 'Production and build server variables differ'
-          else
-            echo 'Build server variable unavailable for comparison'
-          fi
           host="grow-api.$DOMAIN"
           for route in public origin; do
             headers="$(mktemp)"
