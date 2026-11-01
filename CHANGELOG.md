@@ -116,6 +116,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- Updated app-kit and app-kit-ui to version 28.
+
 - **Header navigation**: the map link now appears before genealogy.
 
 - **Pop-side curation columns**: the `canonical_genre_pop_side` list shows its new `root_item_id` / `pop_child_item_id` columns as "Racine" / "Enfant pop". Requires grow-api 14.7.0.
