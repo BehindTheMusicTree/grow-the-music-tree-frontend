@@ -99,6 +99,13 @@ describe("GenreTreePage zoom controls", () => {
     }
   });
 
+  it("hides the zoom controls on touch screens by default", async () => {
+    renderGenreTreePage("pop-core");
+
+    const zoomIn = await screen.findByRole("button", { name: "Zoom in" }, { timeout: 4000 });
+    expect(zoomIn.closest(".gtv-zoom-controls--auto")).not.toBeNull();
+  });
+
   it("renders no zoom controls in the outline view", async () => {
     renderGenreTreePage("outline");
 

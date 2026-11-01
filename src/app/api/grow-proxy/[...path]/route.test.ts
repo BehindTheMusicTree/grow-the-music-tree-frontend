@@ -28,7 +28,9 @@ describe("grow-proxy route", () => {
   it("forwards anonymous GET requests to the upstream URL with a trailing slash and query string and no body", async () => {
     const fetchMock = vi
       .spyOn(global, "fetch")
-      .mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200, headers: { "content-type": "application/json" } }));
+      .mockResolvedValue(
+        new Response(JSON.stringify({ ok: true }), { status: 200, headers: { "content-type": "application/json" } }),
+      );
 
     const request = new NextRequest("http://localhost/api/grow-proxy/genres/?foo=bar");
     const response = await GET(request, makeContext(["genres"]));
@@ -48,7 +50,12 @@ describe("grow-proxy route", () => {
     getAdminIdTokenMock.mockResolvedValue("admin-id-token");
     const fetchMock = vi
       .spyOn(global, "fetch")
-      .mockResolvedValue(new Response(JSON.stringify({ created: true }), { status: 201, headers: { "content-type": "application/json" } }));
+      .mockResolvedValue(
+        new Response(JSON.stringify({ created: true }), {
+          status: 201,
+          headers: { "content-type": "application/json" },
+        }),
+      );
 
     const request = new NextRequest("http://localhost/api/grow-proxy/genres/tree/import/", {
       method: "POST",
@@ -91,7 +98,10 @@ describe("grow-proxy route", () => {
 
   it("passes through a non-2xx upstream status and body unchanged", async () => {
     vi.spyOn(global, "fetch").mockResolvedValue(
-      new Response(JSON.stringify({ detail: "not found" }), { status: 404, headers: { "content-type": "application/json" } })
+      new Response(JSON.stringify({ detail: "not found" }), {
+        status: 404,
+        headers: { "content-type": "application/json" },
+      }),
     );
 
     const request = new NextRequest("http://localhost/api/grow-proxy/genres/missing/");
@@ -100,7 +110,6 @@ describe("grow-proxy route", () => {
     expect(response.status).toBe(404);
     expect(await response.json()).toEqual({ detail: "not found" });
   });
-
 
   it("forwards If-None-Match and passes an upstream 304 through with its ETag and no body", async () => {
     const fetchMock = vi
@@ -118,5 +127,27 @@ describe("grow-proxy route", () => {
     expect(response.headers.get("etag")).toBe('"abc"');
     expect(response.headers.get("cache-control")).toBe("private, no-cache");
     expect(response.body).toBeNull();
+  });
+
+  it("keeps an immutable upstream Cache-Control and drops Content-Encoding from the inflated body", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ type: "FeatureCollection", features: [] }), {
+        status: 200,
+        headers: {
+          "content-type": "application/geo+json",
+          "content-encoding": "gzip",
+          etag: '"abc"',
+          "cache-control": "public, max-age=31536000, immutable",
+        },
+      }),
+    );
+
+    const request = new NextRequest("http://localhost/api/grow-proxy/regions/map/files/abc/");
+    const response = await GET(request, makeContext(["regions", "map", "files", "abc"]));
+
+    expect(response.headers.get("cache-control")).toBe("public, max-age=31536000, immutable");
+    expect(response.headers.get("content-type")).toBe("application/geo+json");
+    expect(response.headers.get("content-encoding")).toBeNull();
+    expect(response.headers.get("etag")).toBe('"abc"');
   });
 });

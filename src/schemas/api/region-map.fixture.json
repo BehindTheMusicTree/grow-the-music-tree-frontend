@@ -1,0 +1,87 @@
+{
+  "regions": [
+    {
+      "id": "Q142",
+      "name": "France",
+      "kind": "country",
+      "parentId": "world",
+      "childIds": ["Q12130"],
+      "zoneIds": ["Q236626"],
+      "bbox": [-5, 42, 8, 51],
+      "mainBbox": [-5, 42, 8, 51],
+      "centroid": [2, 46],
+      "drillable": true,
+      "genres": [
+        {
+          "itemId": "Q1",
+          "rule": "anchor",
+          "relation": "canonical"
+        }
+      ],
+      "songCount": 120,
+      "genreCount": 1
+    },
+    {
+      "id": "Q12130",
+      "name": "Brittany",
+      "kind": "admin_unit",
+      "parentId": "Q142",
+      "childIds": [],
+      "zoneIds": ["Q236626"],
+      "bbox": [-5, 42, 8, 51],
+      "mainBbox": [-5, 42, 8, 51],
+      "centroid": [2, 46],
+      "drillable": false,
+      "genres": [
+        {
+          "itemId": "Q2",
+          "rule": "anchor",
+          "relation": "canonical"
+        }
+      ],
+      "songCount": 40,
+      "genreCount": 1
+    },
+    {
+      "id": "Q183",
+      "name": "Germany",
+      "kind": "country",
+      "parentId": "world",
+      "childIds": [],
+      "zoneIds": [],
+      "bbox": [-5, 42, 8, 51],
+      "mainBbox": [-5, 42, 8, 51],
+      "centroid": [2, 46],
+      "drillable": false,
+      "genres": [],
+      "songCount": 0,
+      "genreCount": 0
+    },
+    {
+      "id": "Q236626",
+      "name": "Celtic nations",
+      "kind": "zone",
+      "parentId": null,
+      "childIds": [],
+      "zoneIds": [],
+      "bbox": [-5, 42, 8, 51],
+      "mainBbox": [-5, 42, 8, 51],
+      "centroid": [2, 46],
+      "drillable": false,
+      "genres": [
+        {
+          "itemId": "Q2",
+          "rule": "anchor",
+          "relation": "canonical"
+        }
+      ],
+      "songCount": 40,
+      "genreCount": 1
+    }
+  ],
+  "files": {
+    "geometry/world.geojson": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "geometry/Q142.geojson": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "zones/Q236626.geojson": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  }
+}

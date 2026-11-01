@@ -4,12 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { CircleDot, Info, List, Network } from "lucide-react";
+import { CircleDot, Info, List, Map as MapIcon, Network } from "lucide-react";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { getAudiometaUrl } from "@lib/site-urls";
 import { MenuGroup } from "./MenuGroup";
-import { ABOUT_HREF, GENEALOGY_HREF } from "@lib/constants/routes";
+import { ABOUT_HREF, GENEALOGY_HREF, REGION_MAP_HREF } from "@lib/constants/routes";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { iconPillClassName } from "./iconPillClassName";
 import { UserMenu } from "./UserMenu";
@@ -70,21 +70,25 @@ export default function AppHeader({ className }: AppHeaderProps) {
   const { viewMode, setViewMode, canShowPopCore } = useGenreTreeViewMode();
   const isOutline = viewMode === "outline";
   const isGenealogy = pathname === GENEALOGY_HREF;
+  const isRegionMap = pathname === REGION_MAP_HREF;
+  const isLabelledPage = isGenealogy || isRegionMap;
 
   return (
-    <div className={`fixed top-gutter right-gutter z-50 flex h-header w-right-column items-center justify-end gap-2 ${className ?? ""}`}>
+    <div
+      className={`fixed top-gutter right-gutter z-50 flex h-header w-right-column max-md:left-gutter max-md:w-auto items-center justify-end gap-2 ${className ?? ""}`}
+    >
       <Link
         href="/"
         prefetch={false}
-        className={`flex h-full shrink-0 items-center gap-2 rounded-full bg-black/70 pl-1.5 pr-1.5 shadow-lg backdrop-blur xl:min-w-0 ${isGenealogy ? "" : "xl:pr-3"}`}
+        className="flex h-full shrink-0 items-center rounded-full bg-black/70 px-1.5 shadow-lg backdrop-blur"
         aria-label={`${APP_NAME} home`}
       >
-        <div className="flex h-9 flex-wrap items-center gap-x-2 overflow-hidden xl:min-w-0">
+        <div className="flex h-9 items-center">
           <Image src={logo} alt="" width={40} height={40} className="h-auto w-9 shrink-0" aria-hidden priority />
           <h1
-            className={`whitespace-nowrap text-base font-bold text-gray-100 ${isGenealogy ? "sr-only" : "hidden xl:block"}`}
+            className={`grid overflow-hidden whitespace-nowrap text-base font-bold text-gray-100 transition-[grid-template-columns,opacity] duration-200 motion-reduce:transition-none ${isLabelledPage ? "grid-cols-[0fr] opacity-0" : "grid-cols-[0fr] opacity-0 xl:grid-cols-[1fr] xl:opacity-100"}`}
           >
-            {APP_NAME}
+            <span className="min-w-0 overflow-hidden"><span className="pl-2">{APP_NAME}</span></span>
           </h1>
         </div>
       </Link>
@@ -107,14 +111,24 @@ export default function AppHeader({ className }: AppHeaderProps) {
         </button>
       )}
       <Link
+        href={REGION_MAP_HREF}
+        prefetch={false}
+        className={`${iconPillClassName.replace("aspect-square", "aspect-auto")} px-3`}
+        aria-label="Region map"
+        aria-current={isRegionMap ? "page" : undefined}
+      >
+        <MapIcon className="h-5 w-5" aria-hidden />
+        <span aria-hidden className={`grid overflow-hidden whitespace-nowrap text-base font-bold transition-[grid-template-columns,opacity] duration-200 motion-reduce:transition-none ${isRegionMap ? "grid-cols-[0fr] opacity-0 xl:grid-cols-[1fr] xl:opacity-100" : "grid-cols-[0fr] opacity-0"}`}><span className="min-w-0 overflow-hidden"><span className="pl-2">Map</span></span></span>
+      </Link>
+      <Link
         href={GENEALOGY_HREF}
         prefetch={false}
-        className={`${iconPillClassName} ${isGenealogy ? "xl:aspect-auto xl:gap-2 xl:px-3" : ""}`}
+        className={`${iconPillClassName.replace("aspect-square", "aspect-auto")} px-3`}
         aria-label="Genealogy"
         aria-current={isGenealogy ? "page" : undefined}
       >
         <Network className="h-5 w-5" aria-hidden />
-        {isGenealogy && <span className="hidden text-base font-bold xl:inline">Genealogy</span>}
+        <span aria-hidden className={`grid overflow-hidden whitespace-nowrap text-base font-bold transition-[grid-template-columns,opacity] duration-200 motion-reduce:transition-none ${isGenealogy ? "grid-cols-[0fr] opacity-0 xl:grid-cols-[1fr] xl:opacity-100" : "grid-cols-[0fr] opacity-0"}`}><span className="min-w-0 overflow-hidden"><span className="pl-2">Genealogy</span></span></span>
       </Link>
       <Suspense fallback={null}>
         <AboutButton />

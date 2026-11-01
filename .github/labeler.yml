@@ -131,4 +131,3 @@ dependencies:
           - ".github/scripts/**"
           - "scripts/**"
           - ".vscode/**"
-          - ".cursor/**"

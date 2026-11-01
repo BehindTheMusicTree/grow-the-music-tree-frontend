@@ -5,13 +5,19 @@ import { GenealogySchema } from "@schemas/api/genealogy";
 import GenealogyChart from "./GenealogyChart";
 import { anchorPosition, buildAnchorIndex } from "./geometry";
 
+const mocks = vi.hoisted(() => ({ isAdmin: true }));
+vi.mock("@hooks/useIsAdmin", () => ({ useIsAdmin: () => mocks.isAdmin }));
+
 const data = GenealogySchema.parse(fixture);
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  mocks.isAdmin = true;
+});
 
-function renderChart(onOpenInTree = vi.fn()) {
-  const { container } = render(<GenealogyChart data={data} onOpenInTree={onOpenInTree} />);
-  return { container, onOpenInTree };
+function renderChart(selectedId: string | null = null, onSelect = vi.fn()) {
+  const { container } = render(<GenealogyChart data={data} selectedId={selectedId} onSelect={onSelect} />);
+  return { container, onSelect };
 }
 
 describe("GenealogyChart", () => {
@@ -20,6 +26,13 @@ describe("GenealogyChart", () => {
 
     expect(container.querySelectorAll("[data-tradition]")).toHaveLength(5);
     expect(screen.getByText("1 traditions without a place are not shown")).toBeTruthy();
+  });
+
+  it("hides the unplaced count from non-admins", () => {
+    mocks.isAdmin = false;
+    renderChart();
+
+    expect(screen.queryByText("1 traditions without a place are not shown")).toBeNull();
   });
 
   it("draws the band fragments, then the lanes, after each other", () => {
@@ -43,16 +56,30 @@ describe("GenealogyChart", () => {
     expect(association?.getAttribute("marker-end")).toBeNull();
   });
 
-  it("opens the tree only for traditions in the canonical tree", () => {
-    const { container, onOpenInTree } = renderChart();
-    const inTree = data.traditions.find((tradition) => tradition.inCanonicalTree)!;
-    const notInTree = data.traditions.find((tradition) => !tradition.inCanonicalTree && tradition.anchorId)!;
+  it("selects a tradition from its marker, with the mouse or the keyboard", () => {
+    const { onSelect } = renderChart();
+    const tradition = data.traditions.find((entry) => entry.anchorId && entry.start !== null)!;
 
-    fireEvent.click(container.querySelector(`[data-tradition="${notInTree.wikidataId}"]`)!);
-    expect(onOpenInTree).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: tradition.label }));
+    fireEvent.keyDown(screen.getByRole("button", { name: tradition.label }), { key: "Enter" });
 
-    fireEvent.click(container.querySelector(`[data-tradition="${inTree.wikidataId}"]`)!);
-    expect(onOpenInTree).toHaveBeenCalledWith(inTree.wikidataId);
+    expect(onSelect).toHaveBeenCalledTimes(2);
+    expect(onSelect).toHaveBeenCalledWith(tradition.wikidataId);
+  });
+
+  it("marks the selected tradition as pressed", () => {
+    const tradition = data.traditions.find((entry) => entry.anchorId && entry.start !== null)!;
+    renderChart(tradition.wikidataId);
+
+    expect(screen.getByRole("button", { name: tradition.label }).getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("offers the same zoom controls as the genre tree", () => {
+    renderChart();
+
+    expect(screen.getByRole("button", { name: "Zoom in" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Zoom out" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Fit to frame" })).toBeTruthy();
   });
 
   it("shows the label and years of a hovered tradition", () => {
@@ -67,7 +94,8 @@ describe("GenealogyChart", () => {
 
 describe("anchorPosition", () => {
   const index = buildAnchorIndex({
-    columns: [{ id: "c", position: 3, lanes: [{ entityId: "Q1", label: "L", startYear: null, endYear: 1950 }] }],
+    columns: [{ id: "c", position: 3, regionId: "r", lanes: [{ entityId: "Q1", label: "L", startYear: null, endYear: 1950 }] }],
+    regions: [{ id: "r", label: "R", startPosition: 3, endPosition: 3 }],
     bands: [
       { entityId: "Q2", label: "B", fragment: 0, startPosition: 0, endPosition: 1, startYear: null, endYear: 1000 },
       { entityId: "Q2", label: "B", fragment: 1, startPosition: 6, endPosition: 8, startYear: 1001, endYear: 1950 },

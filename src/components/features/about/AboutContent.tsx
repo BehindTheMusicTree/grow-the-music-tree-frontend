@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { BookOpen, Compass, Headphones } from "lucide-react";
+import { TipeeeSocialLinkColored } from "@behindthemusictree/brand/components";
 import OrgSocialLinks from "@components/features/menu/OrgSocialLinks";
 import { AboutTheMusicTreeLockup } from "@components/features/about/AboutTheMusicTreeLockup";
+import { trackEvent } from "@lib/analytics";
 
 const GITHUB_ORG_URL = "https://github.com/BehindTheMusicTree";
 const GITHUB_AUDIOMETA_URL = "https://github.com/BehindTheMusicTree/audiometa";
@@ -82,6 +84,20 @@ export default function AboutContent({ onClose }: { onClose: () => void }) {
             <li key={item}>{item}</li>
           ))}
         </ul>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-base font-semibold text-gray-900">Support TheMusicTree</h2>
+        <p className="text-sm leading-relaxed text-gray-600">
+          TheMusicTree is independent and open source. If it helps you dig, support its growth.
+        </p>
+        <div>
+          <TipeeeSocialLinkColored
+            showText
+            text="Support us on Tipeee"
+            onClick={() => trackEvent("tipeee_click", { source: "about" })}
+          />
+        </div>
       </section>
 
       <section className="flex flex-col gap-4 pt-6 border-t border-gray-100">

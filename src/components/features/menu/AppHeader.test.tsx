@@ -37,6 +37,23 @@ describe("AppHeader view toggle", () => {
     pathname = "/";
   });
 
+  it.each(["/", "/map", "/genealogy"])("keeps Map before Genealogy on %s", (route) => {
+    pathname = route;
+    renderHeader(true);
+
+    const links = screen.getAllByRole("link");
+    const map = screen.getByRole("link", { name: "Region map" });
+    const genealogy = screen.getByRole("link", { name: "Genealogy" });
+    expect(links.indexOf(map)).toBeLessThan(links.indexOf(genealogy));
+    expect(map).toHaveAttribute("href", "/map");
+    if (route === "/map") {
+      expect(map).toHaveAttribute("aria-current", "page");
+      expect(genealogy).not.toHaveAttribute("aria-current");
+    } else {
+      expect(map).not.toHaveAttribute("aria-current");
+    }
+  });
+
   it("links the About button to /?about", () => {
     renderHeader(true);
 
@@ -53,7 +70,7 @@ describe("AppHeader view toggle", () => {
     renderHeader(true);
 
     const link = screen.getByRole("link", { name: "Genealogy" });
-    expect(link).toHaveTextContent("");
+    expect(link).toHaveTextContent("Genealogy");
     expect(link).not.toHaveAttribute("aria-current");
   });
 
@@ -64,7 +81,7 @@ describe("AppHeader view toggle", () => {
     const link = screen.getByRole("link", { name: "Genealogy" });
     expect(link).toHaveTextContent("Genealogy");
     expect(link).toHaveAttribute("aria-current", "page");
-    expect(screen.getByRole("heading", { name: "GrowTheMusicTree" })).toHaveClass("sr-only");
+    expect(screen.getByRole("heading", { name: "GrowTheMusicTree" })).toBeInTheDocument();
   });
 
   it("keeps other params when opening About", () => {

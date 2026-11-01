@@ -1,9 +1,11 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import AboutContent from "@components/features/about/AboutContent";
+import { trackEvent } from "@lib/analytics";
 
 vi.mock("@components/features/menu/OrgSocialLinks", () => ({ default: () => null }));
 vi.mock("@components/features/about/AboutTheMusicTreeLockup", () => ({ AboutTheMusicTreeLockup: () => null }));
+vi.mock("@lib/analytics", () => ({ trackEvent: vi.fn() }));
 
 describe("AboutContent", () => {
   afterEach(cleanup);
@@ -42,5 +44,19 @@ describe("AboutContent", () => {
   it("keeps a link to the admin area", () => {
     render(<AboutContent onClose={vi.fn()} />);
     expect(screen.getByRole("link", { name: "Admin" })).toHaveAttribute("href", "/admin");
+  });
+
+  it("links the GrowTheMusicTree Tipeee page", () => {
+    render(<AboutContent onClose={vi.fn()} />);
+    expect(screen.getByRole("link", { name: /support us on tipeee/i })).toHaveAttribute(
+      "href",
+      "https://fr.tipeee.com/growthemusictree/",
+    );
+  });
+
+  it("tracks clicks on the Tipeee link", () => {
+    render(<AboutContent onClose={vi.fn()} />);
+    fireEvent.click(screen.getByRole("link", { name: /support us on tipeee/i }));
+    expect(trackEvent).toHaveBeenCalledWith("tipeee_click", { source: "about" });
   });
 });

@@ -10,7 +10,8 @@
           "startYear": 1825
         }
       ],
-      "position": 21
+      "position": 21,
+      "regionId": "americas"
     },
     {
       "id": "Q45",
@@ -22,7 +23,8 @@
           "startYear": 868
         }
       ],
-      "position": 29
+      "position": 29,
+      "regionId": "europe"
     },
     {
       "id": "Q34",
@@ -34,7 +36,8 @@
           "startYear": 900
         }
       ],
-      "position": 67
+      "position": 67,
+      "regionId": "europe"
     },
     {
       "id": "Q12536",
@@ -52,7 +55,8 @@
           "startYear": 1299
         }
       ],
-      "position": 96
+      "position": 96,
+      "regionId": "asia"
     },
     {
       "id": "Q252",
@@ -64,7 +68,28 @@
           "startYear": 1945
         }
       ],
-      "position": 130
+      "position": 130,
+      "regionId": "asia"
+    }
+  ],
+  "regions": [
+    {
+      "id": "americas",
+      "label": "Americas",
+      "startPosition": 21,
+      "endPosition": 21
+    },
+    {
+      "id": "europe",
+      "label": "Europe",
+      "startPosition": 29,
+      "endPosition": 67
+    },
+    {
+      "id": "asia",
+      "label": "Asia",
+      "startPosition": 96,
+      "endPosition": 130
     }
   ],
   "bands": [
@@ -119,7 +144,7 @@
     },
     {
       "end": 1950,
-      "label": "Taizé song",
+      "label": "Taiz\u00e9 song",
       "start": 481,
       "anchorId": "Q142",
       "wikidataId": "Q101525913",
