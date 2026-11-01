@@ -12,7 +12,6 @@ import {
   TrackListSidebarVisibilityProvider,
   TrackListProvider,
   libraryEndpoints,
-  libraryQueryKeys,
   SongDetailedSchema,
 } from "@behindthemusictree/app-kit/genre-tree";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -51,8 +50,6 @@ function AppProviders({ children }: ProvidersProps) {
           <TrackListProvider
             getBackendBaseUrl={getGrowBackendBaseUrl}
             schema={SongDetailedSchema}
-            listEndpoint={() => libraryEndpoints[PLAYER_SCOPE].songs.list()}
-            listQueryKey={(page) => libraryQueryKeys[PLAYER_SCOPE].songs.list(page)}
           >
             {children}
           </TrackListProvider>

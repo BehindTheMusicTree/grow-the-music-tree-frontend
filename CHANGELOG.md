@@ -116,6 +116,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- Updated app-kit and app-kit-ui to version 28.
+
 - Removed two unused bindings so lint runs without warnings.
 
 - Share project guidance and launch instructions across Claude and Codex with a drift check.
