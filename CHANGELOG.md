@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.21.0 - 2026-11-01](#3210---2026-11-01)
 - [3.20.0 - 2026-10-29](#3200---2026-10-29)
 - [3.19.0 - 2026-10-29](#3190---2026-10-29)
 - [3.17.1 - 2026-10-26](#3171---2026-10-26)
@@ -105,6 +106,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.21.0] - 2026-11-01
+
 ### Added
 
 - Show region and column headers on the genealogy chart as users pan and zoom.
@@ -134,7 +137,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### CI
 
+- Check the production API version through its origin and monitor the public health endpoint separately.
+
 - **PR labeler**: `.cursor/**` no longer maps to the `infrastructure` label.
+
 
 ## [3.20.0] - 2026-10-29
 
