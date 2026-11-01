@@ -116,6 +116,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- Use explicit deployment SSH and application origin variables in deployment workflows.
+
 - Header labels animate when navigating, and genre and artist details provide shareable links.
 
 - Updated app-kit and app-kit-ui to version 28.
