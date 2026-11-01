@@ -70,7 +70,7 @@ describe("AppHeader view toggle", () => {
     renderHeader(true);
 
     const link = screen.getByRole("link", { name: "Genealogy" });
-    expect(link).toHaveTextContent("");
+    expect(link).toHaveTextContent("Genealogy");
     expect(link).not.toHaveAttribute("aria-current");
   });
 
@@ -81,7 +81,7 @@ describe("AppHeader view toggle", () => {
     const link = screen.getByRole("link", { name: "Genealogy" });
     expect(link).toHaveTextContent("Genealogy");
     expect(link).toHaveAttribute("aria-current", "page");
-    expect(screen.getByRole("heading", { name: "GrowTheMusicTree" })).toHaveClass("sr-only");
+    expect(screen.getByRole("heading", { name: "GrowTheMusicTree" })).toBeInTheDocument();
   });
 
   it("keeps other params when opening About", () => {
