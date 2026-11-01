@@ -27,6 +27,11 @@ jobs:
             echo '::error::Production origin matches build server'
             exit 1
           fi
+          if [ -n "$BUILD_HOST" ]; then
+            echo 'Production and build server variables differ'
+          else
+            echo 'Build server variable unavailable for comparison'
+          fi
           host="grow-api.$DOMAIN"
           for route in public origin; do
             headers="$(mktemp)"
@@ -39,6 +44,16 @@ jobs:
             awk 'BEGIN { IGNORECASE=1 } /^(content-type|cf-ray|cf-mitigated):/ { print }' "$headers"
             rm -f "$headers"
           done
+      - uses: actions/checkout@v4
+      - name: Read required API version
+        id: version
+        run: echo "minimum=$(jq -er .growApi.minVersion package.json)" >> "$GITHUB_OUTPUT"
+      - name: Check version through origin
+        uses: BehindTheMusicTree/github-workflows/.github/actions/check-api-version@v4.9.0
+        with:
+          health_url: https://grow-api.${{ vars.DOMAIN_NAME }}/health/
+          min_version: ${{ steps.version.outputs.minimum }}
+          origin_ip: ${{ vars.SERVER_HOST }}
 
   public-health:
     if: github.event_name != 'pull_request'
