@@ -16,7 +16,17 @@ const ColumnSchema = z
   .object({
     id: NonEmpty,
     position: z.number().int().min(0),
+    regionId: NonEmpty,
     lanes: z.array(LaneSchema).min(1),
+  })
+  .strict();
+
+const RegionSchema = z
+  .object({
+    id: NonEmpty,
+    label: NonEmpty,
+    startPosition: z.number().int().min(0),
+    endPosition: z.number().int().min(0),
   })
   .strict();
 
@@ -59,6 +69,7 @@ const TraditionLinkSchema = z
 export const GenealogySchema = z
   .object({
     columns: z.array(ColumnSchema),
+    regions: z.array(RegionSchema).min(1),
     bands: z.array(BandSchema),
     successions: z.array(SuccessionSchema),
     traditions: z.array(TraditionSchema),
@@ -69,6 +80,7 @@ export const GenealogySchema = z
 export type Genealogy = z.infer<typeof GenealogySchema>;
 export type GenealogyColumn = Genealogy["columns"][number];
 export type GenealogyLane = GenealogyColumn["lanes"][number];
+export type GenealogyRegion = Genealogy["regions"][number];
 export type GenealogyBand = Genealogy["bands"][number];
 export type GenealogyTradition = Genealogy["traditions"][number];
 export type GenealogyTraditionLink = Genealogy["traditionLinks"][number];
