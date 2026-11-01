@@ -32,4 +32,11 @@ describe("GenealogySchema", () => {
     ).toBe(false);
     expect(GenealogySchema.safeParse({ ...fixture, columns: [{ ...fixture.columns[0], lanes: [] }] }).success).toBe(false);
   });
+
+  it("rejects a document without regions or a column without a region", () => {
+    expect(GenealogySchema.safeParse({ ...fixture, regions: [] }).success).toBe(false);
+    expect(
+      GenealogySchema.safeParse({ ...fixture, columns: [{ ...fixture.columns[0], regionId: undefined }] }).success,
+    ).toBe(false);
+  });
 });

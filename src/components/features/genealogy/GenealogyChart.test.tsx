@@ -94,7 +94,8 @@ describe("GenealogyChart", () => {
 
 describe("anchorPosition", () => {
   const index = buildAnchorIndex({
-    columns: [{ id: "c", position: 3, lanes: [{ entityId: "Q1", label: "L", startYear: null, endYear: 1950 }] }],
+    columns: [{ id: "c", position: 3, regionId: "r", lanes: [{ entityId: "Q1", label: "L", startYear: null, endYear: 1950 }] }],
+    regions: [{ id: "r", label: "R", startPosition: 3, endPosition: 3 }],
     bands: [
       { entityId: "Q2", label: "B", fragment: 0, startPosition: 0, endPosition: 1, startYear: null, endYear: 1000 },
       { entityId: "Q2", label: "B", fragment: 1, startPosition: 6, endPosition: 8, startYear: 1001, endYear: 1950 },
