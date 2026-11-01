@@ -116,6 +116,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- Removed two unused bindings so lint runs without warnings.
+
 - Share project guidance and launch instructions across Claude and Codex with a drift check.
 
 - **Header navigation**: the map link now appears before genealogy.
