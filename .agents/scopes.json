@@ -1,0 +1,16 @@
+{
+  "api-responses": {
+    "source": ".agents/rules/api-responses.md",
+    "paths": [
+      "src/**/*.ts",
+      "src/**/*.tsx"
+    ]
+  },
+  "spacing": {
+    "source": ".agents/rules/spacing.md",
+    "paths": [
+      "src/**/*.tsx",
+      "src/**/*.css"
+    ]
+  }
+}
