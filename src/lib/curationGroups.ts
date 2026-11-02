@@ -42,6 +42,12 @@ export const CURATION_GROUPS: { title: string; lists: Record<string, string> }[]
     },
   },
   {
+    title: "Géohistoire",
+    lists: {
+      region_overrides: "Régions des colonnes de généalogie",
+    },
+  },
+  {
     title: "Matching des chansons",
     lists: {
       genre_alias: "Alias de genres MusicBrainz",

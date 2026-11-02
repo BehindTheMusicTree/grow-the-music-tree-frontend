@@ -106,6 +106,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- Curation page: the `region_overrides` list (region of a genealogy column's entity) appears in a new "Géohistoire" group, with a "Région" column title.
+
 ### Changed
 
 - Install `@behindthemusictree/*` from the public npmjs registry (app-kit and app-kit-ui 28.0.2): no GitHub token is needed to install, build or run CI. Removed the `GH_PACKAGES_TOKEN_READ` build secret, the CI token guard and the Dependabot registry, and dropped the retired `assets` package from `transpilePackages`.

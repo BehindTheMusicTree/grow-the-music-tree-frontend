@@ -15,6 +15,7 @@ const COLUMN_TITLES: Record<string, string> = {
   wikidata_genre_name: "Genre Wikidata",
   root_item_id: "Racine",
   pop_child_item_id: "Enfant pop",
+  region_id: "Région",
 };
 
 export function curationColumnTitle(column: string): string {
