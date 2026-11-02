@@ -4,12 +4,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 RUN npm install -g "$(node -p 'require("./package.json").packageManager')"
 RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
-    --mount=type=secret,id=GH_PACKAGES_TOKEN_READ \
-    if [ ! -s /run/secrets/GH_PACKAGES_TOKEN_READ ]; then \
-        echo "ERROR: GH_PACKAGES_TOKEN_READ build secret is not provided" >&2; \
-        exit 1; \
-    fi && \
-    NPM_TOKEN="$(cat /run/secrets/GH_PACKAGES_TOKEN_READ)" pnpm install --frozen-lockfile
+    pnpm install --frozen-lockfile
 
 # src/lib/env.ts is imported by next.config.ts, so its schema is validated at `next build` time:
 # every NEXT_PUBLIC_* var baked into the client bundle must be passed as a build arg here, or the

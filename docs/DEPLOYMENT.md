@@ -22,11 +22,11 @@ This is the distinction that matters most when adding a new env var:
 
 Both sets are declared in Zod schemas: build-time vars in [`src/lib/env.ts`](../src/lib/env.ts) (validated when `next.config.ts` loads, so `next build` fails with "Invalid public environment variables"), runtime vars in [`src/lib/env.server.ts`](../src/lib/env.server.ts) (validated at server boot by `src/instrumentation.ts`, so the container fails its healthcheck with "Invalid server environment variables").
 
-## 3. Organization assets (branding and subdomains)
+## 3. Organization constants (branding and subdomains)
 
-The banner **TheMusicTree** lockup and sidebar social icons use **`@behindthemusictree/assets`**. The lockup's organization site URL is embedded when that package is published; `NEXT_PUBLIC_THEMUSICTREE_URL` is not used.
+The banner **TheMusicTree** lockup and sidebar social icons use **`@behindthemusictree/brand`**. The lockup's organization site URL is embedded when that package is published; `NEXT_PUBLIC_THEMUSICTREE_URL` is not used.
 
-[`src/lib/site-urls.ts`](../src/lib/site-urls.ts) also imports the org's subdomain labels (`HTMT_API_SUBDOMAIN`, `AUDIOMETA_FRONT_SUBDOMAIN`) and `ORG_DOMAIN` from this package to compute `NEXT_PUBLIC_BACKEND_BASE_URL` and the AudioMeta link at build/runtime. Keep `@behindthemusictree/assets` reasonably current (`pnpm install` after a version bump) so these constants exist and stay accurate.
+[`src/lib/site-urls.ts`](../src/lib/site-urls.ts) also imports the org's subdomain labels (`HTMT_API_SUBDOMAIN`, `AUDIOMETA_FRONT_SUBDOMAIN`) and `ORG_DOMAIN` from `brand` to compute `NEXT_PUBLIC_BACKEND_BASE_URL` and the AudioMeta link at build/runtime. Keep `@behindthemusictree/brand` reasonably current (`pnpm install` after a version bump) so these constants exist and stay accurate.
 
 ## 4. Build-time env vars reference
 
@@ -46,7 +46,6 @@ To reproduce a Coolify build locally:
 
 ```bash
 DOCKER_BUILDKIT=1 docker build \
-  --secret id=GH_PACKAGES_TOKEN_READ,src=<path-to-token-file> \
   --build-arg NEXT_PUBLIC_CONTACT_EMAIL=you@example.com \
   --build-arg NEXT_PUBLIC_AUDIOMETA_URL=https://audiometa-staging.themusictree.org \
   --build-arg NEXT_PUBLIC_SENTRY_IS_ACTIVE=false \
@@ -55,7 +54,7 @@ DOCKER_BUILDKIT=1 docker build \
 docker run -p 3000:3000 -e PORT=3000 grow-the-music-tree-frontend
 ```
 
-The `GH_PACKAGES_TOKEN_READ` build secret is required — it's a GitHub PAT with `read:packages`, used by `pnpm install` inside the `builder` stage to pull `@behindthemusictree/*` from GitHub Packages. See [GitHub Packages tokens](https://github.com/BehindTheMusicTree/infrastructure/blob/main/docs/guides/github-packages-tokens.md) in the `infrastructure` repo for how it's provisioned; CI passes the org secret of the same name.
+The `@behindthemusictree/*` packages are public on npmjs, so the build needs no registry token or build secret.
 
 ## 6. Summary
 
