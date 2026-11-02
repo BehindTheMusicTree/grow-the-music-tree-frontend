@@ -23,6 +23,7 @@ const REGISTRY = [
   "genre_alias",
   "genre_precedence",
   "regional_secondary_parents",
+  "region_overrides",
 ];
 
 describe("curationGroups", () => {
