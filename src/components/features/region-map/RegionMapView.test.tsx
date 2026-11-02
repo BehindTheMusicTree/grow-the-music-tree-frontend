@@ -75,13 +75,13 @@ describe("RegionMapView", () => {
     expect(screen.queryByRole("button", { name: "Germany" })).toBeNull();
   });
 
-  it("mounts a fresh chart per level so per-level state such as the tooltip does not survive a drill", () => {
+  it("keeps one map mounted across drills so the view can animate between levels", () => {
     render(<RegionMapView />);
     expect(chartMounts).toBe(1);
 
     fireEvent.click(screen.getByText("click Q142"));
 
-    expect(chartMounts).toBe(2);
+    expect(chartMounts).toBe(1);
   });
 
   it("reports a zone that fails to load and keeps the map", () => {
