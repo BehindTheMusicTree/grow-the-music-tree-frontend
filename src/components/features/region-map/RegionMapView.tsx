@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { useRegionMapFile, useRegionMapIndex } from "@hooks/useRegionMap";
 import { WORLD_ID, type Region } from "@schemas/api/region-map";
 
-const RegionMapChart = dynamic(() => import("./RegionMapChart"), {
+const RegionMapCanvas = dynamic(() => import("./RegionMapCanvas"), {
   ssr: false,
   loading: () => <div className="h-full w-full animate-pulse rounded-lg bg-gray-200" />,
 });
@@ -92,20 +92,25 @@ export default function RegionMapView() {
           </p>
         )}
       </div>
-      <div className="min-h-0 flex-1">
+      <div className="relative min-h-0 flex-1">
         {level.isError ? (
           <p className="text-red-600">Could not load this level of the map.</p>
-        ) : level.data === undefined ? (
-          <Skeleton />
         ) : (
-          <RegionMapChart
-            key={levelId}
-            level={level.data}
-            zone={zone.data}
-            regions={regions}
-            selectedId={selectedId}
-            onRegionClick={onRegionClick}
-          />
+          <>
+            <RegionMapCanvas
+              levelId={levelId}
+              level={level.data}
+              zone={zone.data}
+              regions={regions}
+              selectedId={selectedId}
+              onRegionClick={onRegionClick}
+            />
+            {level.data === undefined && (
+              <p role="status" className="absolute left-2 top-2 rounded bg-white/90 px-2 py-1 text-sm text-gray-700">
+                Loading map…
+              </p>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -112,6 +112,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Region map**: `/map` now renders on a MapLibre GL JS globe with smooth pan, zoom and animated drill-down, replacing the flat SVG chart. The accessible region list, tooltip and zone overlay are kept.
 - Install `@behindthemusictree/*` from the public npmjs registry (app-kit and app-kit-ui 28.0.2): no GitHub token is needed to install, build or run CI. Removed the `GH_PACKAGES_TOKEN_READ` build secret, the CI token guard and the Dependabot registry, and dropped the retired `assets` package from `transpilePackages`.
 
 ## [3.21.0] - 2026-11-01
