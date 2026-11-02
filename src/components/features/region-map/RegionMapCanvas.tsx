@@ -2,7 +2,7 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Map as MapLibreMap, type GeoJSONSource, type MapLayerMouseEvent } from "maplibre-gl";
+import { Map as MapLibreMap, setWorkerUrl, type GeoJSONSource, type MapLayerMouseEvent } from "maplibre-gl";
 import type { Region, RegionFeatureCollection } from "@schemas/api/region-map";
 import {
   buildStyle,
@@ -31,11 +31,15 @@ type Props = {
 
 const TOOLTIP_OFFSET = 12;
 
+// MapLibre 6 locates its worker from `import.meta.url`, which a bundler rewrites, so the worker must be emitted explicitly.
+setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href);
+
 export default function RegionMapCanvas({ levelId, level, zone, regions, selectedId, onRegionClick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const regionsRef = useRef(regions);
   const onClickRef = useRef(onRegionClick);
+  const levelIdRef = useRef(levelId);
   const hoveredRef = useRef<string | null>(null);
   const selectedRef = useRef<string | null>(null);
   const fittedRef = useRef(false);
@@ -46,6 +50,7 @@ export default function RegionMapCanvas({ levelId, level, zone, regions, selecte
   useEffect(() => {
     regionsRef.current = regions;
     onClickRef.current = onRegionClick;
+    levelIdRef.current = levelId;
   });
 
   useEffect(() => {
@@ -84,7 +89,8 @@ export default function RegionMapCanvas({ levelId, level, zone, regions, selecte
     map.on("load", () => setReady(true));
     map.on("click", REGION_FILL_LAYER, (event) => {
       const region = regionAt(event);
-      if (region) onClickRef.current(region);
+      // While the next level loads, the previous level's features are still on the map and must not be drillable.
+      if (region && region.parentId === levelIdRef.current) onClickRef.current(region);
     });
     map.on("mousemove", REGION_FILL_LAYER, (event) => {
       const region = regionAt(event);
@@ -155,27 +161,37 @@ export default function RegionMapCanvas({ levelId, level, zone, regions, selecte
   const onFocusRegion = (region: Region) => {
     const map = mapRef.current;
     if (!map) return;
-    map.setFeatureState({ source: LEVEL_SOURCE, id: region.id }, { hover: true });
-    hoveredRef.current = region.id;
+    // Feature state throws until the style has loaded.
+    if (ready) {
+      if (hoveredRef.current !== null && hoveredRef.current !== region.id) {
+        map.setFeatureState({ source: LEVEL_SOURCE, id: hoveredRef.current }, { hover: false });
+      }
+      map.setFeatureState({ source: LEVEL_SOURCE, id: region.id }, { hover: true });
+      hoveredRef.current = region.id;
+    }
     const point = map.project(region.centroid);
     setTooltip({ x: point.x + TOOLTIP_OFFSET, y: point.y + TOOLTIP_OFFSET, text: describe(region) });
   };
   const onBlurRegion = (region: Region) => {
-    mapRef.current?.setFeatureState({ source: LEVEL_SOURCE, id: region.id }, { hover: false });
+    if (ready) mapRef.current?.setFeatureState({ source: LEVEL_SOURCE, id: region.id }, { hover: false });
     hoveredRef.current = null;
     setTooltip(null);
   };
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-lg" role="group" aria-label="Region map">
-      <div ref={containerRef} className="h-full w-full" />
+      {!webglFailed && <div ref={containerRef} className="h-full w-full" />}
       {webglFailed && (
-        <p role="alert" className="absolute inset-x-0 top-0 bg-white p-3 text-sm text-red-600">
+        <p role="alert" className="bg-white p-3 text-sm text-red-600">
           The map cannot be displayed on this device. Use the region list instead.
         </p>
       )}
       <ul
-        className={`${webglFailed ? "relative" : "sr-only focus-within:not-sr-only focus-within:absolute focus-within:left-2 focus-within:top-2"} max-h-64 overflow-y-auto rounded bg-white p-1 text-sm`}
+        className={
+          webglFailed
+            ? "max-h-64 overflow-y-auto bg-white p-1 text-sm"
+            : "sr-only text-sm focus-within:not-sr-only focus-within:absolute focus-within:left-2 focus-within:top-2 focus-within:max-h-64 focus-within:overflow-y-auto focus-within:rounded focus-within:bg-white focus-within:p-1"
+        }
       >
         {listed.map((region) => (
           <li key={region.id}>

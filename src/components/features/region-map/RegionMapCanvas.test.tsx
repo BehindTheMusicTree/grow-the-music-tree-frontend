@@ -6,7 +6,7 @@ import { RegionMapIndexSchema, type RegionFeatureCollection } from "@schemas/api
 type Handler = (event: unknown) => void;
 
 const hoisted = vi.hoisted(() => {
-  const state = { instances: [] as unknown[], failConstruction: false };
+  const state = { instances: [] as unknown[], failConstruction: false, setWorkerUrl: vi.fn() };
   return state;
 });
 
@@ -59,7 +59,7 @@ vi.mock("maplibre-gl", () => {
       this.removed = true;
     }
   }
-  return { Map: FakeMap };
+  return { Map: FakeMap, setWorkerUrl: hoisted.setWorkerUrl };
 });
 
 import RegionMapCanvas from "./RegionMapCanvas";
@@ -174,6 +174,22 @@ describe("RegionMapCanvas", () => {
     await act(() => map.emit("mouseleave:region-fill"));
     expect(map.canvas.style.cursor).toBe("");
     expect(screen.queryByText(/France · 120 songs/)).toBeNull();
+  });
+
+  it("ignores a click on a feature that is not part of the current level", async () => {
+    const { onRegionClick } = mount({ levelId: "Q142", level: undefined });
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+
+    map.emit("click:region-fill", { features: [{ properties: { id: "Q183" } }], point: { x: 1, y: 1 } });
+    expect(onRegionClick).not.toHaveBeenCalled();
+
+    map.emit("click:region-fill", { features: [{ properties: { id: "Q12130" } }], point: { x: 1, y: 1 } });
+    expect(onRegionClick).toHaveBeenCalledWith(expect.objectContaining({ id: "Q12130" }));
+  });
+
+  it("points MapLibre at its worker bundle", () => {
+    expect(hoisted.setWorkerUrl).toHaveBeenCalledWith(expect.stringContaining("maplibre-gl-worker.mjs"));
   });
 
   it("marks the selected region through feature state", async () => {
