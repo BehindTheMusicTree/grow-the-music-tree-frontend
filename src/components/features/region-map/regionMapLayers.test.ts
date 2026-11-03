@@ -7,6 +7,7 @@ import {
   EMPTY_FILL,
   fillColorExpression,
   levelBounds,
+  levelRegions,
   regionColors,
 } from "./regionMapLayers";
 
@@ -69,17 +70,78 @@ describe("describeRegion", () => {
 });
 
 describe("buildStyle", () => {
-  it("is a globe with an atmosphere and layers ordered ocean, regions, zone", () => {
-    const style = buildStyle();
+  const style = (overrides: Partial<Parameters<typeof buildStyle>[0]> = {}) =>
+    buildStyle({
+      tilesetUrl: "https://tiles.example.com/regions/abc.pmtiles",
+      glyphsUrl: "https://tiles.example.com/fonts/{fontstack}/{range}.pbf",
+      levelId: "Q142",
+      zoneId: null,
+      colors: new Map([["Q12130", "#123456"]]),
+      ...overrides,
+    });
+  const layer = (id: string) => style().layers.find((candidate) => candidate.id === id) as { filter?: unknown };
 
-    expect(style.projection).toEqual({ type: "globe" });
-    expect(style.sky).toBeDefined();
-    expect(style.layers.map((layer) => layer.id)).toEqual([
+  it("is a globe with an atmosphere, fed by one pmtiles vector source", () => {
+    const built = style();
+
+    expect(built.projection).toEqual({ type: "globe" });
+    expect(built.sky).toBeDefined();
+    expect(built.glyphs).toBe("https://tiles.example.com/fonts/{fontstack}/{range}.pbf");
+    expect(built.sources).toEqual({
+      tiles: {
+        type: "vector",
+        url: "pmtiles://https://tiles.example.com/regions/abc.pmtiles",
+        maxzoom: 10,
+        promoteId: { regions: "id", zones: "id" },
+      },
+    });
+  });
+
+  it("stacks the layers from the ocean up to the labels", () => {
+    expect(style().layers.map((candidate) => candidate.id)).toEqual([
       "ocean",
+      "land",
+      "lakes",
       "region-fill",
+      "rivers",
       "region-line",
+      "disputed",
       "zone-fill",
       "zone-line",
+      "places",
+      "place-labels",
+      "region-labels",
     ]);
+  });
+
+  it("shows only the children of the level, with their colours", () => {
+    expect(layer("region-fill").filter).toEqual(["==", ["get", "parentId"], "Q142"]);
+    expect(layer("region-line").filter).toEqual(["==", ["get", "parentId"], "Q142"]);
+    expect(layer("region-labels").filter).toEqual(["==", ["get", "parentId"], "Q142"]);
+    expect(style().layers.find((candidate) => candidate.id === "region-fill")).toMatchObject({
+      paint: { "fill-color": ["match", ["get", "id"], "Q12130", "#123456", EMPTY_FILL] },
+    });
+  });
+
+  it("shows no zone until one is chosen", () => {
+    expect(layer("zone-fill").filter).toEqual(["==", ["get", "id"], ""]);
+    expect(style({ zoneId: "Q236626" }).layers.find((candidate) => candidate.id === "zone-line")).toMatchObject({
+      filter: ["==", ["get", "id"], "Q236626"],
+    });
+  });
+
+  it("reveals cities and rivers from their Natural Earth min_zoom", () => {
+    const byMinZoom = ["<=", ["get", "min_zoom"], ["zoom"]];
+
+    expect(layer("places").filter).toEqual(byMinZoom);
+    expect(layer("place-labels").filter).toEqual(byMinZoom);
+    expect(layer("rivers").filter).toEqual(byMinZoom);
+  });
+});
+
+describe("levelRegions", () => {
+  it("lists the children of a level", () => {
+    expect(levelRegions(regions, WORLD_ID).map((region) => region.id)).toContain("Q142");
+    expect(levelRegions(regions, "Q142").map((region) => region.id)).toEqual(["Q12130"]);
   });
 });

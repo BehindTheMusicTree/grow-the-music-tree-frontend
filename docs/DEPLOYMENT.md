@@ -35,6 +35,7 @@ These are the `NEXT_PUBLIC_*` `ARG`s declared in the [`Dockerfile`](../Dockerfil
 | Variable                       | Notes |
 | ------------------------------ | ----- |
 | `NEXT_PUBLIC_CONTACT_EMAIL`    | `CONTACT_EMAIL` |
+| `NEXT_PUBLIC_TILES_BASE_URL`   | `TILES_BASE_URL` (public origin of the R2 tiles bucket, e.g. `https://tiles.<domain>`; required) |
 | `NEXT_PUBLIC_AUDIOMETA_URL`    | `https://<AUDIOMETA_FRONT_SUBDOMAIN>[-staging].<DOMAIN_NAME>` (`-staging` on `develop`) |
 | `NEXT_PUBLIC_SENTRY_IS_ACTIVE` | `true` |
 | `NEXT_PUBLIC_UMAMI_WEBSITE_ID` | `UMAMI_WEBSITE_ID` on `main`, empty elsewhere (analytics off) |
@@ -47,6 +48,7 @@ To reproduce a Coolify build locally:
 ```bash
 DOCKER_BUILDKIT=1 docker build \
   --build-arg NEXT_PUBLIC_CONTACT_EMAIL=you@example.com \
+  --build-arg NEXT_PUBLIC_TILES_BASE_URL=https://tiles.themusictree.org \
   --build-arg NEXT_PUBLIC_AUDIOMETA_URL=https://audiometa-staging.themusictree.org \
   --build-arg NEXT_PUBLIC_SENTRY_IS_ACTIVE=false \
   -t grow-the-music-tree-frontend .

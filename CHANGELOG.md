@@ -113,6 +113,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Changed
 
 - **Region map**: `/map` now renders on a MapLibre GL JS globe with smooth pan, zoom and animated drill-down, replacing the flat SVG chart. The accessible region list, tooltip and zone overlay are kept.
+- **Region map**: `/map` now draws regions from a PMTiles vector tileset (Natural Earth, served from `NEXT_PUBLIC_TILES_BASE_URL`) instead of per-level GeoJSON. Drill-down switches a layer filter and fits the bounds with no network fetch. `NEXT_PUBLIC_TILES_BASE_URL` is a new required build variable (CI reads the `TILES_BASE_URL` variable); until a tileset is published the map shows "not computed yet".
 - Install `@behindthemusictree/*` from the public npmjs registry (app-kit and app-kit-ui 28.0.2): no GitHub token is needed to install, build or run CI. Removed the `GH_PACKAGES_TOKEN_READ` build secret, the CI token guard and the Dependabot registry, and dropped the retired `assets` package from `transpilePackages`.
 
 ## [3.21.0] - 2026-11-01

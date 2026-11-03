@@ -1,7 +1,7 @@
 # Builds the image on GitHub-hosted runners (this repo is public, so minutes are free) and pushes it
 # to GHCR, keeping Docker builds off the CPU-bound VPS. NEXT_PUBLIC_* vars are inlined at build time,
 # so develop and main each build their own image (`staging` / `prod` tag), which Coolify deploys.
-# Requires org-level vars CONTACT_EMAIL, AUDIOMETA_FRONT_SUBDOMAIN, COOLIFY_API_SUBDOMAIN, DOMAIN_NAME,
+# Requires org-level vars CONTACT_EMAIL, TILES_BASE_URL, AUDIOMETA_FRONT_SUBDOMAIN, COOLIFY_API_SUBDOMAIN, DOMAIN_NAME,
 # DEPLOY_SSH_HOST, APP_ORIGIN_IP and org-level secrets COOLIFY_API_TOKEN.
 name: Build and deploy
 
@@ -63,6 +63,7 @@ jobs:
           build-args: |
             NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.CONTACT_EMAIL }}
             NEXT_PUBLIC_AUDIOMETA_URL=https://${{ vars.AUDIOMETA_FRONT_SUBDOMAIN }}${{ env.HOST_SUFFIX }}.${{ vars.DOMAIN_NAME }}
+            NEXT_PUBLIC_TILES_BASE_URL=${{ vars.TILES_BASE_URL }}
             NEXT_PUBLIC_SENTRY_IS_ACTIVE=true
             NEXT_PUBLIC_UMAMI_WEBSITE_ID=${{ github.ref == 'refs/heads/main' && vars.UMAMI_WEBSITE_ID || '' }}
             NEXT_PUBLIC_UMAMI_ORIGIN=${{ github.ref == 'refs/heads/main' && vars.UMAMI_ORIGIN || '' }}

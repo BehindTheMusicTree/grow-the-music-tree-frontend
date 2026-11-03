@@ -16,6 +16,20 @@ describe("RegionMapIndexSchema", () => {
     expect(RegionMapIndexSchema.safeParse(fixture).success).toBe(true);
   });
 
+  it("accepts an index without a tileset and a bbox that crosses the antimeridian", () => {
+    const withoutTileset = { ...fixture, tileset: undefined };
+    const fiji = { ...fixture.regions[0], bbox: [177, -20, 182, -16], mainBbox: [177, -20, 182, -16] };
+
+    expect(RegionMapIndexSchema.safeParse(withoutTileset).success).toBe(true);
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [fiji] }).success).toBe(true);
+  });
+
+  it("rejects a tileset whose path is not a content-addressed pmtiles file", () => {
+    const tileset = { ...fixture.tileset, path: "regions/latest.pmtiles" };
+
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, tileset }).success).toBe(false);
+  });
+
   it("rejects unknown keys, a malformed file hash and an unknown kind", () => {
     expect(RegionMapIndexSchema.safeParse({ ...fixture, extra: 1 }).success).toBe(false);
     expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...fixture.regions[0], extra: 1 }] }).success).toBe(
