@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { useRegionMapFile, useRegionMapIndex } from "@hooks/useRegionMap";
+import { useRegionMapIndex } from "@hooks/useRegionMap";
 import { WORLD_ID, type Region } from "@schemas/api/region-map";
 
 const RegionMapCanvas = dynamic(() => import("./RegionMapCanvas"), {
@@ -20,12 +20,11 @@ export default function RegionMapView() {
   const regions = useMemo(() => new Map((index?.regions ?? []).map((region) => [region.id, region])), [index]);
 
   const levelId = trail[trail.length - 1];
-  const level = useRegionMapFile(index?.files[`geometry/${levelId}.geojson`]);
-  const zone = useRegionMapFile(zoneId === null ? undefined : index?.files[`zones/${zoneId}.geojson`]);
 
   if (isPending) return <Skeleton />;
   if (isError) return <p className="text-red-600">Could not load the region map.</p>;
-  if (index === null) return <p className="text-gray-700">The region map has not been computed yet.</p>;
+  if (index === null || index.tileset === undefined)
+    return <p className="text-gray-700">The region map has not been computed yet.</p>;
 
   const goTo = (depth: number) => {
     setTrail(trail.slice(0, depth + 1));
@@ -80,11 +79,6 @@ export default function RegionMapView() {
             </select>
           </label>
         )}
-        {zone.isError && (
-          <p className="text-sm text-red-600" role="alert">
-            Could not load this zone.
-          </p>
-        )}
         {selected && (
           <p className="text-sm" aria-live="polite">
             <span className="font-semibold">{selected.name}</span>: {selected.songCount} songs, {selected.genreCount}{" "}
@@ -93,25 +87,14 @@ export default function RegionMapView() {
         )}
       </div>
       <div className="relative min-h-0 flex-1">
-        {level.isError ? (
-          <p className="text-red-600">Could not load this level of the map.</p>
-        ) : (
-          <>
-            <RegionMapCanvas
-              levelId={levelId}
-              level={level.data}
-              zone={zone.data}
-              regions={regions}
-              selectedId={selectedId}
-              onRegionClick={onRegionClick}
-            />
-            {level.data === undefined && (
-              <p role="status" className="absolute left-2 top-2 rounded bg-white/90 px-2 py-1 text-sm text-gray-700">
-                Loading map…
-              </p>
-            )}
-          </>
-        )}
+        <RegionMapCanvas
+          levelId={levelId}
+          tilesetPath={index.tileset.path}
+          zoneId={zoneId}
+          regions={regions}
+          selectedId={selectedId}
+          onRegionClick={onRegionClick}
+        />
       </div>
     </div>
   );

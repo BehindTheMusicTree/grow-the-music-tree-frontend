@@ -35,6 +35,15 @@ export const RegionMapIndexSchema = z
   .object({
     regions: z.array(RegionSchema).min(1),
     files: z.record(NonEmpty, z.string().regex(/^[0-9a-f]{64}$/)),
+    /** Optional until a pipelines run has published one; then required. */
+    tileset: z
+      .object({
+        path: z.string().regex(/^regions\/[0-9a-f]{64}\.pmtiles$/),
+        sha256: z.string().regex(/^[0-9a-f]{64}$/),
+        bytes: z.number().int().min(1),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 

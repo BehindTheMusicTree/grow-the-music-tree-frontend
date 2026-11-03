@@ -1,14 +1,20 @@
 import { interpolateYlGnBu, scaleSequentialSqrt } from "d3";
-import type { ExpressionSpecification, LngLatBoundsLike, StyleSpecification } from "maplibre-gl";
+import type { ExpressionSpecification, FilterSpecification, LngLatBoundsLike, StyleSpecification } from "maplibre-gl";
 import { WORLD_ID, type Region } from "@schemas/api/region-map";
 
 export const EMPTY_FILL = "#e5e7eb";
 export const MAX_ZOOM = 11;
 
-export const LEVEL_SOURCE = "level";
-export const ZONE_SOURCE = "zone";
+export const TILES_SOURCE = "tiles";
 export const REGION_FILL_LAYER = "region-fill";
 export const REGION_LINE_LAYER = "region-line";
+export const REGION_LABEL_LAYER = "region-labels";
+export const ZONE_FILL_LAYER = "zone-fill";
+export const ZONE_LINE_LAYER = "zone-line";
+export const REGIONS_SOURCE_LAYER = "regions";
+/** The tileset's last zoom: MapLibre overzooms it up to MAX_ZOOM. */
+export const TILESET_MAX_ZOOM = 10;
+const FONT = ["Noto Sans Regular"];
 
 const OCEAN = "#dbeafe";
 // Latitudes beyond these hold no region worth framing (Antarctica is not part of the map).
@@ -16,8 +22,6 @@ const WORLD_BOUNDS: LngLatBoundsLike = [
   [-180, -58],
   [180, 84],
 ];
-
-export const EMPTY_COLLECTION: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
 
 export const describe = (region: Region) => `${region.name} · ${region.songCount} songs · ${region.genreCount} genres`;
 
@@ -48,9 +52,30 @@ export function levelBounds(levelId: string, regions: ReadonlyMap<string, Region
   ];
 }
 
+/** The regions drawn at a level: the children of `levelId`. */
+export const levelRegions = (regions: ReadonlyMap<string, Region>, levelId: string): Region[] =>
+  Array.from(regions.values()).filter((region) => region.parentId === levelId);
+
 const featureState = (key: "selected" | "hover"): ExpressionSpecification => ["boolean", ["feature-state", key], false];
 
-export function buildStyle(): StyleSpecification {
+export const levelFilter = (levelId: string): FilterSpecification => ["==", ["get", "parentId"], levelId];
+
+/** A zone id is never empty, so this matches no zone while none is chosen. */
+export const zoneFilter = (zoneId: string | null): FilterSpecification => ["==", ["get", "id"], zoneId ?? ""];
+
+/** Natural Earth's `min_zoom` says from which zoom a feature is worth drawing. */
+const byMinZoom: FilterSpecification = ["<=", ["get", "min_zoom"], ["zoom"]];
+
+type StyleOptions = {
+  tilesetUrl: string;
+  glyphsUrl: string;
+  levelId: string;
+  zoneId: string | null;
+  colors: ReadonlyMap<string, string>;
+};
+
+export function buildStyle({ tilesetUrl, glyphsUrl, levelId, zoneId, colors }: StyleOptions): StyleSpecification {
+  const halo = { "text-halo-color": "#ffffff", "text-halo-width": 1.2 };
   return {
     version: 8,
     projection: { type: "globe" },
@@ -60,28 +85,105 @@ export function buildStyle(): StyleSpecification {
       "sky-horizon-blend": 0.6,
       "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 1, 7, 0],
     },
+    glyphs: glyphsUrl,
     sources: {
-      [LEVEL_SOURCE]: { type: "geojson", data: EMPTY_COLLECTION, promoteId: "id" },
-      [ZONE_SOURCE]: { type: "geojson", data: EMPTY_COLLECTION },
+      [TILES_SOURCE]: {
+        type: "vector",
+        url: `pmtiles://${tilesetUrl}`,
+        maxzoom: TILESET_MAX_ZOOM,
+        promoteId: { [REGIONS_SOURCE_LAYER]: "id", zones: "id" },
+      },
     },
     layers: [
       { id: "ocean", type: "background", paint: { "background-color": OCEAN } },
-      { id: REGION_FILL_LAYER, type: "fill", source: LEVEL_SOURCE, paint: { "fill-color": EMPTY_FILL } },
+      { id: "land", type: "fill", source: TILES_SOURCE, "source-layer": "land", paint: { "fill-color": EMPTY_FILL } },
+      { id: "lakes", type: "fill", source: TILES_SOURCE, "source-layer": "lakes", paint: { "fill-color": OCEAN } },
+      {
+        id: REGION_FILL_LAYER,
+        type: "fill",
+        source: TILES_SOURCE,
+        "source-layer": REGIONS_SOURCE_LAYER,
+        filter: levelFilter(levelId),
+        paint: { "fill-color": fillColorExpression(colors) },
+      },
+      {
+        id: "rivers",
+        type: "line",
+        source: TILES_SOURCE,
+        "source-layer": "rivers",
+        filter: byMinZoom,
+        paint: { "line-color": "#93c5fd", "line-width": 0.8 },
+      },
       {
         id: REGION_LINE_LAYER,
         type: "line",
-        source: LEVEL_SOURCE,
+        source: TILES_SOURCE,
+        "source-layer": REGIONS_SOURCE_LAYER,
+        filter: levelFilter(levelId),
         paint: {
           "line-color": ["case", featureState("selected"), "#111827", featureState("hover"), "#374151", "#ffffff"],
           "line-width": ["case", featureState("selected"), 2, featureState("hover"), 1.5, 0.5],
         },
       },
-      { id: "zone-fill", type: "fill", source: ZONE_SOURCE, paint: { "fill-color": "#f97316", "fill-opacity": 0.15 } },
       {
-        id: "zone-line",
+        id: "disputed",
         type: "line",
-        source: ZONE_SOURCE,
+        source: TILES_SOURCE,
+        "source-layer": "disputed",
+        paint: { "line-color": "#6b7280", "line-width": 1, "line-dasharray": [2, 2] },
+      },
+      {
+        id: ZONE_FILL_LAYER,
+        type: "fill",
+        source: TILES_SOURCE,
+        "source-layer": "zones",
+        filter: zoneFilter(zoneId),
+        paint: { "fill-color": "#f97316", "fill-opacity": 0.15 },
+      },
+      {
+        id: ZONE_LINE_LAYER,
+        type: "line",
+        source: TILES_SOURCE,
+        "source-layer": "zones",
+        filter: zoneFilter(zoneId),
         paint: { "line-color": "#c2410c", "line-width": 1.5, "line-dasharray": [4, 3] },
+      },
+      {
+        id: "places",
+        type: "circle",
+        source: TILES_SOURCE,
+        "source-layer": "places",
+        filter: byMinZoom,
+        paint: {
+          "circle-radius": 2.5,
+          "circle-color": "#374151",
+          "circle-stroke-color": "#ffffff",
+          "circle-stroke-width": 1,
+        },
+      },
+      {
+        id: "place-labels",
+        type: "symbol",
+        source: TILES_SOURCE,
+        "source-layer": "places",
+        filter: byMinZoom,
+        layout: {
+          "text-field": ["get", "name"],
+          "text-font": FONT,
+          "text-size": 11,
+          "text-anchor": "top",
+          "text-offset": [0, 0.5],
+        },
+        paint: { "text-color": "#374151", ...halo },
+      },
+      {
+        id: REGION_LABEL_LAYER,
+        type: "symbol",
+        source: TILES_SOURCE,
+        "source-layer": "region_labels",
+        filter: levelFilter(levelId),
+        layout: { "text-field": ["get", "name"], "text-font": FONT, "text-size": 13 },
+        paint: { "text-color": "#111827", ...halo },
       },
     ],
   };

@@ -5,6 +5,7 @@ const sampleRate = (fallback: number) => z.coerce.number().min(0).max(1).default
 const PublicEnvSchema = z.object({
   NEXT_PUBLIC_CONTACT_EMAIL: z.string().email(),
   NEXT_PUBLIC_AUDIOMETA_URL: z.string().url().optional(),
+  NEXT_PUBLIC_TILES_BASE_URL: z.string().url().transform((value) => value.replace(/\/+$/, "")),
   NEXT_PUBLIC_APP_VERSION: z.string().min(1).optional(),
   NEXT_PUBLIC_SENTRY_IS_ACTIVE: z.enum(["true", "false"]).optional(),
   NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: sampleRate(0.1),
@@ -26,6 +27,7 @@ const PublicEnvSchema = z.object({
 const parsed = PublicEnvSchema.safeParse({
   NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
   NEXT_PUBLIC_AUDIOMETA_URL: process.env.NEXT_PUBLIC_AUDIOMETA_URL || undefined,
+  NEXT_PUBLIC_TILES_BASE_URL: process.env.NEXT_PUBLIC_TILES_BASE_URL,
   NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION || undefined,
   NEXT_PUBLIC_SENTRY_IS_ACTIVE: process.env.NEXT_PUBLIC_SENTRY_IS_ACTIVE || undefined,
   NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE || undefined,

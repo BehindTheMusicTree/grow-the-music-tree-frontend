@@ -2,44 +2,56 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Map as MapLibreMap, setWorkerUrl, type GeoJSONSource, type MapLayerMouseEvent } from "maplibre-gl";
-import type { Region, RegionFeatureCollection } from "@schemas/api/region-map";
+import { addProtocol, Map as MapLibreMap, setWorkerUrl, type MapLayerMouseEvent } from "maplibre-gl";
+import { Protocol } from "pmtiles";
+import { publicEnv } from "@lib/env";
+import type { Region } from "@schemas/api/region-map";
 import {
   buildStyle,
   describe,
-  EMPTY_COLLECTION,
   fillColorExpression,
   levelBounds,
-  LEVEL_SOURCE,
+  levelFilter,
+  levelRegions,
   MAX_ZOOM,
   REGION_FILL_LAYER,
+  REGION_LABEL_LAYER,
+  REGION_LINE_LAYER,
+  REGIONS_SOURCE_LAYER,
   regionColors,
-  ZONE_SOURCE,
+  TILES_SOURCE,
+  ZONE_FILL_LAYER,
+  ZONE_LINE_LAYER,
+  zoneFilter,
 } from "./regionMapLayers";
 
 type Tooltip = { x: number; y: number; text: string };
 
 type Props = {
   levelId: string;
-  /** Undefined while the level is loading: the previous level stays on the map until the new one arrives. */
-  level: RegionFeatureCollection | undefined;
-  zone: RegionFeatureCollection | undefined;
+  /** Path of the vector tileset inside the tiles bucket, from the index; immutable per content hash. */
+  tilesetPath: string;
+  zoneId: string | null;
   regions: ReadonlyMap<string, Region>;
   selectedId: string | null;
   onRegionClick: (region: Region) => void;
 };
 
 const TOOLTIP_OFFSET = 12;
+const TILES_BASE_URL = publicEnv.NEXT_PUBLIC_TILES_BASE_URL;
+const regionState = (id: string) => ({ source: TILES_SOURCE, sourceLayer: REGIONS_SOURCE_LAYER, id });
+
+addProtocol("pmtiles", new Protocol().tile);
 
 // MapLibre 6 locates its worker from `import.meta.url`, which a bundler rewrites, so the worker must be emitted explicitly.
 setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href);
 
-export default function RegionMapCanvas({ levelId, level, zone, regions, selectedId, onRegionClick }: Props) {
+export default function RegionMapCanvas({ levelId, tilesetPath, zoneId, regions, selectedId, onRegionClick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const regionsRef = useRef(regions);
   const onClickRef = useRef(onRegionClick);
-  const levelIdRef = useRef(levelId);
+  const initialRef = useRef({ levelId, zoneId });
   const hoveredRef = useRef<string | null>(null);
   const selectedRef = useRef<string | null>(null);
   const fittedRef = useRef(false);
@@ -50,7 +62,7 @@ export default function RegionMapCanvas({ levelId, level, zone, regions, selecte
   useEffect(() => {
     regionsRef.current = regions;
     onClickRef.current = onRegionClick;
-    levelIdRef.current = levelId;
+    initialRef.current = { levelId, zoneId };
   });
 
   useEffect(() => {
@@ -60,7 +72,15 @@ export default function RegionMapCanvas({ levelId, level, zone, regions, selecte
     try {
       map = new MapLibreMap({
         container,
-        style: buildStyle(),
+        style: buildStyle({
+          tilesetUrl: `${TILES_BASE_URL}/${tilesetPath}`,
+          glyphsUrl: `${TILES_BASE_URL}/fonts/{fontstack}/{range}.pbf`,
+          ...initialRef.current,
+          colors: regionColors(
+            levelRegions(regionsRef.current, initialRef.current.levelId).map((region) => region.id),
+            regionsRef.current,
+          ),
+        }),
         maxZoom: MAX_ZOOM,
         dragRotate: false,
         pitchWithRotate: false,
@@ -76,9 +96,9 @@ export default function RegionMapCanvas({ levelId, level, zone, regions, selecte
     const setHover = (id: string | null) => {
       if (hoveredRef.current === id) return;
       if (hoveredRef.current !== null) {
-        map.setFeatureState({ source: LEVEL_SOURCE, id: hoveredRef.current }, { hover: false });
+        map.setFeatureState(regionState(hoveredRef.current), { hover: false });
       }
-      if (id !== null) map.setFeatureState({ source: LEVEL_SOURCE, id }, { hover: true });
+      if (id !== null) map.setFeatureState(regionState(id), { hover: true });
       hoveredRef.current = id;
     };
     const regionAt = (event: MapLayerMouseEvent) => {
@@ -89,8 +109,7 @@ export default function RegionMapCanvas({ levelId, level, zone, regions, selecte
     map.on("load", () => setReady(true));
     map.on("click", REGION_FILL_LAYER, (event) => {
       const region = regionAt(event);
-      // While the next level loads, the previous level's features are still on the map and must not be drillable.
-      if (region && region.parentId === levelIdRef.current) onClickRef.current(region);
+      if (region) onClickRef.current(region);
     });
     map.on("mousemove", REGION_FILL_LAYER, (event) => {
       const region = regionAt(event);
@@ -113,18 +132,23 @@ export default function RegionMapCanvas({ levelId, level, zone, regions, selecte
       fittedRef.current = false;
       setReady(false);
     };
-  }, []);
+  }, [tilesetPath]);
 
-  const levelIds = useMemo(() => level?.features.map((feature) => feature.id) ?? [], [level]);
+  const listed = useMemo(() => levelRegions(regions, levelId), [regions, levelId]);
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!ready || !map || !level) return;
-    const source = map.getSource<GeoJSONSource>(LEVEL_SOURCE);
-    if (!source) return;
-    source.setData(level as unknown as GeoJSON.FeatureCollection);
-    map.setPaintProperty(REGION_FILL_LAYER, "fill-color", fillColorExpression(regionColors(levelIds, regions)));
-    map.removeFeatureState({ source: LEVEL_SOURCE });
+    if (!ready || !map) return;
+    const filter = levelFilter(levelId);
+    map.setFilter(REGION_FILL_LAYER, filter);
+    map.setFilter(REGION_LINE_LAYER, filter);
+    map.setFilter(REGION_LABEL_LAYER, filter);
+    const colors = regionColors(
+      listed.map((region) => region.id),
+      regions,
+    );
+    map.setPaintProperty(REGION_FILL_LAYER, "fill-color", fillColorExpression(colors));
+    map.removeFeatureState({ source: TILES_SOURCE, sourceLayer: REGIONS_SOURCE_LAYER });
     hoveredRef.current = null;
     selectedRef.current = null;
     map.fitBounds(levelBounds(levelId, regions), {
@@ -133,30 +157,24 @@ export default function RegionMapCanvas({ levelId, level, zone, regions, selecte
       animate: fittedRef.current,
     });
     fittedRef.current = true;
-  }, [ready, level, levelId, levelIds, regions]);
+  }, [ready, levelId, listed, regions]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
-    map
-      .getSource<GeoJSONSource>(ZONE_SOURCE)
-      ?.setData((zone as unknown as GeoJSON.FeatureCollection | undefined) ?? EMPTY_COLLECTION);
-  }, [ready, zone]);
+    map.setFilter(ZONE_FILL_LAYER, zoneFilter(zoneId));
+    map.setFilter(ZONE_LINE_LAYER, zoneFilter(zoneId));
+  }, [ready, zoneId]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
     if (selectedRef.current !== null) {
-      map.setFeatureState({ source: LEVEL_SOURCE, id: selectedRef.current }, { selected: false });
+      map.setFeatureState(regionState(selectedRef.current), { selected: false });
     }
-    if (selectedId !== null) map.setFeatureState({ source: LEVEL_SOURCE, id: selectedId }, { selected: true });
+    if (selectedId !== null) map.setFeatureState(regionState(selectedId), { selected: true });
     selectedRef.current = selectedId;
-  }, [ready, level, selectedId]);
-
-  const listed = useMemo(
-    () => Array.from(regions.values()).filter((region) => region.parentId === levelId),
-    [regions, levelId],
-  );
+  }, [ready, levelId, selectedId]);
 
   const onFocusRegion = (region: Region) => {
     const map = mapRef.current;
@@ -164,16 +182,16 @@ export default function RegionMapCanvas({ levelId, level, zone, regions, selecte
     // Feature state throws until the style has loaded.
     if (ready) {
       if (hoveredRef.current !== null && hoveredRef.current !== region.id) {
-        map.setFeatureState({ source: LEVEL_SOURCE, id: hoveredRef.current }, { hover: false });
+        map.setFeatureState(regionState(hoveredRef.current), { hover: false });
       }
-      map.setFeatureState({ source: LEVEL_SOURCE, id: region.id }, { hover: true });
+      map.setFeatureState(regionState(region.id), { hover: true });
       hoveredRef.current = region.id;
     }
     const point = map.project(region.centroid);
     setTooltip({ x: point.x + TOOLTIP_OFFSET, y: point.y + TOOLTIP_OFFSET, text: describe(region) });
   };
   const onBlurRegion = (region: Region) => {
-    if (ready) mapRef.current?.setFeatureState({ source: LEVEL_SOURCE, id: region.id }, { hover: false });
+    if (ready) mapRef.current?.setFeatureState(regionState(region.id), { hover: false });
     hoveredRef.current = null;
     setTooltip(null);
   };

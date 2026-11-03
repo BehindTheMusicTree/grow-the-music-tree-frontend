@@ -168,6 +168,7 @@ Production and staging hosting run on **Coolify** as a multi-stage Docker build 
 ```bash
 DOCKER_BUILDKIT=1 docker build \
   --build-arg NEXT_PUBLIC_CONTACT_EMAIL=you@example.com \
+  --build-arg NEXT_PUBLIC_TILES_BASE_URL=https://tiles.themusictree.org \
   --build-arg NEXT_PUBLIC_SENTRY_IS_ACTIVE=false \
   -t grow-the-music-tree-frontend .
 ```

@@ -83,5 +83,10 @@
     "geometry/world.geojson": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "geometry/Q142.geojson": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
     "zones/Q236626.geojson": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "tileset": {
+    "path": "regions/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd.pmtiles",
+    "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "bytes": 41943040
   }
 }
