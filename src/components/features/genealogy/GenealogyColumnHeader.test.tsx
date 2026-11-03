@@ -12,17 +12,24 @@ afterEach(cleanup);
 function renderHeader(k: number, width = 0) {
   return render(
     <svg>
-      <GenealogyColumnHeader columns={data.columns} regions={data.regions} transform={zoomIdentity.scale(k)} width={width} />
+      <GenealogyColumnHeader columns={data.columns} regions={data.regions} transform={zoomIdentity.scale(k)} width={width} top={0} />
     </svg>,
   );
 }
 
 describe("GenealogyColumnHeader", () => {
   it("shows the regions in data order", () => {
-    renderHeader(1);
+    renderHeader(2);
 
     const labels = data.regions.map(({ label }) => screen.getByText(label).textContent);
     expect(labels).toEqual(["Americas", "Europe", "Asia"]);
+  });
+
+  it("hides a region label its cell is too narrow to hold", () => {
+    renderHeader(1);
+
+    expect(screen.queryByText("Americas")).toBeNull();
+    expect(screen.getByText("Europe")).toBeTruthy();
   });
 
   it("hides column labels while columns are narrow", () => {
