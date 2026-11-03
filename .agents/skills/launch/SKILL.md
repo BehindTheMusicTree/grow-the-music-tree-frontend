@@ -22,8 +22,8 @@ Trust its `key=value` output and don't re-verify with `curl`/`lsof`. If the outp
 - `status=ok` → give the user `web_url` (always `localhost`, never `127.0.0.1`, or Google sign-in fails).
 - Surface `api_warning` (the API checkout isn't on an up-to-date `main`/`develop`, so migrations or endpoints may
   differ) and `signin=disabled` (see `docs/frontend-auth.md` → Setup).
-- `ignored_origin_override=<origin>` → a `.env*` file points `GROW_API_ORIGIN` elsewhere; dev-up pinned the local API
-  anyway. Mention it once.
+- `ignored_origin_override=<origin>` → a `.env*` file points `GROW_API_ORIGIN` elsewhere; with `--local`, dev-up pinned
+  the local API anyway. Mention it once.
 - `reason=port-in-use` → rerun without `--port`, or with another port.
 - Other `error` → relay the reason and `log_tail`.
 - No `status=` line (in the output or `.dev-up.status`) → the run was cut off or is still going (e.g. waiting for
