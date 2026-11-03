@@ -1,10 +1,15 @@
 import type { Genealogy } from "@schemas/api/genealogy";
 
 export const COLUMN_WIDTH = 44;
-export const AXIS_WIDTH = 64;
+export const AXIS_WIDTH = 44;
 export const HEADER_ROW_HEIGHT = 22;
 export const HEADER_HEIGHT = 2 * HEADER_ROW_HEIGHT;
 export const TOP_MARGIN = HEADER_HEIGHT + 12;
+export const MIN_COLUMN_LABEL_WIDTH = 64;
+
+export const showsColumnLabels = (k: number) => COLUMN_WIDTH * k >= MIN_COLUMN_LABEL_WIDTH;
+/** The column-label row only takes space when zoomed in enough to show its labels. */
+export const headerHeight = (k: number) => (showsColumnLabels(k) ? HEADER_HEIGHT : HEADER_ROW_HEIGHT);
 
 export const columnX = (position: number) => AXIS_WIDTH + position * COLUMN_WIDTH + COLUMN_WIDTH / 2;
 
