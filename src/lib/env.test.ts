@@ -21,6 +21,16 @@ describe("env", () => {
     await expect(import("@lib/env")).rejects.toThrow(/NEXT_PUBLIC_CONTACT_EMAIL/);
   });
 
+  it("requires NEXT_PUBLIC_TILES_BASE_URL and drops its trailing slash", async () => {
+    vi.stubEnv("NEXT_PUBLIC_TILES_BASE_URL", "https://tiles.example.org/");
+    const { publicEnv } = await import("@lib/env");
+    expect(publicEnv.NEXT_PUBLIC_TILES_BASE_URL).toBe("https://tiles.example.org");
+
+    vi.resetModules();
+    vi.stubEnv("NEXT_PUBLIC_TILES_BASE_URL", "");
+    await expect(import("@lib/env")).rejects.toThrow(/NEXT_PUBLIC_TILES_BASE_URL/);
+  });
+
   it("parses server env when all required vars are set", async () => {
     vi.stubEnv("AUTH_SECRET", "secret");
     vi.stubEnv("AUTH_GOOGLE_ID", "id");

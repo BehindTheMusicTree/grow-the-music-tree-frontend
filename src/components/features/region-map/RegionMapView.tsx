@@ -2,10 +2,10 @@
 
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { useRegionMapFile, useRegionMapIndex } from "@hooks/useRegionMap";
+import { useRegionMapIndex } from "@hooks/useRegionMap";
 import { WORLD_ID, type Region } from "@schemas/api/region-map";
 
-const RegionMapChart = dynamic(() => import("./RegionMapChart"), {
+const RegionMapCanvas = dynamic(() => import("./RegionMapCanvas"), {
   ssr: false,
   loading: () => <div className="h-full w-full animate-pulse rounded-lg bg-gray-200" />,
 });
@@ -20,12 +20,11 @@ export default function RegionMapView() {
   const regions = useMemo(() => new Map((index?.regions ?? []).map((region) => [region.id, region])), [index]);
 
   const levelId = trail[trail.length - 1];
-  const level = useRegionMapFile(index?.files[`geometry/${levelId}.geojson`]);
-  const zone = useRegionMapFile(zoneId === null ? undefined : index?.files[`zones/${zoneId}.geojson`]);
 
   if (isPending) return <Skeleton />;
   if (isError) return <p className="text-red-600">Could not load the region map.</p>;
-  if (index === null) return <p className="text-gray-700">The region map has not been computed yet.</p>;
+  if (index === null)
+    return <p className="text-gray-700">The region map has not been computed yet.</p>;
 
   const goTo = (depth: number) => {
     setTrail(trail.slice(0, depth + 1));
@@ -80,11 +79,6 @@ export default function RegionMapView() {
             </select>
           </label>
         )}
-        {zone.isError && (
-          <p className="text-sm text-red-600" role="alert">
-            Could not load this zone.
-          </p>
-        )}
         {selected && (
           <p className="text-sm" aria-live="polite">
             <span className="font-semibold">{selected.name}</span>: {selected.songCount} songs, {selected.genreCount}{" "}
@@ -92,21 +86,15 @@ export default function RegionMapView() {
           </p>
         )}
       </div>
-      <div className="min-h-0 flex-1">
-        {level.isError ? (
-          <p className="text-red-600">Could not load this level of the map.</p>
-        ) : level.data === undefined ? (
-          <Skeleton />
-        ) : (
-          <RegionMapChart
-            key={levelId}
-            level={level.data}
-            zone={zone.data}
-            regions={regions}
-            selectedId={selectedId}
-            onRegionClick={onRegionClick}
-          />
-        )}
+      <div className="relative min-h-0 flex-1">
+        <RegionMapCanvas
+          levelId={levelId}
+          tileset={index.tileset}
+          zoneId={zoneId}
+          regions={regions}
+          selectedId={selectedId}
+          onRegionClick={onRegionClick}
+        />
       </div>
     </div>
   );

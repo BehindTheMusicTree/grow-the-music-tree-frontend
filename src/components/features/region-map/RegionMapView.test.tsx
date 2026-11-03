@@ -6,17 +6,11 @@ import { RegionMapIndexSchema, type Region } from "@schemas/api/region-map";
 import RegionMapView from "./RegionMapView";
 
 const index = RegionMapIndexSchema.parse(fixture);
-const requestedHashes: (string | undefined)[] = [];
-const failingHashes = new Set<string>();
 let chartMounts = 0;
+let lastProps: { levelId: string; tileset: string; zoneId: string | null };
 
 vi.mock("@hooks/useRegionMap", () => ({
   useRegionMapIndex: () => ({ data: index, isPending: false, isError: false }),
-  useRegionMapFile: (sha256: string | undefined) => {
-    requestedHashes.push(sha256);
-    if (sha256 !== undefined && failingHashes.has(sha256)) return { data: undefined, isError: true };
-    return { data: sha256 && { type: "FeatureCollection", features: [] }, isError: false };
-  },
 }));
 
 vi.mock("next/dynamic", () => ({
@@ -24,10 +18,15 @@ vi.mock("next/dynamic", () => ({
     function Chart({
       regions,
       onRegionClick,
+      ...props
     }: {
       regions: Map<string, Region>;
       onRegionClick: (region: Region) => void;
+      levelId: string;
+      tileset: string;
+      zoneId: string | null;
     }) {
+      lastProps = props;
       useEffect(() => {
         chartMounts += 1;
       }, []);
@@ -45,22 +44,18 @@ vi.mock("next/dynamic", () => ({
 
 afterEach(() => {
   cleanup();
-  requestedHashes.length = 0;
-  failingHashes.clear();
   chartMounts = 0;
 });
 
 describe("RegionMapView", () => {
-  it("loads the world level, drills into a drillable region and back, and overlays a chosen zone", () => {
+  it("drills into a drillable region and back, and overlays a chosen zone", () => {
     render(<RegionMapView />);
-    expect(requestedHashes).toContain(index.files["geometry/world.geojson"]);
 
     fireEvent.click(screen.getByText("click Q142"));
-    expect(requestedHashes).toContain(index.files["geometry/Q142.geojson"]);
     expect(screen.getByRole("button", { name: "France" })).toBeTruthy();
 
     fireEvent.change(screen.getByRole("combobox"), { target: { value: "Q236626" } });
-    expect(requestedHashes).toContain(index.files["zones/Q236626.geojson"]);
+    expect(lastProps.zoneId).toBe("Q236626");
 
     fireEvent.click(screen.getByRole("button", { name: "World" }));
     expect(screen.queryByRole("button", { name: "France" })).toBeNull();
@@ -75,23 +70,21 @@ describe("RegionMapView", () => {
     expect(screen.queryByRole("button", { name: "Germany" })).toBeNull();
   });
 
-  it("mounts a fresh chart per level so per-level state such as the tooltip does not survive a drill", () => {
+  it("keeps one map mounted across drills so the view can animate between levels", () => {
     render(<RegionMapView />);
     expect(chartMounts).toBe(1);
 
     fireEvent.click(screen.getByText("click Q142"));
 
-    expect(chartMounts).toBe(2);
+    expect(chartMounts).toBe(1);
   });
 
-  it("reports a zone that fails to load and keeps the map", () => {
-    failingHashes.add(index.files["zones/Q236626.geojson"]);
+  it("hands the tileset, level and zone to the map", () => {
     render(<RegionMapView />);
+    expect(lastProps).toMatchObject({ levelId: "world", tileset: index.tileset, zoneId: null });
+
     fireEvent.click(screen.getByText("click Q142"));
 
-    fireEvent.change(screen.getByRole("combobox"), { target: { value: "Q236626" } });
-
-    expect(screen.getByRole("alert").textContent).toBe("Could not load this zone.");
-    expect(screen.getByText("click Q142")).toBeTruthy();
+    expect(lastProps.levelId).toBe("Q142");
   });
 });

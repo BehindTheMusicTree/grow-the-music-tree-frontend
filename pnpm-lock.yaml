@@ -28,11 +28,11 @@ importers:
   .:
     dependencies:
       '@behindthemusictree/app-kit':
-        specifier: 28.0.0
-        version: 28.0.0(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: 28.0.2
+        version: 28.0.2(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@behindthemusictree/app-kit-ui':
-        specifier: 28.0.0
-        version: 28.0.0(@behindthemusictree/app-kit@28.0.0(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@behindthemusictree/ui@0.10.0(@behindthemusictree/brand@12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: 28.0.2
+        version: 28.0.2(@behindthemusictree/app-kit@28.0.2(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@behindthemusictree/ui@0.10.0(@behindthemusictree/brand@12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@behindthemusictree/brand':
         specifier: 12.8.0
         version: 12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -78,12 +78,18 @@ importers:
       lucide-react:
         specifier: 0.487.0
         version: 0.487.0(react@19.1.0)
+      maplibre-gl:
+        specifier: 6.15.0
+        version: 6.15.0
       next:
         specifier: 16.4.3
         version: 16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       next-auth:
         specifier: 5.0.0-beta.32
         version: 5.0.0-beta.32(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+      pmtiles:
+        specifier: 4.5.0
+        version: 4.5.0
       prop-types:
         specifier: 15.8.1
         version: 15.8.1
@@ -332,18 +338,18 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@behindthemusictree/app-kit-ui@28.0.0':
-    resolution: {integrity: sha512-1fjQwznJwNwC0Acp7nx9UuSCEEzM/nZOEGHjvhSnS8J64E0oUDh44Y9gHTCh0mEzMYFedU/cDdZgG5GqCnbVMg==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/app-kit-ui/28.0.0/6361efd39e380eae5460b9cb3c9dd1ee35e70a76}
+  '@behindthemusictree/app-kit-ui@28.0.2':
+    resolution: {integrity: sha512-3ZSlFdfCk3erfMe0fHq3rxOU/zfV2nsa/BKvu/VdghmH16l8PW3/jJ9R7VO9GvANPWyTCmH4oxQ+VoDUp9Q1nA==}
     peerDependencies:
-      '@behindthemusictree/app-kit': ^28.0.0
+      '@behindthemusictree/app-kit': ^28.0.2
       '@behindthemusictree/ui': ^0.10.0
       '@tanstack/react-query': '>=5.0.0'
       next: '>=14.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@behindthemusictree/app-kit@28.0.0':
-    resolution: {integrity: sha512-MjLSvyf4CDWte7EXmKG27ssoomIxzAGEWlKqX4BeLhg2d0xN8OSXUpYcPZIv21bzZl9QA6wPDDQAdsR/9+HRKA==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/app-kit/28.0.0/3f7aa699f141d5e0ac0ddded7dc3c8ef99823901}
+  '@behindthemusictree/app-kit@28.0.2':
+    resolution: {integrity: sha512-9g85jrzwEbvIiBpZfOOw8TVVg3kFOxZ93fR6LhkaCPNyALt2SrqaCojYD3igvZoWwrD8fH4iyn76UVhS2xA1Mg==}
     peerDependencies:
       '@tanstack/react-query': '>=5.0.0'
       next: '>=14.0.0'
@@ -351,25 +357,27 @@ packages:
       react-dom: '>=18.0.0'
 
   '@behindthemusictree/brand@12.8.0':
-    resolution: {integrity: sha512-DAWKBychIBTglLZ0d4nYfi30A8GJkIt1Zj5gfcBf/5Mle33WBG4ZLH4nrHWqUU5YiVwfKih6OBH4f+844+g98A==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/brand/12.8.0/1863628f06bb186185cc690b34ffca68cc2e43ae}
+    resolution: {integrity: sha512-yvN7goIh0+7CSNH94QUgwzd430PVG+Iy72fIk5gWl1wosDUXPhTI3z/oaG9vMbGOdVlpb62Ir1vy/YpmS8J2lw==}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@behindthemusictree/genre-tree-view@https://registry.npmjs.org/@behindthemusictree/genre-tree-view/-/genre-tree-view-6.4.0.tgz':
-    resolution: {integrity: sha512-q4XGjUXSdxCIOYlsAIpPIbtbXjn33HkzqCaYe+3WjIy7O0s713vDjoaWVezs7+XsTKaWMlVk8on/y7oBrinAPw==, tarball: https://registry.npmjs.org/@behindthemusictree/genre-tree-view/-/genre-tree-view-6.4.0.tgz}
-    version: 6.4.0
+  '@behindthemusictree/genre-tree-view@6.4.0':
+    resolution: {integrity: sha512-q4XGjUXSdxCIOYlsAIpPIbtbXjn33HkzqCaYe+3WjIy7O0s713vDjoaWVezs7+XsTKaWMlVk8on/y7oBrinAPw==}
     peerDependencies:
       '@behindthemusictree/ui': ^0.10.0
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
   '@behindthemusictree/ui@0.10.0':
-    resolution: {integrity: sha512-2BbkifUSfDxQsuJFTI9zvObDv/IQmmcTdMYYs0L6EC3rv/UQqMd89cwpXC73nElcVL6ncXzrNMdqihH/FyCB3w==, tarball: https://npm.pkg.github.com/download/@behindthemusictree/ui/0.10.0/9469d5fdaab5e5bc6c08762d30cb00cb0bfb49f8}
+    resolution: {integrity: sha512-AYCcZpamdSy0f3bGwIs0Rofc4UKK7noCXWzrOeuT/jE+jAqbipr6vmn9CYMv8S1c25j9YUCsgf0Wg/7PFwwR6Q==}
     peerDependencies:
       '@behindthemusictree/brand': ^12.7.0
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
+    peerDependenciesMeta:
+      '@behindthemusictree/brand':
+        optional: true
 
   '@csstools/color-helpers@6.1.2':
     resolution: {integrity: sha512-grhRy3OKmniaAEKXMjua5z/EODX0MSqBGjunw8+j/3HQjOnahs2AGhvEOIYVUWcU6ScApbhLhVrQTX8XqrMrow==}
@@ -852,6 +860,35 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@mapbox/jsonlint-lines-primitives@2.0.3':
+    resolution: {integrity: sha512-0SElaV0uMxEnxzBhhX9WTuPyUeMsAN/SS0i16tjuba4/mio63MG9khjC1a0JAiPGXAwvwm4UfHJURCN7nyudQg==}
+    engines: {node: '>= 22'}
+
+  '@mapbox/point-geometry@1.1.0':
+    resolution: {integrity: sha512-YGcBz1cg4ATXDCM/71L9xveh4dynfGmcLDqufR+nQQy3fKwsAZsWd/x4621/6uJaeB9mwOHE6hPeDgXz9uViUQ==}
+
+  '@mapbox/tiny-sdf@2.3.0':
+    resolution: {integrity: sha512-gBvcNDBBB66bgQYvnaJ6Jk+VCaMmVq5+IZR2kWPisT88Z8s0kBQt6hfVi8QgRW8Vpg0UWZzBA4ZSyzHHC+VeRA==}
+
+  '@mapbox/unitbezier@1.0.0':
+    resolution: {integrity: sha512-fqd515fjBmANKGGsQ286E2Wvj/XvDFpGzwJxq4CI6jMQue6Oy04uCKp+JWKF00xRTmk6cEu1jPJ9p3xqH8YWqQ==}
+
+  '@mapbox/vector-tile@3.0.0':
+    resolution: {integrity: sha512-Qf10S1uIHMk20ri/IVBnpS+esUEkVaR5Hftmz88jTInrpmWgPGJfPe3LVjjlE77trLx8tH6qjTG7uWH9hIq/0Q==}
+
+  '@maplibre/geojson-vt@6.3.0':
+    resolution: {integrity: sha512-3Zw2jsU9pIJG3G2CQFbLjWj2MlAHodhD7cSY+15iywUuLmmkgzcKRnueVRZ4AcC/5wOtfhidcJAAzBpoBNs3Xg==}
+
+  '@maplibre/maplibre-gl-style-spec@26.5.1':
+    resolution: {integrity: sha512-9ufQ5LR+Ldn87SILPVyRNz4wVm/sBrM2ZRv9VfjLRKYKIGAcvC1VFw/DEkJLAHqfMV8m03zDz1DUNTIUj/GvdA==}
+    hasBin: true
+
+  '@maplibre/mlt@1.3.0':
+    resolution: {integrity: sha512-7M2O7ABM80Oi8XPkfkrjKB8mOBIxGoVgkA52Mu4RMWoBvvMdagQ522+WxVYujZsMpqIr3BpzrTbXrm4k8lCzCQ==}
+
+  '@maplibre/vt-pbf@4.3.3':
+    resolution: {integrity: sha512-dEe5XUd64RQbxNxy2OzIkJnwNDWjVmSXjCd0A7zLirm7QJ/WWbmtDFIkfsiM4yt1cplqzG6oSivRYeWx1SM1yg==}
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     resolution: {integrity: sha512-oTXEIha4SsuXdTA4Iyskj0kpdx2yVXdhd75c2v3xGrHFfVMsbhTPZU/nMPL4sWKo4pBHm3aucLaqGlF696dTyQ==}
@@ -2331,6 +2368,9 @@ packages:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
 
+  earcut@3.2.4:
+    resolution: {integrity: sha512-FHc6yNpnTORB0tM5kmZ03iD2mDuNakDE2lvf4Hw1XkfxtEHIGVi01B/GqUSwx+NcC1WGjidAfpTXzeALtPtfpg==}
+
   electron-to-chromium@1.5.467:
     resolution: {integrity: sha512-Nw9X371rtZmYcBSnEijnCDONILjs93biCZO34juC7MBOmK8E+GFnyD4T/WvyrlJkppul7oxg6TwvtKst9SODTw==}
 
@@ -2655,6 +2695,9 @@ packages:
     engines: {node: '>=12.0.0'}
     hasBin: true
 
+  gl-matrix@3.4.4:
+    resolution: {integrity: sha512-latSnyDNt/8zYUB6VIJ6PCh2jBjJX6gnDsoCZ7LyW7GkqrD51EWwa9qCoGixj8YqBtETQK/xY7OmpTF8xz1DdQ==}
+
   glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
     engines: {node: '>= 6'}
@@ -2977,6 +3020,9 @@ packages:
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
 
+  json-stringify-pretty-compact@4.0.0:
+    resolution: {integrity: sha512-3CNZ2DnrpByG9Nqj6Xo8vqbjT4F6N+tb4Gb28ESAZjYZ5yqvmc56J+/kuIwkaAMOyblTQhUW7PxMkUb8Q36N3Q==}
+
   json5@1.0.2:
     resolution: {integrity: sha512-g1MWMLBiz8FKi1e4w0UyVL3w+iJceWAFBAaBnnGKOpNa5f8TLktkbre1+s6oICydWAm+HRUGTmI+//xv2hvXYA==}
     hasBin: true
@@ -2989,6 +3035,9 @@ packages:
   jsx-ast-utils@3.3.5:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
+
+  kdbush@4.1.0:
+    resolution: {integrity: sha512-e9vurzrXJQrFX6ckpHP3bvj5l+9CnYzkxDNnNQ1h2QTqdWsUAJgXiKdGNcOa1EY85dU8KbQ+z/FdQdB7P+9yfQ==}
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
@@ -3050,6 +3099,10 @@ packages:
   make-dir@4.0.0:
     resolution: {integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==}
     engines: {node: '>=10'}
+
+  maplibre-gl@6.15.0:
+    resolution: {integrity: sha512-kxFetbvUHDOVaAP1CYb226Mdk2QhzIPddqM0xJTFD35wu78Mpd6NM7+H68ALjc6Oa0kAOX5EAdMKyvD2u3qfcg==}
+    engines: {node: '>=16.14.0', npm: '>=8.1.0'}
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -3163,6 +3216,9 @@ packages:
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
+
+  murmurhash-js@1.0.0:
+    resolution: {integrity: sha512-TvmkNhkv8yct0SVBSy+o8wYzXjE4Zz3PCesbfs8HiCXXdcTuocApFv11UWlNFWKYsP2okqrhb7JNlSm9InBhIw==}
 
   mz@2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
@@ -3326,6 +3382,10 @@ packages:
   pathe@2.0.3:
     resolution: {integrity: sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==}
 
+  pbf@5.1.2:
+    resolution: {integrity: sha512-mnvGdvOrIvJOBGUEdGkrVXjN8E/VkIJCkf2eS1DH2yv82ORUlLttmDt0rWY38yYZmVwciZwBUvHM20qxBZf40w==}
+    hasBin: true
+
   performance-now@2.1.0:
     resolution: {integrity: sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==}
 
@@ -3343,6 +3403,9 @@ packages:
   pirates@4.0.7:
     resolution: {integrity: sha512-TfySrs/5nm8fQJDcBDuUng3VOUKsd7S+zqvbOTiGXHfxX4wK31ard+hoNuvkicM/2YFzlpDgABOevKSsB4G/FA==}
     engines: {node: '>= 6'}
+
+  pmtiles@4.5.0:
+    resolution: {integrity: sha512-CBeD4SoUluFziGdy/8k7FOjQxQy486n+929W/tWophauvMICpkZ26vGBWhDt/6b1FZQWNaf4jFdT/5+q0Wii5w==}
 
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
@@ -3389,6 +3452,9 @@ packages:
     resolution: {integrity: sha512-g50586zr4bZmwFiTlflMu8E0bDTb5I5gertgwAKmsdUlTQIhZtunzUlD1WSzwcVWPoAVpsrA6vlfCD7oXvRwgg==}
     engines: {node: ^10 || ^12 || >=14}
 
+  potpack@2.1.0:
+    resolution: {integrity: sha512-pcaShQc1Shq0y+E7GqJqvZj8DTthWV1KeHGdi0Z6IAin2Oi3JnLCOfwnCo84qc+HAp52wT9nK9H7FAJp5a44GQ==}
+
   preact-render-to-string@6.5.11:
     resolution: {integrity: sha512-ubnauqoGczeGISiOh6RjX0/cdaF8v/oDXIjO85XALCQjwQP+SB4RDXXtvZ6yTYSjG+PC1QRP2AhPgCEsM2EvUw==}
     peerDependencies:
@@ -3412,6 +3478,9 @@ packages:
   prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
 
+  protocol-buffers-schema@3.6.1:
+    resolution: {integrity: sha512-VG2K63Igkiv9p76tk1lilczEK1cT+kCjKtkdhw1dQZV3k3IXJbd3o6Ho8b9zJZaHSnT2hKe4I+ObmX9w6m5SmQ==}
+
   proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
 
@@ -3421,6 +3490,9 @@ packages:
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
+
+  quickselect@3.0.0:
+    resolution: {integrity: sha512-XdjUArbK4Bm5fLLvlm5KpTFOiOThgfWWI4axAZDWg4E/0mKdZyI9tNEfds27qCi1ze/vwTR16kvmmGhRra3c2g==}
 
   raf@3.4.1:
     resolution: {integrity: sha512-Sq4CW4QhwOHE8ucn6J34MqtZCeWFP2aQSmrlroYgqAV1PjStIhJXxYuTgUIfkEk7zTLjmIjLmU5q+fbD1NnOJA==}
@@ -3485,6 +3557,9 @@ packages:
 
   resolve-pkg-maps@1.0.0:
     resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
+
+  resolve-protobuf-schema@2.1.0:
+    resolution: {integrity: sha512-kI5ffTiZWmJaS/huM8wZfEMer1eRd7oJQhDuxeCLe3t7N7mX3z94CN0xPxBQxFYQTSNz9T0i+v6inKqSdK8xrQ==}
 
   resolve@1.22.13:
     resolution: {integrity: sha512-Dj/cW9zBV2aRj6XzCxuGIs3ESZKv02jixne3q6jFZYZ3/Tg09gHHviSMDL4kObh9pqSahdRHEnDoaP2gn8YLhA==}
@@ -3750,6 +3825,9 @@ packages:
   tinyglobby@0.2.17:
     resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
     engines: {node: '>=12.0.0'}
+
+  tinyqueue@3.0.0:
+    resolution: {integrity: sha512-gRa9gwYU3ECmQYv3lslts5hxuIa90veaEcxDYuu3QGOIAEM2mOZkVHp48ANJuu1CURtRdHKUBY5Lm1tHV+sD4g==}
 
   tinyrainbow@3.2.0:
     resolution: {integrity: sha512-LgO3D9yZJjApUiuUfl9iFAwrtaX4+lok3wJIqttGoKCHlWUqHqbQpnxCf82L8FjgKsh4iGo78hqJwgL8F6To2A==}
@@ -4226,10 +4304,10 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@behindthemusictree/app-kit-ui@28.0.0(@behindthemusictree/app-kit@28.0.0(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@behindthemusictree/ui@0.10.0(@behindthemusictree/brand@12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@behindthemusictree/app-kit-ui@28.0.2(@behindthemusictree/app-kit@28.0.2(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@behindthemusictree/ui@0.10.0(@behindthemusictree/brand@12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
-      '@behindthemusictree/app-kit': 28.0.0(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@behindthemusictree/genre-tree-view': https://registry.npmjs.org/@behindthemusictree/genre-tree-view/-/genre-tree-view-6.4.0.tgz(@behindthemusictree/ui@0.10.0(@behindthemusictree/brand@12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@behindthemusictree/app-kit': 28.0.2(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@behindthemusictree/genre-tree-view': 6.4.0(@behindthemusictree/ui@0.10.0(@behindthemusictree/brand@12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@behindthemusictree/ui': 0.10.0(@behindthemusictree/brand@12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tanstack/react-query': 5.72.2(react@19.1.0)
       clsx: 2.1.1
@@ -4242,7 +4320,7 @@ snapshots:
       uuid: 11.1.1
       zod: 4.6.7
 
-  '@behindthemusictree/app-kit@28.0.0(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@behindthemusictree/app-kit@28.0.2(@tanstack/react-query@5.72.2(react@19.1.0))(next@16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@tanstack/react-query': 5.72.2(react@19.1.0)
       next: 16.4.3(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -4256,7 +4334,7 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
-  '@behindthemusictree/genre-tree-view@https://registry.npmjs.org/@behindthemusictree/genre-tree-view/-/genre-tree-view-6.4.0.tgz(@behindthemusictree/ui@0.10.0(@behindthemusictree/brand@12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@behindthemusictree/genre-tree-view@6.4.0(@behindthemusictree/ui@0.10.0(@behindthemusictree/brand@12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@behindthemusictree/ui': 0.10.0(@behindthemusictree/brand@12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       d3: 7.9.0
@@ -4266,7 +4344,6 @@ snapshots:
 
   '@behindthemusictree/ui@0.10.0(@behindthemusictree/brand@12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
-      '@behindthemusictree/brand': 12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       class-variance-authority: 0.7.1
       clsx: 2.1.1
       lucide-react: 0.487.0(react@19.1.0)
@@ -4274,6 +4351,8 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
       react-icons: 5.7.0(react@19.1.0)
       tailwind-merge: 3.2.0
+    optionalDependencies:
+      '@behindthemusictree/brand': 12.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
   '@csstools/color-helpers@6.1.2': {}
 
@@ -4615,6 +4694,43 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
+
+  '@mapbox/jsonlint-lines-primitives@2.0.3': {}
+
+  '@mapbox/point-geometry@1.1.0': {}
+
+  '@mapbox/tiny-sdf@2.3.0': {}
+
+  '@mapbox/unitbezier@1.0.0': {}
+
+  '@mapbox/vector-tile@3.0.0':
+    dependencies:
+      '@mapbox/point-geometry': 1.1.0
+      '@types/geojson': 7946.0.16
+      pbf: 5.1.2
+
+  '@maplibre/geojson-vt@6.3.0':
+    dependencies:
+      kdbush: 4.1.0
+
+  '@maplibre/maplibre-gl-style-spec@26.5.1':
+    dependencies:
+      '@mapbox/jsonlint-lines-primitives': 2.0.3
+      '@mapbox/unitbezier': 1.0.0
+      json-stringify-pretty-compact: 4.0.0
+      minimist: 1.2.8
+      quickselect: 3.0.0
+      tinyqueue: 3.0.0
+
+  '@maplibre/mlt@1.3.0':
+    dependencies:
+      '@mapbox/point-geometry': 1.1.0
+
+  '@maplibre/vt-pbf@4.3.3':
+    dependencies:
+      '@mapbox/point-geometry': 1.1.0
+      '@types/geojson': 7946.0.16
+      pbf: 5.1.2
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
@@ -6172,6 +6288,8 @@ snapshots:
       es-errors: 1.3.0
       gopd: 1.2.0
 
+  earcut@3.2.4: {}
+
   electron-to-chromium@1.5.467: {}
 
   emoji-regex@9.2.2: {}
@@ -6672,6 +6790,8 @@ snapshots:
 
   git-worktree-scripts@1.4.1: {}
 
+  gl-matrix@3.4.4: {}
+
   glob-parent@5.1.2:
     dependencies:
       is-glob: 4.0.3
@@ -7014,6 +7134,8 @@ snapshots:
 
   json-stable-stringify-without-jsonify@1.0.1: {}
 
+  json-stringify-pretty-compact@4.0.0: {}
+
   json5@1.0.2:
     dependencies:
       minimist: 1.2.8
@@ -7026,6 +7148,8 @@ snapshots:
       array.prototype.flat: 1.3.3
       object.assign: 4.1.7
       object.values: 1.2.1
+
+  kdbush@4.1.0: {}
 
   keyv@4.5.4:
     dependencies:
@@ -7084,6 +7208,27 @@ snapshots:
     dependencies:
       semver: 7.8.5
 
+  maplibre-gl@6.15.0:
+    dependencies:
+      '@mapbox/point-geometry': 1.1.0
+      '@mapbox/tiny-sdf': 2.3.0
+      '@mapbox/unitbezier': 1.0.0
+      '@mapbox/vector-tile': 3.0.0
+      '@maplibre/geojson-vt': 6.3.0
+      '@maplibre/maplibre-gl-style-spec': 26.5.1
+      '@maplibre/mlt': 1.3.0
+      '@maplibre/vt-pbf': 4.3.3
+      '@types/geojson': 7946.0.16
+      bidi-js: 1.1.0
+      earcut: 3.2.4
+      gl-matrix: 3.4.4
+      kdbush: 4.1.0
+      murmurhash-js: 1.0.0
+      pbf: 5.1.2
+      potpack: 2.1.0
+      quickselect: 3.0.0
+      tinyqueue: 3.0.0
+
   math-intrinsics@1.1.0: {}
 
   mdn-data@2.27.1: {}
@@ -7135,6 +7280,8 @@ snapshots:
   mrmime@2.0.1: {}
 
   ms@2.1.3: {}
+
+  murmurhash-js@1.0.0: {}
 
   mz@2.7.0:
     dependencies:
@@ -7290,6 +7437,10 @@ snapshots:
 
   pathe@2.0.3: {}
 
+  pbf@5.1.2:
+    dependencies:
+      resolve-protobuf-schema: 2.1.0
+
   performance-now@2.1.0: {}
 
   picocolors@1.1.1: {}
@@ -7299,6 +7450,10 @@ snapshots:
   picomatch@4.0.4: {}
 
   pirates@4.0.7: {}
+
+  pmtiles@4.5.0:
+    dependencies:
+      fflate: 0.8.3
 
   possible-typed-array-names@1.1.0: {}
 
@@ -7339,6 +7494,8 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.2
 
+  potpack@2.1.0: {}
+
   preact-render-to-string@6.5.11(preact@10.24.3):
     dependencies:
       preact: 10.24.3
@@ -7361,11 +7518,15 @@ snapshots:
       object-assign: 4.1.1
       react-is: 16.13.1
 
+  protocol-buffers-schema@3.6.1: {}
+
   proxy-from-env@1.1.0: {}
 
   punycode@2.3.1: {}
 
   queue-microtask@1.2.3: {}
+
+  quickselect@3.0.0: {}
 
   raf@3.4.1:
     dependencies:
@@ -7436,6 +7597,10 @@ snapshots:
   resolve-from@4.0.0: {}
 
   resolve-pkg-maps@1.0.0: {}
+
+  resolve-protobuf-schema@2.1.0:
+    dependencies:
+      protocol-buffers-schema: 3.6.1
 
   resolve@1.22.13:
     dependencies:
@@ -7807,6 +7972,8 @@ snapshots:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.4)
       picomatch: 4.0.4
+
+  tinyqueue@3.0.0: {}
 
   tinyrainbow@3.2.0: {}
 

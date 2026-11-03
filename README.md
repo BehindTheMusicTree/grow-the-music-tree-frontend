@@ -129,7 +129,7 @@ cp .env.example .env.local
 **Notes:**
 
 - Only variables prefixed with `NEXT_PUBLIC_` are available in the browser
-- The grow-api origin comes from `GROW_API_ORIGIN` (staging by default in `.env`); the app appends the API contract version itself (see [src/lib/grow-api-upstream-url.ts](src/lib/grow-api-upstream-url.ts)). Set `GROW_API_ORIGIN=http://127.0.0.1:8001` in `.env.local` to target a local grow-api instead. The sidebar "Audio Metadata" link is computed from `@behindthemusictree/assets` (see [src/lib/site-urls.ts](src/lib/site-urls.ts)).
+- The grow-api origin comes from `GROW_API_ORIGIN` (staging by default in `.env`); the app appends the API contract version itself (see [src/lib/grow-api-upstream-url.ts](src/lib/grow-api-upstream-url.ts)). Set `GROW_API_ORIGIN=http://127.0.0.1:8001` in `.env.local` to target a local grow-api instead. The sidebar "Audio Metadata" link is computed from `@behindthemusictree/brand` (see [src/lib/site-urls.ts](src/lib/site-urls.ts)).
 - Restart `pnpm dev` after env changes
 
 ## Getting Started
@@ -138,13 +138,11 @@ cp .env.example .env.local
 
 - Node.js 26 (see [`.nvmrc`](.nvmrc))
 - pnpm: the version pinned in `package.json`'s `packageManager` (also used by the Dockerfile and CI). Any global pnpm 10+ switches to it automatically
-- A [GitHub PAT](https://github.com/settings/tokens) with `read:packages` (and org access) — [`.npmrc`](.npmrc) pulls `@behindthemusictree/*` packages from GitHub Packages
 - Docker (optional, for containerized builds)
 
 ### Install dependencies
 
 ```bash
-export NPM_TOKEN=ghp_…   # or set _authToken in ~/.npmrc instead
 pnpm install --frozen-lockfile
 ```
 
@@ -165,12 +163,12 @@ pnpm install --frozen-lockfile
 
 Production and staging hosting run on **Coolify** as a multi-stage Docker build (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). The Dockerfile builds the app in a `builder` stage (`pnpm build` against Next.js `output: "standalone"`) and copies only the standalone output into a slim `runner` stage that runs `node server.js`.
 
-**Build image** (requires the `GH_PACKAGES_TOKEN_READ` build secret to install `@behindthemusictree/*`):
+**Build image:**
 
 ```bash
 DOCKER_BUILDKIT=1 docker build \
-  --secret id=GH_PACKAGES_TOKEN_READ,src=<path-to-token-file> \
   --build-arg NEXT_PUBLIC_CONTACT_EMAIL=you@example.com \
+  --build-arg NEXT_PUBLIC_TILES_BASE_URL=https://tiles.themusictree.org \
   --build-arg NEXT_PUBLIC_SENTRY_IS_ACTIVE=false \
   -t grow-the-music-tree-frontend .
 ```
@@ -189,7 +187,7 @@ Continuous Integration ([`.github/workflows/validate.yml`](.github/workflows/val
 
 The CI pipeline includes:
 
-- Dependency installation (`pnpm install --frozen-lockfile`, needs the `GH_PACKAGES_TOKEN_READ` repo secret)
+- Dependency installation (`pnpm install --frozen-lockfile`)
 - Linting
 - Testing
 - Build check

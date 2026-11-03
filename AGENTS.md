@@ -72,7 +72,7 @@ Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONIN
 - **Comments**: only when the *why* is non-obvious — no placeholder comments
   (`// changed`, `// fix`, `// temp`, etc.).
 - **Env vars**: only `NEXT_PUBLIC_*`-prefixed vars are exposed to the browser.
-  Installing requires a GitHub PAT with `read:packages` for `@behindthemusictree/*`.
+  `@behindthemusictree/*` packages are public on npmjs; installing needs no token.
 - **Dev backend**: `.env` targets a local grow-api (`http://127.0.0.1:8001`) — start it with
   `docker compose up -d` in `../grow-the-music-tree-api`, check `curl 127.0.0.1:8001/health/`;
   staging is a read-only opt-in via `./scripts/dev-up.sh --staging` and rejects dev-client tokens.
