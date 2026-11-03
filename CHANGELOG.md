@@ -109,10 +109,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Header**: the Map and Genealogy buttons are round like About when their label is collapsed, instead of oval.
 - **Genre history**: a genre whose pop/core side was changed shows its Modifications panel again (it failed to load on the unknown `side_changed` action), with side changes labelled "Side changed core → pop".
 
 ### Changed
 
+- **Region map**: `/map` no longer shows the "Music by region" title or a "not computed yet" message; the page stays empty until a map is available.
 - **Genealogy**: the chart fills the page width and spreads the years over the spare height. Its header extends under the floating app header, with centred region labels kept below the buttons. Crowded year labels and region labels too wide for their cell are hidden, and the empty column-label row collapses until you zoom in.
 - **Header**: the region map link's icon is now a globe that rotates through Africa, the Americas and Asia every few seconds (static under reduced motion).
 - **Dev tooling**: `./scripts/dev-up.sh` now targets read-only staging by default; pass `--local` to start the local grow-api (`--restore`/`--no-restore` require `--local`).
