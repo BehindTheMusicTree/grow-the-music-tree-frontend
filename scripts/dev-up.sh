@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# Start the local grow-api (restoring prod data when its DB is empty) and the Next.js dev server.
+# Start the Next.js dev server against read-only staging (default) or a local grow-api.
 #
-#   dev-up.sh [--port <n>] [--restore|--no-restore] [--staging]
+#   dev-up.sh [--port <n>] [--local [--restore|--no-restore]] [--staging]
 #
 # Without --port, picks the first free port in 3000-3009 (the range the dev Google OAuth client allows).
-# --restore forces a fresh prod restore (wipes the local DB); --no-restore never restores.
-# --staging skips the local API and points the app at read-only staging (admin sign-in unavailable).
+# Default (or --staging): points the app at read-only staging; admin sign-in is unavailable.
+# --local starts the local grow-api instead, restoring prod data when its DB is empty;
+# --restore forces a fresh prod restore (wipes the local DB), --no-restore never restores.
 # The API checkout is resolved as a sibling of the main checkout (works from any worktree);
 # override with GROW_API_DIR.
 #
@@ -21,16 +22,21 @@ trap 'exec >&-; while kill -0 "$tee_pid" 2>/dev/null; do sleep 0.05; done' EXIT
 
 port=""
 restore="auto"
-target="local"
+target="staging"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --port) port="${2:?--port requires a value}"; shift 2 ;;
     --restore) restore="force"; shift ;;
     --no-restore) restore="skip"; shift ;;
     --staging) target="staging"; shift ;;
+    --local) target="local"; shift ;;
     *) echo "status=error reason=unknown-arg-$1"; exit 1 ;;
   esac
 done
+if [[ "$target" == "staging" && "$restore" != "auto" ]]; then
+  echo "status=error reason=restore-requires-local hint=add---local"
+  exit 1
+fi
 
 main_root="$(dirname "$(git -C "$repo_root" rev-parse --path-format=absolute --git-common-dir)")"
 api_dir="${GROW_API_DIR:-$(dirname "$main_root")/grow-the-music-tree-api}"
