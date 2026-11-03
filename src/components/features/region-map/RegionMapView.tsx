@@ -23,8 +23,7 @@ export default function RegionMapView() {
 
   if (isPending) return <Skeleton />;
   if (isError) return <p className="text-red-600">Could not load the region map.</p>;
-  if (index === null)
-    return <p className="text-gray-700">The region map has not been computed yet.</p>;
+  if (index === null) return null;
 
   const goTo = (depth: number) => {
     setTrail(trail.slice(0, depth + 1));

@@ -6,11 +6,12 @@ import { RegionMapIndexSchema, type Region } from "@schemas/api/region-map";
 import RegionMapView from "./RegionMapView";
 
 const index = RegionMapIndexSchema.parse(fixture);
+let data: typeof index | null = index;
 let chartMounts = 0;
 let lastProps: { levelId: string; tileset: string; zoneId: string | null };
 
 vi.mock("@hooks/useRegionMap", () => ({
-  useRegionMapIndex: () => ({ data: index, isPending: false, isError: false }),
+  useRegionMapIndex: () => ({ data, isPending: false, isError: false }),
 }));
 
 vi.mock("next/dynamic", () => ({
@@ -45,9 +46,17 @@ vi.mock("next/dynamic", () => ({
 afterEach(() => {
   cleanup();
   chartMounts = 0;
+  data = index;
 });
 
 describe("RegionMapView", () => {
+  it("renders nothing before the region map is computed", () => {
+    data = null;
+    const { container } = render(<RegionMapView />);
+
+    expect(container.childElementCount).toBe(0);
+  });
+
   it("drills into a drillable region and back, and overlays a chosen zone", () => {
     render(<RegionMapView />);
 
