@@ -73,9 +73,10 @@ Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONIN
   (`// changed`, `// fix`, `// temp`, etc.).
 - **Env vars**: only `NEXT_PUBLIC_*`-prefixed vars are exposed to the browser.
   `@behindthemusictree/*` packages are public on npmjs; installing needs no token.
-- **Dev backend**: `.env` targets a local grow-api (`http://127.0.0.1:8001`) — start it with
-  `docker compose up -d` in `../grow-the-music-tree-api`, check `curl 127.0.0.1:8001/health/`;
-  staging is a read-only opt-in via `./scripts/dev-up.sh --staging` and rejects dev-client tokens.
+- **Dev backend**: `./scripts/dev-up.sh` targets read-only staging by default (rejects dev-client
+  tokens, so no admin sign-in); `./scripts/dev-up.sh --local` starts the local grow-api
+  (`http://127.0.0.1:8001`, from `../grow-the-music-tree-api`) instead. Plain `pnpm dev` still uses
+  `.env`, which targets the local grow-api — check it with `curl 127.0.0.1:8001/health/`.
 - **Admin sign-in locally**: use the dev Google client, and give the local grow-api the same
   `GOOGLE_OAUTH_CLIENT_ID` plus your `ADMIN_GOOGLE_SUB`. Open `http://localhost:<3000–3009>` (what `pnpm dev`
   prints), never `127.0.0.1`, or Google returns `redirect_uri_mismatch`. See
@@ -99,7 +100,7 @@ Claude `paths:` metadata is not a Codex loader. Graphify can be used when instal
 
 <!-- BEGIN:nextjs-agent-rules -->
 
-# This is NOT the Next.js you know
+## This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 
