@@ -107,6 +107,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- **Genre history**: a genre whose pop/core side was changed shows its Modifications panel again (it failed to load on the unknown `side_changed` action), with side changes labelled "Side changed core → pop".
+
 ### Changed
 
 - **Genealogy**: the chart fills the page width and spreads the years over the spare height. Its header extends under the floating app header, with centred region labels kept below the buttons. Crowded year labels and region labels too wide for their cell are hidden, and the empty column-label row collapses until you zoom in.
