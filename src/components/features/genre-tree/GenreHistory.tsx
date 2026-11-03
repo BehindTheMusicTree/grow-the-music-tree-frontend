@@ -10,12 +10,16 @@ function describeEntry({ action, oldValue, newValue }: GenreHistoryEntry): strin
       return `Renamed ${oldValue} → ${newValue}`;
     case "parent_changed":
       return `Moved from ${oldValue ?? "root"} to ${newValue ?? "root"}`;
+    case "side_changed":
+      return `Side changed ${oldValue} → ${newValue}`;
     case "created":
       return "Created";
     case "excluded":
       return "Excluded";
     case "genre_changed":
       return "Genre changed";
+    case "updated":
+      return "Updated";
     case "deleted":
       return "Deleted";
     case "name_conflict_resolved":
