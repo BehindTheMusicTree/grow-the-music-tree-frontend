@@ -1,6 +1,6 @@
 ---
 name: launch
-description: Use this skill when asked to run, start, dev-serve, or preview grow-the-music-tree-frontend, or to confirm a change works in the real app. Starts the local grow-api (restoring prod data into it when empty) and the Next.js dev server. Args - optional port, `restore` (force a fresh prod restore), `no-restore`.
+description: Use this skill when asked to run, start, dev-serve, or preview grow-the-music-tree-frontend, or to confirm a change works in the real app. Starts the Next.js dev server against read-only staging by default, or against the local grow-api (restoring prod data into it when empty) with `local`. Args - optional port, `local`, `restore` (force a fresh prod restore, implies local), `no-restore` (implies local).
 ---
 
 # Launch grow-the-music-tree-frontend
@@ -8,12 +8,13 @@ description: Use this skill when asked to run, start, dev-serve, or preview grow
 Run from the repo root (any worktree):
 
 ```bash
-./scripts/dev-up.sh [--port <n>] [--restore|--no-restore] [--staging]
+./scripts/dev-up.sh [--port <n>] [--local [--restore|--no-restore]]
 ```
 
-Map args: a port → `--port <n>` (omit it to get the first free port in 3000–3009), `restore` → `--restore`
-(wipes the local DB), `no-restore` → `--no-restore`, `staging` → `--staging` (read-only staging data, no local API,
-`signin=disabled`). The default restores prod data only when the local DB is empty.
+Map args: a port → `--port <n>` (omit it to get the first free port in 3000–3009), `local` → `--local`,
+`restore` → `--local --restore` (wipes the local DB), `no-restore` → `--local --no-restore`. Without `--local` it
+targets read-only staging (no local API, `signin=disabled`); use `--local` when the user needs admin sign-in or
+writes. With `--local`, prod data is restored only when the local DB is empty.
 
 Trust its `key=value` output and don't re-verify with `curl`/`lsof`. If the output is lost, read
 `.dev-up.status` at the repo root, which holds the last run's lines:
