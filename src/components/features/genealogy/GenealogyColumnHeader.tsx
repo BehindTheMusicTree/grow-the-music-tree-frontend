@@ -38,7 +38,8 @@ export default function GenealogyColumnHeader({ columns, regions, transform, wid
         const x = left(region.startPosition);
         const w = (region.endPosition - region.startPosition + 1) * cellWidth;
         if (!visible(x, w)) return null;
-        const fits = region.label.length * REGION_CHAR_WIDTH + 2 * REGION_LABEL_INSET <= w;
+        const visibleWidth = Math.min(x + w, right) - Math.max(x, AXIS_WIDTH);
+        const fits = region.label.length * REGION_CHAR_WIDTH + 2 * REGION_LABEL_INSET <= visibleWidth;
         return (
           <svg key={`${region.id}:${region.startPosition}`} x={x} y={0} width={w} height={regionHeight}>
             <rect width="100%" height="100%" className={index % 2 === 0 ? "fill-slate-100" : "fill-slate-200"} />

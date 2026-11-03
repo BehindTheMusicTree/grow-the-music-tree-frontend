@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { linkVertical, select, zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from "d3";
 import { ZoomControls } from "@behindthemusictree/ui";
 import { useIsAdmin } from "@hooks/useIsAdmin";
@@ -124,7 +124,8 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
     };
   }, []);
 
-  useEffect(() => {
+  // Layout effect: the band height and first fit must land before paint, or labels flash under the app header.
+  useLayoutEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
     const fitOnce = () => {
