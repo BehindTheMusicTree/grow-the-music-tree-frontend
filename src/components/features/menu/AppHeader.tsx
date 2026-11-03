@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { CircleDot, Info, List, Map as MapIcon, Network } from "lucide-react";
+import { CircleDot, Info, List, Network } from "lucide-react";
+import { RegionGlobeIcon } from "./RegionGlobeIcon";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { getAudiometaUrl } from "@lib/site-urls";
@@ -117,7 +118,7 @@ export default function AppHeader({ className }: AppHeaderProps) {
         aria-label="Region map"
         aria-current={isRegionMap ? "page" : undefined}
       >
-        <MapIcon className="h-5 w-5" aria-hidden />
+        <RegionGlobeIcon className="h-5 w-5" />
         <span aria-hidden className={`grid overflow-hidden whitespace-nowrap text-base font-bold transition-[grid-template-columns,opacity] duration-200 motion-reduce:transition-none ${isRegionMap ? "grid-cols-[0fr] opacity-0 xl:grid-cols-[1fr] xl:opacity-100" : "grid-cols-[0fr] opacity-0"}`}><span className="min-w-0 overflow-hidden"><span className="pl-2">Map</span></span></span>
       </Link>
       <Link
