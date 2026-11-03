@@ -114,7 +114,7 @@ export default function AppHeader({ className }: AppHeaderProps) {
       <Link
         href={REGION_MAP_HREF}
         prefetch={false}
-        className={`${iconPillClassName.replace("aspect-square", "aspect-auto")} px-3`}
+        className={`${iconPillClassName} px-3`}
         aria-label="Region map"
         aria-current={isRegionMap ? "page" : undefined}
       >
@@ -124,7 +124,7 @@ export default function AppHeader({ className }: AppHeaderProps) {
       <Link
         href={GENEALOGY_HREF}
         prefetch={false}
-        className={`${iconPillClassName.replace("aspect-square", "aspect-auto")} px-3`}
+        className={`${iconPillClassName} px-3`}
         aria-label="Genealogy"
         aria-current={isGenealogy ? "page" : undefined}
       >
