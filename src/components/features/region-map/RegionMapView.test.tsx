@@ -7,7 +7,7 @@ import RegionMapView from "./RegionMapView";
 
 const index = RegionMapIndexSchema.parse(fixture);
 let chartMounts = 0;
-let lastProps: { levelId: string; tilesetPath: string; zoneId: string | null };
+let lastProps: { levelId: string; tileset: string; zoneId: string | null };
 
 vi.mock("@hooks/useRegionMap", () => ({
   useRegionMapIndex: () => ({ data: index, isPending: false, isError: false }),
@@ -23,7 +23,7 @@ vi.mock("next/dynamic", () => ({
       regions: Map<string, Region>;
       onRegionClick: (region: Region) => void;
       levelId: string;
-      tilesetPath: string;
+      tileset: string;
       zoneId: string | null;
     }) {
       lastProps = props;
@@ -81,7 +81,7 @@ describe("RegionMapView", () => {
 
   it("hands the tileset, level and zone to the map", () => {
     render(<RegionMapView />);
-    expect(lastProps).toMatchObject({ levelId: "world", tilesetPath: index.tileset!.path, zoneId: null });
+    expect(lastProps).toMatchObject({ levelId: "world", tileset: index.tileset, zoneId: null });
 
     fireEvent.click(screen.getByText("click Q142"));
 

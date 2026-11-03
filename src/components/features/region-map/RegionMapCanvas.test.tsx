@@ -80,7 +80,7 @@ const mount = (props: Partial<React.ComponentProps<typeof RegionMapCanvas>> = {}
   const view = render(
     <RegionMapCanvas
       levelId="world"
-      tilesetPath={index.tileset!.path}
+      tileset={index.tileset}
       zoneId={null}
       regions={regions}
       selectedId={null}
@@ -104,7 +104,7 @@ describe("RegionMapCanvas", () => {
 
     expect(map.options).toMatchObject({
       style: {
-        sources: { tiles: { url: `pmtiles://https://tiles.example.com/${index.tileset!.path}` } },
+        sources: { tiles: { url: `pmtiles://https://tiles.example.com/regions/${index.tileset}.pmtiles` } },
         glyphs: "https://tiles.example.com/fonts/{fontstack}/{range}.pbf",
       },
     });
@@ -125,7 +125,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="Q142"
-        tilesetPath={index.tileset!.path}
+        tileset={index.tileset}
         zoneId={null}
         regions={regions}
         selectedId={null}
@@ -156,7 +156,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="world"
-        tilesetPath={`regions/${"e".repeat(64)}.pmtiles`}
+        tileset={"e".repeat(64)}
         zoneId={null}
         regions={regions}
         selectedId={null}
@@ -198,7 +198,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="world"
-        tilesetPath={index.tileset!.path}
+        tileset={index.tileset}
         zoneId={null}
         regions={regions}
         selectedId="Q183"
@@ -220,7 +220,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="world"
-        tilesetPath={index.tileset!.path}
+        tileset={index.tileset}
         zoneId="Q236626"
         regions={regions}
         selectedId={null}

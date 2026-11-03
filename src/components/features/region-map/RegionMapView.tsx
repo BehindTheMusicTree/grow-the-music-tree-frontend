@@ -23,7 +23,7 @@ export default function RegionMapView() {
 
   if (isPending) return <Skeleton />;
   if (isError) return <p className="text-red-600">Could not load the region map.</p>;
-  if (index === null || index.tileset === undefined)
+  if (index === null)
     return <p className="text-gray-700">The region map has not been computed yet.</p>;
 
   const goTo = (depth: number) => {
@@ -89,7 +89,7 @@ export default function RegionMapView() {
       <div className="relative min-h-0 flex-1">
         <RegionMapCanvas
           levelId={levelId}
-          tilesetPath={index.tileset.path}
+          tileset={index.tileset}
           zoneId={zoneId}
           regions={regions}
           selectedId={selectedId}
