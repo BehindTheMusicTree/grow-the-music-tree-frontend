@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.22.0 - 2026-11-03](#3220---2026-11-03)
 - [3.21.0 - 2026-11-01](#3210---2026-11-01)
 - [3.20.0 - 2026-10-29](#3200---2026-10-29)
 - [3.19.0 - 2026-10-29](#3190---2026-10-29)
@@ -106,6 +107,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+## [3.22.0] - 2026-11-03
+
 ### Added
 
 - Curation page: the `region_overrides` list (region of a genealogy column's entity) appears in a new "Géohistoire" group, with a "Région" column title.
@@ -115,6 +118,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Region map**: `/map` now renders on a MapLibre GL JS globe with smooth pan, zoom and animated drill-down, replacing the flat SVG chart. The accessible region list, tooltip and zone overlay are kept.
 - **Region map**: `/map` now draws regions from a PMTiles vector tileset (Natural Earth, served from `NEXT_PUBLIC_TILES_BASE_URL`) instead of per-level GeoJSON. Drill-down switches a layer filter and fits the bounds with no network fetch. `NEXT_PUBLIC_TILES_BASE_URL` is a new required build variable (CI reads the `TILES_BASE_URL` variable); until a tileset is published the map shows "not computed yet".
 - Install `@behindthemusictree/*` from the public npmjs registry (app-kit and app-kit-ui 28.0.2): no GitHub token is needed to install, build or run CI. Removed the `GH_PACKAGES_TOKEN_READ` build secret, the CI token guard and the Dependabot registry, and dropped the retired `assets` package from `transpilePackages`.
+- Require grow-api 15.0.0, the version that serves the tileset region map index.
+- **Region map**: the index schema follows grow-api 15's contract (`tileset` is the bare sha256 of `regions/<sha256>.pmtiles`, no `files` map); the unused GeoJSON file hook and schema are removed.
 
 ## [3.21.0] - 2026-11-01
 

@@ -29,8 +29,8 @@ type Tooltip = { x: number; y: number; text: string };
 
 type Props = {
   levelId: string;
-  /** Path of the vector tileset inside the tiles bucket, from the index; immutable per content hash. */
-  tilesetPath: string;
+  /** sha256 of the vector tileset (`regions/<sha256>.pmtiles` in the tiles bucket), from the index; immutable per content hash. */
+  tileset: string;
   zoneId: string | null;
   regions: ReadonlyMap<string, Region>;
   selectedId: string | null;
@@ -46,7 +46,7 @@ addProtocol("pmtiles", new Protocol().tile);
 // MapLibre 6 locates its worker from `import.meta.url`, which a bundler rewrites, so the worker must be emitted explicitly.
 setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href);
 
-export default function RegionMapCanvas({ levelId, tilesetPath, zoneId, regions, selectedId, onRegionClick }: Props) {
+export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, selectedId, onRegionClick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const regionsRef = useRef(regions);
@@ -73,7 +73,7 @@ export default function RegionMapCanvas({ levelId, tilesetPath, zoneId, regions,
       map = new MapLibreMap({
         container,
         style: buildStyle({
-          tilesetUrl: `${TILES_BASE_URL}/${tilesetPath}`,
+          tilesetUrl: `${TILES_BASE_URL}/regions/${tileset}.pmtiles`,
           glyphsUrl: `${TILES_BASE_URL}/fonts/{fontstack}/{range}.pbf`,
           ...initialRef.current,
           colors: regionColors(
@@ -132,7 +132,7 @@ export default function RegionMapCanvas({ levelId, tilesetPath, zoneId, regions,
       fittedRef.current = false;
       setReady(false);
     };
-  }, [tilesetPath]);
+  }, [tileset]);
 
   const listed = useMemo(() => levelRegions(regions, levelId), [regions, levelId]);
 
