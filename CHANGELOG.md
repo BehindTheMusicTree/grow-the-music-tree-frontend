@@ -109,6 +109,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Genealogy**: the schema accepts the `sitelinks` count the API now serves on every tradition (the strict schema would otherwise reject the new snapshot).
 - **Header**: the Map and Genealogy buttons are round like About when their label is collapsed, instead of oval.
 - **Genre history**: a genre whose pop/core side was changed shows its Modifications panel again (it failed to load on the unknown `side_changed` action), with side changes labelled "Side changed core → pop".
 
