@@ -29,6 +29,8 @@ import {
 
 type Props = {
   levelId: string;
+  /** The regions drawn at this level. */
+  childIds: readonly string[];
   /** sha256 of the vector tileset (`regions/<sha256>.pmtiles` in the tiles bucket), from the index; immutable per content hash. */
   tileset: string;
   zoneId: string | null;
@@ -46,12 +48,12 @@ addProtocol("pmtiles", new Protocol().tile);
 // MapLibre 6 locates its worker from `import.meta.url`, which a bundler rewrites, so the worker must be emitted explicitly.
 setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href);
 
-export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, selectedId, onRegionClick }: Props) {
+export default function RegionMapCanvas({ levelId, childIds, tileset, zoneId, regions, selectedId, onRegionClick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const regionsRef = useRef(regions);
   const onClickRef = useRef(onRegionClick);
-  const initialRef = useRef({ levelId, zoneId });
+  const initialRef = useRef({ childIds, zoneId });
   const hoveredRef = useRef<string | null>(null);
   const selectedRef = useRef<string | null>(null);
   const fittedRef = useRef(false);
@@ -62,7 +64,7 @@ export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, sel
   useEffect(() => {
     regionsRef.current = regions;
     onClickRef.current = onRegionClick;
-    initialRef.current = { levelId, zoneId };
+    initialRef.current = { childIds, zoneId };
   });
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, sel
           glyphsUrl: `${TILES_BASE_URL}/fonts/{fontstack}/{range}.pbf`,
           ...initialRef.current,
           colors: regionColors(
-            levelRegions(regionsRef.current, initialRef.current.levelId).map((region) => region.id),
+            levelRegions(regionsRef.current, initialRef.current.childIds).map((region) => region.id),
             regionsRef.current,
           ),
         }),
@@ -115,7 +117,7 @@ export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, sel
       const region = regionAt(event);
       if (!region) return;
       setHover(region.id);
-      map.getCanvas().style.cursor = region.drillable ? "zoom-in" : "pointer";
+      map.getCanvas().style.cursor = "pointer";
       showTooltip(event.point.x + TOOLTIP_OFFSET, event.point.y + TOOLTIP_OFFSET, describe(region));
     });
     map.on("mouseleave", REGION_FILL_LAYER, () => {
@@ -134,12 +136,12 @@ export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, sel
     };
   }, [tileset, showTooltip, hideTooltip]);
 
-  const listed = useMemo(() => levelRegions(regions, levelId), [regions, levelId]);
+  const listed = useMemo(() => levelRegions(regions, childIds), [regions, childIds]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
-    const filter = levelFilter(levelId);
+    const filter = levelFilter(childIds);
     map.setFilter(REGION_FILL_LAYER, filter);
     map.setFilter(REGION_LINE_LAYER, filter);
     map.setFilter(REGION_LABEL_LAYER, filter);
@@ -157,7 +159,7 @@ export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, sel
       animate: fittedRef.current,
     });
     fittedRef.current = true;
-  }, [ready, levelId, listed, regions]);
+  }, [ready, levelId, childIds, listed, regions]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -216,7 +218,7 @@ export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, sel
             <button
               type="button"
               aria-label={describe(region)}
-              aria-pressed={region.drillable ? undefined : selectedId === region.id}
+              aria-pressed={selectedId === region.id}
               onClick={() => onRegionClick(region)}
               onFocus={() => onFocusRegion(region)}
               onBlur={() => onBlurRegion(region)}

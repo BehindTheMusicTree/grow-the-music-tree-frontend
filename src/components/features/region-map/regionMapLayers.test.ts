@@ -74,7 +74,7 @@ describe("buildStyle", () => {
     buildStyle({
       tilesetUrl: "https://tiles.example.com/regions/abc.pmtiles",
       glyphsUrl: "https://tiles.example.com/fonts/{fontstack}/{range}.pbf",
-      levelId: "Q142",
+      childIds: ["Q12130"],
       zoneId: null,
       colors: new Map([["Q12130", "#123456"]]),
       ...overrides,
@@ -115,9 +115,9 @@ describe("buildStyle", () => {
   });
 
   it("shows only the children of the level, with their colours", () => {
-    expect(layer("region-fill").filter).toEqual(["==", ["get", "parentId"], "Q142"]);
-    expect(layer("region-line").filter).toEqual(["==", ["get", "parentId"], "Q142"]);
-    expect(layer("region-labels").filter).toEqual(["==", ["get", "parentId"], "Q142"]);
+    expect(layer("region-fill").filter).toEqual(["in", ["get", "id"], ["literal", ["Q12130"]]]);
+    expect(layer("region-line").filter).toEqual(["in", ["get", "id"], ["literal", ["Q12130"]]]);
+    expect(layer("region-labels").filter).toEqual(["in", ["get", "id"], ["literal", ["Q12130"]]]);
     expect(style().layers.find((candidate) => candidate.id === "region-fill")).toMatchObject({
       paint: { "fill-color": ["match", ["get", "id"], "Q12130", "#123456", EMPTY_FILL] },
     });
@@ -141,7 +141,7 @@ describe("buildStyle", () => {
 
 describe("levelRegions", () => {
   it("lists the children of a level", () => {
-    expect(levelRegions(regions, WORLD_ID).map((region) => region.id)).toContain("Q142");
-    expect(levelRegions(regions, "Q142").map((region) => region.id)).toEqual(["Q12130"]);
+    expect(levelRegions(regions, ["Q142", "Q183"]).map((region) => region.id)).toContain("Q142");
+    expect(levelRegions(regions, ["Q12130"]).map((region) => region.id)).toEqual(["Q12130"]);
   });
 });

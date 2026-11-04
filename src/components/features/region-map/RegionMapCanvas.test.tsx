@@ -74,12 +74,14 @@ const fakeMap = (): Fake => hoisted.instances[hoisted.instances.length - 1] as F
 
 const index = RegionMapIndexSchema.parse(fixture);
 const regions = new Map(index.regions.map((region) => [region.id, region]));
+const WORLD_CHILDREN = index.worldChildIds;
 
 const mount = (props: Partial<React.ComponentProps<typeof RegionMapCanvas>> = {}) => {
   const onRegionClick = vi.fn();
   const view = render(
     <RegionMapCanvas
       levelId="world"
+      childIds={WORLD_CHILDREN}
       tileset={index.tileset}
       zoneId={null}
       regions={regions}
@@ -125,6 +127,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="Q142"
+        childIds={["Q12130"]}
         tileset={index.tileset}
         zoneId={null}
         regions={regions}
@@ -133,7 +136,7 @@ describe("RegionMapCanvas", () => {
       />,
     );
 
-    const level = ["==", ["get", "parentId"], "Q142"];
+    const level = ["in", ["get", "id"], ["literal", ["Q12130"]]];
     expect(hoisted.instances).toHaveLength(1);
     expect(map.removed).toBe(false);
     expect(map.calls.setFilter).toEqual(
@@ -156,6 +159,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="world"
+      childIds={WORLD_CHILDREN}
         tileset={"e".repeat(64)}
         zoneId={null}
         regions={regions}
@@ -175,7 +179,7 @@ describe("RegionMapCanvas", () => {
     const event = { features: [{ properties: { id: "Q142" } }], point: { x: 10, y: 20 } };
 
     await act(() => map.emit("mousemove:region-fill", event));
-    expect(map.canvas.style.cursor).toBe("zoom-in");
+    expect(map.canvas.style.cursor).toBe("pointer");
     const tooltip = screen.getByText(/France · 120 songs/);
     expect(tooltip.style.left).toBe("22px");
     expect(tooltip.style.top).toBe("32px");
@@ -205,6 +209,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="world"
+      childIds={WORLD_CHILDREN}
         tileset={index.tileset}
         zoneId={null}
         regions={regions}
@@ -227,6 +232,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="world"
+      childIds={WORLD_CHILDREN}
         tileset={index.tileset}
         zoneId="Q236626"
         regions={regions}
@@ -254,12 +260,12 @@ describe("RegionMapCanvas", () => {
   });
 
   describe("accessible region list", () => {
-    it("lists the regions of the level as buttons, pressing only the non-drillable ones", () => {
+    it("lists the regions of the level as buttons, pressing the selected one", () => {
       mount({ selectedId: "Q183" });
 
       expect(
         screen.getByRole("button", { name: /^France · 120 songs · \d+ genres$/ }).getAttribute("aria-pressed"),
-      ).toBeNull();
+      ).toBe("false");
       expect(screen.getByRole("button", { name: /^Germany/ }).getAttribute("aria-pressed")).toBe("true");
       expect(screen.queryByRole("button", { name: /Celtic/ })).toBeNull();
     });
