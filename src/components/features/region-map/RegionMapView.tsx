@@ -46,21 +46,23 @@ export default function RegionMapView() {
   return (
     <div className="flex h-full flex-col gap-3">
       <div className="flex flex-wrap items-center gap-3">
-        <nav aria-label="Region path" className="flex flex-wrap items-center gap-1 text-sm">
-          {trail.map((id, depth) => (
-            <span key={id} className="flex items-center gap-1">
-              {depth > 0 && <span aria-hidden>›</span>}
-              <button
-                type="button"
-                onClick={() => goTo(depth)}
-                disabled={depth === trail.length - 1}
-                className="rounded px-1 font-semibold hover:underline disabled:no-underline"
-              >
-                {id === WORLD_ID ? "World" : (regions.get(id)?.name ?? id)}
-              </button>
-            </span>
-          ))}
-        </nav>
+        {trail.length > 1 && (
+          <nav aria-label="Region path" className="flex flex-wrap items-center gap-1 text-sm">
+            {trail.map((id, depth) => (
+              <span key={id} className="flex items-center gap-1">
+                {depth > 0 && <span aria-hidden>›</span>}
+                <button
+                  type="button"
+                  onClick={() => goTo(depth)}
+                  disabled={depth === trail.length - 1}
+                  className="rounded px-1 font-semibold hover:underline disabled:no-underline"
+                >
+                  {id === WORLD_ID ? "World" : (regions.get(id)?.name ?? id)}
+                </button>
+              </span>
+            ))}
+          </nav>
+        )}
         {zones.length > 0 && (
           <label className="flex items-center gap-2 text-sm">
             Zone
