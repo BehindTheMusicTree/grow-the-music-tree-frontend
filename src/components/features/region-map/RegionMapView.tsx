@@ -72,7 +72,7 @@ export default function RegionMapView() {
 
   return (
     <div className="flex h-full flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3 p-gutter pb-0">
         {path.length > 0 && (
           <nav aria-label="Region path" className="flex flex-wrap items-center gap-1 text-sm">
             <button type="button" onClick={() => goTo(0)} className="rounded px-1 font-semibold hover:underline">
