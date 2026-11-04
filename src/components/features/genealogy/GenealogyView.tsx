@@ -4,10 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { useFetchWrapper } from "@behindthemusictree/app-kit/transport";
+import { useGenreByWikidataId } from "@behindthemusictree/app-kit/genre-tree";
+import { useLeftDetailPanelLayout } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { useGenealogy } from "@hooks/useGenealogy";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
-import { CanonicalGenreSearchSchema } from "@schemas/api/curation";
 import TraditionDetailPanel from "./TraditionDetailPanel";
 
 const TRADITION_PARAM = "tradition";
@@ -21,9 +21,9 @@ export default function GenealogyView() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
   const { data, isPending, isError } = useGenealogy();
-  const [opening, setOpening] = useState(false);
+  const [openingQid, setOpeningQid] = useState<string | null>(null);
+  const lookup = useGenreByWikidataId(openingQid, "reference", getGrowBackendBaseUrl);
 
   const requestedId = searchParams.get(TRADITION_PARAM);
   const selected = useMemo(
@@ -55,29 +55,19 @@ export default function GenealogyView() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [selected, setSelectedId]);
 
-  useEffect(() => {
-    if (selected) return undefined;
-    const root = document.documentElement;
-    root.style.setProperty("--layout-left-w", "0px");
-    return () => {
-      root.style.removeProperty("--layout-left-w");
-    };
-  }, [selected]);
+  useLeftDetailPanelLayout(selected !== null);
 
-  const openInTree = async (wikidataId: string) => {
-    if (opening) return;
-    setOpening(true);
-    try {
-      const { results } = CanonicalGenreSearchSchema.parse(await fetch("genres/", true, false, {}, { wikidataId, pageSize: 1 }));
-      const genre = results[0];
-      if (!genre) {
-        toast.error("This tradition is not in the genre tree yet");
-        return;
-      }
-      router.push(`/?zoom=${genre.uuid}`);
-    } finally {
-      setOpening(false);
-    }
+  const lookedUp = lookup.data;
+  const lookupFailed = lookup.isError;
+  useEffect(() => {
+    if (openingQid === null || (lookedUp === undefined && !lookupFailed)) return;
+    setOpeningQid(null);
+    if (lookedUp) router.push(`/?zoom=${lookedUp.uuid}`);
+    else toast.error(lookupFailed ? "Could not look up this tradition" : "This tradition is not in the genre tree yet");
+  }, [openingQid, lookedUp, lookupFailed, router]);
+
+  const openInTree = (wikidataId: string) => {
+    if (openingQid === null) setOpeningQid(wikidataId);
   };
 
   if (isPending) return <div className="h-full w-full animate-pulse bg-gray-200" aria-busy />;

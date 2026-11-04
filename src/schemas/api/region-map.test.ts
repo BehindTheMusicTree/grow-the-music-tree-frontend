@@ -31,4 +31,20 @@ describe("RegionMapIndexSchema", () => {
       RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...fixture.regions[0], kind: "city" }] }).success,
     ).toBe(false);
   });
+
+  it("fills the world level from parentId while the index predates worldChildIds", () => {
+    const parsed = RegionMapIndexSchema.parse(fixture);
+
+    expect(parsed.worldChildIds).toEqual(fixture.regions.filter((r) => r.parentId === "world").map((r) => r.id));
+    expect(parsed.worldZoneIds).toEqual(
+      fixture.regions.filter((r) => r.kind === "zone" && r.parentId === null).map((r) => r.id),
+    );
+  });
+
+  it("keeps the world level an index provides", () => {
+    const parsed = RegionMapIndexSchema.parse({ ...fixture, worldChildIds: ["Q183"], worldZoneIds: [] });
+
+    expect(parsed.worldChildIds).toEqual(["Q183"]);
+    expect(parsed.worldZoneIds).toEqual([]);
+  });
 });

@@ -42,23 +42,39 @@ export function fillColorExpression(colors: ReadonlyMap<string, string>): string
   return ["match", ["get", "id"], ...Array.from(colors).flat(), EMPTY_FILL] as unknown as ExpressionSpecification;
 }
 
+const union = (boxes: readonly Region["mainBbox"][]): Region["mainBbox"] => [
+  Math.min(...boxes.map((box) => box[0])),
+  Math.min(...boxes.map((box) => box[1])),
+  Math.max(...boxes.map((box) => box[2])),
+  Math.max(...boxes.map((box) => box[3])),
+];
+
 export function levelBounds(levelId: string, regions: ReadonlyMap<string, Region>): LngLatBoundsLike {
   const region = levelId === WORLD_ID ? undefined : regions.get(levelId);
   if (!region) return WORLD_BOUNDS;
-  const [west, south, east, north] = region.mainBbox;
+  // A zone's own box spans the antimeridian through its overseas members, so frame the members instead.
+  const members = region.kind === "zone" ? region.childIds.flatMap((id) => {
+        const box = regions.get(id)?.mainBbox;
+        return box ? [box] : [];
+      }) : [];
+  const [west, south, east, north] = members.length > 0 ? union(members) : region.mainBbox;
   return [
     [west, south],
     [east, north],
   ];
 }
 
-/** The regions drawn at a level: the children of `levelId`. */
-export const levelRegions = (regions: ReadonlyMap<string, Region>, levelId: string): Region[] =>
-  Array.from(regions.values()).filter((region) => region.parentId === levelId);
+/** The regions drawn at a level. */
+export const levelRegions = (regions: ReadonlyMap<string, Region>, childIds: readonly string[]): Region[] =>
+  childIds.flatMap((id) => regions.get(id) ?? []);
 
 const featureState = (key: "selected" | "hover"): ExpressionSpecification => ["boolean", ["feature-state", key], false];
 
-export const levelFilter = (levelId: string): FilterSpecification => ["==", ["get", "parentId"], levelId];
+export const levelFilter = (childIds: readonly string[]): FilterSpecification => [
+  "in",
+  ["get", "id"],
+  ["literal", [...childIds]],
+];
 
 /** A zone id is never empty, so this matches no zone while none is chosen. */
 export const zoneFilter = (zoneId: string | null): FilterSpecification => ["==", ["get", "id"], zoneId ?? ""];
@@ -69,12 +85,12 @@ const byMinZoom: FilterSpecification = ["<=", ["get", "min_zoom"], ["zoom"]];
 type StyleOptions = {
   tilesetUrl: string;
   glyphsUrl: string;
-  levelId: string;
+  childIds: readonly string[];
   zoneId: string | null;
   colors: ReadonlyMap<string, string>;
 };
 
-export function buildStyle({ tilesetUrl, glyphsUrl, levelId, zoneId, colors }: StyleOptions): StyleSpecification {
+export function buildStyle({ tilesetUrl, glyphsUrl, childIds, zoneId, colors }: StyleOptions): StyleSpecification {
   const halo = { "text-halo-color": "#ffffff", "text-halo-width": 1.2 };
   return {
     version: 8,
@@ -103,7 +119,7 @@ export function buildStyle({ tilesetUrl, glyphsUrl, levelId, zoneId, colors }: S
         type: "fill",
         source: TILES_SOURCE,
         "source-layer": REGIONS_SOURCE_LAYER,
-        filter: levelFilter(levelId),
+        filter: levelFilter(childIds),
         paint: { "fill-color": fillColorExpression(colors) },
       },
       {
@@ -119,7 +135,7 @@ export function buildStyle({ tilesetUrl, glyphsUrl, levelId, zoneId, colors }: S
         type: "line",
         source: TILES_SOURCE,
         "source-layer": REGIONS_SOURCE_LAYER,
-        filter: levelFilter(levelId),
+        filter: levelFilter(childIds),
         paint: {
           "line-color": ["case", featureState("selected"), "#111827", featureState("hover"), "#374151", "#ffffff"],
           "line-width": ["case", featureState("selected"), 2, featureState("hover"), 1.5, 0.5],
@@ -181,7 +197,7 @@ export function buildStyle({ tilesetUrl, glyphsUrl, levelId, zoneId, colors }: S
         type: "symbol",
         source: TILES_SOURCE,
         "source-layer": "region_labels",
-        filter: levelFilter(levelId),
+        filter: levelFilter(childIds),
         layout: { "text-field": ["get", "name"], "text-font": FONT, "text-size": 13 },
         paint: { "text-color": "#111827", ...halo },
       },

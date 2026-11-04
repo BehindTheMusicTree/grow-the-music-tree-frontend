@@ -109,10 +109,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Region map**: clicking a region (country, continent, zone or sub-national region) selects it and opens its "Music of X" genre in a left detail panel, with a Focus action to drill in. Zones can now be drilled into too, and the selection, drill path and panel genre live in the URL (`?region=`, `?path=`, `?genre=`). Needs `@behindthemusictree/app-kit` and `app-kit-ui` 29.0.0.
 - **Genealogy**: tradition names are always shown on the chart. Like the genre tree, the most-linked traditions (Wikidata sitelinks) get larger labels and appear at lower zoom; the rest appear as you zoom in, colliding labels are dropped, and the selected tradition is always labelled. Includes unit tests for the label layout. Needs `@behindthemusictree/ui` 0.12.0.
 
 ### Fixed
 
+- **Region map**: opening a shared or reloaded `?region=<zone>` link now highlights that zone and shows it in the Zone selector, instead of only opening its panel.
 - **Genealogy, region map**: the mouse cursor no longer stutters while hovering. The hover tooltip re-rendered the whole chart or map on every pointer move; only its text is state now, the position is applied directly.
 - **Genealogy**: the schema accepts the `sitelinks` count the API now serves on every tradition (the strict schema would otherwise reject the new snapshot).
 - **Header**: the Map and Genealogy buttons are round like About when their label is collapsed, instead of oval.
