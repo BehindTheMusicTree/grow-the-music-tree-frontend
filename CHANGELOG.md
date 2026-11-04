@@ -123,6 +123,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Navigation**: the floating header is replaced by a permanent icon-only rail on the left of the detail panel (tree, map, genealogy, About, sign-in/account, top to bottom). The app title next to the logo is gone, and the account menu opens to the right of the rail.
+- **Genealogy**: the column header now starts at the top of the chart, since no floating header covers it any more.
 - **Region map**: `/map` no longer shows the "Music by region" title or a "not computed yet" message; the page stays empty until a map is available.
 - **Genealogy**: the chart fills the page width and spreads the years over the spare height. Its header extends under the floating app header, with centred region labels kept below the buttons. Crowded year labels and region labels too wide for their cell are hidden, and the empty column-label row collapses until you zoom in.
 - **Cursor**: the genealogy chart and region map backgrounds show the arrow instead of the grab hand; regions and traditions show the pointer. The genre tree background does the same, with the pointer only on nodes and controls (`@behindthemusictree/app-kit` and `app-kit-ui` 29.0.1).

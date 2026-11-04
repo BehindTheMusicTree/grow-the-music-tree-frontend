@@ -38,7 +38,6 @@ type Props = {
 export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
   const isAdmin = useIsAdmin();
   const svgRef = useRef<SVGSVGElement>(null);
-  const bandRef = useRef<HTMLDivElement>(null);
   const behaviorRef = useRef<ZoomBehavior<SVGSVGElement, unknown> | null>(null);
   const fittedRef = useRef(false);
   const [transform, setTransform] = useState<ZoomTransform>(zoomIdentity);
@@ -47,8 +46,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
   const [height, setHeight] = useState(0);
   const tooltip = useHoverTooltip();
   const [width, setWidth] = useState(0);
-  const [headerTop, setHeaderTop] = useState(0);
-  const headerBottom = headerTop + headerHeight(transform.k);
+  const headerBottom = headerHeight(transform.k);
   const [stretch, setStretch] = useState(1);
   const yearScale = useMemo(() => createYearScale(stretch), [stretch]);
   const ticks = useMemo(yearTicks, []);
@@ -115,7 +113,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
       const y0 = TOP_MARGIN;
       const availableWidth = svg.clientWidth - AXIS_WIDTH - 2 * FIT_PADDING;
       const widthK = availableWidth / (x1 - x0);
-      const top = (bandRef.current?.offsetHeight ?? 0) + headerHeight(widthK);
+      const top = headerHeight(widthK);
       const availableHeight = svg.clientHeight - top - FIT_TOP_PADDING - FIT_PADDING;
       const heightK = availableHeight / BASE_HEIGHT;
       // By default the chart fills the width and may extend beyond the viewport height; "Fit to frame" shows it whole.
@@ -156,14 +154,13 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
     };
   }, []);
 
-  // Layout effect: the band height and first fit must land before paint, or labels flash under the app header.
+  // Layout effect: the first fit must land before paint, or the chart flashes at its unfitted scale.
   useLayoutEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
     const fitOnce = () => {
       setWidth(svg.clientWidth);
       setHeight(svg.clientHeight);
-      setHeaderTop(bandRef.current?.offsetHeight ?? 0);
       if (!fittedRef.current && fit(false, false)) fittedRef.current = true;
     };
     fitOnce();
@@ -200,8 +197,6 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-white" data-testid="genealogy-chart">
-      {/* Measures the band the floating app header occupies, so header labels sit below its buttons. */}
-      <div ref={bandRef} className="pointer-events-none invisible absolute top-0 left-0 h-band w-px" aria-hidden />
       <svg
         ref={svgRef}
         className="h-full w-full touch-none select-none"
@@ -352,7 +347,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
           ))}
         </g>
 
-        <GenealogyColumnHeader columns={data.columns} regions={data.regions} transform={transform} width={width} top={headerTop} />
+        <GenealogyColumnHeader columns={data.columns} regions={data.regions} transform={transform} width={width} top={0} />
 
         <g data-layer="year-axis" pointerEvents="none">
           <rect x={0} y={0} width={AXIS_WIDTH} height="100%" className="fill-white" />

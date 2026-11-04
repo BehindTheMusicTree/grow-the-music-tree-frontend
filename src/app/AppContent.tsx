@@ -7,7 +7,7 @@ import { initSentry } from "@lib/sentry";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
-import AppHeader from "@components/features/menu/AppHeader";
+import SideRail from "@components/features/menu/SideRail";
 import Player from "@components/features/player/Player";
 import AutoAdvance from "@components/features/player/AutoAdvance";
 
@@ -44,10 +44,9 @@ export default function AppContent({ children }: { children: ReactNode }) {
     <PlayerPanelProvider>
     <GenreTreeViewModeProvider>
       <div className="app col h-screen">
-        <AppHeader />
-
-        <div className="center fixed top-0 flex h-full w-full bg-gray-100">
+        <div className="center fixed top-0 flex h-full w-full">
           <div className="relative flex min-h-0 w-full flex-grow">
+            <SideRail />
             <div className="min-h-0 flex-grow w-full flex" style={activePopup ? { filter: "blur(4px)" } : undefined}>
               <main className="flex min-h-0 w-full flex-grow flex-col">
                 <div className="flex min-h-0 flex-1 flex-col">{children}</div>
