@@ -125,7 +125,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Region map**: `/map` no longer shows the "Music by region" title or a "not computed yet" message; the page stays empty until a map is available.
 - **Genealogy**: the chart fills the page width and spreads the years over the spare height. Its header extends under the floating app header, with centred region labels kept below the buttons. Crowded year labels and region labels too wide for their cell are hidden, and the empty column-label row collapses until you zoom in.
-- **Cursor**: the genealogy chart and region map backgrounds show the arrow instead of the grab hand; regions and traditions show the pointer.
+- **Cursor**: the genealogy chart and region map backgrounds show the arrow instead of the grab hand; regions and traditions show the pointer. The genre tree background does the same, with the pointer only on nodes and controls (`@behindthemusictree/app-kit` and `app-kit-ui` 29.0.1).
 - **Header**: the Genealogy button is icon-only.
 - **Genre tree**: the outline/wheel toggle sits in the floating controls next to the size metric.
 - **Region map**: the map attribution control is removed.
