@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { linkVertical, select, zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from "d3";
 import { ZoomControls } from "@behindthemusictree/ui";
+import { useHoverTooltip } from "@hooks/useHoverTooltip";
 import { useIsAdmin } from "@hooks/useIsAdmin";
 import type { Genealogy, GenealogyLane, GenealogyTradition } from "@schemas/api/genealogy";
 import GenealogyColumnHeader from "./GenealogyColumnHeader";
@@ -17,7 +18,6 @@ const MIN_ZOOM = 0.3;
 const MAX_ZOOM = 6;
 const ARROW_ID = "genealogy-arrow";
 
-type Tooltip = { x: number; y: number; text: string };
 
 // From this many times the fit scale on, every tradition is eligible for a label.
 const LABEL_FOCUS_FIT_MULTIPLE = 3;
@@ -45,7 +45,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
   const [minZoom, setMinZoom] = useState(MIN_ZOOM);
   const [fitScale, setFitScale] = useState(MIN_ZOOM);
   const [height, setHeight] = useState(0);
-  const [tooltip, setTooltip] = useState<Tooltip | null>(null);
+  const tooltip = useHoverTooltip();
   const [width, setWidth] = useState(0);
   const [headerTop, setHeaderTop] = useState(0);
   const headerBottom = headerTop + headerHeight(transform.k);
@@ -181,9 +181,9 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
 
   const showTooltip = (event: { clientX: number; clientY: number }, text: string) => {
     const box = svgRef.current?.getBoundingClientRect();
-    setTooltip({ x: event.clientX - (box?.left ?? 0) + 12, y: event.clientY - (box?.top ?? 0) + 12, text });
+    tooltip.show(event.clientX - (box?.left ?? 0) + 12, event.clientY - (box?.top ?? 0) + 12, text);
   };
-  const hideTooltip = () => setTooltip(null);
+  const hideTooltip = tooltip.hide;
 
   const onMarkerKeyDown = (event: KeyboardEvent, { wikidataId }: GenealogyTradition) => {
     if (event.key !== "Enter" && event.key !== " ") return;
@@ -386,11 +386,11 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
         canZoomIn={transform.k < MAX_ZOOM}
         canZoomOut={transform.k > minZoom}
       />
-      {tooltip && (
+      {tooltip.text !== null && (
         <div
+          ref={tooltip.ref}
           role="tooltip"
           className="pointer-events-none absolute z-10 max-w-xs rounded bg-slate-900 px-2 py-1 text-xs text-white shadow"
-          style={{ left: tooltip.x, top: tooltip.y }}
         >
           {tooltip.text}
         </div>

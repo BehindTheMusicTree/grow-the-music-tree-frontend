@@ -4,6 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { addProtocol, Map as MapLibreMap, setWorkerUrl, type MapLayerMouseEvent } from "maplibre-gl";
 import { Protocol } from "pmtiles";
+import { useHoverTooltip } from "@hooks/useHoverTooltip";
 import { publicEnv } from "@lib/env";
 import type { Region } from "@schemas/api/region-map";
 import {
@@ -25,7 +26,6 @@ import {
   zoneFilter,
 } from "./regionMapLayers";
 
-type Tooltip = { x: number; y: number; text: string };
 
 type Props = {
   levelId: string;
@@ -57,7 +57,7 @@ export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, sel
   const fittedRef = useRef(false);
   const [ready, setReady] = useState(false);
   const [webglFailed, setWebglFailed] = useState(false);
-  const [tooltip, setTooltip] = useState<Tooltip | null>(null);
+  const { text: tooltipText, ref: tooltipRef, show: showTooltip, hide: hideTooltip } = useHoverTooltip();
 
   useEffect(() => {
     regionsRef.current = regions;
@@ -116,12 +116,12 @@ export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, sel
       if (!region) return;
       setHover(region.id);
       map.getCanvas().style.cursor = region.drillable ? "zoom-in" : "pointer";
-      setTooltip({ x: event.point.x + TOOLTIP_OFFSET, y: event.point.y + TOOLTIP_OFFSET, text: describe(region) });
+      showTooltip(event.point.x + TOOLTIP_OFFSET, event.point.y + TOOLTIP_OFFSET, describe(region));
     });
     map.on("mouseleave", REGION_FILL_LAYER, () => {
       setHover(null);
       map.getCanvas().style.cursor = "";
-      setTooltip(null);
+      hideTooltip();
     });
 
     return () => {
@@ -132,7 +132,7 @@ export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, sel
       fittedRef.current = false;
       setReady(false);
     };
-  }, [tileset]);
+  }, [tileset, showTooltip, hideTooltip]);
 
   const listed = useMemo(() => levelRegions(regions, levelId), [regions, levelId]);
 
@@ -188,12 +188,12 @@ export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, sel
       hoveredRef.current = region.id;
     }
     const point = map.project(region.centroid);
-    setTooltip({ x: point.x + TOOLTIP_OFFSET, y: point.y + TOOLTIP_OFFSET, text: describe(region) });
+    showTooltip(point.x + TOOLTIP_OFFSET, point.y + TOOLTIP_OFFSET, describe(region));
   };
   const onBlurRegion = (region: Region) => {
     if (ready) mapRef.current?.setFeatureState(regionState(region.id), { hover: false });
     hoveredRef.current = null;
-    setTooltip(null);
+    hideTooltip();
   };
 
   return (
@@ -227,14 +227,14 @@ export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, sel
           </li>
         ))}
       </ul>
-      {tooltip && (
+      {tooltipText !== null && (
         <div
+          ref={tooltipRef}
           aria-hidden
           data-tooltip
           className="pointer-events-none absolute rounded bg-black/80 px-2 py-1 text-sm text-white"
-          style={{ left: tooltip.x, top: tooltip.y }}
         >
-          {tooltip.text}
+          {tooltipText}
         </div>
       )}
     </div>
