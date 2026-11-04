@@ -123,6 +123,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Genealogy**: the chart fills the page width and spreads the years over the spare height. Its header extends under the floating app header, with centred region labels kept below the buttons. Crowded year labels and region labels too wide for their cell are hidden, and the empty column-label row collapses until you zoom in.
 - **Header**: the region map link's icon is now a globe that rotates through Africa, the Americas and Asia every few seconds (static under reduced motion).
 - **Dev tooling**: `./scripts/dev-up.sh` now targets read-only staging by default; pass `--local` to start the local grow-api (`--restore`/`--no-restore` require `--local`).
+- **Dev tooling**: `next dev` no longer rewrites `AGENTS.md` (`agentRules: false`); the Next.js guidance is now a hand-maintained section, so Next upgrades no longer leave a modified `AGENTS.md` that blocks `git pull`.
 
 ## [3.22.0] - 2026-11-03
 
