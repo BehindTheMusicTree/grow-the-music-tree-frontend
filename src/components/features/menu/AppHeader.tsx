@@ -119,7 +119,7 @@ export default function AppHeader({ className }: AppHeaderProps) {
         aria-current={isRegionMap ? "page" : undefined}
       >
         <RegionGlobeIcon className="h-5 w-5" />
-        <span aria-hidden className={`grid overflow-hidden whitespace-nowrap text-base font-bold transition-[grid-template-columns,opacity] duration-200 motion-reduce:transition-none ${isRegionMap ? "grid-cols-[0fr] opacity-0 xl:grid-cols-[1fr] xl:opacity-100" : "grid-cols-[0fr] opacity-0"}`}><span className="min-w-0 overflow-hidden"><span className="pl-2">Map</span></span></span>
+        {isRegionMap && <span aria-hidden className="hidden whitespace-nowrap pl-2 text-base font-bold xl:inline">Map</span>}
       </Link>
       <Link
         href={GENEALOGY_HREF}

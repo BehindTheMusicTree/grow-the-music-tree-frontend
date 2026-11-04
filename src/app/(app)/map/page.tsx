@@ -1,11 +1,14 @@
+import { Suspense } from "react";
 import Page from "@components/ui/Page";
 import RegionMapView from "@components/features/region-map/RegionMapView";
 
 export default function RegionMapPage() {
   return (
     <Page title="Music by region" visuallyHiddenTitle dataPage="map">
-      <div className="h-[calc(100dvh-12rem)] min-h-96">
-        <RegionMapView />
+      <div className="h-full min-h-96">
+        <Suspense>
+          <RegionMapView />
+        </Suspense>
       </div>
     </Page>
   );

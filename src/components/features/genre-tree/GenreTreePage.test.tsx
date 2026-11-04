@@ -65,6 +65,7 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
 }));
 
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
+  useLeftDetailPanelLayout: () => undefined,
   GenreTreeView: (props: GenreTreeViewProps) => (
     <div
       data-testid="genre-tree-view"

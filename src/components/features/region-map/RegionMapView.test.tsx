@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import fixture from "@schemas/api/region-map.fixture.json";
 import { RegionMapIndexSchema, type Region } from "@schemas/api/region-map";
@@ -8,10 +8,33 @@ import RegionMapView from "./RegionMapView";
 const index = RegionMapIndexSchema.parse(fixture);
 let data: typeof index | null = index;
 let chartMounts = 0;
-let lastProps: { levelId: string; tileset: string; zoneId: string | null };
+let lastProps: { levelId: string; childIds: string[]; tileset: string; zoneId: string | null; selectedId: string | null };
+let search = new URLSearchParams();
+const navigation = vi.hoisted(() => ({ replace: vi.fn(), push: vi.fn() }));
 
 vi.mock("@hooks/useRegionMap", () => ({
   useRegionMapIndex: () => ({ data, isPending: false, isError: false }),
+}));
+
+vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({ useLeftDetailPanelLayout: () => undefined }));
+
+vi.mock("./RegionDetailPanel", () => ({
+  default: ({ region, onFocus, onClose }: { region: Region; onFocus: (r: Region) => void; onClose: () => void }) => (
+    <section aria-label={`Panel ${region.name}`}>
+      <button type="button" onClick={() => onFocus(region)}>
+        Focus
+      </button>
+      <button type="button" onClick={onClose}>
+        Close
+      </button>
+    </section>
+  ),
+}));
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => navigation,
+  usePathname: () => "/map",
+  useSearchParams: () => search,
 }));
 
 vi.mock("next/dynamic", () => ({
@@ -24,8 +47,10 @@ vi.mock("next/dynamic", () => ({
       regions: Map<string, Region>;
       onRegionClick: (region: Region) => void;
       levelId: string;
+      childIds: string[];
       tileset: string;
       zoneId: string | null;
+      selectedId: string | null;
     }) {
       lastProps = props;
       useEffect(() => {
@@ -43,6 +68,14 @@ vi.mock("next/dynamic", () => ({
     },
 }));
 
+const url = (call: unknown[]) => new URL(String(call[0]), "http://localhost");
+
+beforeEach(() => {
+  search = new URLSearchParams();
+  navigation.push.mockClear();
+  navigation.replace.mockClear();
+});
+
 afterEach(() => {
   cleanup();
   chartMounts = 0;
@@ -57,43 +90,72 @@ describe("RegionMapView", () => {
     expect(container.childElementCount).toBe(0);
   });
 
-  it("drills into a drillable region and back, and overlays a chosen zone", () => {
+  it("selects a region on click without drilling into it", () => {
     render(<RegionMapView />);
 
     fireEvent.click(screen.getByText("click Q142"));
-    expect(screen.getByRole("button", { name: "France" })).toBeTruthy();
 
-    fireEvent.change(screen.getByRole("combobox"), { target: { value: "Q236626" } });
-    expect(lastProps.zoneId).toBe("Q236626");
-
-    fireEvent.click(screen.getByRole("button", { name: "World" }));
-    expect(screen.queryByRole("button", { name: "France" })).toBeNull();
+    expect(url(navigation.push.mock.calls[0]).searchParams.get("region")).toBe("Q142");
+    expect(url(navigation.push.mock.calls[0]).searchParams.get("path")).toBeNull();
   });
 
-  it("selects a non-drillable region instead of drilling into it", () => {
+  it("shows the panel of the selected region and focuses into it", () => {
+    search = new URLSearchParams("region=Q142");
     render(<RegionMapView />);
 
-    fireEvent.click(screen.getByText("click Q183"));
+    fireEvent.click(screen.getByRole("button", { name: "Focus" }));
 
-    expect(screen.getByText("Germany")).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Germany" })).toBeNull();
+    expect(url(navigation.push.mock.calls[0]).searchParams.get("path")).toBe("Q142");
+    expect(url(navigation.push.mock.calls[0]).searchParams.get("region")).toBe("Q142");
   });
 
-  it("keeps one map mounted across drills so the view can animate between levels", () => {
+  it("closes the panel on Escape", () => {
+    search = new URLSearchParams("region=Q142");
     render(<RegionMapView />);
-    expect(chartMounts).toBe(1);
 
-    fireEvent.click(screen.getByText("click Q142"));
+    fireEvent.keyDown(window, { key: "Escape" });
 
-    expect(chartMounts).toBe(1);
+    expect(url(navigation.push.mock.calls[0]).searchParams.get("region")).toBeNull();
   });
 
-  it("hands the tileset, level and zone to the map", () => {
+  it("draws the children of the focused level and follows the path in the breadcrumb", () => {
+    search = new URLSearchParams("path=Q142");
     render(<RegionMapView />);
-    expect(lastProps).toMatchObject({ levelId: "world", tileset: index.tileset, zoneId: null });
-
-    fireEvent.click(screen.getByText("click Q142"));
 
     expect(lastProps.levelId).toBe("Q142");
+    expect(lastProps.childIds).toEqual(["Q12130"]);
+    expect(screen.getByRole("button", { name: "World" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "France" }));
+    expect(url(navigation.push.mock.calls[0]).searchParams.get("region")).toBe("Q142");
+
+    fireEvent.click(screen.getByRole("button", { name: "World" }));
+    expect(url(navigation.push.mock.calls[1]).searchParams.get("path")).toBeNull();
+  });
+
+  it("drops an invalid tail of the path and an unknown region with replace", () => {
+    search = new URLSearchParams("path=Q142/Q183&region=nope");
+    render(<RegionMapView />);
+
+    expect(url(navigation.replace.mock.calls[0]).searchParams.get("path")).toBe("Q142");
+  });
+
+  it("selects a zone chosen in the selector and overlays it", () => {
+    render(<RegionMapView />);
+
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "Q236626" } });
+
+    expect(lastProps.zoneId).toBe("Q236626");
+    expect(url(navigation.push.mock.calls[0]).searchParams.get("region")).toBe("Q236626");
+  });
+
+  it("keeps one map mounted across levels so the view can animate", () => {
+    const { rerender } = render(<RegionMapView />);
+    expect(chartMounts).toBe(1);
+
+    search = new URLSearchParams("path=Q142");
+    rerender(<RegionMapView />);
+
+    expect(chartMounts).toBe(1);
+    expect(lastProps).toMatchObject({ levelId: "Q142", tileset: index.tileset });
   });
 });
