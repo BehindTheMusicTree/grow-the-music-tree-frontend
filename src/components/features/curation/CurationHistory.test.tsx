@@ -14,8 +14,8 @@ const item = (overrides: Partial<CurationHistoryItem>): CurationHistoryItem => (
   ...overrides,
 });
 
-const mainParent = {
-  name: "main_parent",
+const canonicalParent = {
+  name: "canonical_parent",
   keyColumns: ["item_id"],
   columns: ["item_id", "parent_id", "reason", "exclude_other_parents"],
   columnSpecs: [
@@ -29,20 +29,20 @@ const mainParent = {
 };
 const labels = { Q1: "Rock", Q2: "Pop", Q3: "Jazz" };
 
-const snapshot = (row: Record<string, string | boolean>) => JSON.stringify({ list_name: "main_parent", ...row });
+const snapshot = (row: Record<string, string | boolean>) => JSON.stringify({ list_name: "canonical_parent", ...row });
 
 describe("CurationHistory", () => {
   afterEach(cleanup);
 
   it("says when nothing was recorded", () => {
-    render(<CurationHistory items={[]} lists={[mainParent]} labels={labels} />);
+    render(<CurationHistory items={[]} lists={[canonicalParent]} labels={labels} />);
     expect(screen.getByText("Aucune modification enregistrée.")).toBeInTheDocument();
   });
 
   it("shows only the changed columns of an update, old then new", () => {
     render(
       <CurationHistory
-        lists={[mainParent]}
+        lists={[canonicalParent]}
         labels={labels}
         items={[
           item({
@@ -54,7 +54,7 @@ describe("CurationHistory", () => {
     );
 
     expect(screen.getByText("· Modification")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Parent principal imposé" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Parent canonique imposé" })).toBeInTheDocument();
     expect(screen.getByRole("deletion")).toHaveTextContent("Pop");
     expect(screen.getByRole("insertion")).toHaveTextContent("Jazz");
     expect(screen.queryByText("Raison")).not.toBeInTheDocument();
@@ -63,7 +63,7 @@ describe("CurationHistory", () => {
   it("credits the pipeline and shows a deleted row's old values", () => {
     render(
       <CurationHistory
-        lists={[mainParent]}
+        lists={[canonicalParent]}
         labels={labels}
         items={[
           item({

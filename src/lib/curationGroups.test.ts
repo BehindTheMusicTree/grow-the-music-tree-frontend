@@ -9,10 +9,12 @@ const REGISTRY = [
   "duplicate_genres",
   "indigenous_to_exclusions",
   "label_overrides",
-  "main_parent",
+  "canonical_overrides",
+  "canonical_parent",
   "out_of_scope_genres",
   "overview_reclassifications",
-  "regional_overrides",
+  "regional_genre_parent",
+  "regional_overviews",
   "regional_overview_additions",
   "technique_genres",
   "theme_genres",
@@ -41,7 +43,7 @@ describe("curationGroups", () => {
   });
 
   it("falls back to the technical name for an unmapped list title", () => {
-    expect(curationListTitle("main_parent")).toBe("Parent principal imposé");
+    expect(curationListTitle("canonical_parent")).toBe("Parent canonique imposé");
     expect(curationListTitle("brand_new")).toBe("brand_new");
   });
 });
