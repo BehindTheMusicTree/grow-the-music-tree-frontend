@@ -30,6 +30,11 @@ export default function RegionMapView() {
 
   useLeftDetailPanelLayout(panelOpen);
 
+  const urlZoneId = level && state.region !== null && level.zoneIds.includes(state.region) ? state.region : null;
+  useEffect(() => {
+    if (urlZoneId !== null) setZoneId(urlZoneId);
+  }, [urlZoneId]);
+
   const invalidPath = index != null && path.length !== state.path.length;
   const invalidRegion = index != null && state.region !== null && selected === undefined;
   useEffect(() => {
