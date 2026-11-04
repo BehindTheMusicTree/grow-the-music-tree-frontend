@@ -204,7 +204,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
       <div ref={bandRef} className="pointer-events-none invisible absolute top-0 left-0 h-band w-px" aria-hidden />
       <svg
         ref={svgRef}
-        className="h-full w-full cursor-grab touch-none select-none active:cursor-grabbing"
+        className="h-full w-full touch-none select-none"
         role="img"
         aria-label="Genealogy of music traditions"
       >
