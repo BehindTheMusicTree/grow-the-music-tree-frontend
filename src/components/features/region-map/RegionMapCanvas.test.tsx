@@ -17,6 +17,7 @@ vi.mock("maplibre-gl", () => {
     calls: Record<string, unknown[][]> = {};
     canvas = { style: { cursor: "" } };
     removed = false;
+    surfaceRadius = Infinity;
 
     constructor(public options: unknown) {
       if (hoisted.failConstruction) throw new Error("WebGL unavailable");
@@ -51,8 +52,16 @@ vi.mock("maplibre-gl", () => {
     fitBounds(...args: unknown[]) {
       this.record("fitBounds", args);
     }
-    project() {
-      return { x: 40, y: 60 };
+    // Screen point <-> "lngLat" round trip on a disk of `surfaceRadius` around the origin: a point
+    // outside snaps to the disk's edge, like MapLibre snapping a point in space onto the globe.
+    unproject([x, y]: [number, number]) {
+      const distance = Math.hypot(x, y);
+      const scale = distance > this.surfaceRadius ? this.surfaceRadius / distance : 1;
+      return { lng: x * scale, lat: y * scale };
+    }
+    project(lngLat: [number, number] | { lng: number; lat: number }) {
+      if (Array.isArray(lngLat)) return { x: 40, y: 60 };
+      return { x: lngLat.lng, y: lngLat.lat };
     }
     remove() {
       this.removed = true;
@@ -68,6 +77,7 @@ type Fake = {
   calls: Record<string, unknown[][]>;
   canvas: { style: { cursor: string } };
   removed: boolean;
+  surfaceRadius: number;
   emit: (key: string, event?: unknown) => void;
 };
 const fakeMap = (): Fake => hoisted.instances[hoisted.instances.length - 1] as Fake;
@@ -173,9 +183,10 @@ describe("RegionMapCanvas", () => {
     const map = fakeMap();
     await act(() => map.emit("load"));
     const event = { features: [{ properties: { id: "Q142" } }], point: { x: 10, y: 20 } };
+    expect(map.canvas.style.cursor).toBe("default");
 
     await act(() => map.emit("mousemove:region-fill", event));
-    expect(map.canvas.style.cursor).toBe("zoom-in");
+    expect(map.canvas.style.cursor).toBe("pointer");
     const tooltip = screen.getByText(/France · 120 songs/);
     expect(tooltip.style.left).toBe("22px");
     expect(tooltip.style.top).toBe("32px");
@@ -189,8 +200,27 @@ describe("RegionMapCanvas", () => {
     expect(onRegionClick).toHaveBeenCalledWith(expect.objectContaining({ id: "Q142" }));
 
     await act(() => map.emit("mouseleave:region-fill"));
-    expect(map.canvas.style.cursor).toBe("");
+    expect(map.canvas.style.cursor).toBe("default");
     expect(screen.queryByText(/France · 120 songs/)).toBeNull();
+  });
+
+  it("ignores a region MapLibre snaps to the horizon when the pointer is off the globe", async () => {
+    const { onRegionClick } = mount();
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+    map.surfaceRadius = 100;
+    const onGlobe = { features: [{ properties: { id: "Q142" } }], point: { x: 10, y: 20 } };
+    const inSpace = { ...onGlobe, point: { x: 300, y: 20 } };
+
+    await act(() => map.emit("mousemove:region-fill", onGlobe));
+    expect(screen.getByText(/France · 120 songs/)).toBeInTheDocument();
+
+    await act(() => map.emit("mousemove:region-fill", inSpace));
+    expect(screen.queryByText(/France · 120 songs/)).toBeNull();
+    expect(map.canvas.style.cursor).toBe("default");
+
+    map.emit("click:region-fill", inSpace);
+    expect(onRegionClick).not.toHaveBeenCalled();
   });
 
   it("points MapLibre at its worker bundle", () => {
