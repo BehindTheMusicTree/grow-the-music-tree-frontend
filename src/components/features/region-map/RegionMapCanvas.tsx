@@ -40,6 +40,7 @@ type Props = {
 };
 
 const TOOLTIP_OFFSET = 12;
+const ON_GLOBE_TOLERANCE_PX = 1;
 const TILES_BASE_URL = publicEnv.NEXT_PUBLIC_TILES_BASE_URL;
 const regionState = (id: string) => ({ source: TILES_SOURCE, sourceLayer: REGIONS_SOURCE_LAYER, id });
 
@@ -87,13 +88,15 @@ export default function RegionMapCanvas({ levelId, childIds, tileset, zoneId, re
         dragRotate: false,
         pitchWithRotate: false,
         touchPitch: false,
-        attributionControl: { compact: true, customAttribution: "Natural Earth" },
+        attributionControl: false,
       });
     } catch {
       setWebglFailed(true);
       return;
     }
     mapRef.current = map;
+    // Overrides MapLibre's grab/grabbing container cursor: background shows the arrow, regions the pointer.
+    map.getCanvas().style.cursor = "default";
 
     const setHover = (id: string | null) => {
       if (hoveredRef.current === id) return;
@@ -103,9 +106,22 @@ export default function RegionMapCanvas({ levelId, childIds, tileset, zoneId, re
       if (id !== null) map.setFeatureState(regionState(id), { hover: true });
       hoveredRef.current = id;
     };
+    const isOnGlobe = (point: { x: number; y: number }) => {
+      const back = map.project(map.unproject([point.x, point.y]));
+      return Math.hypot(back.x - point.x, back.y - point.y) <= ON_GLOBE_TOLERANCE_PX;
+    };
     const regionAt = (event: MapLayerMouseEvent) => {
+      // On the globe, MapLibre snaps a point in space to the nearest point of the sphere, so the
+      // layer events report the region on the horizon all along the ray out to the viewport edge.
+      // Such a point does not round-trip through unproject/project back onto itself.
+      if (!isOnGlobe(event.point)) return undefined;
       const id = event.features?.[0]?.properties?.id;
       return typeof id === "string" ? regionsRef.current.get(id) : undefined;
+    };
+    const clearHover = () => {
+      setHover(null);
+      map.getCanvas().style.cursor = "default";
+      hideTooltip();
     };
 
     map.on("load", () => setReady(true));
@@ -115,16 +131,15 @@ export default function RegionMapCanvas({ levelId, childIds, tileset, zoneId, re
     });
     map.on("mousemove", REGION_FILL_LAYER, (event) => {
       const region = regionAt(event);
-      if (!region) return;
+      if (!region) {
+        clearHover();
+        return;
+      }
       setHover(region.id);
       map.getCanvas().style.cursor = "pointer";
       showTooltip(event.point.x + TOOLTIP_OFFSET, event.point.y + TOOLTIP_OFFSET, describe(region));
     });
-    map.on("mouseleave", REGION_FILL_LAYER, () => {
-      setHover(null);
-      map.getCanvas().style.cursor = "";
-      hideTooltip();
-    });
+    map.on("mouseleave", REGION_FILL_LAYER, clearHover);
 
     return () => {
       map.remove();

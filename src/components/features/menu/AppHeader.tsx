@@ -4,14 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { CircleDot, Info, List, Network } from "lucide-react";
+import { Info, Network } from "lucide-react";
 import { RegionGlobeIcon } from "./RegionGlobeIcon";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { getAudiometaUrl } from "@lib/site-urls";
 import { MenuGroup } from "./MenuGroup";
 import { ABOUT_HREF, GENEALOGY_HREF, REGION_MAP_HREF } from "@lib/constants/routes";
-import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { iconPillClassName } from "./iconPillClassName";
 import { UserMenu } from "./UserMenu";
 
@@ -68,11 +67,9 @@ interface AppHeaderProps {
 
 export default function AppHeader({ className }: AppHeaderProps) {
   const pathname = usePathname();
-  const { viewMode, setViewMode, canShowPopCore } = useGenreTreeViewMode();
-  const isOutline = viewMode === "outline";
   const isGenealogy = pathname === GENEALOGY_HREF;
   const isRegionMap = pathname === REGION_MAP_HREF;
-  const isLabelledPage = isGenealogy || isRegionMap;
+  const isLabelledPage = isRegionMap;
 
   return (
     <div
@@ -101,16 +98,6 @@ export default function AppHeader({ className }: AppHeaderProps) {
           <MenuGroup items={menuGroup} layout="horizontal" />
         </nav>
       )}
-      {pathname === "/" && canShowPopCore && (
-        <button
-          type="button"
-          onClick={() => setViewMode(isOutline ? "pop-core" : "outline")}
-          className={iconPillClassName}
-          aria-label={isOutline ? "Show wheel view" : "Show outline view"}
-        >
-          {isOutline ? <CircleDot className="h-5 w-5" aria-hidden /> : <List className="h-5 w-5" aria-hidden />}
-        </button>
-      )}
       <Link
         href={REGION_MAP_HREF}
         prefetch={false}
@@ -129,7 +116,6 @@ export default function AppHeader({ className }: AppHeaderProps) {
         aria-current={isGenealogy ? "page" : undefined}
       >
         <Network className="h-5 w-5" aria-hidden />
-        <span aria-hidden className={`grid overflow-hidden whitespace-nowrap text-base font-bold transition-[grid-template-columns,opacity] duration-200 motion-reduce:transition-none ${isGenealogy ? "grid-cols-[0fr] opacity-0 xl:grid-cols-[1fr] xl:opacity-100" : "grid-cols-[0fr] opacity-0"}`}><span className="min-w-0 overflow-hidden"><span className="pl-2">Genealogy</span></span></span>
       </Link>
       <Suspense fallback={null}>
         <AboutButton />

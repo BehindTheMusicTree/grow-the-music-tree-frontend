@@ -118,12 +118,17 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Genealogy, region map**: the mouse cursor no longer stutters while hovering. The hover tooltip re-rendered the whole chart or map on every pointer move; only its text is state now, the position is applied directly.
 - **Genealogy**: the schema accepts the `sitelinks` count the API now serves on every tradition (the strict schema would otherwise reject the new snapshot).
 - **Header**: the Map and Genealogy buttons are round like About when their label is collapsed, instead of oval.
+- **Region map**: pointing at space beside the globe no longer highlights, tooltips or clicks the region on the horizon in that direction.
 - **Genre history**: a genre whose pop/core side was changed shows its Modifications panel again (it failed to load on the unknown `side_changed` action), with side changes labelled "Side changed core → pop".
 
 ### Changed
 
 - **Region map**: `/map` no longer shows the "Music by region" title or a "not computed yet" message; the page stays empty until a map is available.
 - **Genealogy**: the chart fills the page width and spreads the years over the spare height. Its header extends under the floating app header, with centred region labels kept below the buttons. Crowded year labels and region labels too wide for their cell are hidden, and the empty column-label row collapses until you zoom in.
+- **Cursor**: the genealogy chart and region map backgrounds show the arrow instead of the grab hand; regions and traditions show the pointer.
+- **Header**: the Genealogy button is icon-only.
+- **Genre tree**: the outline/wheel toggle sits in the floating controls next to the size metric.
+- **Region map**: the map attribution control is removed.
 - **Header**: the region map link's icon is now a globe that rotates through Africa, the Americas and Asia every few seconds (static under reduced motion).
 - **Dev tooling**: `./scripts/dev-up.sh` now targets read-only staging by default; pass `--local` to start the local grow-api (`--restore`/`--no-restore` require `--local`).
 - **Dev tooling**: `next dev` no longer rewrites `AGENTS.md` (`agentRules: false`); the Next.js guidance is now a hand-maintained section, so Next upgrades no longer leave a modified `AGENTS.md` that blocks `git pull`.
