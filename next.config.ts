@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   images: { unoptimized: true },
   reactStrictMode: false,
   productionBrowserSourceMaps: true,
+  agentRules: false,
   async rewrites() {
     const origin = publicEnv.NEXT_PUBLIC_UMAMI_ORIGIN;
     if (!origin) return [];
