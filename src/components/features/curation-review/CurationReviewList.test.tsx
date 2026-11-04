@@ -216,11 +216,11 @@ describe("CurationReviewList", () => {
             ...base,
             key: "Q10",
             column: "parent_item_id",
-            list: "main_parent",
+            list: "canonical_parent",
             itemId: "Q99",
             reason: "redirect_conflict",
             target: "Q10",
-            evidence: { conflictList: "main_parent" },
+            evidence: { conflictList: "canonical_parent" },
           },
         ]}
       />,
@@ -253,7 +253,7 @@ describe("CurationReviewList", () => {
             ...base,
             key: "Q10",
             column: "parent_item_id",
-            list: "main_parent",
+            list: "canonical_parent",
             itemId: "Q99",
             reason: "missing",
             target: null,
@@ -262,7 +262,7 @@ describe("CurationReviewList", () => {
             ...base,
             key: "Q11",
             column: "overview_item_id",
-            list: "regional_overrides",
+            list: "regional_overviews",
             itemId: "Q98",
             reason: "missing",
             target: null,
@@ -271,7 +271,7 @@ describe("CurationReviewList", () => {
       />,
     );
 
-    expect(screen.getByText(/Parent principal de/)).toBeInTheDocument();
+    expect(screen.getByText(/Parent de/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Q10" })).toBeInTheDocument();
     expect(screen.getByText(/Vue d'ensemble de/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Q11" })).toBeInTheDocument();

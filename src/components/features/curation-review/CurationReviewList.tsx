@@ -70,7 +70,7 @@ function explain({
 function Rule({ rowKey, column }: { rowKey: string; column: string }) {
   const owner = <GenreRef id={rowKey} showQid={false} />;
   if (column === "parent_item_id" || column === "parent_id")
-    return <span className="flex gap-1">Parent principal de {owner}</span>;
+    return <span className="flex gap-1">Parent de {owner}</span>;
   if (column === "overview_item_id") return <span className="flex gap-1">Vue d&apos;ensemble de {owner}</span>;
   return (
     <span className="flex gap-1">

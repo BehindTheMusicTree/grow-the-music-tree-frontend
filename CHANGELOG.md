@@ -124,6 +124,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Curation admin**: the Parenté group follows the three parent axes: "Parent canonique imposé" (`canonical_parent`, was `main_parent`), "Parent régional imposé" (`regional_genre_parent`), and under Régional "Vues régionales imposées" (`regional_overviews`, was `regional_overrides`) and "Genres maintenus canoniques" (`canonical_overrides`). A parent rule in the review queue reads "Parent de" instead of "Parent principal de". Needs grow-the-music-tree-api with the three-parent-axes curation lists.
 - **Navigation**: the floating header is replaced by a permanent icon-only rail on the left of the detail panel (tree, map, genealogy, About, sign-in/account, top to bottom). The app title next to the logo is gone, and the account menu opens to the right of the rail.
 - **Genealogy**: the column header now starts at the top of the chart, since no floating header covers it any more.
 - **Region map**: `/map` no longer shows the "Music by region" title or a "not computed yet" message; the page stays empty until a map is available.

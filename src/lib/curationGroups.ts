@@ -11,7 +11,8 @@ export const CURATION_GROUPS: { title: string; lists: Record<string, string> }[]
   {
     title: "Parenté",
     lists: {
-      main_parent: "Parent principal imposé",
+      canonical_parent: "Parent canonique imposé",
+      regional_genre_parent: "Parent régional imposé",
       canonical_parent_additions: "Parents canoniques ajoutés",
       overview_reclassifications: "Genres reclassés en vue régionale",
       regional_secondary_parents: "Parents régionaux secondaires",
@@ -37,7 +38,8 @@ export const CURATION_GROUPS: { title: string; lists: Record<string, string> }[]
   {
     title: "Régional",
     lists: {
-      regional_overrides: "Rattachements régionaux",
+      regional_overviews: "Vues régionales imposées",
+      canonical_overrides: "Genres maintenus canoniques",
       regional_overview_additions: "Vues régionales ajoutées",
     },
   },

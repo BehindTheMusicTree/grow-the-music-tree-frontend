@@ -18,8 +18,8 @@ vi.mock("@behindthemusictree/app-kit/transport", () => ({
   useQueryWithParse: () => ({ data: undefined, isFetching: false }),
 }));
 
-const mainParent = {
-  name: "main_parent",
+const canonicalParent = {
+  name: "canonical_parent",
   keyColumns: ["item_id"],
   columns: ["item_id", "reason", "parent_item_id"],
   columnSpecs: [
@@ -39,7 +39,7 @@ const capitalized = {
   count: 0,
 };
 const rule = {
-  listName: "main_parent",
+  listName: "canonical_parent",
   uuid: "11111111-1111-4111-8111-111111111111",
   row: { item_id: "Q2", reason: "Because", parent_item_id: "Q1" },
   createdOn: "2026-10-01T00:00:00Z",
@@ -53,16 +53,16 @@ describe("CurationGenreRules", () => {
     render(
       <CurationGenreRules
         itemId="Q1"
-        lists={[capitalized, mainParent]}
+        lists={[capitalized, canonicalParent]}
         rules={{ results: [rule], labels: { Q1: "Rock", Q2: "Palaeo" } }}
         appliedExportOn={null}
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "Parent principal imposé" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Parent principal imposé" })).toHaveAttribute(
+    expect(screen.getByRole("heading", { name: "Parent canonique imposé" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Parent canonique imposé" })).toHaveAttribute(
       "href",
-      "/admin/curation/main_parent",
+      "/admin/curation/canonical_parent",
     );
     expect(within(screen.getByRole("table")).getByRole("link", { name: "Palaeo" })).toHaveAttribute(
       "href",
@@ -75,7 +75,7 @@ describe("CurationGenreRules", () => {
     render(
       <CurationGenreRules
         itemId="Q1"
-        lists={[capitalized, mainParent]}
+        lists={[capitalized, canonicalParent]}
         rules={{ results: [], labels: {} }}
         appliedExportOn={null}
       />,
@@ -87,7 +87,7 @@ describe("CurationGenreRules", () => {
       within(select)
         .getAllByRole("option")
         .map((option) => option.textContent),
-    ).toEqual(["Parent principal imposé"]);
+    ).toEqual(["Parent canonique imposé"]);
 
     fireEvent.click(screen.getByRole("button", { name: "Ajouter" }));
 
