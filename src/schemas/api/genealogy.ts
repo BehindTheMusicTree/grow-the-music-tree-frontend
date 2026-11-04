@@ -52,6 +52,7 @@ const TraditionSchema = z
     end: z.number().int().nullable(),
     anchorId: z.string().nullable(),
     inCanonicalTree: z.boolean(),
+    sitelinks: z.number().int().min(0),
   })
   .strict();
 
