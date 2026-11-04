@@ -107,6 +107,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- **Genealogy**: tradition names are always shown on the chart. Like the genre tree, the most-linked traditions (Wikidata sitelinks) get larger labels and appear at lower zoom; the rest appear as you zoom in, colliding labels are dropped, and the selected tradition is always labelled. Includes unit tests for the label layout. Needs `@behindthemusictree/ui` 0.12.0.
+
 ### Fixed
 
 - **Genealogy**: the schema accepts the `sitelinks` count the API now serves on every tradition (the strict schema would otherwise reject the new snapshot).
