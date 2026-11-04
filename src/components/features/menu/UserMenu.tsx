@@ -15,7 +15,7 @@ const MENU_LINKS = [
   { href: "/admin/root-review", label: "Root review" },
 ];
 
-const buttonClassName = "flex h-full aspect-square shrink-0 items-center justify-center rounded-full shadow-lg";
+const buttonClassName = "flex h-header w-header shrink-0 items-center justify-center rounded-full shadow-lg";
 const itemClassName = "block w-full px-3 py-2 text-left text-sm hover:bg-white/10";
 
 export function UserMenu() {
@@ -56,7 +56,7 @@ export function UserMenu() {
   }
 
   return (
-    <div ref={containerRef} className="relative h-full">
+    <div ref={containerRef} className="relative">
       <button
         type="button"
         className={buttonClassName}
@@ -70,7 +70,7 @@ export function UserMenu() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-full mt-2 min-w-48 overflow-hidden rounded-lg bg-black/80 py-1 text-gray-100 shadow-lg backdrop-blur"
+          className="absolute bottom-full left-0 z-50 mb-2 min-w-48 md:bottom-auto md:left-full md:top-0 md:mb-0 md:ml-2 overflow-hidden rounded-lg bg-black/80 py-1 text-gray-100 shadow-lg backdrop-blur"
         >
           {session?.user?.email && <p className="px-3 py-2 text-xs text-gray-400">{session.user.email}</p>}
           {MENU_LINKS.map(({ href, label }) => (

@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
-import AppHeader from "./AppHeader";
+import SideRail from "./SideRail";
 
 let searchParams = new URLSearchParams();
 let pathname = "/";
@@ -14,14 +14,23 @@ vi.mock("next/navigation", () => ({
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api", getAudiometaUrl: () => "" }));
 
 function renderHeader() {
-  render(<AppHeader />);
+  render(<SideRail />);
 }
 
-describe("AppHeader", () => {
+describe("SideRail", () => {
   afterEach(() => {
     cleanup();
     searchParams = new URLSearchParams();
     pathname = "/";
+  });
+
+  it("lists tree, map, genealogy and about from top to bottom, icon-only", () => {
+    renderHeader();
+
+    const names = screen.getAllByRole("link").map((link) => link.getAttribute("aria-label"));
+    expect(names).toEqual(["GrowTheMusicTree home", "Region map", "Genealogy", "About"]);
+    screen.getAllByRole("link").forEach((link) => expect(link).toHaveTextContent(/^$/));
+    expect(screen.getByRole("link", { name: "GrowTheMusicTree home" })).toHaveAttribute("href", "/");
   });
 
   it.each(["/", "/map", "/genealogy"])("keeps Map before Genealogy on %s", (route) => {
@@ -68,7 +77,6 @@ describe("AppHeader", () => {
     const link = screen.getByRole("link", { name: "Genealogy" });
     expect(link).toHaveTextContent(/^$/);
     expect(link).toHaveAttribute("aria-current", "page");
-    expect(screen.getByRole("heading", { name: "GrowTheMusicTree" })).toBeInTheDocument();
   });
 
   it("keeps other params when opening About", () => {
