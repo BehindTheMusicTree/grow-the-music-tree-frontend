@@ -114,6 +114,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Region map**: the zone selector and region path no longer touch the edge of the side rail.
 - **Region map**: opening a shared or reloaded `?region=<zone>` link now highlights that zone and shows it in the Zone selector, instead of only opening its panel.
 - **Genealogy, region map**: the mouse cursor no longer stutters while hovering. The hover tooltip re-rendered the whole chart or map on every pointer move; only its text is state now, the position is applied directly.
 - **Genealogy**: the schema accepts the `sitelinks` count the API now serves on every tradition (the strict schema would otherwise reject the new snapshot).
