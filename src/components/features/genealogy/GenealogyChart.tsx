@@ -8,6 +8,7 @@ import type { Genealogy, GenealogyLane, GenealogyTradition } from "@schemas/api/
 import GenealogyColumnHeader from "./GenealogyColumnHeader";
 import { formatSpan, formatYear } from "./format";
 import { anchorPosition, AXIS_WIDTH, buildAnchorIndex, COLUMN_WIDTH, columnX, headerHeight, TOP_MARGIN } from "./geometry";
+import { genealogyLabelLayout, sitelinksRange } from "./labelLayout";
 import { BASE_HEIGHT, createYearScale, YEAR_MAX, YEAR_MIN, yearTicks } from "./yearScale";
 
 const LANE_WIDTH = 8;
@@ -18,6 +19,8 @@ const ARROW_ID = "genealogy-arrow";
 
 type Tooltip = { x: number; y: number; text: string };
 
+// From this many times the fit scale on, every tradition is eligible for a label.
+const LABEL_FOCUS_FIT_MULTIPLE = 3;
 const ZOOM_STEP = 1.4;
 const ZOOM_DURATION = 200;
 const FIT_PADDING = 24;
@@ -40,6 +43,8 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
   const fittedRef = useRef(false);
   const [transform, setTransform] = useState<ZoomTransform>(zoomIdentity);
   const [minZoom, setMinZoom] = useState(MIN_ZOOM);
+  const [fitScale, setFitScale] = useState(MIN_ZOOM);
+  const [height, setHeight] = useState(0);
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
   const [width, setWidth] = useState(0);
   const [headerTop, setHeaderTop] = useState(0);
@@ -69,6 +74,32 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
   );
   const markerById = useMemo(() => new Map(markers.map((marker) => [marker.tradition.wikidataId, marker])), [markers]);
   const unplacedCount = data.traditions.length - markers.length;
+  const labelMarkers = useMemo(
+    () =>
+      markers.map(({ tradition, x, y }) => ({
+        id: tradition.wikidataId,
+        label: tradition.label,
+        sitelinks: tradition.sitelinks,
+        x,
+        y,
+        radius: tradition.wikidataId === selectedId ? MARKER_RADIUS + 2 : MARKER_RADIUS,
+      })),
+    [markers, selectedId],
+  );
+  const labelRange = useMemo(() => (labelMarkers.length > 0 ? sitelinksRange(labelMarkers) : { min: 0, max: 0 }), [labelMarkers]);
+  const labels = useMemo(
+    () =>
+      genealogyLabelLayout(labelMarkers, {
+        transform,
+        viewport: { width, height },
+        headerBottom,
+        selectedId,
+        sitelinksRange: labelRange,
+        minScale: minZoom,
+        focusScale: fitScale * LABEL_FOCUS_FIT_MULTIPLE,
+      }),
+    [labelMarkers, transform, width, height, headerBottom, selectedId, labelRange, minZoom, fitScale],
+  );
 
   const fit = useCallback(
     (animate: boolean, wholeChart: boolean) => {
@@ -102,6 +133,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
       setStretch(nextStretch);
       behavior.scaleExtent([floor, MAX_ZOOM]);
       setMinZoom(floor);
+      setFitScale(fitK);
       const selection = select(svg);
       if (animate) selection.transition().duration(ZOOM_DURATION).call(behavior.transform, next);
       else selection.call(behavior.transform, next);
@@ -130,6 +162,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
     if (!svg) return;
     const fitOnce = () => {
       setWidth(svg.clientWidth);
+      setHeight(svg.clientHeight);
       setHeaderTop(bandRef.current?.offsetHeight ?? 0);
       if (!fittedRef.current && fit(false, false)) fittedRef.current = true;
     };
@@ -300,6 +333,23 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
               );
             })}
           </g>
+        </g>
+
+        <g data-layer="tradition-labels" pointerEvents="none">
+          {labels.map(({ id, text, x, y, anchor, fontSize, selected }) => (
+            <text
+              key={id}
+              data-tradition-label={id}
+              x={x}
+              y={y}
+              textAnchor={anchor}
+              dominantBaseline="middle"
+              fontSize={fontSize}
+              className={`fill-slate-700 stroke-white stroke-[3] [paint-order:stroke] ${selected ? "font-semibold" : ""}`}
+            >
+              {text}
+            </text>
+          ))}
         </g>
 
         <GenealogyColumnHeader columns={data.columns} regions={data.regions} transform={transform} width={width} top={headerTop} />
