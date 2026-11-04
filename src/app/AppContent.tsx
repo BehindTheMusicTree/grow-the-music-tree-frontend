@@ -45,7 +45,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
     <GenreTreeViewModeProvider>
       <div className="app col h-screen">
         <div className="center fixed top-0 flex h-full w-full">
-          <div className="relative flex min-h-0 w-full flex-grow">
+          <div className="relative flex min-h-0 w-full flex-grow flex-col-reverse md:flex-row">
             <SideRail />
             <div className="min-h-0 flex-grow w-full flex" style={activePopup ? { filter: "blur(4px)" } : undefined}>
               <main className="flex min-h-0 w-full flex-grow flex-col">

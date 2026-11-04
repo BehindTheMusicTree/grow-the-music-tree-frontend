@@ -44,7 +44,8 @@ export default function SideRail() {
   return (
     <nav
       aria-label="Main navigation"
-      className="relative z-50 flex shrink-0 flex-col items-center gap-2 px-1 py-1"
+      // Bottom bar below md (thumb reach, full-width content); the env() inset keeps it clear of the home indicator.
+      className="relative z-50 flex shrink-0 flex-row items-center justify-around gap-2 bg-black/70 px-1 py-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] backdrop-blur md:flex-col md:justify-start md:bg-transparent md:pb-1 md:backdrop-blur-none"
     >
       <Link
         href="/"
