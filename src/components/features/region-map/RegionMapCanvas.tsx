@@ -85,7 +85,7 @@ export default function RegionMapCanvas({ levelId, tileset, zoneId, regions, sel
         dragRotate: false,
         pitchWithRotate: false,
         touchPitch: false,
-        attributionControl: { compact: true, customAttribution: "Natural Earth" },
+        attributionControl: false,
       });
     } catch {
       setWebglFailed(true);
