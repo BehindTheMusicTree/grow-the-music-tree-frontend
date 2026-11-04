@@ -176,7 +176,14 @@ describe("RegionMapCanvas", () => {
 
     await act(() => map.emit("mousemove:region-fill", event));
     expect(map.canvas.style.cursor).toBe("zoom-in");
-    expect(screen.queryByText(/France · 120 songs/)).not.toBeNull();
+    const tooltip = screen.getByText(/France · 120 songs/);
+    expect(tooltip.style.left).toBe("22px");
+    expect(tooltip.style.top).toBe("32px");
+
+    await act(() => map.emit("mousemove:region-fill", { ...event, point: { x: 50, y: 60 } }));
+    expect(screen.getByText(/France · 120 songs/)).toBe(tooltip);
+    expect(tooltip.style.left).toBe("62px");
+    expect(tooltip.style.top).toBe("72px");
 
     map.emit("click:region-fill", event);
     expect(onRegionClick).toHaveBeenCalledWith(expect.objectContaining({ id: "Q142" }));
