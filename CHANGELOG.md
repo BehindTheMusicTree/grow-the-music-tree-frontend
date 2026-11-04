@@ -127,7 +127,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Genealogy**: the chart fills the page width and spreads the years over the spare height. Its header extends under the floating app header, with centred region labels kept below the buttons. Crowded year labels and region labels too wide for their cell are hidden, and the empty column-label row collapses until you zoom in.
 - **Cursor**: the genealogy chart and region map backgrounds show the arrow instead of the grab hand; regions and traditions show the pointer. The genre tree background does the same, with the pointer only on nodes and controls (`@behindthemusictree/app-kit` and `app-kit-ui` 29.0.1).
 - **Header**: the Genealogy button is icon-only.
-- **Genre tree**: the outline/wheel toggle sits in the floating controls next to the size metric.
+- **Genre tree**: the outline/wheel toggle sits in the floating controls next to the size metric. Both toggles use the floating segmented style, matching the zoom controls' height (`@behindthemusictree/ui` 0.13.0, `app-kit`/`app-kit-ui` 29.1.0).
 - **Region map**: the map attribution control is removed.
 - **Header**: the region map link's icon is now a globe that rotates through Africa, the Americas and Asia every few seconds (static under reduced motion).
 - **Dev tooling**: `./scripts/dev-up.sh` now targets read-only staging by default; pass `--local` to start the local grow-api (`--restore`/`--no-restore` require `--local`).

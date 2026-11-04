@@ -11,6 +11,7 @@ export function ViewModeToggle() {
 
   return (
     <SegmentedControl<ToggleMode>
+      variant="floating"
       aria-label="Tree view"
       value={viewMode === "outline" ? "outline" : "pop-core"}
       onChange={setViewMode}
