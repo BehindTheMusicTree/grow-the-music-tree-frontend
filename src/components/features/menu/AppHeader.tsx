@@ -72,7 +72,7 @@ export default function AppHeader({ className }: AppHeaderProps) {
   const isOutline = viewMode === "outline";
   const isGenealogy = pathname === GENEALOGY_HREF;
   const isRegionMap = pathname === REGION_MAP_HREF;
-  const isLabelledPage = isGenealogy || isRegionMap;
+  const isLabelledPage = isRegionMap;
 
   return (
     <div
@@ -129,7 +129,6 @@ export default function AppHeader({ className }: AppHeaderProps) {
         aria-current={isGenealogy ? "page" : undefined}
       >
         <Network className="h-5 w-5" aria-hidden />
-        <span aria-hidden className={`grid overflow-hidden whitespace-nowrap text-base font-bold transition-[grid-template-columns,opacity] duration-200 motion-reduce:transition-none ${isGenealogy ? "grid-cols-[0fr] opacity-0 xl:grid-cols-[1fr] xl:opacity-100" : "grid-cols-[0fr] opacity-0"}`}><span className="min-w-0 overflow-hidden"><span className="pl-2">Genealogy</span></span></span>
       </Link>
       <Suspense fallback={null}>
         <AboutButton />

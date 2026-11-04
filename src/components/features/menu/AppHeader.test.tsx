@@ -70,16 +70,16 @@ describe("AppHeader view toggle", () => {
     renderHeader(true);
 
     const link = screen.getByRole("link", { name: "Genealogy" });
-    expect(link).toHaveTextContent("Genealogy");
+    expect(link).toHaveTextContent(/^$/);
     expect(link).not.toHaveAttribute("aria-current");
   });
 
-  it("shows the Genealogy label and keeps the brand heading for assistive tech on the genealogy page", () => {
+  it("keeps the Genealogy link icon-only and marks it current on the genealogy page", () => {
     pathname = "/genealogy";
     renderHeader(true);
 
     const link = screen.getByRole("link", { name: "Genealogy" });
-    expect(link).toHaveTextContent("Genealogy");
+    expect(link).toHaveTextContent(/^$/);
     expect(link).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("heading", { name: "GrowTheMusicTree" })).toBeInTheDocument();
   });
