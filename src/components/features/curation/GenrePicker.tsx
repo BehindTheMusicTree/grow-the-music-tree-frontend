@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useFetchWrapper, useQueryWithParse } from "@behindthemusictree/app-kit/transport";
 import type { GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
-import Combobox from "@components/ui/Combobox";
+import { Combobox } from "@behindthemusictree/ui";
 import { useDebouncedValue } from "@hooks/useDebouncedValue";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { CanonicalGenreSearchSchema, CurationItemSearchSchema, ITEM_ID_PATTERN } from "@schemas/api/curation";
@@ -67,8 +67,9 @@ export default function GenrePicker({
     if (canLoadMore) void genres.fetchNextPage();
   };
 
-  const pick = (index: number) => {
-    const option = options[index];
+  const pick = (_groupKey: string, optionKey: string) => {
+    const option = options.find((candidate) => candidate.key === optionKey);
+    if (!option) return;
     setText(option.name);
     setOpen(false);
     onChange(option.itemId, option.name, option.uuid);
@@ -85,15 +86,20 @@ export default function GenrePicker({
         listLabel={label}
         value={text}
         placeholder="Nom du genre, Q123 ou LOCAL:slug"
-        options={options.map((option) => ({
-          key: option.key,
-          content: (
-            <>
-              <span>{option.name}</span>
-              <span className="font-mono text-xs text-gray-500">{option.itemId}</span>
-            </>
-          ),
-        }))}
+        groups={[
+          {
+            key: "genres",
+            options: options.map((option) => ({
+              key: option.key,
+              content: (
+                <div className="flex justify-between gap-2">
+                  <span>{option.name}</span>
+                  <span className="font-mono text-xs text-gray-500">{option.itemId}</span>
+                </div>
+              ),
+            })),
+          },
+        ]}
         open={open}
         onValueChange={(next) => {
           setText(next);
@@ -103,8 +109,6 @@ export default function GenrePicker({
         onPick={pick}
         onLoadMore={loadMore}
         canLoadMore={canLoadMore}
-        inputClassName="w-full px-3 py-2 border rounded-md"
-        optionClassName="flex justify-between gap-2 px-3 py-2 cursor-pointer aria-selected:bg-gray-100 hover:bg-gray-100"
         footer={
           !catalog && genres.hasNextPage ? (
             <button
