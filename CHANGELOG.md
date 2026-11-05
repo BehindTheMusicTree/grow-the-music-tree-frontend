@@ -87,6 +87,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Region map, genealogy**: Escape in a search field no longer closes the open panel.
 - **Audio Player**: Fixed track progress bar not updating correctly on mobile Safari
   - Includes regression tests across different browser environments
   - Improved audio event handling for better compatibility
@@ -109,6 +110,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Detail panels**: the genre, artist, song, region and genealogy panels share one shell. On desktop it sits flush against the left rail (the left margin is gone; top and bottom gutters stay), and the region and genealogy panels get the same bottom sheet on mobile and the same edge tab to hide and show the panel as the genre panel.
 - **Song search and detail**: the search box finds songs alongside genres and artists, and a song opens in a detail panel at `?song=<uuid>` (`/songs/<uuid>` redirects there). The link-songs dialog uses the new `library/songs/search/` endpoint. The curation genre picker uses the shared `Combobox`. **Must deploy together with the API song search endpoint.** Needs `@behindthemusictree/app-kit` and `app-kit-ui` 30.0.0 and `@behindthemusictree/ui` 0.14.0.
 - **Region map**: clicking a region (country, continent, zone or sub-national region) selects it and opens its "Music of X" genre in a left detail panel, with a Focus action to drill in. Zones can now be drilled into too, and the selection, drill path and panel genre live in the URL (`?region=`, `?path=`, `?genre=`). Needs `@behindthemusictree/app-kit` and `app-kit-ui` 29.0.0.
 - **Genealogy**: tradition names are always shown on the chart. Like the genre tree, the most-linked traditions (Wikidata sitelinks) get larger labels and appear at lower zoom; the rest appear as you zoom in, colliding labels are dropped, and the selected tradition is always labelled. Includes unit tests for the label layout. Needs `@behindthemusictree/ui` 0.12.0.

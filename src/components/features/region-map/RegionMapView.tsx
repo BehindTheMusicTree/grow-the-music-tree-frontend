@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { useLeftDetailPanelLayout } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { useRegionMapIndex } from "@hooks/useRegionMap";
 import { WORLD_ID, type Region } from "@schemas/api/region-map";
 import RegionDetailPanel from "./RegionDetailPanel";
@@ -26,9 +25,12 @@ export default function RegionMapView() {
   const levelId = path.length > 0 ? path[path.length - 1] : WORLD_ID;
   const level = useMemo(() => (index ? levelOf(index, regions, levelId) : null), [index, regions, levelId]);
   const selected = state.region === null ? undefined : regions.get(state.region);
-  const panelOpen = selected !== undefined;
 
-  useLeftDetailPanelLayout(panelOpen);
+  const [collapsed, setCollapsed] = useState(false);
+  const selectedId = state.region;
+  useEffect(() => {
+    setCollapsed(false);
+  }, [selectedId]);
 
   const urlZoneId = level && state.region !== null && level.zoneIds.includes(state.region) ? state.region : null;
   useEffect(() => {
@@ -41,15 +43,6 @@ export default function RegionMapView() {
     if (invalidPath) update({ path }, "replace");
     else if (invalidRegion) update({ region: null, genre: null }, "replace");
   }, [invalidPath, invalidRegion, path, update]);
-
-  useEffect(() => {
-    if (!panelOpen) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") update({ region: null, genre: null });
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [panelOpen, update]);
 
   if (isPending) return <Skeleton />;
   if (isError) return <p className="text-red-600">Could not load the region map.</p>;
@@ -129,6 +122,8 @@ export default function RegionMapView() {
           <RegionDetailPanel
             key={selected.id}
             region={selected}
+            collapsed={collapsed}
+            onCollapsedChange={setCollapsed}
             genreUuid={state.genre}
             onSelectGenre={(genre) => update({ genre })}
             onFocus={focus}

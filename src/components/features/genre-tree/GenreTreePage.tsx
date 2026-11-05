@@ -14,7 +14,7 @@ import {
   useArtist,
   useSong,
 } from "@behindthemusictree/app-kit/genre-tree";
-import { GenreTreeViewSkeleton, useLeftDetailPanelLayout, type FocusChangeReason, type ParentChange, type GenreTreeShareTarget } from "@behindthemusictree/app-kit-ui/genre-tree";
+import { GenreTreeViewSkeleton, type FocusChangeReason, type ParentChange, type GenreTreeShareTarget } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { useUpdateGenreParent } from "@hooks/curation/useUpdateGenreParent";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
 import GenreRenamePopup from "@components/ui/popup/child/GenreRenamePopup";
@@ -174,10 +174,6 @@ function ZoomableGenreTreeView({
   useEffect(() => {
     setSongExpanded(false);
   }, [songUuid]);
-
-  // The brand layout tokens derive the center column, header and extended player from this variable.
-  const isDetailHidden = detailCollapsed || (!selectedNodeId && !artistUuid && !songUuid);
-  useLeftDetailPanelLayout(!isDetailHidden);
 
   // The About link only adds its own param, so a stale genre or artist is dropped here.
   useEffect(() => {

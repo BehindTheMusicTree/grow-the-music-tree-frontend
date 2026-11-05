@@ -25,7 +25,7 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
   ),
 }));
 
-const props = { genreUuid: null, onSelectGenre: vi.fn(), onFocus: vi.fn(), onClose: vi.fn() };
+const props = { genreUuid: null, onSelectGenre: vi.fn(), onFocus: vi.fn(), onClose: vi.fn(), collapsed: false, onCollapsedChange: vi.fn() };
 const withOverview = (id: string | null): Region => ({ ...france, overviewItemId: id, drillable: true });
 
 afterEach(() => {
@@ -58,5 +58,24 @@ describe("RegionDetailPanel", () => {
     expect(screen.getByText(france.name)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: `Focus on ${france.name}` }));
     expect(props.onFocus).toHaveBeenCalled();
+  });
+
+  it("closes on Escape", () => {
+    render(<RegionDetailPanel {...props} region={withOverview(null)} />);
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(props.onClose).toHaveBeenCalled();
+  });
+
+  it("hides and shows through its edge tab", () => {
+    const { rerender } = render(<RegionDetailPanel {...props} region={withOverview(null)} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Hide panel" }));
+    expect(props.onCollapsedChange).toHaveBeenCalledWith(true);
+
+    rerender(<RegionDetailPanel {...props} collapsed region={withOverview(null)} />);
+    fireEvent.click(screen.getByRole("button", { name: "Show panel", hidden: true }));
+    expect(props.onCollapsedChange).toHaveBeenCalledWith(false);
   });
 });
