@@ -114,6 +114,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Region map**: a region without its own "Music of X" genre opens the one of its nearest parent region instead (Normandie opens "Music of France"), from the index's new optional `inheritedOverviewItemId`. **Must reach production before a pipelines index carrying that key is imported:** the index schema rejects unknown keys.
 - **Genealogy**: tradition names are always shown on the chart. Like the genre tree, the most-linked traditions (Wikidata sitelinks) get larger labels and appear at lower zoom; the rest appear as you zoom in, colliding labels are dropped, and the selected tradition is always labelled. Includes unit tests for the label layout. Needs `@behindthemusictree/ui` 0.12.0.
 
+### Changed
+
+- **Curation admin**: "Genres maintenus canoniques" follows the list's new name, `forced_canonical_genres` (was `canonical_overrides`). Needs grow-the-music-tree-api with the renamed list.
+
 ### Fixed
 
 - **Region map**: the zone selector and region path no longer touch the edge of the side rail.

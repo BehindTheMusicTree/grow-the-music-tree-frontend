@@ -9,7 +9,7 @@ const REGISTRY = [
   "duplicate_genres",
   "indigenous_to_exclusions",
   "label_overrides",
-  "canonical_overrides",
+  "forced_canonical_genres",
   "canonical_parent",
   "out_of_scope_genres",
   "overview_reclassifications",
