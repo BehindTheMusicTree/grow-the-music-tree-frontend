@@ -87,6 +87,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Popups**: the left rail is now blurred and inert behind an open popup like the rest of the page; it used to stay sharp, undimmed and clickable.
 - **Region map, genealogy**: Escape in a search field no longer closes the open panel.
 - **Audio Player**: Fixed track progress bar not updating correctly on mobile Safari
   - Includes regression tests across different browser environments
