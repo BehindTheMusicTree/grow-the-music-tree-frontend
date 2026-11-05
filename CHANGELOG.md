@@ -122,7 +122,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
-- **Genre panel**: the Modifications section is a `PanelSection` again, so it keeps its padding and border (genre-tree-view 8.0.0 removed the class it relied on). ESLint now rejects `gtv-info-panel-*` classes. The Links, Summary, Essential and Songs sections are fixed in app-kit-ui, in a release not yet adopted here.
+- **Genre panel**: the Links, Summary, Essential and Songs sections get their padding, border and collapsible title back, as `PanelSection`s, by moving to `@behindthemusictree/app-kit` and `app-kit-ui` 32.0.0 (the summary and essential-songs editors now sit inside a titled section). Needs app-kit and app-kit-ui 32.0.0.
+- **Genre panel**: the Modifications section is a `PanelSection` again, so it keeps its padding and border (genre-tree-view 8.0.0 removed the class it relied on). ESLint now rejects `gtv-info-panel-*` classes.
 - **Region map**: the zone selector and region path no longer touch the edge of the side rail.
 - **Region map**: opening a shared or reloaded `?region=<zone>` link now highlights that zone and shows it in the Zone selector, instead of only opening its panel.
 - **Genealogy, region map**: the mouse cursor no longer stutters while hovering. The hover tooltip re-rendered the whole chart or map on every pointer move; only its text is state now, the position is applied directly.
