@@ -16,10 +16,12 @@ type Props = {
 };
 
 export default function RegionDetailPanel({ region, genreUuid, onSelectGenre, onFocus, onClose }: Props) {
-  const overview = useGenreByWikidataId(region.overviewItemId ?? null, "reference", getGrowBackendBaseUrl);
+  const ownOverviewId = region.overviewItemId ?? null;
+  const overviewId = ownOverviewId ?? region.inheritedOverviewItemId ?? null;
+  const overview = useGenreByWikidataId(overviewId, "reference", getGrowBackendBaseUrl);
   const onZoomIn = region.drillable ? () => onFocus(region) : undefined;
 
-  if (region.overviewItemId == null) {
+  if (overviewId === null) {
     return (
       <DetailPanel title={region.name} onClose={onClose} side="left">
         <FieldList
@@ -48,7 +50,9 @@ export default function RegionDetailPanel({ region, genreUuid, onSelectGenre, on
       <DetailPanel title={region.name} onClose={onClose} side="left">
         {failed ? (
           <p role="alert" className="px-6 py-4 text-red-600">
-            The genre “Music of {region.name}” could not be loaded.
+            {ownOverviewId === null
+              ? `The music genre covering ${region.name} could not be loaded.`
+              : `The genre “Music of ${region.name}” could not be loaded.`}
           </p>
         ) : (
           <div className="m-6 h-24 animate-pulse rounded bg-gray-200" aria-busy />
