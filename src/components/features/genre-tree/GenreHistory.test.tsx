@@ -91,7 +91,16 @@ describe("GenreHistory", () => {
     renderHistory();
 
     expect(await screen.findByText("—")).toBeInTheDocument();
-    expect(screen.getByText("Modifications")).toBeInTheDocument();
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
+  });
+
+  it("frames the entries in a titled Modifications section", async () => {
+    fetchMock.mockResolvedValue([entry({ action: "created" })]);
+
+    renderHistory();
+
+    const list = await screen.findByRole("list");
+    const toggle = screen.getByRole("button", { name: "Modifications" });
+    expect(toggle.closest("section")).toContainElement(list);
   });
 });
