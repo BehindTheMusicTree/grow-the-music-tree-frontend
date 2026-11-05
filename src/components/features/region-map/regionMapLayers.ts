@@ -1,5 +1,6 @@
 import { interpolateYlGnBu, scaleSequentialSqrt } from "d3";
 import type { ExpressionSpecification, FilterSpecification, LngLatBoundsLike, StyleSpecification } from "maplibre-gl";
+import { labelHalo } from "@behindthemusictree/ui";
 import { WORLD_ID, type Region } from "@schemas/api/region-map";
 
 export const EMPTY_FILL = "#e5e7eb";
@@ -82,6 +83,16 @@ export const zoneFilter = (zoneId: string | null): FilterSpecification => ["==",
 /** Natural Earth's `min_zoom` says from which zoom a feature is worth drawing. */
 const byMinZoom: FilterSpecification = ["<=", ["get", "min_zoom"], ["zoom"]];
 
+const PLACE_LABEL_SIZE = 11;
+const PLACE_LABEL_COLOR = "#374151";
+const REGION_LABEL_SIZE = 13;
+const REGION_LABEL_COLOR = "#111827";
+
+function textPaint(color: string, size: number) {
+  const halo = labelHalo(color, size);
+  return { "text-color": color, "text-halo-color": halo.color, "text-halo-width": halo.width };
+}
+
 type StyleOptions = {
   tilesetUrl: string;
   glyphsUrl: string;
@@ -91,7 +102,6 @@ type StyleOptions = {
 };
 
 export function buildStyle({ tilesetUrl, glyphsUrl, childIds, zoneId, colors }: StyleOptions): StyleSpecification {
-  const halo = { "text-halo-color": "#ffffff", "text-halo-width": 1.2 };
   return {
     version: 8,
     projection: { type: "globe" },
@@ -186,11 +196,11 @@ export function buildStyle({ tilesetUrl, glyphsUrl, childIds, zoneId, colors }: 
         layout: {
           "text-field": ["get", "name"],
           "text-font": FONT,
-          "text-size": 11,
+          "text-size": PLACE_LABEL_SIZE,
           "text-anchor": "top",
           "text-offset": [0, 0.5],
         },
-        paint: { "text-color": "#374151", ...halo },
+        paint: textPaint(PLACE_LABEL_COLOR, PLACE_LABEL_SIZE),
       },
       {
         id: REGION_LABEL_LAYER,
@@ -198,8 +208,8 @@ export function buildStyle({ tilesetUrl, glyphsUrl, childIds, zoneId, colors }: 
         source: TILES_SOURCE,
         "source-layer": "region_labels",
         filter: levelFilter(childIds),
-        layout: { "text-field": ["get", "name"], "text-font": FONT, "text-size": 13 },
-        paint: { "text-color": "#111827", ...halo },
+        layout: { "text-field": ["get", "name"], "text-font": FONT, "text-size": REGION_LABEL_SIZE },
+        paint: textPaint(REGION_LABEL_COLOR, REGION_LABEL_SIZE),
       },
     ],
   };

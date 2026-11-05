@@ -108,6 +108,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Labels**: hovering a tradition label on the genealogy chart or a region label on the map shows the pointer, and clicking it selects the tradition or region. Labels on the genealogy chart and the map get a contrast halo (black behind light text, white behind dark text) sized to the font. Needs app-kit and app-kit-ui 32.0.1, ui 0.16.0 and genre-tree-view 8.1.0.
+
 ### Added
 
 - **Detail panels**: the genre, artist, song, region and genealogy panels share one shell. On desktop it sits flush against the left rail (the left margin is gone; top and bottom gutters stay), and the region and genealogy panels get the same bottom sheet on mobile and the same edge tab to hide and show the panel as the genre panel. Needs app-kit and app-kit-ui 31.0.0, ui 0.15.0, brand 12.10.0 and genre-tree-view 8.0.0.

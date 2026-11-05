@@ -12,6 +12,9 @@ const data = GenealogySchema.parse(fixture);
 
 afterEach(() => {
   cleanup();
+  vi.unstubAllGlobals();
+  Reflect.deleteProperty(SVGElement.prototype, "clientWidth");
+  Reflect.deleteProperty(SVGElement.prototype, "clientHeight");
   mocks.isAdmin = true;
 });
 
@@ -65,6 +68,27 @@ describe("GenealogyChart", () => {
 
     expect(onSelect).toHaveBeenCalledTimes(2);
     expect(onSelect).toHaveBeenCalledWith(tradition.wikidataId);
+  });
+
+  it("selects a tradition from its label, which shows the pointer and a contrast halo", () => {
+    // Labels are laid out against the viewport, which happy-dom reports as empty.
+    vi.stubGlobal("ResizeObserver", undefined);
+    Object.defineProperty(SVGElement.prototype, "clientWidth", { configurable: true, get: () => 5000 });
+    Object.defineProperty(SVGElement.prototype, "clientHeight", { configurable: true, get: () => 5000 });
+    const onSelect = vi.fn();
+    const first = render(<GenealogyChart data={data} selectedId={null} onSelect={onSelect} />);
+    const placedId = first.container.querySelector("[data-tradition]")!.getAttribute("data-tradition")!;
+    first.rerender(<GenealogyChart data={data} selectedId={placedId} onSelect={onSelect} />);
+    const { container } = first;
+    const label = container.querySelector<SVGTextElement>("[data-tradition-label]")!;
+    expect(label).not.toBeNull();
+
+    fireEvent.click(label);
+
+    expect(onSelect).toHaveBeenCalledWith(label.dataset.traditionLabel);
+    expect(label.getAttribute("class")).toContain("cursor-pointer");
+    expect(label.getAttribute("stroke")).toBe("#ffffff");
+    expect(label.getAttribute("aria-hidden")).toBe("true");
   });
 
   it("marks the selected tradition as pressed", () => {
