@@ -39,7 +39,7 @@ export const CURATION_GROUPS: { title: string; lists: Record<string, string> }[]
     title: "Régional",
     lists: {
       regional_overviews: "Vues régionales imposées",
-      canonical_overrides: "Genres maintenus canoniques",
+      forced_canonical_genres: "Genres maintenus canoniques",
       regional_overview_additions: "Vues régionales ajoutées",
     },
   },
