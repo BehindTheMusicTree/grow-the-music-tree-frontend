@@ -40,7 +40,7 @@ const withOverview = (id: string | null, inherited: string | null = null): Regio
 afterEach(() => {
   cleanup();
   lookup = { data: undefined, isError: false };
-  lookedUp.mockClear();
+  vi.clearAllMocks();
 });
 
 describe("RegionDetailPanel", () => {
@@ -65,15 +65,33 @@ describe("RegionDetailPanel", () => {
   it("prefers the region's own overview over an inherited one", () => {
     render(<RegionDetailPanel {...props} region={withOverview("Q672134", "Q1")} />);
 
-    expect(lookedUp).toHaveBeenCalledWith("Q672134");
+    expect(lookedUp).toHaveBeenLastCalledWith("Q672134");
   });
 
-  it("shows the inherited overview genre when the region has none of its own", () => {
+  it("shows the inherited overview genre when the region has none of its own, and focuses on request", () => {
     lookup = { data: { uuid: "22222222-2222-4222-8222-222222222222" }, isError: false };
-    render(<RegionDetailPanel {...props} region={withOverview(null, "Q672134")} />);
+    const region = withOverview(null, "Q672134");
+    render(<RegionDetailPanel {...props} region={region} />);
 
-    expect(lookedUp).toHaveBeenCalledWith("Q672134");
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+
+    expect(lookedUp).toHaveBeenLastCalledWith("Q672134");
     expect(screen.getByRole("region", { name: /Genre 22222222/ })).toBeTruthy();
+    expect(props.onFocus).toHaveBeenCalledWith(region);
+  });
+
+  it("shows a picked genre over the inherited overview", () => {
+    lookup = { data: { uuid: "22222222-2222-4222-8222-222222222222" }, isError: false };
+    render(
+      <RegionDetailPanel
+        {...props}
+        genreUuid="33333333-3333-4333-8333-333333333333"
+        region={withOverview(null, "Q672134")}
+      />,
+    );
+
+    expect(screen.getByRole("region", { name: /Genre 33333333/ })).toBeTruthy();
+    expect(screen.queryByRole("region", { name: /Genre 22222222/ })).toBeNull();
   });
 
   it("does not name an inherited overview after the region when it fails to load", () => {

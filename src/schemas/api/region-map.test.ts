@@ -28,6 +28,13 @@ describe("RegionMapIndexSchema", () => {
       "Q672134",
     );
     expect(
+      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: null }] }).success,
+    ).toBe(true);
+    expect(
+      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: undefined }] })
+        .success,
+    ).toBe(true);
+    expect(
       RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: "" }] }).success,
     ).toBe(false);
   });
