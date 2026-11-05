@@ -48,6 +48,30 @@ describe("useGenreTreeUrlState artist filter", () => {
     expect(pushMock).toHaveBeenCalledWith("/?artist=band", { scroll: false });
   });
 
+  it("drops the genre, artist and about when a song is set", async () => {
+    searchParams = new URLSearchParams("artist=band&genre=rock&about=");
+    const { result } = renderState();
+
+    result.current.setSongUuid("song-1");
+
+    await flushNavigation();
+
+    expect(pushMock).toHaveBeenCalledWith("/?song=song-1", { scroll: false });
+  });
+
+  it("drops the song when a genre or an artist is set", async () => {
+    searchParams = new URLSearchParams("song=song-1");
+    const { result } = renderState();
+
+    result.current.setSelectedNodeId("rock");
+    await flushNavigation();
+    expect(pushMock).toHaveBeenLastCalledWith("/?genre=rock", { scroll: false });
+
+    result.current.setArtistUuid("band");
+    await flushNavigation();
+    expect(pushMock).toHaveBeenLastCalledWith("/?artist=band", { scroll: false });
+  });
+
   it("clears only the artist when the filter is cleared", async () => {
     searchParams = new URLSearchParams("artist=band&genre=rock&zoom=pop");
     const { result } = renderState();

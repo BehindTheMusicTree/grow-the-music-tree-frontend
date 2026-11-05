@@ -61,6 +61,7 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   useVisibleGenrePlaylists: (options: { artistUuid?: string | null }) => useVisibleGenrePlaylistsMock(options),
   hasMainstreamPopRoot: (nodes: { id: string }[]) => hasMainstreamPopRootMock(nodes),
   useArtist: () => ({ status: "idle" }),
+  useSong: () => ({ status: "idle" }),
   GenrePlaylistUuidSchema: { parse: (value: string) => value },
 }));
 

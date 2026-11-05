@@ -1,22 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { useFetchWrapper } from "@behindthemusictree/app-kit/transport";
+import { SongSearchResultsSchema } from "@behindthemusictree/app-kit/genre-tree";
 import { RingLoader } from "@behindthemusictree/ui";
 import { useAssignSongGenre } from "@hooks/curation/useAssignSongGenre";
 import { useDebouncedValue } from "@hooks/useDebouncedValue";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
-import {
-  LinkSuggestionsSchema,
-  SongSearchSchema,
-  type LinkCandidate,
-} from "@schemas/api/curation";
+import { LinkSuggestionsSchema, type LinkCandidate } from "@schemas/api/curation";
 import type { CuratedGenre } from "@components/features/genre-curation/GenreCurationProvider";
 
 type Tab = "suggested" | "search";
+
+const SEARCH_LIMIT = 50;
 
 function CandidateRow({
   candidate,
@@ -60,19 +59,24 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
     queryFn: async () =>
       LinkSuggestionsSchema.parse(await fetch(`genres/${genre.uuid}/link-suggestions/`, true, false)),
   });
-  const search = useInfiniteQuery({
+  const search = useQuery({
     queryKey: ["referenceSongs", "linkSearch", query, genreless],
     enabled: tab === "search" && query.length >= 2,
-    initialPageParam: "",
-    queryFn: async ({ pageParam }) =>
-      SongSearchSchema.parse(
-        await fetch("library/songs/search/", true, false, {}, { q: query, genreless, cursor: pageParam }),
+    placeholderData: keepPreviousData,
+    queryFn: async () =>
+      SongSearchResultsSchema.parse(
+        await fetch(
+          "library/songs/search/",
+          true,
+          false,
+          {},
+          { q: query, limit: SEARCH_LIMIT, genre: genreless ? "without" : "any" },
+        ),
       ),
-    getNextPageParam: (last) => last.next ?? undefined,
   });
 
-  const candidates = tab === "suggested" ? (suggestions.data ?? []) : (search.data?.pages.flatMap((p) => p.results) ?? []);
-  const loading = tab === "suggested" ? suggestions.isLoading : search.isFetching && !search.isFetchingNextPage;
+  const candidates = tab === "suggested" ? (suggestions.data ?? []) : (search.data ?? []);
+  const loading = tab === "suggested" ? suggestions.isLoading : search.isFetching;
   const toggle = (uuid: string) =>
     setChecked((current) => {
       const next = new Set(current);
@@ -136,15 +140,6 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
             />
           ))}
         </ul>
-        {tab === "search" && search.hasNextPage && (
-          <button
-            type="button"
-            className="self-start px-3 py-1 text-sm border rounded cursor-pointer hover:bg-gray-100"
-            onClick={() => search.fetchNextPage()}
-          >
-            More results
-          </button>
-        )}
       </div>
     </BasePopup>
   );

@@ -289,7 +289,3 @@ export const LinkCandidateSchema = z.object({
 });
 export type LinkCandidate = z.infer<typeof LinkCandidateSchema>;
 export const LinkSuggestionsSchema = z.array(LinkCandidateSchema);
-export const SongSearchSchema = z.object({
-  results: z.array(LinkCandidateSchema),
-  next: z.string().nullable(),
-});
