@@ -27,6 +27,11 @@ const RegionSchema = z
     drillable: z.boolean(),
     /** Wikidata item id of the region's "Music of X" genre. Optional until every published index carries it. */
     overviewItemId: NonEmpty.nullable().optional(),
+    /**
+     * Without its own overview, the overview of the region's nearest admin ancestor that has one ("Music of France"
+     * for Normandie); null on zones. Optional until every published index carries it.
+     */
+    inheritedOverviewItemId: NonEmpty.nullable().optional(),
     genres: z.array(RegionGenreSchema),
     songCount: z.number().int().min(0),
     genreCount: z.number().int().min(0),
