@@ -21,6 +21,14 @@ describe("RegionMapIndexSchema", () => {
     ).toBe(false);
   });
 
+  it("requires both overview keys on every region, null when there is none", () => {
+    const withoutOwn = { ...fixture.regions[0], overviewItemId: undefined };
+    const withoutInherited = { ...fixture.regions[0], inheritedOverviewItemId: undefined };
+
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [withoutOwn] }).success).toBe(false);
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [withoutInherited] }).success).toBe(false);
+  });
+
   it("accepts the overview a region inherits from its nearest ancestor", () => {
     const normandie = { ...fixture.regions[0], overviewItemId: null, inheritedOverviewItemId: "Q672134" };
 
@@ -29,10 +37,6 @@ describe("RegionMapIndexSchema", () => {
     );
     expect(
       RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: null }] }).success,
-    ).toBe(true);
-    expect(
-      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: undefined }] })
-        .success,
     ).toBe(true);
     expect(
       RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: "" }] }).success,

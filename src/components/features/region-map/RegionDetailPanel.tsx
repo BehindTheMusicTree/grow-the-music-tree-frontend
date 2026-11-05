@@ -16,8 +16,8 @@ type Props = {
 };
 
 export default function RegionDetailPanel({ region, genreUuid, onSelectGenre, onFocus, onClose }: Props) {
-  const ownOverviewId = region.overviewItemId ?? null;
-  const overviewId = ownOverviewId ?? region.inheritedOverviewItemId ?? null;
+  const ownOverviewId = region.overviewItemId;
+  const overviewId = ownOverviewId ?? region.inheritedOverviewItemId;
   const overview = useGenreByWikidataId(overviewId, "reference", getGrowBackendBaseUrl);
   const onZoomIn = region.drillable ? () => onFocus(region) : undefined;
 
