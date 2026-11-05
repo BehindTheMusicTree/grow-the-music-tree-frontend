@@ -128,6 +128,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Genre tree**: sector boundaries (the underground/EDM edge included) no longer stair-step while panning or zooming, and the wheel backdrop follows the tree without repainting. Needs app-kit and app-kit-ui 32.0.3 and genre-tree-view 8.3.0. The pinned genre-tree-view 8.0.0 tarball override, left from when the scope resolved through GitHub Packages, is removed: genre-tree-view now resolves through app-kit-ui, so the 8.1.0 and 8.2.0 changes the entries below require are actually installed.
 - **Genre panel**: the Links, Summary, Essential and Songs sections get their padding, border and collapsible title back, as `PanelSection`s, by moving to `@behindthemusictree/app-kit` and `app-kit-ui` 32.0.0 (the summary and essential-songs editors now sit inside a titled section). Needs app-kit and app-kit-ui 32.0.0.
 - **Genre panel**: the Modifications section is a `PanelSection` again, so it keeps its padding and border (genre-tree-view 8.0.0 removed the class it relied on). ESLint now rejects `gtv-info-panel-*` classes.
 - **Region map**: the zone selector and region path no longer touch the edge of the side rail.
