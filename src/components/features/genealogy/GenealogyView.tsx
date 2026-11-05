@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useGenreByWikidataId } from "@behindthemusictree/app-kit/genre-tree";
-import { useLeftDetailPanelLayout } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { useGenealogy } from "@hooks/useGenealogy";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import TraditionDetailPanel from "./TraditionDetailPanel";
@@ -46,16 +45,11 @@ export default function GenealogyView() {
     if (data && requestedId !== null && !selected) setSelectedId(null, "replace");
   }, [data, requestedId, selected, setSelectedId]);
 
+  const [collapsed, setCollapsed] = useState(false);
+  const selectedWikidataId = selected?.wikidataId ?? null;
   useEffect(() => {
-    if (!selected) return undefined;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !event.defaultPrevented) setSelectedId(null);
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selected, setSelectedId]);
-
-  useLeftDetailPanelLayout(selected !== null);
+    setCollapsed(false);
+  }, [selectedWikidataId]);
 
   const lookedUp = lookup.data;
   const lookupFailed = lookup.isError;
@@ -80,6 +74,8 @@ export default function GenealogyView() {
         <TraditionDetailPanel
           data={data}
           tradition={selected}
+          collapsed={collapsed}
+          onCollapsedChange={setCollapsed}
           onSelect={setSelectedId}
           onClose={() => setSelectedId(null)}
           onOpenInTree={openInTree}

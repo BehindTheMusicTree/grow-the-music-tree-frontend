@@ -66,7 +66,6 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
 }));
 
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
-  useLeftDetailPanelLayout: () => undefined,
   GenreTreeView: (props: GenreTreeViewProps) => (
     <div
       data-testid="genre-tree-view"
@@ -102,7 +101,7 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
       )}
       <button onClick={() => props.onArtistExpandedChange?.(true)}>Expand artist</button>
       {props.overlayPanel && (
-        <section aria-label={props.overlayPanel.title}>
+        <section aria-label={String(props.overlayPanel.title)}>
           {props.overlayPanel.content}
           <button onClick={props.overlayPanel.onClose}>Close panel</button>
           {props.overlayPanel.onExpandedChange && (

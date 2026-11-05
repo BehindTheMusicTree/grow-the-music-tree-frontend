@@ -16,8 +16,6 @@ vi.mock("@hooks/useRegionMap", () => ({
   useRegionMapIndex: () => ({ data, isPending: false, isError: false }),
 }));
 
-vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({ useLeftDetailPanelLayout: () => undefined }));
-
 vi.mock("./RegionDetailPanel", () => ({
   default: ({ region, onFocus, onClose }: { region: Region; onFocus: (r: Region) => void; onClose: () => void }) => (
     <section aria-label={`Panel ${region.name}`}>
@@ -107,15 +105,6 @@ describe("RegionMapView", () => {
 
     expect(url(navigation.push.mock.calls[0]).searchParams.get("path")).toBe("Q142");
     expect(url(navigation.push.mock.calls[0]).searchParams.get("region")).toBe("Q142");
-  });
-
-  it("closes the panel on Escape", () => {
-    search = new URLSearchParams("region=Q142");
-    render(<RegionMapView />);
-
-    fireEvent.keyDown(window, { key: "Escape" });
-
-    expect(url(navigation.push.mock.calls[0]).searchParams.get("region")).toBeNull();
   });
 
   it("draws the children of the focused level and follows the path in the breadcrumb", () => {

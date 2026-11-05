@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { Button, DetailPanel, FieldList, PanelSection } from "@behindthemusictree/ui";
+import { collapseEdgeTab } from "@utils/collapseEdgeTab";
 import type { Genealogy, GenealogyTradition } from "@schemas/api/genealogy";
 import { formatSpan } from "./format";
 
@@ -11,9 +12,11 @@ type Props = {
   onSelect: (wikidataId: string) => void;
   onClose: () => void;
   onOpenInTree: (wikidataId: string) => void;
+  collapsed: boolean;
+  onCollapsedChange: (collapsed: boolean) => void;
 };
 
-export default function TraditionDetailPanel({ data, tradition, onSelect, onClose, onOpenInTree }: Props) {
+export default function TraditionDetailPanel({ data, tradition, onSelect, onClose, onOpenInTree, collapsed, onCollapsedChange }: Props) {
   const { wikidataId, label, start, end, anchorId, inCanonicalTree } = tradition;
 
   const anchorLabel = useMemo(() => {
@@ -44,7 +47,13 @@ export default function TraditionDetailPanel({ data, tradition, onSelect, onClos
   ];
 
   return (
-    <DetailPanel title={label} onClose={onClose} side="left">
+    <DetailPanel
+      title={label}
+      onClose={onClose}
+      side="left"
+      collapsed={collapsed}
+      edgeTab={collapseEdgeTab(collapsed, onCollapsedChange)}
+    >
       <FieldList
         items={[
           { label: "Period", value: formatSpan(start, end) },
