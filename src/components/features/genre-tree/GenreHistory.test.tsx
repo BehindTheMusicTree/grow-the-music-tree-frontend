@@ -91,6 +91,7 @@ describe("GenreHistory", () => {
     renderHistory();
 
     expect(await screen.findByText("—")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Modifications" })).toBeInTheDocument();
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
   });
 
