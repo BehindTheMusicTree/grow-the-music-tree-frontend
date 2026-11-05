@@ -18,8 +18,23 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
 }));
 
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
-  GenreDetailPanel: ({ genreUuid, onZoomIn }: { genreUuid: string; onZoomIn?: () => void }) => (
-    <section aria-label={`Genre ${genreUuid}`}>
+  GenreDetailPanel: ({
+    genreUuid,
+    onZoomIn,
+    collapsed,
+    edgeTab,
+  }: {
+    genreUuid: string;
+    onZoomIn?: () => void;
+    collapsed?: boolean;
+    edgeTab?: { center?: { label: string; onClick: () => void } | null };
+  }) => (
+    <section aria-label={`Genre ${genreUuid}`} data-collapsed={collapsed ? "true" : undefined}>
+      {edgeTab?.center && (
+        <button type="button" onClick={edgeTab.center.onClick}>
+          {edgeTab.center.label}
+        </button>
+      )}
       {onZoomIn && (
         <button type="button" onClick={onZoomIn}>
           Zoom in
@@ -125,6 +140,15 @@ describe("RegionDetailPanel", () => {
 
     rerender(<RegionDetailPanel {...props} collapsed region={withOverview(null)} />);
     fireEvent.click(screen.getByRole("button", { name: "Show panel", hidden: true }));
+    expect(props.onCollapsedChange).toHaveBeenCalledWith(false);
+  });
+
+  it("forwards its collapse state and edge tab to the genre panel", () => {
+    lookup = { data: { uuid: "11111111-1111-4111-8111-111111111111" }, isError: false };
+    render(<RegionDetailPanel {...props} collapsed region={withOverview("Q672134")} />);
+
+    expect(screen.getByRole("region", { name: /Genre 11111111/ }).getAttribute("data-collapsed")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "Show panel" }));
     expect(props.onCollapsedChange).toHaveBeenCalledWith(false);
   });
 });
