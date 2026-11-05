@@ -3,8 +3,8 @@ export const CURATION_GROUPS: { title: string; lists: Record<string, string> }[]
     title: "Racines",
     lists: {
       accepted_canonical_roots: "Racines canoniques acceptées",
-      non_stylistic_genres: "Appellations non stylistiques",
-      umbrella_genres: "Genres parapluie (à affiner)",
+      umbrella_non_stylistic_genres: "Appellations non stylistiques",
+      umbrella_stylistic_genres: "Genres parapluie (à affiner)",
       canonical_genre_pop_side: "Côté pop des racines",
     },
   },
