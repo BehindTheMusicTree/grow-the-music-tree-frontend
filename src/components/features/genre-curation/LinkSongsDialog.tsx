@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { useFetchWrapper } from "@behindthemusictree/app-kit/transport";
 import { SongSearchResultsSchema } from "@behindthemusictree/app-kit/genre-tree";
@@ -62,6 +62,7 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
   const search = useQuery({
     queryKey: ["referenceSongs", "linkSearch", query, genreless],
     enabled: tab === "search" && query.length >= 2,
+    placeholderData: keepPreviousData,
     queryFn: async () =>
       SongSearchResultsSchema.parse(
         await fetch(
