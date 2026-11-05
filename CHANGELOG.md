@@ -118,6 +118,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Curation admin**: the lists `umbrella_genres` and `non_stylistic_genres` are now `umbrella_stylistic_genres` and `umbrella_non_stylistic_genres` (same labels). Needs grow-the-music-tree-api's migration 0102 and the-music-tree-pipelines' matching rename; merge together
 - **Curation admin**: "Genres maintenus canoniques" follows the list's new name, `forced_canonical_genres` (was `canonical_overrides`). Needs grow-the-music-tree-api with the renamed list.
 
 ### Fixed
