@@ -21,6 +21,24 @@ describe("RegionMapIndexSchema", () => {
     ).toBe(false);
   });
 
+  it("accepts the overview a region inherits from its nearest ancestor", () => {
+    const normandie = { ...fixture.regions[0], overviewItemId: null, inheritedOverviewItemId: "Q672134" };
+
+    expect(RegionMapIndexSchema.parse({ ...fixture, regions: [normandie] }).regions[0].inheritedOverviewItemId).toBe(
+      "Q672134",
+    );
+    expect(
+      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: null }] }).success,
+    ).toBe(true);
+    expect(
+      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: undefined }] })
+        .success,
+    ).toBe(true);
+    expect(
+      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: "" }] }).success,
+    ).toBe(false);
+  });
+
   it("rejects unknown keys (including the removed files map) and an unknown kind", () => {
     expect(RegionMapIndexSchema.safeParse({ ...fixture, extra: 1 }).success).toBe(false);
     expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...fixture.regions[0], extra: 1 }] }).success).toBe(
