@@ -9,7 +9,7 @@ const config = {
   content: [
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
-    "./node_modules/@behindthemusictree/**/dist/**/*.{js,cjs}",
+    "./node_modules/@behindthemusictree/*/dist/**/*.{js,cjs}",
   ],
   theme: {
     extend: {

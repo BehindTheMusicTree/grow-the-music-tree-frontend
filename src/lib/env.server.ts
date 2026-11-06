@@ -2,6 +2,8 @@ import { z } from "zod";
 import { formatIssues } from "@lib/env";
 
 const ServerEnvSchema = z.object({
+  EDGE_VIEWER_CONTEXT_TOKEN: z.string().min(32).optional(),
+  VIEWER_CONTEXT_TOKEN: z.string().min(32).optional(),
   AUTH_SECRET: z.string().min(1),
   AUTH_GOOGLE_ID: z.string().min(1),
   AUTH_GOOGLE_SECRET: z.string().min(1),
@@ -10,6 +12,8 @@ const ServerEnvSchema = z.object({
     .url()
     .refine((value) => URL.canParse(value) && new URL(value).pathname === "/", "must be an origin without a path")
     .transform((value) => new URL(value).origin),
+}).refine((env) => Boolean(env.EDGE_VIEWER_CONTEXT_TOKEN) === Boolean(env.VIEWER_CONTEXT_TOKEN), {
+  message: "Both viewer context tokens must be configured together",
 });
 
 let cached: z.infer<typeof ServerEnvSchema> | undefined;
@@ -19,6 +23,8 @@ let cached: z.infer<typeof ServerEnvSchema> | undefined;
 export function getServerEnv() {
   if (cached) return cached;
   const parsed = ServerEnvSchema.safeParse({
+    EDGE_VIEWER_CONTEXT_TOKEN: process.env.EDGE_VIEWER_CONTEXT_TOKEN || undefined,
+    VIEWER_CONTEXT_TOKEN: process.env.VIEWER_CONTEXT_TOKEN || undefined,
     AUTH_SECRET: process.env.AUTH_SECRET,
     AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
