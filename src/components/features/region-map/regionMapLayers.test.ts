@@ -43,6 +43,16 @@ describe("depthColors", () => {
     expect(colors.get("Q142")).toMatch(/^rgb\(/);
   });
 
+  it("tints a region without songs when one of its zones has some", () => {
+    const zone = regions.get("Q236626")!;
+    const covered = new Map(regions)
+      .set(zone.id, { ...zone, songCount: 10 })
+      .set("Q183", { ...regions.get("Q183")!, songCount: 0, zoneIds: [zone.id] });
+
+    expect(depthColors(covered).get("Q183")).toMatch(/^rgb\(/);
+    expect(depthColors(regions).get("Q183")).toBe(EMPTY_FILL);
+  });
+
   it("leaves zones out", () => {
     expect(depthColors(regions).has("Q236626")).toBe(false);
   });

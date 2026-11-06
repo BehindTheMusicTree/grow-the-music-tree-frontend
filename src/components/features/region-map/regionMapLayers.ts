@@ -59,7 +59,11 @@ export function depthColors(regions: ReadonlyMap<string, Region>): Map<string, s
   for (const peers of Array.from(byDepth.values())) {
     const max = Math.max(1, ...peers.map((region) => region.songCount));
     const scale = scaleSequentialSqrt(interpolateYlGnBu).domain([0, max]);
-    for (const region of peers) colors.set(region.id, region.songCount > 0 ? scale(region.songCount) : EMPTY_FILL);
+    for (const region of peers) {
+      // No songs of its own, but part of a zone that has some: lightest tint, not "uncovered" grey.
+      const inLiveZone = region.zoneIds.some((id) => (regions.get(id)?.songCount ?? 0) > 0);
+      colors.set(region.id, region.songCount > 0 || inLiveZone ? scale(region.songCount) : EMPTY_FILL);
+    }
   }
   return colors;
 }
