@@ -17,10 +17,12 @@ const RegionSchema = z
   .object({
     id: NonEmpty,
     name: NonEmpty,
-    kind: z.enum(["country", "admin_unit", "zone"]),
+    kind: z.enum(["country", "admin_unit", "zone", "city"]),
     parentId: z.string().nullable(),
     childIds: z.array(NonEmpty),
     zoneIds: z.array(NonEmpty),
+    /** Point regions of kind "city" under an admin unit; not part of `childIds`. Optional until every published index carries them. */
+    cityIds: z.array(NonEmpty).optional(),
     bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]),
     mainBbox: z.tuple([z.number(), z.number(), z.number(), z.number()]),
     centroid: Position,
