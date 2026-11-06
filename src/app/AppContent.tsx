@@ -36,7 +36,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
       renderInternalErrorPopup: (errorCode) => <InternalErrorPopup errorCode={errorCode} />,
       renderSpotifyAuthErrorPopup: () => null,
       renderGoogleAuthErrorPopup: () => null,
-      renderNetworkErrorPopup: () => <NetworkErrorPopup />,
+      renderNetworkErrorPopup: (errorCode) => <NetworkErrorPopup errorCode={errorCode} />,
     },
   });
 

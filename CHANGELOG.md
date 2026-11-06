@@ -109,6 +109,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- Limit shared-package style scanning to package output so local linked-package production builds finish without scanning nested dependencies.
+
 ### Changed
 
 - **Breadcrumbs**: the region map and the genre tree share one breadcrumb. On the map it is now a floating card over the canvas like the tree's: a home icon for World, collapsed long paths, and the current region still reopens its panel. On the tree, clicking the current genre centers it and opens its info panel. Needs app-kit and app-kit-ui 32.0.2, ui 0.17.0 and genre-tree-view 8.2.0.
