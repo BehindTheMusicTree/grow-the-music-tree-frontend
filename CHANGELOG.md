@@ -87,6 +87,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Genre tree, region map**: selecting a genre no longer opens its panel only to close it again when the zoom ends: URL updates now build on the current URL instead of a stale one. Panning and zooming also stop triggering a server request on every move.
 - **Popups**: the left rail is now blurred and inert behind an open popup like the rest of the page; it used to stay sharp, undimmed and clickable.
 - **Region map, genealogy**: Escape in a search field no longer closes the open panel.
 - **Audio Player**: Fixed track progress bar not updating correctly on mobile Safari

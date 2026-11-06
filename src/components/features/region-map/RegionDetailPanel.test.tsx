@@ -44,7 +44,14 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
   ),
 }));
 
-const props = { genreUuid: null, onSelectGenre: vi.fn(), onFocus: vi.fn(), onClose: vi.fn(), collapsed: false, onCollapsedChange: vi.fn() };
+const props = {
+  genreUuid: null,
+  onSelectGenre: vi.fn(),
+  onFocus: vi.fn(),
+  onClose: vi.fn(),
+  collapsed: false,
+  onCollapsedChange: vi.fn(),
+};
 const withOverview = (id: string | null, inherited: string | null = null): Region => ({
   ...france,
   overviewItemId: id,

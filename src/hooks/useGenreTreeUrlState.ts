@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
+import { updateUrlQuery } from "@lib/urlQuery";
 import type { FocusChangeReason, GenreTreeViewport } from "@behindthemusictree/app-kit-ui/genre-tree";
 
 export const GENRE_PARAM = "genre";
@@ -32,8 +33,6 @@ interface UseGenreTreeUrlStateOptions {
 }
 
 export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStateOptions) {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const genre = searchParams.get(GENRE_PARAM);
   const zoom = searchParams.get(ZOOM_PARAM);
@@ -48,44 +47,21 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
   // can legitimately precede the refetch.
   const genreValidated = useRef(false);
 
-  // The tree reports some transitions as two calls in one handler (clear the genre, then open an artist).
-  // Applying them as one navigation keeps a single history entry.
-  const pending = useRef<{ mutations: ((params: URLSearchParams) => void)[]; method: "push" | "replace" } | null>(null);
-  const navigate = useCallback(
-    (mutate: (params: URLSearchParams) => void, method: "push" | "replace") => {
-      if (pending.current) {
-        pending.current.mutations.push(mutate);
-        if (method === "push") pending.current.method = "push";
-        return;
-      }
-      const batch = { mutations: [mutate], method };
-      pending.current = batch;
-      queueMicrotask(() => {
-        pending.current = null;
-        const params = new URLSearchParams(searchParams.toString());
-        batch.mutations.forEach((m) => m(params));
-        const query = params.toString();
-        router[batch.method](query ? `${pathname}?${query}` : pathname, { scroll: false });
-      });
-    },
-    [pathname, router, searchParams],
-  );
-
   const setSelectedNodeId = useCallback(
     (id: string | null, method: "push" | "replace" = "push") =>
-      navigate((params) => {
+      updateUrlQuery((params) => {
         if (id) {
           params.set(GENRE_PARAM, id);
           params.delete(ABOUT_PARAM);
           params.delete(SONG_PARAM);
         } else params.delete(GENRE_PARAM);
       }, method),
-    [navigate],
+    [],
   );
 
   const setArtistUuid = useCallback(
     (uuid: string | null, method: "push" | "replace" = "push") =>
-      navigate((params) => {
+      updateUrlQuery((params) => {
         if (uuid) {
           params.set(ARTIST_PARAM, uuid);
           params.delete(GENRE_PARAM);
@@ -93,12 +69,12 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
           params.delete(SONG_PARAM);
         } else params.delete(ARTIST_PARAM);
       }, method),
-    [navigate],
+    [],
   );
 
   const setSongUuid = useCallback(
     (uuid: string | null, method: "push" | "replace" = "push") =>
-      navigate((params) => {
+      updateUrlQuery((params) => {
         if (uuid) {
           params.set(SONG_PARAM, uuid);
           params.delete(GENRE_PARAM);
@@ -106,21 +82,21 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
           params.delete(ABOUT_PARAM);
         } else params.delete(SONG_PARAM);
       }, method),
-    [navigate],
+    [],
   );
 
   const setSizeMetric = useCallback(
     (metric: SizeMetric) =>
-      navigate((params) => {
+      updateUrlQuery((params) => {
         if (metric === "views") params.set(SIZE_PARAM, metric);
         else params.delete(SIZE_PARAM);
       }, "replace"),
-    [navigate],
+    [],
   );
 
   const setFocus = useCallback(
     (uuid: string | null, reason: FocusChangeReason) =>
-      navigate(
+      updateUrlQuery(
         (params) => {
           if (uuid) params.set(ZOOM_PARAM, uuid);
           else params.delete(ZOOM_PARAM);
@@ -129,16 +105,16 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
         // A rejected zoom must not stay in history, or browser back would land on it again.
         reason === "rejected" ? "replace" : "push",
       ),
-    [navigate],
+    [],
   );
 
   const onViewportChange = useCallback(
     (viewport: GenreTreeViewport) => {
       const formatted = formatViewport(viewport);
       if (formatted === view) return;
-      navigate((params) => params.set(VIEW_PARAM, formatted), "replace");
+      updateUrlQuery((params) => params.set(VIEW_PARAM, formatted), "replace");
     },
-    [navigate, view],
+    [view],
   );
 
   useEffect(() => {
@@ -152,12 +128,12 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
     if (genreIds !== undefined) genreValidated.current = true;
     const malformedView = view !== null && parseViewport(view) === undefined;
     if (!stripView && !stripZoom && !stripGenre && !malformedView) return;
-    navigate((params) => {
+    updateUrlQuery((params) => {
       if (stripView || malformedView) params.delete(VIEW_PARAM);
       if (stripZoom) params.delete(ZOOM_PARAM);
       if (stripGenre) params.delete(GENRE_PARAM);
     }, "replace");
-  }, [viewMode, view, zoom, genre, genreIds, navigate]);
+  }, [viewMode, view, zoom, genre, genreIds]);
 
   return {
     selectedNodeId: genre,
