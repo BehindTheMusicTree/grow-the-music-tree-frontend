@@ -21,7 +21,6 @@ vi.mock("@lib/sentry", () => ({ initSentry: vi.fn() }));
 
 vi.mock("@components/features/menu/SideRail", () => ({ default: () => <nav aria-label="Side rail" /> }));
 vi.mock("@components/features/player/Player", () => ({ default: () => null }));
-vi.mock("@components/features/player/AutoAdvance", () => ({ default: () => null }));
 
 function RaiseNetworkError({ enabled }: { enabled: boolean }) {
   const { setConnectivityError } = useConnectivityError();

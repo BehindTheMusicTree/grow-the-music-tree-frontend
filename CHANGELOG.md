@@ -110,6 +110,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- Limit shared-package style scanning to package output so local linked-package production builds finish without scanning nested dependencies.
+
 ### CI
 
 - Automate stable release tags from the version and changelog on `main`.
@@ -128,6 +132,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Labels**: hovering a tradition label on the genealogy chart or a region label on the map shows the pointer, and clicking it selects the tradition or region. Labels on the genealogy chart and the map get a contrast halo (black behind light text, white behind dark text) sized to the font. Needs app-kit and app-kit-ui 32.0.1, ui 0.16.0 and genre-tree-view 8.1.0.
 
 ### Added
+
+- Use trusted edge country context for playback, prevent caching of contextual song responses, and show retry controls when playback context cannot be loaded. Requires app-kit and app-kit-ui 33.1.0; includes the 33.0 network-error prop migration.
 
 - **Detail panels**: the genre, artist, song, region and genealogy panels share one shell. On desktop it sits flush against the left rail (the left margin is gone; top and bottom gutters stay), and the region and genealogy panels get the same bottom sheet on mobile and the same edge tab to hide and show the panel as the genre panel. Needs app-kit and app-kit-ui 31.0.0, ui 0.15.0, brand 12.10.0 and genre-tree-view 8.0.0.
 - **Song search and detail**: the search box finds songs alongside genres and artists, and a song opens in a detail panel at `?song=<uuid>` (`/songs/<uuid>` redirects there). The link-songs dialog uses the new `library/songs/search/` endpoint. The curation genre picker uses the shared `Combobox`. **Must deploy together with the API song search endpoint.** Needs `@behindthemusictree/app-kit` and `app-kit-ui` 30.0.0 and `@behindthemusictree/ui` 0.14.0.

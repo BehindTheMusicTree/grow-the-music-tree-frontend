@@ -75,6 +75,7 @@ describe("GenreTreePage zoom controls", () => {
       "fetch",
       vi.fn(async (input: RequestInfo | URL) => {
         const url = String(input);
+        if (url.includes("playback/context")) return jsonResponse({ country: null });
         if (url.includes("genre-playlists")) {
           return jsonResponse(genrePlaylists);
         }

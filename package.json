@@ -22,8 +22,8 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@behindthemusictree/app-kit": "32.0.3",
-    "@behindthemusictree/app-kit-ui": "32.0.3",
+    "@behindthemusictree/app-kit": "33.1.0",
+    "@behindthemusictree/app-kit-ui": "33.1.0",
     "@behindthemusictree/brand": "12.10.0",
     "@behindthemusictree/ui": "0.17.1",
     "@fortawesome/fontawesome-svg-core": "6.5.2",
