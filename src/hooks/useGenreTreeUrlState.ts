@@ -108,14 +108,10 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
     [],
   );
 
-  const onViewportChange = useCallback(
-    (viewport: GenreTreeViewport) => {
-      const formatted = formatViewport(viewport);
-      if (formatted === view) return;
-      updateUrlQuery((params) => params.set(VIEW_PARAM, formatted), "replace");
-    },
-    [view],
-  );
+  const onViewportChange = useCallback((viewport: GenreTreeViewport) => {
+    const formatted = formatViewport(viewport);
+    updateUrlQuery((params) => params.set(VIEW_PARAM, formatted), "replace");
+  }, []);
 
   useEffect(() => {
     const modeChanged = previousViewMode.current !== viewMode;

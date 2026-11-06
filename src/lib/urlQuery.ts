@@ -22,8 +22,10 @@ export function updateUrlQuery(mutate: UrlQueryMutation, method: UrlQueryMethod)
   queueMicrotask(() => {
     pending = null;
     const url = new URL(window.location.href);
+    // Compare serialized params, not hrefs: serializing re-encodes characters like "," that the current URL keeps raw.
+    const before = url.searchParams.toString();
     batch.mutations.forEach((m) => m(url.searchParams));
-    if (url.href === window.location.href) return;
+    if (url.searchParams.toString() === before) return;
     const target = `${url.pathname}${url.search}${url.hash}`;
     if (batch.method === "push") window.history.pushState(null, "", target);
     else window.history.replaceState(null, "", target);

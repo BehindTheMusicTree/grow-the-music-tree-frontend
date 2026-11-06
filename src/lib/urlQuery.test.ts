@@ -37,7 +37,10 @@ describe("updateUrlQuery", () => {
   });
 
   it("writes nothing when the URL does not change", async () => {
-    updateUrlQuery((params) => params.set("keep", "1"), "push");
+    window.history.replaceState(null, "", "/map?view=1,2,3");
+    vi.mocked(window.history.replaceState).mockClear();
+
+    updateUrlQuery((params) => params.set("view", "1,2,3"), "push");
     await flush();
 
     expect(window.history.pushState).not.toHaveBeenCalled();
