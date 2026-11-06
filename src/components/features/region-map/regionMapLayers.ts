@@ -44,6 +44,10 @@ export function depthOf(region: Region, regions: ReadonlyMap<string, Region>): n
   return depth;
 }
 
+// Regions with songs start at light green; the pale yellow below it is kept for the zone-only ones.
+const SONGS_TINT_START = 0.25;
+const ZONE_ONLY_FILL = interpolateYlGnBu(0);
+
 /**
  * Square-root scale over the songs of the admin regions of the same depth: countries are compared with countries and
  * subdivisions with subdivisions worldwide, so a country's rolled-up total does not flatten its own subdivisions.
@@ -58,11 +62,15 @@ export function depthColors(regions: ReadonlyMap<string, Region>): Map<string, s
   const colors = new Map<string, string>();
   for (const peers of Array.from(byDepth.values())) {
     const max = Math.max(1, ...peers.map((region) => region.songCount));
-    const scale = scaleSequentialSqrt(interpolateYlGnBu).domain([0, max]);
+    const scale = scaleSequentialSqrt((t) => interpolateYlGnBu(SONGS_TINT_START + (1 - SONGS_TINT_START) * t)).domain([
+      0,
+      max,
+    ]);
     for (const region of peers) {
       // No songs of its own, but part of a zone that has some: lightest tint, not "uncovered" grey.
       const inLiveZone = region.zoneIds.some((id) => (regions.get(id)?.songCount ?? 0) > 0);
-      colors.set(region.id, region.songCount > 0 || inLiveZone ? scale(region.songCount) : EMPTY_FILL);
+      if (region.songCount > 0) colors.set(region.id, scale(region.songCount));
+      else colors.set(region.id, inLiveZone ? ZONE_ONLY_FILL : EMPTY_FILL);
     }
   }
   return colors;
@@ -216,22 +224,8 @@ export function buildStyle({ tilesetUrl, glyphsUrl, zoneId, selectedId, colors }
         filter: byMinZoom,
         layout: { "line-sort-key": ["-", 0, depth] },
         paint: {
-          "line-color": [
-            "case",
-            hovered,
-            "#111827",
-            ["==", depth, 0],
-            "#1f2937",
-            "#f9fafb",
-          ],
-          "line-width": [
-            "case",
-            hovered,
-            1.5,
-            ["==", depth, 0],
-            1.2,
-            0.5,
-          ],
+          "line-color": ["case", hovered, "#111827", ["==", depth, 0], "#1f2937", "#f9fafb"],
+          "line-width": ["case", hovered, 1.5, ["==", depth, 0], 1.2, 0.5],
         },
       },
       {
