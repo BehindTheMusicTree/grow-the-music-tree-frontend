@@ -8,13 +8,15 @@ import RegionMapView from "./RegionMapView";
 const index = RegionMapIndexSchema.parse(fixture);
 let data: typeof index | null = index;
 let chartMounts = 0;
-let lastProps: {
-  levelId: string;
-  childIds: string[];
+type ChartProps = {
   tileset: string;
   zoneId: string | null;
   selectedId: string | null;
+  initialCamera: { lng: number; lat: number; zoom: number } | null;
+  focus: { id: string | null; seq: number } | null;
+  onCameraChange: (camera: { lng: number; lat: number; zoom: number }) => void;
 };
+let lastProps: ChartProps;
 let search = new URLSearchParams();
 const pushState = vi.spyOn(window.history, "pushState");
 const replaceState = vi.spyOn(window.history, "replaceState");
@@ -31,10 +33,10 @@ vi.mock("@hooks/useRegionMap", () => ({
 }));
 
 vi.mock("./RegionDetailPanel", () => ({
-  default: ({ region, onFocus, onClose }: { region: Region; onFocus: (r: Region) => void; onClose: () => void }) => (
+  default: ({ region, onZoomTo, onClose }: { region: Region; onZoomTo: (r: Region) => void; onClose: () => void }) => (
     <section aria-label={`Panel ${region.name}`}>
-      <button type="button" onClick={() => onFocus(region)}>
-        Focus
+      <button type="button" onClick={() => onZoomTo(region)}>
+        Zoom to
       </button>
       <button type="button" onClick={onClose}>
         Close
@@ -54,14 +56,9 @@ vi.mock("next/dynamic", () => ({
       regions,
       onRegionClick,
       ...props
-    }: {
+    }: ChartProps & {
       regions: Map<string, Region>;
       onRegionClick: (region: Region) => void;
-      levelId: string;
-      childIds: string[];
-      tileset: string;
-      zoneId: string | null;
-      selectedId: string | null;
     }) {
       lastProps = props;
       useEffect(() => {
@@ -111,57 +108,91 @@ describe("RegionMapView", () => {
     expect(url(pushState.mock.calls[0]).searchParams.get("path")).toBeNull();
   });
 
-  it("shows the panel of the selected region and focuses into it", async () => {
+  it("zooms to the selected region from its panel without touching the URL selection", async () => {
     setSearch("region=Q142");
     render(<RegionMapView />);
+    const before = lastProps.focus;
 
-    fireEvent.click(screen.getByRole("button", { name: "Focus" }));
+    fireEvent.click(screen.getByRole("button", { name: "Zoom to" }));
 
+    expect(lastProps.focus).toEqual({ id: "Q142", seq: (before?.seq ?? 0) + 1 });
     await flushNavigation();
-    expect(url(pushState.mock.calls[0]).searchParams.get("path")).toBe("Q142");
-    expect(url(pushState.mock.calls[0]).searchParams.get("region")).toBe("Q142");
+    expect(pushState).not.toHaveBeenCalled();
   });
 
-  it("draws the children of the focused level and follows the path in the breadcrumb", async () => {
-    setSearch("path=Q142");
+  it("opens on the URL camera, else on the selected region", () => {
+    setSearch("at=2,46,5&region=Q142");
+    const { unmount } = render(<RegionMapView />);
+    expect(lastProps.initialCamera).toEqual({ lng: 2, lat: 46, zoom: 5 });
+    expect(lastProps.focus).toBeNull();
+    unmount();
+
+    setSearch("region=Q142");
+    render(<RegionMapView />);
+    expect(lastProps.initialCamera).toBeNull();
+    expect(lastProps.focus).toEqual({ id: "Q142", seq: 0 });
+  });
+
+  it("writes the camera with replace, adding no history entry", async () => {
     render(<RegionMapView />);
 
-    expect(lastProps.levelId).toBe("Q142");
-    expect(lastProps.childIds).toEqual(["Q12130"]);
+    act(() => lastProps.onCameraChange({ lng: 2, lat: 46, zoom: 5 }));
+
+    await flushNavigation();
+    expect(pushState).not.toHaveBeenCalled();
+    expect(url(replaceState.mock.calls.at(-1)!).searchParams.get("at")).toBe("2,46,5");
+  });
+
+  it("traces the selection's ancestry in the breadcrumb and flies along it", async () => {
+    setSearch("region=Q12130");
+    render(<RegionMapView />);
     const breadcrumb = within(screen.getByRole("navigation", { name: "Breadcrumb" }));
-    expect(breadcrumb.getByRole("button", { name: "France" }).getAttribute("aria-current")).toBe("page");
+    expect(breadcrumb.getByRole("button", { name: "Brittany" }).getAttribute("aria-current")).toBe("page");
+
     fireEvent.click(breadcrumb.getByRole("button", { name: "France" }));
     await flushNavigation();
     expect(url(pushState.mock.calls[0]).searchParams.get("region")).toBe("Q142");
+    expect(lastProps.focus).toMatchObject({ id: "Q142" });
 
     fireEvent.click(breadcrumb.getByRole("button", { name: "World" }));
     await flushNavigation();
-    expect(url(pushState.mock.calls[1]).searchParams.get("path")).toBeNull();
+    expect(url(pushState.mock.calls[1]).searchParams.get("region")).toBeNull();
+    expect(lastProps.focus).toMatchObject({ id: null });
   });
 
-  it("drops an invalid tail of the path and an unknown region with replace", async () => {
-    setSearch("path=Q142/Q183&region=nope");
+  it("frames an old ?path= link on its deepest known level, then drops it with replace", async () => {
+    setSearch("path=Q142/nope");
+    render(<RegionMapView />);
+
+    expect(lastProps.focus).toEqual({ id: "Q142", seq: 0 });
+    await flushNavigation();
+    expect(url(replaceState.mock.calls.at(-1)!).searchParams.get("path")).toBeNull();
+  });
+
+  it("drops an unknown region with replace", async () => {
+    setSearch("region=nope");
     render(<RegionMapView />);
 
     await flushNavigation();
-    expect(url(replaceState.mock.calls[0]).searchParams.get("path")).toBe("Q142");
+    expect(url(replaceState.mock.calls.at(-1)!).searchParams.get("region")).toBeNull();
   });
 
-  it("restores the zone overlay from ?region= on load", () => {
+  it("fills the selected zone", () => {
     setSearch("region=Q236626");
     render(<RegionMapView />);
 
     expect(lastProps.zoneId).toBe("Q236626");
   });
 
-  it("keeps one map mounted across levels so the view can animate", () => {
-    const { rerender } = render(<RegionMapView />);
-    expect(chartMounts).toBe(1);
+  it("keeps one map mounted as the selection changes", async () => {
+    render(<RegionMapView />);
 
-    setSearch("path=Q142");
-    rerender(<RegionMapView />);
+    fireEvent.click(screen.getByText("click Q142"));
+    await flushNavigation();
+    setSearch("region=Q142");
+    fireEvent.click(screen.getByText("click Q183"));
 
     expect(chartMounts).toBe(1);
-    expect(lastProps).toMatchObject({ levelId: "Q142", tileset: index.tileset });
+    expect(lastProps.tileset).toBe(index.tileset);
   });
 });

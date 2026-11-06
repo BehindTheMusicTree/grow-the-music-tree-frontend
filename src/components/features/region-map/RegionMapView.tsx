@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Breadcrumb } from "@behindthemusictree/ui";
 import { useRegionMapIndex } from "@hooks/useRegionMap";
-import { WORLD_ID, type Region } from "@schemas/api/region-map";
+import type { Region, RegionMapIndex } from "@schemas/api/region-map";
 import RegionDetailPanel from "./RegionDetailPanel";
-import { levelOf, validPath } from "./regionLevels";
-import { useRegionMapUrlState } from "./useRegionMapUrlState";
+import type { FocusRequest } from "./RegionMapCanvas";
+import { ancestry } from "./regionMapLayers";
+import { useRegionMapUrlState, type Camera } from "./useRegionMapUrlState";
 
 const RegionMapCanvas = dynamic(() => import("./RegionMapCanvas"), {
   ssr: false,
@@ -18,14 +19,29 @@ const Skeleton = () => <div className="h-full w-full animate-pulse rounded-lg bg
 
 export default function RegionMapView() {
   const { data: index, isPending, isError } = useRegionMapIndex();
-  const { state, update } = useRegionMapUrlState();
-  const [zoneId, setZoneId] = useState<string | null>(null);
-  const regions = useMemo(() => new Map((index?.regions ?? []).map((region) => [region.id, region])), [index]);
 
-  const path = useMemo(() => (index ? validPath(index, regions, state.path) : []), [index, regions, state.path]);
-  const levelId = path.length > 0 ? path[path.length - 1] : WORLD_ID;
-  const level = useMemo(() => (index ? levelOf(index, regions, levelId) : null), [index, regions, levelId]);
+  if (isPending) return <Skeleton />;
+  if (isError) return <p className="text-red-600">Could not load the region map.</p>;
+  if (index === null) return null;
+  return <LoadedRegionMap index={index} />;
+}
+
+function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
+  const { state, update } = useRegionMapUrlState();
+  const regions = useMemo(() => new Map(index.regions.map((region) => [region.id, region])), [index]);
   const selected = state.region === null ? undefined : regions.get(state.region);
+
+  // The URL camera wins; else an old `?path=` link frames its deepest known level, else the selection.
+  const [initial] = useState(() => {
+    const legacyTarget = state.legacyPath.findLast((id) => regions.has(id));
+    const target = legacyTarget ?? (selected ? selected.id : null);
+    return {
+      camera: state.at,
+      focus: state.at === null && target !== null ? { id: target, seq: 0 } : null,
+    };
+  });
+  const [focus, setFocus] = useState<FocusRequest | null>(initial.focus);
+  const flyTo = (id: string | null) => setFocus((current) => ({ id, seq: (current?.seq ?? 0) + 1 }));
 
   const [collapsed, setCollapsed] = useState(false);
   const selectedId = state.region;
@@ -33,52 +49,54 @@ export default function RegionMapView() {
     setCollapsed(false);
   }, [selectedId]);
 
-  const urlZoneId = level && state.region !== null && level.zoneIds.includes(state.region) ? state.region : null;
+  const hasLegacyPath = state.legacyPath.length > 0;
+  const invalidRegion = state.region !== null && selected === undefined;
   useEffect(() => {
-    if (urlZoneId !== null) setZoneId(urlZoneId);
-  }, [urlZoneId]);
+    if (hasLegacyPath || invalidRegion) {
+      update({ legacyPath: null, ...(invalidRegion ? { region: null, genre: null } : {}) }, "replace");
+    }
+  }, [hasLegacyPath, invalidRegion, update]);
 
-  const invalidPath = index != null && path.length !== state.path.length;
-  const invalidRegion = index != null && state.region !== null && selected === undefined;
-  useEffect(() => {
-    if (invalidPath) update({ path }, "replace");
-    else if (invalidRegion) update({ region: null, genre: null }, "replace");
-  }, [invalidPath, invalidRegion, path, update]);
+  // Panning is not navigation: the camera replaces the history entry instead of adding one.
+  const onCameraChange = useCallback((at: Camera) => update({ at }, "replace"), [update]);
 
-  if (isPending) return <Skeleton />;
-  if (isError) return <p className="text-red-600">Could not load the region map.</p>;
-  if (index === null || !level) return null;
-
-  const goTo = (depth: number) => {
-    setZoneId(null);
-    update({ path: path.slice(0, depth), region: null, genre: null });
-  };
   const select = (region: Region) => update({ region: region.id, genre: null });
-  const focus = (region: Region) => {
-    setZoneId(null);
-    update({ path: path.includes(region.id) ? path : [...path, region.id], genre: null });
+  const clearSelection = () => {
+    if (state.region !== null) update({ region: null, genre: null });
   };
-  const current = regions.get(levelId);
+  const trail = selected ? ancestry(selected, regions) : [];
 
   return (
     <div className="flex h-full flex-col gap-3">
       <div className="relative min-h-0 flex-1">
         <RegionMapCanvas
-          levelId={levelId}
-          childIds={level.childIds}
           tileset={index.tileset}
-          zoneId={zoneId}
           regions={regions}
+          rootIds={index.worldChildIds}
           selectedId={state.region}
+          zoneId={selected?.kind === "zone" ? selected.id : null}
+          initialCamera={initial.camera}
+          focus={focus}
           onRegionClick={select}
+          onClearSelection={clearSelection}
+          onCameraChange={onCameraChange}
         />
-        {path.length > 0 && (
+        {selected && (
           <Breadcrumb
             className="absolute left-1/2 top-3 z-10 max-w-[calc(100%-theme(spacing.6))] -translate-x-1/2"
-            home={{ label: "World", onSelect: () => goTo(0) }}
-            items={path.map((id) => ({ id, label: regions.get(id)?.name ?? id }))}
-            onSelect={(id) => goTo(path.indexOf(id) + 1)}
-            onSelectCurrent={current && (() => select(current))}
+            home={{
+              label: "World",
+              onSelect: () => {
+                update({ region: null, genre: null });
+                flyTo(null);
+              },
+            }}
+            items={trail.map((region) => ({ id: region.id, label: region.name }))}
+            onSelect={(id) => {
+              update({ region: id, genre: null });
+              flyTo(id);
+            }}
+            onSelectCurrent={() => flyTo(selected.id)}
           />
         )}
         {selected && (
@@ -89,7 +107,7 @@ export default function RegionMapView() {
             onCollapsedChange={setCollapsed}
             genreUuid={state.genre}
             onSelectGenre={(genre) => update({ genre })}
-            onFocus={focus}
+            onZoomTo={(region) => flyTo(region.id)}
             onClose={() => update({ region: null, genre: null })}
           />
         )}
