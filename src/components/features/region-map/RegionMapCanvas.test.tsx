@@ -164,7 +164,12 @@ describe("RegionMapCanvas", () => {
     const map = fakeMap();
     await act(() => map.emit("load"));
 
-    expect(map.options).toMatchObject({ bounds: [[-5, 42], [8, 51]] });
+    expect(map.options).toMatchObject({
+      bounds: [
+        [-5, 42],
+        [8, 51],
+      ],
+    });
     expect(map.calls.fitBounds).toBeUndefined();
   });
 
@@ -282,6 +287,24 @@ describe("RegionMapCanvas", () => {
     map.rendered = [feature("region-fill", { id: "Q142", depth: 0 })];
     map.emit("click", { point: { x: 10, y: 20 } });
     expect(onClearSelection).toHaveBeenCalledTimes(1);
+  });
+
+  it("thickens a zone's outline while its label is hovered", async () => {
+    mount();
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+
+    await act(() =>
+      map.emit("mousemove:zone-labels", {
+        features: [feature("zone-labels", { id: "Q236626" })],
+        point: { x: 10, y: 20 },
+      }),
+    );
+
+    expect(map.calls.setFeatureState).toContainEqual([
+      { source: expect.any(String), sourceLayer: "zones", id: "Q236626" },
+      { hover: true },
+    ]);
   });
 
   it("points MapLibre at its worker bundle", () => {

@@ -61,7 +61,11 @@ const TOOLTIP_OFFSET = 12;
 const ON_GLOBE_TOLERANCE_PX = 1;
 const FIT_PADDING = 24;
 const TILES_BASE_URL = publicEnv.NEXT_PUBLIC_TILES_BASE_URL;
-const regionState = (id: string) => ({ source: TILES_SOURCE, sourceLayer: REGIONS_SOURCE_LAYER, id });
+const featureState = (region: Pick<Region, "id" | "kind">) => ({
+  source: TILES_SOURCE,
+  sourceLayer: region.kind === "zone" ? "zones" : REGIONS_SOURCE_LAYER,
+  id: region.id,
+});
 
 addProtocol("pmtiles", new Protocol().tile);
 
@@ -82,7 +86,9 @@ const POINT_LAYERS = new Set([ZONE_LABEL_LAYER, CITY_LAYER, CITY_LABEL_LAYER]);
 const LISTED_LAYERS = [REGION_FILL_LAYER, ZONE_LABEL_LAYER, CITY_LAYER];
 
 /** The feature under the pointer: a zone or city label first, else the deepest region, the one drawn on top. */
-export function pickFeatureId(features: readonly Pick<MapGeoJSONFeature, "properties" | "layer">[]): string | undefined {
+export function pickFeatureId(
+  features: readonly Pick<MapGeoJSONFeature, "properties" | "layer">[],
+): string | undefined {
   const point = features.find((feature) => POINT_LAYERS.has(feature.layer.id));
   const picked =
     point ??
@@ -119,7 +125,7 @@ export default function RegionMapCanvas({
   const onCameraRef = useRef(onCameraChange);
   const initialRef = useRef({ initialCamera, selectedId, zoneId, focus });
   const focusSeqRef = useRef(focus?.seq);
-  const hoveredRef = useRef<string | null>(null);
+  const hoveredRef = useRef<Region | null>(null);
   const [ready, setReady] = useState(false);
   const [webglFailed, setWebglFailed] = useState(false);
   const [visibleIds, setVisibleIds] = useState<readonly string[]>([]);
@@ -139,7 +145,12 @@ export default function RegionMapCanvas({
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    const { initialCamera: camera, selectedId: initialSelected, zoneId: initialZone, focus: initialFocus } = initialRef.current;
+    const {
+      initialCamera: camera,
+      selectedId: initialSelected,
+      zoneId: initialZone,
+      focus: initialFocus,
+    } = initialRef.current;
     const opening = initialFocus?.id == null ? undefined : regionsRef.current.get(initialFocus.id);
     let map: MapLibreMap;
     try {
@@ -154,7 +165,10 @@ export default function RegionMapCanvas({
         }),
         ...(camera
           ? { center: [camera.lng, camera.lat] as [number, number], zoom: camera.zoom }
-          : { bounds: regionBounds(opening, regionsRef.current), fitBoundsOptions: { padding: FIT_PADDING, maxZoom: MAX_ZOOM } }),
+          : {
+              bounds: regionBounds(opening, regionsRef.current),
+              fitBoundsOptions: { padding: FIT_PADDING, maxZoom: MAX_ZOOM },
+            }),
         maxZoom: MAX_ZOOM,
         dragRotate: false,
         pitchWithRotate: false,
@@ -169,11 +183,11 @@ export default function RegionMapCanvas({
     // Overrides MapLibre's grab/grabbing container cursor: background shows the arrow, regions the pointer.
     map.getCanvas().style.cursor = "default";
 
-    const setHover = (id: string | null) => {
-      if (hoveredRef.current === id) return;
-      if (hoveredRef.current !== null) map.setFeatureState(regionState(hoveredRef.current), { hover: false });
-      if (id !== null) map.setFeatureState(regionState(id), { hover: true });
-      hoveredRef.current = id;
+    const setHover = (region: Region | null) => {
+      if (hoveredRef.current?.id === region?.id) return;
+      if (hoveredRef.current !== null) map.setFeatureState(featureState(hoveredRef.current), { hover: false });
+      if (region !== null) map.setFeatureState(featureState(region), { hover: true });
+      hoveredRef.current = region;
     };
     const isOnGlobe = (point: { x: number; y: number }) => {
       const back = map.project(map.unproject([point.x, point.y]));
@@ -223,7 +237,7 @@ export default function RegionMapCanvas({
         clearHover();
         return;
       }
-      setHover(region.kind === "zone" || region.kind === "city" ? null : region.id);
+      setHover(region.kind === "city" ? null : region);
       map.getCanvas().style.cursor = "pointer";
       showTooltip(event.point.x + TOOLTIP_OFFSET, event.point.y + TOOLTIP_OFFSET, describe(region));
     });
@@ -265,31 +279,25 @@ export default function RegionMapCanvas({
     map.fitBounds(regionBounds(region, regionsRef.current), { padding: FIT_PADDING, maxZoom: MAX_ZOOM });
   }, [ready, focus]);
 
-  const listed = useMemo(
-    () =>
-      visibleIds
-        .flatMap((id) => regions.get(id) ?? [])
-        .sort(byName),
-    [visibleIds, regions],
-  );
+  const listed = useMemo(() => visibleIds.flatMap((id) => regions.get(id) ?? []).sort(byName), [visibleIds, regions]);
 
   const onFocusRegion = (region: Region) => {
     const map = mapRef.current;
     if (!map) return;
     // Feature state throws until the style has loaded.
-    if (ready && region.kind !== "zone" && region.kind !== "city") {
-      if (hoveredRef.current !== null && hoveredRef.current !== region.id) {
-        map.setFeatureState(regionState(hoveredRef.current), { hover: false });
+    if (ready && region.kind !== "city") {
+      if (hoveredRef.current !== null && hoveredRef.current.id !== region.id) {
+        map.setFeatureState(featureState(hoveredRef.current), { hover: false });
       }
-      map.setFeatureState(regionState(region.id), { hover: true });
-      hoveredRef.current = region.id;
+      map.setFeatureState(featureState(region), { hover: true });
+      hoveredRef.current = region;
     }
     const point = map.project(region.centroid);
     showTooltip(point.x + TOOLTIP_OFFSET, point.y + TOOLTIP_OFFSET, describe(region));
   };
   const onBlurRegion = (region: Region) => {
-    if (ready && hoveredRef.current === region.id) {
-      mapRef.current?.setFeatureState(regionState(region.id), { hover: false });
+    if (ready && hoveredRef.current?.id === region.id) {
+      mapRef.current?.setFeatureState(featureState(region), { hover: false });
     }
     hoveredRef.current = null;
     hideTooltip();

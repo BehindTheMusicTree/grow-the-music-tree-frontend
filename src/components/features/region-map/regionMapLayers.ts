@@ -249,7 +249,7 @@ export function buildStyle({ tilesetUrl, glyphsUrl, zoneId, selectedId, colors }
         source: TILES_SOURCE,
         "source-layer": "zones",
         filter: zoneLineFilter(zoneId),
-        paint: { "line-color": ZONE_COLOR, "line-width": 1.5, "line-dasharray": [4, 3] },
+        paint: { "line-color": ZONE_COLOR, "line-width": ["case", hovered, 3, 1.5], "line-dasharray": [4, 3] },
       },
       {
         // No zoom filter: the selection stays outlined once the map zooms past its band.
