@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import fixture from "@schemas/api/region-map.fixture.json";
 import { RegionMapIndexSchema, type Region } from "@schemas/api/region-map";
 import RegionMapView from "./RegionMapView";
@@ -113,11 +113,12 @@ describe("RegionMapView", () => {
 
     expect(lastProps.levelId).toBe("Q142");
     expect(lastProps.childIds).toEqual(["Q12130"]);
-    expect(screen.getByRole("button", { name: "World" })).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "France" }));
+    const breadcrumb = within(screen.getByRole("navigation", { name: "Breadcrumb" }));
+    expect(breadcrumb.getByRole("button", { name: "France" }).getAttribute("aria-current")).toBe("page");
+    fireEvent.click(breadcrumb.getByRole("button", { name: "France" }));
     expect(url(navigation.push.mock.calls[0]).searchParams.get("region")).toBe("Q142");
 
-    fireEvent.click(screen.getByRole("button", { name: "World" }));
+    fireEvent.click(breadcrumb.getByRole("button", { name: "World" }));
     expect(url(navigation.push.mock.calls[1]).searchParams.get("path")).toBeNull();
   });
 

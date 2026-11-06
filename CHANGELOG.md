@@ -87,6 +87,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Popups**: the left rail is now blurred and inert behind an open popup like the rest of the page; it used to stay sharp, undimmed and clickable.
 - **Region map, genealogy**: Escape in a search field no longer closes the open panel.
 - **Audio Player**: Fixed track progress bar not updating correctly on mobile Safari
   - Includes regression tests across different browser environments
@@ -108,6 +109,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- **Breadcrumbs**: the region map and the genre tree share one breadcrumb. On the map it is now a floating card over the canvas like the tree's: a home icon for World, collapsed long paths, and the current region still reopens its panel. On the tree, clicking the current genre centers it and opens its info panel. Needs app-kit and app-kit-ui 32.0.2, ui 0.17.0 and genre-tree-view 8.2.0.
+- **Labels**: hovering a tradition label on the genealogy chart or a region label on the map shows the pointer, and clicking it selects the tradition or region. Labels on the genealogy chart and the map get a contrast halo (black behind light text, white behind dark text) sized to the font. Needs app-kit and app-kit-ui 32.0.1, ui 0.16.0 and genre-tree-view 8.1.0.
+
 ### Added
 
 - Use trusted edge country context for playback, prevent caching of contextual song responses, and show retry controls when playback context cannot be loaded.
@@ -120,11 +126,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Curation admin**: the lists `umbrella_genres` and `non_stylistic_genres` are now `umbrella_stylistic_genres` and `umbrella_non_stylistic_genres` (same labels). Needs grow-the-music-tree-api's migration 0102 and the-music-tree-pipelines' matching rename; merge together
 - **Curation admin**: "Genres maintenus canoniques" follows the list's new name, `forced_canonical_genres` (was `canonical_overrides`). Needs grow-the-music-tree-api with the renamed list.
 
 ### Fixed
 
-- **Genre panel**: the Modifications section is a `PanelSection` again, so it keeps its padding and border (genre-tree-view 8.0.0 removed the class it relied on). ESLint now rejects `gtv-info-panel-*` classes. The Links, Summary, Essential and Songs sections are fixed in app-kit-ui, in a release not yet adopted here.
+- **Genre tree**: sector boundaries (the underground/EDM edge included) no longer stair-step while panning or zooming, and the wheel backdrop follows the tree without repainting. Needs app-kit and app-kit-ui 32.0.3 and genre-tree-view 8.3.0. The pinned genre-tree-view 8.0.0 tarball override, left from when the scope resolved through GitHub Packages, is removed: genre-tree-view now resolves through app-kit-ui, so the 8.1.0 and 8.2.0 changes the entries below require are actually installed.
+- **Genre panel**: the Links, Summary, Essential and Songs sections get their padding, border and collapsible title back, as `PanelSection`s, by moving to `@behindthemusictree/app-kit` and `app-kit-ui` 32.0.0 (the summary and essential-songs editors now sit inside a titled section). Needs app-kit and app-kit-ui 32.0.0.
+- **Genre panel**: the Modifications section is a `PanelSection` again, so it keeps its padding and border (genre-tree-view 8.0.0 removed the class it relied on). ESLint now rejects `gtv-info-panel-*` classes.
 - **Region map**: the zone selector and region path no longer touch the edge of the side rail.
 - **Region map**: opening a shared or reloaded `?region=<zone>` link now highlights that zone and shows it in the Zone selector, instead of only opening its panel.
 - **Genealogy, region map**: the mouse cursor no longer stutters while hovering. The hover tooltip re-rendered the whole chart or map on every pointer move; only its text is state now, the position is applied directly.

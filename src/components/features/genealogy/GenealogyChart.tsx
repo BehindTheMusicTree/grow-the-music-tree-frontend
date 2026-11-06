@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { linkVertical, select, zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from "d3";
-import { ZoomControls } from "@behindthemusictree/ui";
+import { labelHalo, ZoomControls } from "@behindthemusictree/ui";
 import { useHoverTooltip } from "@hooks/useHoverTooltip";
 import { useIsAdmin } from "@hooks/useIsAdmin";
 import type { Genealogy, GenealogyLane, GenealogyTradition } from "@schemas/api/genealogy";
@@ -17,7 +17,8 @@ const MARKER_RADIUS = 5;
 const MIN_ZOOM = 0.3;
 const MAX_ZOOM = 6;
 const ARROW_ID = "genealogy-arrow";
-
+// Hex, not a Tailwind class: the halo color is derived from it.
+const LABEL_COLOR = "#334155";
 
 // From this many times the fit scale on, every tradition is eligible for a label.
 const LABEL_FOCUS_FIT_MULTIPLE = 3;
@@ -71,6 +72,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
     [data.traditions, anchors, yearScale],
   );
   const markerById = useMemo(() => new Map(markers.map((marker) => [marker.tradition.wikidataId, marker])), [markers]);
+  const traditionById = useMemo(() => new Map(markers.map(({ tradition }) => [tradition.wikidataId, tradition])), [markers]);
   const unplacedCount = data.traditions.length - markers.length;
   const labelMarkers = useMemo(
     () =>
@@ -187,6 +189,13 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
     event.preventDefault();
     onSelect(wikidataId);
   };
+
+  const traditionHandlers = (tradition: GenealogyTradition) => ({
+    onClick: () => onSelect(tradition.wikidataId),
+    onMouseMove: (event: { clientX: number; clientY: number }) =>
+      showTooltip(event, `${tradition.label} · ${formatSpan(tradition.start, tradition.end)}`),
+    onMouseLeave: hideTooltip,
+  });
 
   const visibleTicks = ticks.reduce<{ year: number; y: number }[]>((shown, year) => {
     const y = transform.applyY(TOP_MARGIN + yearScale(year));
@@ -318,33 +327,40 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
                   tabIndex={0}
                   aria-label={tradition.label}
                   aria-pressed={selected}
-                  onClick={() => onSelect(tradition.wikidataId)}
                   onKeyDown={(event) => onMarkerKeyDown(event, tradition)}
-                  onMouseMove={(event) =>
-                    showTooltip(event, `${tradition.label} · ${formatSpan(tradition.start, tradition.end)}`)
-                  }
-                  onMouseLeave={hideTooltip}
+                  {...traditionHandlers(tradition)}
                 />
               );
             })}
           </g>
         </g>
 
-        <g data-layer="tradition-labels" pointerEvents="none">
-          {labels.map(({ id, text, x, y, anchor, fontSize, selected }) => (
-            <text
-              key={id}
-              data-tradition-label={id}
-              x={x}
-              y={y}
-              textAnchor={anchor}
-              dominantBaseline="middle"
-              fontSize={fontSize}
-              className={`fill-slate-700 stroke-white stroke-[3] [paint-order:stroke] ${selected ? "font-semibold" : ""}`}
-            >
-              {text}
-            </text>
-          ))}
+        <g data-layer="tradition-labels">
+          {labels.map(({ id, text, x, y, anchor, fontSize, selected }) => {
+            const tradition = traditionById.get(id);
+            const halo = labelHalo(LABEL_COLOR, fontSize);
+            return (
+              <text
+                key={id}
+                data-tradition-label={id}
+                x={x}
+                y={y}
+                textAnchor={anchor}
+                dominantBaseline="middle"
+                fontSize={fontSize}
+                fill={LABEL_COLOR}
+                stroke={halo.color}
+                strokeWidth={2 * halo.width}
+                strokeLinejoin="round"
+                paintOrder="stroke"
+                aria-hidden="true"
+                className={`cursor-pointer ${selected ? "font-semibold" : ""}`}
+                {...(tradition ? traditionHandlers(tradition) : {})}
+              >
+                {text}
+              </text>
+            );
+          })}
         </g>
 
         <GenealogyColumnHeader columns={data.columns} regions={data.regions} transform={transform} width={width} top={0} />

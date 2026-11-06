@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import { Breadcrumb } from "@behindthemusictree/ui";
 import { useRegionMapIndex } from "@hooks/useRegionMap";
 import { WORLD_ID, type Region } from "@schemas/api/region-map";
 import RegionDetailPanel from "./RegionDetailPanel";
@@ -61,36 +62,13 @@ export default function RegionMapView() {
     setZoneId(id);
     if (id) update({ region: id, genre: null });
   };
+  const current = regions.get(levelId);
   const zones = level.zoneIds.flatMap((id) => regions.get(id) ?? []);
 
   return (
     <div className="flex h-full flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-3 p-gutter pb-0">
-        {path.length > 0 && (
-          <nav aria-label="Region path" className="flex flex-wrap items-center gap-1 text-sm">
-            <button type="button" onClick={() => goTo(0)} className="rounded px-1 font-semibold hover:underline">
-              World
-            </button>
-            {path.map((id, depth) => {
-              const region = regions.get(id);
-              const current = depth === path.length - 1;
-              return (
-                <span key={id} className="flex items-center gap-1">
-                  <span aria-hidden>›</span>
-                  <button
-                    type="button"
-                    onClick={() => (current && region ? select(region) : goTo(depth + 1))}
-                    aria-current={current ? "location" : undefined}
-                    className="rounded px-1 font-semibold hover:underline"
-                  >
-                    {region?.name ?? id}
-                  </button>
-                </span>
-              );
-            })}
-          </nav>
-        )}
-        {zones.length > 0 && (
+      {zones.length > 0 && (
+        <div className="flex flex-wrap items-center gap-3 p-gutter pb-0">
           <label className="flex items-center gap-2 text-sm">
             Zone
             <select
@@ -106,8 +84,8 @@ export default function RegionMapView() {
               ))}
             </select>
           </label>
-        )}
-      </div>
+        </div>
+      )}
       <div className="relative min-h-0 flex-1">
         <RegionMapCanvas
           levelId={levelId}
@@ -118,6 +96,15 @@ export default function RegionMapView() {
           selectedId={state.region}
           onRegionClick={select}
         />
+        {path.length > 0 && (
+          <Breadcrumb
+            className="absolute left-1/2 top-3 z-10 max-w-[calc(100%-theme(spacing.6))] -translate-x-1/2"
+            home={{ label: "World", onSelect: () => goTo(0) }}
+            items={path.map((id) => ({ id, label: regions.get(id)?.name ?? id }))}
+            onSelect={(id) => goTo(path.indexOf(id) + 1)}
+            onSelectCurrent={current && (() => select(current))}
+          />
+        )}
         {selected && (
           <RegionDetailPanel
             key={selected.id}
