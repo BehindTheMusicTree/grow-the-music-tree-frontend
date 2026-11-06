@@ -87,7 +87,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
-- **Genre tree, region map**: selecting a genre no longer opens its panel only to close it again when the zoom ends: URL updates now build on the current URL instead of a stale one. Panning and zooming also stop triggering a server request on every move.
 - **Popups**: the left rail is now blurred and inert behind an open popup like the rest of the page; it used to stay sharp, undimmed and clickable.
 - **Region map, genealogy**: Escape in a search field no longer closes the open panel.
 - **Audio Player**: Fixed track progress bar not updating correctly on mobile Safari
@@ -116,6 +115,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Region map**: the "Zone" selector above the map is gone. Zones can no longer be selected from the map; a `?region=<zone>` URL still selects one and draws its overlay.
 - **Breadcrumbs**: the region map and the genre tree share one breadcrumb. On the map it is now a floating card over the canvas like the tree's: a home icon for World, collapsed long paths, and the current region still reopens its panel. On the tree, clicking the current genre centers it and opens its info panel. Needs app-kit and app-kit-ui 32.0.2, ui 0.17.0 and genre-tree-view 8.2.0.
 - **Labels**: hovering a tradition label on the genealogy chart or a region label on the map shows the pointer, and clicking it selects the tradition or region. Labels on the genealogy chart and the map get a contrast halo (black behind light text, white behind dark text) sized to the font. Needs app-kit and app-kit-ui 32.0.1, ui 0.16.0 and genre-tree-view 8.1.0.
 
@@ -134,6 +134,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- **Genre tree, region map**: selecting a genre no longer opens its panel only to close it again when the zoom ends: URL updates now build on the current URL instead of a stale one. Panning and zooming also stop triggering a server request on every move.
 - **Genre tree**: sector boundaries (the underground/EDM edge included) no longer stair-step while panning or zooming, and the wheel backdrop follows the tree without repainting. Needs app-kit and app-kit-ui 32.0.3 and genre-tree-view 8.3.0. The pinned genre-tree-view 8.0.0 tarball override, left from when the scope resolved through GitHub Packages, is removed: genre-tree-view now resolves through app-kit-ui, so the 8.1.0 and 8.2.0 changes the entries below require are actually installed.
 - **Genre panel**: the Links, Summary, Essential and Songs sections get their padding, border and collapsible title back, as `PanelSection`s, by moving to `@behindthemusictree/app-kit` and `app-kit-ui` 32.0.0 (the summary and essential-songs editors now sit inside a titled section). Needs app-kit and app-kit-ui 32.0.0.
 - **Genre panel**: the Modifications section is a `PanelSection` again, so it keeps its padding and border (genre-tree-view 8.0.0 removed the class it relied on). ESLint now rejects `gtv-info-panel-*` classes.

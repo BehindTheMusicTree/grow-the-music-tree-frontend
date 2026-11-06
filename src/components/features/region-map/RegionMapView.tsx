@@ -58,34 +58,10 @@ export default function RegionMapView() {
     setZoneId(null);
     update({ path: path.includes(region.id) ? path : [...path, region.id], genre: null });
   };
-  const onZoneChange = (id: string | null) => {
-    setZoneId(id);
-    if (id) update({ region: id, genre: null });
-  };
   const current = regions.get(levelId);
-  const zones = level.zoneIds.flatMap((id) => regions.get(id) ?? []);
 
   return (
     <div className="flex h-full flex-col gap-3">
-      {zones.length > 0 && (
-        <div className="flex flex-wrap items-center gap-3 p-gutter pb-0">
-          <label className="flex items-center gap-2 text-sm">
-            Zone
-            <select
-              value={zoneId ?? ""}
-              onChange={(event) => onZoneChange(event.target.value || null)}
-              className="rounded border-gray-300 py-0.5 text-sm"
-            >
-              <option value="">None</option>
-              {zones.map((region) => (
-                <option key={region.id} value={region.id}>
-                  {region.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      )}
       <div className="relative min-h-0 flex-1">
         <RegionMapCanvas
           levelId={levelId}
