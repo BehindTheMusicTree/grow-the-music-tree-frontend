@@ -3,6 +3,8 @@ import fixture from "@schemas/api/region-map.fixture.json";
 import { RegionMapIndexSchema, type Region } from "@schemas/api/region-map";
 import {
   ancestry,
+  focusIds,
+  greyed,
   backdropColors,
   backdropFilter,
   buildStyle,
@@ -17,6 +19,7 @@ import {
   regionBounds,
   supranationalZoneIds,
   WORLD_BOUNDS,
+  zoneColor,
   zoneFilters,
 } from "./regionMapLayers";
 
@@ -69,6 +72,50 @@ describe("backdropColors", () => {
     expect(backdrop.get("Q142")).not.toBe(depthColors(regions).get("Q142"));
     expect(backdrop.has("Q183")).toBe(false);
     expect(backdrop.has("Q236626")).toBe(false);
+  });
+});
+
+describe("greyed", () => {
+  it("keeps each colour's lightness and drops its hue", () => {
+    const grey = greyed(new Map([["Q142", "#41b6c4"]])).get("Q142")!;
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(grey.slice(i, i + 2), 16));
+
+    expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThanOrEqual(2);
+    expect(r).toBeGreaterThan(100);
+  });
+});
+
+describe("focusIds", () => {
+  it("keeps an admin region and its subdivisions, nothing for a zone, no focus for a city or none", () => {
+    expect(focusIds(null, regions)).toBeNull();
+    expect(focusIds("Q142", regions)).toEqual(new Set(["Q142", "Q12130"]));
+    expect(focusIds("Q12130", regions)).toEqual(new Set(["Q12130"]));
+    expect(focusIds("Q236626", regions)).toEqual(new Set());
+    const city = { ...brittany, id: "Q90", kind: "city" as const };
+    expect(focusIds("Q90", new Map(regions).set("Q90", city))).toBeNull();
+  });
+
+  it("leaves the kept colours untouched", () => {
+    const colors = new Map([
+      ["Q142", "#41b6c4"],
+      ["Q183", "#41b6c4"],
+    ]);
+    const shown = greyed(colors, new Set(["Q142"]));
+
+    expect(shown.get("Q142")).toBe("#41b6c4");
+    expect(shown.get("Q183")).not.toBe("#41b6c4");
+  });
+});
+
+describe("zoneColor", () => {
+  it("is null without a zone and colours a zone by its songs", () => {
+    const zone = regions.get("Q236626")!;
+
+    expect(zoneColor(null, regions)).toBeNull();
+    expect(zoneColor(zone.id, new Map(regions).set(zone.id, { ...zone, songCount: 0 }))).toBe(
+      backdropColors(regions).get("Q142"),
+    );
+    expect(zoneColor(zone.id, new Map(regions).set(zone.id, { ...zone, songCount: 5 }))).toMatch(/^rgb\(/);
   });
 });
 
@@ -137,6 +184,8 @@ describe("buildStyle", () => {
       selectedId: null,
       colors: new Map([["Q12130", "#123456"]]),
       backdrop: new Map([["Q142", "#abcdef"]]),
+      zoneFill: null,
+      glowId: null,
       ...overrides,
     });
   const layer = (id: string, built = style()) =>
@@ -166,13 +215,15 @@ describe("buildStyle", () => {
       "region-hit",
       "region-backdrop",
       "region-fill",
+      "zone-fill",
       "rivers",
       "region-line",
       "disputed",
-      "zone-fill",
+      "zone-glow",
       "zone-line",
       "zone-supra-hover",
       "zone-supra-selected",
+      "region-glow",
       "region-selected-line",
       "places",
       "place-labels",
@@ -213,6 +264,11 @@ describe("buildStyle", () => {
     expect(layer("cities").filter).toEqual(byMinZoom);
   });
 
+  it("haloes the admin region in focus", () => {
+    expect(layer("region-glow").filter).toEqual(idFilter(null));
+    expect(layer("region-glow", style({ glowId: "Q142" })).filter).toEqual(idFilter("Q142"));
+  });
+
   it("outlines the selection at any zoom", () => {
     expect(layer("region-selected-line").filter).toEqual(idFilter(null));
     expect(layer("region-selected-line", style({ selectedId: "Q142" })).filter).toEqual(["==", ["get", "id"], "Q142"]);
@@ -226,12 +282,13 @@ describe("buildStyle", () => {
     expect(layer("zone-line", style({ zoneId: "Q236626" })).filter).toEqual(zone.line);
   });
 
-  it("outlines a supranational zone in blue only while hovered or selected, and never tints it", () => {
+  it("outlines a supranational zone in blue only while hovered or selected, and fills it in focus", () => {
     const supra = style({ zoneId: "Q4412", supranationalIds: ["Q4412"] });
 
     expect(layer("zone-supra-hover", supra).paint).toMatchObject({ "line-opacity": ["case", expect.anything(), 1, 0] });
     expect(layer("zone-supra-selected", supra).filter).toEqual(zoneFilters("Q4412", ["Q4412"]).supraSelected);
-    expect(JSON.stringify(layer("zone-fill", supra).filter)).toContain('"!"');
+    expect(layer("zone-fill", supra).filter).toEqual(idFilter("Q4412"));
+    expect(layer("zone-fill", style({ zoneFill: "#abcdef" })).paint).toEqual({ "fill-color": "#abcdef" });
   });
 
   it("treats a zone with a country member as supranational", () => {

@@ -1,4 +1,4 @@
-import { interpolateYlGnBu, scaleSequentialSqrt } from "d3";
+import { hcl, interpolateYlGnBu, scaleSequentialSqrt } from "d3";
 import type { ExpressionSpecification, LngLatBoundsLike, StyleSpecification } from "maplibre-gl";
 import { labelHalo } from "@behindthemusictree/ui";
 import { WORLD_ID, type Region } from "@schemas/api/region-map";
@@ -12,8 +12,10 @@ export const REGION_BACKDROP_LAYER = "region-backdrop";
 export const REGION_FILL_LAYER = "region-fill";
 export const REGION_LINE_LAYER = "region-line";
 export const REGION_SELECTED_LAYER = "region-selected-line";
+export const REGION_GLOW_LAYER = "region-glow";
 export const REGION_LABEL_LAYER = "region-labels";
 export const ZONE_FILL_LAYER = "zone-fill";
+export const ZONE_GLOW_LAYER = "zone-glow";
 export const ZONE_LINE_LAYER = "zone-line";
 export const ZONE_SUPRA_HOVER_LAYER = "zone-supra-hover";
 export const ZONE_SUPRA_SELECTED_LAYER = "zone-supra-selected";
@@ -52,6 +54,9 @@ export function depthOf(region: Region, regions: ReadonlyMap<string, Region>): n
 const SONGS_TINT_START = 0.4;
 const ZONE_ONLY_FILL = interpolateYlGnBu(0);
 
+const songsScale = (max: number) =>
+  scaleSequentialSqrt((t) => interpolateYlGnBu(SONGS_TINT_START + (1 - SONGS_TINT_START) * t)).domain([0, max]);
+
 /**
  * Square-root scale over the songs of the admin regions of the same depth: countries are compared with countries and
  * subdivisions with subdivisions worldwide, so a country's rolled-up total does not flatten its own subdivisions.
@@ -66,10 +71,7 @@ export function depthColors(regions: ReadonlyMap<string, Region>): Map<string, s
   const colors = new Map<string, string>();
   for (const peers of Array.from(byDepth.values())) {
     const max = Math.max(1, ...peers.map((region) => region.songCount));
-    const scale = scaleSequentialSqrt((t) => interpolateYlGnBu(SONGS_TINT_START + (1 - SONGS_TINT_START) * t)).domain([
-      0,
-      max,
-    ]);
+    const scale = songsScale(max);
     for (const region of peers) {
       // No songs of its own, but part of a zone that has some: lightest tint, not "uncovered" grey.
       const inLiveZone = region.zoneIds.some((id) => (regions.get(id)?.songCount ?? 0) > 0);
@@ -129,6 +131,42 @@ export function regionBounds(region: Region | undefined, regions: ReadonlyMap<st
   ];
 }
 
+/**
+ * What keeps its colours while a selection is in focus: an admin region and its subdivisions, nothing for a zone (its
+ * own outline is filled instead). `null` when nothing is in focus: no selection, or a city, too small to spotlight.
+ */
+export function focusIds(selectedId: string | null, regions: ReadonlyMap<string, Region>): Set<string> | null {
+  const selected = selectedId === null ? undefined : regions.get(selectedId);
+  if (!selected || selected.kind === "city") return null;
+  if (selected.kind === "zone") return new Set();
+  return new Set(
+    Array.from(regions.values())
+      .filter((region) => isAdmin(region) && ancestry(region, regions).some((r) => r.id === selected.id))
+      .map((region) => region.id),
+  );
+}
+
+/** The colours outside the focus lose their hue but keep their lightness, so the rest of the map recedes to greys. */
+export function greyed(colors: ReadonlyMap<string, string>, keep: ReadonlySet<string> = new Set()): Map<string, string> {
+  return new Map(
+    Array.from(colors, ([id, color]) => {
+      if (keep.has(id)) return [id, color];
+      const grey = hcl(color);
+      grey.c = 0;
+      return [id, grey.formatHex()];
+    }),
+  );
+}
+
+/** A zone's own colour, on the same square-root scale as its peer zones, to fill its outline while in focus. */
+export function zoneColor(zoneId: string | null, regions: ReadonlyMap<string, Region>): string | null {
+  const zone = zoneId === null ? undefined : regions.get(zoneId);
+  if (!zone) return null;
+  if (zone.songCount === 0) return ZONE_ONLY_FILL;
+  const zones = Array.from(regions.values()).filter((region) => region.kind === "zone");
+  return songsScale(Math.max(1, ...zones.map((region) => region.songCount)))(zone.songCount);
+}
+
 /** The region and its ancestors up to the world, outermost first. */
 export function ancestry(region: Region, regions: ReadonlyMap<string, Region>): Region[] {
   const chain = [region];
@@ -184,8 +222,8 @@ const isSupranational = (ids: readonly string[]): ExpressionSpecification => [
 export function zoneFilters(zoneId: string | null, supranationalIds: readonly string[]) {
   const supra = isSupranational(supranationalIds);
   return {
-    // A supranational zone never tints its interior nor shows its dashed outline.
-    fill: ["all", idFilter(zoneId), ["!", supra]] as ExpressionSpecification,
+    fill: idFilter(zoneId),
+    // A supranational zone never shows its dashed outline.
     line: ["all", zoneLineFilter(zoneId), ["!", supra]] as ExpressionSpecification,
     supraHover: supra,
     supraSelected: ["all", idFilter(zoneId), supra] as ExpressionSpecification,
@@ -193,6 +231,9 @@ export function zoneFilters(zoneId: string | null, supranationalIds: readonly st
 }
 
 const depth: ExpressionSpecification = ["get", "depth"];
+
+// A soft halo under the outline lifts the selection in focus off the greyed map.
+const GLOW_PAINT = { "line-color": "#111827", "line-width": 14, "line-blur": 10, "line-opacity": 0.35 };
 
 const PLACE_LABEL_SIZE = 11;
 const PLACE_LABEL_COLOR = "#374151";
@@ -214,6 +255,9 @@ type StyleOptions = {
   selectedId: string | null;
   colors: ReadonlyMap<string, string>;
   backdrop: ReadonlyMap<string, string>;
+  zoneFill: string | null;
+  /** The admin region in focus, haloed like a zone; `null` for none, a zone or a city. */
+  glowId: string | null;
 };
 
 export function buildStyle({
@@ -224,6 +268,8 @@ export function buildStyle({
   selectedId,
   colors,
   backdrop,
+  zoneFill,
+  glowId,
 }: StyleOptions): StyleSpecification {
   const zone = zoneFilters(zoneId, supranationalIds);
   return {
@@ -276,6 +322,15 @@ export function buildStyle({
         paint: { "fill-color": fillColorExpression(colors) },
       },
       {
+        // Drawn from the zone's own outline, so only its share of a country is lit.
+        id: ZONE_FILL_LAYER,
+        type: "fill",
+        source: TILES_SOURCE,
+        "source-layer": "zones",
+        filter: zone.fill,
+        paint: { "fill-color": zoneFill ?? EMPTY_FILL },
+      },
+      {
         id: "rivers",
         type: "line",
         source: TILES_SOURCE,
@@ -304,12 +359,12 @@ export function buildStyle({
         paint: { "line-color": "#6b7280", "line-width": 1, "line-dasharray": [2, 2] },
       },
       {
-        id: ZONE_FILL_LAYER,
-        type: "fill",
+        id: ZONE_GLOW_LAYER,
+        type: "line",
         source: TILES_SOURCE,
         "source-layer": "zones",
         filter: zone.fill,
-        paint: { "fill-color": "#f97316", "fill-opacity": 0.15 },
+        paint: GLOW_PAINT,
       },
       {
         id: ZONE_LINE_LAYER,
@@ -335,6 +390,14 @@ export function buildStyle({
         "source-layer": "zones",
         filter: zone.supraSelected,
         paint: { "line-color": SUPRA_ZONE_COLOR, "line-width": 4 },
+      },
+      {
+        id: REGION_GLOW_LAYER,
+        type: "line",
+        source: TILES_SOURCE,
+        "source-layer": REGIONS_SOURCE_LAYER,
+        filter: idFilter(glowId),
+        paint: GLOW_PAINT,
       },
       {
         // No zoom filter: the selection stays outlined once the map zooms past its band.
