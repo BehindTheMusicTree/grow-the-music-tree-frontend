@@ -381,6 +381,7 @@ function GenreTreePageContent() {
             <GenreDangerZone
               key={playlist.criteria.uuid}
               genre={playlist.criteria}
+              parent={playlist.parent}
               onAliased={(targetUuid) => setSelectedNodeId(targetUuid)}
               onRemoved={() => setSelectedNodeId(playlist.parent?.uuid ?? null, "replace")}
             />
