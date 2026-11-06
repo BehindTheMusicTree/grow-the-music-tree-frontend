@@ -207,6 +207,28 @@ describe("buildStyle", () => {
     });
   });
 
+  it("rounds the joins of every border and thins it at world scale", () => {
+    for (const id of [
+      "region-line",
+      "disputed",
+      "zone-line",
+      "zone-supra-hover",
+      "zone-supra-selected",
+      "region-selected-line",
+    ]) {
+      expect(layer(id).layout).toMatchObject({ "line-join": "round", "line-cap": "round" });
+    }
+    expect((layer("region-selected-line").paint as Record<string, unknown>)["line-width"]).toEqual([
+      "interpolate",
+      ["linear"],
+      ["zoom"],
+      0,
+      ["*", 0.5, 2],
+      6,
+      2,
+    ]);
+  });
+
   it("stacks the layers from the ocean up to the labels", () => {
     expect(style().layers.map((candidate) => candidate.id)).toEqual([
       "ocean",

@@ -147,7 +147,10 @@ export function focusIds(selectedId: string | null, regions: ReadonlyMap<string,
 }
 
 /** The colours outside the focus lose their hue but keep their lightness, so the rest of the map recedes to greys. */
-export function greyed(colors: ReadonlyMap<string, string>, keep: ReadonlySet<string> = new Set()): Map<string, string> {
+export function greyed(
+  colors: ReadonlyMap<string, string>,
+  keep: ReadonlySet<string> = new Set(),
+): Map<string, string> {
   return new Map(
     Array.from(colors, ([id, color]) => {
       if (keep.has(id)) return [id, color];
@@ -231,6 +234,20 @@ export function zoneFilters(zoneId: string | null, supranationalIds: readonly st
 }
 
 const depth: ExpressionSpecification = ["get", "depth"];
+
+/** Halves a line's width at world scale, where full-width outlines bury the small regions and islands. */
+const byZoom = (width: number | ExpressionSpecification): ExpressionSpecification => [
+  "interpolate",
+  ["linear"],
+  ["zoom"],
+  0,
+  ["*", 0.5, width],
+  6,
+  width,
+];
+
+// The default miter join turns every sharp turn of a coastline into a spike.
+const ROUND_LINE = { "line-join": "round", "line-cap": "round" } as const;
 
 // A soft halo under the outline lifts the selection in focus off the greyed map.
 const GLOW_PAINT = { "line-color": "#111827", "line-width": 14, "line-blur": 10, "line-opacity": 0.35 };
@@ -345,10 +362,10 @@ export function buildStyle({
         source: TILES_SOURCE,
         "source-layer": REGIONS_SOURCE_LAYER,
         filter: byMinZoom,
-        layout: { "line-sort-key": ["-", 0, depth] },
+        layout: { ...ROUND_LINE, "line-sort-key": ["-", 0, depth] },
         paint: {
           "line-color": ["case", hovered, "#111827", "#1f2937"],
-          "line-width": ["case", hovered, 1.5, ["==", depth, 0], 1.2, 0.6],
+          "line-width": byZoom(["case", hovered, 1.5, ["==", depth, 0], 1.2, 0.6]),
         },
       },
       {
@@ -356,7 +373,8 @@ export function buildStyle({
         type: "line",
         source: TILES_SOURCE,
         "source-layer": "disputed",
-        paint: { "line-color": "#6b7280", "line-width": 1, "line-dasharray": [2, 2] },
+        layout: ROUND_LINE,
+        paint: { "line-color": "#6b7280", "line-width": byZoom(1), "line-dasharray": [2, 2] },
       },
       {
         id: ZONE_GLOW_LAYER,
@@ -372,7 +390,8 @@ export function buildStyle({
         source: TILES_SOURCE,
         "source-layer": "zones",
         filter: zone.line,
-        paint: { "line-color": ZONE_COLOR, "line-width": ["case", hovered, 3, 1.5], "line-dasharray": [4, 3] },
+        layout: ROUND_LINE,
+        paint: { "line-color": ZONE_COLOR, "line-width": byZoom(["case", hovered, 3, 1.5]), "line-dasharray": [4, 3] },
       },
       {
         id: ZONE_SUPRA_HOVER_LAYER,
@@ -380,6 +399,7 @@ export function buildStyle({
         source: TILES_SOURCE,
         "source-layer": "zones",
         filter: zone.supraHover,
+        layout: ROUND_LINE,
         paint: { "line-color": SUPRA_ZONE_COLOR, "line-width": 4, "line-opacity": ["case", hovered, 1, 0] },
       },
       {
@@ -389,6 +409,7 @@ export function buildStyle({
         source: TILES_SOURCE,
         "source-layer": "zones",
         filter: zone.supraSelected,
+        layout: ROUND_LINE,
         paint: { "line-color": SUPRA_ZONE_COLOR, "line-width": 4 },
       },
       {
@@ -406,7 +427,8 @@ export function buildStyle({
         source: TILES_SOURCE,
         "source-layer": REGIONS_SOURCE_LAYER,
         filter: idFilter(selectedId),
-        paint: { "line-color": "#111827", "line-width": 2 },
+        layout: ROUND_LINE,
+        paint: { "line-color": "#111827", "line-width": byZoom(2) },
       },
       {
         id: "places",
