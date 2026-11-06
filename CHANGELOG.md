@@ -105,9 +105,13 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - Blocks invalid PRs to main and develop branches
 ```
 
-**Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
+**Note:** Prepare the version and changelog on the release or hotfix branch. The shared workflow creates the matching tag after merge to `main`; see [docs/VERSIONING.md](docs/VERSIONING.md).
 
 ## [Unreleased]
+
+### CI
+
+- Automate stable release tags from the version and changelog on `main`.
 
 ### Added
 
