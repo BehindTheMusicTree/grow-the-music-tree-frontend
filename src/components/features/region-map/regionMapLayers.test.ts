@@ -74,6 +74,7 @@ describe("buildStyle", () => {
     buildStyle({
       tilesetUrl: "https://tiles.example.com/regions/abc.pmtiles",
       glyphsUrl: "https://tiles.example.com/fonts/{fontstack}/{range}.pbf",
+      levelId: "Q142",
       childIds: ["Q12130"],
       zoneId: null,
       colors: new Map([["Q12130", "#123456"]]),
@@ -92,7 +93,7 @@ describe("buildStyle", () => {
         type: "vector",
         url: "pmtiles://https://tiles.example.com/regions/abc.pmtiles",
         maxzoom: 10,
-        promoteId: { regions: "id", zones: "id" },
+        promoteId: { regions: "id", zones: "id", cities: "id" },
       },
     });
   });
@@ -109,6 +110,7 @@ describe("buildStyle", () => {
       "zone-fill",
       "zone-line",
       "places",
+      "city-points",
       "place-labels",
       "region-labels",
     ]);
@@ -121,6 +123,10 @@ describe("buildStyle", () => {
     expect(style().layers.find((candidate) => candidate.id === "region-fill")).toMatchObject({
       paint: { "fill-color": ["match", ["get", "id"], "Q12130", "#123456", EMPTY_FILL] },
     });
+  });
+
+  it("shows the cities of the level and of the regions drawn on it", () => {
+    expect(layer("city-points").filter).toEqual(["in", ["get", "parentId"], ["literal", ["Q142", "Q12130"]]]);
   });
 
   it("shows no zone until one is chosen", () => {

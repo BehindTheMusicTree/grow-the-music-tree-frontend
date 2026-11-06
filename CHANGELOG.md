@@ -116,6 +116,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Added
 
 - **Region map**: the index schema accepts regions of kind `city` (point regions under an admin unit) and the optional `cityIds` on admin units, so the pipelines can publish city-level genre anchors. Must be deployed before such an index is imported.
+- **Region map**: cities claimed by a genre are drawn as points (tileset layer `cities`, from zoom 5) on the level of their admin unit and of the regions shown there. They hover, show the region tooltip and open the detail panel on click, like any region.
 
 ### Changed
 

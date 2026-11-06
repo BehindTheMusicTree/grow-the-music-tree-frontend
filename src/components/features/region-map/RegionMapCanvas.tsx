@@ -9,6 +9,9 @@ import { publicEnv } from "@lib/env";
 import type { Region } from "@schemas/api/region-map";
 import {
   buildStyle,
+  CITIES_SOURCE_LAYER,
+  CITY_LAYER,
+  cityFilter,
   describe,
   fillColorExpression,
   levelBounds,
@@ -42,13 +45,12 @@ type Props = {
 const TOOLTIP_OFFSET = 12;
 const ON_GLOBE_TOLERANCE_PX = 1;
 const TILES_BASE_URL = publicEnv.NEXT_PUBLIC_TILES_BASE_URL;
-const regionState = (id: string) => ({ source: TILES_SOURCE, sourceLayer: REGIONS_SOURCE_LAYER, id });
 
 addProtocol("pmtiles", new Protocol().tile);
 
 // MapLibre 6 locates its worker from `import.meta.url`, which a bundler rewrites, so the worker must be emitted explicitly.
 // A label can overflow its region onto the sea: it must hover and select like the fill.
-const REGION_HIT_LAYERS = [REGION_FILL_LAYER, REGION_LABEL_LAYER];
+const REGION_HIT_LAYERS = [CITY_LAYER, REGION_FILL_LAYER, REGION_LABEL_LAYER];
 
 setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href);
 
@@ -57,7 +59,13 @@ export default function RegionMapCanvas({ levelId, childIds, tileset, zoneId, re
   const mapRef = useRef<MapLibreMap | null>(null);
   const regionsRef = useRef(regions);
   const onClickRef = useRef(onRegionClick);
-  const initialRef = useRef({ childIds, zoneId });
+  const initialRef = useRef({ levelId, childIds, zoneId });
+  // Cities live in their own tile layer, so their feature state is addressed there.
+  const regionState = (id: string) => ({
+    source: TILES_SOURCE,
+    sourceLayer: regionsRef.current.get(id)?.kind === "city" ? CITIES_SOURCE_LAYER : REGIONS_SOURCE_LAYER,
+    id,
+  });
   const hoveredRef = useRef<string | null>(null);
   const selectedRef = useRef<string | null>(null);
   const fittedRef = useRef(false);
@@ -68,7 +76,7 @@ export default function RegionMapCanvas({ levelId, childIds, tileset, zoneId, re
   useEffect(() => {
     regionsRef.current = regions;
     onClickRef.current = onRegionClick;
-    initialRef.current = { childIds, zoneId };
+    initialRef.current = { levelId, childIds, zoneId };
   });
 
   useEffect(() => {
@@ -163,12 +171,14 @@ export default function RegionMapCanvas({ levelId, childIds, tileset, zoneId, re
     map.setFilter(REGION_FILL_LAYER, filter);
     map.setFilter(REGION_LINE_LAYER, filter);
     map.setFilter(REGION_LABEL_LAYER, filter);
+    map.setFilter(CITY_LAYER, cityFilter(levelId, childIds));
     const colors = regionColors(
       listed.map((region) => region.id),
       regions,
     );
     map.setPaintProperty(REGION_FILL_LAYER, "fill-color", fillColorExpression(colors));
     map.removeFeatureState({ source: TILES_SOURCE, sourceLayer: REGIONS_SOURCE_LAYER });
+    map.removeFeatureState({ source: TILES_SOURCE, sourceLayer: CITIES_SOURCE_LAYER });
     hoveredRef.current = null;
     selectedRef.current = null;
     map.fitBounds(levelBounds(levelId, regions), {
