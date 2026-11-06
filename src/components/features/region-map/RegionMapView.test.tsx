@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import fixture from "@schemas/api/region-map.fixture.json";
 import { RegionMapIndexSchema, type Region } from "@schemas/api/region-map";
 import RegionMapView from "./RegionMapView";
@@ -8,9 +8,23 @@ import RegionMapView from "./RegionMapView";
 const index = RegionMapIndexSchema.parse(fixture);
 let data: typeof index | null = index;
 let chartMounts = 0;
-let lastProps: { levelId: string; childIds: string[]; tileset: string; zoneId: string | null; selectedId: string | null };
+let lastProps: {
+  levelId: string;
+  childIds: string[];
+  tileset: string;
+  zoneId: string | null;
+  selectedId: string | null;
+};
 let search = new URLSearchParams();
-const navigation = vi.hoisted(() => ({ replace: vi.fn(), push: vi.fn() }));
+const pushState = vi.spyOn(window.history, "pushState");
+const replaceState = vi.spyOn(window.history, "replaceState");
+// URL writes go through the History API and start from window.location, so the rendered params must match it.
+const setSearch = (query: string) => {
+  Object.getPrototypeOf(window.history).replaceState.call(window.history, null, "", query ? `/map?${query}` : "/map");
+  search = new URLSearchParams(query);
+};
+// URL writes are batched into a microtask, so history assertions run after it.
+const flushNavigation = () => act(async () => {});
 
 vi.mock("@hooks/useRegionMap", () => ({
   useRegionMapIndex: () => ({ data, isPending: false, isError: false }),
@@ -30,7 +44,6 @@ vi.mock("./RegionDetailPanel", () => ({
 }));
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => navigation,
   usePathname: () => "/map",
   useSearchParams: () => search,
 }));
@@ -66,12 +79,12 @@ vi.mock("next/dynamic", () => ({
     },
 }));
 
-const url = (call: unknown[]) => new URL(String(call[0]), "http://localhost");
+const url = (call: unknown[]) => new URL(String(call[2]), "http://localhost");
 
 beforeEach(() => {
-  search = new URLSearchParams();
-  navigation.push.mockClear();
-  navigation.replace.mockClear();
+  setSearch("");
+  pushState.mockClear();
+  replaceState.mockClear();
 });
 
 afterEach(() => {
@@ -88,27 +101,29 @@ describe("RegionMapView", () => {
     expect(container.childElementCount).toBe(0);
   });
 
-  it("selects a region on click without drilling into it", () => {
+  it("selects a region on click without drilling into it", async () => {
     render(<RegionMapView />);
 
     fireEvent.click(screen.getByText("click Q142"));
 
-    expect(url(navigation.push.mock.calls[0]).searchParams.get("region")).toBe("Q142");
-    expect(url(navigation.push.mock.calls[0]).searchParams.get("path")).toBeNull();
+    await flushNavigation();
+    expect(url(pushState.mock.calls[0]).searchParams.get("region")).toBe("Q142");
+    expect(url(pushState.mock.calls[0]).searchParams.get("path")).toBeNull();
   });
 
-  it("shows the panel of the selected region and focuses into it", () => {
-    search = new URLSearchParams("region=Q142");
+  it("shows the panel of the selected region and focuses into it", async () => {
+    setSearch("region=Q142");
     render(<RegionMapView />);
 
     fireEvent.click(screen.getByRole("button", { name: "Focus" }));
 
-    expect(url(navigation.push.mock.calls[0]).searchParams.get("path")).toBe("Q142");
-    expect(url(navigation.push.mock.calls[0]).searchParams.get("region")).toBe("Q142");
+    await flushNavigation();
+    expect(url(pushState.mock.calls[0]).searchParams.get("path")).toBe("Q142");
+    expect(url(pushState.mock.calls[0]).searchParams.get("region")).toBe("Q142");
   });
 
-  it("draws the children of the focused level and follows the path in the breadcrumb", () => {
-    search = new URLSearchParams("path=Q142");
+  it("draws the children of the focused level and follows the path in the breadcrumb", async () => {
+    setSearch("path=Q142");
     render(<RegionMapView />);
 
     expect(lastProps.levelId).toBe("Q142");
@@ -116,30 +131,34 @@ describe("RegionMapView", () => {
     const breadcrumb = within(screen.getByRole("navigation", { name: "Breadcrumb" }));
     expect(breadcrumb.getByRole("button", { name: "France" }).getAttribute("aria-current")).toBe("page");
     fireEvent.click(breadcrumb.getByRole("button", { name: "France" }));
-    expect(url(navigation.push.mock.calls[0]).searchParams.get("region")).toBe("Q142");
+    await flushNavigation();
+    expect(url(pushState.mock.calls[0]).searchParams.get("region")).toBe("Q142");
 
     fireEvent.click(breadcrumb.getByRole("button", { name: "World" }));
-    expect(url(navigation.push.mock.calls[1]).searchParams.get("path")).toBeNull();
+    await flushNavigation();
+    expect(url(pushState.mock.calls[1]).searchParams.get("path")).toBeNull();
   });
 
-  it("drops an invalid tail of the path and an unknown region with replace", () => {
-    search = new URLSearchParams("path=Q142/Q183&region=nope");
+  it("drops an invalid tail of the path and an unknown region with replace", async () => {
+    setSearch("path=Q142/Q183&region=nope");
     render(<RegionMapView />);
 
-    expect(url(navigation.replace.mock.calls[0]).searchParams.get("path")).toBe("Q142");
+    await flushNavigation();
+    expect(url(replaceState.mock.calls[0]).searchParams.get("path")).toBe("Q142");
   });
 
-  it("selects a zone chosen in the selector and overlays it", () => {
+  it("selects a zone chosen in the selector and overlays it", async () => {
     render(<RegionMapView />);
 
     fireEvent.change(screen.getByRole("combobox"), { target: { value: "Q236626" } });
 
     expect(lastProps.zoneId).toBe("Q236626");
-    expect(url(navigation.push.mock.calls[0]).searchParams.get("region")).toBe("Q236626");
+    await flushNavigation();
+    expect(url(pushState.mock.calls[0]).searchParams.get("region")).toBe("Q236626");
   });
 
   it("restores the zone overlay and selector from ?region= on load", () => {
-    search = new URLSearchParams("region=Q236626");
+    setSearch("region=Q236626");
     render(<RegionMapView />);
 
     expect(lastProps.zoneId).toBe("Q236626");
@@ -150,7 +169,7 @@ describe("RegionMapView", () => {
     const { rerender } = render(<RegionMapView />);
     expect(chartMounts).toBe(1);
 
-    search = new URLSearchParams("path=Q142");
+    setSearch("path=Q142");
     rerender(<RegionMapView />);
 
     expect(chartMounts).toBe(1);

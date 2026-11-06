@@ -172,7 +172,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="world"
-      childIds={WORLD_CHILDREN}
+        childIds={WORLD_CHILDREN}
         tileset={"e".repeat(64)}
         zoneId={null}
         regions={regions}
@@ -257,7 +257,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="world"
-      childIds={WORLD_CHILDREN}
+        childIds={WORLD_CHILDREN}
         tileset={index.tileset}
         zoneId={null}
         regions={regions}
@@ -280,7 +280,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="world"
-      childIds={WORLD_CHILDREN}
+        childIds={WORLD_CHILDREN}
         tileset={index.tileset}
         zoneId="Q236626"
         regions={regions}
