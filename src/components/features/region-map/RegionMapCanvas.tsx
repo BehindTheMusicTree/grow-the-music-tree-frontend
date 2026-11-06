@@ -53,6 +53,7 @@ type Props = {
   /** Each new `seq` flies to a region; the request present at mount frames the opening view instead. */
   focus: FocusRequest | null;
   onRegionClick: (region: Region) => void;
+  onClearSelection: () => void;
   onCameraChange: (camera: Camera) => void;
 };
 
@@ -107,12 +108,14 @@ export default function RegionMapCanvas({
   initialCamera,
   focus,
   onRegionClick,
+  onClearSelection,
   onCameraChange,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const regionsRef = useRef(regions);
   const onClickRef = useRef(onRegionClick);
+  const onClearRef = useRef(onClearSelection);
   const onCameraRef = useRef(onCameraChange);
   const initialRef = useRef({ initialCamera, selectedId, zoneId, focus });
   const focusSeqRef = useRef(focus?.seq);
@@ -125,6 +128,7 @@ export default function RegionMapCanvas({
   useEffect(() => {
     regionsRef.current = regions;
     onClickRef.current = onRegionClick;
+    onClearRef.current = onClearSelection;
     onCameraRef.current = onCameraChange;
   });
 
@@ -207,6 +211,11 @@ export default function RegionMapCanvas({
     map.on("click", HIT_LAYERS, (event) => {
       const region = regionAt(event);
       if (region) onClickRef.current(region);
+    });
+    // Layer handlers only fire over a feature: a click on the ocean or off the globe clears the selection.
+    map.on("click", (event) => {
+      const features = map.queryRenderedFeatures(event.point, { layers: HIT_LAYERS });
+      if (!isOnGlobe(event.point) || features.length === 0) onClearRef.current();
     });
     map.on("mousemove", HIT_LAYERS, (event) => {
       const region = regionAt(event);

@@ -107,7 +107,7 @@ const regions = new Map(index.regions.map((region) => [region.id, region]));
 type Props = React.ComponentProps<typeof RegionMapCanvas>;
 
 const mount = (props: Partial<Props> = {}) => {
-  const handlers = { onRegionClick: vi.fn(), onCameraChange: vi.fn() };
+  const handlers = { onRegionClick: vi.fn(), onClearSelection: vi.fn(), onCameraChange: vi.fn() };
   const element = (overrides: Partial<Props>) => (
     <RegionMapCanvas
       tileset={index.tileset}
@@ -268,6 +268,20 @@ describe("RegionMapCanvas", () => {
 
     map.emit("click:region-fill", inSpace);
     expect(onRegionClick).not.toHaveBeenCalled();
+  });
+
+  it("clears the selection on a click that hits no region", async () => {
+    const { onClearSelection } = mount();
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+
+    map.rendered = [];
+    map.emit("click", { point: { x: 10, y: 20 } });
+    expect(onClearSelection).toHaveBeenCalledTimes(1);
+
+    map.rendered = [feature("region-fill", { id: "Q142", depth: 0 })];
+    map.emit("click", { point: { x: 10, y: 20 } });
+    expect(onClearSelection).toHaveBeenCalledTimes(1);
   });
 
   it("points MapLibre at its worker bundle", () => {

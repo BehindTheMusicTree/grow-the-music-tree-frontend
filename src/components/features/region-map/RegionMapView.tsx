@@ -61,6 +61,9 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   const onCameraChange = useCallback((at: Camera) => update({ at }, "replace"), [update]);
 
   const select = (region: Region) => update({ region: region.id, genre: null });
+  const clearSelection = () => {
+    if (state.region !== null) update({ region: null, genre: null });
+  };
   const trail = selected ? ancestry(selected, regions) : [];
 
   return (
@@ -75,6 +78,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
           initialCamera={initial.camera}
           focus={focus}
           onRegionClick={select}
+          onClearSelection={clearSelection}
           onCameraChange={onCameraChange}
         />
         {selected && (
