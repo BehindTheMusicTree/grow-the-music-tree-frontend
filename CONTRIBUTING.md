@@ -52,7 +52,7 @@ The maintainer(s) are responsible for:
 - Maintaining the project's infrastructure
 - Creating and managing hotfix branches for urgent production fixes
 - Creating and managing release branches for preparing releases
-- Preparing releases on `release/*` branches, then merging via PR to `main`, tagging on `main`, and back-merging to `develop` via PR
+- Preparing releases on `release/*` branches, merging via PR to `main`, checking the automated tag, and back-merging to `develop` via PR
 - Managing repository automation (stale issues/PRs, auto-labeling, auto-assignment, etc.)
 
 **Important:** Even maintainers must go through Pull Requests. No direct commits to `main` or `develop` are allowed - all changes, including those from maintainers, must be submitted via Pull Requests and go through the standard review process.
@@ -234,7 +234,7 @@ We follow **strict Git Flow** with the following branch structure:
   ```
 
 - Only bug fixes and release-related changes go into release branches
-- When ready, open a PR from `release/*` to `main` (no direct merge), then tag the release on `main` after the PR merge
+- When ready, open a PR from `release/*` to `main` (no direct merge), then check the automated tag on `main` after the PR merge
 - After tagging, open a PR from `main` to `develop` for the required back-merge (no direct merge)
 - Release grow-api to prod first. A PR that consumes a new grow-api field bumps `growApi.minVersion` in `package.json` to the grow-api release that ships it; the `grow-api contract (prod)` check on PRs to `main` and the prod deploy job fail while prod is older
 
@@ -254,7 +254,7 @@ We follow **strict Git Flow** with the following branch structure:
   ```
 
 - Contributors can submit fixes via feature branches that maintainers may promote to hotfixes if needed
-- When complete, open a PR from `hotfix/*` to `main` (no direct merge), tag on `main` if needed, then open a PR from `main` to `develop` for back-merge
+- When complete, open a PR from `hotfix/*` to `main` (no direct merge), check the automated tag, then open a PR from `main` to `develop` for back-merge
 
 #### Dependabot Branches (`dependabot/*`)
 
@@ -300,62 +300,9 @@ When testing your changes, verify:
 
 You can validate that your branch builds successfully by running local CI checks (`npm run lint`, `npm run test`, `npm run build`) before opening a PR. Deployment is handled by Coolify, which auto-builds staging on every push to `develop` and production on every push to `main` — there is no tag or manual-dispatch gate (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
-**Choosing a Version Number:**
-
-Since the actual release version (major/minor/patch) isn't known until the release branch is created, use the following guidelines for dev tags:
-
-- **Feature branches** (`feature/`): Typically indicate minor version updates (new features, backward compatible)
-  - Use the next minor version: if latest is `v0.3.5`, use `v0.3.6-dev-<branch-name>` or `v0.4.0-dev-<branch-name>`
-  - Use the branch name **without** the `feature/` prefix: `feature/improve-cicd` → `v0.3.6-dev-improve-cicd`
-- **Hotfix branches** (`hotfix/`): Typically indicate patch version updates (bug fixes)
-  - Use the next patch version: if latest is `v0.3.5`, use `v0.3.6-dev-<branch-name>`
-  - Use the branch name **without** the `hotfix/` prefix: `hotfix/critical-bug` → `v0.3.6-dev-critical-bug`
-- **Breaking changes**: Use the next major version: if latest is `v0.3.5`, use `v1.0.0-dev-<branch-name>`
-
-**Note:** The version number in dev tags is just a placeholder for testing. The actual release version will be determined when creating the release branch based on the changes included. Dev tags are temporary and can use any version number that makes sense for your testing needs.
-
-**Process:**
-
-```bash
-# On your feature branch (e.g., feature/improve-cicd), create a development tag
-# Use the branch name without the type prefix (feature/, hotfix/, etc.)
-git tag v0.3.6-dev-improve-cicd  # branch: feature/improve-cicd
-git push origin v0.3.6-dev-improve-cicd
-```
-
-Development tags are still useful as release metadata, but they no longer trigger a dedicated publish workflow.
-
-Deployment to staging happens automatically via Coolify when you push to `develop`. Production deploys automatically via Coolify when the release lands on `main` — no separate deploy step or version tag is required to trigger it.
-
-**Republishing After Changes:**
-
-Git tags are immutable once pushed. If you make changes and need to republish:
-
-1. **Delete the old tag** (recommended for dev tags):
-
-   ```bash
-   git tag -d v0.3.6-dev-improve-cicd
-   git push origin --delete v0.3.6-dev-improve-cicd
-   # Then create and push a new tag with the same name
-   git tag v0.3.6-dev-improve-cicd
-   git push origin v0.3.6-dev-improve-cicd
-   ```
-
-2. **Or use an incrementing suffix** (if you want to keep history):
-   ```bash
-   git tag v0.3.6-dev-improve-cicd-1  # First iteration
-   git push origin v0.3.6-dev-improve-cicd-1
-   # After changes:
-   git tag v0.3.6-dev-improve-cicd-2  # Second iteration
-   git push origin v0.3.6-dev-improve-cicd-2
-   ```
-
-**Note:** Development tags are for testing purposes only and should not be used for releases. Delete them after testing if desired:
-
-```bash
-git tag -d v0.3.6-dev-improve-cicd
-git push origin --delete v0.3.6-dev-improve-cicd
-```
+Stable release tags are created by the release workflow after a version change reaches
+`main`. Do not create, move, or delete release tags manually. Staging deploys from
+`develop` and production deploys from `main`; tags do not trigger deployment.
 
 ### 5. Committing
 
@@ -587,95 +534,20 @@ When you open a Pull Request, several automations may run automatically (if conf
 
 ### 7. Releasing _(For Maintainers)_
 
-Releases are created from the `main` branch using **strict Git Flow**. Release tags are created **on `main`** (after the release or hotfix PR is merged), not from `feature/*`, or the tip of `release/*`. Version bump, changelog roll into the versioned section, and pre-release tag cleanup are done with **`npm version` on `main`** and its postversion script. See [docs/VERSIONING.md](docs/VERSIONING.md) for details.
+Before the first automated release, activate the policy on `main` in a separate
+no-bump PR and provision the release App, as described in
+[docs/VERSIONING.md](docs/VERSIONING.md).
 
-**Do not** run `npm version` (with automatic tag) on a **feature** branch to ship a release, and **do not** push **`vX.Y.Z`** from there: production deploy keys off the tag, and the tag must point at the canonical commit on **`main`**.
+Prepare each release or hotfix on its branch, including the version in
+`package.json` and a matching dated section in `CHANGELOG.md`. Use
+`npm pkg set version=X.Y.Z` to update the version without creating a commit or tag.
+Open a PR to `main` and pass the production API compatibility check. Once merged,
+the shared release workflow creates the immutable `vX.Y.Z` tag for the versioned
+commit. Check that workflow before opening the required `main` → `develop`
+back-merge PR. Never create or delete the release tag manually.
 
-**Quick release process:**
-
-1. **Ensure `develop` is ready for release** – All features for the release should be merged into `develop`.
-
-   ```bash
-   git checkout develop
-   git pull origin develop
-   ```
-
-2. **Create a release branch from `develop`**
-
-   ```bash
-   git checkout -b release/v0.2.0
-   git push origin release/v0.2.0
-   ```
-
-3. **On the release branch, prepare the release**
-   - Move `[Unreleased]` items into a new `## [X.Y.Z] - YYYY-MM-DD` section and add the TOC entry; bump **`package.json`** with **`npm pkg set version=X.Y.Z`** then **`npm install --package-lock-only`** (do **not** run **`npm version`** here — **`postversion`** is intended for **`main`** and will run `scripts/update-changelog-release.mjs` / amend the wrong commit).
-   - Make any final bug fixes or adjustments.
-   - Ensure build and lint pass: `npm run build` and `npm run lint`.
-   - Commit: `chore(release): prepare vX.Y.Z` (see prior release branches for examples).
-
-4. **Merge release branch into `main`**
-
-   Open and merge a **Pull Request** from `release/v0.2.0` to `main` in GitHub (no direct push merge to `main`). Then update local `main`:
-
-   ```bash
-   git checkout main
-   git pull origin main
-   ```
-
-5. **On `main`: create the shipping tag (and version commit if needed)**
-
-   Stay on **`main`** — this is the only branch where the shipping **`vX.Y.Z`** tag should be created.
-
-   If **`package.json` and `CHANGELOG.md` were already prepared on the release branch** (step 3), merge has brought that commit onto **`main`**; then create the tag on the current **`main`** tip and push (no extra version bump):
-
-   ```bash
-   git tag v0.2.0   # must match package.json
-   git push origin main
-   git push origin v0.2.0
-   ```
-
-   If **`main`** still needs a version bump and changelog roll-up (no full prepare on **`release/*`**), use **`npm version`** instead; it updates **`package.json`**, commits, and creates the tag. The **postversion** script then:
-   - Moves `[Unreleased]` content into `## [X.Y.Z] - YYYY-MM-DD` in `CHANGELOG.md` and amends the version commit.
-   - Recreates the tag on the amended commit.
-   - Deletes local and remote test and dev tags for that version (e.g. `v0.2.0-test`, `v0.2.0-dev-*`). Rc/beta/alpha tags are not deleted automatically. See `scripts/delete-test-dev-tags.mjs`.
-
-   Coolify has already deployed production from this push to `main`, independent of the tag — pushing the tag itself has no deploy effect, it only records release identity. Push the tag only from the intended **`main`** commit. If you used **`git tag`** only (no **`npm version`**), run **`node scripts/delete-test-dev-tags.mjs`** when you still want test/dev tag cleanup for that version.
-
-6. **Merge release branch back into `develop`**
-
-   ```bash
-   git checkout develop
-   git pull origin develop
-   git merge --no-ff release/v0.2.0
-   git push origin develop
-   ```
-
-7. **Delete the release branch** (locally and remotely)
-
-   ```bash
-   git branch -d release/v0.2.0
-   git push origin --delete release/v0.2.0
-   ```
-
-**Hotfix release process**
-
-1. Create hotfix branch from `main`, make the fix, and add an entry to `CHANGELOG.md` under `[Unreleased]`.
-2. Merge hotfix into `main` via **Pull Request**, then update local `main`:
-
-   ```bash
-   git checkout main
-   git pull origin main
-   ```
-
-3. On `main`, bump version and push:
-
-   ```bash
-   npm version patch
-   git push origin main
-   git push origin v0.1.3
-   ```
-
-4. Merge hotfix into `develop`, then delete the hotfix branch.
+Coolify deploys production on pushes to `main` and staging on pushes to `develop`;
+the tag does not trigger a deployment. See [docs/VERSIONING.md](docs/VERSIONING.md).
 
 ## 🏷️ Issue & PR Labels
 

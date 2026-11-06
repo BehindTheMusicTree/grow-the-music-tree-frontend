@@ -55,12 +55,10 @@ Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONIN
   and CI/tooling/maintenance work go on `feature/*`. There is no `ci/*` prefix.
   Never commit directly to `main`/`develop`.
 - **Never locally `git merge` + `git push origin main`** to ship a release/hotfix —
-  it skips the PR/branch-protection checks. Always open a PR; merge on GitHub; then
-  `git pull` locally before tagging.
-- **Versioning**: `npm version` (the one that creates the shipping `vX.Y.Z` tag) runs
-  only on `main`, only after a `release/*`/`hotfix/*` PR has merged. On `release/*`
-  branches, prepare the version with `npm pkg set version=X.Y.Z` (or
-  `npm version … --no-git-tag-version`) — never the tagging form.
+  it skips the PR/branch-protection checks. Always open a PR and merge on GitHub.
+- **Versioning**: prepare `package.json` and `CHANGELOG.md` on `release/*` or
+  `hotfix/*` without creating a tag. After the PR merges into `main`, the shared
+  release workflow creates the matching immutable tag. See `docs/VERSIONING.md`.
 - **Styling**: Tailwind utility classes only. No `.module.css` files, no inline
   styles. Class order: Layout → Typography → Visual → Interactive → States (see
   `docs/STYLE_GUIDE.md`).
