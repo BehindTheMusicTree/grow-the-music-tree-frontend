@@ -9,8 +9,8 @@ import { RegionGlobeIcon } from "./RegionGlobeIcon";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { ABOUT_HREF, GENEALOGY_HREF, REGION_MAP_HREF } from "@lib/constants/routes";
+import { cn } from "@lib/utils";
 import { iconPillClassName } from "./iconPillClassName";
-import { UserMenu } from "./UserMenu";
 
 function AboutButton() {
   const pathname = usePathname();
@@ -26,11 +26,11 @@ function AboutButton() {
     <Link
       href={isOpen ? closedHref : openHref}
       prefetch={false}
-      className={iconPillClassName}
+      className={cn(iconPillClassName, "h-[calc(var(--layout-header-h)/2)] w-[calc(var(--layout-header-h)/2)]")}
       aria-label="About"
       aria-pressed={isOpen}
     >
-      <Info className="h-5 w-5" aria-hidden />
+      <Info className="h-4 w-4" aria-hidden />
     </Link>
   );
 }
@@ -54,7 +54,7 @@ export default function SideRail() {
         aria-label={`${APP_NAME} home`}
         aria-current={isHome ? "page" : undefined}
       >
-        <Image src={logo} alt="" width={40} height={40} className="h-auto w-7 shrink-0" aria-hidden priority />
+        <Image src={logo} alt="" width={40} height={40} className={cn("h-auto w-7 shrink-0", isHome && "brightness-0")} aria-hidden priority />
       </Link>
       <Link
         href={REGION_MAP_HREF}
@@ -74,10 +74,12 @@ export default function SideRail() {
       >
         <Network className="h-5 w-5" aria-hidden />
       </Link>
-      <Suspense fallback={null}>
-        <AboutButton />
-      </Suspense>
-      <UserMenu />
+      {/* Pinned to the rail's bottom-left corner on desktop. */}
+      <div className="flex md:mt-auto">
+        <Suspense fallback={null}>
+          <AboutButton />
+        </Suspense>
+      </div>
     </nav>
   );
 }

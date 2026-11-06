@@ -5,6 +5,7 @@ import { usePopup, useConnectivityErrorPopup } from "@behindthemusictree/app-kit
 import { usePlayer } from "@behindthemusictree/app-kit/player";
 import { initSentry } from "@lib/sentry";
 import { cn } from "@lib/utils";
+import { UserMenu } from "@components/features/menu/UserMenu";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
@@ -53,6 +54,9 @@ export default function AppContent({ children }: { children: ReactNode }) {
             )}
           >
             <SideRail />
+            <div className="absolute top-[max(0.25rem,env(safe-area-inset-top))] right-1 z-50">
+              <UserMenu />
+            </div>
             <div className="flex min-h-0 w-full flex-grow">
               <main className="flex min-h-0 w-full flex-grow flex-col">
                 <div className="flex min-h-0 flex-1 flex-col">{children}</div>
