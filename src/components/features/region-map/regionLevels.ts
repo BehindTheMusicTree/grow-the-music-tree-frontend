@@ -4,7 +4,7 @@ export type Level = {
   id: string;
   /** The regions drawn at this level. */
   childIds: readonly string[];
-  /** The zones offered by the Zone selector at this level. */
+  /** The zones of this level; a zone selected through `?region=` is drawn as an overlay. */
   zoneIds: readonly string[];
 };
 
