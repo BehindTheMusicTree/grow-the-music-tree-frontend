@@ -7,6 +7,7 @@ import GenrePicker from "@components/features/curation/GenrePicker";
 import { useGenreCuration } from "@components/features/genre-curation/GenreCurationProvider";
 import { useAliasGenre, useAliasPreview } from "@hooks/curation/useAliasGenre";
 import { useExcludeGenre } from "@hooks/curation/useExcludeGenre";
+import { useSetGenreRoot } from "@hooks/curation/useSetGenreRoot";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { EXCLUDE_CATEGORIES } from "@schemas/api/curation";
@@ -26,6 +27,7 @@ interface PopupProps {
 
 interface DangerZoneProps {
   genre: Genre;
+  parent?: { uuid: string; name: string } | null;
   onAliased?: (targetUuid: string) => void;
   onRemoved?: () => void;
 }
@@ -75,6 +77,31 @@ function AliasPopup({ genre, onClose, onAliased }: PopupProps & Pick<DangerZoneP
           </p>
         )}
       </div>
+    </BasePopup>
+  );
+}
+
+function SetRootPopup({ genre, parent, onClose }: PopupProps & { parent: { name: string } }) {
+  const { mutate, isPending } = useSetGenreRoot();
+
+  return (
+    <BasePopup
+      title={`Set ${genre.name} as root`}
+      type="warning"
+      topOffset={BANNER_HEIGHT}
+      isDismissable
+      showOkButton
+      showCancelButton
+      okButtonText="Set as root"
+      okButtonDisabled={isPending}
+      onOk={() => mutate({ uuid: genre.uuid, name: genre.name }, { onSuccess: onClose })}
+      onCancel={onClose}
+      onClose={onClose}
+    >
+      <p className="max-w-md">
+        {genre.name} and its descendants will no longer be under {parent.name}. It stays a root on every
+        import.
+      </p>
     </BasePopup>
   );
 }
@@ -162,7 +189,7 @@ function DeletePopup({ genre, onClose, onRemoved }: PopupProps & Pick<DangerZone
   );
 }
 
-export default function GenreDangerZone({ genre, onAliased, onRemoved }: DangerZoneProps) {
+export default function GenreDangerZone({ genre, parent, onAliased, onRemoved }: DangerZoneProps) {
   const { openDialog } = useGenreCuration();
   const button = "px-3 py-1 text-sm text-red-600 border border-red-300 rounded cursor-pointer hover:bg-red-50";
 
@@ -171,6 +198,15 @@ export default function GenreDangerZone({ genre, onAliased, onRemoved }: DangerZ
       {!genre.wikidataId && (
         <button type="button" className={button} onClick={() => openDialog((close) => <AliasPopup genre={genre} onClose={close} onAliased={onAliased} />)}>
           Alias of…
+        </button>
+      )}
+      {parent && (
+        <button
+          type="button"
+          className={button}
+          onClick={() => openDialog((close) => <SetRootPopup genre={genre} parent={parent} onClose={close} />)}
+        >
+          Set as root…
         </button>
       )}
       <button type="button" className={button} onClick={() => openDialog((close) => <ExcludePopup genre={genre} onClose={close} onRemoved={onRemoved} />)}>

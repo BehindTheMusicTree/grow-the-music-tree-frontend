@@ -27,13 +27,13 @@ const RegionSchema = z
     mainBbox: z.tuple([z.number(), z.number(), z.number(), z.number()]),
     centroid: Position,
     drillable: z.boolean(),
-    /** Wikidata item id of the region's "Music of X" genre. Optional until every published index carries it. */
-    overviewItemId: NonEmpty.nullable().optional(),
+    /** Wikidata item id of the region's "Music of X" genre; null when it has none. */
+    overviewItemId: NonEmpty.nullable(),
     /**
      * Without its own overview, the overview of the region's nearest admin ancestor that has one ("Music of France"
-     * for Normandie); null on zones. Optional until every published index carries it.
+     * for Normandie); null on zones.
      */
-    inheritedOverviewItemId: NonEmpty.nullable().optional(),
+    inheritedOverviewItemId: NonEmpty.nullable(),
     genres: z.array(RegionGenreSchema),
     songCount: z.number().int().min(0),
     genreCount: z.number().int().min(0),

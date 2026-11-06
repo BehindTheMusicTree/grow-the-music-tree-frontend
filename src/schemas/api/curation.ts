@@ -268,6 +268,10 @@ export const UpdateGenreParentInputSchema = z.object({
 export type UpdateGenreParentInput = z.infer<typeof UpdateGenreParentInputSchema>;
 export const UpdateGenreOutputSchema = UuidOutputSchema;
 
+export const SetGenreRootInputSchema = z.object({ uuid: GenreUuidSchema, name: z.string() });
+export type SetGenreRootInput = z.infer<typeof SetGenreRootInputSchema>;
+export const SetGenreRootOutputSchema = UuidOutputSchema;
+
 const EssentialSongSchema = z.object({
   uuid: z.string(),
   title: z.string(),

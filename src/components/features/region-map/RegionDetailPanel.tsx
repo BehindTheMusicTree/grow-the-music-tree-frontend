@@ -12,18 +12,26 @@ type Props = {
   /** A genre picked inside the panel (family chip); it replaces the region's overview. */
   genreUuid: string | null;
   onSelectGenre: (genreUuid: string) => void;
-  onFocus: (region: Region) => void;
+  onZoomTo: (region: Region) => void;
   onClose: () => void;
   collapsed: boolean;
   onCollapsedChange: (collapsed: boolean) => void;
 };
 
-export default function RegionDetailPanel({ region, genreUuid, onSelectGenre, onFocus, onClose, collapsed, onCollapsedChange }: Props) {
-  const ownOverviewId = region.overviewItemId ?? null;
-  const overviewId = ownOverviewId ?? region.inheritedOverviewItemId ?? null;
+export default function RegionDetailPanel({
+  region,
+  genreUuid,
+  onSelectGenre,
+  onZoomTo,
+  onClose,
+  collapsed,
+  onCollapsedChange,
+}: Props) {
+  const ownOverviewId = region.overviewItemId;
+  const overviewId = ownOverviewId ?? region.inheritedOverviewItemId;
   const overview = useGenreByWikidataId(overviewId, "reference", getGrowBackendBaseUrl);
   const edgeTab = collapseEdgeTab(collapsed, onCollapsedChange);
-  const onZoomIn = region.drillable ? () => onFocus(region) : undefined;
+  const onZoomIn = region.drillable ? () => onZoomTo(region) : undefined;
 
   if (overviewId === null) {
     return (
@@ -37,7 +45,7 @@ export default function RegionDetailPanel({ region, genreUuid, onSelectGenre, on
         {onZoomIn && (
           <div className="px-6 py-4">
             <Button type="button" onClick={onZoomIn}>
-              Focus on {region.name}
+              Zoom to {region.name}
             </Button>
           </div>
         )}
