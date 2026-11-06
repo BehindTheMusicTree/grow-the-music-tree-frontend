@@ -20,6 +20,7 @@ vi.mock("@behindthemusictree/app-kit/player", async (importOriginal) => {
 vi.mock("@lib/sentry", () => ({ initSentry: vi.fn() }));
 
 vi.mock("@components/features/menu/SideRail", () => ({ default: () => <nav aria-label="Side rail" /> }));
+vi.mock("@components/features/menu/UserMenu", () => ({ UserMenu: () => null }));
 vi.mock("@components/features/player/Player", () => ({ default: () => null }));
 
 function RaiseNetworkError({ enabled }: { enabled: boolean }) {

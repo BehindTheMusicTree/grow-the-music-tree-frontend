@@ -70,7 +70,7 @@ export function UserMenu() {
       {open && (
         <div
           role="menu"
-          className="absolute bottom-full left-0 z-50 mb-2 min-w-48 md:bottom-auto md:left-full md:top-0 md:mb-0 md:ml-2 overflow-hidden rounded-lg bg-black/80 py-1 text-gray-100 shadow-lg backdrop-blur"
+          className="absolute top-full right-0 z-50 mt-2 min-w-48 overflow-hidden rounded-lg bg-black/80 py-1 text-gray-100 shadow-lg backdrop-blur"
         >
           {session?.user?.email && <p className="px-3 py-2 text-xs text-gray-400">{session.user.email}</p>}
           {MENU_LINKS.map(({ href, label }) => (
