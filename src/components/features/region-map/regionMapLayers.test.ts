@@ -3,6 +3,8 @@ import fixture from "@schemas/api/region-map.fixture.json";
 import { RegionMapIndexSchema, type Region } from "@schemas/api/region-map";
 import {
   ancestry,
+  backdropColors,
+  backdropFilter,
   buildStyle,
   cityRadius,
   depthColors,
@@ -56,6 +58,17 @@ describe("depthColors", () => {
 
   it("leaves zones out", () => {
     expect(depthColors(regions).has("Q236626")).toBe(false);
+  });
+});
+
+describe("backdropColors", () => {
+  it("gives the lightest tint to admin regions with songs only", () => {
+    const backdrop = backdropColors(regions);
+
+    expect(backdrop.get("Q142")).toMatch(/^rgb\(/);
+    expect(backdrop.get("Q142")).not.toBe(depthColors(regions).get("Q142"));
+    expect(backdrop.has("Q183")).toBe(false);
+    expect(backdrop.has("Q236626")).toBe(false);
   });
 });
 
@@ -123,6 +136,7 @@ describe("buildStyle", () => {
       supranationalIds: [],
       selectedId: null,
       colors: new Map([["Q12130", "#123456"]]),
+      backdrop: new Map([["Q142", "#abcdef"]]),
       ...overrides,
     });
   const layer = (id: string, built = style()) =>
@@ -150,6 +164,7 @@ describe("buildStyle", () => {
       "land",
       "lakes",
       "region-hit",
+      "region-backdrop",
       "region-fill",
       "rivers",
       "region-line",
@@ -174,6 +189,19 @@ describe("buildStyle", () => {
     expect(layer("zone-labels").filter).toEqual(inBand);
     expect(layer("region-fill").paint).toMatchObject({
       "fill-color": ["match", ["get", "id"], "Q12130", "#123456", EMPTY_FILL],
+    });
+  });
+
+  it("backs a region zoomed past its band with the lightest tint, under its subdivisions", () => {
+    expect(layer("region-backdrop").filter).toEqual(backdropFilter(new Map([["Q142", "#abcdef"]])));
+    expect(backdropFilter(new Map([["Q142", "#abcdef"]]))).toEqual([
+      "all",
+      ["<=", ["get", "min_zoom"], ["zoom"]],
+      ["!", inBand],
+      ["in", ["get", "id"], ["literal", ["Q142"]]],
+    ]);
+    expect(layer("region-backdrop").paint).toMatchObject({
+      "fill-color": ["match", ["get", "id"], "Q142", "#abcdef", EMPTY_FILL],
     });
   });
 

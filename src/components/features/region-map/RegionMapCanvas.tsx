@@ -18,11 +18,14 @@ import {
   CITY_LABEL_LAYER,
   CITY_LAYER,
   cityRadius,
+  backdropColors,
+  backdropFilter,
   depthColors,
   describe,
   fillColorExpression,
   idFilter,
   MAX_ZOOM,
+  REGION_BACKDROP_LAYER,
   REGION_FILL_LAYER,
   REGION_HIT_LAYER,
   REGION_LABEL_LAYER,
@@ -146,6 +149,9 @@ export default function RegionMapCanvas({
   supranationalRef.current = supranationalIds;
   const colorsRef = useRef(colors);
   colorsRef.current = colors;
+  const backdrop = useMemo(() => backdropColors(regions), [regions]);
+  const backdropRef = useRef(backdrop);
+  backdropRef.current = backdrop;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -168,6 +174,7 @@ export default function RegionMapCanvas({
           supranationalIds: supranationalRef.current,
           selectedId: initialSelected,
           colors: colorsRef.current,
+          backdrop: backdropRef.current,
         }),
         ...(camera
           ? { center: [camera.lng, camera.lat] as [number, number], zoom: camera.zoom }
@@ -261,7 +268,9 @@ export default function RegionMapCanvas({
     const map = mapRef.current;
     if (!ready || !map) return;
     map.setPaintProperty(REGION_FILL_LAYER, "fill-color", fillColorExpression(colors));
-  }, [ready, colors]);
+    map.setFilter(REGION_BACKDROP_LAYER, backdropFilter(backdrop));
+    map.setPaintProperty(REGION_BACKDROP_LAYER, "fill-color", fillColorExpression(backdrop));
+  }, [ready, colors, backdrop]);
 
   useEffect(() => {
     const map = mapRef.current;

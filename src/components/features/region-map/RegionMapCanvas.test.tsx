@@ -353,6 +353,15 @@ describe("RegionMapCanvas", () => {
     ]);
   });
 
+  it("paints the backdrop of regions with songs once loaded", async () => {
+    mount();
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+
+    expect(map.calls.setFilter).toContainEqual(["region-backdrop", expect.arrayContaining(["all"])]);
+    expect(map.calls.setPaintProperty).toContainEqual(["region-backdrop", "fill-color", expect.anything()]);
+  });
+
   it("fills the selected zone and keeps it outlined", async () => {
     const { rerender } = mount();
     const map = fakeMap();

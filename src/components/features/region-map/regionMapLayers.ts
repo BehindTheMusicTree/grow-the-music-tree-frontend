@@ -8,6 +8,7 @@ export const MAX_ZOOM = 11;
 
 export const TILES_SOURCE = "tiles";
 export const REGION_HIT_LAYER = "region-hit";
+export const REGION_BACKDROP_LAYER = "region-backdrop";
 export const REGION_FILL_LAYER = "region-fill";
 export const REGION_LINE_LAYER = "region-line";
 export const REGION_SELECTED_LAYER = "region-selected-line";
@@ -46,8 +47,9 @@ export function depthOf(region: Region, regions: ReadonlyMap<string, Region>): n
   return depth;
 }
 
-// Regions with songs start at light green; the pale yellow below it is kept for the zone-only ones.
-const SONGS_TINT_START = 0.25;
+// Regions with songs start at a clear green; the pale yellow below it is kept for areas only covered by a zone or a
+// parent with songs.
+const SONGS_TINT_START = 0.4;
 const ZONE_ONLY_FILL = interpolateYlGnBu(0);
 
 /**
@@ -77,6 +79,26 @@ export function depthColors(regions: ReadonlyMap<string, Region>): Map<string, s
   }
   return colors;
 }
+
+/**
+ * Admin regions with songs, painted with the lightest tint once zoomed past their band: the parts of a country its
+ * drawn subdivisions do not cover still read as having songs instead of falling back to the grey land.
+ */
+export function backdropColors(regions: ReadonlyMap<string, Region>): Map<string, string> {
+  const colors = new Map<string, string>();
+  for (const region of Array.from(regions.values())) {
+    if (isAdmin(region) && region.songCount > 0) colors.set(region.id, ZONE_ONLY_FILL);
+  }
+  return colors;
+}
+
+/** Regions zoomed past their band whose backdrop is painted: the others stay transparent over the land. */
+export const backdropFilter = (colors: ReadonlyMap<string, string>): ExpressionSpecification => [
+  "all",
+  byMinZoom,
+  ["!", inBand],
+  ["in", ["get", "id"], ["literal", Array.from(colors.keys())]],
+];
 
 export function fillColorExpression(colors: ReadonlyMap<string, string>): string | ExpressionSpecification {
   if (colors.size === 0) return EMPTY_FILL;
@@ -191,6 +213,7 @@ type StyleOptions = {
   supranationalIds: readonly string[];
   selectedId: string | null;
   colors: ReadonlyMap<string, string>;
+  backdrop: ReadonlyMap<string, string>;
 };
 
 export function buildStyle({
@@ -200,6 +223,7 @@ export function buildStyle({
   supranationalIds,
   selectedId,
   colors,
+  backdrop,
 }: StyleOptions): StyleSpecification {
   const zone = zoneFilters(zoneId, supranationalIds);
   return {
@@ -234,6 +258,15 @@ export function buildStyle({
         paint: { "fill-color": EMPTY_FILL, "fill-opacity": 0 },
       },
       {
+        id: REGION_BACKDROP_LAYER,
+        type: "fill",
+        source: TILES_SOURCE,
+        "source-layer": REGIONS_SOURCE_LAYER,
+        filter: backdropFilter(backdrop),
+        layout: { "fill-sort-key": depth },
+        paint: { "fill-color": fillColorExpression(backdrop) },
+      },
+      {
         id: REGION_FILL_LAYER,
         type: "fill",
         source: TILES_SOURCE,
@@ -259,8 +292,8 @@ export function buildStyle({
         filter: byMinZoom,
         layout: { "line-sort-key": ["-", 0, depth] },
         paint: {
-          "line-color": ["case", hovered, "#111827", ["==", depth, 0], "#1f2937", "#f9fafb"],
-          "line-width": ["case", hovered, 1.5, ["==", depth, 0], 1.2, 0.5],
+          "line-color": ["case", hovered, "#111827", "#1f2937"],
+          "line-width": ["case", hovered, 1.5, ["==", depth, 0], 1.2, 0.6],
         },
       },
       {
