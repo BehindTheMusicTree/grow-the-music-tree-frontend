@@ -47,7 +47,7 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
 const props = {
   genreUuid: null,
   onSelectGenre: vi.fn(),
-  onFocus: vi.fn(),
+  onZoomTo: vi.fn(),
   onClose: vi.fn(),
   collapsed: false,
   onCollapsedChange: vi.fn(),
@@ -74,7 +74,7 @@ describe("RegionDetailPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
 
     expect(screen.getByRole("region", { name: /Genre 11111111/ })).toBeTruthy();
-    expect(props.onFocus).toHaveBeenCalledWith(region);
+    expect(props.onZoomTo).toHaveBeenCalledWith(region);
   });
 
   it("reports an overview genre the API does not know", () => {
@@ -99,7 +99,7 @@ describe("RegionDetailPanel", () => {
 
     expect(lookedUp).toHaveBeenLastCalledWith("Q672134");
     expect(screen.getByRole("region", { name: /Genre 22222222/ })).toBeTruthy();
-    expect(props.onFocus).toHaveBeenCalledWith(region);
+    expect(props.onZoomTo).toHaveBeenCalledWith(region);
   });
 
   it("shows a picked genre over the inherited overview", () => {
@@ -127,8 +127,8 @@ describe("RegionDetailPanel", () => {
     render(<RegionDetailPanel {...props} region={withOverview(null)} />);
 
     expect(screen.getByText(france.name)).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: `Focus on ${france.name}` }));
-    expect(props.onFocus).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: `Zoom to ${france.name}` }));
+    expect(props.onZoomTo).toHaveBeenCalled();
   });
 
   it("closes on Escape", () => {
