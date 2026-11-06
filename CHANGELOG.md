@@ -76,6 +76,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Genre curation**: admins get a "Set as root…" action in a genre's danger zone (genres with a parent), behind a confirmation. It calls `POST genres/{uuid}/set-root/` and has no Undo, since moving the genre back under a parent would leave its accepted-root rule behind. Needs the grow-api endpoint deployed first.
 - **Artist search**: a header search box finds artists by name or alias (accent- and typo-tolerant) and opens their page. The curation genre picker now shares its combobox with it (`ui/Combobox`). Requires grow-api `GET artists/search/`.
 - **Genre Tree Visualization**: Added interactive D3.js-based genre tree component
   - Includes unit tests for tree layout calculations and node interactions
