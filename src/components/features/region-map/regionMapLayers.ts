@@ -13,6 +13,8 @@ export const REGION_LABEL_LAYER = "region-labels";
 export const ZONE_FILL_LAYER = "zone-fill";
 export const ZONE_LINE_LAYER = "zone-line";
 export const REGIONS_SOURCE_LAYER = "regions";
+export const CITY_LAYER = "city-points";
+export const CITIES_SOURCE_LAYER = "cities";
 /** The tileset's last zoom: MapLibre overzooms it up to MAX_ZOOM. */
 export const TILESET_MAX_ZOOM = 10;
 const FONT = ["Noto Sans Regular"];
@@ -77,6 +79,13 @@ export const levelFilter = (childIds: readonly string[]): FilterSpecification =>
   ["literal", [...childIds]],
 ];
 
+/** The cities of the level itself and of the regions drawn on it; the tileset carries each city's admin `parentId`. */
+export const cityFilter = (levelId: string, childIds: readonly string[]): FilterSpecification => [
+  "in",
+  ["get", "parentId"],
+  ["literal", [levelId, ...childIds]],
+];
+
 /** A zone id is never empty, so this matches no zone while none is chosen. */
 export const zoneFilter = (zoneId: string | null): FilterSpecification => ["==", ["get", "id"], zoneId ?? ""];
 
@@ -96,12 +105,13 @@ function textPaint(color: string, size: number) {
 type StyleOptions = {
   tilesetUrl: string;
   glyphsUrl: string;
+  levelId: string;
   childIds: readonly string[];
   zoneId: string | null;
   colors: ReadonlyMap<string, string>;
 };
 
-export function buildStyle({ tilesetUrl, glyphsUrl, childIds, zoneId, colors }: StyleOptions): StyleSpecification {
+export function buildStyle({ tilesetUrl, glyphsUrl, levelId, childIds, zoneId, colors }: StyleOptions): StyleSpecification {
   return {
     version: 8,
     projection: { type: "globe" },
@@ -117,7 +127,7 @@ export function buildStyle({ tilesetUrl, glyphsUrl, childIds, zoneId, colors }: 
         type: "vector",
         url: `pmtiles://${tilesetUrl}`,
         maxzoom: TILESET_MAX_ZOOM,
-        promoteId: { [REGIONS_SOURCE_LAYER]: "id", zones: "id" },
+        promoteId: { [REGIONS_SOURCE_LAYER]: "id", zones: "id", [CITIES_SOURCE_LAYER]: "id" },
       },
     },
     layers: [
@@ -185,6 +195,19 @@ export function buildStyle({ tilesetUrl, glyphsUrl, childIds, zoneId, colors }: 
           "circle-color": "#374151",
           "circle-stroke-color": "#ffffff",
           "circle-stroke-width": 1,
+        },
+      },
+      {
+        id: CITY_LAYER,
+        type: "circle",
+        source: TILES_SOURCE,
+        "source-layer": CITIES_SOURCE_LAYER,
+        filter: cityFilter(levelId, childIds),
+        paint: {
+          "circle-radius": ["case", featureState("selected"), 7, featureState("hover"), 6, 4.5],
+          "circle-color": ["case", featureState("selected"), "#111827", "#f97316"],
+          "circle-stroke-color": "#ffffff",
+          "circle-stroke-width": 1.5,
         },
       },
       {
