@@ -4,6 +4,7 @@ import { useEffect, ReactNode } from "react";
 import { usePopup, useConnectivityErrorPopup } from "@behindthemusictree/app-kit/popup";
 import { usePlayer } from "@behindthemusictree/app-kit/player";
 import { initSentry } from "@lib/sentry";
+import { cn } from "@lib/utils";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
@@ -45,9 +46,14 @@ export default function AppContent({ children }: { children: ReactNode }) {
     <GenreTreeViewModeProvider>
       <div className="app col h-screen">
         <div className="center fixed top-0 flex h-full w-full">
-          <div className="relative flex min-h-0 w-full flex-grow flex-col-reverse md:flex-row">
+          <div
+            className={cn(
+              "relative flex min-h-0 w-full flex-grow flex-col-reverse md:flex-row",
+              activePopup && "pointer-events-none blur-sm",
+            )}
+          >
             <SideRail />
-            <div className="min-h-0 flex-grow w-full flex" style={activePopup ? { filter: "blur(4px)" } : undefined}>
+            <div className="flex min-h-0 w-full flex-grow">
               <main className="flex min-h-0 w-full flex-grow flex-col">
                 <div className="flex min-h-0 flex-1 flex-col">{children}</div>
               </main>

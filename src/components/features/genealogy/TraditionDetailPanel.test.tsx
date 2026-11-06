@@ -9,9 +9,9 @@ const data = GenealogySchema.parse(fixture);
 afterEach(cleanup);
 
 function renderPanel(wikidataId: string) {
-  const handlers = { onSelect: vi.fn(), onClose: vi.fn(), onOpenInTree: vi.fn() };
+  const handlers = { onSelect: vi.fn(), onClose: vi.fn(), onOpenInTree: vi.fn(), onCollapsedChange: vi.fn() };
   const tradition = data.traditions.find((entry) => entry.wikidataId === wikidataId)!;
-  render(<TraditionDetailPanel data={data} tradition={tradition} {...handlers} />);
+  render(<TraditionDetailPanel data={data} tradition={tradition} collapsed={false} {...handlers} />);
   return { tradition, ...handlers };
 }
 
@@ -25,6 +25,15 @@ describe("TraditionDetailPanel", () => {
       `https://www.wikidata.org/wiki/${inTree.wikidataId}`,
     );
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it("hides through its edge tab and closes on Escape", () => {
+    const { onCollapsedChange, onClose } = renderPanel(data.traditions[0].wikidataId);
+
+    fireEvent.click(screen.getByRole("button", { name: "Hide panel" }));
+    expect(onCollapsedChange).toHaveBeenCalledWith(true);
+    fireEvent.keyDown(document, { key: "Escape" });
     expect(onClose).toHaveBeenCalled();
   });
 

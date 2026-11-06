@@ -29,6 +29,25 @@ describe("RegionMapIndexSchema", () => {
     expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [withoutInherited] }).success).toBe(false);
   });
 
+  it("accepts a city point region and the cityIds of its admin unit", () => {
+    const rennes = {
+      ...fixture.regions[0],
+      id: "Q647",
+      kind: "city",
+      parentId: fixture.regions[0].id,
+      childIds: [],
+      zoneIds: [],
+      bbox: [-1.68, 48.11, -1.68, 48.11],
+      mainBbox: [-1.68, 48.11, -1.68, 48.11],
+      centroid: [-1.68, 48.11],
+      drillable: false,
+    };
+    const parent = { ...fixture.regions[0], cityIds: ["Q647"] };
+
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [parent, rennes] }).success).toBe(true);
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...parent, cityIds: [""] }] }).success).toBe(false);
+  });
+
   it("accepts the overview a region inherits from its nearest ancestor", () => {
     const normandie = { ...fixture.regions[0], overviewItemId: null, inheritedOverviewItemId: "Q672134" };
 
@@ -36,7 +55,8 @@ describe("RegionMapIndexSchema", () => {
       "Q672134",
     );
     expect(
-      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: null }] }).success,
+      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: null }] })
+        .success,
     ).toBe(true);
     expect(
       RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: "" }] }).success,
@@ -50,7 +70,7 @@ describe("RegionMapIndexSchema", () => {
     );
     expect(RegionMapIndexSchema.safeParse({ ...fixture, files: {} }).success).toBe(false);
     expect(
-      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...fixture.regions[0], kind: "city" }] }).success,
+      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...fixture.regions[0], kind: "village" }] }).success,
     ).toBe(false);
   });
 

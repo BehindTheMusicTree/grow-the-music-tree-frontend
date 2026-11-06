@@ -24,6 +24,16 @@ const config = [
     rules: {
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      // The section frame (padding, title, border) comes from PanelSection in @behindthemusictree/ui.
+      // gtv-info-panel-* classes belong to genre-tree-view's tree content; genre-tree-view 8.0.0 dropped
+      // the section rule and silently unstyled every host section that relied on it.
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "Literal[value=/gtv-info-panel/], TemplateElement[value.raw=/gtv-info-panel/]",
+          message: "Build panel sections with PanelSection from @behindthemusictree/ui, not gtv-info-panel-* classes.",
+        },
+      ],
     },
   },
 ];

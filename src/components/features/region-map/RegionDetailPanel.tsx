@@ -4,6 +4,7 @@ import { GenreUuidSchema, useGenreByWikidataId } from "@behindthemusictree/app-k
 import { GenreDetailPanel } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { Button, DetailPanel, FieldList } from "@behindthemusictree/ui";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
+import { collapseEdgeTab } from "@utils/collapseEdgeTab";
 import type { Region } from "@schemas/api/region-map";
 
 type Props = {
@@ -13,17 +14,28 @@ type Props = {
   onSelectGenre: (genreUuid: string) => void;
   onFocus: (region: Region) => void;
   onClose: () => void;
+  collapsed: boolean;
+  onCollapsedChange: (collapsed: boolean) => void;
 };
 
-export default function RegionDetailPanel({ region, genreUuid, onSelectGenre, onFocus, onClose }: Props) {
+export default function RegionDetailPanel({
+  region,
+  genreUuid,
+  onSelectGenre,
+  onFocus,
+  onClose,
+  collapsed,
+  onCollapsedChange,
+}: Props) {
   const ownOverviewId = region.overviewItemId;
   const overviewId = ownOverviewId ?? region.inheritedOverviewItemId;
   const overview = useGenreByWikidataId(overviewId, "reference", getGrowBackendBaseUrl);
+  const edgeTab = collapseEdgeTab(collapsed, onCollapsedChange);
   const onZoomIn = region.drillable ? () => onFocus(region) : undefined;
 
   if (overviewId === null) {
     return (
-      <DetailPanel title={region.name} onClose={onClose} side="left">
+      <DetailPanel title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
         <FieldList
           items={[
             { label: "Songs", value: region.songCount },
@@ -47,7 +59,7 @@ export default function RegionDetailPanel({ region, genreUuid, onSelectGenre, on
   if (!uuid) {
     const failed = overview.isError || overview.data === null;
     return (
-      <DetailPanel title={region.name} onClose={onClose} side="left">
+      <DetailPanel title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
         {failed ? (
           <p role="alert" className="px-6 py-4 text-red-600">
             {ownOverviewId === null
@@ -69,6 +81,8 @@ export default function RegionDetailPanel({ region, genreUuid, onSelectGenre, on
       onClose={onClose}
       onSelectGenre={onSelectGenre}
       onZoomIn={onZoomIn}
+      collapsed={collapsed}
+      edgeTab={edgeTab}
     />
   );
 }

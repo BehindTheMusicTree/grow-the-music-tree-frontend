@@ -28,8 +28,11 @@ vi.mock("maplibre-gl", () => {
     }
     on(type: string, ...rest: unknown[]) {
       const handler = rest[rest.length - 1] as Handler;
-      const key = rest.length === 2 ? `${type}:${rest[0]}` : type;
-      this.handlers.set(key, [...(this.handlers.get(key) ?? []), handler]);
+      const layers = rest.length === 2 ? ([] as string[]).concat(rest[0] as string | string[]) : [null];
+      for (const layer of layers) {
+        const key = layer === null ? type : `${type}:${layer}`;
+        this.handlers.set(key, [...(this.handlers.get(key) ?? []), handler]);
+      }
     }
     emit(key: string, event?: unknown) {
       for (const handler of this.handlers.get(key) ?? []) handler(event);
@@ -169,7 +172,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="world"
-      childIds={WORLD_CHILDREN}
+        childIds={WORLD_CHILDREN}
         tileset={"e".repeat(64)}
         zoneId={null}
         regions={regions}
@@ -208,6 +211,21 @@ describe("RegionMapCanvas", () => {
     expect(screen.queryByText(/France · 120 songs/)).toBeNull();
   });
 
+  it("treats a region label like its fill: pointer cursor and click select", async () => {
+    const { onRegionClick } = mount();
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+    const event = { features: [{ properties: { id: "Q142" } }], point: { x: 10, y: 20 } };
+
+    await act(() => map.emit("mousemove:region-labels", event));
+    expect(map.canvas.style.cursor).toBe("pointer");
+    map.emit("click:region-labels", event);
+    expect(onRegionClick).toHaveBeenCalledWith(expect.objectContaining({ id: "Q142" }));
+
+    await act(() => map.emit("mouseleave:region-labels"));
+    expect(map.canvas.style.cursor).toBe("default");
+  });
+
   it("ignores a region MapLibre snaps to the horizon when the pointer is off the globe", async () => {
     const { onRegionClick } = mount();
     const map = fakeMap();
@@ -239,7 +257,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="world"
-      childIds={WORLD_CHILDREN}
+        childIds={WORLD_CHILDREN}
         tileset={index.tileset}
         zoneId={null}
         regions={regions}
@@ -262,7 +280,7 @@ describe("RegionMapCanvas", () => {
     rerender(
       <RegionMapCanvas
         levelId="world"
-      childIds={WORLD_CHILDREN}
+        childIds={WORLD_CHILDREN}
         tileset={index.tileset}
         zoneId="Q236626"
         regions={regions}

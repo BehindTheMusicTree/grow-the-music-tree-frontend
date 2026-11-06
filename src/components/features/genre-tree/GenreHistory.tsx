@@ -1,5 +1,6 @@
 "use client";
 
+import { PanelSection } from "@behindthemusictree/ui";
 import { useFetchWrapper, useQueryWithParse } from "@behindthemusictree/app-kit/transport";
 import { GenreHistorySchema, type GenreHistoryEntry } from "@schemas/api/genre-history";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -39,24 +40,25 @@ export default function GenreHistory({ genreUuid }: { genreUuid: string }) {
   });
 
   return (
-    <div className="gtv-info-panel-children" aria-busy={isPending}>
-      <span className="gtv-info-panel-children-title">Modifications</span>
-      {isPending ? (
-        <div className="h-4 w-3/4 animate-pulse rounded bg-gray-200" />
-      ) : isError ? (
-        <p className="text-red-600">Could not load modifications.</p>
-      ) : entries.length === 0 ? (
-        <p>—</p>
-      ) : (
-        <ol>
-          {entries.map((entry) => (
-            <li key={entry.uuid}>
-              {describeEntry(entry)} by {entry.actorPseudo ?? "Pipeline"},{" "}
-              <time dateTime={entry.createdOn}>{new Date(entry.createdOn).toLocaleDateString()}</time>
-            </li>
-          ))}
-        </ol>
-      )}
-    </div>
+    <PanelSection title="Modifications">
+      <div aria-busy={isPending}>
+        {isPending ? (
+          <div className="h-4 w-3/4 animate-pulse rounded bg-gray-200" />
+        ) : isError ? (
+          <p className="text-red-600">Could not load modifications.</p>
+        ) : entries.length === 0 ? (
+          <p>—</p>
+        ) : (
+          <ol>
+            {entries.map((entry) => (
+              <li key={entry.uuid}>
+                {describeEntry(entry)} by {entry.actorPseudo ?? "Pipeline"},{" "}
+                <time dateTime={entry.createdOn}>{new Date(entry.createdOn).toLocaleDateString()}</time>
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
+    </PanelSection>
   );
 }

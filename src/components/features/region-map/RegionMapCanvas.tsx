@@ -47,6 +47,9 @@ const regionState = (id: string) => ({ source: TILES_SOURCE, sourceLayer: REGION
 addProtocol("pmtiles", new Protocol().tile);
 
 // MapLibre 6 locates its worker from `import.meta.url`, which a bundler rewrites, so the worker must be emitted explicitly.
+// A label can overflow its region onto the sea: it must hover and select like the fill.
+const REGION_HIT_LAYERS = [REGION_FILL_LAYER, REGION_LABEL_LAYER];
+
 setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href);
 
 export default function RegionMapCanvas({ levelId, childIds, tileset, zoneId, regions, selectedId, onRegionClick }: Props) {
@@ -125,11 +128,11 @@ export default function RegionMapCanvas({ levelId, childIds, tileset, zoneId, re
     };
 
     map.on("load", () => setReady(true));
-    map.on("click", REGION_FILL_LAYER, (event) => {
+    map.on("click", REGION_HIT_LAYERS, (event) => {
       const region = regionAt(event);
       if (region) onClickRef.current(region);
     });
-    map.on("mousemove", REGION_FILL_LAYER, (event) => {
+    map.on("mousemove", REGION_HIT_LAYERS, (event) => {
       const region = regionAt(event);
       if (!region) {
         clearHover();
@@ -139,7 +142,7 @@ export default function RegionMapCanvas({ levelId, childIds, tileset, zoneId, re
       map.getCanvas().style.cursor = "pointer";
       showTooltip(event.point.x + TOOLTIP_OFFSET, event.point.y + TOOLTIP_OFFSET, describe(region));
     });
-    map.on("mouseleave", REGION_FILL_LAYER, clearHover);
+    map.on("mouseleave", REGION_HIT_LAYERS, clearHover);
 
     return () => {
       map.remove();
