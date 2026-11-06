@@ -33,7 +33,9 @@ import {
   ZONE_FILL_LAYER,
   ZONE_LABEL_LAYER,
   ZONE_LINE_LAYER,
-  zoneLineFilter,
+  ZONE_SUPRA_SELECTED_LAYER,
+  zoneFilters,
+  supranationalZoneIds,
 } from "./regionMapLayers";
 import type { Camera } from "./useRegionMapUrlState";
 
@@ -139,6 +141,9 @@ export default function RegionMapCanvas({
   });
 
   const colors = useMemo(() => depthColors(regions), [regions]);
+  const supranationalIds = useMemo(() => supranationalZoneIds(regions), [regions]);
+  const supranationalRef = useRef(supranationalIds);
+  supranationalRef.current = supranationalIds;
   const colorsRef = useRef(colors);
   colorsRef.current = colors;
 
@@ -160,6 +165,7 @@ export default function RegionMapCanvas({
           tilesetUrl: `${TILES_BASE_URL}/regions/${tileset}.pmtiles`,
           glyphsUrl: `${TILES_BASE_URL}/fonts/{fontstack}/{range}.pbf`,
           zoneId: initialZone,
+          supranationalIds: supranationalRef.current,
           selectedId: initialSelected,
           colors: colorsRef.current,
         }),
@@ -260,9 +266,11 @@ export default function RegionMapCanvas({
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
-    map.setFilter(ZONE_FILL_LAYER, idFilter(zoneId));
-    map.setFilter(ZONE_LINE_LAYER, zoneLineFilter(zoneId));
-  }, [ready, zoneId]);
+    const zone = zoneFilters(zoneId, supranationalIds);
+    map.setFilter(ZONE_FILL_LAYER, zone.fill);
+    map.setFilter(ZONE_LINE_LAYER, zone.line);
+    map.setFilter(ZONE_SUPRA_SELECTED_LAYER, zone.supraSelected);
+  }, [ready, zoneId, supranationalIds]);
 
   useEffect(() => {
     const map = mapRef.current;

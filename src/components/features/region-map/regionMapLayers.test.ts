@@ -13,8 +13,9 @@ import {
   idFilter,
   inBand,
   regionBounds,
+  supranationalZoneIds,
   WORLD_BOUNDS,
-  zoneLineFilter,
+  zoneFilters,
 } from "./regionMapLayers";
 
 const index = RegionMapIndexSchema.parse(fixture);
@@ -119,6 +120,7 @@ describe("buildStyle", () => {
       tilesetUrl: "https://tiles.example.com/regions/abc.pmtiles",
       glyphsUrl: "https://tiles.example.com/fonts/{fontstack}/{range}.pbf",
       zoneId: null,
+      supranationalIds: [],
       selectedId: null,
       colors: new Map([["Q12130", "#123456"]]),
       ...overrides,
@@ -154,6 +156,8 @@ describe("buildStyle", () => {
       "disputed",
       "zone-fill",
       "zone-line",
+      "zone-supra-hover",
+      "zone-supra-selected",
       "region-selected-line",
       "places",
       "place-labels",
@@ -188,9 +192,26 @@ describe("buildStyle", () => {
   });
 
   it("fills only the chosen zone and keeps it outlined out of its band", () => {
-    expect(layer("zone-fill").filter).toEqual(["==", ["get", "id"], ""]);
-    expect(layer("zone-fill", style({ zoneId: "Q236626" })).filter).toEqual(["==", ["get", "id"], "Q236626"]);
-    expect(layer("zone-line", style({ zoneId: "Q236626" })).filter).toEqual(zoneLineFilter("Q236626"));
+    expect(layer("zone-fill").filter).toEqual(zoneFilters(null, []).fill);
+    const zone = zoneFilters("Q236626", []);
+    expect(layer("zone-fill", style({ zoneId: "Q236626" })).filter).toEqual(zone.fill);
+    expect(layer("zone-line", style({ zoneId: "Q236626" })).filter).toEqual(zone.line);
+  });
+
+  it("outlines a supranational zone in blue only while hovered or selected, and never tints it", () => {
+    const supra = style({ zoneId: "Q4412", supranationalIds: ["Q4412"] });
+
+    expect(layer("zone-supra-hover", supra).paint).toMatchObject({ "line-opacity": ["case", expect.anything(), 1, 0] });
+    expect(layer("zone-supra-selected", supra).filter).toEqual(zoneFilters("Q4412", ["Q4412"]).supraSelected);
+    expect(JSON.stringify(layer("zone-fill", supra).filter)).toContain('"!"');
+  });
+
+  it("treats a zone with a country member as supranational", () => {
+    const zone = regions.get("Q236626")!;
+    const withCountry = new Map(regions).set(zone.id, { ...zone, childIds: ["Q142"] });
+
+    expect(supranationalZoneIds(withCountry)).toContain(zone.id);
+    expect(supranationalZoneIds(new Map(regions).set(zone.id, { ...zone, childIds: [] }))).not.toContain(zone.id);
   });
 
   it("reveals cities and rivers from their Natural Earth min_zoom", () => {

@@ -87,6 +87,7 @@ vi.mock("maplibre-gl", () => {
 });
 
 import RegionMapCanvas from "./RegionMapCanvas";
+import { supranationalZoneIds, zoneFilters } from "./regionMapLayers";
 
 type Fake = {
   options: Record<string, unknown>;
@@ -359,9 +360,9 @@ describe("RegionMapCanvas", () => {
 
     rerender({ zoneId: "Q236626" });
 
-    const zone = ["==", ["get", "id"], "Q236626"];
-    expect(map.calls.setFilter).toContainEqual(["zone-fill", zone]);
-    expect(map.calls.setFilter).toContainEqual(["zone-line", ["any", expect.anything(), zone]]);
+    const zone = zoneFilters("Q236626", supranationalZoneIds(regions));
+    expect(map.calls.setFilter).toContainEqual(["zone-fill", zone.fill]);
+    expect(map.calls.setFilter).toContainEqual(["zone-line", zone.line]);
   });
 
   it("destroys the map on unmount", () => {

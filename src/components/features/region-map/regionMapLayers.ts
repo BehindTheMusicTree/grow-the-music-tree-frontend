@@ -14,6 +14,8 @@ export const REGION_SELECTED_LAYER = "region-selected-line";
 export const REGION_LABEL_LAYER = "region-labels";
 export const ZONE_FILL_LAYER = "zone-fill";
 export const ZONE_LINE_LAYER = "zone-line";
+export const ZONE_SUPRA_HOVER_LAYER = "zone-supra-hover";
+export const ZONE_SUPRA_SELECTED_LAYER = "zone-supra-selected";
 export const ZONE_LABEL_LAYER = "zone-labels";
 export const CITY_LAYER = "cities";
 export const CITY_LABEL_LAYER = "city-labels";
@@ -145,12 +147,36 @@ export const inBand: ExpressionSpecification = [
 /** Zones are outlined inside their band; the selected zone stays outlined at any zoom. */
 export const zoneLineFilter = (zoneId: string | null): ExpressionSpecification => ["any", inBand, idFilter(zoneId)];
 
+/** Zones spanning several countries: their outline is only drawn while hovered or selected. */
+export const supranationalZoneIds = (regions: ReadonlyMap<string, Region>): string[] =>
+  Array.from(regions.values())
+    .filter((r) => r.kind === "zone" && r.childIds.some((id) => regions.get(id)?.kind === "country"))
+    .map((r) => r.id);
+
+const isSupranational = (ids: readonly string[]): ExpressionSpecification => [
+  "in",
+  ["get", "id"],
+  ["literal", [...ids]],
+];
+
+export function zoneFilters(zoneId: string | null, supranationalIds: readonly string[]) {
+  const supra = isSupranational(supranationalIds);
+  return {
+    // A supranational zone never tints its interior nor shows its dashed outline.
+    fill: ["all", idFilter(zoneId), ["!", supra]] as ExpressionSpecification,
+    line: ["all", zoneLineFilter(zoneId), ["!", supra]] as ExpressionSpecification,
+    supraHover: supra,
+    supraSelected: ["all", idFilter(zoneId), supra] as ExpressionSpecification,
+  };
+}
+
 const depth: ExpressionSpecification = ["get", "depth"];
 
 const PLACE_LABEL_SIZE = 11;
 const PLACE_LABEL_COLOR = "#374151";
 const REGION_LABEL_COLOR = "#111827";
 const ZONE_COLOR = "#c2410c";
+const SUPRA_ZONE_COLOR = "#2563eb";
 const CITY_COLOR = "#7c3aed";
 
 function textPaint(color: string, size: number) {
@@ -162,11 +188,20 @@ type StyleOptions = {
   tilesetUrl: string;
   glyphsUrl: string;
   zoneId: string | null;
+  supranationalIds: readonly string[];
   selectedId: string | null;
   colors: ReadonlyMap<string, string>;
 };
 
-export function buildStyle({ tilesetUrl, glyphsUrl, zoneId, selectedId, colors }: StyleOptions): StyleSpecification {
+export function buildStyle({
+  tilesetUrl,
+  glyphsUrl,
+  zoneId,
+  supranationalIds,
+  selectedId,
+  colors,
+}: StyleOptions): StyleSpecification {
+  const zone = zoneFilters(zoneId, supranationalIds);
   return {
     version: 8,
     projection: { type: "globe" },
@@ -240,7 +275,7 @@ export function buildStyle({ tilesetUrl, glyphsUrl, zoneId, selectedId, colors }
         type: "fill",
         source: TILES_SOURCE,
         "source-layer": "zones",
-        filter: idFilter(zoneId),
+        filter: zone.fill,
         paint: { "fill-color": "#f97316", "fill-opacity": 0.15 },
       },
       {
@@ -248,8 +283,25 @@ export function buildStyle({ tilesetUrl, glyphsUrl, zoneId, selectedId, colors }
         type: "line",
         source: TILES_SOURCE,
         "source-layer": "zones",
-        filter: zoneLineFilter(zoneId),
+        filter: zone.line,
         paint: { "line-color": ZONE_COLOR, "line-width": ["case", hovered, 3, 1.5], "line-dasharray": [4, 3] },
+      },
+      {
+        id: ZONE_SUPRA_HOVER_LAYER,
+        type: "line",
+        source: TILES_SOURCE,
+        "source-layer": "zones",
+        filter: zone.supraHover,
+        paint: { "line-color": SUPRA_ZONE_COLOR, "line-width": 4, "line-opacity": ["case", hovered, 1, 0] },
+      },
+      {
+        // No zoom filter: the selection stays outlined once the map zooms past its band.
+        id: ZONE_SUPRA_SELECTED_LAYER,
+        type: "line",
+        source: TILES_SOURCE,
+        "source-layer": "zones",
+        filter: zone.supraSelected,
+        paint: { "line-color": SUPRA_ZONE_COLOR, "line-width": 4 },
       },
       {
         // No zoom filter: the selection stays outlined once the map zooms past its band.
