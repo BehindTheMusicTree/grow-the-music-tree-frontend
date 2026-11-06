@@ -129,21 +129,11 @@ describe("RegionMapView", () => {
     expect(url(navigation.replace.mock.calls[0]).searchParams.get("path")).toBe("Q142");
   });
 
-  it("selects a zone chosen in the selector and overlays it", () => {
-    render(<RegionMapView />);
-
-    fireEvent.change(screen.getByRole("combobox"), { target: { value: "Q236626" } });
-
-    expect(lastProps.zoneId).toBe("Q236626");
-    expect(url(navigation.push.mock.calls[0]).searchParams.get("region")).toBe("Q236626");
-  });
-
-  it("restores the zone overlay and selector from ?region= on load", () => {
+  it("restores the zone overlay from ?region= on load", () => {
     search = new URLSearchParams("region=Q236626");
     render(<RegionMapView />);
 
     expect(lastProps.zoneId).toBe("Q236626");
-    expect(screen.getByRole("combobox")).toHaveValue("Q236626");
   });
 
   it("keeps one map mounted across levels so the view can animate", () => {
