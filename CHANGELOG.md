@@ -113,12 +113,15 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - Limit shared-package style scanning to package output so local linked-package production builds finish without scanning nested dependencies.
 
+
 ### Changed
 
 - **Breadcrumbs**: the region map and the genre tree share one breadcrumb. On the map it is now a floating card over the canvas like the tree's: a home icon for World, collapsed long paths, and the current region still reopens its panel. On the tree, clicking the current genre centers it and opens its info panel. Needs app-kit and app-kit-ui 32.0.2, ui 0.17.0 and genre-tree-view 8.2.0.
 - **Labels**: hovering a tradition label on the genealogy chart or a region label on the map shows the pointer, and clicking it selects the tradition or region. Labels on the genealogy chart and the map get a contrast halo (black behind light text, white behind dark text) sized to the font. Needs app-kit and app-kit-ui 32.0.1, ui 0.16.0 and genre-tree-view 8.1.0.
 
 ### Added
+
+- **Region map**: the index schema accepts regions of kind `city` (point regions under an admin unit) and the optional `cityIds` on admin units, so the pipelines can publish city-level genre anchors. Must be deployed before such an index is imported.
 
 - Use trusted edge country context for playback, prevent caching of contextual song responses, and show retry controls when playback context cannot be loaded.
 
