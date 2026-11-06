@@ -215,9 +215,9 @@ export function buildStyle({ tilesetUrl, glyphsUrl, zoneId, selectedId, colors }
           "line-color": [
             "case",
             hovered,
-            "#374151",
+            "#111827",
             ["==", depth, 0],
-            "#ffffff",
+            "#1f2937",
             "#f9fafb",
           ],
           "line-width": [
