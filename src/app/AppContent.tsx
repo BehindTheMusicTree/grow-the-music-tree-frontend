@@ -9,7 +9,6 @@ import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
 import SideRail from "@components/features/menu/SideRail";
 import Player from "@components/features/player/Player";
-import AutoAdvance from "@components/features/player/AutoAdvance";
 
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
 
@@ -59,7 +58,6 @@ export default function AppContent({ children }: { children: ReactNode }) {
         </div>
 
         <Player className={activePopup ? "blur-sm pointer-events-none" : undefined} />
-        <AutoAdvance />
         {activePopup}
       </div>
     </GenreTreeViewModeProvider>

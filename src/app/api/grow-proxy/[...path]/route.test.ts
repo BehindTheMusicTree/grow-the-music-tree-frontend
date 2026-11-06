@@ -151,3 +151,14 @@ describe("grow-proxy route", () => {
     expect(response.headers.get("etag")).toBe('"abc"');
   });
 });
+
+it("does not revalidate or cache contextual song responses", async () => {
+  const fetchMock = vi.spyOn(global, "fetch").mockResolvedValue(new Response("[]", { headers: { etag: "stale", "cache-control": "public, immutable", "x-playback-country": "AL" } }));
+  const response = await GET(new NextRequest("http://localhost/api/grow-proxy/library/songs/", { headers: { "if-none-match": "stale" } }), makeContext(["library", "songs"]));
+  expect(fetchMock.mock.calls[0][1]?.cache).toBe("no-store");
+  expect((fetchMock.mock.calls[0][1]?.headers as Record<string, string>)["If-None-Match"]).toBeUndefined();
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(response.headers.has("etag")).toBe(false);
+  expect(response.headers.get("x-playback-country")).toBe("AL");
+  vi.restoreAllMocks();
+});

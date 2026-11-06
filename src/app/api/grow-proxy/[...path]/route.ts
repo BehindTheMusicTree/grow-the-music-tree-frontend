@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getGrowApiUpstreamBaseUrl } from "@lib/grow-api-upstream-url";
+import { viewerContextHeaders } from "@lib/viewer-context";
 import { getAdminIdToken } from "@lib/auth";
 
 const AUTHENTICATION_REQUIRED_MESSAGE = "Authentication credentials were not provided.";
@@ -23,11 +24,14 @@ async function forward(request: NextRequest, path: string[]): Promise<NextRespon
   }
 
   const contentType = request.headers.get("content-type");
-  const ifNoneMatch = request.headers.get("if-none-match");
+  const contextual = path[0] === "library" || path[0] === "playback" || path.includes("tracks");
+  const ifNoneMatch = contextual ? null : request.headers.get("if-none-match");
 
   const upstreamResponse = await fetch(upstreamUrl, {
     method: request.method,
+    ...(contextual ? { cache: "no-store" as const } : {}),
     headers: {
+      ...viewerContextHeaders(request.headers),
       ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
       ...(contentType ? { "Content-Type": contentType } : {}),
       ...(ifNoneMatch ? { "If-None-Match": ifNoneMatch } : {}),
@@ -42,7 +46,10 @@ async function forward(request: NextRequest, path: string[]): Promise<NextRespon
   const cacheControl = upstreamCacheControl?.includes("immutable") ? upstreamCacheControl : "private, no-cache";
   const headers: Record<string, string> = {
     "Content-Type": upstreamResponse.headers.get("content-type") ?? "application/json",
-    ...(etag ? { ETag: etag, "Cache-Control": cacheControl } : {}),
+    ...(contextual && upstreamResponse.headers.has("x-playback-country")
+      ? { "X-Playback-Country": upstreamResponse.headers.get("x-playback-country")! }
+      : {}),
+    ...(contextual ? { "Cache-Control": "private, no-store" } : etag ? { ETag: etag, "Cache-Control": cacheControl } : {}),
   };
 
   if (upstreamResponse.status === 304) {
