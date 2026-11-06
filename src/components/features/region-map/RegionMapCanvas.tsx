@@ -18,23 +18,32 @@ import {
   CITY_LABEL_LAYER,
   CITY_LAYER,
   cityRadius,
+  backdropColors,
+  backdropFilter,
   depthColors,
+  EMPTY_FILL,
   describe,
   fillColorExpression,
   idFilter,
   MAX_ZOOM,
+  REGION_BACKDROP_LAYER,
   REGION_FILL_LAYER,
   REGION_HIT_LAYER,
   REGION_LABEL_LAYER,
+  REGION_GLOW_LAYER,
   REGION_SELECTED_LAYER,
   REGIONS_SOURCE_LAYER,
   regionBounds,
   TILES_SOURCE,
   ZONE_FILL_LAYER,
+  ZONE_GLOW_LAYER,
   ZONE_LABEL_LAYER,
   ZONE_LINE_LAYER,
   ZONE_SUPRA_SELECTED_LAYER,
   zoneFilters,
+  focusIds,
+  greyed,
+  zoneColor,
   supranationalZoneIds,
 } from "./regionMapLayers";
 import type { Camera } from "./useRegionMapUrlState";
@@ -140,12 +149,18 @@ export default function RegionMapCanvas({
     onCameraRef.current = onCameraChange;
   });
 
-  const colors = useMemo(() => depthColors(regions), [regions]);
+  const depth = useMemo(() => depthColors(regions), [regions]);
+  const focused = useMemo(() => focusIds(selectedId, regions), [selectedId, regions]);
+  const colors = useMemo(() => (focused === null ? depth : greyed(depth, focused)), [focused, depth]);
   const supranationalIds = useMemo(() => supranationalZoneIds(regions), [regions]);
   const supranationalRef = useRef(supranationalIds);
   supranationalRef.current = supranationalIds;
   const colorsRef = useRef(colors);
   colorsRef.current = colors;
+  const lit = useMemo(() => backdropColors(regions), [regions]);
+  const backdrop = useMemo(() => (focused === null ? lit : greyed(lit, focused)), [focused, lit]);
+  const backdropRef = useRef(backdrop);
+  backdropRef.current = backdrop;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -168,6 +183,9 @@ export default function RegionMapCanvas({
           supranationalIds: supranationalRef.current,
           selectedId: initialSelected,
           colors: colorsRef.current,
+          backdrop: backdropRef.current,
+          zoneFill: zoneColor(initialZone, regionsRef.current),
+          glowId: null,
         }),
         ...(camera
           ? { center: [camera.lng, camera.lat] as [number, number], zoom: camera.zoom }
@@ -261,23 +279,28 @@ export default function RegionMapCanvas({
     const map = mapRef.current;
     if (!ready || !map) return;
     map.setPaintProperty(REGION_FILL_LAYER, "fill-color", fillColorExpression(colors));
-  }, [ready, colors]);
+    map.setFilter(REGION_BACKDROP_LAYER, backdropFilter(backdrop));
+    map.setPaintProperty(REGION_BACKDROP_LAYER, "fill-color", fillColorExpression(backdrop));
+  }, [ready, colors, backdrop]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
     const zone = zoneFilters(zoneId, supranationalIds);
     map.setFilter(ZONE_FILL_LAYER, zone.fill);
+    map.setFilter(ZONE_GLOW_LAYER, zone.fill);
+    map.setPaintProperty(ZONE_FILL_LAYER, "fill-color", zoneColor(zoneId, regions) ?? EMPTY_FILL);
     map.setFilter(ZONE_LINE_LAYER, zone.line);
     map.setFilter(ZONE_SUPRA_SELECTED_LAYER, zone.supraSelected);
-  }, [ready, zoneId, supranationalIds]);
+  }, [ready, zoneId, supranationalIds, regions]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
     map.setFilter(REGION_SELECTED_LAYER, idFilter(selectedId));
+    map.setFilter(REGION_GLOW_LAYER, idFilter(focused !== null && focused.size > 0 ? selectedId : null));
     map.setPaintProperty(CITY_LAYER, "circle-radius", cityRadius(selectedId));
-  }, [ready, selectedId]);
+  }, [ready, selectedId, focused]);
 
   useEffect(() => {
     const map = mapRef.current;
