@@ -21,6 +21,14 @@ describe("RegionMapIndexSchema", () => {
     ).toBe(false);
   });
 
+  it("requires both overview keys on every region, null when there is none", () => {
+    const withoutOwn = { ...fixture.regions[0], overviewItemId: undefined };
+    const withoutInherited = { ...fixture.regions[0], inheritedOverviewItemId: undefined };
+
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [withoutOwn] }).success).toBe(false);
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [withoutInherited] }).success).toBe(false);
+  });
+
   it("accepts a city point region and the cityIds of its admin unit", () => {
     const rennes = {
       ...fixture.regions[0],
@@ -47,10 +55,7 @@ describe("RegionMapIndexSchema", () => {
       "Q672134",
     );
     expect(
-      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: null }] }).success,
-    ).toBe(true);
-    expect(
-      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: undefined }] })
+      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: null }] })
         .success,
     ).toBe(true);
     expect(

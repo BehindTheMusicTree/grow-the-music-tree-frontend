@@ -129,6 +129,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Region map**: the index schema now requires `overviewItemId` and `inheritedOverviewItemId` (nullable) on every region. **Must not reach production before the published index carries both keys.**
 - **Curation admin**: the lists `umbrella_genres` and `non_stylistic_genres` are now `umbrella_stylistic_genres` and `umbrella_non_stylistic_genres` (same labels). Needs grow-the-music-tree-api's migration 0102 and the-music-tree-pipelines' matching rename; merge together
 - **Curation admin**: "Genres maintenus canoniques" follows the list's new name, `forced_canonical_genres` (was `canonical_overrides`). Needs grow-the-music-tree-api with the renamed list.
 
@@ -210,7 +211,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **PR labeler**: `.cursor/**` no longer maps to the `infrastructure` label.
 
-
 ## [3.20.0] - 2026-10-29
 
 ### Changed
@@ -225,7 +225,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Removed
 
 - **Dead edit-mode panel**: the title and parents editors, the secondary-parent editor and the rename hook were no longer rendered since `app-kit` 25.0.0 removed the edit-mode slots. The "Parent" action-band popup is the only parent-change flow. The genre tree's extra props are now type-checked so a slot removed upstream fails `pnpm typecheck`.
-
 
 ## [3.19.0] - 2026-10-29
 
@@ -299,14 +298,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 17.1.1: genre counts are no longer inflated (genre-tree-view 4.0.0 treats `itemCount` as a subtree total).
 
-
 ## [3.17.0] - 2026-10-26
 
 ### Changed
 
 - **Recording renamed to Song**: bumps `@behindthemusictree/app-kit` and `app-kit-ui` to 17.0.0 (needs grow-api >= 13.2.0). The app calls `library/songs`, sends `essentialSongs` and `songs` (assign-genre), and reads the `songs` / `essentialSongs` alias counts. Its own `Recording*` identifiers, files and query keys are now `Song*` (`SongRowActions`, `SongPopups`, `SongVideoDialog`, `LinkSongsDialog`, `useAssignSongGenre`, `ArtistSongs`, `EssentialSongsEditor`). MusicBrainz recording names are unchanged. No behavior change.
 - Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 16.1.0: segmented view-mode toggle and brand-token dark track sidebar. Removed the unused `trackListName` and `144` Tailwind keys.
-
 
 ## [3.16.0] - 2026-10-26
 
@@ -336,13 +333,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - The curation genre picker searches every known Wikidata item (`curation/items/`), pruned ones included. Genre assignment pickers still search canonical genres.
   - Requires grow-api with the `columnSpecs` list metadata and the `labels` history map.
 
-
 ## [3.15.1] - 2026-10-26
 
 ### Fixed
 
 - A failed genre edit (e.g. a server error when reparenting) now rolls back the change and shows the real error instead of an "Output validation failed" Zod error, via app-kit 13.4.1.
-
 
 ## [3.15.0] - 2026-10-22
 
@@ -381,7 +376,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - The About panel is rewritten around TheMusicTree: a short pitch, what you can do, what's next, an open-source section and data credits (Wikidata, MusicBrainz, YouTube); the API link now points at `grow-the-music-tree-api`.
 - The About panel stops where the player panel begins while it is visible, and extends to the right edge otherwise (`@behindthemusictree/app-kit` 11.8.0).
 - `@behindthemusictree/app-kit` 12.0.0 and `@behindthemusictree/ui` 0.2.0: `ui` is now a peer dependency of app-kit, so the app owns the single installed copy.
-
 
 ## [3.12.0] - 2026-10-20
 
@@ -610,7 +604,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Branching**: `fix/*` and `chore/*` are not strict Gitflow and branch protection now rejects them for PRs to `develop`; bug fixes and CI/tooling/maintenance work use `feature/*`.
 
-
 ## [3.2.1] - 2026-09-29
 
 ### Changed
@@ -652,7 +645,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Genre tree**: `@behindthemusictree/app-kit` 6.0.0 → 7.0.0. Selecting a node (notably in the Outline view) opens the detail panel without lag: only the two affected rows re-render, the panel loads the lean genre overview (grow-api v8.0.0) and prefetches it on hover.
 
-
 ## [3.0.0] - 2026-09-27
 
 ### Changed
@@ -679,7 +671,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Genre tree**: Creating or renaming a genre with a name that's already taken now shows the error in the popup, which stays open with the typed name and parent, instead of closing silently.
 - **Genre name review**: The conflict list is now validated against a schema, so a malformed grow-api response fails loudly instead of rendering broken rows.
 
-
 ## [2.7.0] - 2026-09-26
 
 ### Added
@@ -701,7 +692,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   Removed the `env/` presets, `verify-env`, `dev:local`/`dev:remote` and their scripts. The
   Dockerfile now forwards `NEXT_PUBLIC_AUDIOMETA_URL` as a build arg and drops stale Spotify/Google
   args; `.dockerignore` excludes `.env*` so local env files never reach the image.
-
 
 ## [2.6.0] - 2026-09-24
 
@@ -851,7 +841,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   Stacked/Wheel/Pop-Core toggle, leaving Stacked and Pop-Core. The reference tree now defaults to
   "Stacked" instead of "Wheel".
 
-
 ## [2.5.0] - 2026-08-28
 
 ### Changed
@@ -907,7 +896,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Genre tree "Pop/Core" view mode**: Bumped `@behindthemusictree/app-kit` to `4.4.0`, which adds a third `"pop-core"` `GenreTreeView` mode rendering a radial view rooted at a "Mainstream Pop" node. `AppHeader.tsx`'s Stacked/Wheel toggle group now has a third "Pop/Core" button, always rendered but disabled (with a tooltip) when the loaded tree has no "Mainstream Pop" root. `GenreTreePage.tsx` computes this via app-kit's exported `hasMainstreamPopRoot` helper against the same `useListFullGenrePlaylists` data `GenreTreeView` fetches internally (shared react-query cache, no extra request), and pushes the result into `GenreTreeViewModeProvider`'s context (new `canShowPopCore`/`setCanShowPopCore`) so `AppHeader.tsx` can read it without new prop-drilling.
 - **Genre tree view-mode toggle**: The Stacked/Wheel/Pop-Core toggle group in `AppHeader.tsx` now also renders on `/prototype/reference-genre-tree`, not just `/reference-genre-tree` — it previously only checked the live route, so the prototype page had no way to switch view modes.
-
 
 ## [2.4.0] - 2026-08-27
 
@@ -1031,7 +1019,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Org assets dependency**: Switched from the stale `@behindthemusictree/assets` package to `@behindthemusictree/brand`, which is the package actually published from the org's asset source repo. Mark asset subpaths moved from `/brand/*` to `/marks/*` to match the new package's exports map.
 - **Brand package**: Bumped `@behindthemusictree/brand` to `11.5.2`, which fixes broken image URLs in `TheMusicTreeByline`/`TheMusicTreeMarkLink` (previously bundled as relative paths that only resolved correctly relative to the package's own module location, 404ing in this app).
 
-
 ## [1.5.1] - 2026-06-20
 
 ### CI
@@ -1047,7 +1034,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Site URLs**: `getBackendBaseUrl()` and `getAudiometaUrl()` now throw if `HTMT_API_SUBDOMAIN` / `AUDIOMETA_FRONT_SUBDOMAIN` are missing, instead of silently building a malformed URL.
 
 - **Site URLs**: `getBackendBaseUrl()` no longer honors a stale `NEXT_PUBLIC_BACKEND_BASE_URL` left in a Vercel project's environment settings — the override now only applies outside Vercel (when `NEXT_PUBLIC_VERCEL_ENV` is unset), e.g. for local or remote dev.
-
 
 ## [1.5.0] - 2026-04-05
 
@@ -1103,7 +1089,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Git Flow and tooling**: Align CONTRIBUTING, PR template, branch-protection error copy, `docs/STYLE_GUIDE.md`, and `.cursor/rules` (`git-flow-branches.mdc`, `pr-description-workflow.mdc`) with enforced PR branch prefixes; document `chore/*` for CI changes (not `ci/*`). Update DEPLOYMENT, VERSIONING, README, CONTRIBUTING, and `validate.yml` comment for the two-workflow model.
 
-
 ## [1.4.3] - 2026-03-28
 
 ### CI
@@ -1121,13 +1106,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Deployment and versioning**: Update `docs/DEPLOYMENT.md`, `docs/VERSIONING.md`, `README.md`, and `CONTRIBUTING.md` for hook-based Vercel deploys, required env configuration, and release flow (PR-only merges to `main`, release tag on `main`).
 - **Contributor workflow**: Update `.cursor/rules/pr-description-workflow.mdc` so draft PR descriptions live under `.pr-descriptions/<branch-name>.md`.
 
-
 ## [1.4.2] - 2026-03-26
 
 ### CI
 
 - **Sync Vercel env**: `NEXT_PUBLIC_BACKEND_BASE_URL` includes the API root from required repo var `HTMT_API_ROOT_SEGMENT` (e.g. `v2`); the workflow fails validation if it is missing. Preview/staging API host uses `staging.<HTMT_API_SUBDOMAIN>.<DOMAIN_NAME>` instead of `<subdomain>-test.<DOMAIN_NAME>`. Preview job prefers `SPOTIFY_CLIENT_ID_STAGING` / `GOOGLE_CLIENT_ID_STAGING`, with fallback to the existing `*_TEST` variables. Subdomain GitHub variables are `HTMT_API_SUBDOMAIN`, `GTMT_FRONT_SUBDOMAIN`, and `AUDIOMETA_SUBDOMAIN` (replaces the previous `*_SUBDOMAIN_NAME` names).
-
 
 ## [1.4.1] - 2026-03-15
 
@@ -1388,7 +1371,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Branch Protection**: Added Git Flow branch protection workflow
   - Enforces branch naming conventions for PRs to `main` (hotfix/_, release/_ only)
-  - Enforces branch naming conventions for PRs to `develop` (feature/_, fix/_, chore/_, dependabot/\_ only)
+  - Enforces branch naming conventions for PRs to `develop` (feature/_, fix/_, chore/\_, dependabot/\_ only)
   - Automatically comments on invalid PRs with clear instructions
   - Prevents merging branches that don't follow Git Flow workflow
 

@@ -18,9 +18,17 @@ type Props = {
   onCollapsedChange: (collapsed: boolean) => void;
 };
 
-export default function RegionDetailPanel({ region, genreUuid, onSelectGenre, onFocus, onClose, collapsed, onCollapsedChange }: Props) {
-  const ownOverviewId = region.overviewItemId ?? null;
-  const overviewId = ownOverviewId ?? region.inheritedOverviewItemId ?? null;
+export default function RegionDetailPanel({
+  region,
+  genreUuid,
+  onSelectGenre,
+  onFocus,
+  onClose,
+  collapsed,
+  onCollapsedChange,
+}: Props) {
+  const ownOverviewId = region.overviewItemId;
+  const overviewId = ownOverviewId ?? region.inheritedOverviewItemId;
   const overview = useGenreByWikidataId(overviewId, "reference", getGrowBackendBaseUrl);
   const edgeTab = collapseEdgeTab(collapsed, onCollapsedChange);
   const onZoomIn = region.drillable ? () => onFocus(region) : undefined;
