@@ -47,6 +47,17 @@ const RegionSchema = z
       : coordinates.every((value) => value !== null);
   }, { message: "Boundary status and coordinates disagree" });
 
+/** A subdivision kept out of the map until a genre is attached to it by hand (`tradition_placement_overrides`). */
+const HiddenRegionSchema = z
+  .object({
+    id: NonEmpty,
+    name: NonEmpty,
+    kind: z.enum(["country", "admin_unit", "zone", "city"]),
+    parentId: NonEmpty,
+    centroid: Position,
+  })
+  .strict();
+
 const RegionMapIndexShapeSchema = z
   .object({
     regions: z.array(RegionSchema).min(1),
@@ -55,6 +66,8 @@ const RegionMapIndexShapeSchema = z
     /** Regions and zones shown at the world level. Optional until every published index carries them. */
     worldChildIds: z.array(NonEmpty).optional(),
     worldZoneIds: z.array(NonEmpty).optional(),
+    /** Optional: absent when every subdivision is drawn. Never part of `regions` or the tileset. */
+    hiddenRegions: z.array(HiddenRegionSchema).optional(),
   })
   .strict();
 
@@ -65,9 +78,11 @@ const RegionMapIndexShapeSchema = z
  */
 export const RegionMapIndexSchema = RegionMapIndexShapeSchema.transform((index) => ({
   ...index,
-  worldChildIds: index.worldChildIds ?? index.regions.filter((region) => region.parentId === WORLD_ID).map((region) => region.id),
+  worldChildIds:
+    index.worldChildIds ?? index.regions.filter((region) => region.parentId === WORLD_ID).map((region) => region.id),
   worldZoneIds:
-    index.worldZoneIds ?? index.regions.filter((region) => region.kind === "zone" && region.parentId === null).map((region) => region.id),
+    index.worldZoneIds ??
+    index.regions.filter((region) => region.kind === "zone" && region.parentId === null).map((region) => region.id),
 }));
 
 export type RegionMapIndex = z.infer<typeof RegionMapIndexSchema>;

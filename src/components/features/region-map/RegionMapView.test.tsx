@@ -32,6 +32,8 @@ vi.mock("@hooks/useRegionMap", () => ({
   useRegionMapIndex: () => ({ data, isPending: false, isError: false }),
 }));
 
+vi.mock("./RegionMapSearch", () => ({ default: () => null }));
+
 vi.mock("./RegionDetailPanel", () => ({
   default: ({ region, onZoomTo, onClose }: { region: Region; onZoomTo: (r: Region) => void; onClose: () => void }) => (
     <section aria-label={`Panel ${region.name}`}>

@@ -6,6 +6,7 @@ import { Breadcrumb } from "@behindthemusictree/ui";
 import { useRegionMapIndex } from "@hooks/useRegionMap";
 import type { Region, RegionMapIndex } from "@schemas/api/region-map";
 import RegionDetailPanel from "./RegionDetailPanel";
+import RegionMapSearch from "./RegionMapSearch";
 import type { FocusRequest } from "./RegionMapCanvas";
 import { ancestry } from "./regionMapLayers";
 import { useRegionMapUrlState, type Camera } from "./useRegionMapUrlState";
@@ -44,10 +45,10 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
     };
   });
   const [focus, setFocus] = useState<FocusRequest | null>(initial.focus);
-  const flyTo = (id: string | null) => {
+  const flyTo = useCallback((id: string | null) => {
     if (id !== null && regions.get(id)?.boundaryStatus === "missing") return;
     setFocus((current) => ({ id, seq: (current?.seq ?? 0) + 1 }));
-  };
+  }, [regions]);
   const missingBoundaries = index.regions
     .filter((region) => region.boundaryStatus === "missing")
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -73,6 +74,13 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   const clearSelection = () => {
     if (state.region !== null) update({ region: null, genre: null });
   };
+  const pick = useCallback(
+    (regionId: string, genre: string | null) => {
+      update({ region: regionId, genre });
+      flyTo(regionId);
+    },
+    [update, flyTo],
+  );
   const trail = selected ? ancestry(selected, regions) : [];
 
   return (
@@ -110,9 +118,10 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
           onClearSelection={clearSelection}
           onCameraChange={onCameraChange}
         />
+        <RegionMapSearch index={index} regions={regions} onPick={pick} className="absolute left-3 right-3 top-3 z-20 sm:right-auto sm:w-80" />
         {selected && (
           <Breadcrumb
-            className="absolute left-1/2 top-3 z-10 max-w-[calc(100%-theme(spacing.6))] -translate-x-1/2"
+            className="absolute left-1/2 top-16 z-10 max-w-[calc(100%-theme(spacing.6))] -translate-x-1/2"
             home={{
               label: "World",
               onSelect: () => {

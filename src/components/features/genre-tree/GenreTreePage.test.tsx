@@ -28,7 +28,13 @@ vi.mock("@contexts/PlayerPanelProvider", () => ({
     setExpanded: setTracklistExpandedMock,
   }),
 }));
+const routerPushMock = vi.fn();
+const regionMapIndexMock = vi.fn<(enabled?: boolean) => unknown>(() => ({ data: undefined, isPending: false, isError: false }));
+const lexiconMock = vi.fn<(enabled: boolean) => unknown>(() => ({ entries: [], isPending: false, isError: false }));
+
+vi.mock("@hooks/useRegionMap", () => ({ useRegionMapIndex: (enabled?: boolean) => regionMapIndexMock(enabled) }));
 vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: routerPushMock, replace: vi.fn() }),
   usePathname: () => "/",
   useSearchParams: () => searchParams,
 }));
@@ -64,6 +70,10 @@ const hasMainstreamPopRootMock = vi.fn<(nodes: { id: string }[]) => boolean>(() 
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   useVisibleGenrePlaylists: (options: { artistUuid?: string | null }) => useVisibleGenrePlaylistsMock(options),
   hasMainstreamPopRoot: (nodes: { id: string }[]) => hasMainstreamPopRootMock(nodes),
+  useRegionGenreLexicon: (_getBaseUrl: () => string, enabled: boolean) => lexiconMock(enabled),
+  SEARCH_QUERY_MIN_LENGTH: 2,
+  rankByName: <T,>(items: T[], query: string, getName: (item: T) => string) =>
+    items.filter((item) => getName(item).toLowerCase().includes(query.toLowerCase())),
   useArtist: () => ({ status: "idle" }),
   useSong: () => ({ status: "idle" }),
   GenrePlaylistUuidSchema: { parse: (value: string) => value },
@@ -120,6 +130,17 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
         </>
       )}
       <button onClick={() => props.onArtistExpandedChange?.(true)}>Expand artist</button>
+      <button onClick={() => props.onSearchFocus?.()}>Focus search</button>
+      <button onClick={() => props.onSearchQueryChange?.("fra")}>Type fra</button>
+      {props.extraSearchGroups?.map((group) => (
+        <ul key={group.key} aria-label={group.label}>
+          {group.items.map((item) => (
+            <li key={item.key}>
+              <button onClick={item.onSelect}>{`pick ${item.key}`}</button>
+            </li>
+          ))}
+        </ul>
+      ))}
       {props.overlayPanel && (
         <section aria-label={String(props.overlayPanel.title)}>
           {props.overlayPanel.content}
@@ -138,6 +159,7 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
       )}
     </div>
   ),
+  searchStatus: () => undefined,
   GenreTreeViewSkeleton: ({ viewMode }: { viewMode: string }) => (
     <div data-testid="genre-tree-view-skeleton" data-viewmode={viewMode} />
   ),
@@ -183,6 +205,50 @@ describe("GenreTreePage", () => {
     replaceState.mockClear();
     tracklistExpanded = false;
     setTracklistExpandedMock.mockReset();
+    routerPushMock.mockReset();
+    regionMapIndexMock.mockClear();
+    lexiconMock.mockClear();
+  });
+
+  it("loads the region index and lexicon only once the search is focused", async () => {
+    renderGenreTreePage();
+    await screen.findByTestId("genre-tree-view");
+    expect(regionMapIndexMock).toHaveBeenLastCalledWith(false);
+    expect(lexiconMock).toHaveBeenLastCalledWith(false);
+
+    fireEvent.click(screen.getByRole("button", { name: "Focus search" }));
+
+    await waitFor(() => expect(regionMapIndexMock).toHaveBeenLastCalledWith(true));
+    expect(lexiconMock).toHaveBeenLastCalledWith(true);
+  });
+
+  it("offers places and regional genres, skipping canonical ones, and opens them on the map", async () => {
+    regionMapIndexMock.mockReturnValue({
+      data: {
+        regions: [{ id: "Q142", name: "France", kind: "country", parentId: null, overviewItemId: null, genres: [{ itemId: "Q1", relation: "regional" }, { itemId: "Q2", relation: "canonical" }] }],
+      },
+      isPending: false,
+      isError: false,
+    });
+    lexiconMock.mockReturnValue({
+      entries: [
+        { wikidataId: "Q1", uuid: "g-regional", name: "Fra regional", treeName: "regional", genrePlaylistUuid: null, isUmbrella: false, viewsCount: 1 },
+        { wikidataId: "Q2", uuid: "g-canonical", name: "Fra canonical", treeName: "canonical", genrePlaylistUuid: null, isUmbrella: false, viewsCount: 1 },
+      ],
+      isPending: false,
+      isError: false,
+    });
+    renderGenreTreePage();
+    await screen.findByTestId("genre-tree-view");
+    fireEvent.click(screen.getByRole("button", { name: "Type fra" }));
+
+    expect(screen.queryByRole("button", { name: "pick g-canonical" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "pick g-regional" }));
+    expect(routerPushMock).toHaveBeenCalledWith("/map?region=Q142&genre=g-regional");
+    fireEvent.click(screen.getByRole("button", { name: "pick Q142" }));
+    expect(routerPushMock).toHaveBeenLastCalledWith("/map?region=Q142");
+    regionMapIndexMock.mockReturnValue({ data: undefined, isPending: false, isError: false });
+    lexiconMock.mockReturnValue({ entries: [], isPending: false, isError: false });
   });
 
   it("renders the genre tree read-only, hiding its write controls, when not signed in as admin", async () => {

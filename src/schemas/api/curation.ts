@@ -141,19 +141,6 @@ export const CurationItemSearchSchema = z.object({
   results: z.array(z.object({ id: z.string(), label: z.string() })),
 });
 
-export const CanonicalGenreSearchSchema = z.object({
-  results: z.array(
-    z.object({
-      uuid: GenreUuidSchema,
-      name: z.string(),
-      wikidataId: z.string().nullable(),
-      isUmbrella: z.boolean().optional(),
-    }),
-  ),
-  page: z.number().int(),
-  totalPages: z.number().int(),
-});
-
 export const CurationReviewReasonSchema = z.enum(["redirect_conflict", "missing", "not_in_tree"]);
 
 export type CurationReviewReason = z.infer<typeof CurationReviewReasonSchema>;

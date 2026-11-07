@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { useFetchWrapper } from "@behindthemusictree/app-kit/transport";
-import { SongSearchResultsSchema } from "@behindthemusictree/app-kit/genre-tree";
+import { useSongSearch } from "@behindthemusictree/app-kit/genre-tree";
 import { RingLoader } from "@behindthemusictree/ui";
 import { useAssignSongGenre } from "@hooks/curation/useAssignSongGenre";
-import { useDebouncedValue } from "@hooks/useDebouncedValue";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { LinkSuggestionsSchema, type LinkCandidate } from "@schemas/api/curation";
@@ -50,7 +49,6 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
   const [text, setText] = useState("");
   const [genreless, setGenreless] = useState(true);
   const [checked, setChecked] = useState<ReadonlySet<string>>(new Set());
-  const query = useDebouncedValue(text.trim(), 300);
   const { mutate, isPending } = useAssignSongGenre(`linked to ${genre.name}`);
 
   const suggestions = useQuery({
@@ -59,24 +57,13 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
     queryFn: async () =>
       LinkSuggestionsSchema.parse(await fetch(`genres/${genre.uuid}/link-suggestions/`, true, false)),
   });
-  const search = useQuery({
-    queryKey: ["referenceSongs", "linkSearch", query, genreless],
-    enabled: tab === "search" && query.length >= 2,
-    placeholderData: keepPreviousData,
-    queryFn: async () =>
-      SongSearchResultsSchema.parse(
-        await fetch(
-          "library/songs/search/",
-          true,
-          false,
-          {},
-          { q: query, limit: SEARCH_LIMIT, genre: genreless ? "without" : "any" },
-        ),
-      ),
+  const search = useSongSearch(getGrowBackendBaseUrl, text.trim(), {
+    limit: SEARCH_LIMIT,
+    genre: genreless ? "without" : "any",
   });
 
-  const candidates = tab === "suggested" ? (suggestions.data ?? []) : (search.data ?? []);
-  const loading = tab === "suggested" ? suggestions.isLoading : search.isFetching;
+  const candidates = tab === "suggested" ? (suggestions.data ?? []) : search.songs;
+  const loading = tab === "suggested" ? suggestions.isLoading : search.pending;
   const toggle = (uuid: string) =>
     setChecked((current) => {
       const next = new Set(current);
