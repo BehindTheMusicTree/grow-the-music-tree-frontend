@@ -5,7 +5,7 @@ import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { RegionMapIndexSchema } from "@schemas/api/region-map";
 
 /** The region map index, or null while grow-api has no snapshot yet (404). */
-export function useRegionMapIndex() {
+export function useRegionMapIndex(enabled = true) {
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
   return useQueryWithParse({
     queryKey: ["regionMap", "index"],
@@ -19,5 +19,6 @@ export function useRegionMapIndex() {
     },
     schema: RegionMapIndexSchema.nullable(),
     context: "useRegionMapIndex",
+    enabled,
   });
 }

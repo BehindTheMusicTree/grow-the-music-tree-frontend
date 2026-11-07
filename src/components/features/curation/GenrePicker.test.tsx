@@ -1,63 +1,74 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import GenrePicker from "./GenrePicker";
 
-const fetchMock = vi.fn();
+const searchMock = vi.fn();
 
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api" }));
 vi.mock("@behindthemusictree/app-kit/transport", () => ({
-  useFetchWrapper: () => ({ fetch: fetchMock }),
+  useFetchWrapper: () => ({ fetch: vi.fn() }),
   useQueryWithParse: () => ({ data: undefined, isFetching: false }),
 }));
+vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
+  useGenreRemoteSearch: (...args: unknown[]) => searchMock(...args),
+}));
 
-const genre = (n: number) => ({ uuid: `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`, name: `Genre ${n}`, wikidataId: `Q${n}` });
-const page = (page: number, totalPages: number, names: number[]) => ({ results: names.map(genre), page, totalPages });
+const genre = (n: number, extra: Record<string, unknown> = {}) => ({
+  uuid: `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`,
+  name: `Genre ${n}`,
+  wikidataId: `Q${n}`,
+  isUmbrella: false,
+  ...extra,
+});
 
-const renderPicker = (onChange = vi.fn()) => {
-  render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
-      <GenrePicker label="Main parent" value="" defaultText="" onChange={onChange} />
-    </QueryClientProvider>,
-  );
+const renderPicker = (props: { excludeUmbrellas?: boolean; onChange?: () => void } = {}) => {
+  render(<GenrePicker label="Main parent" value="" defaultText="" onChange={props.onChange ?? vi.fn()} excludeUmbrellas={props.excludeUmbrellas} />);
   fireEvent.change(screen.getByRole("combobox", { name: "Main parent" }), { target: { value: "genre" } });
 };
 
 describe("GenrePicker", () => {
   beforeEach(() => {
-    fetchMock.mockReset();
+    searchMock.mockReset();
+    searchMock.mockReturnValue({ genres: [], isError: false, settled: true, pending: false });
   });
   afterEach(cleanup);
 
-  it("appends the next page when 'Plus de résultats…' is pressed", async () => {
-    fetchMock.mockResolvedValueOnce(page(1, 2, [1, 2])).mockResolvedValueOnce(page(2, 2, [3]));
+  it("searches the canonical tree with the typed text once the list is open", async () => {
     renderPicker();
+    fireEvent.keyDown(screen.getByRole("combobox", { name: "Main parent" }), { key: "ArrowDown" });
 
-    expect(await screen.findAllByRole("option")).toHaveLength(2);
-    fireEvent.mouseDown(screen.getByRole("button", { name: "Plus de résultats…" }));
-
-    await waitFor(() => expect(screen.getAllByRole("option")).toHaveLength(3));
-    expect(fetchMock).toHaveBeenLastCalledWith("genres/", true, false, {}, { name: "genre", pageSize: 10, page: 2 });
-    expect(screen.queryByRole("button", { name: "Plus de résultats…" })).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(searchMock).toHaveBeenLastCalledWith(expect.any(Function), "genre", { treeName: "canonical", limit: 25 }),
+    );
   });
 
-  it("hides the button when there is a single page", async () => {
-    fetchMock.mockResolvedValueOnce(page(1, 1, [1, 2]));
-    renderPicker();
+  it("does not search before the text is long enough", () => {
+    render(<GenrePicker label="Main parent" value="" defaultText="" onChange={vi.fn()} />);
 
-    expect(await screen.findAllByRole("option")).toHaveLength(2);
-    expect(screen.queryByRole("button", { name: "Plus de résultats…" })).not.toBeInTheDocument();
+    expect(searchMock).toHaveBeenLastCalledWith(expect.any(Function), "", expect.anything());
   });
 
-  it("loads the next page when ArrowDown is pressed on the last option", async () => {
-    fetchMock.mockResolvedValueOnce(page(1, 2, [1, 2])).mockResolvedValueOnce(page(2, 2, [3]));
+  it("lists the hits, leaving out genres without a Wikidata id", () => {
+    searchMock.mockReturnValue({
+      genres: [genre(1), genre(2, { wikidataId: null })],
+      isError: false,
+      settled: true,
+      pending: false,
+    });
     renderPicker();
-    await screen.findAllByRole("option");
-    const input = screen.getByRole("combobox", { name: "Main parent" });
 
-    fireEvent.keyDown(input, { key: "ArrowDown" });
-    fireEvent.keyDown(input, { key: "ArrowDown" });
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+  });
 
-    await waitFor(() => expect(screen.getAllByRole("option")).toHaveLength(3));
+  it("leaves out umbrellas when asked to", () => {
+    searchMock.mockReturnValue({
+      genres: [genre(1), genre(2, { isUmbrella: true })],
+      isError: false,
+      settled: true,
+      pending: false,
+    });
+    renderPicker({ excludeUmbrellas: true });
+
+    expect(screen.getAllByRole("option")).toHaveLength(1);
   });
 });

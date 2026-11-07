@@ -2,6 +2,10 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, within } from "@testing-library/react";
 import CurationGenreRules from "./CurationGenreRules";
 
+vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@behindthemusictree/app-kit/genre-tree")>()),
+  useGenreRemoteSearch: () => ({ genres: [], isError: false, settled: true, pending: false }),
+}));
 vi.mock("@tanstack/react-query", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@tanstack/react-query")>()),
   useInfiniteQuery: () => ({ data: undefined, isFetching: false, hasNextPage: false }),

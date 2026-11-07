@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
+import EntityPicker from "@components/features/curation/EntityPicker";
 import GenrePicker from "@components/features/curation/GenrePicker";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { curationColumnTitle } from "@lib/curationColumns";
@@ -81,6 +82,16 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
                 defaultText={labels[row[column]] || row[column]}
                 onChange={(itemId) => set(column, itemId)}
                 catalog
+              />
+            );
+          }
+          if (kind === "entity_id") {
+            return (
+              <EntityPicker
+                key={column}
+                label={title}
+                value={row[column]}
+                onChange={(entityId) => set(column, entityId)}
               />
             );
           }

@@ -1,13 +1,12 @@
 "use client";
 
 import { useId, useState } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { useFetchWrapper, useQueryWithParse } from "@behindthemusictree/app-kit/transport";
-import type { GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
+import { useGenreRemoteSearch, type GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
 import { Combobox } from "@behindthemusictree/ui";
 import { useDebouncedValue } from "@hooks/useDebouncedValue";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
-import { CanonicalGenreSearchSchema, CurationItemSearchSchema, ITEM_ID_PATTERN } from "@schemas/api/curation";
+import { CurationItemSearchSchema, ITEM_ID_PATTERN } from "@schemas/api/curation";
 
 type Props = {
   label: string;
@@ -20,6 +19,8 @@ type Props = {
   /** Searches every known Wikidata item, pruned ones included, instead of the canonical genres. */
   catalog?: boolean;
 };
+
+const GENRE_LIMIT = 25;
 
 type Option = { key: string; name: string; itemId: string; uuid?: GenreUuid };
 
@@ -39,13 +40,9 @@ export default function GenrePicker({
   const search = useDebouncedValue(text.trim(), 250);
   const isItemId = ITEM_ID_PATTERN.test(search);
   const enabled = open && search.length >= 2 && !isItemId;
-  const genres = useInfiniteQuery({
-    queryKey: ["curationGenrePicker", search],
-    enabled: enabled && !catalog,
-    initialPageParam: 1,
-    queryFn: async ({ pageParam }) =>
-      CanonicalGenreSearchSchema.parse(await fetch("genres/", true, false, {}, { name: search, pageSize: 10, page: pageParam })),
-    getNextPageParam: (last) => (last.page < last.totalPages ? last.page + 1 : undefined),
+  const genres = useGenreRemoteSearch(getGrowBackendBaseUrl, enabled && !catalog ? text.trim() : "", {
+    treeName: "canonical",
+    limit: GENRE_LIMIT,
   });
   const items = useQueryWithParse({
     queryKey: ["curationItemPicker", search],
@@ -54,18 +51,14 @@ export default function GenrePicker({
     context: "GenrePicker",
     enabled: enabled && catalog,
   });
-  const isFetching = genres.isFetching || items.isFetching;
+  const isFetching = genres.pending || items.isFetching;
   const options: Option[] = catalog
     ? (items.data?.results ?? []).map((item) => ({ key: item.id, name: item.label, itemId: item.id }))
-    : (genres.data?.pages.flatMap((page) => page.results) ?? []).flatMap((genre) =>
+    : genres.genres.flatMap((genre) =>
         genre.wikidataId === null || (excludeUmbrellas && genre.isUmbrella)
           ? []
           : [{ key: genre.uuid, name: genre.name, itemId: genre.wikidataId, uuid: genre.uuid }],
       );
-  const canLoadMore = !catalog && genres.hasNextPage && !genres.isFetchingNextPage;
-  const loadMore = () => {
-    if (canLoadMore) void genres.fetchNextPage();
-  };
 
   const pick = (_groupKey: string, optionKey: string) => {
     const option = options.find((candidate) => candidate.key === optionKey);
@@ -107,23 +100,6 @@ export default function GenrePicker({
         }}
         onOpenChange={setOpen}
         onPick={pick}
-        onLoadMore={loadMore}
-        canLoadMore={canLoadMore}
-        footer={
-          !catalog && genres.hasNextPage ? (
-            <button
-              type="button"
-              disabled={genres.isFetchingNextPage}
-              onMouseDown={(event) => {
-                event.preventDefault();
-                loadMore();
-              }}
-              className="w-full px-3 py-2 text-sm text-left text-gray-600 border-t cursor-pointer hover:bg-gray-100 disabled:opacity-50"
-            >
-              {genres.isFetchingNextPage ? "Chargement…" : "Plus de résultats…"}
-            </button>
-          ) : null
-        }
       />
       <p id={`${id}-qid`} className="font-mono text-xs text-gray-500">
         {value ? `QID : ${value}` : "Aucun genre choisi"}

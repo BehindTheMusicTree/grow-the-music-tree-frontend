@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useState, type ComponentProps } from "react";
 import dynamic from "next/dynamic";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 import { usePopup } from "@behindthemusictree/app-kit/popup";
@@ -43,6 +43,12 @@ import { renderSongLink } from "@components/features/song/renderSongLink";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
+import { useRegionMapIndex } from "@hooks/useRegionMap";
+import { useRegionGenreLexicon } from "@behindthemusictree/app-kit/genre-tree";
+import { useRegionGenreIndex } from "@components/features/search/useRegionGenreIndex";
+import { usePlaceSearchGroup, useRegionGenreSearchGroup } from "@components/features/search/useRegionSearchGroups";
+import { mapRegionHref } from "@lib/searchHrefs";
+import type { Region } from "@schemas/api/region-map";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { trackEvent } from "@lib/analytics";
 
@@ -258,6 +264,35 @@ function GenreTreePageContent() {
   const isAdmin = useIsAdmin();
   const { showPopup, hidePopup } = usePopup();
   const [expanded, setExpanded] = useState(false);
+  const router = useRouter();
+  const [searchText, setSearchText] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+
+  // The region index and genre lexicon are only fetched once the search box is first focused.
+  const regionIndex = useRegionMapIndex(searchFocused);
+  const lexicon = useRegionGenreLexicon(getBackendBaseUrl, searchFocused);
+  const regions = useMemo(
+    () => (regionIndex.data ? new Map(regionIndex.data.regions.map((region) => [region.id, region])) : null),
+    [regionIndex.data],
+  );
+  const regionGenres = useRegionGenreIndex(regionIndex.data, lexicon.entries);
+  const places = usePlaceSearchGroup(
+    regions,
+    { ready: !regionIndex.isPending, isError: regionIndex.isError },
+    searchText,
+    useCallback((region: Region) => router.push(mapRegionHref(region.id)), [router]),
+  );
+  const regionGenreGroup = useRegionGenreSearchGroup(
+    // Canonical genres are already the tree's own results.
+    useMemo(() => regionGenres.filter((entry) => entry.genre.treeName !== "canonical"), [regionGenres]),
+    { ready: !regionIndex.isPending && !lexicon.isPending, isError: regionIndex.isError || lexicon.isError },
+    searchText,
+    useCallback((entry) => router.push(mapRegionHref(entry.region.id, entry.genre.uuid)), [router]),
+  );
+  const extraSearchGroups = useMemo(
+    () => [places, regionGenreGroup].filter((group) => group !== undefined),
+    [places, regionGenreGroup],
+  );
 
   // The visible tree depends on the URL's artist, and the URL state validates its genre against that tree.
   const artistFilter = useSearchParams().get(ARTIST_PARAM);
@@ -425,6 +460,9 @@ function GenreTreePageContent() {
       renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
       renderArtistLink={renderArtistLink}
       renderSongLink={renderSongLink}
+      extraSearchGroups={extraSearchGroups}
+      onSearchQueryChange={setSearchText}
+      onSearchFocus={() => setSearchFocused(true)}
       {...curation}
     />
   );

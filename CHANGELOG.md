@@ -114,8 +114,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - Use explicit genre playlist counts for tree sizing and preserve separate catalogue and playlist summaries in the shared genre panels.
 
-### Fixed
-
+- Link songs: the search text is kept when switching tabs, and results no longer empty on each keystroke while a track is playing (app-kit 33.3.0).
+- Genre picker: searches the canonical tree with the ranked genre search (typo-tolerant) instead of a paged list.
 - Give detail panel scrollbars consistent theme colors and sizing.
 - Region map: zoomed-out coasts no longer look hairy. Borders use round joins instead of spiky miters and are half as thick at world scale.
 - Limit shared-package style scanning to package output so local linked-package production builds finish without scanning nested dependencies.
@@ -126,11 +126,15 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- Genre tree search also lists places and regional genres (from the region map index and genre lexicon, loaded on first focus); picking one opens it on the map.
+- **Region map**: a search box over the canvas (top-left, full width on mobile) finds places, overviews and regional or canonical genres linked to a region, other genres, artists and songs. Places and region genres are matched in memory, ranked and accent-insensitive; the genre lexicon (`regions/map/genres/`) loads on the first focus. Picking a place or genre selects its region, frames it and opens the genre in the panel; other genres open in the tree, artists and songs in their tree panels. The breadcrumb moves below the box. Needs app-kit and app-kit-ui 33.2.0, ui 0.18.0 and grow-api #414. Tests cover the region-genre index, the hrefs and the box.
+- Region map index accepts an optional `hiddenRegions` list (subdivisions kept off the map), and the curation entry editor offers an entity picker listing drawn and hidden regions for `entity_id` columns, so a tradition can be attached to a subdivision that has no genre yet. Needs grow-api's `GET regions/map/attachable/`: deploy this app first, then grow-api, then the pipelines. Tested.
 - **Region map**: the index schema accepts regions of kind `city` (point regions under an admin unit) and the optional `cityIds` on admin units, so the pipelines can publish city-level genre anchors. Must be deployed before such an index is imported.
 - **Region map**: cities claimed by a genre are drawn as points (tileset layer `cities`, from their zoom band). They hover, show the region tooltip and open the detail panel on click, like any region.
 
 ### Changed
 
+- **Link songs dialog**: song search goes through app-kit's `useSongSearch` (shared debounce and minimum length) instead of its own query.
 - **Region map**: subdivisions appear and disappear with the zoom, as on Google Maps. Zooming in on a country reveals its regions, zooming out brings the country back, and a country's name stays a little after its regions show up. Each depth (countries, first-level regions…) is colored against its own peers worldwide. Zones show as a dashed outline with a clickable label within their zoom range, and the outline doubles in width while its label is hovered; zones spanning several countries only show a thick blue outline when hovered or selected, without tinting their interior. Country borders are dark. A region without songs of its own but inside a zone that has some gets the palest yellow instead of grey, and regions with songs start at light green. Clicking outside any region clears the selection. The breadcrumb follows the selected region's ancestry. The panel's "Focus on" becomes "Zoom to". The URL keeps the camera in `?at=lng,lat,zoom`, replacing `?path=`: old `?path=` links still open on their deepest level. **Needs the pipelines tileset with zoom bands** (`min_zoom`/`max_zoom`/`depth`, `zone_labels`): publish it before deploying.
 - **Detail panels**: on desktop the panel now sits flush against the canvas edges, with no left, top or bottom margin, and panel sections have half the left padding. Needs ui 0.17.1.
 - **Side rail**: the About button sits at the bottom of the rail at half size, the account button moves to the top-right corner of the screen, and the button of the current page is highlighted (white pill, dark icon).

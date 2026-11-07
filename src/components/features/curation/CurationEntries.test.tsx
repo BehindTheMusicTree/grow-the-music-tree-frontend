@@ -9,6 +9,10 @@ const formErrorsMock = vi.fn((): { field: string; message: string }[] => []);
 const searchResultsMock = vi.fn(() => ({ results: [] as { id: string; label: string }[] }));
 let searchParams = new URLSearchParams();
 
+vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@behindthemusictree/app-kit/genre-tree")>()),
+  useGenreRemoteSearch: () => ({ genres: [], isError: false, settled: true, pending: false }),
+}));
 vi.mock("@tanstack/react-query", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@tanstack/react-query")>()),
   useInfiniteQuery: () => ({ data: undefined, isFetching: false, hasNextPage: false }),
