@@ -1,0 +1,16 @@
+# Performance measurements
+
+Run `scripts/perf-snapshot.sh https://grow-api-staging.themusictree.org/v1/`
+from the repository root. The argument must include the API prefix. The script
+records three sequential observations for identity and Brotli for each endpoint,
+with response validators and cache metadata. Bytes are transferred response-body
+bytes; curl does not decompress the downloaded body. Check `content-encoding`
+before treating a Brotli request as a compressed response.
+
+The 2026-11-07 baseline targets API revision
+`4d8c7f50a4c2d02481063f01c98bb0c553c6136e`, verified separately through the staging
+container image label. The public requests do not establish cold server-cache
+latency. CDN compression may vary between requests even with the same validator.
+
+Browser load/parse/paint and React typing profiles have not yet been captured.
+These network observations do not establish client performance improvements.
