@@ -31,9 +31,12 @@ export default function RegionDetailPanel({
   const overviewId = ownOverviewId ?? region.inheritedOverviewItemId;
   const overview = useGenreByWikidataId(overviewId, "reference", getGrowBackendBaseUrl);
   const edgeTab = collapseEdgeTab(collapsed, onCollapsedChange);
-  const onZoomIn = region.drillable ? () => onZoomTo(region) : undefined;
+  const onZoomIn = region.drillable && region.boundaryStatus !== "missing" ? () => onZoomTo(region) : undefined;
 
-  if (overviewId === null) {
+  const picked = genreUuid === null ? null : GenreUuidSchema.safeParse(genreUuid);
+  const uuid = picked?.success ? picked.data : overview.data?.uuid;
+
+  if (overviewId === null && !uuid) {
     return (
       <DetailPanel title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
         <FieldList
@@ -42,6 +45,13 @@ export default function RegionDetailPanel({
             { label: "Genres", value: region.genreCount },
           ]}
         />
+        <ul className="flex flex-col gap-3 px-6 py-4" aria-label="Region genres">
+          {region.genres
+            .filter((genre) => genre.relation !== "tradition")
+            .map((genre) => (
+              <RegionGenreChoice key={genre.itemId} itemId={genre.itemId} onSelect={onSelectGenre} />
+            ))}
+        </ul>
         {onZoomIn && (
           <div className="px-6 py-4">
             <Button type="button" onClick={onZoomIn}>
@@ -52,9 +62,6 @@ export default function RegionDetailPanel({
       </DetailPanel>
     );
   }
-
-  const picked = genreUuid === null ? null : GenreUuidSchema.safeParse(genreUuid);
-  const uuid = picked?.success ? picked.data : overview.data?.uuid;
 
   if (!uuid) {
     const failed = overview.isError || overview.data === null;
@@ -84,5 +91,19 @@ export default function RegionDetailPanel({
       collapsed={collapsed}
       edgeTab={edgeTab}
     />
+  );
+}
+
+function RegionGenreChoice({ itemId, onSelect }: { itemId: string; onSelect: (uuid: string) => void }) {
+  const genre = useGenreByWikidataId(itemId, "reference", getGrowBackendBaseUrl);
+  if (genre.isError || genre.data === null) return <li>Genre {itemId} is unavailable.</li>;
+  if (!genre.data) return <li aria-busy>Loading genre…</li>;
+  const resolved = genre.data;
+  return (
+    <li>
+      <Button type="button" onClick={() => onSelect(resolved.uuid)}>
+        {resolved.name}
+      </Button>
+    </li>
   );
 }

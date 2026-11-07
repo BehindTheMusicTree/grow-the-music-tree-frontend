@@ -23,9 +23,10 @@ const RegionSchema = z
     zoneIds: z.array(NonEmpty),
     /** Point regions of kind "city" under an admin unit; not part of `childIds`. Optional until every published index carries them. */
     cityIds: z.array(NonEmpty).optional(),
-    bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]),
-    mainBbox: z.tuple([z.number(), z.number(), z.number(), z.number()]),
-    centroid: Position,
+    boundaryStatus: z.enum(["available", "missing"]).optional(),
+    bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]).nullable(),
+    mainBbox: z.tuple([z.number(), z.number(), z.number(), z.number()]).nullable(),
+    centroid: Position.nullable(),
     drillable: z.boolean(),
     /** Wikidata item id of the region's "Music of X" genre; null when it has none. */
     overviewItemId: NonEmpty.nullable(),
@@ -38,7 +39,13 @@ const RegionSchema = z
     songCount: z.number().int().min(0),
     genreCount: z.number().int().min(0),
   })
-  .strict();
+  .strict()
+  .refine((region) => {
+    const coordinates = [region.bbox, region.mainBbox, region.centroid];
+    return region.boundaryStatus === "missing"
+      ? coordinates.every((value) => value === null)
+      : coordinates.every((value) => value !== null);
+  }, { message: "Boundary status and coordinates disagree" });
 
 /** A subdivision kept out of the map until a genre is attached to it by hand (`tradition_placement_overrides`). */
 const HiddenRegionSchema = z

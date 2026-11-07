@@ -100,6 +100,42 @@ describe("RegionMapView", () => {
     expect(container.childElementCount).toBe(0);
   });
 
+  it("opens a region without a boundary without moving the camera", async () => {
+    data = RegionMapIndexSchema.parse({
+      ...fixture,
+      regions: [...fixture.regions, {
+        ...fixture.regions[0],
+        id: "JO",
+        name: "Joseon",
+        kind: "zone",
+        parentId: null,
+        boundaryStatus: "missing",
+        bbox: null,
+        mainBbox: null,
+        centroid: null,
+      }],
+    });
+    setSearch("region=JO");
+    const { unmount } = render(<RegionMapView />);
+
+    expect(screen.getByRole("status")).toHaveTextContent("Boundary unavailable for Joseon");
+    expect(screen.getByRole("region", { name: "Panel Joseon" })).toBeInTheDocument();
+    expect(lastProps.focus).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Zoom to" }));
+    expect(lastProps.focus).toBeNull();
+    await flushNavigation();
+    expect(pushState).not.toHaveBeenCalled();
+    unmount();
+
+    setSearch("");
+    render(<RegionMapView />);
+    fireEvent.change(screen.getByRole("combobox", { name: "Regions without a boundary" }), {
+      target: { value: "JO" },
+    });
+    await flushNavigation();
+    expect(url(pushState.mock.calls[0]).searchParams.get("region")).toBe("JO");
+  });
+
   it("selects a region on click without drilling into it", async () => {
     render(<RegionMapView />);
 

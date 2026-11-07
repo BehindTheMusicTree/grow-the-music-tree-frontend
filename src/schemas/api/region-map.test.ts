@@ -7,6 +7,25 @@ describe("RegionMapIndexSchema", () => {
     expect(RegionMapIndexSchema.safeParse(fixture).success).toBe(true);
   });
 
+  it("accepts missing boundaries only with null coordinates", () => {
+    const missing = { ...fixture.regions[0], boundaryStatus: "missing", bbox: null, mainBbox: null, centroid: null };
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [missing] }).success).toBe(true);
+    for (const invalid of [
+      { ...missing, boundaryStatus: "available" },
+      { ...missing, boundaryStatus: undefined },
+      { ...missing, centroid: [0, 0] },
+      { ...fixture.regions[0], boundaryStatus: "missing" },
+    ]) {
+      expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [invalid] }).success).toBe(false);
+    }
+  });
+
+  it("accepts missing boundaries and hidden regions together", () => {
+    const missing = { ...fixture.regions[0], boundaryStatus: "missing", bbox: null, mainBbox: null, centroid: null };
+    const hidden = { id: "hidden", name: "Hidden", kind: "admin_unit", parentId: "world", centroid: [1, 2] };
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [missing], hiddenRegions: [hidden] }).success).toBe(true);
+  });
+
   it("accepts a bbox that crosses the antimeridian", () => {
     const fiji = { ...fixture.regions[0], bbox: [177, -20, 182, -16], mainBbox: [177, -20, 182, -16] };
 
