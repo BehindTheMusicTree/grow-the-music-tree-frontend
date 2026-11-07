@@ -113,6 +113,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Fixed
 
 - Keep regions without a boundary searchable and selectable, show their genres, and avoid camera or hover geometry for them.
+- Use explicit genre playlist counts for tree sizing and preserve separate catalogue and playlist summaries in the shared genre panels.
+
 - Link songs: the search text is kept when switching tabs, and results no longer empty on each keystroke while a track is playing (app-kit 33.3.0).
 - Genre picker: searches the canonical tree with the ranked genre search (typo-tolerant) instead of a paged list.
 - Give detail panel scrollbars consistent theme colors and sizing.
