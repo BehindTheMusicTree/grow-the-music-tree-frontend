@@ -57,7 +57,7 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
     queryFn: async () =>
       LinkSuggestionsSchema.parse(await fetch(`genres/${genre.uuid}/link-suggestions/`, true, false)),
   });
-  const search = useSongSearch(getGrowBackendBaseUrl, tab === "search" ? text.trim() : "", {
+  const search = useSongSearch(getGrowBackendBaseUrl, text.trim(), {
     limit: SEARCH_LIMIT,
     genre: genreless ? "without" : "any",
   });
