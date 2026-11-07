@@ -107,7 +107,7 @@ export function fillColorExpression(colors: ReadonlyMap<string, string>): string
   return ["match", ["get", "id"], ...Array.from(colors).flat(), EMPTY_FILL] as unknown as ExpressionSpecification;
 }
 
-const union = (boxes: readonly Region["mainBbox"][]): Region["mainBbox"] => [
+const union = (boxes: readonly NonNullable<Region["mainBbox"]>[]): NonNullable<Region["mainBbox"]> => [
   Math.min(...boxes.map((box) => box[0])),
   Math.min(...boxes.map((box) => box[1])),
   Math.max(...boxes.map((box) => box[2])),
@@ -115,7 +115,7 @@ const union = (boxes: readonly Region["mainBbox"][]): Region["mainBbox"] => [
 ];
 
 export function regionBounds(region: Region | undefined, regions: ReadonlyMap<string, Region>): LngLatBoundsLike {
-  if (!region) return WORLD_BOUNDS;
+  if (!region || region.mainBbox === null) return WORLD_BOUNDS;
   // A zone's own box spans the antimeridian through its overseas members, so frame the members instead.
   const members =
     region.kind === "zone"
@@ -137,7 +137,7 @@ export function regionBounds(region: Region | undefined, regions: ReadonlyMap<st
  */
 export function focusIds(selectedId: string | null, regions: ReadonlyMap<string, Region>): Set<string> | null {
   const selected = selectedId === null ? undefined : regions.get(selectedId);
-  if (!selected || selected.kind === "city") return null;
+  if (!selected || selected.kind === "city" || selected.boundaryStatus === "missing") return null;
   if (selected.kind === "zone") return new Set();
   return new Set(
     Array.from(regions.values())

@@ -307,6 +307,7 @@ export default function RegionMapCanvas({
     if (!ready || !map || focus === null || focus.seq === focusSeqRef.current) return;
     focusSeqRef.current = focus.seq;
     const region = focus.id === null ? undefined : regionsRef.current.get(focus.id);
+    if (region?.boundaryStatus === "missing") return;
     map.fitBounds(regionBounds(region, regionsRef.current), { padding: FIT_PADDING, maxZoom: MAX_ZOOM });
   }, [ready, focus]);
 
@@ -314,7 +315,7 @@ export default function RegionMapCanvas({
 
   const onFocusRegion = (region: Region) => {
     const map = mapRef.current;
-    if (!map) return;
+    if (!map || region.centroid === null) return;
     // Feature state throws until the style has loaded.
     if (ready && region.kind !== "city") {
       if (hoveredRef.current !== null && hoveredRef.current.id !== region.id) {

@@ -125,7 +125,7 @@ describe("regionBounds", () => {
   });
 
   it("frames a region by its main bbox", () => {
-    const [west, south, east, north] = france.mainBbox;
+    const [west, south, east, north] = france.mainBbox!;
 
     expect(regionBounds(france, regions)).toEqual([
       [west, south],

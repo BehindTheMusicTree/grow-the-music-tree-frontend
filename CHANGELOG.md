@@ -112,6 +112,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- Keep regions without a boundary searchable and selectable, show their genres, and avoid camera or hover geometry for them.
+
+### Fixed
+
 - Give detail panel scrollbars consistent theme colors and sizing.
 - Region map: zoomed-out coasts no longer look hairy. Borders use round joins instead of spiky miters and are half as thick at world scale.
 - Limit shared-package style scanning to package output so local linked-package production builds finish without scanning nested dependencies.

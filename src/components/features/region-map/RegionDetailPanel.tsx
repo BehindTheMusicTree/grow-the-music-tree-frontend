@@ -31,7 +31,7 @@ export default function RegionDetailPanel({
   const overviewId = ownOverviewId ?? region.inheritedOverviewItemId;
   const overview = useGenreByWikidataId(overviewId, "reference", getGrowBackendBaseUrl);
   const edgeTab = collapseEdgeTab(collapsed, onCollapsedChange);
-  const onZoomIn = region.drillable ? () => onZoomTo(region) : undefined;
+  const onZoomIn = region.drillable && region.boundaryStatus !== "missing" ? () => onZoomTo(region) : undefined;
 
   if (overviewId === null) {
     return (
