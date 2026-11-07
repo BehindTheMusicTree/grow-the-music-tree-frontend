@@ -86,6 +86,15 @@ describe("greyed", () => {
 });
 
 describe("focusIds", () => {
+  it("does not let a caller mutate the cached focus set", () => {
+    focusIds("Q142", regions)!.clear();
+    expect(focusIds("Q142", regions)).toEqual(new Set(["Q142", "Q12130"]));
+    expect(focusIds("Q12130", regions)).toEqual(new Set(["Q12130"]));
+    const replacement = new Map(regions);
+    replacement.delete("Q12130");
+    expect(focusIds("Q142", replacement)).toEqual(new Set(["Q142"]));
+  });
+
   it("keeps an admin region and its subdivisions, nothing for a zone, no focus for a city or none", () => {
     expect(focusIds(null, regions)).toBeNull();
     expect(focusIds("Q142", regions)).toEqual(new Set(["Q142", "Q12130"]));

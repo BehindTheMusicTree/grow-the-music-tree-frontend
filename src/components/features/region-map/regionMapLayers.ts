@@ -135,15 +135,26 @@ export function regionBounds(region: Region | undefined, regions: ReadonlyMap<st
  * What keeps its colours while a selection is in focus: an admin region and its subdivisions, nothing for a zone (its
  * own outline is filled instead). `null` when nothing is in focus: no selection, or a city, too small to spotlight.
  */
+const descendantsByRegions = new WeakMap<ReadonlyMap<string, Region>, Map<string, Set<string>>>();
+
 export function focusIds(selectedId: string | null, regions: ReadonlyMap<string, Region>): Set<string> | null {
   const selected = selectedId === null ? undefined : regions.get(selectedId);
   if (!selected || selected.kind === "city" || selected.boundaryStatus === "missing") return null;
   if (selected.kind === "zone") return new Set();
-  return new Set(
-    Array.from(regions.values())
-      .filter((region) => isAdmin(region) && ancestry(region, regions).some((r) => r.id === selected.id))
-      .map((region) => region.id),
-  );
+  let descendants = descendantsByRegions.get(regions);
+  if (!descendants) {
+    descendants = new Map();
+    for (const region of regions.values()) {
+      if (!isAdmin(region)) continue;
+      for (const ancestor of ancestry(region, regions)) {
+        let ids = descendants.get(ancestor.id);
+        if (!ids) descendants.set(ancestor.id, ids = new Set());
+        ids.add(region.id);
+      }
+    }
+    descendantsByRegions.set(regions, descendants);
+  }
+  return new Set(descendants.get(selected.id));
 }
 
 /** The colours outside the focus lose their hue but keep their lightness, so the rest of the map recedes to greys. */

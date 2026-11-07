@@ -112,7 +112,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Improved
 
-- Reuse the region lookup between map and genre search for each cached region index.
+- Reuse the region lookup between map and genre search for each cached region index, and prepare descendant lookups once for map focus.
 
 ### Added
 
