@@ -10,6 +10,7 @@ import {
   useVisibleGenrePlaylists,
   CriteriaMinimum,
   hasMainstreamPopRoot,
+  genrePlaylistTrackCount,
   GenrePlaylistUuidSchema,
   useArtist,
   useSong,
@@ -335,7 +336,7 @@ function GenreTreePageContent() {
           id: genrePlaylist.uuid,
           parentId: genrePlaylist.parent?.uuid ?? null,
           name: genrePlaylist.name,
-          itemCount: genrePlaylist.tracksCount,
+          itemCount: genrePlaylistTrackCount(genrePlaylist),
         })),
     );
   }, [genrePlaylists]);
