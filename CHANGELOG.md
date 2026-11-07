@@ -122,6 +122,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- Region map index accepts an optional `hiddenRegions` list (subdivisions kept off the map), and the curation entry editor offers an entity picker listing drawn and hidden regions for `entity_id` columns, so a tradition can be attached to a subdivision that has no genre yet. Needs grow-api's `GET regions/map/attachable/`: deploy this app first, then grow-api, then the pipelines. Tested.
 - **Region map**: the index schema accepts regions of kind `city` (point regions under an admin unit) and the optional `cityIds` on admin units, so the pipelines can publish city-level genre anchors. Must be deployed before such an index is imported.
 - **Region map**: cities claimed by a genre are drawn as points (tileset layer `cities`, from their zoom band). They hover, show the region tooltip and open the detail panel on click, like any region.
 

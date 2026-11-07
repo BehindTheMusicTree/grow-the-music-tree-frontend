@@ -89,4 +89,19 @@ describe("RegionMapIndexSchema", () => {
     expect(parsed.worldChildIds).toEqual(["Q183"]);
     expect(parsed.worldZoneIds).toEqual([]);
   });
+
+  it("accepts hidden regions outside the drawn ones and refuses unknown keys on them", () => {
+    const normandy = {
+      id: "Q18677875",
+      name: "Normandy",
+      kind: "admin_unit",
+      parentId: "Q142",
+      centroid: [1.02, 49.38],
+    };
+
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, hiddenRegions: [normandy] }).success).toBe(true);
+    expect(
+      RegionMapIndexSchema.safeParse({ ...fixture, hiddenRegions: [{ ...normandy, bbox: [0, 0, 1, 1] }] }).success,
+    ).toBe(false);
+  });
 });
