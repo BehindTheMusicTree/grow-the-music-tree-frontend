@@ -61,7 +61,8 @@ vi.mock("@behindthemusictree/app-kit/popup", () => ({
 
 const hasMainstreamPopRootMock = vi.fn<(nodes: { id: string }[]) => boolean>(() => true);
 
-vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
+vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   useVisibleGenrePlaylists: (options: { artistUuid?: string | null }) => useVisibleGenrePlaylistsMock(options),
   hasMainstreamPopRoot: (nodes: { id: string }[]) => hasMainstreamPopRootMock(nodes),
   useArtist: () => ({ status: "idle" }),
@@ -461,7 +462,9 @@ describe("GenreTreePage", () => {
       name: uuid,
       parent: uuid === rootUuid ? null : { uuid: rootUuid },
       root: { uuid: rootUuid },
-      tracksCount: 1,
+      tracksCount: 999,
+      genreOnlyTracksCount: 0,
+      genreAndSubgenresTracksCount: { canonical: 1, regional: 0, all: 1 },
       viewsCount: 0,
       isUnacceptedRoot,
     });
@@ -474,8 +477,8 @@ describe("GenreTreePage", () => {
 
     await screen.findByTestId("genre-tree-view");
     expect(hasMainstreamPopRootMock).toHaveBeenLastCalledWith([
-      expect.objectContaining({ id: "pop" }),
-      expect.objectContaining({ id: "pop-child" }),
+      expect.objectContaining({ id: "pop", itemCount: 1 }),
+      expect.objectContaining({ id: "pop-child", itemCount: 1 }),
     ]);
   });
 
