@@ -112,6 +112,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Fixed
 
+- Link songs: the search text is kept when switching tabs, and results no longer empty on each keystroke while a track is playing (app-kit 33.3.0).
+- Genre picker: searches the canonical tree with the ranked genre search (typo-tolerant) instead of a paged list.
 - Give detail panel scrollbars consistent theme colors and sizing.
 - Region map: zoomed-out coasts no longer look hairy. Borders use round joins instead of spiky miters and are half as thick at world scale.
 - Limit shared-package style scanning to package output so local linked-package production builds finish without scanning nested dependencies.
@@ -122,6 +124,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- Genre tree search also lists places and regional genres (from the region map index and genre lexicon, loaded on first focus); picking one opens it on the map.
 - **Region map**: a search box over the canvas (top-left, full width on mobile) finds places, overviews and regional or canonical genres linked to a region, other genres, artists and songs. Places and region genres are matched in memory, ranked and accent-insensitive; the genre lexicon (`regions/map/genres/`) loads on the first focus. Picking a place or genre selects its region, frames it and opens the genre in the panel; other genres open in the tree, artists and songs in their tree panels. The breadcrumb moves below the box. Needs app-kit and app-kit-ui 33.2.0, ui 0.18.0 and grow-api #414. Tests cover the region-genre index, the hrefs and the box.
 - Region map index accepts an optional `hiddenRegions` list (subdivisions kept off the map), and the curation entry editor offers an entity picker listing drawn and hidden regions for `entity_id` columns, so a tradition can be attached to a subdivision that has no genre yet. Needs grow-api's `GET regions/map/attachable/`: deploy this app first, then grow-api, then the pipelines. Tested.
 - **Region map**: the index schema accepts regions of kind `city` (point regions under an admin unit) and the optional `cityIds` on admin units, so the pipelines can publish city-level genre anchors. Must be deployed before such an index is imported.
