@@ -110,6 +110,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- Add a repeatable tree and region-map network snapshot script and record the staging baseline.
+
 ### Fixed
 
 - Keep regions without a boundary searchable and selectable, show their genres, and avoid camera or hover geometry for them.

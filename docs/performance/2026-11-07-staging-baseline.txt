@@ -1,0 +1,135 @@
+Captured: 2026-11-07T15:24:28Z
+API: https://grow-api-staging.themusictree.org/v1
+curl 8.7.1 (x86_64-apple-darwin24.0) libcurl/8.7.1 (SecureTransport) LibreSSL/3.3.6 zlib/1.2.12 nghttp2/1.64.0
+Release-Date: 2024-03-27
+
+endpoint	encoding	run	status	body_bytes	ttfb_seconds	total_seconds
+genre-playlists/tree/?tree_name=canonical	identity	1	200	2669636	0.310857	0.551717
+HTTP/2 200 
+cache-control: no-cache
+etag: W/"scoped-v2-canonical-4d8c7f50a4c2d02481063f01c98bb0c553c6136e-e32134a8-d100-4fc6-93fe-301020dcecaf"
+vary: Accept-Encoding
+vary: origin
+cf-cache-status: DYNAMIC
+genre-playlists/tree/?tree_name=canonical	identity	2	200	2669636	0.151885	0.394802
+HTTP/2 200 
+cache-control: no-cache
+etag: W/"scoped-v2-canonical-4d8c7f50a4c2d02481063f01c98bb0c553c6136e-e32134a8-d100-4fc6-93fe-301020dcecaf"
+vary: Accept-Encoding
+vary: origin
+cf-cache-status: DYNAMIC
+genre-playlists/tree/?tree_name=canonical	identity	3	200	2669636	0.186649	0.439880
+HTTP/2 200 
+cache-control: no-cache
+etag: W/"scoped-v2-canonical-4d8c7f50a4c2d02481063f01c98bb0c553c6136e-e32134a8-d100-4fc6-93fe-301020dcecaf"
+vary: Accept-Encoding
+vary: origin
+cf-cache-status: DYNAMIC
+genre-playlists/tree/?tree_name=canonical	br	1	200	552421	0.171275	0.341543
+HTTP/2 200 
+cache-control: no-cache
+etag: W/"scoped-v2-canonical-4d8c7f50a4c2d02481063f01c98bb0c553c6136e-e32134a8-d100-4fc6-93fe-301020dcecaf"
+vary: Accept-Encoding
+vary: origin
+cf-cache-status: DYNAMIC
+content-encoding: br
+genre-playlists/tree/?tree_name=canonical	br	2	200	553091	0.156909	0.321855
+HTTP/2 200 
+cache-control: no-cache
+etag: W/"scoped-v2-canonical-4d8c7f50a4c2d02481063f01c98bb0c553c6136e-e32134a8-d100-4fc6-93fe-301020dcecaf"
+vary: Accept-Encoding
+vary: origin
+cf-cache-status: DYNAMIC
+content-encoding: br
+genre-playlists/tree/?tree_name=canonical	br	3	200	553771	0.193665	0.354175
+HTTP/2 200 
+cache-control: no-cache
+etag: W/"scoped-v2-canonical-4d8c7f50a4c2d02481063f01c98bb0c553c6136e-e32134a8-d100-4fc6-93fe-301020dcecaf"
+vary: Accept-Encoding
+vary: origin
+cf-cache-status: DYNAMIC
+content-encoding: br
+regions/map/genres/	identity	1	200	1054141	0.181070	0.368974
+HTTP/2 200 
+etag: W/"0519df8fdd62ca950e2546ffba4dd458"
+vary: Accept-Encoding
+vary: origin
+cf-cache-status: DYNAMIC
+regions/map/genres/	identity	2	200	1054141	0.191781	0.385358
+HTTP/2 200 
+etag: W/"0519df8fdd62ca950e2546ffba4dd458"
+vary: Accept-Encoding
+vary: origin
+cf-cache-status: DYNAMIC
+regions/map/genres/	identity	3	200	1054141	0.197834	0.388809
+HTTP/2 200 
+etag: W/"0519df8fdd62ca950e2546ffba4dd458"
+vary: Accept-Encoding
+vary: origin
+cf-cache-status: DYNAMIC
+regions/map/genres/	br	1	200	291304	0.169701	0.303144
+HTTP/2 200 
+etag: W/"0519df8fdd62ca950e2546ffba4dd458"
+vary: Accept-Encoding
+vary: origin
+cf-cache-status: DYNAMIC
+content-encoding: br
+regions/map/genres/	br	2	200	291441	0.202408	0.336628
+HTTP/2 200 
+etag: W/"0519df8fdd62ca950e2546ffba4dd458"
+vary: Accept-Encoding
+vary: origin
+cf-cache-status: DYNAMIC
+content-encoding: br
+regions/map/genres/	br	3	200	290763	0.192033	0.321701
+HTTP/2 200 
+etag: W/"0519df8fdd62ca950e2546ffba4dd458"
+vary: Accept-Encoding
+vary: origin
+cf-cache-status: DYNAMIC
+content-encoding: br
+regions/map/	identity	1	200	636852	0.148625	0.331310
+HTTP/2 200 
+cache-control: no-cache
+etag: W/"5ee2f9b26dcd1ea79b3d1768ed740a8ba332e41362d4dbab8cdbfec00a8048f2-gzip"
+vary: Accept-Encoding
+vary: Accept-Encoding, origin
+cf-cache-status: DYNAMIC
+regions/map/	identity	2	200	636852	0.150691	0.318367
+HTTP/2 200 
+cache-control: no-cache
+etag: W/"5ee2f9b26dcd1ea79b3d1768ed740a8ba332e41362d4dbab8cdbfec00a8048f2-gzip"
+vary: Accept-Encoding
+vary: Accept-Encoding, origin
+cf-cache-status: DYNAMIC
+regions/map/	identity	3	200	636852	0.135510	0.297485
+HTTP/2 200 
+cache-control: no-cache
+etag: W/"5ee2f9b26dcd1ea79b3d1768ed740a8ba332e41362d4dbab8cdbfec00a8048f2-gzip"
+vary: Accept-Encoding
+vary: Accept-Encoding, origin
+cf-cache-status: DYNAMIC
+regions/map/	br	1	200	102622	0.143086	0.221845
+HTTP/2 200 
+cache-control: no-cache
+etag: W/"5ee2f9b26dcd1ea79b3d1768ed740a8ba332e41362d4dbab8cdbfec00a8048f2-gzip"
+vary: Accept-Encoding
+vary: Accept-Encoding, origin
+cf-cache-status: DYNAMIC
+content-encoding: br
+regions/map/	br	2	200	102542	0.148701	0.231377
+HTTP/2 200 
+cache-control: no-cache
+etag: W/"5ee2f9b26dcd1ea79b3d1768ed740a8ba332e41362d4dbab8cdbfec00a8048f2-gzip"
+vary: Accept-Encoding
+vary: Accept-Encoding, origin
+cf-cache-status: DYNAMIC
+content-encoding: br
+regions/map/	br	3	200	102714	0.146583	0.234991
+HTTP/2 200 
+cache-control: no-cache
+etag: W/"5ee2f9b26dcd1ea79b3d1768ed740a8ba332e41362d4dbab8cdbfec00a8048f2-gzip"
+vary: Accept-Encoding
+vary: Accept-Encoding, origin
+cf-cache-status: DYNAMIC
+content-encoding: br
