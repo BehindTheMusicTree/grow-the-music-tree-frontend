@@ -144,7 +144,7 @@ export function focusIds(selectedId: string | null, regions: ReadonlyMap<string,
   let descendants = descendantsByRegions.get(regions);
   if (!descendants) {
     descendants = new Map();
-    for (const region of regions.values()) {
+    for (const region of Array.from(regions.values())) {
       if (!isAdmin(region)) continue;
       for (const ancestor of ancestry(region, regions)) {
         let ids = descendants.get(ancestor.id);
