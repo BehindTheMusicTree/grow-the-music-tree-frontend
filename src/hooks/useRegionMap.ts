@@ -4,11 +4,12 @@ import { AppError, ErrorCode, useFetchWrapper, useQueryWithParse } from "@behind
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { RegionMapIndexSchema } from "@schemas/api/region-map";
 
-/** The region map index, or null while grow-api has no snapshot yet (404). */
-export function useRegionMapIndex() {
+/** The region map index, or null while grow-api has no snapshot yet (404). `enabled` defers the fetch, e.g. to a search box's first focus. */
+export function useRegionMapIndex(enabled = true) {
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
   return useQueryWithParse({
     queryKey: ["regionMap", "index"],
+    enabled,
     queryFn: async () => {
       try {
         return await fetch("regions/map/", true, false, {}, undefined, false, true);
