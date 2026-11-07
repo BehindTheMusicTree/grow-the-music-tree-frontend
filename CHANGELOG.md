@@ -110,6 +110,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Improved
+
+- Reuse the region lookup between map and genre search for each cached region index.
+
 ### Added
 
 - Add a repeatable tree and region-map network snapshot script and record the staging baseline.

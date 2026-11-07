@@ -43,6 +43,7 @@ import { renderSongLink } from "@components/features/song/renderSongLink";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
+import { regionMapLookup } from "@lib/region-map-index";
 import { useRegionMapIndex } from "@hooks/useRegionMap";
 import { useRegionGenreLexicon } from "@behindthemusictree/app-kit/genre-tree";
 import { useRegionGenreIndex } from "@components/features/search/useRegionGenreIndex";
@@ -272,7 +273,7 @@ function GenreTreePageContent() {
   const regionIndex = useRegionMapIndex(searchFocused);
   const lexicon = useRegionGenreLexicon(getBackendBaseUrl, searchFocused);
   const regions = useMemo(
-    () => (regionIndex.data ? new Map(regionIndex.data.regions.map((region) => [region.id, region])) : null),
+    () => (regionIndex.data ? regionMapLookup(regionIndex.data) : null),
     [regionIndex.data],
   );
   const regionGenres = useRegionGenreIndex(regionIndex.data, lexicon.entries);
