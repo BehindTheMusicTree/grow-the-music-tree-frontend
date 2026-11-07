@@ -6,14 +6,17 @@ import RegionDetailPanel from "./RegionDetailPanel";
 
 const index = RegionMapIndexSchema.parse(fixture);
 const france = index.regions.find((region) => region.id === "Q142") as Region;
-let lookup: { data: { uuid: string } | null | undefined; isError: boolean } = { data: undefined, isError: false };
+let lookup: { data: { uuid: string; name?: string } | null | undefined; isError: boolean } = {
+  data: undefined,
+  isError: false,
+};
 const lookedUp = vi.fn();
 
 vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
   ...(await importOriginal<object>()),
   useGenreByWikidataId: (wikidataId: string | null) => {
     lookedUp(wikidataId);
-    return lookup;
+    return wikidataId === null ? { data: undefined, isError: false } : lookup;
   },
 }));
 
@@ -129,6 +132,26 @@ describe("RegionDetailPanel", () => {
     expect(screen.getByText(france.name)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: `Zoom to ${france.name}` }));
     expect(props.onZoomTo).toHaveBeenCalled();
+  });
+
+  it("opens retained genres for a missing boundary with no overview", () => {
+    const uuid = "33333333-3333-4333-8333-333333333333";
+    lookup = { data: { uuid, name: "Basque music" }, isError: false };
+    const region: Region = {
+      ...withOverview(null),
+      boundaryStatus: "missing",
+      bbox: null,
+      mainBbox: null,
+      centroid: null,
+      genres: [{ itemId: "Q3121396", rule: "P495", relation: "regional" }],
+    };
+    const { rerender } = render(<RegionDetailPanel {...props} region={region} />);
+    fireEvent.click(screen.getByRole("button", { name: "Basque music" }));
+    expect(props.onSelectGenre).toHaveBeenCalledWith(uuid);
+    expect(screen.queryByRole("button", { name: /Zoom/ })).toBeNull();
+
+    rerender(<RegionDetailPanel {...props} genreUuid={uuid} region={region} />);
+    expect(screen.getByRole("region", { name: `Genre ${uuid}` })).toBeInTheDocument();
   });
 
   it("closes on Escape", () => {
