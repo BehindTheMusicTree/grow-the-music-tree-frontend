@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Breadcrumb } from "@behindthemusictree/ui";
+import { regionMapLookup } from "@lib/region-map-index";
 import { useRegionMapIndex } from "@hooks/useRegionMap";
 import type { Region, RegionMapIndex } from "@schemas/api/region-map";
 import RegionDetailPanel from "./RegionDetailPanel";
@@ -29,7 +30,7 @@ export default function RegionMapView() {
 
 function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   const { state, update } = useRegionMapUrlState();
-  const regions = useMemo(() => new Map(index.regions.map((region) => [region.id, region])), [index]);
+  const regions = regionMapLookup(index);
   const selected = state.region === null ? undefined : regions.get(state.region);
 
   // The URL camera wins; else an old `?path=` link frames its deepest known level, else the selection.
