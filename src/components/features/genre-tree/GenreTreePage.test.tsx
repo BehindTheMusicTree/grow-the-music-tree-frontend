@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { act, render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import type { GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
 import type { GenreTreeViewProps } from "@behindthemusictree/app-kit-ui/genre-tree";
@@ -81,7 +81,11 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
 }));
 
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
-  GenreTreeView: (props: GenreTreeViewProps) => (
+  GenreTreeView: (props: GenreTreeViewProps) => {
+    const [query, setQuery] = useState("");
+    const [focused, setFocused] = useState(false);
+    const Groups = props.SearchGroups;
+    return (
     <div
       data-testid="genre-tree-view"
       data-readonly={String(props.readOnly)}
@@ -131,17 +135,13 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
         </>
       )}
       <button onClick={() => props.onArtistExpandedChange?.(true)}>Expand artist</button>
-      <button onClick={() => props.onSearchFocus?.()}>Focus search</button>
-      <button onClick={() => props.onSearchQueryChange?.("fra")}>Type fra</button>
-      {props.extraSearchGroups?.map((group) => (
+      <button onClick={() => setFocused(true)}>Focus search</button>
+      <button onClick={() => setQuery("fra")}>Type fra</button>
+      {Groups && <Groups query={query} focused={focused}>{(groups) => groups.map((group) => (
         <ul key={group.key} aria-label={group.label}>
-          {group.items.map((item) => (
-            <li key={item.key}>
-              <button onClick={item.onSelect}>{`pick ${item.key}`}</button>
-            </li>
-          ))}
+          {group.items.map((item) => <li key={item.key}><button onClick={item.onSelect}>{`pick ${item.key}`}</button></li>)}
         </ul>
-      ))}
+      ))}</Groups>}
       {props.overlayPanel && (
         <section aria-label={String(props.overlayPanel.title)}>
           {props.overlayPanel.content}
@@ -159,7 +159,8 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
         </>
       )}
     </div>
-  ),
+  );
+  },
   searchStatus: () => undefined,
   GenreTreeViewSkeleton: ({ viewMode }: { viewMode: string }) => (
     <div data-testid="genre-tree-view-skeleton" data-viewmode={viewMode} />
