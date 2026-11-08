@@ -55,17 +55,17 @@ describe("GenreCreationPopup", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it("closes and reports the created genre's tree node id on success", () => {
+  it("closes and reports the created genre's entity UUID on success", () => {
     const onClose = vi.fn();
     const onCreated = vi.fn();
     render(<GenreCreationPopup onClose={onClose} onCreated={onCreated} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
     const [, { onSuccess }] = mutateMock.mock.calls[0];
-    onSuccess({ criteriaPlaylist: { uuid: "playlist-uuid" } });
+    onSuccess({ uuid: makeGenreUuid("created"), criteriaPlaylist: { uuid: "playlist-uuid" } });
 
     expect(onClose).toHaveBeenCalledTimes(1);
-    expect(onCreated).toHaveBeenCalledWith("playlist-uuid");
+    expect(onCreated).toHaveBeenCalledWith(makeGenreUuid("created"));
   });
 
   it("does not report a created genre before the mutation succeeds", () => {

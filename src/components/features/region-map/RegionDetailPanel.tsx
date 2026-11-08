@@ -1,6 +1,6 @@
 "use client";
 
-import { GenreUuidSchema, useGenreByWikidataId } from "@behindthemusictree/app-kit/genre-tree";
+import { useGenreByWikidataId } from "@behindthemusictree/app-kit/genre-tree";
 import { GenreDetailPanel } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { Button, DetailPanel, FieldList } from "@behindthemusictree/ui";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -9,8 +9,6 @@ import type { Region } from "@schemas/api/region-map";
 
 type Props = {
   region: Region;
-  /** A genre picked inside the panel (family chip); it replaces the region's overview. */
-  genreUuid: string | null;
   onSelectGenre: (genreUuid: string) => void;
   onZoomTo: (region: Region) => void;
   onClose: () => void;
@@ -20,7 +18,6 @@ type Props = {
 
 export default function RegionDetailPanel({
   region,
-  genreUuid,
   onSelectGenre,
   onZoomTo,
   onClose,
@@ -33,12 +30,11 @@ export default function RegionDetailPanel({
   const edgeTab = collapseEdgeTab(collapsed, onCollapsedChange);
   const onZoomIn = region.drillable && region.boundaryStatus !== "missing" ? () => onZoomTo(region) : undefined;
 
-  const picked = genreUuid === null ? null : GenreUuidSchema.safeParse(genreUuid);
-  const uuid = picked?.success ? picked.data : overview.data?.uuid;
+  const uuid = overview.data?.uuid;
 
   if (overviewId === null && !uuid) {
     return (
-      <DetailPanel title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
+      <DetailPanel headerClassName="md:pt-[calc(var(--layout-search-h)+theme(spacing.6))]" title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
         <FieldList
           items={[
             { label: "Songs", value: region.songCount },
@@ -66,7 +62,7 @@ export default function RegionDetailPanel({
   if (!uuid) {
     const failed = overview.isError || overview.data === null;
     return (
-      <DetailPanel title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
+      <DetailPanel headerClassName="md:pt-[calc(var(--layout-search-h)+theme(spacing.6))]" title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
         {failed ? (
           <p role="alert" className="px-6 py-4 text-red-600">
             {ownOverviewId === null
@@ -82,6 +78,7 @@ export default function RegionDetailPanel({
 
   return (
     <GenreDetailPanel
+      headerClassName="md:pt-[calc(var(--layout-search-h)+theme(spacing.6))]"
       genreUuid={uuid}
       scope="reference"
       getBackendBaseUrl={getGrowBackendBaseUrl}

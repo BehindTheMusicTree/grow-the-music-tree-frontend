@@ -110,6 +110,14 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- Tree and map genre links now use genre entity UUIDs. Playlist UUID links are no longer interpreted as genre selections.
+
+### Fixed
+
+- Open regional search results in the current view, including descendants absent from the map index. Genre details work without a visible tree node or region, preserve map context during family navigation, and reopen on repeated selection.
+
 ### Improved
 
 - Keep search typing within the search panel and reuse indexed place and genre names for faster local results.

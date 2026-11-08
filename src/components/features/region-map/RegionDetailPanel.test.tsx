@@ -105,20 +105,6 @@ describe("RegionDetailPanel", () => {
     expect(props.onZoomTo).toHaveBeenCalledWith(region);
   });
 
-  it("shows a picked genre over the inherited overview", () => {
-    lookup = { data: { uuid: "22222222-2222-4222-8222-222222222222" }, isError: false };
-    render(
-      <RegionDetailPanel
-        {...props}
-        genreUuid="33333333-3333-4333-8333-333333333333"
-        region={withOverview(null, "Q672134")}
-      />,
-    );
-
-    expect(screen.getByRole("region", { name: /Genre 33333333/ })).toBeTruthy();
-    expect(screen.queryByRole("region", { name: /Genre 22222222/ })).toBeNull();
-  });
-
   it("does not name an inherited overview after the region when it fails to load", () => {
     lookup = { data: null, isError: false };
     render(<RegionDetailPanel {...props} region={withOverview(null, "Q672134")} />);
@@ -145,13 +131,11 @@ describe("RegionDetailPanel", () => {
       centroid: null,
       genres: [{ itemId: "Q3121396", rule: "P495", relation: "regional" }],
     };
-    const { rerender } = render(<RegionDetailPanel {...props} region={region} />);
+    render(<RegionDetailPanel {...props} region={region} />);
     fireEvent.click(screen.getByRole("button", { name: "Basque music" }));
     expect(props.onSelectGenre).toHaveBeenCalledWith(uuid);
     expect(screen.queryByRole("button", { name: /Zoom/ })).toBeNull();
 
-    rerender(<RegionDetailPanel {...props} genreUuid={uuid} region={region} />);
-    expect(screen.getByRole("region", { name: `Genre ${uuid}` })).toBeInTheDocument();
   });
 
   it("closes on Escape", () => {

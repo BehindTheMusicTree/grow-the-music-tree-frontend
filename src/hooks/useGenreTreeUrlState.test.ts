@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { makeGenreUuid } from "@behindthemusictree/app-kit/genre-tree/testing";
 import { act, renderHook } from "@testing-library/react";
 import { formatViewport, parseViewport, useGenreTreeUrlState } from "./useGenreTreeUrlState";
 
@@ -16,8 +17,8 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => searchParams,
 }));
 
-function renderState(genreIds?: ReadonlySet<string>) {
-  return renderHook(() => useGenreTreeUrlState({ viewMode: "pop-core", genreIds }));
+function renderState() {
+  return renderHook(() => useGenreTreeUrlState({ viewMode: "pop-core" }));
 }
 
 // URL writes are batched in a microtask; this lets the batch flush.
@@ -34,15 +35,15 @@ describe("useGenreTreeUrlState artist filter", () => {
     setSearch("artist=band&about=");
     const { result } = renderState();
 
-    result.current.setSelectedNodeId("rock");
+    result.current.setSelectedGenreUuid(makeGenreUuid("rock"));
 
     await flushNavigation();
 
-    expect(pushState).toHaveBeenCalledWith(null, "", "/?artist=band&genre=rock");
+    expect(pushState).toHaveBeenCalledWith(null, "", `/?artist=band&genre=${makeGenreUuid("rock")}`);
   });
 
   it("drops the genre and about when an artist is set", async () => {
-    setSearch("genre=rock&about=");
+    setSearch(`genre=${makeGenreUuid("rock")}&about=`);
     const { result } = renderState();
 
     result.current.setArtistUuid("band");
@@ -53,7 +54,7 @@ describe("useGenreTreeUrlState artist filter", () => {
   });
 
   it("drops the genre, artist and about when a song is set", async () => {
-    setSearch("artist=band&genre=rock&about=");
+    setSearch(`artist=band&genre=${makeGenreUuid("rock")}&about=`);
     const { result } = renderState();
 
     result.current.setSongUuid("song-1");
@@ -67,9 +68,9 @@ describe("useGenreTreeUrlState artist filter", () => {
     setSearch("song=song-1");
     const { result } = renderState();
 
-    result.current.setSelectedNodeId("rock");
+    result.current.setSelectedGenreUuid(makeGenreUuid("rock"));
     await flushNavigation();
-    expect(pushState).toHaveBeenLastCalledWith(null, "", "/?genre=rock");
+    expect(pushState).toHaveBeenLastCalledWith(null, "", `/?genre=${makeGenreUuid("rock")}`);
 
     result.current.setArtistUuid("band");
     await flushNavigation();
@@ -77,28 +78,29 @@ describe("useGenreTreeUrlState artist filter", () => {
   });
 
   it("clears only the artist when the filter is cleared", async () => {
-    setSearch("artist=band&genre=rock&zoom=pop");
+    setSearch(`artist=band&genre=${makeGenreUuid("rock")}&zoom=pop`);
     const { result } = renderState();
 
     result.current.setArtistUuid(null);
 
     await flushNavigation();
 
-    expect(pushState).toHaveBeenCalledWith(null, "", "/?genre=rock&zoom=pop");
+    expect(pushState).toHaveBeenCalledWith(null, "", `/?genre=${makeGenreUuid("rock")}&zoom=pop`);
   });
 
-  it("drops a first-load genre outside the artist's tree but keeps the artist", async () => {
-    setSearch("artist=band&genre=metal");
-    renderState(new Set(["pop", "rock"]));
+  it("keeps a first-load genre outside the artist's tree", async () => {
+    setSearch(`artist=band&genre=${makeGenreUuid("metal")}`);
+    const { result } = renderState();
 
     await flushNavigation();
 
-    expect(replaceState).toHaveBeenCalledWith(null, "", "/?artist=band");
+    expect(replaceState).not.toHaveBeenCalled();
+    expect(result.current.selectedGenreUuid).toBe(makeGenreUuid("metal"));
   });
 
   it("keeps a first-load genre inside the artist's tree", async () => {
-    setSearch("artist=band&genre=rock");
-    renderState(new Set(["pop", "rock"]));
+    setSearch(`artist=band&genre=${makeGenreUuid("rock")}`);
+    renderState();
 
     await flushNavigation();
 
@@ -106,10 +108,10 @@ describe("useGenreTreeUrlState artist filter", () => {
   });
 
   it("pushes one history entry when the selection is cleared before an artist is set", async () => {
-    setSearch("genre=rock");
+    setSearch(`genre=${makeGenreUuid("rock")}`);
     const { result } = renderState();
 
-    result.current.setSelectedNodeId(null);
+    result.current.setSelectedGenreUuid(null);
     result.current.setArtistUuid("band");
 
     await flushNavigation();
@@ -166,18 +168,18 @@ describe("useGenreTreeUrlState size metric", () => {
   });
 
   it("writes ?size=views and drops it for songs, keeping other params", async () => {
-    setSearch("genre=rock");
+    setSearch(`genre=${makeGenreUuid("rock")}`);
     const { result } = renderState();
 
     result.current.setSizeMetric("views");
     await flushNavigation();
-    expect(replaceState).toHaveBeenCalledWith(null, "", "/?genre=rock&size=views");
+    expect(replaceState).toHaveBeenCalledWith(null, "", `/?genre=${makeGenreUuid("rock")}&size=views`);
 
-    setSearch("genre=rock&size=views");
+    setSearch(`genre=${makeGenreUuid("rock")}&size=views`);
     const second = renderState();
     second.result.current.setSizeMetric("songs");
     await flushNavigation();
-    expect(replaceState).toHaveBeenLastCalledWith(null, "", "/?genre=rock");
+    expect(replaceState).toHaveBeenLastCalledWith(null, "", `/?genre=${makeGenreUuid("rock")}`);
   });
 });
 
@@ -192,15 +194,34 @@ describe("useGenreTreeUrlState writes not yet rendered", () => {
   // before the selection, whose params lacked ?genre=; writing from those params closed the panel just opened.
   it("keeps a just-selected genre when the viewport is reported before the next render", async () => {
     const { result } = renderState();
-    const { setSelectedNodeId, onViewportChange } = result.current;
+    const { setSelectedGenreUuid, onViewportChange } = result.current;
 
-    setSelectedNodeId("pop");
+    setSelectedGenreUuid(makeGenreUuid("pop"));
     await flushNavigation();
     onViewportChange({ x: 3, y: 4, zoom: 0.2 });
     await flushNavigation();
 
     const params = new URLSearchParams(window.location.search);
-    expect(params.get("genre")).toBe("pop");
+    expect(params.get("genre")).toBe(makeGenreUuid("pop"));
     expect(params.get("view")).toBe("3.0,4.0,0.20");
+  });
+});
+
+describe("genre entity URL boundary", () => {
+  it("keeps a valid UUID for endpoint resolution without interpreting playlist identity", () => {
+    const oldPlaylistUuid = "822dfe9b-a34d-4a5c-8b85-e845e91b9543";
+    setSearch(`genre=${oldPlaylistUuid}&view=1,2,3`);
+    const { result } = renderState();
+    expect(result.current.selectedGenreUuid).toBe(oldPlaylistUuid);
+    expect(result.current.invalidGenre).toBe(false);
+  });
+
+  it("exposes malformed selections as unavailable without silently dropping the URL", async () => {
+    setSearch("genre=not-a-uuid&view=1,2,3");
+    const { result } = renderState();
+    expect(result.current.invalidGenre).toBe(true);
+    expect(result.current.selectedGenreUuid).toBeNull();
+    await flushNavigation();
+    expect(window.location.search).toContain("genre=not-a-uuid");
   });
 });

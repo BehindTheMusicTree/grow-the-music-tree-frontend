@@ -2,7 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { Breadcrumb } from "@behindthemusictree/ui";
+import { GenreUuidSchema } from "@behindthemusictree/app-kit/genre-tree";
+import { GenreDetailPanel } from "@behindthemusictree/app-kit-ui/genre-tree";
+import { getGrowBackendBaseUrl } from "@lib/site-urls";
+import { collapseEdgeTab } from "@utils/collapseEdgeTab";
+import { Breadcrumb, DetailPanel } from "@behindthemusictree/ui";
 import { regionMapLookup } from "@lib/region-map-index";
 import { useRegionMapIndex } from "@hooks/useRegionMap";
 import type { Region, RegionMapIndex } from "@schemas/api/region-map";
@@ -56,29 +60,31 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
 
   const [collapsed, setCollapsed] = useState(false);
   const selectedId = state.region;
+  const parsedGenre = GenreUuidSchema.safeParse(state.genre);
   useEffect(() => {
     setCollapsed(false);
-  }, [selectedId]);
+  }, [selectedId, state.genre]);
 
   const hasLegacyPath = state.legacyPath.length > 0;
   const invalidRegion = state.region !== null && selected === undefined;
   useEffect(() => {
     if (hasLegacyPath || invalidRegion) {
-      update({ legacyPath: null, ...(invalidRegion ? { region: null, genre: null } : {}) }, "replace");
+      update({ legacyPath: null, ...(invalidRegion ? { region: null } : {}) }, "replace");
     }
   }, [hasLegacyPath, invalidRegion, update]);
 
   // Panning is not navigation: the camera replaces the history entry instead of adding one.
   const onCameraChange = useCallback((at: Camera) => update({ at }, "replace"), [update]);
 
-  const select = (region: Region) => update({ region: region.id, genre: null });
+  const select = (region: Region) => { setCollapsed(false); update({ region: region.id, genre: null }); };
   const clearSelection = () => {
-    if (state.region !== null) update({ region: null, genre: null });
+    if (state.region !== null || state.genre !== null) update({ region: null, genre: null });
   };
   const pick = useCallback(
-    (regionId: string, genre: string | null) => {
-      update({ region: regionId, genre });
-      flyTo(regionId);
+    (regionId: string | null, genre: string | null) => {
+      setCollapsed(false);
+      update({ ...(regionId !== null ? { region: regionId } : {}), genre });
+      if (regionId !== null) flyTo(regionId);
     },
     [update, flyTo],
   );
@@ -119,7 +125,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
           onClearSelection={clearSelection}
           onCameraChange={onCameraChange}
         />
-        <RegionMapSearch index={index} regions={regions} onPick={pick} className="absolute left-3 right-3 top-3 z-20 sm:right-auto sm:w-80" />
+        <RegionMapSearch index={index} regions={regions} onPick={pick} selectedGenreUuid={state.genre} className="absolute left-3 right-3 top-3 z-20 sm:right-auto sm:w-80" />
         {selected && (
           <Breadcrumb
             className="absolute left-1/2 top-16 z-10 max-w-[calc(100%-theme(spacing.6))] -translate-x-1/2"
@@ -132,24 +138,41 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
             }}
             items={trail.map((region) => ({ id: region.id, label: region.name }))}
             onSelect={(id) => {
+              setCollapsed(false);
               update({ region: id, genre: null });
               flyTo(id);
             }}
-            onSelectCurrent={() => flyTo(selected.id)}
+            onSelectCurrent={() => { setCollapsed(false); flyTo(selected.id); }}
           />
         )}
-        {selected && (
+        {state.genre !== null ? parsedGenre.success ? (
+          <GenreDetailPanel
+            headerClassName="md:pt-[calc(var(--layout-search-h)+theme(spacing.6))]"
+            genreUuid={parsedGenre.data}
+            scope="reference"
+            getBackendBaseUrl={getGrowBackendBaseUrl}
+            onSelectGenre={(genre) => { setCollapsed(false); update({ genre }); }}
+            onClose={() => update({ genre: null })}
+            shareUrl={typeof window === "undefined" ? undefined : window.location.href}
+            shareTarget={{ kind: "genre", genreUuid: parsedGenre.data, name: "Genre", scope: "reference", artistUuid: null }}
+            collapsed={collapsed}
+            edgeTab={collapseEdgeTab(collapsed, setCollapsed)}
+          />
+        ) : (
+          <DetailPanel headerClassName="md:pt-[calc(var(--layout-search-h)+theme(spacing.6))]" title="Genre unavailable" side="left" onClose={() => update({ genre: null })}>
+            <p role="alert">This genre could not be loaded.</p>
+          </DetailPanel>
+        ) : selected ? (
           <RegionDetailPanel
             key={selected.id}
             region={selected}
             collapsed={collapsed}
             onCollapsedChange={setCollapsed}
-            genreUuid={state.genre}
-            onSelectGenre={(genre) => update({ genre })}
+            onSelectGenre={(genre) => { setCollapsed(false); update({ genre }); }}
             onZoomTo={(region) => flyTo(region.id)}
             onClose={() => update({ region: null, genre: null })}
           />
-        )}
+        ) : null}
       </div>
     </div>
   );

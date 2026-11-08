@@ -34,3 +34,5 @@ Cannot be statically generated - requires dynamic data and real-time updates.
 - Public access allows non-authenticated users to explore the genre taxonomy
 - Features interactive tree visualization, read-only (no write-action UI) unless signed in as admin
 - Also the logo / home link
+
+See [Genre selection](genre-selection.md) for the entity UUID URL contract shared with the map.

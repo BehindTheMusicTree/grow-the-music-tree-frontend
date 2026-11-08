@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
+import { GenreUuidSchema, type GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
 import { updateUrlQuery } from "@lib/urlQuery";
 import type { FocusChangeReason, GenreTreeViewport } from "@behindthemusictree/app-kit-ui/genre-tree";
 
@@ -29,12 +30,13 @@ export function formatViewport({ x, y, zoom }: GenreTreeViewport): string {
 
 interface UseGenreTreeUrlStateOptions {
   viewMode: string;
-  genreIds: ReadonlySet<string> | undefined;
 }
 
-export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStateOptions) {
+export function useGenreTreeUrlState({ viewMode }: UseGenreTreeUrlStateOptions) {
   const searchParams = useSearchParams();
-  const genre = searchParams.get(GENRE_PARAM);
+  const rawGenre = searchParams.get(GENRE_PARAM);
+  const parsedGenre = GenreUuidSchema.safeParse(rawGenre);
+  const genre = parsedGenre.success ? parsedGenre.data : null;
   const zoom = searchParams.get(ZOOM_PARAM);
   const view = searchParams.get(VIEW_PARAM);
   const artist = searchParams.get(ARTIST_PARAM);
@@ -43,12 +45,8 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
   // Mount-only seed: the library ignores later changes, and later URL writes must not feed back.
   const [defaultViewport, setDefaultViewport] = useState(() => parseViewport(view));
   const previousViewMode = useRef(viewMode);
-  // Only the genre present when the list first loads is validated: later selections (a just-created genre)
-  // can legitimately precede the refetch.
-  const genreValidated = useRef(false);
-
-  const setSelectedNodeId = useCallback(
-    (id: string | null, method: "push" | "replace" = "push") =>
+  const setSelectedGenreUuid = useCallback(
+    (id: GenreUuid | null, method: "push" | "replace" = "push") =>
       updateUrlQuery((params) => {
         if (id) {
           params.set(GENRE_PARAM, id);
@@ -120,20 +118,18 @@ export function useGenreTreeUrlState({ viewMode, genreIds }: UseGenreTreeUrlStat
 
     const stripView = modeChanged && view !== null;
     const stripZoom = zoom !== null && viewMode !== "pop-core";
-    const stripGenre = !genreValidated.current && genre !== null && genreIds !== undefined && !genreIds.has(genre);
-    if (genreIds !== undefined) genreValidated.current = true;
     const malformedView = view !== null && parseViewport(view) === undefined;
-    if (!stripView && !stripZoom && !stripGenre && !malformedView) return;
+    if (!stripView && !stripZoom && !malformedView) return;
     updateUrlQuery((params) => {
       if (stripView || malformedView) params.delete(VIEW_PARAM);
       if (stripZoom) params.delete(ZOOM_PARAM);
-      if (stripGenre) params.delete(GENRE_PARAM);
     }, "replace");
-  }, [viewMode, view, zoom, genre, genreIds]);
+  }, [viewMode, view, zoom]);
 
   return {
-    selectedNodeId: genre,
-    setSelectedNodeId,
+    selectedGenreUuid: genre,
+    invalidGenre: rawGenre !== null && !parsedGenre.success,
+    setSelectedGenreUuid,
     artistUuid: artist,
     setArtistUuid,
     songUuid: song,
