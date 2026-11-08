@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "repository": "/absolute/path/to/the/served/worktree",
+  "url": "http://localhost:3007/",
+  "browserExecutable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "buildMode": "production",
+  "buildCommand": "pnpm build",
+  "apiOrigin": "https://grow-api-staging.themusictree.org",
+  "remoteSearch": "live",
+  "backendRevision": null,
+  "machine": "Replace with machine model and relevant hardware details",
+  "power": "Replace with power source and power-saving settings",
+  "notes": "Record background load, environment deviations, and how the server/build identity was verified"
+}
