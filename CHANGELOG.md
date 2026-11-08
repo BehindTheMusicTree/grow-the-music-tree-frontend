@@ -125,6 +125,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- Add repeatable browser search profiling with recorded run metadata, trace checksums, and a documented evidence-retention procedure.
 - Add a repeatable tree and region-map network snapshot script and record the staging baseline.
 
 ### Fixed

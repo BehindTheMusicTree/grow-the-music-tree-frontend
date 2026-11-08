@@ -1,0 +1,833 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-11-08",
+  "archive": "$HOME/.local/share/themusictree/performance/search-pr-510/2026-11-08",
+  "shared": false,
+  "sharedObjectIdentifier": null,
+  "retention": "No automated expiry; retain until deliberately superseded or removed. No off-device backup established.",
+  "historical": [
+    {
+      "originalName": "before-react.json",
+      "originalBytes": 339300,
+      "originalSha256": "23b8f5343b07e92fed450dd1ea811626baf084f7f488d2c221fc0bdb4dd8cd5a",
+      "archivedPath": "historical/before-react.json.gz",
+      "archivedBytes": 18803,
+      "archivedSha256": "c6356ff6430005708bb96d066ae8b257cdba9533f806df5904121b9892903962",
+      "format": "custom React diagnostics",
+      "rootCallbackCount": 253,
+      "scenarioMarkers": null,
+      "embeddedCommit": null,
+      "embeddedBrowserVersion": null
+    },
+    {
+      "originalName": "before-trace.json.gz",
+      "originalBytes": 1211706,
+      "originalSha256": "6e6e672f334520fdf905824d097b079de7a2b34ca14720119c6a26f7cabcbf65",
+      "archivedPath": "historical/before-trace.json.gz",
+      "archivedBytes": 1211706,
+      "archivedSha256": "6e6e672f334520fdf905824d097b079de7a2b34ca14720119c6a26f7cabcbf65",
+      "format": "Chrome trace",
+      "eventCount": 74228,
+      "scenarioMarkers": 0,
+      "embeddedCommit": null,
+      "embeddedBrowserVersion": null
+    },
+    {
+      "originalName": "after-adoption-react.json",
+      "originalBytes": 415371,
+      "originalSha256": "9ba41243dcab51eadfa49fbd8822bf3fbbe4e441a3ba3a06d24c7ca6e0cf4be3",
+      "archivedPath": "historical/after-adoption-react.json.gz",
+      "archivedBytes": 20422,
+      "archivedSha256": "690eb3dd43e0afa9460c2bab5b23e34c75debdaddd53868b47d8abfce233d642",
+      "format": "custom React diagnostics",
+      "rootCallbackCount": 181,
+      "scenarioMarkers": null,
+      "embeddedCommit": null,
+      "embeddedBrowserVersion": null
+    },
+    {
+      "originalName": "after-adoption-trace.json",
+      "originalBytes": 10627362,
+      "originalSha256": "b87e95a267a51e758dae9891366ef33c38c1b765cfda50953957af1ff41fdf3d",
+      "archivedPath": "historical/after-adoption-trace.json.gz",
+      "archivedBytes": 896629,
+      "archivedSha256": "cf46facb575949f11e51e4fb660453da3385d4b62c53cc51a2926881c942229a",
+      "format": "Chrome trace",
+      "eventCount": 49487,
+      "scenarioMarkers": 0,
+      "embeddedCommit": null,
+      "embeddedBrowserVersion": null
+    }
+  ],
+  "runs": [
+    {
+      "id": "pilot-before",
+      "included": false,
+      "status": "failed",
+      "commit": "e50783a74dc0563276148b471ddefa5e58a46e6a",
+      "buildMode": "production",
+      "remoteSearch": null,
+      "buildCommand": "pnpm build",
+      "buildId": "6l2Bb6yrh45fn_W7ZsOmv",
+      "lockfileSha256": "b63b563540391d65af0a292b87fc5f979942d992b11e0bf456a6e6458a4b28dd",
+      "appKit": "34.0.0",
+      "appKitUi": "34.0.0",
+      "captureScriptSha256": null,
+      "failure": "Error: API requests did not settle within 60 seconds",
+      "artifacts": [
+        {
+          "path": "runs/pilot-before/manifest.json",
+          "bytes": 3069,
+          "sha256": "0d9aea33478d63e46a77a20b05214242ed988cb79b32e4ec2a978978b0a4f6e4"
+        },
+        {
+          "path": "runs/pilot-before/trace.json.gz",
+          "bytes": 281805,
+          "sha256": "2bc9b007e871f739018d9d74ac12cdf84c942b7d6e2e86ecd4c98b23b5214a65"
+        }
+      ]
+    },
+    {
+      "id": "pilot-controlled-after",
+      "included": false,
+      "status": "complete",
+      "commit": "05ac685a555ff1243265b26882eb02138e86c805",
+      "buildMode": "production",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm build",
+      "buildId": "3531z94FTHLGIVV0Go-_S",
+      "lockfileSha256": "d934eb7736035310bc29057a274131300417ffc880247eb694688cdff0c0f961",
+      "appKit": "34.1.0",
+      "appKitUi": "34.1.0",
+      "captureScriptSha256": "f8bdf7607df7b72c0a28e06d657319f97eb5c26e690ad32db6f080231b9a91bd",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/pilot-controlled-after/manifest.json",
+          "bytes": 3931,
+          "sha256": "e655e922edac163a3c850a0754da8264f105da5aa54a721cf402783e5d54b982"
+        },
+        {
+          "path": "runs/pilot-controlled-after/trace.json.gz",
+          "bytes": 179979,
+          "sha256": "076d9833d18a625796128949c09e577b2af02c0cb9f945a811254a7ab5b2e7cb"
+        },
+        {
+          "path": "runs/pilot-controlled-after/observations.json",
+          "bytes": 4949,
+          "sha256": "9341c68e8147230ce0674e1f850c9e88b7afbfe08b89227c2788ed65323c0402"
+        }
+      ]
+    },
+    {
+      "id": "pilot-controlled-before",
+      "included": false,
+      "status": "complete",
+      "commit": "e50783a74dc0563276148b471ddefa5e58a46e6a",
+      "buildMode": "production",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm build",
+      "buildId": "6l2Bb6yrh45fn_W7ZsOmv",
+      "lockfileSha256": "b63b563540391d65af0a292b87fc5f979942d992b11e0bf456a6e6458a4b28dd",
+      "appKit": "34.0.0",
+      "appKitUi": "34.0.0",
+      "captureScriptSha256": null,
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/pilot-controlled-before/manifest.json",
+          "bytes": 3616,
+          "sha256": "e1f6e05e363f9dd6eb37f781bab2dfb943fe395f18ff1d92493aa3c2d7d7f43a"
+        },
+        {
+          "path": "runs/pilot-controlled-before/trace.json.gz",
+          "bytes": 174551,
+          "sha256": "6842bc9f35355ec64ae462115f59de2038c7430874c10696812502a60b764798"
+        },
+        {
+          "path": "runs/pilot-controlled-before/observations.json",
+          "bytes": 5489,
+          "sha256": "aa3da29f4f7fad251cc1bc5b905fe66a8da09eff4cfbccad0d8b107a0d5c17cd"
+        }
+      ]
+    },
+    {
+      "id": "pilot-profile-before",
+      "included": false,
+      "status": "complete",
+      "commit": "e50783a74dc0563276148b471ddefa5e58a46e6a",
+      "buildMode": "react-profile",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm exec next build --profile",
+      "buildId": "eewdrviF8eILyjJRlJut2",
+      "lockfileSha256": "b63b563540391d65af0a292b87fc5f979942d992b11e0bf456a6e6458a4b28dd",
+      "appKit": "34.0.0",
+      "appKitUi": "34.0.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/pilot-profile-before/manifest.json",
+          "bytes": 4088,
+          "sha256": "4888692e9fd02010c1f30ce110a1a8ae36bfe351905eeb19a7d57a456d2f067a"
+        },
+        {
+          "path": "runs/pilot-profile-before/trace.json.gz",
+          "bytes": 240855,
+          "sha256": "d4f8369dad06c204b7000c8bf87d1da8a41a60972170913db39a5f6555f927a9"
+        },
+        {
+          "path": "runs/pilot-profile-before/observations.json",
+          "bytes": 7527,
+          "sha256": "3276debc1a7f8f280a1d80ae342cc2d676b23a58f983cc1ca4fb6d4a9d052a80"
+        }
+      ]
+    },
+    {
+      "id": "production-after-01",
+      "included": true,
+      "status": "complete",
+      "commit": "05ac685a555ff1243265b26882eb02138e86c805",
+      "buildMode": "production",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm build",
+      "buildId": "3531z94FTHLGIVV0Go-_S",
+      "lockfileSha256": "d934eb7736035310bc29057a274131300417ffc880247eb694688cdff0c0f961",
+      "appKit": "34.1.0",
+      "appKitUi": "34.1.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/production-after-01/manifest.json",
+          "bytes": 4104,
+          "sha256": "cc1685362b88e2bd558345778e473acf3211552b1d0cf119f8a245df3140a090"
+        },
+        {
+          "path": "runs/production-after-01/trace.json.gz",
+          "bytes": 159018,
+          "sha256": "284d14cf6eacdf49290f13184a2da232210d6edc3a383aa544ac399fd18080ed"
+        },
+        {
+          "path": "runs/production-after-01/observations.json",
+          "bytes": 4812,
+          "sha256": "a47d50bc503c3ed016090f53d4b7bd829313d32ce9f026f6a3ff5785fe61c265"
+        }
+      ]
+    },
+    {
+      "id": "production-after-02",
+      "included": true,
+      "status": "complete",
+      "commit": "05ac685a555ff1243265b26882eb02138e86c805",
+      "buildMode": "production",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm build",
+      "buildId": "3531z94FTHLGIVV0Go-_S",
+      "lockfileSha256": "d934eb7736035310bc29057a274131300417ffc880247eb694688cdff0c0f961",
+      "appKit": "34.1.0",
+      "appKitUi": "34.1.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/production-after-02/manifest.json",
+          "bytes": 4092,
+          "sha256": "1928e3bd10f2b5dd3438be2cfa379506efc7ac482dd418aecdb0ae286edc6c69"
+        },
+        {
+          "path": "runs/production-after-02/trace.json.gz",
+          "bytes": 177149,
+          "sha256": "9f1860f27c1d3450791fc73d6f436ed7db2c59e11b8d439108b347904907c5b6"
+        },
+        {
+          "path": "runs/production-after-02/observations.json",
+          "bytes": 4730,
+          "sha256": "9b13ddc82ed2e715526832d566f46525f64f5e27734aaef3c23d14bd8ee7bb04"
+        }
+      ]
+    },
+    {
+      "id": "production-after-03",
+      "included": true,
+      "status": "complete",
+      "commit": "05ac685a555ff1243265b26882eb02138e86c805",
+      "buildMode": "production",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm build",
+      "buildId": "3531z94FTHLGIVV0Go-_S",
+      "lockfileSha256": "d934eb7736035310bc29057a274131300417ffc880247eb694688cdff0c0f961",
+      "appKit": "34.1.0",
+      "appKitUi": "34.1.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/production-after-03/manifest.json",
+          "bytes": 4093,
+          "sha256": "6fddd829c85696ed967d31a0b03dc29665aa3f2eb4ec57f214cefc46d4a442f8"
+        },
+        {
+          "path": "runs/production-after-03/trace.json.gz",
+          "bytes": 160229,
+          "sha256": "b67a2900b292e8f96981722bcf771e6ef13f1c739bfb751392c6368ec13d7fda"
+        },
+        {
+          "path": "runs/production-after-03/observations.json",
+          "bytes": 5170,
+          "sha256": "f13c8d899489cb98f1878d2ced3aa2b72e368a843c145b13c4dd359248bbc601"
+        }
+      ]
+    },
+    {
+      "id": "production-after-04",
+      "included": true,
+      "status": "complete",
+      "commit": "05ac685a555ff1243265b26882eb02138e86c805",
+      "buildMode": "production",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm build",
+      "buildId": "3531z94FTHLGIVV0Go-_S",
+      "lockfileSha256": "d934eb7736035310bc29057a274131300417ffc880247eb694688cdff0c0f961",
+      "appKit": "34.1.0",
+      "appKitUi": "34.1.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/production-after-04/manifest.json",
+          "bytes": 4168,
+          "sha256": "7493a2adfeb758a6d4a6aac687412e8893d05bf2a98746b89ada508db1bc557e"
+        },
+        {
+          "path": "runs/production-after-04/trace.json.gz",
+          "bytes": 160561,
+          "sha256": "584f1c5e316fcf739c12baf4ba362508ff8c9f61e943dc368615ab33e7ebdc64"
+        },
+        {
+          "path": "runs/production-after-04/observations.json",
+          "bytes": 5030,
+          "sha256": "4829b0d7ecfec200308d820cfb8a93a13db831434b467e9a861bc86e7cc9a594"
+        }
+      ]
+    },
+    {
+      "id": "production-after-05",
+      "included": true,
+      "status": "complete",
+      "commit": "05ac685a555ff1243265b26882eb02138e86c805",
+      "buildMode": "production",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm build",
+      "buildId": "3531z94FTHLGIVV0Go-_S",
+      "lockfileSha256": "d934eb7736035310bc29057a274131300417ffc880247eb694688cdff0c0f961",
+      "appKit": "34.1.0",
+      "appKitUi": "34.1.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/production-after-05/manifest.json",
+          "bytes": 4183,
+          "sha256": "1e1b105b5ea14e0f26718c1cb9f2fa7476cf7d137496bff6c77ef5cef0dfb5d2"
+        },
+        {
+          "path": "runs/production-after-05/trace.json.gz",
+          "bytes": 153389,
+          "sha256": "7871f088468101b7c52f13adcce68485d046353e1a33f69a595e85c9144d9df1"
+        },
+        {
+          "path": "runs/production-after-05/observations.json",
+          "bytes": 4720,
+          "sha256": "21b4127aa185e20e5f69ed3d801fdbe1b0794c0d1b957a42b288ff3870d4c1d7"
+        }
+      ]
+    },
+    {
+      "id": "production-before-01",
+      "included": true,
+      "status": "complete",
+      "commit": "e50783a74dc0563276148b471ddefa5e58a46e6a",
+      "buildMode": "production",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm build",
+      "buildId": "zuxc6HqDF_DN07-dCF42B",
+      "lockfileSha256": "b63b563540391d65af0a292b87fc5f979942d992b11e0bf456a6e6458a4b28dd",
+      "appKit": "34.0.0",
+      "appKitUi": "34.0.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/production-before-01/manifest.json",
+          "bytes": 3868,
+          "sha256": "2f7a0b020abde1b97c0da6a067cdcccf2af2880473ea1eb62bbd4145dba5119a"
+        },
+        {
+          "path": "runs/production-before-01/trace.json.gz",
+          "bytes": 175410,
+          "sha256": "81be38469a3a871569955fcf2361ca5575836cfc219e8936b7aa173f3031e691"
+        },
+        {
+          "path": "runs/production-before-01/observations.json",
+          "bytes": 5476,
+          "sha256": "d8db4e1fca8c2e99c2ec6d92f90db34c24f2100b291b17b958376f86337feef4"
+        }
+      ]
+    },
+    {
+      "id": "production-before-02",
+      "included": true,
+      "status": "complete",
+      "commit": "e50783a74dc0563276148b471ddefa5e58a46e6a",
+      "buildMode": "production",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm build",
+      "buildId": "zuxc6HqDF_DN07-dCF42B",
+      "lockfileSha256": "b63b563540391d65af0a292b87fc5f979942d992b11e0bf456a6e6458a4b28dd",
+      "appKit": "34.0.0",
+      "appKitUi": "34.0.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/production-before-02/manifest.json",
+          "bytes": 3871,
+          "sha256": "1cda96ba39905b6152c897b4673e85d6d5faa61e15293815f1bf2986901bab7c"
+        },
+        {
+          "path": "runs/production-before-02/trace.json.gz",
+          "bytes": 171609,
+          "sha256": "bd81e76a88c175e7bcb461151a3d98910560e18667612bd14d27b4f71793065f"
+        },
+        {
+          "path": "runs/production-before-02/observations.json",
+          "bytes": 5286,
+          "sha256": "a9319f1b8e0a0b28af3506090dc1208355a00de27ee1bf855d49fa828cd53007"
+        }
+      ]
+    },
+    {
+      "id": "production-before-03",
+      "included": true,
+      "status": "complete",
+      "commit": "e50783a74dc0563276148b471ddefa5e58a46e6a",
+      "buildMode": "production",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm build",
+      "buildId": "zuxc6HqDF_DN07-dCF42B",
+      "lockfileSha256": "b63b563540391d65af0a292b87fc5f979942d992b11e0bf456a6e6458a4b28dd",
+      "appKit": "34.0.0",
+      "appKitUi": "34.0.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/production-before-03/manifest.json",
+          "bytes": 3868,
+          "sha256": "5c4e6fdbd78202343c38c5f3327686bd0c37fe49591918f593145979cedbd531"
+        },
+        {
+          "path": "runs/production-before-03/trace.json.gz",
+          "bytes": 171558,
+          "sha256": "4dc2a5cad3b96d2056671a03f0105905ce3dc8255045c81fe5246ec42b546b98"
+        },
+        {
+          "path": "runs/production-before-03/observations.json",
+          "bytes": 4893,
+          "sha256": "3c7bb36218b0909543bd3e5167cde0f94c1a1480a971c3f3f6ded60319d35dcd"
+        }
+      ]
+    },
+    {
+      "id": "production-before-04",
+      "included": true,
+      "status": "complete",
+      "commit": "e50783a74dc0563276148b471ddefa5e58a46e6a",
+      "buildMode": "production",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm build",
+      "buildId": "zuxc6HqDF_DN07-dCF42B",
+      "lockfileSha256": "b63b563540391d65af0a292b87fc5f979942d992b11e0bf456a6e6458a4b28dd",
+      "appKit": "34.0.0",
+      "appKitUi": "34.0.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/production-before-04/manifest.json",
+          "bytes": 3856,
+          "sha256": "d1450471adce836912eba225fabbcb25d77549d6615666ea89d24d73378ef243"
+        },
+        {
+          "path": "runs/production-before-04/trace.json.gz",
+          "bytes": 168014,
+          "sha256": "5ef215725dee7f55e49da2e15f86a2f46a3fa734efdcd969ed17047a95f1097f"
+        },
+        {
+          "path": "runs/production-before-04/observations.json",
+          "bytes": 5166,
+          "sha256": "d224a03a1d6c9b5b61fd34d228283c3024b90216c38cc7a658fe24a03e231942"
+        }
+      ]
+    },
+    {
+      "id": "production-before-05",
+      "included": true,
+      "status": "complete",
+      "commit": "e50783a74dc0563276148b471ddefa5e58a46e6a",
+      "buildMode": "production",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm build",
+      "buildId": "zuxc6HqDF_DN07-dCF42B",
+      "lockfileSha256": "b63b563540391d65af0a292b87fc5f979942d992b11e0bf456a6e6458a4b28dd",
+      "appKit": "34.0.0",
+      "appKitUi": "34.0.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/production-before-05/manifest.json",
+          "bytes": 3870,
+          "sha256": "aa4a249af10e8f507131b33cb3310b5f73446c759fe179b29780ca0dd7bb2b56"
+        },
+        {
+          "path": "runs/production-before-05/trace.json.gz",
+          "bytes": 164440,
+          "sha256": "55f9a11d035a20e5a7aa98e972ca02d27005cd5c1e529b38828bae1ce2c5f1d7"
+        },
+        {
+          "path": "runs/production-before-05/observations.json",
+          "bytes": 4572,
+          "sha256": "439cc64fe55ba4832d1f47c0a502e30b448dce91885a4a908b43713c44ce5539"
+        }
+      ]
+    },
+    {
+      "id": "react-profile-after-01",
+      "included": true,
+      "status": "complete",
+      "commit": "05ac685a555ff1243265b26882eb02138e86c805",
+      "buildMode": "react-profile",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm exec next build --profile",
+      "buildId": "U7iO2nw5pGeMBKiB-eDvs",
+      "lockfileSha256": "d934eb7736035310bc29057a274131300417ffc880247eb694688cdff0c0f961",
+      "appKit": "34.1.0",
+      "appKitUi": "34.1.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/react-profile-after-01/manifest.json",
+          "bytes": 4642,
+          "sha256": "1cb37ce99a08db68a102cb7a94dc796ea15a9f5f6ed86666d37d679c47d0a0e3"
+        },
+        {
+          "path": "runs/react-profile-after-01/trace.json.gz",
+          "bytes": 195105,
+          "sha256": "2c88d8094991bfbeabe593e4c0f9c92a88730d8d13ca043fed8d33bcdf899edc"
+        },
+        {
+          "path": "runs/react-profile-after-01/observations.json",
+          "bytes": 8657,
+          "sha256": "363437f46de942e0e0cd4f801a6305d6f019c078745079ebda8f8cfd48c3113b"
+        }
+      ]
+    },
+    {
+      "id": "react-profile-after-02",
+      "included": true,
+      "status": "complete",
+      "commit": "05ac685a555ff1243265b26882eb02138e86c805",
+      "buildMode": "react-profile",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm exec next build --profile",
+      "buildId": "U7iO2nw5pGeMBKiB-eDvs",
+      "lockfileSha256": "d934eb7736035310bc29057a274131300417ffc880247eb694688cdff0c0f961",
+      "appKit": "34.1.0",
+      "appKitUi": "34.1.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/react-profile-after-02/manifest.json",
+          "bytes": 4579,
+          "sha256": "4f7583a101e2f511b4a6ab6379e99460fd8eb8670005a5b3185f7eb0e8b57c1f"
+        },
+        {
+          "path": "runs/react-profile-after-02/trace.json.gz",
+          "bytes": 188644,
+          "sha256": "3fb7b070c262f6cf3d491415674d915b695552a317a7835cf94748d1a67e08b4"
+        },
+        {
+          "path": "runs/react-profile-after-02/observations.json",
+          "bytes": 8176,
+          "sha256": "3edb9f4e1995d30bd7b614c6aa481452f6115160701fd8edd764347110ea2a66"
+        }
+      ]
+    },
+    {
+      "id": "react-profile-after-03",
+      "included": true,
+      "status": "complete",
+      "commit": "05ac685a555ff1243265b26882eb02138e86c805",
+      "buildMode": "react-profile",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm exec next build --profile",
+      "buildId": "U7iO2nw5pGeMBKiB-eDvs",
+      "lockfileSha256": "d934eb7736035310bc29057a274131300417ffc880247eb694688cdff0c0f961",
+      "appKit": "34.1.0",
+      "appKitUi": "34.1.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/react-profile-after-03/manifest.json",
+          "bytes": 4587,
+          "sha256": "91d2e340193c9e6e059fb475a294b97f5ef007ce96c7a704b654a5e197846cbc"
+        },
+        {
+          "path": "runs/react-profile-after-03/trace.json.gz",
+          "bytes": 200182,
+          "sha256": "8bc3d3044cc1d2a3676a660b1a6b546ba78938c99025b1450201bab67f3093cd"
+        },
+        {
+          "path": "runs/react-profile-after-03/observations.json",
+          "bytes": 8186,
+          "sha256": "bfdc6600954a51283cee341c1421c38c5291dee516e8b9164611ff451d91e80b"
+        }
+      ]
+    },
+    {
+      "id": "react-profile-after-04",
+      "included": true,
+      "status": "complete",
+      "commit": "05ac685a555ff1243265b26882eb02138e86c805",
+      "buildMode": "react-profile",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm exec next build --profile",
+      "buildId": "U7iO2nw5pGeMBKiB-eDvs",
+      "lockfileSha256": "d934eb7736035310bc29057a274131300417ffc880247eb694688cdff0c0f961",
+      "appKit": "34.1.0",
+      "appKitUi": "34.1.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/react-profile-after-04/manifest.json",
+          "bytes": 4638,
+          "sha256": "09d5d00d8bee29cfaf536846c8ff040a372d23d0b225e74825652281b34626a7"
+        },
+        {
+          "path": "runs/react-profile-after-04/trace.json.gz",
+          "bytes": 247066,
+          "sha256": "9ab7619c7174f236f283d6e026848557cf33722d3b85dcd147aaa53b57570063"
+        },
+        {
+          "path": "runs/react-profile-after-04/observations.json",
+          "bytes": 8060,
+          "sha256": "332899348fe6899f5300788d4f809716b63ef68053d288df2574f406f8c99579"
+        }
+      ]
+    },
+    {
+      "id": "react-profile-after-05",
+      "included": true,
+      "status": "complete",
+      "commit": "05ac685a555ff1243265b26882eb02138e86c805",
+      "buildMode": "react-profile",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm exec next build --profile",
+      "buildId": "U7iO2nw5pGeMBKiB-eDvs",
+      "lockfileSha256": "d934eb7736035310bc29057a274131300417ffc880247eb694688cdff0c0f961",
+      "appKit": "34.1.0",
+      "appKitUi": "34.1.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/react-profile-after-05/manifest.json",
+          "bytes": 4644,
+          "sha256": "4bebeba1010b0eb666d15ec0b5e396e32661bbfbef2ec67df79e85a5ce38343f"
+        },
+        {
+          "path": "runs/react-profile-after-05/trace.json.gz",
+          "bytes": 216078,
+          "sha256": "d5fb3bceaff946e8407fe6d89e8a639817722e2c3034c17149269cd94c891895"
+        },
+        {
+          "path": "runs/react-profile-after-05/observations.json",
+          "bytes": 8402,
+          "sha256": "29410181148954028cd5da359d4be7f7d2ed0958bb8d3c3ba6e2ed5a3487f9c8"
+        }
+      ]
+    },
+    {
+      "id": "react-profile-before-01",
+      "included": true,
+      "status": "complete",
+      "commit": "e50783a74dc0563276148b471ddefa5e58a46e6a",
+      "buildMode": "react-profile",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm exec next build --profile",
+      "buildId": "eewdrviF8eILyjJRlJut2",
+      "lockfileSha256": "b63b563540391d65af0a292b87fc5f979942d992b11e0bf456a6e6458a4b28dd",
+      "appKit": "34.0.0",
+      "appKitUi": "34.0.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/react-profile-before-01/manifest.json",
+          "bytes": 4241,
+          "sha256": "473b04c44dbd43714bb26addc715bd7163b2d903b61591223a769d58e926c99c"
+        },
+        {
+          "path": "runs/react-profile-before-01/trace.json.gz",
+          "bytes": 212145,
+          "sha256": "166d035f2d9d97e1862aea7da1765dd55e7a0ed5203a90e605c846e268d33f35"
+        },
+        {
+          "path": "runs/react-profile-before-01/observations.json",
+          "bytes": 8111,
+          "sha256": "25ca3e9abe1dbe81ebbce53fc249aeaa0868e3db06850f98220bac244d27bd08"
+        }
+      ]
+    },
+    {
+      "id": "react-profile-before-02",
+      "included": true,
+      "status": "complete",
+      "commit": "e50783a74dc0563276148b471ddefa5e58a46e6a",
+      "buildMode": "react-profile",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm exec next build --profile",
+      "buildId": "eewdrviF8eILyjJRlJut2",
+      "lockfileSha256": "b63b563540391d65af0a292b87fc5f979942d992b11e0bf456a6e6458a4b28dd",
+      "appKit": "34.0.0",
+      "appKitUi": "34.0.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/react-profile-before-02/manifest.json",
+          "bytes": 4138,
+          "sha256": "800317f8341172565e67134d2549f2a444580a2a03957358eba35826c487bf5d"
+        },
+        {
+          "path": "runs/react-profile-before-02/trace.json.gz",
+          "bytes": 204658,
+          "sha256": "6564757297579f1136a3bf7ead7025c5c4ba458c561a706f2618d0d6b1cffc1d"
+        },
+        {
+          "path": "runs/react-profile-before-02/observations.json",
+          "bytes": 8440,
+          "sha256": "5419930d54aee369da35276d132205880151e1449a24936672c91b479b4110d7"
+        }
+      ]
+    },
+    {
+      "id": "react-profile-before-03",
+      "included": true,
+      "status": "complete",
+      "commit": "e50783a74dc0563276148b471ddefa5e58a46e6a",
+      "buildMode": "react-profile",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm exec next build --profile",
+      "buildId": "eewdrviF8eILyjJRlJut2",
+      "lockfileSha256": "b63b563540391d65af0a292b87fc5f979942d992b11e0bf456a6e6458a4b28dd",
+      "appKit": "34.0.0",
+      "appKitUi": "34.0.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/react-profile-before-03/manifest.json",
+          "bytes": 4118,
+          "sha256": "547d4afb0899bc0b482f7619a447d266fc5963e2b9acc067d8d05572edf4c158"
+        },
+        {
+          "path": "runs/react-profile-before-03/trace.json.gz",
+          "bytes": 226234,
+          "sha256": "2f0d43bf968e0cc38b3ae0a0f1fc6c796e57263494cb86c267c313771366770b"
+        },
+        {
+          "path": "runs/react-profile-before-03/observations.json",
+          "bytes": 8595,
+          "sha256": "be7cf1e42d77d0dd4e2636b137e797dd6f6d8101cd73dd07045e3f42eb745dd7"
+        }
+      ]
+    },
+    {
+      "id": "react-profile-before-04",
+      "included": true,
+      "status": "complete",
+      "commit": "e50783a74dc0563276148b471ddefa5e58a46e6a",
+      "buildMode": "react-profile",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm exec next build --profile",
+      "buildId": "eewdrviF8eILyjJRlJut2",
+      "lockfileSha256": "b63b563540391d65af0a292b87fc5f979942d992b11e0bf456a6e6458a4b28dd",
+      "appKit": "34.0.0",
+      "appKitUi": "34.0.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/react-profile-before-04/manifest.json",
+          "bytes": 4107,
+          "sha256": "e02bd0b390411e15703de13216ed71fc48e64cb6014dbae47d5a5fafd116816d"
+        },
+        {
+          "path": "runs/react-profile-before-04/trace.json.gz",
+          "bytes": 201790,
+          "sha256": "9b5c4d616b53eebc3f131b10c762fb10b88b93f1575ed96784d0613b8a26d0c9"
+        },
+        {
+          "path": "runs/react-profile-before-04/observations.json",
+          "bytes": 9122,
+          "sha256": "be4c2d811eb53e01aed83f2ae7a58c2d9f4cc9343f5083f0b34ac18112b5705e"
+        }
+      ]
+    },
+    {
+      "id": "react-profile-before-05",
+      "included": true,
+      "status": "complete",
+      "commit": "e50783a74dc0563276148b471ddefa5e58a46e6a",
+      "buildMode": "react-profile",
+      "remoteSearch": "empty-fixture",
+      "buildCommand": "pnpm exec next build --profile",
+      "buildId": "eewdrviF8eILyjJRlJut2",
+      "lockfileSha256": "b63b563540391d65af0a292b87fc5f979942d992b11e0bf456a6e6458a4b28dd",
+      "appKit": "34.0.0",
+      "appKitUi": "34.0.0",
+      "captureScriptSha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66",
+      "failure": null,
+      "artifacts": [
+        {
+          "path": "runs/react-profile-before-05/manifest.json",
+          "bytes": 4151,
+          "sha256": "1c8724e5ac679b2adba9b1f48fddfe619fe13aac4a7aba09f901788ee8c40b02"
+        },
+        {
+          "path": "runs/react-profile-before-05/trace.json.gz",
+          "bytes": 198629,
+          "sha256": "17b281e9dc4fe1b610bb20b836a9b2e922ef1cd39b8e39ac871c56c0e9d26671"
+        },
+        {
+          "path": "runs/react-profile-before-05/observations.json",
+          "bytes": 8598,
+          "sha256": "b221633327f71a9d46cde61d0b2500c4a819007077fb80efa9f73387c4cb4224"
+        }
+      ]
+    }
+  ],
+  "captureTool": {
+    "sourcePath": "scripts/perf-search.mts",
+    "archivedPath": "tooling/perf-search.mts",
+    "bytes": 17039,
+    "sha256": "9ceec2495404ea3d15611a89dc631310e728eaf62a9e7543c201f6bc54746b66"
+  }
+}
