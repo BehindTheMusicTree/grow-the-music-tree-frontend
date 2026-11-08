@@ -12,5 +12,15 @@ The 2026-11-07 baseline targets API revision
 container image label. The public requests do not establish cold server-cache
 latency. CDN compression may vary between requests even with the same validator.
 
-Browser load/parse/paint and React typing profiles have not yet been captured.
-These network observations do not establish client performance improvements.
+## Browser search profiling
+
+Follow [the search profiling procedure](search-profiling.md) to capture repeatable
+production-build timing and separate React diagnostic runs. Start with
+[the run configuration template](templates/search-run.json).
+
+The [November 7 development baseline](2026-11-07-baseline.md) records historical
+browser observations. [The PR #510 evidence report](search-pr-510.md) audits the
+existing captures and records the controlled comparison and its limitations.
+Network observations and development traces do not establish production client
+performance improvements. Keep raw captures outside Git; commit procedures,
+results and artifact checksums.
