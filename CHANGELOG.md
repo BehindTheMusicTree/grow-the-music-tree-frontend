@@ -112,6 +112,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Improved
 
+- Direct coding agents to the established performance measurement and search profiling procedures.
 - Keep search typing within the search panel and reuse indexed place and genre names for faster local results.
 - Reuse the region lookup between map and genre search for each cached region index, and prepare descendant lookups once for map focus.
 
