@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { SEARCH_QUERY_MIN_LENGTH, rankByName } from "@behindthemusictree/app-kit/genre-tree";
+import { SEARCH_QUERY_MIN_LENGTH, createNameIndex, rankNameIndex } from "@behindthemusictree/app-kit/genre-tree";
 import { searchStatus, type SearchGroup } from "@behindthemusictree/app-kit-ui/genre-tree";
 import type { Region } from "@schemas/api/region-map";
 import type { RegionGenreEntry } from "./useRegionGenreIndex";
@@ -30,9 +30,10 @@ export function usePlaceSearchGroup(
   onSelect: (region: Region) => void,
 ): SearchGroup | undefined {
   const query = text.trim();
+  const index = useMemo(() => createNameIndex(regions ? Array.from(regions.values()) : [], (region) => region.name), [regions]);
   return useMemo(() => {
     if (query.length < SEARCH_QUERY_MIN_LENGTH) return undefined;
-    const hits = regions ? rankByName(Array.from(regions.values()), query, (region) => region.name).slice(0, MAX_LOCAL_RESULTS) : [];
+    const hits = rankNameIndex(index, query, MAX_LOCAL_RESULTS);
     return {
       key: "places",
       label: "Places",
@@ -49,7 +50,7 @@ export function usePlaceSearchGroup(
         onSelect: () => onSelect(region),
       })),
     };
-  }, [query, regions, source.ready, source.isError, onSelect]);
+  }, [query, regions, index, source.ready, source.isError, onSelect]);
 }
 
 /** Overviews and regional, tradition and canonical genres linked to a region, ranked locally. */
@@ -60,14 +61,10 @@ export function useRegionGenreSearchGroup(
   onSelect: (entry: RegionGenreEntry) => void,
 ): SearchGroup | undefined {
   const query = text.trim();
+  const index = useMemo(() => createNameIndex(entries, (entry) => entry.genre.name, (entry) => entry.genre.viewsCount), [entries]);
   return useMemo(() => {
     if (query.length < SEARCH_QUERY_MIN_LENGTH) return undefined;
-    const hits = rankByName(
-      entries,
-      query,
-      (entry) => entry.genre.name,
-      (entry) => entry.genre.viewsCount,
-    ).slice(0, MAX_LOCAL_RESULTS);
+    const hits = rankNameIndex(index, query, MAX_LOCAL_RESULTS);
     return {
       key: "region-genres",
       label: "Genres",
@@ -84,5 +81,5 @@ export function useRegionGenreSearchGroup(
         onSelect: () => onSelect(entry),
       })),
     };
-  }, [query, entries, source.ready, source.isError, onSelect]);
+  }, [query, index, source.ready, source.isError, onSelect]);
 }

@@ -20,6 +20,7 @@ import {
   type FocusChangeReason,
   type ParentChange,
   type GenreTreeShareTarget,
+  type GenreSearchGroupsProps,
 } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { useUpdateGenreParent } from "@hooks/curation/useUpdateGenreParent";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
@@ -259,19 +260,12 @@ export default function GenreTreePage() {
   );
 }
 
-function GenreTreePageContent() {
-  const getBackendBaseUrl = getGrowBackendBaseUrl;
-  const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
-  const isAdmin = useIsAdmin();
-  const { showPopup, hidePopup } = usePopup();
-  const [expanded, setExpanded] = useState(false);
+function GrowSearchGroups({ query, focused, children }: GenreSearchGroupsProps) {
   const router = useRouter();
-  const [searchText, setSearchText] = useState("");
-  const [searchFocused, setSearchFocused] = useState(false);
-
+  const getBackendBaseUrl = getGrowBackendBaseUrl;
   // The region index and genre lexicon are only fetched once the search box is first focused.
-  const regionIndex = useRegionMapIndex(searchFocused);
-  const lexicon = useRegionGenreLexicon(getBackendBaseUrl, searchFocused);
+  const regionIndex = useRegionMapIndex(focused);
+  const lexicon = useRegionGenreLexicon(getBackendBaseUrl, focused);
   const regions = useMemo(
     () => (regionIndex.data ? regionMapLookup(regionIndex.data) : null),
     [regionIndex.data],
@@ -280,14 +274,14 @@ function GenreTreePageContent() {
   const places = usePlaceSearchGroup(
     regions,
     { ready: !regionIndex.isPending, isError: regionIndex.isError },
-    searchText,
+    query,
     useCallback((region: Region) => router.push(mapRegionHref(region.id)), [router]),
   );
   const regionGenreGroup = useRegionGenreSearchGroup(
     // Canonical genres are already the tree's own results.
     useMemo(() => regionGenres.filter((entry) => entry.genre.treeName !== "canonical"), [regionGenres]),
     { ready: !regionIndex.isPending && !lexicon.isPending, isError: regionIndex.isError || lexicon.isError },
-    searchText,
+    query,
     useCallback((entry) => router.push(mapRegionHref(entry.region.id, entry.genre.uuid)), [router]),
   );
   const extraSearchGroups = useMemo(
@@ -295,6 +289,15 @@ function GenreTreePageContent() {
     [places, regionGenreGroup],
   );
 
+  return children(extraSearchGroups);
+}
+
+function GenreTreePageContent() {
+  const getBackendBaseUrl = getGrowBackendBaseUrl;
+  const { viewMode, setCanShowPopCore } = useGenreTreeViewMode();
+  const isAdmin = useIsAdmin();
+  const { showPopup, hidePopup } = usePopup();
+  const [expanded, setExpanded] = useState(false);
   // The visible tree depends on the URL's artist, and the URL state validates its genre against that tree.
   const artistFilter = useSearchParams().get(ARTIST_PARAM);
 
@@ -461,9 +464,7 @@ function GenreTreePageContent() {
       renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
       renderArtistLink={renderArtistLink}
       renderSongLink={renderSongLink}
-      extraSearchGroups={extraSearchGroups}
-      onSearchQueryChange={setSearchText}
-      onSearchFocus={() => setSearchFocused(true)}
+      SearchGroups={GrowSearchGroups}
       {...curation}
     />
   );
