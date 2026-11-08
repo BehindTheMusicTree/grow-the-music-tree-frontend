@@ -39,7 +39,7 @@ it("verifies the evidence before comparing five matching samples", async () => {
     },
     traceMetrics: { scriptingMs: 12, layoutMs: 4, paintMs: 2 },
   };
-  const runs = [];
+  const runs: string[] = [];
   for (let i = 0; i < 5; i++) {
     const run = path.join(directory, String(i));
     await mkdir(run);
