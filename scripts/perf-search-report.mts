@@ -74,6 +74,9 @@ export async function report(directories: string[]) {
       },
     };
   }));
+  if (new Set(runs.map((run) => run.manifestSha256)).size !== runs.length) {
+    throw new Error("Repeated capture manifest; samples must be independent");
+  }
   if (new Set(runs.map((run) => run.identity)).size !== 1) throw new Error("Runs have different settings, capture scripts, or datasets");
   const groups = Map.groupBy(runs, (run) => `${run.commit}:${run.buildMode}`);
   for (const [group, samples] of Array.from(groups)) {

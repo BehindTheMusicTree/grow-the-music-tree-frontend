@@ -178,7 +178,8 @@ node scripts/perf-search-report.mts .performance-artifacts/production-before-0[1
 ```
 
 The report command verifies artifact sizes and hashes, rejects incomplete or
-duplicate runs, requires at least five samples per revision/build-mode group,
+duplicate runs (including identical manifests reached through copies or aliases),
+requires at least five samples per revision/build-mode group,
 and rejects inconsistent settings, capture-script hashes or dataset hashes.
 It reports each run and group medians/ranges; it does not infer significance.
 Supply failed runs separately in the written report, including their failure
