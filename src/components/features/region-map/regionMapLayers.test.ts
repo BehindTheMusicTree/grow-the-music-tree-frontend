@@ -59,6 +59,13 @@ describe("depthColors", () => {
     expect(depthColors(regions).get("Q183")).toBe(EMPTY_FILL);
   });
 
+  it("tints a region without songs when an admin ancestor has some", () => {
+    const empty = new Map(regions).set("Q12130", { ...brittany, songCount: 0 });
+
+    expect(depthColors(empty).get("Q12130")).toMatch(/^rgb\(/);
+    expect(depthColors(empty).get("Q12130")).not.toBe(EMPTY_FILL);
+  });
+
   it("leaves zones out", () => {
     expect(depthColors(regions).has("Q236626")).toBe(false);
   });
