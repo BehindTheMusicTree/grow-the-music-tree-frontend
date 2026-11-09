@@ -123,6 +123,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- The genre tree's tab title keeps the app name while the genre panel is open, like the map, instead of naming the artist or song filter beside it.
+
 - The region map no longer shows the « Regions without a boundary » bar above it. Those regions stay reachable through the search and `?region=`, and the panel says when a region has no boundary.
 
 - The left bar is gone: the detail panel sits against the left edge, and the Tree, Map and About buttons sit at the bottom left, moving to the right of the panel while it is open. Genealogy is reached from the About page.

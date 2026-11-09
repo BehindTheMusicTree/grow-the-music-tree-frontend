@@ -46,4 +46,5 @@ Changing the view mode drops `view`, and `zoom` outside pop-core, with replace.
 ## Tab title
 
 `useEntityDocumentTitle` titles the tab after the open song (`Title — Artists`) or artist, re-applies it if Next's
-layout `<title>` overwrites it after a navigation, and restores the app name when the entity closes.
+layout `<title>` overwrites it after a navigation, and restores the app name when the entity closes. The genre tree
+and the map apply it only when no genre is selected, since the genre panel is the one displayed.

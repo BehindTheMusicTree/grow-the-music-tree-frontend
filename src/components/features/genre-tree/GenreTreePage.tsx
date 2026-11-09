@@ -192,7 +192,8 @@ function ZoomableGenreTreeView({
     else if (about && (selectedGenreUuid || invalidGenre)) setSelectedGenreUuid(null, "replace");
   }, [about, artistUuid, songUuid, invalidGenre, selectedGenreUuid, setArtistUuid, setSongUuid, setSelectedGenreUuid]);
 
-  useEntityDocumentTitle(artistUuid, songUuid);
+  // The genre panel is displayed over an artist or song, so the tab names what is displayed (as on the map).
+  useEntityDocumentTitle(selectedGenreUuid ? null : artistUuid, selectedGenreUuid ? null : songUuid);
 
   const handleSelectedGenreUuidChange = useCallback(
     (id: GenreUuid | null) => {
