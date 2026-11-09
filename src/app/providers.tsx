@@ -2,7 +2,7 @@
 
 import { ReactNode, useCallback } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient, useFetchWrapper, ConnectivityErrorProvider, Scope, PlaybackContextProvider, usePlaybackContext } from "@behindthemusictree/app-kit/transport";
+import { queryClient, useFetchWrapper, usePlaybackFetch, ConnectivityErrorProvider, Scope, PlaybackContextProvider, usePlaybackContext } from "@behindthemusictree/app-kit/transport";
 import { SessionProvider } from "@behindthemusictree/app-kit/auth";
 import { SessionProvider as AuthSessionProvider } from "next-auth/react";
 import { TrackNounProvider } from "@behindthemusictree/app-kit/track-noun";
@@ -26,19 +26,19 @@ interface ProvidersProps {
 const PLAYER_SCOPE = "reference" satisfies Scope;
 
 function useLoadTrack(getBackendBaseUrl: () => string): (trackId: string) => Promise<PlayerTrack> {
-  const { fetch } = useFetchWrapper(getBackendBaseUrl);
+  const { fetchLatest } = usePlaybackFetch(getBackendBaseUrl);
   const { refresh } = usePlaybackContext();
 
   return useCallback(
     async (trackId: string): Promise<PlayerTrack> => {
       await refresh();
-      const response = await fetch(libraryEndpoints[PLAYER_SCOPE].songs.detail(trackId), true, false);
+      const response = await fetchLatest(libraryEndpoints[PLAYER_SCOPE].songs.detail(trackId), true, false);
       if (!response) {
         throw new Error(`Failed to load track ${trackId}`);
       }
       return toPlayerTrack(SongDetailedSchema.parse(response));
     },
-    [fetch, refresh],
+    [fetchLatest, refresh],
   );
 }
 
