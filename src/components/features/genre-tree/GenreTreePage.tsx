@@ -14,8 +14,6 @@ import {
   GenrePlaylistUuidSchema,
   GenreUuidSchema,
   type GenreUuid,
-  useArtist,
-  useSong,
 } from "@behindthemusictree/app-kit/genre-tree";
 import {
   GenreTreeViewSkeleton,
@@ -35,6 +33,7 @@ import EssentialSongsEditor from "@components/features/genre-curation/EssentialS
 import SongCheckbox from "@components/features/genre-curation/SongCheckbox";
 import SongRowActions from "@components/features/genre-curation/SongRowActions";
 import SelectionBar from "@components/features/genre-curation/SelectionBar";
+import { useEntityDocumentTitle } from "@hooks/useEntityDocumentTitle";
 import { useCenterColumn } from "@hooks/useCenterColumn";
 import { updateUrlQuery, type UrlQueryMethod } from "@lib/urlQuery";
 import { ABOUT_PARAM, ARTIST_PARAM, GENRE_PARAM, SONG_PARAM, useGenreTreeUrlState } from "@hooks/useGenreTreeUrlState";
@@ -193,29 +192,7 @@ function ZoomableGenreTreeView({
     else if (about && (selectedGenreUuid || invalidGenre)) setSelectedGenreUuid(null, "replace");
   }, [about, artistUuid, songUuid, invalidGenre, selectedGenreUuid, setArtistUuid, setSongUuid, setSelectedGenreUuid]);
 
-  const artist = useArtist(artistUuid, getGrowBackendBaseUrl);
-  const artistName = artist.status === "success" ? artist.artist.name : undefined;
-  useEffect(() => {
-    if (!artistName) return undefined;
-    const previous = document.title;
-    document.title = artistName;
-    return () => {
-      document.title = previous;
-    };
-  }, [artistName]);
-
-  const song = useSong(songUuid, getGrowBackendBaseUrl);
-  const songTitle = song.status === "success" ? song.song.title : undefined;
-  const songArtists =
-    song.status === "success" ? song.song.artists?.map((songArtist) => songArtist.name).join(", ") : undefined;
-  useEffect(() => {
-    if (!songTitle) return undefined;
-    const previous = document.title;
-    document.title = songArtists ? `${songTitle} — ${songArtists}` : songTitle;
-    return () => {
-      document.title = previous;
-    };
-  }, [songTitle, songArtists]);
+  useEntityDocumentTitle(artistUuid, songUuid);
 
   const handleSelectedGenreUuidChange = useCallback(
     (id: GenreUuid | null) => {

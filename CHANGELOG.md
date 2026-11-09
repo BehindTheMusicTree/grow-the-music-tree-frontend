@@ -123,6 +123,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - Switching between the tree and the region map keeps the open genre; the map frames its region on opening, or says the genre has no region.
 
+- The region map opens artist and song panels (`/map?artist=` and `/map?song=`) from search, genre tracks and family links, and the Tree and Map buttons carry the open artist or song across views. A genre outranks a song, a song an artist, and an artist a region.
+
 - The five lists replaced by genre edges no longer appear among the curation lists; the curation review links an edge rule to its genre page.
 
 - Tree and map genre links now use genre entity UUIDs. Playlist UUID links are no longer interpreted as genre selections.

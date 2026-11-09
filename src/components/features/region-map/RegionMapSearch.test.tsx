@@ -7,7 +7,6 @@ import RegionMapSearch from "./RegionMapSearch";
 
 const index = RegionMapIndexSchema.parse(fixture);
 const regions = new Map(index.regions.map((region) => [region.id, region]));
-const push = vi.fn();
 const lexiconEnabled = vi.fn();
 const selectedGenre = { uuid: "8f14e45f-ceea-467f-a1d3-2e6f7c1b9a10", name: "Breton punk" };
 const brittany = index.regions.find((region) => region.id === "Q12130") as Region;
@@ -20,10 +19,12 @@ const remoteGenre = {
   genrePlaylistUuid: null, wikidataId: "Q47005557", isUmbrella: false,
 } as GenreSearchResult;
 
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
-
 vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@behindthemusictree/app-kit/genre-tree")>()),
+  useArtist: (uuid: string | null) =>
+    uuid === "artist-1" ? { status: "success", artist: { name: "Kassav" } } : { status: "idle" },
+  useSong: (uuid: string | null) =>
+    uuid === "song-1" ? { status: "success", song: { title: "Zouk la se sel medikaman" } } : { status: "idle" },
   useFetchGenreDetail: (uuid: string | null) => ({ data: uuid === selectedGenre.uuid ? selectedGenre : undefined }),
   useGenreByWikidataId: (wikidataId: string | null) =>
     wikidataId === null ? { data: undefined, isError: false } : overviewLookup,
@@ -56,8 +57,14 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", async (importOriginal) => (
       ? [{ key: remoteGenre.uuid, content: remoteGenre.name, onSelect: () => onSelect(remoteGenre) }]
       : [],
   }),
-  useArtistSearchGroup: () => undefined,
-  useSongSearchGroup: () => undefined,
+  useArtistSearchGroup: (_base: unknown, query: string, onSelect: (artist: { uuid: string }) => void) =>
+    query === "kassav"
+      ? { key: "artists", label: "Artists", items: [{ key: "a", content: "Kassav", onSelect: () => onSelect({ uuid: "artist-1" }) }] }
+      : undefined,
+  useSongSearchGroup: (_base: unknown, query: string, onSelect: (song: { uuid: string }) => void) =>
+    query === "zouk"
+      ? { key: "songs", label: "Songs", items: [{ key: "s", content: "Zouk la", onSelect: () => onSelect({ uuid: "song-1" }) }] }
+      : undefined,
 }));
 
 afterEach(() => {
@@ -68,14 +75,27 @@ afterEach(() => {
 
 const setup = () => {
   const onPick = vi.fn();
-  render(<RegionMapSearch index={index} regions={regions} onPick={onPick} selectedRegion={undefined} selectedGenreUuid={null} onClosePanel={vi.fn()} />);
-  return onPick;
+  const onPickArtist = vi.fn();
+  const onPickSong = vi.fn();
+  render(
+    <RegionMapSearch
+      index={index} regions={regions} onPick={onPick} onPickArtist={onPickArtist} onPickSong={onPickSong}
+      selectedRegion={undefined} selectedGenreUuid={null} selectedArtistUuid={null} selectedSongUuid={null}
+      onClosePanel={vi.fn()}
+    />,
+  );
+  return Object.assign(onPick, { onPickArtist, onPickSong });
 };
 
-const setupSelected = (selection: { region?: Region; genre?: string }) => {
+const setupSelected = (selection: { region?: Region; genre?: string; artist?: string; song?: string }) => {
   const onClosePanel = vi.fn();
   const element = (region = selection.region, genre = selection.genre ?? null) => (
-    <RegionMapSearch index={index} regions={regions} onPick={vi.fn()} selectedRegion={region} selectedGenreUuid={genre} onClosePanel={onClosePanel} />
+    <RegionMapSearch
+      index={index} regions={regions} onPick={vi.fn()} onPickArtist={vi.fn()} onPickSong={vi.fn()}
+      selectedRegion={region} selectedGenreUuid={genre}
+      selectedArtistUuid={selection.artist ?? null} selectedSongUuid={selection.song ?? null}
+      onClosePanel={onClosePanel}
+    />
   );
   const { rerender } = render(element());
   return { onClosePanel, closeSelection: () => rerender(element(undefined, null)) };
@@ -123,6 +143,27 @@ describe("RegionMapSearch", () => {
     fireEvent.change(input, { target: { value: "breton" } });
     fireEvent.mouseDown(screen.getByRole("option", { name: /Breton music/ }));
     expect(onPick).toHaveBeenCalledWith("Q12130", "uuid-q2");
+  });
+
+  it.each([
+    ["artist", "kassav", "Kassav", "onPickArtist", "artist-1"],
+    ["song", "zouk", "Zouk la", "onPickSong", "song-1"],
+  ] as const)("opens a picked %s through the map", (_kind, text, option, callback, uuid) => {
+    const onPick = setup();
+    fireEvent.focus(searchInput());
+    fireEvent.change(searchInput(), { target: { value: text } });
+    fireEvent.mouseDown(screen.getByRole("option", { name: option }));
+    expect(onPick[callback]).toHaveBeenCalledWith(uuid);
+    expect(onPick).not.toHaveBeenCalled();
+  });
+
+  it("shows the open artist or song by its name and offers to close it", () => {
+    setupSelected({ artist: "artist-1" });
+    expect(searchInput()).toHaveProperty("value", "Kassav");
+    expect(closeButton()).not.toBeNull();
+    cleanup();
+    setupSelected({ artist: "artist-1", song: "song-1" });
+    expect(searchInput()).toHaveProperty("value", "Zouk la se sel medikaman");
   });
 
   it("offers no close button with nothing selected, even with typed text", () => {
