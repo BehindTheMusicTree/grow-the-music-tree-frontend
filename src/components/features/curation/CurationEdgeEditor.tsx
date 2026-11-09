@@ -165,7 +165,13 @@ export default function CurationEdgeEditor({ edge, itemId, labels, onClose }: Pr
             <input
               type="checkbox"
               checked={root}
-              onChange={(event) => set("parent_item_id", event.target.checked ? null : "")}
+              onChange={(event) =>
+                setInput((current) => ({
+                  ...current,
+                  parent_item_id: event.target.checked ? null : "",
+                  exclude_other_parents: event.target.checked ? true : current.exclude_other_parents,
+                }))
+              }
             />
             Racine acceptée (sans parent)
           </label>
