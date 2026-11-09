@@ -111,6 +111,11 @@ vi.mock("next/dynamic", () => ({
     },
 }));
 
+const titledEntities = vi.fn();
+vi.mock("@hooks/useEntityDocumentTitle", () => ({
+  useEntityDocumentTitle: (artist: string | null, song: string | null) => titledEntities(artist, song),
+}));
+
 const url = (call: unknown[]) => new URL(String(call[2]), "http://localhost");
 
 beforeEach(() => {
@@ -391,6 +396,16 @@ describe("RegionMapView", () => {
       const params = url(pushState.mock.calls.at(-1)!).searchParams;
       expect(params.get("artist")).toBeNull();
       expect(params.get("at")).toBe("2,46,5");
+    });
+
+    it("titles the tab after the displayed panel, not a hidden artist", () => {
+      setSearch(`genre=${makeGenreUuid("regional")}&artist=artist-1`);
+      render(<RegionMapView />);
+      expect(titledEntities).toHaveBeenLastCalledWith(null, null);
+      cleanup();
+      setSearch("artist=artist-1");
+      render(<RegionMapView />);
+      expect(titledEntities).toHaveBeenLastCalledWith("artist-1", null);
     });
 
     it("lets a genre outrank a song and a song outrank a region", () => {

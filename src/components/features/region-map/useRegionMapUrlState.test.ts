@@ -5,6 +5,7 @@ import { parseCamera, serializeCamera, useRegionMapUrlState } from "./useRegionM
 let search = new URLSearchParams();
 
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/map",
   useSearchParams: () => search,
 }));
 
@@ -60,6 +61,16 @@ describe("useRegionMapUrlState", () => {
     await flushNavigation();
 
     expect(window.location.search).toBe("?at=2%2C46%2C5");
+  });
+
+  it("does not write the camera once the location has left the map", async () => {
+    const { update } = renderHook(() => useRegionMapUrlState()).result.current;
+
+    update({ at: { lng: 1, lat: 2, zoom: 3 } }, "replace");
+    window.history.pushState(null, "", "/?artist=a1");
+    await flushNavigation();
+
+    expect(window.location.search).toBe("?artist=a1");
   });
 
   it("writes the camera rounded and removes the legacy path", async () => {

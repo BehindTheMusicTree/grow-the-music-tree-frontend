@@ -149,8 +149,8 @@ function ZoomableGenreTreeView({
   const { isExpanded: tracklistExpanded, setExpanded: setTracklistExpanded } = usePlayerPanel();
 
   const closeAbout = useCallback(
-    (method: UrlQueryMethod = "push") => updateUrlQuery((params) => params.delete(ABOUT_PARAM), method),
-    [],
+    (method: UrlQueryMethod = "push") => updateUrlQuery((params) => params.delete(ABOUT_PARAM), method, pathname),
+    [pathname],
   );
 
   // Kept apart from the genre panel's state, which the tree owns for non-admins.

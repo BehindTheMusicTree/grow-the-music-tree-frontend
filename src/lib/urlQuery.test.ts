@@ -15,9 +15,9 @@ describe("updateUrlQuery", () => {
   });
 
   it("builds each write on the current URL, so a later write never undoes an earlier one", async () => {
-    updateUrlQuery((params) => params.set("genre", "pop"), "push");
+    updateUrlQuery((params) => params.set("genre", "pop"), "push", "/map");
     await flush();
-    updateUrlQuery((params) => params.set("view", "1,2,3"), "replace");
+    updateUrlQuery((params) => params.set("view", "1,2,3"), "replace", "/map");
     await flush();
 
     expect(window.location.pathname).toBe("/map");
@@ -27,8 +27,8 @@ describe("updateUrlQuery", () => {
   });
 
   it("applies writes of the same tick as one entry, pushed if any write pushes", async () => {
-    updateUrlQuery((params) => params.delete("keep"), "replace");
-    updateUrlQuery((params) => params.set("artist", "band"), "push");
+    updateUrlQuery((params) => params.delete("keep"), "replace", "/map");
+    updateUrlQuery((params) => params.set("artist", "band"), "push", "/map");
     await flush();
 
     expect(window.history.pushState).toHaveBeenCalledTimes(1);
@@ -40,10 +40,32 @@ describe("updateUrlQuery", () => {
     window.history.replaceState(null, "", "/map?view=1,2,3");
     vi.mocked(window.history.replaceState).mockClear();
 
-    updateUrlQuery((params) => params.set("view", "1,2,3"), "push");
+    updateUrlQuery((params) => params.set("view", "1,2,3"), "push", "/map");
     await flush();
 
     expect(window.history.pushState).not.toHaveBeenCalled();
     expect(window.history.replaceState).not.toHaveBeenCalled();
+  });
+
+  it("drops a write whose page has been left before the batch runs", async () => {
+    updateUrlQuery((params) => params.set("at", "1,2,3"), "replace", "/map");
+    window.history.pushState(null, "", "/?artist=band");
+    vi.mocked(window.history.pushState).mockClear();
+    await flush();
+
+    expect(window.location.search).toBe("?artist=band");
+    expect(window.history.replaceState).not.toHaveBeenCalled();
+    expect(window.history.pushState).not.toHaveBeenCalled();
+  });
+
+  it("applies only the writes of the current page in a mixed batch, with their method", async () => {
+    updateUrlQuery((params) => params.set("at", "1,2,3"), "push", "/map");
+    updateUrlQuery((params) => params.set("view", "4,5,6"), "replace", "/");
+    window.history.replaceState(null, "", "/?keep=1");
+    vi.mocked(window.history.replaceState).mockClear();
+    await flush();
+
+    expect(window.history.replaceState).toHaveBeenCalledWith(null, "", "/?keep=1&view=4%2C5%2C6");
+    expect(window.history.pushState).not.toHaveBeenCalled();
   });
 });

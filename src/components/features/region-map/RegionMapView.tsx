@@ -103,7 +103,8 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   useEffect(() => {
     setCollapsed(false);
   }, [selectedId, state.genre, state.artist, state.song]);
-  useEntityDocumentTitle(state.artist, state.song);
+  // The panel shows the genre over an artist or song, so the tab names what is displayed.
+  useEntityDocumentTitle(state.genre === null ? state.artist : null, state.genre === null ? state.song : null);
   const getShareUrl = useCallback(
     (target: GenreTreeShareTarget) => {
       const params = new URLSearchParams();

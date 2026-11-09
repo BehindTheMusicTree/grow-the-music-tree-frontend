@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { updateUrlQuery, type UrlQueryMethod } from "@lib/urlQuery";
 import { ARTIST_PARAM, SONG_PARAM } from "@hooks/useGenreTreeUrlState";
 
@@ -44,6 +44,7 @@ export function serializeCamera({ lng, lat, zoom }: Camera): string {
 /** Camera, selected region and panel entity (genre, artist or song) of the map, kept in the query string so they can be shared. */
 export function useRegionMapUrlState() {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const rawPath = searchParams.get(LEGACY_PATH_PARAM);
   const state: RegionMapUrlState = {
@@ -78,8 +79,8 @@ export function useRegionMapUrlState() {
         params.delete(ARTIST_PARAM);
       }
       if (changes.legacyPath === null) params.delete(LEGACY_PATH_PARAM);
-    }, method);
-  }, []);
+    }, method, pathname);
+  }, [pathname]);
 
   return { state, update };
 }
