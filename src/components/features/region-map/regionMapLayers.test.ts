@@ -194,7 +194,6 @@ describe("buildStyle", () => {
       colors: new Map([["Q12130", "#123456"]]),
       backdrop: new Map([["Q142", "#abcdef"]]),
       zoneFill: null,
-      glowId: null,
       ...overrides,
     });
   const layer = (id: string, built = style()) =>
@@ -254,7 +253,6 @@ describe("buildStyle", () => {
       "zone-line",
       "zone-supra-hover",
       "zone-supra-selected",
-      "region-glow",
       "region-selected-line",
       "places",
       "place-labels",
@@ -293,11 +291,6 @@ describe("buildStyle", () => {
     expect(layer("region-line").filter).toEqual(byMinZoom);
     expect(layer("region-hit").filter).toEqual(byMinZoom);
     expect(layer("cities").filter).toEqual(byMinZoom);
-  });
-
-  it("haloes the admin region in focus", () => {
-    expect(layer("region-glow").filter).toEqual(idFilter(null));
-    expect(layer("region-glow", style({ glowId: "Q142" })).filter).toEqual(idFilter("Q142"));
   });
 
   it("outlines the selection at any zoom", () => {

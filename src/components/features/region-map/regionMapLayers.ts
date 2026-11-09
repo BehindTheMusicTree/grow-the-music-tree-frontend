@@ -12,7 +12,6 @@ export const REGION_BACKDROP_LAYER = "region-backdrop";
 export const REGION_FILL_LAYER = "region-fill";
 export const REGION_LINE_LAYER = "region-line";
 export const REGION_SELECTED_LAYER = "region-selected-line";
-export const REGION_GLOW_LAYER = "region-glow";
 export const REGION_LABEL_LAYER = "region-labels";
 export const ZONE_FILL_LAYER = "zone-fill";
 export const ZONE_GLOW_LAYER = "zone-glow";
@@ -284,8 +283,6 @@ type StyleOptions = {
   colors: ReadonlyMap<string, string>;
   backdrop: ReadonlyMap<string, string>;
   zoneFill: string | null;
-  /** The admin region in focus, haloed like a zone; `null` for none, a zone or a city. */
-  glowId: string | null;
 };
 
 export function buildStyle({
@@ -297,7 +294,6 @@ export function buildStyle({
   colors,
   backdrop,
   zoneFill,
-  glowId,
 }: StyleOptions): StyleSpecification {
   const zone = zoneFilters(zoneId, supranationalIds);
   return {
@@ -393,6 +389,7 @@ export function buildStyle({
         source: TILES_SOURCE,
         "source-layer": "zones",
         filter: zone.fill,
+        layout: ROUND_LINE,
         paint: GLOW_PAINT,
       },
       {
@@ -422,14 +419,6 @@ export function buildStyle({
         filter: zone.supraSelected,
         layout: ROUND_LINE,
         paint: { "line-color": SUPRA_ZONE_COLOR, "line-width": 4 },
-      },
-      {
-        id: REGION_GLOW_LAYER,
-        type: "line",
-        source: TILES_SOURCE,
-        "source-layer": REGIONS_SOURCE_LAYER,
-        filter: idFilter(glowId),
-        paint: GLOW_PAINT,
       },
       {
         // No zoom filter: the selection stays outlined once the map zooms past its band.
