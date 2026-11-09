@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import CurationReviewList from "./CurationReviewList";
 
-const base = { key: "Q1", column: "item_id", reportedOn: "2026-10-19T00:00:00Z" };
+const base = { ruleId: null, key: "Q1", column: "item_id", reportedOn: "2026-10-19T00:00:00Z" };
 
 describe("CurationReviewList", () => {
   afterEach(cleanup);
@@ -27,6 +27,27 @@ describe("CurationReviewList", () => {
     expect(screen.getByText("Fusion en conflit")).toBeInTheDocument();
     expect(screen.getByText("Supprimé sur Wikidata")).toBeInTheDocument();
     expect(screen.getByText("Hors de l'arbre")).toBeInTheDocument();
+  });
+
+  it("links an edge rule to its owner's genre page instead of a list", () => {
+    render(
+      <CurationReviewList
+        items={[
+          {
+            ...base,
+            ruleId: "11111111-1111-4111-8111-111111111111",
+            key: "Q5\tQ6",
+            list: "canonical_parent",
+            column: "parent_item_id",
+            itemId: "Q6",
+            reason: "missing",
+            target: null,
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "canonical_parent" })).toHaveAttribute("href", "/admin/curation/genre/Q5");
   });
 
   it("falls back to a generic sentence per reason without evidence", () => {

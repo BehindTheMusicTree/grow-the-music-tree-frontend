@@ -92,10 +92,17 @@ export default function CurationReviewList({ items }: { items: CurationReviewIte
         </tr>
       </thead>
       <tbody>
-        {items.map(({ list, key, column, itemId, reason, target, evidence }) => (
+        {items.map(({ ruleId, list, key, column, itemId, reason, target, evidence }) => (
           <tr key={`${list}|${key}|${column}`}>
             <td className="pr-4">
-              <Link href={`/admin/curation/${encodeURIComponent(list)}`} className="underline">
+              <Link
+                href={
+                  ruleId
+                    ? `/admin/curation/genre/${encodeURIComponent(key.split("\t")[0])}`
+                    : `/admin/curation/${encodeURIComponent(list)}`
+                }
+                className="underline"
+              >
                 {list}
               </Link>
             </td>

@@ -2,7 +2,6 @@ export const CURATION_GROUPS: { title: string; lists: Record<string, string> }[]
   {
     title: "Racines",
     lists: {
-      accepted_canonical_roots: "Racines canoniques acceptées",
       umbrella_non_stylistic_genres: "Appellations non stylistiques",
       umbrella_stylistic_genres: "Genres parapluie (à affiner)",
       canonical_genre_pop_side: "Côté pop des racines",
@@ -11,11 +10,8 @@ export const CURATION_GROUPS: { title: string; lists: Record<string, string> }[]
   {
     title: "Parenté",
     lists: {
-      canonical_parent: "Parent canonique imposé",
-      regional_genre_parent: "Parent régional imposé",
       canonical_parent_additions: "Parents canoniques ajoutés",
       overview_reclassifications: "Genres reclassés en vue régionale",
-      regional_secondary_parents: "Parents régionaux secondaires",
     },
   },
   {
@@ -38,7 +34,6 @@ export const CURATION_GROUPS: { title: string; lists: Record<string, string> }[]
   {
     title: "Régional",
     lists: {
-      regional_overviews: "Vues régionales imposées",
       forced_canonical_genres: "Genres maintenus canoniques",
       regional_overview_additions: "Vues régionales ajoutées",
     },

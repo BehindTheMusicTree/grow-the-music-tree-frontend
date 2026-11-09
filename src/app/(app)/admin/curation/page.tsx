@@ -26,6 +26,14 @@ export default async function CurationPage() {
         <CurationStatus status={status} />
         <PipelineRunPanel pendingCount={status.pendingCount} initialRequest={latestRun} />
         <CurationGenreSearch />
+        <section aria-labelledby="curation-group-edges">
+          <h2 id="curation-group-edges" className="mb-2 text-lg font-semibold">
+            Arêtes de genres
+          </h2>
+          <Link href="/admin/curation/edges" className="font-medium underline">
+            Parents canoniques, parents régionaux, vues régionales, parents secondaires
+          </Link>
+        </section>
         {groups.map((group) => (
           <section key={group.title} aria-labelledby={`curation-group-${group.title}`}>
             <h2 id={`curation-group-${group.title}`} className="mb-2 text-lg font-semibold">
