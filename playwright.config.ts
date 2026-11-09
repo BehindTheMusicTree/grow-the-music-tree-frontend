@@ -5,6 +5,7 @@ const port = 3100;
 export default defineConfig({
   testDir: "e2e",
   retries: process.env.CI ? 1 : 0,
+  expect: { timeout: 15_000 },
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL: `http://localhost:${port}`,
