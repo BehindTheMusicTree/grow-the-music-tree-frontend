@@ -52,7 +52,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   });
   const [focus, setFocus] = useState<FocusRequest | null>(initial.focus);
   // Region and genre of the last framing, so the effects below only fly for selections that did not already
-  // call `flyTo` themselves (map click, back/forward, edited URL, family links).
+  // call `flyTo` themselves (search and breadcrumb picks); map clicks, back/forward and edited URLs fly here.
   const lastFlown = useRef<string | null>(state.region);
   const lastGenreFlown = useRef<string | null>(state.genre);
   const flyTo = useCallback((id: string | null) => {
@@ -69,18 +69,25 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   const parsedGenre = GenreUuidSchema.safeParse(state.genre);
   const selectedExists = selected !== undefined;
   useEffect(() => {
-    if (selectedId !== null && selectedExists && selectedId !== lastFlown.current) flyTo(selectedId);
+    if (selectedId === null) lastFlown.current = null;
+    else if (selectedExists && selectedId !== lastFlown.current) flyTo(selectedId);
   }, [selectedId, selectedExists, flyTo]);
 
   // A genre selected from anywhere (family links, URL) frames the region the map lists it under.
   const lexicon = useRegionGenreLexicon(getGrowBackendBaseUrl, state.genre !== null);
   const genreEntries = useRegionGenreIndex(index, lexicon.entries);
-  const genreRegionId = useMemo(
-    () => genreEntries.find((entry) => entry.genre.uuid === state.genre)?.region.id ?? null,
-    [genreEntries, state.genre],
-  );
+  const genreRegionId = useMemo(() => {
+    const own = genreEntries.filter((entry) => entry.genre.uuid === state.genre);
+    // Keep the current framing when the selected region already lists the genre.
+    if (own.some((entry) => entry.region.id === selectedId)) return null;
+    return own[0]?.region.id ?? null;
+  }, [genreEntries, state.genre, selectedId]);
   useEffect(() => {
-    if (state.genre === null || genreRegionId === null || state.genre === lastGenreFlown.current) return;
+    if (state.genre === null) {
+      lastGenreFlown.current = null;
+      return;
+    }
+    if (genreRegionId === null || state.genre === lastGenreFlown.current) return;
     lastGenreFlown.current = state.genre;
     flyTo(genreRegionId);
   }, [state.genre, genreRegionId, flyTo]);
@@ -107,6 +114,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
     (regionId: string | null, genre: string | null) => {
       setCollapsed(false);
       update({ ...(regionId !== null ? { region: regionId } : {}), genre });
+      lastGenreFlown.current = genre;
       if (regionId !== null) flyTo(regionId);
     },
     [update, flyTo],
