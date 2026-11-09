@@ -247,6 +247,34 @@ describe("RegionMapView", () => {
     expect(lastProps.focus).toEqual(before);
   });
 
+  it("frames the region of a genre carried in by the URL on opening", () => {
+    setSearch("genre=" + makeGenreUuid("relative"));
+    render(<RegionMapView />);
+
+    expect(lastProps.focus).toEqual({ id: "Q142", seq: 1 });
+  });
+
+  it("keeps a shared camera instead of framing the genre on opening", () => {
+    setSearch("at=2,46,5&genre=" + makeGenreUuid("relative"));
+    render(<RegionMapView />);
+
+    expect(lastProps.focus).toBeNull();
+  });
+
+  it("says so when the open genre has no region on the map", () => {
+    setSearch("genre=" + makeGenreUuid("regional"));
+    render(<RegionMapView />);
+
+    expect(screen.getByRole("status")).toHaveTextContent("This genre has no region on the map.");
+  });
+
+  it("stays silent when the open genre is listed under a region", () => {
+    setSearch("genre=" + makeGenreUuid("relative"));
+    render(<RegionMapView />);
+
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
   it("zooms to the selected region from its panel without touching the URL selection", async () => {
     setSearch("region=Q142");
     render(<RegionMapView />);

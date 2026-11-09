@@ -117,6 +117,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- Switching between the tree and the region map keeps the open genre; the map frames its region on opening, or says the genre has no region.
+
 - The five lists replaced by genre edges no longer appear among the curation lists; the curation review links an edge rule to its genre page.
 
 - Tree and map genre links now use genre entity UUIDs. Playlist UUID links are no longer interpreted as genre selections.
