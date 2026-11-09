@@ -116,11 +116,13 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Improved
 
+- Direct coding agents to the established performance measurement and search profiling procedures.
 - Keep search typing within the search panel and reuse indexed place and genre names for faster local results.
 - Reuse the region lookup between map and genre search for each cached region index, and prepare descendant lookups once for map focus.
 
 ### Added
 
+- Add repeatable browser search profiling with recorded run metadata, trace checksums, and a documented evidence-retention procedure.
 - Add a repeatable tree and region-map network snapshot script and record the staging baseline.
 
 ### Fixed
