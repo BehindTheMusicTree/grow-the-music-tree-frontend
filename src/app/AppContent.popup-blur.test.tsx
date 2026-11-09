@@ -19,7 +19,7 @@ vi.mock("@behindthemusictree/app-kit/player", async (importOriginal) => {
 
 vi.mock("@lib/sentry", () => ({ initSentry: vi.fn() }));
 
-vi.mock("@components/features/menu/SideRail", () => ({ default: () => <nav aria-label="Side rail" /> }));
+vi.mock("@components/features/menu/NavButtons", () => ({ default: () => <nav aria-label="Nav buttons" /> }));
 vi.mock("@components/features/menu/UserMenu", () => ({ UserMenu: () => null }));
 vi.mock("@components/features/player/Player", () => ({ default: () => null }));
 
@@ -51,18 +51,18 @@ describe("AppContent popup backdrop", () => {
     cleanup();
   });
 
-  it("blurs the side rail and the page behind an open popup and makes them inert", () => {
+  it("blurs the nav buttons and the page behind an open popup and makes them inert", () => {
     renderAppContent(true);
 
     expect(screen.getByText("Network Error")).toBeInTheDocument();
-    const row = screen.getByRole("navigation", { name: "Side rail" }).parentElement;
+    const row = screen.getByRole("navigation", { name: "Nav buttons" }).parentElement;
     expect(row).toHaveClass("blur-sm", "pointer-events-none");
     expect(row).toContainElement(screen.getByRole("main"));
   });
 
-  it("leaves the side rail sharp when no popup is open", () => {
+  it("leaves the nav buttons sharp when no popup is open", () => {
     renderAppContent(false);
 
-    expect(screen.getByRole("navigation", { name: "Side rail" }).parentElement).not.toHaveClass("blur-sm");
+    expect(screen.getByRole("navigation", { name: "Nav buttons" }).parentElement).not.toHaveClass("blur-sm");
   });
 });
