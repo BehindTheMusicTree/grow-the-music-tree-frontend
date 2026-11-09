@@ -213,6 +213,30 @@ describe("RegionMapView", () => {
     expect(lastProps.focus).toEqual({ id: "Q142", seq: (before?.seq ?? 0) + 1 });
   });
 
+  it("frames a region again when it is reselected after the selection was cleared", () => {
+    setSearch("region=Q142");
+    const { rerender } = render(<RegionMapView />);
+
+    setSearch("");
+    rerender(<RegionMapView />);
+    const before = lastProps.focus;
+    setSearch("region=Q142");
+    rerender(<RegionMapView />);
+
+    expect(lastProps.focus).toEqual({ id: "Q142", seq: (before?.seq ?? 0) + 1 });
+  });
+
+  it("keeps the framing when the selected region already lists the genre", () => {
+    setSearch("region=Q142&genre=" + makeGenreUuid("regional"));
+    const { rerender } = render(<RegionMapView />);
+    const before = lastProps.focus;
+
+    setSearch("region=Q142&genre=" + makeGenreUuid("relative"));
+    rerender(<RegionMapView />);
+
+    expect(lastProps.focus).toEqual(before);
+  });
+
   it("zooms to the selected region from its panel without touching the URL selection", async () => {
     setSearch("region=Q142");
     render(<RegionMapView />);

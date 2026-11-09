@@ -45,7 +45,7 @@ import {
   zoneColor,
   supranationalZoneIds,
 } from "./regionMapLayers";
-import { fitPadding, measurePanelInset } from "./panelInset";
+import { containerFitPadding } from "./panelInset";
 import type { Camera } from "./useRegionMapUrlState";
 
 /** Asks the map to fly to a region, or to the world when `id` is null; `seq` makes a repeated request a new one. */
@@ -190,7 +190,7 @@ export default function RegionMapCanvas({
           ? { center: [camera.lng, camera.lat] as [number, number], zoom: camera.zoom }
           : {
               bounds: regionBounds(opening, regionsRef.current),
-              fitBoundsOptions: { padding: fitPadding(FIT_PADDING, measurePanelInset(container)), maxZoom: MAX_ZOOM },
+              fitBoundsOptions: { padding: containerFitPadding(FIT_PADDING, container), maxZoom: MAX_ZOOM },
             }),
         maxZoom: MAX_ZOOM,
         dragRotate: false,
@@ -307,7 +307,7 @@ export default function RegionMapCanvas({
     const region = focus.id === null ? undefined : regionsRef.current.get(focus.id);
     if (region?.boundaryStatus === "missing") return;
     const container = containerRef.current;
-    const padding = fitPadding(FIT_PADDING, container ? measurePanelInset(container) : {});
+    const padding = container ? containerFitPadding(FIT_PADDING, container) : FIT_PADDING;
     map.fitBounds(regionBounds(region, regionsRef.current), { padding, maxZoom: MAX_ZOOM });
   }, [ready, focus]);
 
