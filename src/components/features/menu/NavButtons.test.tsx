@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
-import SideRail from "./SideRail";
+import NavButtons from "./NavButtons";
 
 let searchParams = new URLSearchParams();
 let pathname = "/";
@@ -14,40 +14,23 @@ vi.mock("next/navigation", () => ({
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api", getAudiometaUrl: () => "" }));
 
 function renderHeader() {
-  render(<SideRail />);
+  render(<NavButtons />);
 }
 
-describe("SideRail", () => {
+describe("NavButtons", () => {
   afterEach(() => {
     cleanup();
     searchParams = new URLSearchParams();
     pathname = "/";
   });
 
-  it("lists tree, map, genealogy and about from top to bottom, icon-only", () => {
+  it("lists tree, map and about from top to bottom, icon-only", () => {
     renderHeader();
 
     const names = screen.getAllByRole("link").map((link) => link.getAttribute("aria-label"));
-    expect(names).toEqual(["GrowTheMusicTree home", "Region map", "Genealogy", "About"]);
+    expect(names).toEqual(["GrowTheMusicTree home", "Region map", "About"]);
     screen.getAllByRole("link").forEach((link) => expect(link).toHaveTextContent(/^$/));
     expect(screen.getByRole("link", { name: "GrowTheMusicTree home" })).toHaveAttribute("href", "/");
-  });
-
-  it.each(["/", "/map", "/genealogy"])("keeps Map before Genealogy on %s", (route) => {
-    pathname = route;
-    renderHeader();
-
-    const links = screen.getAllByRole("link");
-    const map = screen.getByRole("link", { name: "Region map" });
-    const genealogy = screen.getByRole("link", { name: "Genealogy" });
-    expect(links.indexOf(map)).toBeLessThan(links.indexOf(genealogy));
-    expect(map).toHaveAttribute("href", "/map");
-    if (route === "/map") {
-      expect(map).toHaveAttribute("aria-current", "page");
-      expect(genealogy).not.toHaveAttribute("aria-current");
-    } else {
-      expect(map).not.toHaveAttribute("aria-current");
-    }
   });
 
   it("links the About button to /?about", () => {
@@ -56,27 +39,10 @@ describe("SideRail", () => {
     expect(screen.getByRole("link", { name: "About" })).toHaveAttribute("href", "/?about");
   });
 
-  it("links to the genealogy page", () => {
+  it("no longer offers a Genealogy link", () => {
     renderHeader();
 
-    expect(screen.getByRole("link", { name: "Genealogy" })).toHaveAttribute("href", "/genealogy");
-  });
-
-  it("shows only the icon on the Genealogy link away from the genealogy page", () => {
-    renderHeader();
-
-    const link = screen.getByRole("link", { name: "Genealogy" });
-    expect(link).toHaveTextContent(/^$/);
-    expect(link).not.toHaveAttribute("aria-current");
-  });
-
-  it("keeps the Genealogy link icon-only and marks it current on the genealogy page", () => {
-    pathname = "/genealogy";
-    renderHeader();
-
-    const link = screen.getByRole("link", { name: "Genealogy" });
-    expect(link).toHaveTextContent(/^$/);
-    expect(link).toHaveAttribute("aria-current", "page");
+    expect(screen.queryByRole("link", { name: "Genealogy" })).not.toBeInTheDocument();
   });
 
   it("keeps other params when opening About", () => {
@@ -110,12 +76,11 @@ describe("SideRail", () => {
     expect(screen.getByRole("link", { name: "Region map" })).toHaveAttribute("href", "/map");
   });
 
-  it("does not carry the genre from other pages and leaves Genealogy bare", () => {
+  it("does not carry the genre from other pages", () => {
     pathname = "/genealogy";
     searchParams = new URLSearchParams("genre=abc");
     renderHeader();
 
     expect(screen.getByRole("link", { name: "Region map" })).toHaveAttribute("href", "/map");
-    expect(screen.getByRole("link", { name: "Genealogy" })).toHaveAttribute("href", "/genealogy");
   });
 });

@@ -4,6 +4,7 @@ import { TipeeeSocialLinkColored } from "@behindthemusictree/brand/components";
 import OrgSocialLinks from "@components/features/menu/OrgSocialLinks";
 import { AboutTheMusicTreeLockup } from "@components/features/about/AboutTheMusicTreeLockup";
 import { trackEvent } from "@lib/analytics";
+import { GENEALOGY_HREF } from "@lib/constants/routes";
 
 const GITHUB_ORG_URL = "https://github.com/BehindTheMusicTree";
 const GITHUB_AUDIOMETA_URL = "https://github.com/BehindTheMusicTree/audiometa";
@@ -75,6 +76,17 @@ export default function AboutContent({ onClose }: { onClose: () => void }) {
             <p className="text-sm leading-relaxed text-gray-600">{description}</p>
           </div>
         ))}
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-base font-semibold text-gray-900">Genealogy</h2>
+        <p className="text-sm leading-relaxed text-gray-600">
+          See how musical traditions descend from one another on the{" "}
+          <Link href={GENEALOGY_HREF} className={EXTERNAL_LINK_CLASS}>
+            genealogy chart
+          </Link>
+          .
+        </p>
       </section>
 
       <section className="flex flex-col gap-3">

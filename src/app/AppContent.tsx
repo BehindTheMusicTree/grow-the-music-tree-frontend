@@ -9,7 +9,7 @@ import { UserMenu } from "@components/features/menu/UserMenu";
 
 import InternalErrorPopup from "@components/ui/popup/child/InternalErrorPopup";
 
-import SideRail from "@components/features/menu/SideRail";
+import NavButtons from "@components/features/menu/NavButtons";
 import Player from "@components/features/player/Player";
 
 import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
@@ -48,11 +48,11 @@ export default function AppContent({ children }: { children: ReactNode }) {
         <div className="center fixed top-0 flex h-full w-full">
           <div
             className={cn(
-              "relative flex min-h-0 w-full flex-grow flex-col-reverse md:flex-row",
+              "group relative flex min-h-0 w-full flex-grow",
               activePopup && "pointer-events-none blur-sm",
             )}
           >
-            <SideRail />
+            <NavButtons />
             <div className="absolute top-[max(0.25rem,env(safe-area-inset-top))] right-1 z-50">
               <UserMenu />
             </div>

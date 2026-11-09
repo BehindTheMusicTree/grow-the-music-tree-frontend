@@ -117,6 +117,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- The left bar is gone: the detail panel sits against the left edge, and the Tree, Map and About buttons sit at the bottom left, moving to the right of the panel while it is open. Genealogy is reached from the About page.
+
 - Switching between the tree and the region map keeps the open genre; the map frames its region on opening, or says the genre has no region.
 
 - The five lists replaced by genre edges no longer appear among the curation lists; the curation review links an edge rule to its genre page.
