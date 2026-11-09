@@ -34,4 +34,4 @@ Not applicable - the panel is rendered client-side over the genre tree.
 ## Notes
 
 - Play all queues the playable tracks of the current page; tracks without a video are listed but cannot be played
-- Artist names across the app (genre tree track lists, player track list, member lists) open this panel via `renderArtistLink`
+- Artist names across the app (genre tree track lists, player track list, member lists) open this panel via `renderArtistLink`; on the region map (`/map?artist=<uuid>`) they open the map's own panel instead, without the tree filter

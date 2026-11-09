@@ -35,11 +35,29 @@ vi.mock("@hooks/useRegionMap", () => ({
 
 vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@behindthemusictree/app-kit/genre-tree")>()),
+  useArtist: () => ({ status: "idle" }),
+  useSong: () => ({ status: "idle" }),
   useRegionGenreLexicon: () => ({ entries: [{ wikidataId: "Q1", uuid: makeGenreUuid("relative"), name: "Relative" }], isPending: false, isError: false }),
 }));
 
-vi.mock("./RegionMapSearch", () => ({ default: ({ onPick }: { onPick: (region: string | null, genre: string | null) => void }) => <button onClick={() => onPick(null, makeGenreUuid("regional"))}>Pick regional genre</button> }));
+vi.mock("./RegionMapSearch", () => ({
+  default: ({ onPick, onPickArtist, onPickSong }: { onPick: (region: string | null, genre: string | null) => void; onPickArtist: (uuid: string) => void; onPickSong: (uuid: string) => void }) => (
+    <>
+      <button onClick={() => onPick(null, makeGenreUuid("regional"))}>Pick regional genre</button>
+      <button onClick={() => onPickArtist("artist-1")}>Pick artist</button>
+      <button onClick={() => onPickSong("song-1")}>Pick song</button>
+    </>
+  ),
+}));
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
+  EntityDetailPanel: ({ songUuid, artistUuid, onSongUuidChange, onArtistUuidChange, onSelectGenre }: { songUuid: string | null; artistUuid: string | null; onSongUuidChange: (uuid: string | null) => void; onArtistUuidChange: (uuid: string | null) => void; onSelectGenre: (genre: { uuid: string }) => void }) => (
+    <section aria-label="Entity detail">
+      {songUuid ?? artistUuid}
+      <button onClick={() => onSongUuidChange(null)}>Close song</button>
+      <button onClick={() => onArtistUuidChange(null)}>Close artist</button>
+      <button onClick={() => onSelectGenre({ uuid: makeGenreUuid("relative") })}>Open song genre</button>
+    </section>
+  ),
   GenreDetailPanel: ({ genreUuid, onClose, onSelectGenre, collapsed, edgeTab }: { genreUuid: string; onClose: () => void; onSelectGenre: (uuid: string) => void; collapsed: boolean; edgeTab: { edge: { label: string; onClick: () => void } | null; center: { label: string; onClick: () => void } | null } }) => (
     <section aria-label="Genre detail" data-collapsed={String(collapsed)}>
       {genreUuid}<button onClick={onClose}>Close genre</button>
@@ -361,5 +379,61 @@ describe("RegionMapView", () => {
 
     expect(chartMounts).toBe(1);
     expect(lastProps.tileset).toBe(index.tileset);
+  });
+
+  describe("artist and song panels", () => {
+    it("opens an artist from the URL and keeps the camera when it closes", async () => {
+      setSearch("artist=artist-1&at=2,46,5");
+      render(<RegionMapView />);
+      expect(screen.getByRole("region", { name: "Entity detail" })).toHaveTextContent("artist-1");
+      fireEvent.click(screen.getByRole("button", { name: "Close artist" }));
+      await flushNavigation();
+      const params = url(pushState.mock.calls.at(-1)!).searchParams;
+      expect(params.get("artist")).toBeNull();
+      expect(params.get("at")).toBe("2,46,5");
+    });
+
+    it("lets a genre outrank a song and a song outrank a region", () => {
+      setSearch(`genre=${makeGenreUuid("regional")}&song=song-1&region=Q12130`);
+      render(<RegionMapView />);
+      expect(screen.getByRole("region", { name: "Genre detail" })).toBeInTheDocument();
+      expect(screen.queryByRole("region", { name: "Entity detail" })).not.toBeInTheDocument();
+      cleanup();
+      setSearch("song=song-1&region=Q12130");
+      render(<RegionMapView />);
+      expect(screen.getByRole("region", { name: "Entity detail" })).toHaveTextContent("song-1");
+      expect(screen.queryByRole("region", { name: /Panel/ })).not.toBeInTheDocument();
+    });
+
+    it("opens a picked song and replaces the genre and artist", async () => {
+      setSearch(`genre=${makeGenreUuid("regional")}&artist=artist-1`);
+      render(<RegionMapView />);
+      fireEvent.click(screen.getByRole("button", { name: "Pick song" }));
+      await flushNavigation();
+      const params = url(pushState.mock.calls.at(-1)!).searchParams;
+      expect(params.get("song")).toBe("song-1");
+      expect(params.get("genre")).toBeNull();
+      expect(params.get("artist")).toBeNull();
+    });
+
+    it("opens a song's genre in the genre panel and drops the song", async () => {
+      setSearch("song=song-1");
+      render(<RegionMapView />);
+      fireEvent.click(screen.getByRole("button", { name: "Open song genre" }));
+      await flushNavigation();
+      const params = url(pushState.mock.calls.at(-1)!).searchParams;
+      expect(params.get("genre")).toBe(makeGenreUuid("relative"));
+      expect(params.get("song")).toBeNull();
+    });
+
+    it("clears an artist when a region is picked", async () => {
+      setSearch("artist=artist-1");
+      render(<RegionMapView />);
+      fireEvent.click(screen.getByRole("button", { name: "click Q12130" }));
+      await flushNavigation();
+      const params = url(pushState.mock.calls.at(-1)!).searchParams;
+      expect(params.get("region")).toBe("Q12130");
+      expect(params.get("artist")).toBeNull();
+    });
   });
 });

@@ -2,14 +2,20 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import { GenreUuidSchema, useRegionGenreLexicon } from "@behindthemusictree/app-kit/genre-tree";
-import { GenreDetailPanel } from "@behindthemusictree/app-kit-ui/genre-tree";
+import { EntityDetailPanel, GenreDetailPanel } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { collapseEdgeTab } from "@utils/collapseEdgeTab";
 import { Breadcrumb, DetailPanel } from "@behindthemusictree/ui";
 import { regionMapLookup } from "@lib/region-map-index";
 import { useRegionMapIndex } from "@hooks/useRegionMap";
+import { useEntityDocumentTitle } from "@hooks/useEntityDocumentTitle";
+import GenreHistory from "@components/features/genre-tree/GenreHistory";
+import { renderArtistLink } from "@components/features/artist/renderArtistLink";
+import { renderSongLink } from "@components/features/song/renderSongLink";
 import { useRegionGenreIndex } from "@components/features/search/useRegionGenreIndex";
+import type { GenreTreeShareTarget } from "@behindthemusictree/app-kit-ui/genre-tree";
 import type { Region, RegionMapIndex } from "@schemas/api/region-map";
 import RegionDetailPanel from "./RegionDetailPanel";
 import RegionMapSearch from "./RegionMapSearch";
@@ -35,6 +41,7 @@ export default function RegionMapView() {
 
 function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   const { state, update } = useRegionMapUrlState();
+  const pathname = usePathname();
   const regions = regionMapLookup(index);
   const selected = state.region === null ? undefined : regions.get(state.region);
 
@@ -95,7 +102,17 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   }, [state.genre, genreRegionId, flyTo]);
   useEffect(() => {
     setCollapsed(false);
-  }, [selectedId, state.genre]);
+  }, [selectedId, state.genre, state.artist, state.song]);
+  useEntityDocumentTitle(state.artist, state.song);
+  const getShareUrl = useCallback(
+    (target: GenreTreeShareTarget) => {
+      const params = new URLSearchParams();
+      if (target.kind === "genre") params.set("genre", target.genreUuid);
+      else params.set(target.kind, target.uuid);
+      return `${pathname}?${params.toString()}`;
+    },
+    [pathname],
+  );
   const genreHasNoRegion =
     state.genre !== null && !lexicon.isPending && !lexicon.isError && genreRegionId === null &&
     !genreEntries.some((entry) => entry.genre.uuid === state.genre);
@@ -113,7 +130,9 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
 
   const select = (region: Region) => { setCollapsed(false); update({ region: region.id, genre: null }); };
   const clearSelection = () => {
-    if (state.region !== null || state.genre !== null) update({ region: null, genre: null });
+    if (state.region !== null || state.genre !== null || state.artist !== null || state.song !== null) {
+      update({ region: null, genre: null, artist: null, song: null });
+    }
   };
   const pick = useCallback(
     (regionId: string | null, genre: string | null) => {
@@ -162,14 +181,14 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
           onClearSelection={clearSelection}
           onCameraChange={onCameraChange}
         />
-        <RegionMapSearch index={index} regions={regions} onPick={pick} selectedRegion={selected} selectedGenreUuid={state.genre} onClosePanel={clearSelection} className="absolute left-3 right-3 top-3 z-20 sm:right-auto sm:w-80" />
+        <RegionMapSearch index={index} regions={regions} onPick={pick} onPickArtist={(artist) => { setCollapsed(false); update({ artist }); }} onPickSong={(song) => { setCollapsed(false); update({ song }); }} selectedRegion={selected} selectedGenreUuid={state.genre} selectedArtistUuid={state.artist} selectedSongUuid={state.song} onClosePanel={clearSelection} className="absolute left-3 right-3 top-3 z-20 sm:right-auto sm:w-80" />
         {selected && (
           <Breadcrumb
             className="absolute left-1/2 top-16 z-10 max-w-[calc(100%-theme(spacing.6))] -translate-x-1/2"
             home={{
               label: "World",
               onSelect: () => {
-                update({ region: null, genre: null });
+                update({ region: null, genre: null, artist: null, song: null });
                 flyTo(null);
               },
             }}
@@ -194,11 +213,31 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
             shareTarget={{ kind: "genre", genreUuid: parsedGenre.data, name: "Genre", scope: "reference", artistUuid: null }}
             collapsed={collapsed}
             edgeTab={collapseEdgeTab(collapsed, setCollapsed)}
+            extras={{
+              renderGenreDetailExtras: (overview) => <GenreHistory genreUuid={overview.uuid} />,
+              renderArtistLink,
+              renderSongLink,
+            }}
           />
         ) : (
           <DetailPanel titleInSearch title="Genre unavailable" side="left" onClose={clearSelection}>
             <p role="alert">This genre could not be loaded.</p>
           </DetailPanel>
+        ) : state.song !== null || state.artist !== null ? (
+          <EntityDetailPanel
+            scope="reference"
+            getBackendBaseUrl={getGrowBackendBaseUrl}
+            getShareUrl={getShareUrl}
+            songUuid={state.song}
+            onSongUuidChange={(song) => (song === null ? clearSelection() : update({ song }))}
+            artistUuid={state.artist}
+            onArtistUuidChange={(artist) => (artist === null ? clearSelection() : update({ artist }))}
+            renderArtistLink={renderArtistLink}
+            renderSongLink={renderSongLink}
+            collapsed={collapsed}
+            edgeTab={collapseEdgeTab(collapsed, setCollapsed)}
+            onSelectGenre={(genre) => { setCollapsed(false); update({ genre: genre.uuid }); }}
+          />
         ) : selected ? (
           <RegionDetailPanel
             key={selected.id}

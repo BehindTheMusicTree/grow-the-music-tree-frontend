@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { updateUrlQuery, type UrlQueryMethod } from "@lib/urlQuery";
+import { ARTIST_PARAM, SONG_PARAM } from "@hooks/useGenreTreeUrlState";
 
 export const AT_PARAM = "at";
 /** The drill path of the former level-based map, read only to frame old shared links. */
@@ -14,6 +15,8 @@ export type RegionMapUrlState = {
   at: Camera | null;
   region: string | null;
   genre: string | null;
+  artist: string | null;
+  song: string | null;
   legacyPath: string[];
 };
 export type RegionMapUrlUpdate = Partial<Omit<RegionMapUrlState, "legacyPath">> & { legacyPath?: null };
@@ -38,7 +41,7 @@ export function serializeCamera({ lng, lat, zoom }: Camera): string {
   return `${round(lng, 4)},${round(lat, 4)},${round(zoom, 2)}`;
 }
 
-/** Camera, selected region and panel genre of the map, kept in the query string so they can be shared. */
+/** Camera, selected region and panel entity (genre, artist or song) of the map, kept in the query string so they can be shared. */
 export function useRegionMapUrlState() {
   const searchParams = useSearchParams();
 
@@ -47,6 +50,8 @@ export function useRegionMapUrlState() {
     at: parseCamera(searchParams.get(AT_PARAM)),
     region: searchParams.get(REGION_PARAM),
     genre: searchParams.get(GENRE_PARAM),
+    artist: searchParams.get(ARTIST_PARAM),
+    song: searchParams.get(SONG_PARAM),
     legacyPath: rawPath ? rawPath.split("/").filter(Boolean) : [],
   };
 
@@ -56,6 +61,22 @@ export function useRegionMapUrlState() {
       if (changes.at !== undefined) set(AT_PARAM, changes.at && serializeCamera(changes.at));
       if (changes.region !== undefined) set(REGION_PARAM, changes.region);
       if (changes.genre !== undefined) set(GENRE_PARAM, changes.genre);
+      if (changes.artist !== undefined) set(ARTIST_PARAM, changes.artist);
+      if (changes.song !== undefined) set(SONG_PARAM, changes.song);
+      // Same exclusivity as the tree: the panel shows one entity, so choosing one drops the others it outranks.
+      if (changes.region) {
+        params.delete(ARTIST_PARAM);
+        params.delete(SONG_PARAM);
+      }
+      if (changes.genre) params.delete(SONG_PARAM);
+      if (changes.artist) {
+        params.delete(GENRE_PARAM);
+        params.delete(SONG_PARAM);
+      }
+      if (changes.song) {
+        params.delete(GENRE_PARAM);
+        params.delete(ARTIST_PARAM);
+      }
       if (changes.legacyPath === null) params.delete(LEGACY_PATH_PARAM);
     }, method);
   }, []);

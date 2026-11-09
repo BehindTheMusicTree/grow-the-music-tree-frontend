@@ -69,6 +69,19 @@ describe("NavButtons", () => {
     expect(screen.getByRole("link", { name: /home$/ })).toHaveAttribute("href", "/?genre=abc");
   });
 
+  it("carries the artist and the song across views", () => {
+    searchParams = new URLSearchParams("artist=a1&song=s1&zoom=rock");
+    renderHeader();
+
+    const mapHref = screen.getByRole("link", { name: "Region map" }).getAttribute("href");
+    const homeHref = screen.getByRole("link", { name: /home$/ }).getAttribute("href");
+    expect(mapHref).toContain("artist=a1");
+    expect(mapHref).toContain("song=s1");
+    expect(mapHref).not.toContain("zoom");
+    expect(homeHref).toContain("artist=a1");
+    expect(homeHref).toContain("song=s1");
+  });
+
   it("keeps the links bare without a genre", () => {
     searchParams = new URLSearchParams("zoom=rock");
     renderHeader();
