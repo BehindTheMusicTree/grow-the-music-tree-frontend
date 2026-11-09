@@ -110,6 +110,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- Remove the region selection halo, which produced dark artifacts along intricate coastlines, and round zone halo joins.
+
 ### Improved
 
 - Keep search typing within the search panel and reuse indexed place and genre names for faster local results.
