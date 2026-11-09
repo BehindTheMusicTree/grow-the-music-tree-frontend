@@ -73,9 +73,11 @@ export function depthColors(regions: ReadonlyMap<string, Region>): Map<string, s
     const scale = songsScale(max);
     for (const region of peers) {
       // No songs of its own, but part of a zone that has some: lightest tint, not "uncovered" grey.
+      // The same goes for a subdivision whose enclosing admin region has songs.
       const inLiveZone = region.zoneIds.some((id) => (regions.get(id)?.songCount ?? 0) > 0);
+      const inLiveAncestor = ancestry(region, regions).some((a) => a.id !== region.id && isAdmin(a) && a.songCount > 0);
       if (region.songCount > 0) colors.set(region.id, scale(region.songCount));
-      else colors.set(region.id, inLiveZone ? ZONE_ONLY_FILL : EMPTY_FILL);
+      else colors.set(region.id, inLiveZone || inLiveAncestor ? ZONE_ONLY_FILL : EMPTY_FILL);
     }
   }
   return colors;
