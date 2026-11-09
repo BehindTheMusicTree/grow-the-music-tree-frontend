@@ -27,11 +27,13 @@ export default function RegionDetailPanel({
 }: Props) {
   const { overviewId, uuid, failed } = useRegionOverview(region);
   const edgeTab = collapseEdgeTab(collapsed, onCollapsedChange);
+  const boundaryNote = region.boundaryStatus === "missing" ? <BoundaryNote name={region.name} /> : null;
   const onZoomIn = region.drillable && region.boundaryStatus !== "missing" ? () => onZoomTo(region) : undefined;
 
   if (overviewId === null && !uuid) {
     return (
       <DetailPanel titleInSearch title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
+        {boundaryNote}
         <FieldList
           items={[
             { label: "Songs", value: region.songCount },
@@ -59,6 +61,7 @@ export default function RegionDetailPanel({
   if (!uuid) {
     return (
       <DetailPanel titleInSearch title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
+        {boundaryNote}
         {failed ? (
           <p role="alert" className="px-6 py-4 text-red-600">
             {region.overviewItemId === null
@@ -83,7 +86,16 @@ export default function RegionDetailPanel({
       onZoomIn={onZoomIn}
       collapsed={collapsed}
       edgeTab={edgeTab}
+      extras={boundaryNote ? { renderGenreDetailExtras: () => boundaryNote } : undefined}
     />
+  );
+}
+
+function BoundaryNote({ name }: { name: string }) {
+  return (
+    <p role="status" className="px-6 py-2 text-[var(--color-text-muted)]">
+      Boundary unavailable for {name}. Its music remains available below.
+    </p>
   );
 }
 

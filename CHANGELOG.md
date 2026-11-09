@@ -119,6 +119,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- The region map no longer shows the « Regions without a boundary » bar above it. Those regions stay reachable through the search and `?region=`, and the panel says when a region has no boundary.
+
 - The left bar is gone: the detail panel sits against the left edge, and the Tree, Map and About buttons sit at the bottom left, moving to the right of the panel while it is open. Genealogy is reached from the About page.
 
 - Switching between the tree and the region map keeps the open genre; the map frames its region on opening, or says the genre has no region.
