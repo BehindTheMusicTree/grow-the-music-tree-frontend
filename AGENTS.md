@@ -44,6 +44,14 @@ no `youtube_unplayable_reason`).
 
 Read `docs/STYLE_GUIDE.md` and `docs/testing.md` before relevant implementation or test changes.
 
+Before investigating or claiming performance improvements, read
+[the performance documentation](docs/performance/README.md). For search profiling,
+follow [the capture and comparison procedure](docs/performance/search-profiling.md)
+and reuse its harness and configuration template. Compare matched revisions,
+datasets and scenarios; keep ordinary production timing separate from React
+profiling. Commit procedures, small results and checksums; keep raw captures
+outside Git and document their storage location and measurement limitations.
+
 Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONING.md`,
 `docs/SEMVER_GUIDE.md` when doing branch/PR/release work.
 
