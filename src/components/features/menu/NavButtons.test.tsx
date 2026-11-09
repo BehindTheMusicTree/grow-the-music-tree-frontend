@@ -83,4 +83,13 @@ describe("NavButtons", () => {
 
     expect(screen.getByRole("link", { name: "Region map" })).toHaveAttribute("href", "/map");
   });
+
+  it("keeps the panel-aware offset classes literal so Tailwind generates them", () => {
+    renderHeader();
+
+    const classes = screen.getByRole("navigation", { name: "Main navigation" }).className;
+    expect(classes).toContain("md:left-[calc(var(--layout-detail-panel-w)+0.25rem)]");
+    expect(classes).toContain("[data-sheet=true]:not([data-collapsed=true])]:max-md:bottom-[calc(var(--layout-sheet-peek)+0.25rem)]");
+    expect(classes).toContain("max-md:hidden");
+  });
 });

@@ -78,7 +78,8 @@ export default function NavButtons() {
         // Sits right of an open left detail panel; :has() reads the panel's own state, which lives in each page.
         // Class names must stay literal so Tailwind's scanner can see them.
         "group-has-[[data-detail-panel][data-side=left]:not([data-collapsed=true])]:md:left-[calc(var(--layout-detail-panel-w)+0.25rem)]",
-        "group-has-[[data-detail-panel][data-side=left]:not([data-collapsed=true])]:max-md:bottom-[calc(var(--layout-sheet-peek)+0.25rem)]",
+        "group-has-[[data-detail-panel][data-side=left][data-sheet=true]:not([data-collapsed=true])]:max-md:bottom-[calc(var(--layout-sheet-peek)+0.25rem)]",
+        "group-has-[[data-detail-panel][data-sheet=true]_[aria-label='Resize_panel'][aria-expanded=true]]:max-md:hidden",
       )}
     >
       <SwitchLink target="/" isCurrent={isHome} label={`${APP_NAME} home`}>
