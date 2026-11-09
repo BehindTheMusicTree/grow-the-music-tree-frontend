@@ -54,3 +54,7 @@ next-env.d.ts
 
 # Local browser performance captures and run configuration
 .performance-artifacts/
+
+# Playwright
+test-results/
+playwright-report/
