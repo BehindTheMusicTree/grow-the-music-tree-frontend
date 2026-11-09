@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { YOUTUBE_UNPLAYABLE_REASON_LABELS } from "@behindthemusictree/app-kit/genre-tree";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
-import { useFetchWrapper } from "@behindthemusictree/app-kit/transport";
+import { usePlaybackQuery } from "@behindthemusictree/app-kit/transport";
 import { RingLoader } from "@behindthemusictree/ui";
 import { useUpdateSongVideo } from "@hooks/curation/useUpdateSongVideo";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
@@ -18,11 +17,12 @@ interface Props {
 }
 
 export default function SongVideoDialog({ song, onClose }: Props) {
-  const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = usePlaybackQuery({
     queryKey: ["referenceSongs", "detail", song.uuid],
-    queryFn: async () =>
-      SongVideoDetailSchema.parse(await fetch(`library/songs/${song.uuid}/`, true, false)),
+    getBackendBaseUrl: getGrowBackendBaseUrl,
+    queryFn: (fetch) => fetch(`library/songs/${song.uuid}/`, true, false),
+    schema: SongVideoDetailSchema,
+    context: "SongVideoDialog",
   });
   const { mutate, isPending } = useUpdateSongVideo();
 

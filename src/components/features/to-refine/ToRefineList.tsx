@@ -4,7 +4,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { keepPreviousData } from "@tanstack/react-query";
 import { Pagination } from "@behindthemusictree/ui";
-import { PaginatedResponseSchema, useFetchWrapper, useQueryWithParse } from "@behindthemusictree/app-kit/transport";
+import { PaginatedResponseSchema, usePlaybackQuery } from "@behindthemusictree/app-kit/transport";
 import GenrePicker from "@components/features/curation/GenrePicker";
 import { useAssignSongGenre } from "@hooks/curation/useAssignSongGenre";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -52,10 +52,10 @@ function ToRefineRow({ song }: { song: ToRefineSong }) {
 
 export default function ToRefineList() {
   const [page, setPage] = useState(1);
-  const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
-  const { data, isPending, isError } = useQueryWithParse({
+  const { data, isPending, isError } = usePlaybackQuery({
     queryKey: ["toRefineSongs", page],
-    queryFn: () => fetch("library/songs/", true, false, undefined, { genreIsUmbrella: true, page }),
+    getBackendBaseUrl: getGrowBackendBaseUrl,
+    queryFn: (fetch) => fetch("library/songs/", true, false, undefined, { genreIsUmbrella: true, page }),
     schema: ToRefinePageSchema,
     placeholderData: keepPreviousData,
     context: "ToRefineList",
