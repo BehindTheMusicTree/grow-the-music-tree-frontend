@@ -55,8 +55,9 @@ test("genre: tree → map frames the region and keeps the genre panel", async ({
   await expect(page.getByText("This genre has no region on the map.")).toHaveCount(0);
 });
 
-test("artist filter + genre: survives tree → map → tree, and the map titles the genre panel", async ({ page }) => {
+test("artist filter + genre: survives tree → map → tree, and both titles follow the genre panel", async ({ page }) => {
   await page.goto(`/?artist=${ids.artist}&genre=${ids.punk}`);
+  await expectState(page, { title: APP_TITLE, panel: names.punk });
   await toMap(page);
   expect(param(page, "artist")).toBe(ids.artist);
   expect(param(page, "genre")).toBe(ids.punk);
@@ -64,7 +65,7 @@ test("artist filter + genre: survives tree → map → tree, and the map titles 
   await toTree(page);
   expect(param(page, "artist")).toBe(ids.artist);
   expect(param(page, "genre")).toBe(ids.punk);
-  await expectUrlInvariants(page);
+  await expectState(page, { title: APP_TITLE, panel: names.punk });
 });
 
 test("panning the map writes `at` without adding history entries", async ({ page }) => {
