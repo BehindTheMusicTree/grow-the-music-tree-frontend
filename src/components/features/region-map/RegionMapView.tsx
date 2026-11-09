@@ -159,7 +159,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
           onCameraChange={onCameraChange}
         />
         <RegionMapSearch index={index} regions={regions} onPick={pick} onPickArtist={(artist) => { setCollapsed(false); update({ artist }); }} onPickSong={(song) => { setCollapsed(false); update({ song }); }} selectedRegion={selected} selectedGenreUuid={state.genre} selectedArtistUuid={state.artist} selectedSongUuid={state.song} onClosePanel={clearSelection} className="absolute left-3 right-3 top-3 z-20 sm:right-auto sm:w-80" />
-        {genreHasNoRegion && (
+        {genreHasNoRegion && !selected && (
           <p role="status" className="absolute left-1/2 top-16 z-10 max-w-[calc(100%-theme(spacing.6))] -translate-x-1/2 rounded bg-white px-3 py-1 shadow">
             This genre has no region on the map.
           </p>

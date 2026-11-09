@@ -289,6 +289,13 @@ describe("RegionMapView", () => {
     expect(screen.getByRole("status")).toHaveTextContent("This genre has no region on the map.");
   });
 
+  it("leaves the breadcrumb alone when a region is open beside a genre without region", () => {
+    setSearch("region=Q142&genre=" + makeGenreUuid("regional"));
+    render(<RegionMapView />);
+
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
   it("stays silent when the open genre is listed under a region", () => {
     setSearch("genre=" + makeGenreUuid("relative"));
     render(<RegionMapView />);
