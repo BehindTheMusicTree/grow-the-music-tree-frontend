@@ -44,6 +44,14 @@ no `youtube_unplayable_reason`).
 
 Read `docs/STYLE_GUIDE.md` and `docs/testing.md` before relevant implementation or test changes.
 
+Before investigating or claiming performance improvements, read
+[the performance documentation](docs/performance/README.md). For search profiling,
+follow [the capture and comparison procedure](docs/performance/search-profiling.md)
+and reuse its harness and configuration template. Compare matched revisions,
+datasets and scenarios; keep ordinary production timing separate from React
+profiling. Commit procedures, small results and checksums; keep raw captures
+outside Git and document their storage location and measurement limitations.
+
 Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONING.md`,
 `docs/SEMVER_GUIDE.md` when doing branch/PR/release work.
 
@@ -55,12 +63,10 @@ Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONIN
   and CI/tooling/maintenance work go on `feature/*`. There is no `ci/*` prefix.
   Never commit directly to `main`/`develop`.
 - **Never locally `git merge` + `git push origin main`** to ship a release/hotfix —
-  it skips the PR/branch-protection checks. Always open a PR; merge on GitHub; then
-  `git pull` locally before tagging.
-- **Versioning**: `npm version` (the one that creates the shipping `vX.Y.Z` tag) runs
-  only on `main`, only after a `release/*`/`hotfix/*` PR has merged. On `release/*`
-  branches, prepare the version with `npm pkg set version=X.Y.Z` (or
-  `npm version … --no-git-tag-version`) — never the tagging form.
+  it skips the PR/branch-protection checks. Always open a PR and merge on GitHub.
+- **Versioning**: prepare `package.json` and `CHANGELOG.md` on `release/*` or
+  `hotfix/*` without creating a tag. After the PR merges into `main`, the shared
+  release workflow creates the matching immutable tag. See `docs/VERSIONING.md`.
 - **Styling**: Tailwind utility classes only. No `.module.css` files, no inline
   styles. Class order: Layout → Typography → Visual → Interactive → States (see
   `docs/STYLE_GUIDE.md`).
@@ -73,9 +79,10 @@ Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONIN
   (`// changed`, `// fix`, `// temp`, etc.).
 - **Env vars**: only `NEXT_PUBLIC_*`-prefixed vars are exposed to the browser.
   `@behindthemusictree/*` packages are public on npmjs; installing needs no token.
-- **Dev backend**: `.env` targets a local grow-api (`http://127.0.0.1:8001`) — start it with
-  `docker compose up -d` in `../grow-the-music-tree-api`, check `curl 127.0.0.1:8001/health/`;
-  staging is a read-only opt-in via `./scripts/dev-up.sh --staging` and rejects dev-client tokens.
+- **Dev backend**: `./scripts/dev-up.sh` targets read-only staging by default (rejects dev-client
+  tokens, so no admin sign-in); `./scripts/dev-up.sh --local` starts the local grow-api
+  (`http://127.0.0.1:8001`, from `../grow-the-music-tree-api`) instead. Plain `pnpm dev` still uses
+  `.env`, which targets the local grow-api — check it with `curl 127.0.0.1:8001/health/`.
 - **Admin sign-in locally**: use the dev Google client, and give the local grow-api the same
   `GOOGLE_OAUTH_CLIENT_ID` plus your `ADMIN_GOOGLE_SUB`. Open `http://localhost:<3000–3009>` (what `pnpm dev`
   prints), never `127.0.0.1`, or Google returns `redirect_uri_mismatch`. See
@@ -97,12 +104,10 @@ Before working on `src/**/*.ts` or `src/**/*.tsx`, read `.agents/rules/api-respo
 Before working on `src/**/*.tsx` or `src/**/*.css`, read `.agents/rules/spacing.md`.
 Claude `paths:` metadata is not a Codex loader. Graphify can be used when installed and useful.
 
-<!-- BEGIN:nextjs-agent-rules -->
+## This is NOT the Next.js you know
 
-# This is NOT the Next.js you know
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
+`agentRules: false` in `next.config.ts` stops `next dev` from writing its own copy of this
+section into `AGENTS.md`; keep it that way, or every Next upgrade that changes the
+generated text leaves a dirty tree that blocks `git pull`.
