@@ -115,6 +115,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - Admin curation edits genre edges (canonical and regional parents, accepted roots, regional overviews, secondary parents) from the genre page and a new `/admin/curation/edges` page, with relation filter, search and history.
 
+- The curation review lists the new reasons `invalid_rule` (with the pipeline's `evidence.detail`) and `exclusive_parent_regional` (pointing to « Genres maintenus canoniques »), with tests. Needs grow-the-music-tree-api 16.0.0.
+
 ### Changed
 
 - Switching between the tree and the region map keeps the open genre; the map frames its region on opening, or says the genre has no region.
