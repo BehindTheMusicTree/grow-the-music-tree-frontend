@@ -94,4 +94,28 @@ describe("SideRail", () => {
     expect(link).toHaveAttribute("href", "/?zoom=rock");
     expect(link).toHaveAttribute("aria-pressed", "true");
   });
+
+  it("carries the genre to the map and back, dropping view-specific params", () => {
+    searchParams = new URLSearchParams("genre=abc&zoom=rock&region=Q1");
+    renderHeader();
+
+    expect(screen.getByRole("link", { name: "Region map" })).toHaveAttribute("href", "/map?genre=abc");
+    expect(screen.getByRole("link", { name: /home$/ })).toHaveAttribute("href", "/?genre=abc");
+  });
+
+  it("keeps the links bare without a genre", () => {
+    searchParams = new URLSearchParams("zoom=rock");
+    renderHeader();
+
+    expect(screen.getByRole("link", { name: "Region map" })).toHaveAttribute("href", "/map");
+  });
+
+  it("does not carry the genre from other pages and leaves Genealogy bare", () => {
+    pathname = "/genealogy";
+    searchParams = new URLSearchParams("genre=abc");
+    renderHeader();
+
+    expect(screen.getByRole("link", { name: "Region map" })).toHaveAttribute("href", "/map");
+    expect(screen.getByRole("link", { name: "Genealogy" })).toHaveAttribute("href", "/genealogy");
+  });
 });

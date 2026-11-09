@@ -54,7 +54,9 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   // Region and genre of the last framing, so the effects below only fly for selections that did not already
   // call `flyTo` themselves (search and breadcrumb picks); map clicks, back/forward and edited URLs fly here.
   const lastFlown = useRef<string | null>(state.region);
-  const lastGenreFlown = useRef<string | null>(state.genre);
+  const lastGenreFlown = useRef<string | null>(
+    state.at === null && state.region === null ? null : state.genre,
+  );
   const flyTo = useCallback((id: string | null) => {
     lastFlown.current = id;
     if (id !== null && regions.get(id)?.boundaryStatus === "missing") return;
@@ -94,6 +96,9 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   useEffect(() => {
     setCollapsed(false);
   }, [selectedId, state.genre]);
+  const genreHasNoRegion =
+    state.genre !== null && !lexicon.isPending && !lexicon.isError && genreRegionId === null &&
+    !genreEntries.some((entry) => entry.genre.uuid === state.genre);
 
   const hasLegacyPath = state.legacyPath.length > 0;
   const invalidRegion = state.region !== null && selected === undefined;
@@ -143,6 +148,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
       {selected?.boundaryStatus === "missing" && (
         <p role="status">Boundary unavailable for {selected.name}. Its music remains available below.</p>
       )}
+      {genreHasNoRegion && <p role="status">This genre has no region on the map.</p>}
       <div className="relative min-h-0 flex-1">
         <RegionMapCanvas
           tileset={index.tileset}

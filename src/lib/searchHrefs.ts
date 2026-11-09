@@ -10,3 +10,9 @@ export const mapRegionHref = (regionId: string, genreUuid: string | null = null)
   if (genreUuid) params.set("genre", genreUuid);
   return `${REGION_MAP_HREF}?${params.toString()}`;
 };
+
+/** Switching between the tree and the map keeps the selected genre; every other parameter belongs to one view. */
+export const viewSwitchHref = (target: "/" | typeof REGION_MAP_HREF, searchParams: URLSearchParams) => {
+  const genre = searchParams.get("genre");
+  return genre ? `${target}?${new URLSearchParams({ genre }).toString()}` : target;
+};
