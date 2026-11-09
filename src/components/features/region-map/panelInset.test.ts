@@ -64,4 +64,8 @@ describe("fitPadding", () => {
   it("adds the inset to the matching side", () => {
     expect(fitPadding(24, { left: 400 })).toEqual({ top: 24, bottom: 24, left: 424, right: 24 });
   });
+
+  it("caps the inset so a third of the map stays visible", () => {
+    expect(fitPadding(24, { left: 900 }, { width: 600, height: 400 })).toEqual({ top: 24, bottom: 24, left: 376, right: 24 });
+  });
 });
