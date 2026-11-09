@@ -8,12 +8,17 @@ const REASON_LABELS: Record<CurationReviewReason, string> = {
   redirect_conflict: "Fusion en conflit",
   missing: "Supprimé sur Wikidata",
   not_in_tree: "Hors de l'arbre",
+  invalid_rule: "Règle invalide",
+  exclusive_parent_regional: "Exclusion impossible",
 };
 
 const FALLBACK_EXPLANATIONS: Record<CurationReviewReason, string> = {
   redirect_conflict: "L'élément a été fusionné sur Wikidata vers un élément déjà présent dans la liste.",
   missing: "L'élément n'existe plus sur Wikidata.",
   not_in_tree: "L'élément ne répond plus au critère d'appartenance à l'arbre.",
+  invalid_rule: "La règle contredit Wikidata : le pipeline l'a ignorée.",
+  exclusive_parent_regional:
+    "L'élément reste régional malgré l'exclusion des autres parents : à déplacer dans « Genres maintenus canoniques ».",
 };
 
 const DATE_FORMAT = new Intl.DateTimeFormat("fr-FR", { dateStyle: "short", timeZone: "Europe/Paris" });
@@ -36,7 +41,9 @@ function explain({
   if (reason === "redirect_conflict" && column !== "item_id" && target === key)
     return "Fusionné vers l'élément porteur de la règle lui-même (règle auto-référente).";
   if (!evidence) return FALLBACK_EXPLANATIONS[reason];
-  const { modified, instanceOf, subclassOf, hasIndigenousTo, conflictList } = evidence;
+  const { modified, instanceOf, subclassOf, hasIndigenousTo, conflictList, detail } = evidence;
+  if (reason === "invalid_rule") return detail ?? FALLBACK_EXPLANATIONS.invalid_rule;
+  if (reason === "exclusive_parent_regional") return FALLBACK_EXPLANATIONS.exclusive_parent_regional;
   if (reason === "missing") return FALLBACK_EXPLANATIONS.missing;
   if (reason === "redirect_conflict") {
     return conflictList

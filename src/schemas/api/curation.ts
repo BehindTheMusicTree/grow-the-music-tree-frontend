@@ -184,7 +184,13 @@ export const CurationItemSearchSchema = z.object({
   results: z.array(z.object({ id: z.string(), label: z.string() })),
 });
 
-export const CurationReviewReasonSchema = z.enum(["redirect_conflict", "missing", "not_in_tree"]);
+export const CurationReviewReasonSchema = z.enum([
+  "redirect_conflict",
+  "missing",
+  "not_in_tree",
+  "invalid_rule",
+  "exclusive_parent_regional",
+]);
 
 export type CurationReviewReason = z.infer<typeof CurationReviewReasonSchema>;
 
@@ -197,6 +203,7 @@ export const CurationReviewEvidenceSchema = z.object({
   subclassOf: z.array(EvidenceItemSchema).optional(),
   hasIndigenousTo: z.boolean().optional(),
   conflictList: z.string().optional(),
+  detail: z.string().optional(),
 });
 
 export type CurationReviewEvidence = z.infer<typeof CurationReviewEvidenceSchema>;

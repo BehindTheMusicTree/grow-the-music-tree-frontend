@@ -297,4 +297,34 @@ describe("CurationReviewList", () => {
     expect(screen.getByText(/Vue d'ensemble de/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Q11" })).toBeInTheDocument();
   });
+
+  it("explains an invalid rule from its evidence detail and falls back without it", () => {
+    render(
+      <CurationReviewList
+        items={[
+          {
+            ...base,
+            list: "a",
+            itemId: "Q1",
+            reason: "invalid_rule",
+            target: null,
+            evidence: { detail: "Racine classée régionale" },
+          },
+          { ...base, key: "Q2", list: "a", itemId: "Q2", reason: "invalid_rule", target: null, evidence: null },
+        ]}
+      />,
+    );
+    expect(screen.getByText("Racine classée régionale")).toBeInTheDocument();
+    expect(screen.getByText("La règle contredit Wikidata : le pipeline l'a ignorée.")).toBeInTheDocument();
+  });
+
+  it("points an exclusive regional parent to the forced canonical genres", () => {
+    render(
+      <CurationReviewList
+        items={[{ ...base, list: "a", itemId: "Q1", reason: "exclusive_parent_regional", target: null }]}
+      />,
+    );
+    expect(screen.getByText("Exclusion impossible")).toBeInTheDocument();
+    expect(screen.getByText(/Genres maintenus canoniques/)).toBeInTheDocument();
+  });
 });
