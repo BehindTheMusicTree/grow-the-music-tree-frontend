@@ -126,6 +126,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - Open regional search results in the current view, including descendants absent from the map index. Genre details work without a visible tree node or region, preserve map context during family navigation, and reopen on repeated selection.
 - Remove the region selection halo, which produced dark artifacts along intricate coastlines, and round zone halo joins.
 - The region map now centers on any selected region (map click, URL, back/forward) and on a selected genre's region, and fits the whole region in the part of the map the detail panel leaves visible.
+- The region map keeps at least a third of the map visible when fitting beside a wide detail panel, and recenters again on a region reselected after the selection was cleared.
 
 ### Improved
 
