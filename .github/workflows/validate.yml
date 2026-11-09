@@ -85,6 +85,54 @@ jobs:
       - name: Build application
         run: pnpm run build
 
+  e2e:
+    name: Browser journeys
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build application
+        env:
+          NEXT_PUBLIC_CONTACT_EMAIL: e2e@example.com
+          NEXT_PUBLIC_TILES_BASE_URL: https://tiles.example.test
+        run: pnpm run build
+
+      - name: Assemble standalone server
+        run: |
+          cp -r public .next/standalone/public
+          mkdir -p .next/standalone/.next
+          cp -r .next/static .next/standalone/.next/static
+
+      - name: Run browser journeys
+        run: pnpm run test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
   grow-api-contract:
     name: grow-api contract (prod)
     if: github.event_name == 'pull_request' && github.base_ref == 'main'

@@ -117,6 +117,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - The curation review lists the new reasons `invalid_rule` (with the pipeline's `evidence.detail`) and `exclusive_parent_regional` (pointing to « Genres maintenus canoniques »), with tests. Needs grow-the-music-tree-api 16.0.0.
 
+### CI
+
+- Playwright browser journeys on a production build with frozen API fixtures keep the genre, artist and song URL params and tab titles right across the tree and the map (`pnpm test:e2e`, `e2e` job).
+
 ### Changed
 
 - The region map no longer shows the « Regions without a boundary » bar above it. Those regions stay reachable through the search and `?region=`, and the panel says when a region has no boundary.
