@@ -69,9 +69,6 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
     if (id !== null && regions.get(id)?.boundaryStatus === "missing") return;
     setFocus((current) => ({ id, seq: (current?.seq ?? 0) + 1 }));
   }, [regions]);
-  const missingBoundaries = index.regions
-    .filter((region) => region.boundaryStatus === "missing")
-    .sort((a, b) => a.name.localeCompare(b.name));
 
   const [collapsed, setCollapsed] = useState(false);
   const selectedId = state.region;
@@ -147,29 +144,8 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   const trail = selected ? ancestry(selected, regions) : [];
 
   return (
-    <div className="flex h-full flex-col gap-3">
-      {missingBoundaries.length > 0 && (
-        <label className="flex items-center gap-3">
-          Regions without a boundary
-          <select
-            value={selected?.boundaryStatus === "missing" ? selected.id : ""}
-            onChange={(event) => {
-              const region = regions.get(event.target.value);
-              if (region) select(region);
-            }}
-          >
-            <option value="">Choose a region</option>
-            {missingBoundaries.map((region) => (
-              <option key={region.id} value={region.id}>{region.name}</option>
-            ))}
-          </select>
-        </label>
-      )}
-      {selected?.boundaryStatus === "missing" && (
-        <p role="status">Boundary unavailable for {selected.name}. Its music remains available below.</p>
-      )}
-      {genreHasNoRegion && <p role="status">This genre has no region on the map.</p>}
-      <div className="relative min-h-0 flex-1">
+    <div className="h-full">
+      <div className="relative h-full">
         <RegionMapCanvas
           tileset={index.tileset}
           regions={regions}
@@ -183,6 +159,11 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
           onCameraChange={onCameraChange}
         />
         <RegionMapSearch index={index} regions={regions} onPick={pick} onPickArtist={(artist) => { setCollapsed(false); update({ artist }); }} onPickSong={(song) => { setCollapsed(false); update({ song }); }} selectedRegion={selected} selectedGenreUuid={state.genre} selectedArtistUuid={state.artist} selectedSongUuid={state.song} onClosePanel={clearSelection} className="absolute left-3 right-3 top-3 z-20 sm:right-auto sm:w-80" />
+        {genreHasNoRegion && (
+          <p role="status" className="absolute left-1/2 top-16 z-10 max-w-[calc(100%-theme(spacing.6))] -translate-x-1/2 rounded bg-white px-3 py-1 shadow">
+            This genre has no region on the map.
+          </p>
+        )}
         {selected && (
           <Breadcrumb
             className="absolute left-1/2 top-16 z-10 max-w-[calc(100%-theme(spacing.6))] -translate-x-1/2"

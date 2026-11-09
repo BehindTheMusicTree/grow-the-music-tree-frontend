@@ -135,7 +135,7 @@ describe("RegionDetailPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: "Basque music" }));
     expect(props.onSelectGenre).toHaveBeenCalledWith(uuid);
     expect(screen.queryByRole("button", { name: /Zoom/ })).toBeNull();
-
+    expect(screen.getByRole("status")).toHaveTextContent(`Boundary unavailable for ${region.name}`);
   });
 
   it("closes on Escape", () => {

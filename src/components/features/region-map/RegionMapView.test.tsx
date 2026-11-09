@@ -44,6 +44,7 @@ vi.mock("./RegionMapSearch", () => ({
   default: ({ onPick, onPickArtist, onPickSong }: { onPick: (region: string | null, genre: string | null) => void; onPickArtist: (uuid: string) => void; onPickSong: (uuid: string) => void }) => (
     <>
       <button onClick={() => onPick(null, makeGenreUuid("regional"))}>Pick regional genre</button>
+      <button onClick={() => onPick("JO", null)}>Pick Joseon</button>
       <button onClick={() => onPickArtist("artist-1")}>Pick artist</button>
       <button onClick={() => onPickSong("song-1")}>Pick song</button>
     </>
@@ -197,7 +198,6 @@ describe("RegionMapView", () => {
     setSearch("region=JO");
     const { unmount } = render(<RegionMapView />);
 
-    expect(screen.getByRole("status")).toHaveTextContent("Boundary unavailable for Joseon");
     expect(screen.getByRole("region", { name: "Panel Joseon" })).toBeInTheDocument();
     expect(lastProps.focus).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Zoom to" }));
@@ -208,9 +208,7 @@ describe("RegionMapView", () => {
 
     setSearch("");
     render(<RegionMapView />);
-    fireEvent.change(screen.getByRole("combobox", { name: "Regions without a boundary" }), {
-      target: { value: "JO" },
-    });
+    fireEvent.click(screen.getByRole("button", { name: "Pick Joseon" }));
     await flushNavigation();
     expect(url(pushState.mock.calls[0]).searchParams.get("region")).toBe("JO");
   });
