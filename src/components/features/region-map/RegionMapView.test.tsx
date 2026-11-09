@@ -119,6 +119,16 @@ describe("RegionMapView", () => {
     expect(url(pushState.mock.calls.at(-1)! ).searchParams.get("at")).toBe("2,46,5");
   });
 
+  it("unselects both the genre and its region when the genre panel closes", async () => {
+    setSearch(`genre=${makeGenreUuid("regional")}&region=Q142`);
+    render(<RegionMapView />);
+    fireEvent.click(screen.getByRole("button", { name: "Close genre" }));
+    await flushNavigation();
+    const params = url(pushState.mock.calls.at(-1)!).searchParams;
+    expect(params.get("genre")).toBeNull();
+    expect(params.get("region")).toBeNull();
+  });
+
   it("reopens a collapsed panel when the same genre is picked again", () => {
     setSearch(`genre=${makeGenreUuid("regional")}&region=Q142`);
     render(<RegionMapView />);

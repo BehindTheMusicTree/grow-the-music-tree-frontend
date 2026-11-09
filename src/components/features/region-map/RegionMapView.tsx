@@ -156,7 +156,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
           onClearSelection={clearSelection}
           onCameraChange={onCameraChange}
         />
-        <RegionMapSearch index={index} regions={regions} onPick={pick} selectedGenreUuid={state.genre} className="absolute left-3 right-3 top-3 z-20 sm:right-auto sm:w-80" />
+        <RegionMapSearch index={index} regions={regions} onPick={pick} selectedRegion={selected} selectedGenreUuid={state.genre} onClosePanel={clearSelection} className="absolute left-3 right-3 top-3 z-20 sm:right-auto sm:w-80" />
         {selected && (
           <Breadcrumb
             className="absolute left-1/2 top-16 z-10 max-w-[calc(100%-theme(spacing.6))] -translate-x-1/2"
@@ -178,19 +178,19 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
         )}
         {state.genre !== null ? parsedGenre.success ? (
           <GenreDetailPanel
-            headerClassName="md:pt-[calc(var(--layout-search-h)+theme(spacing.6))]"
+            titleInSearch
             genreUuid={parsedGenre.data}
             scope="reference"
             getBackendBaseUrl={getGrowBackendBaseUrl}
             onSelectGenre={(genre) => { setCollapsed(false); update({ genre }); }}
-            onClose={() => update({ genre: null })}
+            onClose={clearSelection}
             shareUrl={typeof window === "undefined" ? undefined : window.location.href}
             shareTarget={{ kind: "genre", genreUuid: parsedGenre.data, name: "Genre", scope: "reference", artistUuid: null }}
             collapsed={collapsed}
             edgeTab={collapseEdgeTab(collapsed, setCollapsed)}
           />
         ) : (
-          <DetailPanel headerClassName="md:pt-[calc(var(--layout-search-h)+theme(spacing.6))]" title="Genre unavailable" side="left" onClose={() => update({ genre: null })}>
+          <DetailPanel titleInSearch title="Genre unavailable" side="left" onClose={clearSelection}>
             <p role="alert">This genre could not be loaded.</p>
           </DetailPanel>
         ) : selected ? (
@@ -201,7 +201,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
             onCollapsedChange={setCollapsed}
             onSelectGenre={(genre) => { setCollapsed(false); update({ genre }); }}
             onZoomTo={(region) => flyTo(region.id)}
-            onClose={() => update({ region: null, genre: null })}
+            onClose={clearSelection}
           />
         ) : null}
       </div>

@@ -6,6 +6,7 @@ import { Button, DetailPanel, FieldList } from "@behindthemusictree/ui";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { collapseEdgeTab } from "@utils/collapseEdgeTab";
 import type { Region } from "@schemas/api/region-map";
+import { useRegionOverview } from "./useRegionOverview";
 
 type Props = {
   region: Region;
@@ -24,17 +25,13 @@ export default function RegionDetailPanel({
   collapsed,
   onCollapsedChange,
 }: Props) {
-  const ownOverviewId = region.overviewItemId;
-  const overviewId = ownOverviewId ?? region.inheritedOverviewItemId;
-  const overview = useGenreByWikidataId(overviewId, "reference", getGrowBackendBaseUrl);
+  const { overviewId, uuid, failed } = useRegionOverview(region);
   const edgeTab = collapseEdgeTab(collapsed, onCollapsedChange);
   const onZoomIn = region.drillable && region.boundaryStatus !== "missing" ? () => onZoomTo(region) : undefined;
 
-  const uuid = overview.data?.uuid;
-
   if (overviewId === null && !uuid) {
     return (
-      <DetailPanel headerClassName="md:pt-[calc(var(--layout-search-h)+theme(spacing.6))]" title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
+      <DetailPanel titleInSearch title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
         <FieldList
           items={[
             { label: "Songs", value: region.songCount },
@@ -60,12 +57,11 @@ export default function RegionDetailPanel({
   }
 
   if (!uuid) {
-    const failed = overview.isError || overview.data === null;
     return (
-      <DetailPanel headerClassName="md:pt-[calc(var(--layout-search-h)+theme(spacing.6))]" title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
+      <DetailPanel titleInSearch title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
         {failed ? (
           <p role="alert" className="px-6 py-4 text-red-600">
-            {ownOverviewId === null
+            {region.overviewItemId === null
               ? `The music genre covering ${region.name} could not be loaded.`
               : `The genre “Music of ${region.name}” could not be loaded.`}
           </p>
@@ -78,7 +74,7 @@ export default function RegionDetailPanel({
 
   return (
     <GenreDetailPanel
-      headerClassName="md:pt-[calc(var(--layout-search-h)+theme(spacing.6))]"
+      titleInSearch
       genreUuid={uuid}
       scope="reference"
       getBackendBaseUrl={getGrowBackendBaseUrl}

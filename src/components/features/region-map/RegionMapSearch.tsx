@@ -9,18 +9,22 @@ import { usePlaceSearchGroup, useRegionGenreSearchGroup } from "@components/feat
 import { PATHS } from "@lib/constants/routes";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import type { Region, RegionMapIndex } from "@schemas/api/region-map";
+import { useRegionOverview } from "./useRegionOverview";
 
 type Props = {
   index: RegionMapIndex;
   regions: ReadonlyMap<string, Region>;
   /** Opens the region (and genre) in the panel and frames the region. */
   onPick: (regionId: string | null, genreUuid: GenreUuid | null) => void;
-  selectedGenreUuid?: string | null;
+  selectedRegion: Region | undefined;
+  selectedGenreUuid: string | null;
+  /** Called by the clear button, shown only while a panel is open. */
+  onClosePanel: () => void;
   className?: string;
 };
 
 /** Places, region genres, other genres, artists and songs in one box. The lexicon loads on the first focus. */
-export default function RegionMapSearch({ index, regions, onPick, selectedGenreUuid, className }: Props) {
+export default function RegionMapSearch({ index, regions, onPick, selectedRegion, selectedGenreUuid, onClosePanel, className }: Props) {
   const router = useRouter();
   const [focused, setFocused] = useState(false);
   const lexicon = useRegionGenreLexicon(getGrowBackendBaseUrl, focused);
@@ -30,7 +34,10 @@ export default function RegionMapSearch({ index, regions, onPick, selectedGenreU
 
   const parsedGenre = GenreUuidSchema.safeParse(selectedGenreUuid);
   const { data: selectedGenre } = useFetchGenreDetail(parsedGenre.success ? parsedGenre.data : null, "reference", getGrowBackendBaseUrl);
-  const { query, setQuery, isTyping, clear } = useSearchQueryState({ selectedName: selectedGenre?.name });
+  const regionOverview = useRegionOverview(selectedGenreUuid === null ? selectedRegion : undefined);
+  const selectedName = selectedGenreUuid === null ? regionOverview.panelName : (selectedGenre?.name ?? null);
+  const panelOpen = selectedRegion !== undefined || selectedGenreUuid !== null;
+  const { query, setQuery, isTyping, clear } = useSearchQueryState({ selectedName, onClear: onClosePanel });
   const text = isTyping ? query : "";
   const places = usePlaceSearchGroup(regions, { ready: true, isError: false }, text, useCallback((region: Region) => onPick(region.id, null), [onPick]));
   const regionGenres = useRegionGenreSearchGroup(entries, source, text, useCallback((entry) => onPick(entry.region.id, entry.genre.uuid), [onPick]));
@@ -57,9 +64,10 @@ export default function RegionMapSearch({ index, regions, onPick, selectedGenreU
       placeholder="Search places, genres, artists, songs"
       value={query}
       onValueChange={setQuery}
-      onClear={clear}
+      onClear={panelOpen ? clear : undefined}
+      clearLabel="Close panel"
       groups={groups}
-      onPicked={(_group, key) => setQuery(selectedGenre?.uuid === key ? selectedGenre.name : "")}
+      onPicked={() => setQuery(selectedName ?? "")}
       onFocus={() => setFocused(true)}
     />
   );
