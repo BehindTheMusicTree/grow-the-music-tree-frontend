@@ -3,10 +3,14 @@ import { installApi } from "./support/api";
 import { ids, names } from "./support/fixtures";
 import { APP_TITLE, expectState, expectUrlInvariants } from "./support/invariants";
 
+let unstubbed: string[] = [];
+
 test.beforeEach(async ({ page }) => {
-  const api = await installApi(page);
-  test.info().annotations.push({ type: "api", description: "frozen" });
-  page.on("close", () => expect(api.unstubbed).toEqual([]));
+  ({ unstubbed } = await installApi(page));
+});
+
+test.afterEach(() => {
+  expect(unstubbed, "API calls with no stub").toEqual([]);
 });
 
 const toMap = (page: Page) => page.getByRole("link", { name: "Region map" }).click();
