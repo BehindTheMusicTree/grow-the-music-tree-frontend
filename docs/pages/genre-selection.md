@@ -14,6 +14,8 @@ and camera. Closing the genre returns to the region overview when one is selecte
 
 Regional genre discovery uses remote genre search, independent of the map lexicon.
 Genre results open in the current view; place results keep geographic navigation.
+The full parameter table for both views is in [the map and tree URL contract](map.md).
+
 Artist filters remain in tree URLs when a genre is selected.
 
 This frontend change requires the coordinated app-kit entity-selection changes.

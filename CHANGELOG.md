@@ -138,6 +138,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - Remove the region selection halo, which produced dark artifacts along intricate coastlines, and round zone halo joins.
 - The region map now centers on any selected region (map click, URL, back/forward) and on a selected genre's region, and fits the whole region in the part of the map the detail panel leaves visible.
 - The region map keeps at least a third of the map visible when fitting beside a wide detail panel, and recenters again on a region reselected after the selection was cleared.
+- Switching between the tree and the map no longer copies the map camera (`at`) into the tree URL; an artist or song tab title survives Next's metadata update, and the map titles the tab after the panel it shows rather than a hidden artist. The URL parameters of both views are documented in `docs/pages/map.md`.
 
 ### Improved
 

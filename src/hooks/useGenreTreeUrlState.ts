@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { GenreUuidSchema, type GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
 import { updateUrlQuery } from "@lib/urlQuery";
@@ -34,6 +34,7 @@ interface UseGenreTreeUrlStateOptions {
 
 export function useGenreTreeUrlState({ viewMode }: UseGenreTreeUrlStateOptions) {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const rawGenre = searchParams.get(GENRE_PARAM);
   const parsedGenre = GenreUuidSchema.safeParse(rawGenre);
   const genre = parsedGenre.success ? parsedGenre.data : null;
@@ -53,8 +54,8 @@ export function useGenreTreeUrlState({ viewMode }: UseGenreTreeUrlStateOptions) 
           params.delete(ABOUT_PARAM);
           params.delete(SONG_PARAM);
         } else params.delete(GENRE_PARAM);
-      }, method),
-    [],
+      }, method, pathname),
+    [pathname],
   );
 
   const setArtistUuid = useCallback(
@@ -66,8 +67,8 @@ export function useGenreTreeUrlState({ viewMode }: UseGenreTreeUrlStateOptions) 
           params.delete(ABOUT_PARAM);
           params.delete(SONG_PARAM);
         } else params.delete(ARTIST_PARAM);
-      }, method),
-    [],
+      }, method, pathname),
+    [pathname],
   );
 
   const setSongUuid = useCallback(
@@ -79,8 +80,8 @@ export function useGenreTreeUrlState({ viewMode }: UseGenreTreeUrlStateOptions) 
           params.delete(ARTIST_PARAM);
           params.delete(ABOUT_PARAM);
         } else params.delete(SONG_PARAM);
-      }, method),
-    [],
+      }, method, pathname),
+    [pathname],
   );
 
   const setSizeMetric = useCallback(
@@ -88,8 +89,8 @@ export function useGenreTreeUrlState({ viewMode }: UseGenreTreeUrlStateOptions) 
       updateUrlQuery((params) => {
         if (metric === "views") params.set(SIZE_PARAM, metric);
         else params.delete(SIZE_PARAM);
-      }, "replace"),
-    [],
+      }, "replace", pathname),
+    [pathname],
   );
 
   const setFocus = useCallback(
@@ -102,14 +103,15 @@ export function useGenreTreeUrlState({ viewMode }: UseGenreTreeUrlStateOptions) 
         },
         // A rejected zoom must not stay in history, or browser back would land on it again.
         reason === "rejected" ? "replace" : "push",
+        pathname,
       ),
-    [],
+    [pathname],
   );
 
   const onViewportChange = useCallback((viewport: GenreTreeViewport) => {
     const formatted = formatViewport(viewport);
-    updateUrlQuery((params) => params.set(VIEW_PARAM, formatted), "replace");
-  }, []);
+    updateUrlQuery((params) => params.set(VIEW_PARAM, formatted), "replace", pathname);
+  }, [pathname]);
 
   useEffect(() => {
     const modeChanged = previousViewMode.current !== viewMode;
@@ -123,8 +125,8 @@ export function useGenreTreeUrlState({ viewMode }: UseGenreTreeUrlStateOptions) 
     updateUrlQuery((params) => {
       if (stripView || malformedView) params.delete(VIEW_PARAM);
       if (stripZoom) params.delete(ZOOM_PARAM);
-    }, "replace");
-  }, [viewMode, view, zoom]);
+    }, "replace", pathname);
+  }, [viewMode, view, zoom, pathname]);
 
   return {
     selectedGenreUuid: genre,
