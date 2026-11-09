@@ -120,6 +120,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - Tree and map genre links now use genre entity UUIDs. Playlist UUID links are no longer interpreted as genre selections.
 
+- On the map, the search box alone shows the selected region or genre and closes its panel: the panel header has no title or close cross, and the search cross appears only while a panel is open and unselects the item. Closing a genre opened from a region now closes everything; browser back returns to the region.
+
 ### Fixed
 
 - The genre tree no longer loads blank on first visit when the playback country resolves while the tree request is in flight. Upgrade `@behindthemusictree/app-kit` and `app-kit-ui` to 36.0.0 and read country-dependent data (song detail, to-refine songs, player track loading) through the explicit playback binding.
