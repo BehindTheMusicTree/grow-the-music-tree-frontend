@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit-ui/popup";
-import { CriteriaMinimum, useCreateGenre } from "@behindthemusictree/app-kit/genre-tree";
+import { CriteriaMinimum, type GenreUuid, useCreateGenre } from "@behindthemusictree/app-kit/genre-tree";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
 type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable" | "onClose"> & {
   onClose: () => void;
-  onCreated: (nodeId: string) => void;
+  onCreated: (genreUuid: GenreUuid) => void;
   parent?: CriteriaMinimum | null;
 };
 
@@ -24,7 +24,7 @@ export default function GenreCreationPopup({ onClose, onCreated, parent, ...rest
       {
         onSuccess: (genre) => {
           onClose();
-          onCreated(genre.criteriaPlaylist.uuid);
+          onCreated(genre.uuid);
         },
       },
     );

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import type { RegionGenreLexiconEntry } from "@behindthemusictree/app-kit/genre-tree";
+import type { GenreSearchResult, RegionGenreLexiconEntry } from "@behindthemusictree/app-kit/genre-tree";
 import fixture from "@schemas/api/region-map.fixture.json";
 import { RegionMapIndexSchema } from "@schemas/api/region-map";
 import RegionMapSearch from "./RegionMapSearch";
@@ -9,11 +9,16 @@ const index = RegionMapIndexSchema.parse(fixture);
 const regions = new Map(index.regions.map((region) => [region.id, region]));
 const push = vi.fn();
 const lexiconEnabled = vi.fn();
+const remoteGenre = {
+  uuid: "f2234c80-5949-4ee5-90f5-cd689bd0c693", name: "Breton rock", treeName: "regional",
+  genrePlaylistUuid: null, wikidataId: "Q47005557", isUmbrella: false,
+} as GenreSearchResult;
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 
 vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@behindthemusictree/app-kit/genre-tree")>()),
+  useFetchGenreDetail: () => ({ data: undefined }),
   useRegionGenreLexicon: (_getBaseUrl: unknown, enabled: boolean) => {
     lexiconEnabled(enabled);
     const entries = enabled
@@ -35,7 +40,14 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
 
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@behindthemusictree/app-kit-ui/genre-tree")>()),
-  useGenreRemoteSearchGroup: () => ({ key: "other-genres", label: "Other genres", items: [] }),
+  useGenreRemoteSearchGroup: (
+    _base: unknown, query: string, onSelect: (genre: GenreSearchResult) => void,
+    options: { enabled: boolean; filter: (genre: GenreSearchResult) => boolean },
+  ) => ({ key: "other-genres", label: "Other genres", items:
+    options.enabled && query.toLowerCase().includes("rock") && options.filter(remoteGenre)
+      ? [{ key: remoteGenre.uuid, content: remoteGenre.name, onSelect: () => onSelect(remoteGenre) }]
+      : [],
+  }),
   useArtistSearchGroup: () => undefined,
   useSongSearchGroup: () => undefined,
 }));
@@ -52,6 +64,20 @@ const setup = () => {
 };
 
 describe("RegionMapSearch", () => {
+  it.each(["click", "keyboard"])("opens a remote descendant without a playlist or map entry by %s", (method) => {
+    const onPick = setup();
+    const input = screen.getByRole("combobox", { name: "Search the map" });
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: "Breton rock" } });
+    if (method === "click") {
+      fireEvent.mouseDown(screen.getByRole("option", { name: "Breton rock" }));
+    } else {
+      fireEvent.keyDown(input, { key: "ArrowDown" });
+      fireEvent.keyDown(input, { key: "Enter" });
+    }
+    expect(onPick).toHaveBeenCalledWith(null, remoteGenre.uuid);
+  });
+
   it("loads the lexicon only once the input is focused", () => {
     setup();
     expect(lexiconEnabled).toHaveBeenLastCalledWith(false);

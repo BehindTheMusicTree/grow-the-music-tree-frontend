@@ -12,6 +12,8 @@ import {
   hasMainstreamPopRoot,
   genrePlaylistTrackCount,
   GenrePlaylistUuidSchema,
+  GenreUuidSchema,
+  type GenreUuid,
   useArtist,
   useSong,
 } from "@behindthemusictree/app-kit/genre-tree";
@@ -21,6 +23,7 @@ import {
   type ParentChange,
   type GenreTreeShareTarget,
   type GenreSearchGroupsProps,
+  useGenreRemoteSearchGroup,
 } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { useUpdateGenreParent } from "@hooks/curation/useUpdateGenreParent";
 import GenreCreationPopup from "@components/ui/popup/child/GenreCreationPopup";
@@ -46,9 +49,7 @@ import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
 import { regionMapLookup } from "@lib/region-map-index";
 import { useRegionMapIndex } from "@hooks/useRegionMap";
-import { useRegionGenreLexicon } from "@behindthemusictree/app-kit/genre-tree";
-import { useRegionGenreIndex } from "@components/features/search/useRegionGenreIndex";
-import { usePlaceSearchGroup, useRegionGenreSearchGroup } from "@components/features/search/useRegionSearchGroups";
+import { usePlaceSearchGroup } from "@components/features/search/useRegionSearchGroups";
 import { mapRegionHref } from "@lib/searchHrefs";
 import type { Region } from "@schemas/api/region-map";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -82,7 +83,7 @@ const GenreTreeView = dynamic(
 
 type ZoomableGenreTreeViewProps = Omit<
   ComponentProps<typeof GenreTreeView>,
-  | "onSelectedNodeIdChange"
+  | "onSelectedGenreUuidChange"
   | "focusGenreUuid"
   | "onFocusGenreChange"
   | "artistSearch"
@@ -97,11 +98,12 @@ type ZoomableGenreTreeViewProps = Omit<
   | "songExpanded"
   | "onSongExpandedChange"
 > & {
-  setSelectedNodeId: (id: string | null, method?: "push" | "replace") => void;
+  setSelectedGenreUuid: (id: GenreUuid | null, method?: "push" | "replace") => void;
   artistUuid: string | null;
   setArtistUuid: (uuid: string | null, method?: "push" | "replace") => void;
   songUuid: string | null;
   setSongUuid: (uuid: string | null, method?: "push" | "replace") => void;
+  invalidGenre: boolean;
   focus?: {
     focusGenreUuid: string | null;
     onFocusGenreChange: (uuid: string | null, reason: FocusChangeReason) => void;
@@ -109,7 +111,8 @@ type ZoomableGenreTreeViewProps = Omit<
 };
 
 function ZoomableGenreTreeView({
-  setSelectedNodeId,
+  setSelectedGenreUuid,
+  invalidGenre,
   artistUuid,
   setArtistUuid,
   songUuid,
@@ -124,7 +127,7 @@ function ZoomableGenreTreeView({
       const params = new URLSearchParams(searchParams.toString());
       params.delete(SONG_PARAM);
       if (target.kind === "genre") {
-        params.set(GENRE_PARAM, target.genrePlaylistUuid);
+        params.set(GENRE_PARAM, target.genreUuid);
         params.delete(ARTIST_PARAM);
         if (target.artistUuid) params.set(ARTIST_PARAM, target.artistUuid);
       } else if (target.kind === "artist") {
@@ -142,7 +145,7 @@ function ZoomableGenreTreeView({
     [pathname, searchParams],
   );
   const about = searchParams.has(ABOUT_PARAM);
-  const { selectedNodeId, expanded: detailExpanded = false, onExpandedChange: setDetailExpanded } = viewProps;
+  const { selectedGenreUuid, expanded: detailExpanded = false, onExpandedChange: setDetailExpanded } = viewProps;
   const [detailCollapsed, setDetailCollapsed] = useState(false);
   const { isExpanded: tracklistExpanded, setExpanded: setTracklistExpanded } = usePlayerPanel();
 
@@ -173,7 +176,7 @@ function ZoomableGenreTreeView({
 
   useEffect(() => {
     setDetailCollapsed(false);
-  }, [selectedNodeId, artistUuid, songUuid]);
+  }, [selectedGenreUuid, artistUuid, songUuid]);
 
   useEffect(() => {
     setArtistExpanded(false);
@@ -187,8 +190,8 @@ function ZoomableGenreTreeView({
   useEffect(() => {
     if (about && songUuid) setSongUuid(null, "replace");
     else if (about && artistUuid) setArtistUuid(null, "replace");
-    else if (about && selectedNodeId) setSelectedNodeId(null, "replace");
-  }, [about, artistUuid, songUuid, selectedNodeId, setArtistUuid, setSongUuid, setSelectedNodeId]);
+    else if (about && (selectedGenreUuid || invalidGenre)) setSelectedGenreUuid(null, "replace");
+  }, [about, artistUuid, songUuid, invalidGenre, selectedGenreUuid, setArtistUuid, setSongUuid, setSelectedGenreUuid]);
 
   const artist = useArtist(artistUuid, getGrowBackendBaseUrl);
   const artistName = artist.status === "success" ? artist.artist.name : undefined;
@@ -214,20 +217,23 @@ function ZoomableGenreTreeView({
     };
   }, [songTitle, songArtists]);
 
-  const handleSelectedNodeIdChange = useCallback(
-    (id: string | null) => {
-      setSelectedNodeId(id);
+  const handleSelectedGenreUuidChange = useCallback(
+    (id: GenreUuid | null) => {
+      setDetailCollapsed(false);
+      setSelectedGenreUuid(id);
       if (id !== null) trackEvent("genre_select");
     },
-    [setSelectedNodeId],
+    [setSelectedGenreUuid],
   );
 
   const overlayPanel = about
     ? { title: "TheMusicTree", content: <AboutContent onClose={() => closeAbout()} />, onClose: () => closeAbout() }
-    : undefined;
+    : invalidGenre
+      ? { title: "Genre unavailable", content: <p role="alert">This genre could not be loaded.</p>, onClose: () => setSelectedGenreUuid(null) }
+      : undefined;
   const sharedProps = {
     ...viewProps,
-    onSelectedNodeIdChange: handleSelectedNodeIdChange,
+    onSelectedGenreUuidChange: handleSelectedGenreUuidChange,
     overlayPanel,
     collapsed: detailCollapsed,
     onCollapsedChange: setDetailCollapsed,
@@ -260,29 +266,24 @@ export default function GenreTreePage() {
   );
 }
 
-function GrowSearchGroups({ query, focused, children }: GenreSearchGroupsProps) {
+function GrowSearchGroups({ query, focused, children, onSelectGenre }: GenreSearchGroupsProps) {
   const router = useRouter();
   const getBackendBaseUrl = getGrowBackendBaseUrl;
-  // The region index and genre lexicon are only fetched once the search box is first focused.
+  // Place data is fetched once the search box is first focused.
   const regionIndex = useRegionMapIndex(focused);
-  const lexicon = useRegionGenreLexicon(getBackendBaseUrl, focused);
   const regions = useMemo(
     () => (regionIndex.data ? regionMapLookup(regionIndex.data) : null),
     [regionIndex.data],
   );
-  const regionGenres = useRegionGenreIndex(regionIndex.data, lexicon.entries);
   const places = usePlaceSearchGroup(
     regions,
     { ready: !regionIndex.isPending, isError: regionIndex.isError },
     query,
     useCallback((region: Region) => router.push(mapRegionHref(region.id)), [router]),
   );
-  const regionGenreGroup = useRegionGenreSearchGroup(
-    // Canonical genres are already the tree's own results.
-    useMemo(() => regionGenres.filter((entry) => entry.genre.treeName !== "canonical"), [regionGenres]),
-    { ready: !regionIndex.isPending && !lexicon.isPending, isError: regionIndex.isError || lexicon.isError },
-    query,
-    useCallback((entry) => router.push(mapRegionHref(entry.region.id, entry.genre.uuid)), [router]),
+  const regionGenreGroup = useGenreRemoteSearchGroup(getBackendBaseUrl, query,
+    (genre) => onSelectGenre(genre.uuid),
+    { key: "regional-genres", treeName: "regional", label: "Regional genres", enabled: focused },
   );
   const extraSearchGroups = useMemo(
     () => [places, regionGenreGroup].filter((group) => group !== undefined),
@@ -298,7 +299,7 @@ function GenreTreePageContent() {
   const isAdmin = useIsAdmin();
   const { showPopup, hidePopup } = usePopup();
   const [expanded, setExpanded] = useState(false);
-  // The visible tree depends on the URL's artist, and the URL state validates its genre against that tree.
+  // The artist filters the visualization independently of the selected genre.
   const artistFilter = useSearchParams().get(ARTIST_PARAM);
 
   // Shares the react-query cache with GenreTreeView's internal fetches (same queryKeys), so this
@@ -310,14 +311,10 @@ function GenreTreePageContent() {
     artistUuid: artistFilter,
   });
 
-  // Empty while loading or when the tree fetch failed; validating against it would drop a valid genre.
-  const genreIds = useMemo(
-    () => (genrePlaylists.length > 0 ? new Set(genrePlaylists.map((genrePlaylist) => genrePlaylist.uuid)) : undefined),
-    [genrePlaylists],
-  );
   const {
-    selectedNodeId,
-    setSelectedNodeId,
+    selectedGenreUuid,
+    invalidGenre,
+    setSelectedGenreUuid,
     artistUuid,
     setArtistUuid,
     songUuid,
@@ -328,7 +325,7 @@ function GenreTreePageContent() {
     setFocus,
     defaultViewport,
     onViewportChange,
-  } = useGenreTreeUrlState({ viewMode, genreIds });
+  } = useGenreTreeUrlState({ viewMode });
 
   const canShowPopCore = useMemo(() => {
     const all = genrePlaylists;
@@ -370,8 +367,8 @@ function GenreTreePageContent() {
 
   const showCriteriaCreationPopup = useCallback(
     (parent: CriteriaMinimum | null = null) =>
-      showPopup(<GenreCreationPopup parent={parent} onClose={hidePopup} onCreated={(id) => setSelectedNodeId(id)} />),
-    [hidePopup, setSelectedNodeId, showPopup],
+      showPopup(<GenreCreationPopup parent={parent} onClose={hidePopup} onCreated={setSelectedGenreUuid} />),
+    [hidePopup, setSelectedGenreUuid, showPopup],
   );
 
   const showGenreRenamePopup = useCallback(
@@ -422,8 +419,8 @@ function GenreTreePageContent() {
               key={playlist.criteria.uuid}
               genre={playlist.criteria}
               parent={playlist.parent}
-              onAliased={(targetUuid) => setSelectedNodeId(targetUuid)}
-              onRemoved={() => setSelectedNodeId(playlist.parent?.uuid ?? null, "replace")}
+              onAliased={(targetUuid) => setSelectedGenreUuid(GenreUuidSchema.parse(targetUuid))}
+              onRemoved={() => setSelectedGenreUuid(genrePlaylists.find((item) => item.uuid === playlist.parent?.uuid)?.criteria?.uuid ?? null, "replace")}
             />
           ) : null;
         },
@@ -449,8 +446,9 @@ function GenreTreePageContent() {
       getBackendBaseUrl={getBackendBaseUrl}
       viewMode={viewMode}
       readOnly={!isAdmin}
-      selectedNodeId={selectedNodeId}
-      setSelectedNodeId={setSelectedNodeId}
+      invalidGenre={invalidGenre}
+      selectedGenreUuid={selectedGenreUuid}
+      setSelectedGenreUuid={setSelectedGenreUuid}
       artistUuid={artistUuid}
       setArtistUuid={setArtistUuid}
       songUuid={songUuid}

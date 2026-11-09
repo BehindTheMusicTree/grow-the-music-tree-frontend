@@ -1,3 +1,4 @@
+import { makeGenreUuid } from "@behindthemusictree/app-kit/genre-tree/testing";
 import { useEffect } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
@@ -32,7 +33,16 @@ vi.mock("@hooks/useRegionMap", () => ({
   useRegionMapIndex: () => ({ data, isPending: false, isError: false }),
 }));
 
-vi.mock("./RegionMapSearch", () => ({ default: () => null }));
+vi.mock("./RegionMapSearch", () => ({ default: ({ onPick }: { onPick: (region: string | null, genre: string | null) => void }) => <button onClick={() => onPick(null, makeGenreUuid("regional"))}>Pick regional genre</button> }));
+vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
+  GenreDetailPanel: ({ genreUuid, onClose, onSelectGenre, collapsed, edgeTab }: { genreUuid: string; onClose: () => void; onSelectGenre: (uuid: string) => void; collapsed: boolean; edgeTab: { edge: { label: string; onClick: () => void } | null; center: { label: string; onClick: () => void } | null } }) => (
+    <section aria-label="Genre detail" data-collapsed={String(collapsed)}>
+      {genreUuid}<button onClick={onClose}>Close genre</button>
+      <button onClick={() => onSelectGenre(makeGenreUuid("relative"))}>Relative</button>
+      <button onClick={(edgeTab.edge ?? edgeTab.center)!.onClick}>{(edgeTab.edge ?? edgeTab.center)!.label}</button>
+    </section>
+  ),
+}));
 
 vi.mock("./RegionDetailPanel", () => ({
   default: ({ region, onZoomTo, onClose }: { region: Region; onZoomTo: (r: Region) => void; onClose: () => void }) => (
@@ -93,6 +103,37 @@ afterEach(() => {
 });
 
 describe("RegionMapView", () => {
+  it("opens an explicit genre without a region and preserves the camera on close", async () => {
+    setSearch(`genre=${makeGenreUuid("regional")}&at=2,46,5`);
+    render(<RegionMapView />);
+    expect(screen.getByRole("region", { name: "Genre detail" })).toHaveTextContent(makeGenreUuid("regional"));
+    expect(screen.queryByRole("region", { name: /Panel/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Close genre" }));
+    await flushNavigation();
+    expect(url(pushState.mock.calls.at(-1)! ).searchParams.get("genre")).toBeNull();
+    expect(url(pushState.mock.calls.at(-1)! ).searchParams.get("at")).toBe("2,46,5");
+  });
+
+  it("reopens a collapsed panel when the same genre is picked again", () => {
+    setSearch(`genre=${makeGenreUuid("regional")}&region=Q142`);
+    render(<RegionMapView />);
+    fireEvent.click(screen.getByRole("button", { name: "Hide panel" }));
+    expect(screen.getByRole("region", { name: "Genre detail" })).toHaveAttribute("data-collapsed", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Pick regional genre" }));
+    expect(screen.getByRole("region", { name: "Genre detail" })).toHaveAttribute("data-collapsed", "false");
+  });
+
+  it("keeps map context during family navigation", async () => {
+    setSearch(`genre=${makeGenreUuid("regional")}&region=Q142&at=2,46,5`);
+    render(<RegionMapView />);
+    fireEvent.click(screen.getByRole("button", { name: "Relative" }));
+    await flushNavigation();
+    const params = url(pushState.mock.calls.at(-1)! ).searchParams;
+    expect(params.get("genre")).toBe(makeGenreUuid("relative"));
+    expect(params.get("region")).toBe("Q142");
+    expect(params.get("at")).toBe("2,46,5");
+  });
+
   it("renders nothing before the region map is computed", () => {
     data = null;
     const { container } = render(<RegionMapView />);
