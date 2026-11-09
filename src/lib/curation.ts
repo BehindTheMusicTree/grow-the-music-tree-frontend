@@ -1,6 +1,7 @@
 import "server-only";
 import { fetchAsAdmin } from "@lib/admin-fetch";
 import {
+  CurationEdgesPageSchema,
   CurationEntriesPageSchema,
   CurationHistoryPageSchema,
   CurationListsSchema,
@@ -9,6 +10,7 @@ import {
   CurationStatusSchema,
   type CurationList,
   type CurationOrdering,
+  type EdgeRelation,
 } from "@schemas/api/curation";
 
 export const CURATION_PAGE_SIZE = 100;
@@ -28,6 +30,15 @@ export async function fetchCurationEntries(
   if (q) query.set("q", q);
   const response = await fetchAsAdmin(`curation/${encodeURIComponent(listName)}/entries/?${query}`);
   return response.ok ? CurationEntriesPageSchema.parse(await response.json()) : null;
+}
+
+/** Null when `page` is past the last page. */
+export async function fetchCurationEdges({ page, q, relation }: { page: number; q: string; relation?: EdgeRelation }) {
+  const query = new URLSearchParams({ page: String(page), page_size: String(CURATION_PAGE_SIZE) });
+  if (q) query.set("q", q);
+  if (relation) query.set("relation", relation);
+  const response = await fetchAsAdmin(`curation/edges/?${query}`);
+  return response.ok ? CurationEdgesPageSchema.parse(await response.json()) : null;
 }
 
 export async function fetchCurationRules(itemId: string) {

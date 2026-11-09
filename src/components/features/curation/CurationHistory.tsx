@@ -5,8 +5,10 @@ import { curationListTitle } from "@lib/curationGroups";
 import {
   CurationSnapshotSchema,
   curationColumnKind,
+  EDGE_RELATIONS,
   type CurationHistoryItem,
   type CurationList,
+  type EdgeRelation,
 } from "@schemas/api/curation";
 
 type Snapshot = Record<string, string | boolean | null>;
@@ -28,7 +30,8 @@ type Context = { lists: CurationList[]; labels: Record<string, string> };
 function Value({ column, snapshot, lists, labels }: Context & { column: string; snapshot: Snapshot }) {
   const value = snapshot[column];
   const list = lists.find((candidate) => candidate.name === snapshot.list_name);
-  const kind = list ? curationColumnKind(list, column) : "text";
+  const isEdgeGenre = typeof snapshot.relation === "string" && (column === "item_id" || column === "parent_item_id");
+  const kind = isEdgeGenre ? "item_id" : list ? curationColumnKind(list, column) : "text";
   if (kind === "bool") return value === true || value === "true" ? "Oui" : "Non";
   if (kind === "item_id" && typeof value === "string" && value) {
     return <GenreRef id={value} label={labels[value]} showQid />;
@@ -38,7 +41,7 @@ function Value({ column, snapshot, lists, labels }: Context & { column: string; 
 
 function changedColumns(item: CurationHistoryItem, before: Snapshot, after: Snapshot) {
   const columns = Array.from(new Set([...Object.keys(before), ...Object.keys(after)])).filter(
-    (column) => column !== "list_name",
+    (column) => column !== "list_name" && column !== "id" && column !== "relation",
   );
   if (item.action !== "updated") return columns;
   return columns.filter((column) => String(before[column] ?? "") !== String(after[column] ?? ""));
@@ -48,6 +51,7 @@ function HistoryItem({ item, lists, labels }: Context & { item: CurationHistoryI
   const before = parseSnapshot(item.oldValue);
   const after = parseSnapshot(item.newValue);
   const listName = after.list_name ?? before.list_name;
+  const relation = after.relation ?? before.relation;
   const shown = item.action === "deleted" ? before : after;
 
   return (
@@ -58,7 +62,11 @@ function HistoryItem({ item, lists, labels }: Context & { item: CurationHistoryI
         <span className="font-medium text-gray-900">· {ACTION_LABELS[item.action]}</span>
         <span>
           ·{" "}
-          {typeof listName === "string" ? (
+          {typeof relation === "string" && relation in EDGE_RELATIONS ? (
+            <Link href={`/admin/curation/edges?relation=${relation}`} className="underline">
+              {EDGE_RELATIONS[relation as EdgeRelation]}
+            </Link>
+          ) : typeof listName === "string" ? (
             <Link href={`/admin/curation/${listName}`} className="underline">
               {curationListTitle(listName)}
             </Link>

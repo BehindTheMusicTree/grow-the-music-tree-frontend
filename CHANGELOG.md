@@ -110,7 +110,13 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- Admin curation edits genre edges (canonical and regional parents, accepted roots, regional overviews, secondary parents) from the genre page and a new `/admin/curation/edges` page, with relation filter, search and history.
+
 ### Changed
+
+- The five lists replaced by genre edges no longer appear among the curation lists; the curation review links an edge rule to its genre page.
 
 - Tree and map genre links now use genre entity UUIDs. Playlist UUID links are no longer interpreted as genre selections.
 

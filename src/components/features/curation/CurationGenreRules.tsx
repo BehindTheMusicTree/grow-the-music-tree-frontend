@@ -3,11 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@behindthemusictree/ui";
+import CurationEdgeEditor from "@components/features/curation/CurationEdgeEditor";
+import CurationEdgeRows from "@components/features/curation/CurationEdgeRows";
 import { CurationEntryRows } from "@components/features/curation/CurationEntries";
 import CurationEntryEditor from "@components/features/curation/CurationEntryEditor";
 import { curationListTitle } from "@lib/curationGroups";
 import {
   curationColumnKind,
+  type CurationEdge,
   type CurationEntry,
   type CurationList,
   type CurationRow,
@@ -24,8 +27,9 @@ function genreKeyColumn(list: CurationList) {
 }
 
 export default function CurationGenreRules({ itemId, lists, rules, appliedExportOn }: Props) {
-  const { results, labels } = rules;
+  const { results, edges, labels } = rules;
   const [editing, setEditing] = useState<Editing | null>(null);
+  const [editingEdge, setEditingEdge] = useState<CurationEdge | "new" | null>(null);
   const addable = lists.filter(genreKeyColumn);
   const [addTo, setAddTo] = useState(addable[0]?.name ?? "");
   const sections = lists
@@ -41,7 +45,28 @@ export default function CurationGenreRules({ itemId, lists, rules, appliedExport
 
   return (
     <div className="flex flex-col gap-6">
-      {sections.length === 0 && <p className="text-gray-600">Aucune règle de curation ne concerne ce genre.</p>}
+      {sections.length === 0 && edges.length === 0 && (
+        <p className="text-gray-600">Aucune règle de curation ne concerne ce genre.</p>
+      )}
+      <section aria-labelledby="rules-edges" className="flex flex-col gap-2">
+        <h2 id="rules-edges" className="text-lg font-semibold">
+          <Link href="/admin/curation/edges" className="underline">
+            Arêtes de genres
+          </Link>
+        </h2>
+        {edges.length > 0 && (
+          <CurationEdgeRows
+            edges={edges}
+            labels={labels}
+            showQid={false}
+            appliedExportOn={appliedExportOn}
+            onEdit={setEditingEdge}
+          />
+        )}
+        <Button onClick={() => setEditingEdge("new")} className="self-start">
+          Ajouter une arête
+        </Button>
+      </section>
       {sections.map(({ list, entries }) => (
         <section key={list.name} aria-labelledby={`rules-${list.name}`} className="flex flex-col gap-2">
           <h2 id={`rules-${list.name}`} className="text-lg font-semibold">
@@ -76,6 +101,14 @@ export default function CurationGenreRules({ itemId, lists, rules, appliedExport
         </label>
         <Button onClick={add}>Ajouter</Button>
       </div>
+      {editingEdge && (
+        <CurationEdgeEditor
+          edge={editingEdge === "new" ? undefined : editingEdge}
+          itemId={itemId}
+          labels={labels}
+          onClose={() => setEditingEdge(null)}
+        />
+      )}
       {editing && (
         <CurationEntryEditor
           list={editing.list}

@@ -3,18 +3,14 @@ import { CURATION_GROUPS, UNGROUPED_TITLE, curationListTitle, groupCurationLists
 
 // Mirrors grow-api's CURATION_LISTS registry (grow/curation/lists.py).
 const REGISTRY = [
-  "accepted_canonical_roots",
   "canonical_parent_additions",
   "capitalized_words",
   "duplicate_genres",
   "indigenous_to_exclusions",
   "label_overrides",
   "forced_canonical_genres",
-  "canonical_parent",
   "out_of_scope_genres",
   "overview_reclassifications",
-  "regional_genre_parent",
-  "regional_overviews",
   "regional_overview_additions",
   "technique_genres",
   "theme_genres",
@@ -24,7 +20,6 @@ const REGISTRY = [
   "canonical_genre_pop_side",
   "genre_alias",
   "genre_precedence",
-  "regional_secondary_parents",
   "region_overrides",
 ];
 
@@ -43,7 +38,7 @@ describe("curationGroups", () => {
   });
 
   it("falls back to the technical name for an unmapped list title", () => {
-    expect(curationListTitle("canonical_parent")).toBe("Parent canonique imposé");
+    expect(curationListTitle("canonical_parent_additions")).toBe("Parents canoniques ajoutés");
     expect(curationListTitle("brand_new")).toBe("brand_new");
   });
 });
