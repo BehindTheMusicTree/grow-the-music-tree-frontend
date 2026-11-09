@@ -14,9 +14,14 @@ export async function expectUrlInvariants(page: Page) {
   }
 }
 
-/** Polls, because Next re-commits the layout title after a client navigation. Checks the URL invariants too. */
+/**
+ * Lets requests and Next's metadata commit settle before reading the title: a title read early can match for a moment
+ * (the base title before the artist loads, or the entity title before Next rewrites it) and hide a regression.
+ */
 export async function expectState(page: Page, { title, panel }: { title: string; panel?: string }) {
-  await expect.poll(() => page.title(), { message: "tab title" }).toBe(title);
   if (panel) await expect(page.getByRole("complementary", { name: panel })).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  await page.waitForTimeout(500);
+  expect(await page.title(), "tab title").toBe(title);
   await expectUrlInvariants(page);
 }
