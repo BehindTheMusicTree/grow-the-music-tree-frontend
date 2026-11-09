@@ -30,7 +30,6 @@ import {
   REGION_FILL_LAYER,
   REGION_HIT_LAYER,
   REGION_LABEL_LAYER,
-  REGION_GLOW_LAYER,
   REGION_SELECTED_LAYER,
   REGIONS_SOURCE_LAYER,
   regionBounds,
@@ -185,7 +184,6 @@ export default function RegionMapCanvas({
           colors: colorsRef.current,
           backdrop: backdropRef.current,
           zoneFill: zoneColor(initialZone, regionsRef.current),
-          glowId: null,
         }),
         ...(camera
           ? { center: [camera.lng, camera.lat] as [number, number], zoom: camera.zoom }
@@ -298,9 +296,8 @@ export default function RegionMapCanvas({
     const map = mapRef.current;
     if (!ready || !map) return;
     map.setFilter(REGION_SELECTED_LAYER, idFilter(selectedId));
-    map.setFilter(REGION_GLOW_LAYER, idFilter(focused !== null && focused.size > 0 ? selectedId : null));
     map.setPaintProperty(CITY_LAYER, "circle-radius", cityRadius(selectedId));
-  }, [ready, selectedId, focused]);
+  }, [ready, selectedId]);
 
   useEffect(() => {
     const map = mapRef.current;

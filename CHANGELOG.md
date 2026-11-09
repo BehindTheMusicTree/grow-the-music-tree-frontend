@@ -110,6 +110,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- Remove the region selection halo, which produced dark artifacts along intricate coastlines, and round zone halo joins.
+
 ### Improved
 
 - Direct coding agents to the established performance measurement and search profiling procedures.
