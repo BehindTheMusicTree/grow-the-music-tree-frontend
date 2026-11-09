@@ -195,6 +195,50 @@ describe("RegionMapCanvas", () => {
     expect(hoisted.instances).toHaveLength(1);
   });
 
+  it("pads the fit by the detail panel width", async () => {
+    const host = document.createElement("div");
+    const panel = document.createElement("aside");
+    panel.setAttribute("data-detail-panel", "");
+    panel.getBoundingClientRect = () => ({ left: 0, right: 300, top: 0, bottom: 600 }) as DOMRect;
+    host.getBoundingClientRect = () => ({ left: 0, right: 1000, top: 0, bottom: 600 }) as DOMRect;
+    document.body.append(host);
+    const view = render(
+      <RegionMapCanvas
+        tileset={index.tileset}
+        regions={regions}
+        rootIds={index.worldChildIds}
+        selectedId={null}
+        zoneId={null}
+        initialCamera={null}
+        focus={null}
+        onRegionClick={vi.fn()}
+        onClearSelection={vi.fn()}
+        onCameraChange={vi.fn()}
+      />,
+      { container: host }
+    );
+    host.append(panel);
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+    view.rerender(
+      <RegionMapCanvas
+        tileset={index.tileset}
+        regions={regions}
+        rootIds={index.worldChildIds}
+        selectedId={null}
+        zoneId={null}
+        initialCamera={null}
+        focus={{ id: "Q142", seq: 1 }}
+        onRegionClick={vi.fn()}
+        onClearSelection={vi.fn()}
+        onCameraChange={vi.fn()}
+      />
+    );
+
+    expect(map.calls.fitBounds[0][1]).toMatchObject({ padding: { left: 324, right: 24, top: 24, bottom: 24 } });
+    host.remove();
+  });
+
   it("reports the camera once a move ends", () => {
     const { onCameraChange } = mount();
     const map = fakeMap();

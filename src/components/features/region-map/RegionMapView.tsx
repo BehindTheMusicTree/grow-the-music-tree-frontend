@@ -1,14 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { GenreUuidSchema } from "@behindthemusictree/app-kit/genre-tree";
+import { GenreUuidSchema, useRegionGenreLexicon } from "@behindthemusictree/app-kit/genre-tree";
 import { GenreDetailPanel } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { collapseEdgeTab } from "@utils/collapseEdgeTab";
 import { Breadcrumb, DetailPanel } from "@behindthemusictree/ui";
 import { regionMapLookup } from "@lib/region-map-index";
 import { useRegionMapIndex } from "@hooks/useRegionMap";
+import { useRegionGenreIndex } from "@components/features/search/useRegionGenreIndex";
 import type { Region, RegionMapIndex } from "@schemas/api/region-map";
 import RegionDetailPanel from "./RegionDetailPanel";
 import RegionMapSearch from "./RegionMapSearch";
@@ -50,7 +51,12 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
     };
   });
   const [focus, setFocus] = useState<FocusRequest | null>(initial.focus);
+  // Region and genre of the last framing, so the effects below only fly for selections that did not already
+  // call `flyTo` themselves (map click, back/forward, edited URL, family links).
+  const lastFlown = useRef<string | null>(state.region);
+  const lastGenreFlown = useRef<string | null>(state.genre);
   const flyTo = useCallback((id: string | null) => {
+    lastFlown.current = id;
     if (id !== null && regions.get(id)?.boundaryStatus === "missing") return;
     setFocus((current) => ({ id, seq: (current?.seq ?? 0) + 1 }));
   }, [regions]);
@@ -61,6 +67,23 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   const [collapsed, setCollapsed] = useState(false);
   const selectedId = state.region;
   const parsedGenre = GenreUuidSchema.safeParse(state.genre);
+  const selectedExists = selected !== undefined;
+  useEffect(() => {
+    if (selectedId !== null && selectedExists && selectedId !== lastFlown.current) flyTo(selectedId);
+  }, [selectedId, selectedExists, flyTo]);
+
+  // A genre selected from anywhere (family links, URL) frames the region the map lists it under.
+  const lexicon = useRegionGenreLexicon(getGrowBackendBaseUrl, state.genre !== null);
+  const genreEntries = useRegionGenreIndex(index, lexicon.entries);
+  const genreRegionId = useMemo(
+    () => genreEntries.find((entry) => entry.genre.uuid === state.genre)?.region.id ?? null,
+    [genreEntries, state.genre],
+  );
+  useEffect(() => {
+    if (state.genre === null || genreRegionId === null || state.genre === lastGenreFlown.current) return;
+    lastGenreFlown.current = state.genre;
+    flyTo(genreRegionId);
+  }, [state.genre, genreRegionId, flyTo]);
   useEffect(() => {
     setCollapsed(false);
   }, [selectedId, state.genre]);

@@ -33,6 +33,11 @@ vi.mock("@hooks/useRegionMap", () => ({
   useRegionMapIndex: () => ({ data, isPending: false, isError: false }),
 }));
 
+vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@behindthemusictree/app-kit/genre-tree")>()),
+  useRegionGenreLexicon: () => ({ entries: [{ wikidataId: "Q1", uuid: makeGenreUuid("relative"), name: "Relative" }], isPending: false, isError: false }),
+}));
+
 vi.mock("./RegionMapSearch", () => ({ default: ({ onPick }: { onPick: (region: string | null, genre: string | null) => void }) => <button onClick={() => onPick(null, makeGenreUuid("regional"))}>Pick regional genre</button> }));
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
   GenreDetailPanel: ({ genreUuid, onClose, onSelectGenre, collapsed, edgeTab }: { genreUuid: string; onClose: () => void; onSelectGenre: (uuid: string) => void; collapsed: boolean; edgeTab: { edge: { label: string; onClick: () => void } | null; center: { label: string; onClick: () => void } | null } }) => (
@@ -185,6 +190,27 @@ describe("RegionMapView", () => {
     await flushNavigation();
     expect(url(pushState.mock.calls[0]).searchParams.get("region")).toBe("Q142");
     expect(url(pushState.mock.calls[0]).searchParams.get("path")).toBeNull();
+  });
+
+  it("frames a region selected through the URL, such as browser back", () => {
+    const { rerender } = render(<RegionMapView />);
+    const before = lastProps.focus;
+
+    setSearch("region=Q142");
+    rerender(<RegionMapView />);
+
+    expect(lastProps.focus).toEqual({ id: "Q142", seq: (before?.seq ?? 0) + 1 });
+  });
+
+  it("frames the region a newly selected genre is listed under", () => {
+    setSearch("region=Q12130&genre=" + makeGenreUuid("regional"));
+    const { rerender } = render(<RegionMapView />);
+    const before = lastProps.focus;
+
+    setSearch("region=Q12130&genre=" + makeGenreUuid("relative"));
+    rerender(<RegionMapView />);
+
+    expect(lastProps.focus).toEqual({ id: "Q142", seq: (before?.seq ?? 0) + 1 });
   });
 
   it("zooms to the selected region from its panel without touching the URL selection", async () => {

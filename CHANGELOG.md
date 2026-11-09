@@ -125,6 +125,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - The genre tree no longer loads blank on first visit when the playback country resolves while the tree request is in flight. Upgrade `@behindthemusictree/app-kit` and `app-kit-ui` to 36.0.0 and read country-dependent data (song detail, to-refine songs, player track loading) through the explicit playback binding.
 - Open regional search results in the current view, including descendants absent from the map index. Genre details work without a visible tree node or region, preserve map context during family navigation, and reopen on repeated selection.
 - Remove the region selection halo, which produced dark artifacts along intricate coastlines, and round zone halo joins.
+- The region map now centers on any selected region (map click, URL, back/forward) and on a selected genre's region, and fits the whole region in the part of the map the detail panel leaves visible.
 
 ### Improved
 
