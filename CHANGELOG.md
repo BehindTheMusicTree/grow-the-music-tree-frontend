@@ -124,6 +124,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- Text sizes follow the brand type roles (`text-title`, `text-heading`, `text-body`, `text-caption`) across curation, about, admin, menu and popups; the global `h1`/`h2`/`h3` sizes, `text-1.5xl` and `.page-title` are gone, and ESLint rejects Tailwind size classes and arbitrary sizes (`text-[length:…]` stays for commented exceptions).
+
 - On the region map, the search box follows the shared layout tokens and the breadcrumb sits right under it, centred on the map.
 
 - The type scale follows Google Maps' density: `@behindthemusictree/brand` 12.11.0, `ui` 0.20.0, `app-kit` and `app-kit-ui` 38.0.0 (the search box is centred in the panel).

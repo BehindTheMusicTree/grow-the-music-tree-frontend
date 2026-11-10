@@ -49,7 +49,7 @@ export default function GenealogyColumnHeader({ columns, regions, transform, wid
                 y={top + HEADER_ROW_HEIGHT / 2}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className="fill-slate-700 text-[11px] font-semibold"
+                className="fill-slate-700 text-[length:11px] font-semibold"
               >
                 {region.label}
               </text>
@@ -69,7 +69,7 @@ export default function GenealogyColumnHeader({ columns, regions, transform, wid
                 y={HEADER_ROW_HEIGHT / 2}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className="fill-slate-600 text-[10px]"
+                className="fill-slate-600 text-[length:10px]"
               >
                 {columnLabel(column)}
               </text>

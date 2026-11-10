@@ -44,20 +44,20 @@ export default async function ImportsPage({ searchParams }: Props) {
       <div className="flex flex-col gap-6 p-4">
         <PipelineRunPanel pendingCount={curationStatus.pendingCount} initialRequest={latestRun} />
         <section aria-labelledby="pipeline-run-history" className="flex flex-col gap-2">
-          <h2 id="pipeline-run-history" className="font-semibold">
+          <h2 id="pipeline-run-history" className="text-heading">
             Historique des runs
           </h2>
           <PipelineRunHistory runs={runs} />
         </section>
         <section aria-labelledby="latest-imports" className="flex flex-col gap-2">
-          <h2 id="latest-imports" className="font-semibold">
+          <h2 id="latest-imports" className="text-heading">
             Latest imports
           </h2>
           {/* eslint-disable-next-line react-hooks/purity -- a dynamic server component renders once per request */}
           <LatestImportRuns runs={latest} now={Date.now()} />
         </section>
         <section aria-labelledby="import-history" className="flex flex-col gap-2">
-          <h2 id="import-history" className="font-semibold">
+          <h2 id="import-history" className="text-heading">
             History
           </h2>
           <ImportRunHistory runs={history} kind={kind} />

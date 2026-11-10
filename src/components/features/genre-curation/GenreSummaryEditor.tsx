@@ -29,7 +29,7 @@ export default function GenreSummaryEditor({ overview }: { overview: CriteriaOve
         focused.current = false;
         if (text !== (overview.summary ?? "")) mutate({ uuid: overview.uuid, summary: text, previous: overview.summary ?? "" });
       }}
-      className="w-full px-2 py-1 text-sm border rounded-md"
+      className="w-full px-2 py-1 text-body border rounded-md"
     />
   );
 }

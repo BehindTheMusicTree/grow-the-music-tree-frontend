@@ -18,7 +18,7 @@ type Source = { ready: boolean; isError: boolean };
 const Option = ({ name, detail }: { name: string; detail?: string }) => (
   <span className="flex min-w-0 flex-col">
     <span className="truncate">{name}</span>
-    {detail && <span className="truncate text-xs text-gray-500">{detail}</span>}
+    {detail && <span className="truncate text-caption text-gray-500">{detail}</span>}
   </span>
 );
 

@@ -64,7 +64,7 @@ export default function BlockingOverlay() {
       className="fixed inset-0 z-[2147483647] flex flex-col items-center justify-center gap-4 text-white bg-black bg-opacity-50 cursor-wait"
     >
       <RingLoader />
-      <p className="text-lg font-medium">
+      <p className="text-heading">
         {label}
         {elapsed >= ELAPSED_THRESHOLD_SECONDS && ` · ${elapsed} s`}
       </p>

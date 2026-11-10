@@ -70,7 +70,7 @@ export default function GenrePicker({
 
   return (
     <div className="relative flex flex-col gap-1">
-      <label htmlFor={`${id}-input`} className="text-sm font-medium text-gray-700">
+      <label htmlFor={`${id}-input`} className="text-body font-medium text-gray-700">
         {label}
       </label>
       <Combobox
@@ -87,7 +87,7 @@ export default function GenrePicker({
               content: (
                 <div className="flex justify-between gap-2">
                   <span>{option.name}</span>
-                  <span className="font-mono text-xs text-gray-500">{option.itemId}</span>
+                  <span className="font-mono text-caption text-gray-500">{option.itemId}</span>
                 </div>
               ),
             })),
@@ -101,7 +101,7 @@ export default function GenrePicker({
         onOpenChange={setOpen}
         onPick={pick}
       />
-      <p id={`${id}-qid`} className="font-mono text-xs text-gray-500">
+      <p id={`${id}-qid`} className="font-mono text-caption text-gray-500">
         {value ? `QID : ${value}` : "Aucun genre choisi"}
         {isFetching && " · recherche…"}
       </p>

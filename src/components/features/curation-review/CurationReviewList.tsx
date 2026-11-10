@@ -115,7 +115,7 @@ export default function CurationReviewList({ items }: { items: CurationReviewIte
             </td>
             <td className="pr-4">
               <GenreRef id={itemId} label={target ? undefined : evidence?.label} showQid={false} />
-              <span className="flex gap-2 text-xs">
+              <span className="flex gap-2 text-caption">
                 <a
                   href={`${WIKIDATA_URL}${itemId}`}
                   target="_blank"
@@ -138,7 +138,7 @@ export default function CurationReviewList({ items }: { items: CurationReviewIte
             </td>
             <td className="pr-4">
               <p>{REASON_LABELS[reason]}</p>
-              <p className="text-sm text-gray-600">{explain({ key, column, reason, target, evidence })}</p>
+              <p className="text-body text-gray-600">{explain({ key, column, reason, target, evidence })}</p>
             </td>
             <td className="pr-4">{column !== "item_id" && <Rule rowKey={key} column={column} />}</td>
             <td>{target && <GenreRef id={target} label={evidence?.label} showQid={false} />}</td>

@@ -16,7 +16,7 @@ export default function Page({ title, visuallyHiddenTitle = false, children, dat
         <h1 className="sr-only">{title}</h1>
       ) : (
         <header className="flex-none">
-          <h1 className="page-title">{title}</h1>
+          <h1 className="text-title">{title}</h1>
         </header>
       )}
       <div className="page-content min-h-0 flex-1 overflow-y-auto">{children}</div>

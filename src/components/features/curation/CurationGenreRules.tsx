@@ -49,7 +49,7 @@ export default function CurationGenreRules({ itemId, lists, rules, appliedExport
         <p className="text-gray-600">Aucune règle de curation ne concerne ce genre.</p>
       )}
       <section aria-labelledby="rules-edges" className="flex flex-col gap-2">
-        <h2 id="rules-edges" className="text-lg font-semibold">
+        <h2 id="rules-edges" className="text-heading">
           <Link href="/admin/curation/edges" className="underline">
             Arêtes de genres
           </Link>
@@ -69,7 +69,7 @@ export default function CurationGenreRules({ itemId, lists, rules, appliedExport
       </section>
       {sections.map(({ list, entries }) => (
         <section key={list.name} aria-labelledby={`rules-${list.name}`} className="flex flex-col gap-2">
-          <h2 id={`rules-${list.name}`} className="text-lg font-semibold">
+          <h2 id={`rules-${list.name}`} className="text-heading">
             <Link href={`/admin/curation/${list.name}`} className="underline">
               {curationListTitle(list.name)}
             </Link>
@@ -85,7 +85,7 @@ export default function CurationGenreRules({ itemId, lists, rules, appliedExport
         </section>
       ))}
       <div className="flex flex-wrap items-end gap-3">
-        <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
+        <label className="flex flex-col gap-1 text-body font-medium text-gray-700">
           Ajouter une règle pour ce genre
           <select
             value={addTo}

@@ -38,7 +38,7 @@ function CandidateRow({
         {candidate.title}
         {candidate.artists?.length ? ` — ${candidate.artists.map((artist) => artist.name).join(", ")}` : ""}
       </label>
-      {candidate.genre && <span className="text-xs text-gray-500">already in {candidate.genre.name}</span>}
+      {candidate.genre && <span className="text-caption text-gray-500">already in {candidate.genre.name}</span>}
     </li>
   );
 }
@@ -95,7 +95,7 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
               role="tab"
               aria-selected={tab === name}
               onClick={() => setTab(name)}
-              className="px-3 py-1 text-sm capitalize border-b-2 border-transparent cursor-pointer aria-selected:border-blue-600"
+              className="px-3 py-1 text-body capitalize border-b-2 border-transparent cursor-pointer aria-selected:border-blue-600"
             >
               {name}
             </button>
@@ -110,7 +110,7 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
               onChange={(event) => setText(event.target.value)}
               className="w-full px-3 py-2 border rounded-md"
             />
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-body">
               <input type="checkbox" checked={genreless} onChange={(event) => setGenreless(event.target.checked)} />
               Only genreless
             </label>

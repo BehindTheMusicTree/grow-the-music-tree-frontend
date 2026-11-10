@@ -134,7 +134,7 @@ function ExcludePopup({ genre, onClose, onRemoved }: PopupProps & Pick<DangerZon
       onCancel={onClose}
       onClose={onClose}
     >
-      <label className="flex flex-col gap-1 text-sm font-medium">
+      <label className="flex flex-col gap-1 text-body font-medium">
         Category
         <select
           value={category}
@@ -191,7 +191,7 @@ function DeletePopup({ genre, onClose, onRemoved }: PopupProps & Pick<DangerZone
 
 export default function GenreDangerZone({ genre, parent, onAliased, onRemoved }: DangerZoneProps) {
   const { openDialog } = useGenreCuration();
-  const button = "px-3 py-1 text-sm text-red-600 border border-red-300 rounded cursor-pointer hover:bg-red-50";
+  const button = "px-3 py-1 text-body text-red-600 border border-red-300 rounded cursor-pointer hover:bg-red-50";
 
   return (
     <div className="flex flex-wrap gap-2">

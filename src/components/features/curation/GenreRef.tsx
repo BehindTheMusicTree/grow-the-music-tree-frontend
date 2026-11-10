@@ -9,14 +9,14 @@ export function curationGenreHref(itemId: string) {
 export default function GenreRef({ id, label, showQid }: Props) {
   if (!label)
     return (
-      <Link href={curationGenreHref(id)} className="font-mono text-sm underline">
+      <Link href={curationGenreHref(id)} className="font-mono text-body underline">
         {id}
       </Link>
     );
   return (
     <Link href={curationGenreHref(id)} className="flex flex-col underline" title={showQid ? undefined : id}>
       <span>{label}</span>
-      {showQid && <span className="font-mono text-xs text-gray-500">{id}</span>}
+      {showQid && <span className="font-mono text-caption text-gray-500">{id}</span>}
     </Link>
   );
 }

@@ -56,7 +56,7 @@ function HistoryItem({ item, lists, labels }: Context & { item: CurationHistoryI
 
   return (
     <article className="flex flex-col gap-2 p-3 border rounded-lg">
-      <p className="flex flex-wrap gap-x-2 text-sm text-gray-600">
+      <p className="flex flex-wrap gap-x-2 text-body text-gray-600">
         <time dateTime={item.createdOn}>{DATE_FORMAT.format(new Date(item.createdOn))}</time>
         <span>· {item.actorPseudo ?? "pipeline"}</span>
         <span className="font-medium text-gray-900">· {ACTION_LABELS[item.action]}</span>
@@ -78,7 +78,7 @@ function HistoryItem({ item, lists, labels }: Context & { item: CurationHistoryI
       <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
         {changedColumns(item, before, after).map((column) => (
           <div key={column} className="contents">
-            <dt className="text-sm text-gray-600">{curationColumnTitle(column)}</dt>
+            <dt className="text-body text-gray-600">{curationColumnTitle(column)}</dt>
             <dd className="flex flex-wrap items-center gap-2 break-words">
               {item.action === "updated" ? (
                 <>
