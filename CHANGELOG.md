@@ -123,6 +123,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- The type scale follows Google Maps' density: `@behindthemusictree/brand` 12.11.0, `ui` 0.20.0, `app-kit` and `app-kit-ui` 38.0.0 (the search box is centred in the panel).
+
 - The genre tree's tab title keeps the app name while the genre panel is open, like the map, instead of naming the artist or song filter beside it.
 
 - The region map no longer shows the « Regions without a boundary » bar above it. Those regions stay reachable through the search and `?region=`, and the panel says when a region has no boundary.
