@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { Button, DetailPanel, FieldList, PanelSection } from "@behindthemusictree/ui";
+import { ActionBand, ActionButton, DetailPanel, FieldList, PanelBleed, PanelSection } from "@behindthemusictree/ui";
+import { GitBranch } from "lucide-react";
 import { collapseEdgeTab } from "@utils/collapseEdgeTab";
 import type { Genealogy, GenealogyTradition } from "@schemas/api/genealogy";
 import { formatSpan } from "./format";
@@ -54,6 +55,13 @@ export default function TraditionDetailPanel({ data, tradition, onSelect, onClos
       collapsed={collapsed}
       edgeTab={collapseEdgeTab(collapsed, onCollapsedChange)}
     >
+      {inCanonicalTree && (
+        <PanelBleed>
+          <ActionBand>
+            <ActionButton icon={<GitBranch size={18} />} label="Tree" aria-label="Open in genre tree" onClick={() => onOpenInTree(wikidataId)} />
+          </ActionBand>
+        </PanelBleed>
+      )}
       <FieldList
         items={[
           { label: "Period", value: formatSpan(start, end) },
@@ -88,13 +96,6 @@ export default function TraditionDetailPanel({ data, tradition, onSelect, onClos
             ))}
           </PanelSection>
         ),
-      )}
-      {inCanonicalTree && (
-        <div>
-          <Button type="button" onClick={() => onOpenInTree(wikidataId)}>
-            Open in genre tree
-          </Button>
-        </div>
       )}
     </DetailPanel>
   );
