@@ -21,6 +21,7 @@ export const ZONE_SUPRA_SELECTED_LAYER = "zone-supra-selected";
 export const ZONE_LABEL_LAYER = "zone-labels";
 export const CITY_LAYER = "cities";
 export const CITY_LABEL_LAYER = "city-labels";
+export const STARFIELD_LAYER = "starfield";
 export const REGIONS_SOURCE_LAYER = "regions";
 /** The tileset's last zoom: MapLibre overzooms it up to MAX_ZOOM. */
 export const TILESET_MAX_ZOOM = 10;
@@ -302,8 +303,8 @@ export function buildStyle({
     version: 8,
     projection: { type: "globe" },
     sky: {
-      "sky-color": "#bfdbfe",
-      "horizon-color": "#e0f2fe",
+      "sky-color": "#0b1d3a",
+      "horizon-color": "#1e40af",
       "sky-horizon-blend": 0.6,
       "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 1, 7, 0],
     },

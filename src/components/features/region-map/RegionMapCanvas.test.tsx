@@ -55,6 +55,9 @@ vi.mock("maplibre-gl", () => {
     removeFeatureState(...args: unknown[]) {
       this.record("removeFeatureState", args);
     }
+    addLayer(...args: unknown[]) {
+      this.record("addLayer", args);
+    }
     fitBounds(...args: unknown[]) {
       this.record("fitBounds", args);
     }
@@ -87,7 +90,7 @@ vi.mock("maplibre-gl", () => {
 });
 
 import RegionMapCanvas from "./RegionMapCanvas";
-import { supranationalZoneIds, zoneFilters } from "./regionMapLayers";
+import { STARFIELD_LAYER, supranationalZoneIds, zoneFilters } from "./regionMapLayers";
 
 type Fake = {
   options: Record<string, unknown>;
@@ -151,6 +154,17 @@ describe("RegionMapCanvas", () => {
       ],
     });
     expect(hoisted.addProtocol).toHaveBeenCalledWith("pmtiles", expect.any(Function));
+  });
+
+  it("adds the starfield on top once the style has loaded, not before", async () => {
+    mount();
+    const map = fakeMap();
+    expect(map.calls.addLayer).toBeUndefined();
+    await act(() => map.emit("load"));
+    expect(map.calls.addLayer).toHaveLength(1);
+    const [layer, beforeId] = map.calls.addLayer[0] as [{ id: string; type: string }, unknown];
+    expect(layer).toMatchObject({ id: STARFIELD_LAYER, type: "custom" });
+    expect(beforeId).toBeUndefined();
   });
 
   it("opens on the given camera", () => {
