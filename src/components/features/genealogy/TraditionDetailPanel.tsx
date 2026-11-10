@@ -90,7 +90,7 @@ export default function TraditionDetailPanel({ data, tradition, onSelect, onClos
         ),
       )}
       {inCanonicalTree && (
-        <div className="px-6 py-4">
+        <div>
           <Button type="button" onClick={() => onOpenInTree(wikidataId)}>
             Open in genre tree
           </Button>
