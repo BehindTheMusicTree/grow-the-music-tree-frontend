@@ -241,9 +241,10 @@ export default function RegionMapCanvas({
     };
 
     map.on("load", () => {
+      // Ready first: a failing decorative layer must not leave the region styling and selection disabled.
+      setReady(true);
       // Topmost: drawn last of the layers, before MapLibre's atmosphere glow.
       map.addLayer(createStarfieldLayer());
-      setReady(true);
     });
     map.on("idle", listVisible);
     map.on("moveend", () => {

@@ -122,6 +122,13 @@ describe("starfieldMatrix", () => {
     expect(ndc(northCamera, far).y).toBeGreaterThan(ndc(CENTER, far).y);
   });
 
+  it("turns north toward the left for a positive bearing, as MapLibre does", () => {
+    const north: [number, number, number] = [0, 1, 0];
+    const view = apply(orbitRotation({ lng: 0, lat: 0, bearing: 40, pitch: 0, roll: 0 }), north);
+    expect(view.x).toBeCloseTo(-Math.sin(40 * DEG), 5);
+    expect(view.y).toBeCloseTo(Math.cos(40 * DEG), 5);
+  });
+
   it("rotates stars around the screen centre with bearing", () => {
     const star = surface(CENTER.lng + 180 + 10, -CENTER.lat);
     const before = ndc(CENTER, star);
