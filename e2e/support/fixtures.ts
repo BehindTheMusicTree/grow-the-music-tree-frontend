@@ -108,6 +108,7 @@ export const artist = ArtistDetailedSchema.parse({
   memberOf: [],
   albums: [],
   tracksCount: 1,
+  playableTracksCount: 1,
   image: null,
 });
 
