@@ -37,7 +37,7 @@ export default function RegionDetailPanel({
         {onZoomIn && (
           <PanelBleed>
             <ActionBand>
-              <ActionButton icon={<ZoomIn size={18} />} label="Focus" aria-label={`Zoom to ${region.name}`} onClick={onZoomIn} />
+              <ActionButton icon={<ZoomIn size={18} />} label="Zoom" aria-label={`Zoom to ${region.name}`} onClick={onZoomIn} />
             </ActionBand>
           </PanelBleed>
         )}
