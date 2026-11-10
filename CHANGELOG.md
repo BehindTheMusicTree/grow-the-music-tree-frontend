@@ -125,6 +125,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- The region map index schema reads the lean index the pipelines are moving to, and still reads the current one: `boundaryStatus`, `mainBbox`, `drillable` and the genres' `rule` are optional. A region with no boundary is one with `bbox` and `centroid` null, `mainBbox` falls back to `bbox` and `drillable` to `childIds.length > 0`, so the map code reads one shape either way.
 - `@behindthemusictree/ui` bumped from 0.21.1 to 0.21.2.
 - Genre, artist and song panels get Play buttons with playable counts and the tree's node colors, and the detail panels now rely on the panel body for their margin: `@behindthemusictree/app-kit` and `app-kit-ui` 39.0.0, `ui` 0.21.1, `brand` 12.12.0. The region, tradition and About panels drop their own padding so the margin is no longer applied twice, and the curation selection bar spans the panel edges.
 
