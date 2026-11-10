@@ -124,6 +124,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- On the region map, the search box follows the shared layout tokens and the breadcrumb sits right under it, centred on the map.
+
 - The type scale follows Google Maps' density: `@behindthemusictree/brand` 12.11.0, `ui` 0.20.0, `app-kit` and `app-kit-ui` 38.0.0 (the search box is centred in the panel).
 
 - The genre tree's tab title keeps the app name while the genre panel is open, like the map, instead of naming the artist or song filter beside it.
