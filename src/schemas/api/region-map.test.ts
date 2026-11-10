@@ -12,12 +12,37 @@ describe("RegionMapIndexSchema", () => {
     expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [missing] }).success).toBe(true);
     for (const invalid of [
       { ...missing, boundaryStatus: "available" },
-      { ...missing, boundaryStatus: undefined },
       { ...missing, centroid: [0, 0] },
       { ...fixture.regions[0], boundaryStatus: "missing" },
+      { ...fixture.regions[0], centroid: null },
+      { ...fixture.regions[0], mainBbox: null },
     ]) {
       expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [invalid] }).success).toBe(false);
     }
+  });
+
+  it("reads a lean index: no boundaryStatus, mainBbox, drillable or genre rule", () => {
+    const { genres, ...rest } = fixture.regions[0];
+    const lean = {
+      ...Object.fromEntries(Object.entries(rest).filter(([key]) => !["boundaryStatus", "mainBbox", "drillable"].includes(key))),
+      genres: genres.map(({ itemId, relation }) => ({ itemId, relation })),
+    };
+    const missing = { ...lean, bbox: null, centroid: null };
+    const parsed = RegionMapIndexSchema.parse({ ...fixture, regions: [lean, missing] });
+
+    expect(parsed.regions[0]).toMatchObject({
+      boundaryStatus: "available",
+      mainBbox: fixture.regions[0].bbox,
+      drillable: fixture.regions[0].childIds.length > 0,
+    });
+    expect(parsed.regions[1]).toMatchObject({ boundaryStatus: "missing", bbox: null, mainBbox: null, centroid: null });
+  });
+
+  it("keeps a distinct mainBbox and an explicit drillable when the index carries them", () => {
+    const region = { ...fixture.regions[0], bbox: [0, 0, 10, 10], mainBbox: [1, 1, 2, 2], drillable: false };
+    const [parsed] = RegionMapIndexSchema.parse({ ...fixture, regions: [region] }).regions;
+
+    expect(parsed).toMatchObject({ mainBbox: [1, 1, 2, 2], drillable: false });
   });
 
   it("accepts missing boundaries and hidden regions together", () => {
