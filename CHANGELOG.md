@@ -125,6 +125,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- `@behindthemusictree/ui` bumped from 0.21.1 to 0.21.2.
 - Genre, artist and song panels get Play buttons with playable counts and the tree's node colors, and the detail panels now rely on the panel body for their margin: `@behindthemusictree/app-kit` and `app-kit-ui` 39.0.0, `ui` 0.21.1, `brand` 12.12.0. The region, tradition and About panels drop their own padding so the margin is no longer applied twice, and the curation selection bar spans the panel edges.
 
 - Removed the graphify `merge=graphify` git attribute, which pointed at a machine-specific merge driver; the global agent-config freshness hook keeps the graph fresh.
