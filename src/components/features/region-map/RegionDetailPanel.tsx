@@ -40,7 +40,7 @@ export default function RegionDetailPanel({
             { label: "Genres", value: region.genreCount },
           ]}
         />
-        <ul className="flex flex-col gap-3 px-6 py-4" aria-label="Region genres">
+        <ul className="flex flex-col gap-3" aria-label="Region genres">
           {region.genres
             .filter((genre) => genre.relation !== "tradition")
             .map((genre) => (
@@ -48,7 +48,7 @@ export default function RegionDetailPanel({
             ))}
         </ul>
         {onZoomIn && (
-          <div className="px-6 py-4">
+          <div>
             <Button type="button" onClick={onZoomIn}>
               Zoom to {region.name}
             </Button>
@@ -63,13 +63,13 @@ export default function RegionDetailPanel({
       <DetailPanel titleInSearch title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
         {boundaryNote}
         {failed ? (
-          <p role="alert" className="px-6 py-4 text-red-600">
+          <p role="alert" className="text-red-600">
             {region.overviewItemId === null
               ? `The music genre covering ${region.name} could not be loaded.`
               : `The genre “Music of ${region.name}” could not be loaded.`}
           </p>
         ) : (
-          <div className="m-6 h-24 animate-pulse rounded bg-gray-200" aria-busy />
+          <div className="h-24 animate-pulse rounded bg-gray-200" aria-busy />
         )}
       </DetailPanel>
     );
@@ -93,7 +93,7 @@ export default function RegionDetailPanel({
 
 function BoundaryNote({ name }: { name: string }) {
   return (
-    <p role="status" className="px-6 py-2 text-[var(--color-text-muted)]">
+    <p role="status" className="text-[var(--color-text-muted)]">
       Boundary unavailable for {name}. Its music remains available below.
     </p>
   );
