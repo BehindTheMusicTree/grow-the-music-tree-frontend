@@ -27,7 +27,7 @@ function ToRefineRow({ song }: { song: ToRefineSong }) {
     <li className="flex flex-wrap items-end gap-4 rounded-md border p-4">
       <div className="flex min-w-48 flex-col">
         <span className="font-medium">{song.title}</span>
-        <span className="text-sm text-gray-600">{song.genre?.name}</span>
+        <span className="text-body text-gray-600">{song.genre?.name}</span>
       </div>
       <div className="min-w-64 flex-1">
         <GenrePicker
@@ -40,7 +40,7 @@ function ToRefineRow({ song }: { song: ToRefineSong }) {
       </div>
       <button
         type="button"
-        className="rounded border bg-white px-3 py-2 text-sm hover:bg-gray-100 disabled:opacity-50"
+        className="rounded border bg-white px-3 py-2 text-body hover:bg-gray-100 disabled:opacity-50"
         disabled={!target || isPending}
         onClick={() => target && mutate({ songs: [song.uuid], genre: target.uuid })}
       >

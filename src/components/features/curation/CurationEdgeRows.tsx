@@ -66,7 +66,7 @@ function EdgeActions({
       {pending && (
         <span
           title="Modifiée depuis le dernier run du pipeline"
-          className="self-start px-2 py-0.5 text-xs font-medium text-yellow-900 bg-yellow-100 rounded-full"
+          className="self-start px-2 py-0.5 text-caption font-medium text-yellow-900 bg-yellow-100 rounded-full"
         >
           En attente
         </span>
@@ -86,7 +86,7 @@ function EdgeActions({
         <Link
           href={`/admin/curation/history?${new URLSearchParams({ entry: edge.uuid })}`}
           aria-label={`Historique de ${name}`}
-          className="self-center text-sm underline"
+          className="self-center text-body underline"
         >
           Historique
         </Link>
@@ -108,7 +108,7 @@ export default function CurationEdgeRows({ edges, labels, showQid, appliedExport
           <thead>
             <tr>
               {["Relation", "Genre", "Parent", "Détails"].map((title) => (
-                <th key={title} className="p-2 text-sm font-medium text-gray-600">
+                <th key={title} className="p-2 text-body font-medium text-gray-600">
                   {title}
                 </th>
               ))}
@@ -148,17 +148,17 @@ export default function CurationEdgeRows({ edges, labels, showQid, appliedExport
           <li key={edge.uuid}>
             <article className="flex flex-col gap-3 p-3 border rounded-lg">
               <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
-                <dt className="text-sm text-gray-600">Relation</dt>
+                <dt className="text-body text-gray-600">Relation</dt>
                 <dd>{EDGE_RELATIONS[edge.row.relation]}</dd>
-                <dt className="text-sm text-gray-600">Genre</dt>
+                <dt className="text-body text-gray-600">Genre</dt>
                 <dd className="break-words">
                   <Genre id={edge.row.item_id} labels={labels} showQid={showQid} />
                 </dd>
-                <dt className="text-sm text-gray-600">Parent</dt>
+                <dt className="text-body text-gray-600">Parent</dt>
                 <dd className="break-words">
                   <Genre id={edge.row.parent_item_id} labels={labels} showQid={showQid} />
                 </dd>
-                <dt className="text-sm text-gray-600">Détails</dt>
+                <dt className="text-body text-gray-600">Détails</dt>
                 <dd className="flex flex-col break-words">
                   <Details edge={edge} />
                 </dd>

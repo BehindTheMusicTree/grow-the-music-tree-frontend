@@ -185,12 +185,12 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
           <p aria-live="polite" className={request.status === "failed" ? "text-red-600" : "text-gray-700"}>
             {KIND_LABELS[request.kind]} : {labelOf(request)}
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="text-body text-gray-600">
             {originOf(request)}
             {duration && ` · ${duration}`}
           </p>
           {request.status === "running" && (request.stage === "merging_songs" || request.stage === "merging_artists") && (
-            <p className="text-sm text-gray-600">Une annulation laisse la fusion déjà commencée aller à son terme.</p>
+            <p className="text-body text-gray-600">Une annulation laisse la fusion déjà commencée aller à son terme.</p>
           )}
         </div>
       )}

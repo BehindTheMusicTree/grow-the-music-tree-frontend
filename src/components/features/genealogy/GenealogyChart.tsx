@@ -375,7 +375,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
               y={y}
               textAnchor="end"
               dominantBaseline="middle"
-              className="fill-slate-600 text-[11px]"
+              className="fill-slate-600 text-[length:11px]"
             >
               {formatYear(year)}
             </text>
@@ -384,7 +384,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
       </svg>
 
       {isAdmin && unplacedCount > 0 && (
-        <p className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded bg-white/90 px-2 py-1 text-xs text-slate-600 shadow">
+        <p className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded bg-white/90 px-2 py-1 text-caption text-slate-600 shadow">
           {unplacedCount} traditions without a place are not shown
         </p>
       )}
@@ -401,7 +401,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
         <div
           ref={tooltip.ref}
           role="tooltip"
-          className="pointer-events-none absolute z-10 max-w-xs rounded bg-slate-900 px-2 py-1 text-xs text-white shadow"
+          className="pointer-events-none absolute z-10 max-w-xs rounded bg-slate-900 px-2 py-1 text-caption text-white shadow"
         >
           {tooltip.text}
         </div>

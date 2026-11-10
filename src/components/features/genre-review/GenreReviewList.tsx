@@ -31,7 +31,7 @@ function GenreConflictGroupCard({ group }: { group: GenreNameConflictGroup }) {
 
   return (
     <section className="flex flex-col gap-3 rounded-md border p-4" aria-label={group.name}>
-      <h2 className="font-medium">{group.name}</h2>
+      <h2 className="text-heading">{group.name}</h2>
       {group.genres.map((genre) => (
         <div key={genre.uuid} className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center gap-4">
@@ -58,7 +58,7 @@ function GenreConflictGroupCard({ group }: { group: GenreNameConflictGroup }) {
                 Règles de curation
               </Link>
             )}
-            {genre.hasNameConflict && <span className="text-sm text-amber-600">flagged</span>}
+            {genre.hasNameConflict && <span className="text-body text-amber-600">flagged</span>}
           </div>
           {formErrors
             .filter((error) => error.field === genre.uuid)

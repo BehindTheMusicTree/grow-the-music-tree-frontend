@@ -32,7 +32,7 @@ export default function EntityPicker({ label, value, onChange }: Props) {
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-sm font-medium text-gray-700">
+      <label htmlFor={id} className="text-body font-medium text-gray-700">
         {label}
       </label>
       <input
@@ -50,7 +50,7 @@ export default function EntityPicker({ label, value, onChange }: Props) {
           </option>
         ))}
       </datalist>
-      {current && <p className="text-xs text-gray-500">{current.name}</p>}
+      {current && <p className="text-caption text-gray-500">{current.name}</p>}
     </div>
   );
 }

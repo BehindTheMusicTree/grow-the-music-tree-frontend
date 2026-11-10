@@ -42,7 +42,7 @@ export default function CurationEdges({ edges, q, relation, showQid, appliedExpo
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end gap-3">
-        <label className="flex flex-col flex-1 min-w-48 gap-1 text-sm font-medium text-gray-700">
+        <label className="flex flex-col flex-1 min-w-48 gap-1 text-body font-medium text-gray-700">
           Rechercher
           <input
             type="search"
@@ -52,7 +52,7 @@ export default function CurationEdges({ edges, q, relation, showQid, appliedExpo
             className="w-full px-3 py-2 font-normal border rounded-md"
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
+        <label className="flex flex-col gap-1 text-body font-medium text-gray-700">
           Relation
           <select
             value={relation ?? ""}
@@ -67,7 +67,7 @@ export default function CurationEdges({ edges, q, relation, showQid, appliedExpo
             ))}
           </select>
         </label>
-        <label className="flex items-center gap-2 py-2 text-sm">
+        <label className="flex items-center gap-2 py-2 text-body">
           <input
             type="checkbox"
             checked={showQid}
@@ -77,7 +77,7 @@ export default function CurationEdges({ edges, q, relation, showQid, appliedExpo
         </label>
         <Button onClick={() => setEditing("new")}>Ajouter</Button>
       </div>
-      <p className="text-sm text-gray-600">
+      <p className="text-body text-gray-600">
         {edges.overallTotal} arête{edges.overallTotal > 1 ? "s" : ""}
         {q && ` pour « ${q} »`}
       </p>

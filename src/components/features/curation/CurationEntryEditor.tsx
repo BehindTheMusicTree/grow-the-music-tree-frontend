@@ -97,7 +97,7 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
           }
           if (kind === "bool") {
             return (
-              <label key={column} className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <label key={column} className="flex items-center gap-2 text-body font-medium text-gray-700">
                 <input
                   type="checkbox"
                   checked={row[column] === "true"}
@@ -110,7 +110,7 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
           const Field = column === "reason" ? "textarea" : "input";
           return (
             <div key={column} className="flex flex-col gap-1">
-              <label htmlFor={`${id}-${column}`} className="text-sm font-medium text-gray-700">
+              <label htmlFor={`${id}-${column}`} className="text-body font-medium text-gray-700">
                 {title}
               </label>
               <Field

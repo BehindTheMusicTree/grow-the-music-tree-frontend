@@ -129,7 +129,7 @@ export default function CurationEdgeEditor({ edge, itemId, labels, onClose }: Pr
         className="flex flex-col gap-4"
       >
         <div className="flex flex-col gap-1">
-          <label htmlFor={`${id}-relation`} className="text-sm font-medium text-gray-700">
+          <label htmlFor={`${id}-relation`} className="text-body font-medium text-gray-700">
             {FIELD_TITLES.relation}
           </label>
           <select
@@ -147,7 +147,7 @@ export default function CurationEdgeEditor({ edge, itemId, labels, onClose }: Pr
           </select>
         </div>
         {edge ? (
-          <p className="text-sm">
+          <p className="text-body">
             <span className="font-medium text-gray-700">{FIELD_TITLES.item_id} : </span>
             {labels[input.item_id] || input.item_id}
           </p>
@@ -161,7 +161,7 @@ export default function CurationEdgeEditor({ edge, itemId, labels, onClose }: Pr
           />
         )}
         {input.relation === "canonical_parent" && (
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+          <label className="flex items-center gap-2 text-body font-medium text-gray-700">
             <input
               type="checkbox"
               checked={root}
@@ -187,7 +187,7 @@ export default function CurationEdgeEditor({ edge, itemId, labels, onClose }: Pr
         )}
         {secondary ? (
           <div className="flex flex-col gap-1">
-            <label htmlFor={`${id}-action`} className="text-sm font-medium text-gray-700">
+            <label htmlFor={`${id}-action`} className="text-body font-medium text-gray-700">
               {FIELD_TITLES.action}
             </label>
             <select
@@ -204,7 +204,7 @@ export default function CurationEdgeEditor({ edge, itemId, labels, onClose }: Pr
             </select>
           </div>
         ) : (
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+          <label className="flex items-center gap-2 text-body font-medium text-gray-700">
             <input
               type="checkbox"
               checked={input.exclude_other_parents === true}
@@ -214,7 +214,7 @@ export default function CurationEdgeEditor({ edge, itemId, labels, onClose }: Pr
           </label>
         )}
         <div className="flex flex-col gap-1">
-          <label htmlFor={`${id}-reason`} className="text-sm font-medium text-gray-700">
+          <label htmlFor={`${id}-reason`} className="text-body font-medium text-gray-700">
             {FIELD_TITLES.reason}
           </label>
           <textarea

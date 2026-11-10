@@ -354,7 +354,7 @@ export default function RegionMapCanvas({
       {!webglFailed && <div ref={containerRef} className="h-full w-full" />}
       {webglFailed ? (
         <>
-          <p role="alert" className="bg-white p-3 text-sm text-red-600">
+          <p role="alert" className="bg-white p-3 text-body text-red-600">
             The map cannot be displayed on this device. Use the region list instead.
           </p>
           <RegionTree ids={rootIds} regions={regions} renderButton={(region) => regionButton(region, false)} />
@@ -362,7 +362,7 @@ export default function RegionMapCanvas({
       ) : (
         <ul
           aria-label="Regions on the map"
-          className="sr-only text-sm focus-within:not-sr-only focus-within:absolute focus-within:left-2 focus-within:top-2 focus-within:max-h-64 focus-within:overflow-y-auto focus-within:rounded focus-within:bg-white focus-within:p-1"
+          className="sr-only text-body focus-within:not-sr-only focus-within:absolute focus-within:left-2 focus-within:top-2 focus-within:max-h-64 focus-within:overflow-y-auto focus-within:rounded focus-within:bg-white focus-within:p-1"
         >
           {listed.map((region) => (
             <li key={region.id}>{regionButton(region, true)}</li>
@@ -374,7 +374,7 @@ export default function RegionMapCanvas({
           ref={tooltipRef}
           aria-hidden
           data-tooltip
-          className="pointer-events-none absolute rounded bg-black/80 px-2 py-1 text-sm text-white"
+          className="pointer-events-none absolute rounded bg-black/80 px-2 py-1 text-body text-white"
         >
           {tooltipText}
         </div>
@@ -394,7 +394,7 @@ function RegionTree({ ids, regions, renderButton }: TreeProps) {
   const level = ids.flatMap((id) => regions.get(id) ?? []).sort(byName);
   if (level.length === 0) return null;
   return (
-    <ul className="max-h-64 overflow-y-auto bg-white p-1 text-sm">
+    <ul className="max-h-64 overflow-y-auto bg-white p-1 text-body">
       {level.map((region) => (
         <li key={region.id}>
           {renderButton(region)}

@@ -57,7 +57,7 @@ export default function GenreCreationPopup({ onClose, onCreated, parent, ...rest
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Parent</label>
+              <label className="block text-body font-medium text-gray-700 mb-1">Parent</label>
               <input
                 type="text"
                 name="parent"
@@ -67,7 +67,7 @@ export default function GenreCreationPopup({ onClose, onCreated, parent, ...rest
               />
             </div>
             <div className="space-y-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <label className="block text-body font-medium text-gray-700 mb-1">Name</label>
               <input
                 type="text"
                 name="name"

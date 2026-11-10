@@ -33,6 +33,13 @@ const config = [
           selector: "Literal[value=/gtv-info-panel/], TemplateElement[value.raw=/gtv-info-panel/]",
           message: "Build panel sections with PanelSection from @behindthemusictree/ui, not gtv-info-panel-* classes.",
         },
+        // Type sizes come from the brand roles (text-title, text-heading, text-body, text-caption, text-input, text-search).
+        // text-[length:...] stays available for commented exceptions such as zoom-bound SVG labels.
+        {
+          selector:
+            "Literal[value=/(^|[\\s:])text-(xs|sm|base|lg|xl|[0-9]xl|[0-9.]+xl|\\[[0-9])/], TemplateElement[value.raw=/(^|[\\s:])text-(xs|sm|base|lg|xl|[0-9]xl|[0-9.]+xl|\\[[0-9])/]",
+          message: "Use a brand type role (text-title, text-heading, text-body, text-caption) instead of a Tailwind size or arbitrary size.",
+        },
       ],
     },
   },

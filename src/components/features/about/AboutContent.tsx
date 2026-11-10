@@ -55,8 +55,8 @@ export default function AboutContent({ onClose }: { onClose: () => void }) {
     <div className="flex flex-col gap-10 w-full max-w-2xl py-8 mx-auto">
       <header className="flex flex-col items-center gap-3 text-center">
         <AboutTheMusicTreeLockup />
-        <p className="text-lg font-medium text-gray-700">The map of the world&apos;s music.</p>
-        <p className="max-w-xl text-base leading-relaxed text-gray-600">
+        <p className="text-heading text-gray-700">The map of the world&apos;s music.</p>
+        <p className="max-w-xl text-body text-gray-600">
           Explore how genres branch out, listen as you go, and help build a reference that aims to classify every song.
         </p>
         <button
@@ -72,15 +72,15 @@ export default function AboutContent({ onClose }: { onClose: () => void }) {
         {FEATURES.map(({ Icon, title, description }) => (
           <div key={title} className="flex flex-col gap-2">
             <Icon aria-hidden="true" className="w-6 h-6 text-gray-900" />
-            <h2 className="text-base font-semibold text-gray-900">{title}</h2>
-            <p className="text-sm leading-relaxed text-gray-600">{description}</p>
+            <h2 className="text-heading text-gray-900">{title}</h2>
+            <p className="text-body leading-relaxed text-gray-600">{description}</p>
           </div>
         ))}
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold text-gray-900">Genealogy</h2>
-        <p className="text-sm leading-relaxed text-gray-600">
+        <h2 className="text-heading text-gray-900">Genealogy</h2>
+        <p className="text-body leading-relaxed text-gray-600">
           See how musical traditions descend from one another on the{" "}
           <Link href={GENEALOGY_HREF} className={EXTERNAL_LINK_CLASS}>
             genealogy chart
@@ -90,8 +90,8 @@ export default function AboutContent({ onClose }: { onClose: () => void }) {
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold text-gray-900">What&apos;s next</h2>
-        <ul className="pl-5 space-y-1.5 text-sm leading-relaxed text-gray-600 list-disc">
+        <h2 className="text-heading text-gray-900">What&apos;s next</h2>
+        <ul className="pl-5 space-y-1.5 text-body leading-relaxed text-gray-600 list-disc">
           {NEXT_ITEMS.map((item) => (
             <li key={item}>{item}</li>
           ))}
@@ -99,8 +99,8 @@ export default function AboutContent({ onClose }: { onClose: () => void }) {
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold text-gray-900">Support TheMusicTree</h2>
-        <p className="text-sm leading-relaxed text-gray-600">
+        <h2 className="text-heading text-gray-900">Support TheMusicTree</h2>
+        <p className="text-body leading-relaxed text-gray-600">
           TheMusicTree is independent and open source. If it helps you dig, support its growth.
         </p>
         <div>
@@ -113,8 +113,8 @@ export default function AboutContent({ onClose }: { onClose: () => void }) {
       </section>
 
       <section className="flex flex-col gap-4 pt-6 border-t border-gray-100">
-        <h2 className="text-base font-semibold text-gray-900">Built in the open</h2>
-        <p className="text-sm leading-relaxed text-gray-600">
+        <h2 className="text-heading text-gray-900">Built in the open</h2>
+        <p className="text-body leading-relaxed text-gray-600">
           TheMusicTree is made by <ExternalLink href={GITHUB_ORG_URL}>BehindTheMusicTree</ExternalLink>, an open-source
           team. Browse the <ExternalLink href={GITHUB_API_URL}>API</ExternalLink> and{" "}
           <ExternalLink href={GITHUB_AUDIOMETA_URL}>AudioMeta</ExternalLink>, our audio metadata library.
@@ -122,7 +122,7 @@ export default function AboutContent({ onClose }: { onClose: () => void }) {
         <OrgSocialLinks />
       </section>
 
-      <footer className="flex flex-col items-center gap-1 text-xs text-center text-gray-400">
+      <footer className="flex flex-col items-center gap-1 text-caption text-center text-gray-400">
         <p>
           Genres from{" "}
           <a href={WIKIDATA_URL} target="_blank" rel="noopener noreferrer" className="hover:text-gray-600">

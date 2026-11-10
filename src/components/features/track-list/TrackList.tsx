@@ -25,18 +25,18 @@ export default function TrackList({ tracks, onTrackClick }: TrackListProps) {
           onClick={() => onTrackClick?.(track)}
         >
           <div
-            className="flex items-center justify-center w-16 text-gray-400 text-sm"
+            className="flex items-center justify-center w-16 text-gray-400 text-body"
             style={{ minWidth: "64px", maxWidth: "64px" }}
           >
             {index + 1}
           </div>
           <Image src={track.albumArt} alt={track.title} width={48} height={48} className="w-12 h-12 rounded" />
           <div className="ml-4 flex-grow">
-            <h3 className="font-bold text-white">{track.title}</h3>
+            <h3 className="text-body font-medium text-white">{track.title}</h3>
             <p className="text-gray-400">{track.artist}</p>
           </div>
           <div
-            className="flex items-center justify-center w-16 text-gray-400 text-sm"
+            className="flex items-center justify-center w-16 text-gray-400 text-body"
             style={{ minWidth: "64px", maxWidth: "64px" }}
           >
             {track.duration}

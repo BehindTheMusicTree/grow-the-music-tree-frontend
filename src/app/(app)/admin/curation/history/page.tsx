@@ -53,7 +53,7 @@ export default async function CurationHistoryPage({ searchParams }: Props) {
       <div className="flex flex-col gap-4 p-4">
         <CurationStatus status={status} />
         {(list || entry || itemId) && (
-          <p className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+          <p className="flex flex-wrap items-center gap-2 text-body text-gray-600">
             Filtré sur
             {list && <span className="font-medium text-gray-900">{curationListTitle(list)}</span>}
             {entry && <span>une entrée</span>}
@@ -63,7 +63,7 @@ export default async function CurationHistoryPage({ searchParams }: Props) {
             </Link>
           </p>
         )}
-        <p className="text-sm text-gray-600">
+        <p className="text-body text-gray-600">
           {history.overallTotal} modification{history.overallTotal > 1 ? "s" : ""}
         </p>
         <CurationHistory items={history.results} lists={lists} labels={history.labels} />
@@ -74,7 +74,7 @@ export default async function CurationHistoryPage({ searchParams }: Props) {
                 Précédent
               </Link>
             )}
-            <span className="text-sm text-gray-600">
+            <span className="text-body text-gray-600">
               Page {history.page} / {history.totalPages}
             </span>
             {history.page < history.totalPages && (

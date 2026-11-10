@@ -4,7 +4,7 @@ import { useGenreCuration } from "@components/features/genre-curation/GenreCurat
 import { MoveSongsPopup, UnlinkSongsPopup } from "@components/features/genre-curation/SongPopups";
 import LinkSongsDialog from "@components/features/genre-curation/LinkSongsDialog";
 
-const BUTTON = "px-3 py-1 text-sm rounded border bg-white cursor-pointer hover:bg-gray-100";
+const BUTTON = "px-3 py-1 text-body rounded border bg-white cursor-pointer hover:bg-gray-100";
 
 export default function SelectionBar() {
   const { genre, selected, clearSelection, openDialog } = useGenreCuration();
@@ -23,7 +23,7 @@ export default function SelectionBar() {
       )}
       {songs.length > 0 && (
         <>
-          <span role="status" className="text-sm font-medium">
+          <span role="status" className="text-body font-medium">
             {songs.length} selected
           </span>
           <button

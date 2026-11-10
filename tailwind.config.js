@@ -23,9 +23,6 @@ const config = {
       boxShadow: {
         "progress-bar-blue": "-403px 0 0 400px #3B82F6", // blue-500
       },
-      fontSize: {
-        "1.5xl": "1.1rem",
-      },
       keyframes: {
         "scale-pulse": {
           "0%, 100%": { transform: "scaleY(0.75)" },

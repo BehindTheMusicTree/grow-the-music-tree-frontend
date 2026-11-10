@@ -38,7 +38,7 @@ export function MenuGroup({ items, className = "", collapsed = false, layout = "
         const className = cn(
           "flex items-center transition-colors duration-200",
           isHorizontal
-            ? "shrink-0 gap-2 whitespace-nowrap px-1.5 py-1.5 text-sm lg:gap-2 lg:px-2"
+            ? "shrink-0 gap-2 whitespace-nowrap px-1.5 py-1.5 text-body lg:gap-2 lg:px-2"
             : cn("mx-1 mt-1 py-2", collapsed ? "justify-center px-2" : "gap-3 px-4"),
           "text-gray-300 hover:text-white",
           isCurrentPage && "font-semibold text-white",

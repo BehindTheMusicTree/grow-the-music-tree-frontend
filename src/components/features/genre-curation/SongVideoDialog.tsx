@@ -74,7 +74,7 @@ export function VideoForm({ current, isPending, onSave, onCancel }: VideoFormPro
         if (!invalid) onSave({ youtubeVideoId: videoId, youtubeUnplayableReason: reason || null }, current);
       }}
     >
-      <label className="flex flex-col gap-1 text-sm font-medium">
+      <label className="flex flex-col gap-1 text-body font-medium">
         YouTube URL or ID
         <input
           type="text"
@@ -96,7 +96,7 @@ export function VideoForm({ current, isPending, onSave, onCancel }: VideoFormPro
           allow="encrypted-media"
         />
       )}
-      <label className="flex flex-col gap-1 text-sm font-medium">
+      <label className="flex flex-col gap-1 text-body font-medium">
         Unplayable reason
         <select
           value={reason}
