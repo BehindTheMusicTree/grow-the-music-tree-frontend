@@ -46,6 +46,7 @@ import {
   supranationalZoneIds,
 } from "./regionMapLayers";
 import { containerFitPadding } from "./panelInset";
+import { createStarfieldLayer } from "./starfieldLayer";
 import type { Camera } from "./useRegionMapUrlState";
 
 /** Asks the map to fly to a region, or to the world when `id` is null; `seq` makes a repeated request a new one. */
@@ -239,7 +240,12 @@ export default function RegionMapCanvas({
       setVisibleIds((current) => (current.join() === next.join() ? current : next));
     };
 
-    map.on("load", () => setReady(true));
+    map.on("load", () => {
+      // Ready first: a failing decorative layer must not leave the region styling and selection disabled.
+      setReady(true);
+      // Topmost: drawn last of the layers, before MapLibre's atmosphere glow.
+      map.addLayer(createStarfieldLayer());
+    });
     map.on("idle", listVisible);
     map.on("moveend", () => {
       const { lng, lat } = map.getCenter();
@@ -351,7 +357,7 @@ export default function RegionMapCanvas({
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-lg" role="group" aria-label="Region map">
-      {!webglFailed && <div ref={containerRef} className="h-full w-full" />}
+      {!webglFailed && <div ref={containerRef} className="h-full w-full bg-space" />}
       {webglFailed ? (
         <>
           <p role="alert" className="bg-white p-3 text-body text-red-600">

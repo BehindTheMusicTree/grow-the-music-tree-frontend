@@ -14,6 +14,7 @@ const config = {
   theme: {
     extend: {
       colors: {
+        space: "#050a1a",
         "scrollbar-base": "#your-base-color",
         "scrollbar-light": "#your-thumb-color",
       },
