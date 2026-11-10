@@ -110,7 +110,6 @@ documentation:
           - "**/*.md"
           - ".github/ISSUE_TEMPLATE/**"
           - ".github/DISCUSSION_TEMPLATE/**"
-          - ".github/pull_request_template.md"
           - ".github/LABELS.md"
           - "VISION.md"
           - "CODE_OF_CONDUCT.md"

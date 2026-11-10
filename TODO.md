@@ -327,6 +327,6 @@ If you'd like to work on any of these items:
 2. Create a new issue for discussion if needed
 3. Fork the repository and create a feature branch following our [Git Flow workflow](CONTRIBUTING.md#2-branching)
 4. Implement your changes with appropriate tests following our [testing guidelines](CONTRIBUTING.md#4-testing)
-5. Submit a pull request using our [PR template](.github/pull_request_template.md)
+5. Submit a pull request using our [organization pull request template](https://github.com/BehindTheMusicTree/.github/blob/main/.github/pull_request_template.md)
 
 For questions about specific tasks, please open an issue for discussion or refer to our [Contributing Guidelines](CONTRIBUTING.md).
