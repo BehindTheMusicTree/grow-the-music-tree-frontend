@@ -124,6 +124,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- Removed the graphify `merge=graphify` git attribute, which pointed at a machine-specific merge driver; the global agent-config freshness hook keeps the graph fresh.
 - Text sizes follow the brand type roles (`text-title`, `text-heading`, `text-body`, `text-caption`) across curation, about, admin, menu and popups; the global `h1`/`h2`/`h3` sizes, `text-1.5xl` and `.page-title` are gone, and ESLint rejects Tailwind size classes and arbitrary sizes (`text-[length:…]` stays for commented exceptions).
 
 - On the region map, the search box follows the shared layout tokens and the breadcrumb sits right under it, centred on the map.
