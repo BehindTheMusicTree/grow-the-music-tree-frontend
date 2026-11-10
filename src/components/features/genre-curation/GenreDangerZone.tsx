@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useDeleteGenre, type GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
+import { ActionBand, ActionButton, PanelBleed } from "@behindthemusictree/ui";
+import { ArrowUpToLine, Ban, Merge, Trash2, type LucideIcon } from "lucide-react";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import GenrePicker from "@components/features/curation/GenrePicker";
 import { useGenreCuration } from "@components/features/genre-curation/GenreCurationProvider";
@@ -191,30 +193,46 @@ function DeletePopup({ genre, onClose, onRemoved }: PopupProps & Pick<DangerZone
 
 export default function GenreDangerZone({ genre, parent, onAliased, onRemoved }: DangerZoneProps) {
   const { openDialog } = useGenreCuration();
-  const button = "px-3 py-1 text-body text-red-600 border border-red-300 rounded cursor-pointer hover:bg-red-50";
+  const icon = (Icon: LucideIcon) => <Icon size={18} className="text-red-600" />;
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {!genre.wikidataId && (
-        <button type="button" className={button} onClick={() => openDialog((close) => <AliasPopup genre={genre} onClose={close} onAliased={onAliased} />)}>
-          Alias of…
-        </button>
-      )}
-      {parent && (
-        <button
-          type="button"
-          className={button}
-          onClick={() => openDialog((close) => <SetRootPopup genre={genre} parent={parent} onClose={close} />)}
-        >
-          Set as root…
-        </button>
-      )}
-      <button type="button" className={button} onClick={() => openDialog((close) => <ExcludePopup genre={genre} onClose={close} onRemoved={onRemoved} />)}>
-        Exclude…
-      </button>
-      <button type="button" className={button} onClick={() => openDialog((close) => <DeletePopup genre={genre} onClose={close} onRemoved={onRemoved} />)}>
-        Delete
-      </button>
-    </div>
+    <PanelBleed>
+      <ActionBand
+        section={{
+          title: "Danger zone",
+          children: (
+            <>
+              {!genre.wikidataId && (
+                <ActionButton
+                  icon={icon(Merge)}
+                  label="Alias"
+                  aria-label="Alias of…"
+                  onClick={() => openDialog((close) => <AliasPopup genre={genre} onClose={close} onAliased={onAliased} />)}
+                />
+              )}
+              {parent && (
+                <ActionButton
+                  icon={icon(ArrowUpToLine)}
+                  label="Root"
+                  aria-label="Set as root…"
+                  onClick={() => openDialog((close) => <SetRootPopup genre={genre} parent={parent} onClose={close} />)}
+                />
+              )}
+              <ActionButton
+                icon={icon(Ban)}
+                label="Exclude"
+                aria-label="Exclude…"
+                onClick={() => openDialog((close) => <ExcludePopup genre={genre} onClose={close} onRemoved={onRemoved} />)}
+              />
+              <ActionButton
+                icon={icon(Trash2)}
+                label="Delete"
+                onClick={() => openDialog((close) => <DeletePopup genre={genre} onClose={close} onRemoved={onRemoved} />)}
+              />
+            </>
+          ),
+        }}
+      />
+    </PanelBleed>
   );
 }

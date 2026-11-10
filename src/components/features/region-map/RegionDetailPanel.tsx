@@ -2,7 +2,8 @@
 
 import { useGenreByWikidataId } from "@behindthemusictree/app-kit/genre-tree";
 import { GenreDetailPanel } from "@behindthemusictree/app-kit-ui/genre-tree";
-import { Button, DetailPanel, FieldList } from "@behindthemusictree/ui";
+import { ActionBand, ActionButton, Button, DetailPanel, FieldList, PanelBleed } from "@behindthemusictree/ui";
+import { ZoomIn } from "lucide-react";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { collapseEdgeTab } from "@utils/collapseEdgeTab";
 import type { Region } from "@schemas/api/region-map";
@@ -33,6 +34,13 @@ export default function RegionDetailPanel({
   if (overviewId === null && !uuid) {
     return (
       <DetailPanel titleInSearch title={region.name} onClose={onClose} side="left" collapsed={collapsed} edgeTab={edgeTab}>
+        {onZoomIn && (
+          <PanelBleed>
+            <ActionBand>
+              <ActionButton icon={<ZoomIn size={18} />} label="Focus" aria-label={`Zoom to ${region.name}`} onClick={onZoomIn} />
+            </ActionBand>
+          </PanelBleed>
+        )}
         {boundaryNote}
         <FieldList
           items={[
@@ -47,13 +55,6 @@ export default function RegionDetailPanel({
               <RegionGenreChoice key={genre.itemId} itemId={genre.itemId} onSelect={onSelectGenre} />
             ))}
         </ul>
-        {onZoomIn && (
-          <div>
-            <Button type="button" onClick={onZoomIn}>
-              Zoom to {region.name}
-            </Button>
-          </div>
-        )}
       </DetailPanel>
     );
   }
