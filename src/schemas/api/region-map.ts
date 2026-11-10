@@ -8,12 +8,15 @@ const Position = z.tuple([z.number(), z.number()]);
 const RegionGenreSchema = z
   .object({
     itemId: NonEmpty,
-    rule: NonEmpty,
+    /** Dropped from the published index; still accepted from an index published before that. Nothing reads it. */
+    rule: NonEmpty.optional(),
     relation: z.enum(["canonical", "regional", "tradition"]),
   })
   .strict();
 
-const RegionSchema = z
+const Bbox = z.tuple([z.number(), z.number(), z.number(), z.number()]);
+
+const RegionShapeSchema = z
   .object({
     id: NonEmpty,
     name: NonEmpty,
@@ -23,11 +26,15 @@ const RegionSchema = z
     zoneIds: z.array(NonEmpty),
     /** Point regions of kind "city" under an admin unit; not part of `childIds`. Optional until every published index carries them. */
     cityIds: z.array(NonEmpty).optional(),
+    /** Dropped from the published index (a missing boundary is `bbox` null); still accepted from an older index. */
     boundaryStatus: z.enum(["available", "missing"]).optional(),
-    bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]).nullable(),
-    mainBbox: z.tuple([z.number(), z.number(), z.number(), z.number()]).nullable(),
+    /** Null when the region has no drawable boundary, which `centroid` shares. */
+    bbox: Bbox.nullable(),
+    /** Omitted when equal to `bbox`. */
+    mainBbox: Bbox.nullable().optional(),
     centroid: Position.nullable(),
-    drillable: z.boolean(),
+    /** Dropped from the published index (it is `childIds.length > 0`); still accepted from an older index. */
+    drillable: z.boolean().optional(),
     /** Wikidata item id of the region's "Music of X" genre; null when it has none. */
     overviewItemId: NonEmpty.nullable(),
     /**
@@ -40,12 +47,26 @@ const RegionSchema = z
     genreCount: z.number().int().min(0),
   })
   .strict()
-  .refine((region) => {
-    const coordinates = [region.bbox, region.mainBbox, region.centroid];
-    return region.boundaryStatus === "missing"
-      ? coordinates.every((value) => value === null)
-      : coordinates.every((value) => value !== null);
-  }, { message: "Boundary status and coordinates disagree" });
+  .refine((region) => (region.bbox === null) === (region.centroid === null), {
+    message: "bbox and centroid must both be null or both be set",
+  })
+  .refine((region) => region.mainBbox === undefined || (region.mainBbox === null) === (region.bbox === null), {
+    message: "mainBbox and bbox must both be null or both be set",
+  })
+  .refine((region) => region.boundaryStatus === undefined || (region.boundaryStatus === "missing") === (region.bbox === null), {
+    message: "Boundary status and coordinates disagree",
+  });
+
+/**
+ * One shape for the app whichever format the index was published in: a missing boundary is `bbox` null, `mainBbox`
+ * falls back to `bbox`, and a region is drillable when it has children. Drop the fallbacks once every index is lean.
+ */
+const RegionSchema = RegionShapeSchema.transform((region) => ({
+  ...region,
+  boundaryStatus: region.bbox === null ? ("missing" as const) : ("available" as const),
+  mainBbox: region.mainBbox === undefined ? region.bbox : region.mainBbox,
+  drillable: region.drillable ?? region.childIds.length > 0,
+}));
 
 /** A subdivision kept out of the map until a genre is attached to it by hand (`tradition_placement_overrides`). */
 const HiddenRegionSchema = z
