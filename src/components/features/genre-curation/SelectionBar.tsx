@@ -1,5 +1,6 @@
 "use client";
 
+import { PanelBleed } from "@behindthemusictree/ui";
 import { useGenreCuration } from "@components/features/genre-curation/GenreCurationProvider";
 import { MoveSongsPopup, UnlinkSongsPopup } from "@components/features/genre-curation/SongPopups";
 import LinkSongsDialog from "@components/features/genre-curation/LinkSongsDialog";
@@ -11,7 +12,7 @@ export default function SelectionBar() {
   const songs = Array.from(selected);
 
   return (
-    <div className="sticky bottom-0 z-10 flex flex-wrap items-center gap-2 p-2 bg-white border-t">
+    <PanelBleed padded className="sticky bottom-0 z-10 flex flex-wrap items-center gap-2 py-2 bg-white border-t">
       {genre && (
         <button
           type="button"
@@ -53,6 +54,6 @@ export default function SelectionBar() {
           </button>
         </>
       )}
-    </div>
+    </PanelBleed>
   );
 }

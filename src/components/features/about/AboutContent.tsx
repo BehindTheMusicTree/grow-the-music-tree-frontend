@@ -52,7 +52,7 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
 
 export default function AboutContent({ onClose }: { onClose: () => void }) {
   return (
-    <div className="flex flex-col gap-10 w-full max-w-2xl py-8 mx-auto">
+    <div className="flex flex-col gap-10 w-full max-w-2xl mx-auto">
       <header className="flex flex-col items-center gap-3 text-center">
         <AboutTheMusicTreeLockup />
         <p className="text-heading text-gray-700">The map of the world&apos;s music.</p>
