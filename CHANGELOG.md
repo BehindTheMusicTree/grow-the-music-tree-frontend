@@ -145,6 +145,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - Tree and map genre links now use genre entity UUIDs. Playlist UUID links are no longer interpreted as genre selections.
 
 - On the map, the search box alone shows the selected region or genre and closes its panel: the panel header has no title or close cross, and the search cross appears only while a panel is open and unselects the item. Closing a genre opened from a region now closes everything; browser back returns to the region.
+- Removed the local pull request template; the organization-wide template from `BehindTheMusicTree/.github` applies.
 
 ### Fixed
 
