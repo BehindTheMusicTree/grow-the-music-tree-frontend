@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-import { GenreUuidSchema, type GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
 import { updateUrlQuery } from "@lib/urlQuery";
 import type { FocusChangeReason, GenreTreeViewport } from "@behindthemusictree/app-kit-ui/genre-tree";
 
@@ -35,9 +34,7 @@ interface UseGenreTreeUrlStateOptions {
 export function useGenreTreeUrlState({ viewMode }: UseGenreTreeUrlStateOptions) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const rawGenre = searchParams.get(GENRE_PARAM);
-  const parsedGenre = GenreUuidSchema.safeParse(rawGenre);
-  const genre = parsedGenre.success ? parsedGenre.data : null;
+  const genre = searchParams.get(GENRE_PARAM);
   const zoom = searchParams.get(ZOOM_PARAM);
   const view = searchParams.get(VIEW_PARAM);
   const artist = searchParams.get(ARTIST_PARAM);
@@ -47,7 +44,7 @@ export function useGenreTreeUrlState({ viewMode }: UseGenreTreeUrlStateOptions) 
   const [defaultViewport, setDefaultViewport] = useState(() => parseViewport(view));
   const previousViewMode = useRef(viewMode);
   const setSelectedGenreUuid = useCallback(
-    (id: GenreUuid | null, method: "push" | "replace" = "push") =>
+    (id: string | null, method: "push" | "replace" = "push") =>
       updateUrlQuery((params) => {
         if (id) {
           params.set(GENRE_PARAM, id);
@@ -130,7 +127,6 @@ export function useGenreTreeUrlState({ viewMode }: UseGenreTreeUrlStateOptions) 
 
   return {
     selectedGenreUuid: genre,
-    invalidGenre: rawGenre !== null && !parsedGenre.success,
     setSelectedGenreUuid,
     artistUuid: artist,
     setArtistUuid,

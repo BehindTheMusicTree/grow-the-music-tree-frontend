@@ -692,7 +692,7 @@ describe("GenreTreePage", () => {
       expect(screen.getByTestId("default-viewport")).toHaveTextContent("null");
     });
 
-    it("keeps an unavailable genre in a closable panel", async () => {
+    it("hands an unknown genre to the view as is and leaves the URL alone", async () => {
       setSearch("genre=ghost&other=1");
       useVisibleGenrePlaylistsMock.mockReturnValue({
         genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }],
@@ -701,11 +701,9 @@ describe("GenreTreePage", () => {
 
       renderGenreTreePage();
 
-      expect(await screen.findByRole("region", { name: "Genre unavailable" })).toBeInTheDocument();
-      expect(replaceState).not.toHaveBeenCalled();
-      fireEvent.click(screen.getByRole("button", { name: "Close panel" }));
+      expect(await screen.findByTestId("selected-node")).toHaveTextContent("ghost");
       await flushNavigation();
-      expect(pushState).toHaveBeenCalledWith(null, "", "/?other=1");
+      expect(replaceState).not.toHaveBeenCalled();
     });
 
     it("keeps a known ?genre= and waits for the playlists before judging it", async () => {

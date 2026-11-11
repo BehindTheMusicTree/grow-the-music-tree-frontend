@@ -213,14 +213,12 @@ describe("genre entity URL boundary", () => {
     setSearch(`genre=${oldPlaylistUuid}&view=1,2,3`);
     const { result } = renderState();
     expect(result.current.selectedGenreUuid).toBe(oldPlaylistUuid);
-    expect(result.current.invalidGenre).toBe(false);
   });
 
-  it("exposes malformed selections as unavailable without silently dropping the URL", async () => {
+  it("passes a malformed selection through so the panel can say the genre was not found, without dropping the URL", async () => {
     setSearch("genre=not-a-uuid&view=1,2,3");
     const { result } = renderState();
-    expect(result.current.invalidGenre).toBe(true);
-    expect(result.current.selectedGenreUuid).toBeNull();
+    expect(result.current.selectedGenreUuid).toBe("not-a-uuid");
     await flushNavigation();
     expect(window.location.search).toContain("genre=not-a-uuid");
   });

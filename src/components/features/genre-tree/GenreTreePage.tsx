@@ -102,7 +102,6 @@ type ZoomableGenreTreeViewProps = Omit<
   setArtistUuid: (uuid: string | null, method?: "push" | "replace") => void;
   songUuid: string | null;
   setSongUuid: (uuid: string | null, method?: "push" | "replace") => void;
-  invalidGenre: boolean;
   focus?: {
     focusGenreUuid: string | null;
     onFocusGenreChange: (uuid: string | null, reason: FocusChangeReason) => void;
@@ -111,7 +110,6 @@ type ZoomableGenreTreeViewProps = Omit<
 
 function ZoomableGenreTreeView({
   setSelectedGenreUuid,
-  invalidGenre,
   artistUuid,
   setArtistUuid,
   songUuid,
@@ -189,8 +187,8 @@ function ZoomableGenreTreeView({
   useEffect(() => {
     if (about && songUuid) setSongUuid(null, "replace");
     else if (about && artistUuid) setArtistUuid(null, "replace");
-    else if (about && (selectedGenreUuid || invalidGenre)) setSelectedGenreUuid(null, "replace");
-  }, [about, artistUuid, songUuid, invalidGenre, selectedGenreUuid, setArtistUuid, setSongUuid, setSelectedGenreUuid]);
+    else if (about && selectedGenreUuid) setSelectedGenreUuid(null, "replace");
+  }, [about, artistUuid, songUuid, selectedGenreUuid, setArtistUuid, setSongUuid, setSelectedGenreUuid]);
 
   // The genre panel is displayed over an artist or song, so the tab names what is displayed (as on the map).
   useEntityDocumentTitle(selectedGenreUuid ? null : artistUuid, selectedGenreUuid ? null : songUuid);
@@ -206,9 +204,7 @@ function ZoomableGenreTreeView({
 
   const overlayPanel = about
     ? { title: "TheMusicTree", content: <AboutContent onClose={() => closeAbout()} />, onClose: () => closeAbout() }
-    : invalidGenre
-      ? { title: "Genre unavailable", content: <p role="alert">This genre could not be loaded.</p>, onClose: () => setSelectedGenreUuid(null) }
-      : undefined;
+    : undefined;
   const sharedProps = {
     ...viewProps,
     onSelectedGenreUuidChange: handleSelectedGenreUuidChange,
@@ -291,7 +287,6 @@ function GenreTreePageContent() {
 
   const {
     selectedGenreUuid,
-    invalidGenre,
     setSelectedGenreUuid,
     artistUuid,
     setArtistUuid,
@@ -424,7 +419,6 @@ function GenreTreePageContent() {
       getBackendBaseUrl={getBackendBaseUrl}
       viewMode={viewMode}
       readOnly={!isAdmin}
-      invalidGenre={invalidGenre}
       selectedGenreUuid={selectedGenreUuid}
       setSelectedGenreUuid={setSelectedGenreUuid}
       artistUuid={artistUuid}

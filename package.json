@@ -23,8 +23,8 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@behindthemusictree/app-kit": "40.1.0",
-    "@behindthemusictree/app-kit-ui": "40.1.0",
+    "@behindthemusictree/app-kit": "41.0.0",
+    "@behindthemusictree/app-kit-ui": "41.0.0",
     "@behindthemusictree/brand": "12.12.0",
     "@behindthemusictree/ui": "0.21.2",
     "@fortawesome/fontawesome-svg-core": "6.5.2",
