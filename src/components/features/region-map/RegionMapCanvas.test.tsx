@@ -58,6 +58,14 @@ vi.mock("maplibre-gl", () => {
     addLayer(...args: unknown[]) {
       this.record("addLayer", args);
     }
+    setLight(...args: unknown[]) {
+      this.record("setLight", args);
+      this.record("order", ["setLight"]);
+    }
+    triggerRepaint() {
+      this.record("triggerRepaint", []);
+      this.record("order", ["triggerRepaint"]);
+    }
     fitBounds(...args: unknown[]) {
       this.record("fitBounds", args);
     }
@@ -439,6 +447,31 @@ describe("RegionMapCanvas", () => {
     const zone = zoneFilters("Q236626", supranationalZoneIds(regions));
     expect(map.calls.setFilter).toContainEqual(["zone-fill", zone.fill]);
     expect(map.calls.setFilter).toContainEqual(["zone-line", zone.line]);
+  });
+
+  describe("sky tick", () => {
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
+
+    it("moves the light then repaints every 10 s once loaded, and stops on unmount", async () => {
+      const { unmount } = mount();
+      const map = fakeMap();
+      await act(() => map.emit("load"));
+      expect(map.calls.setLight).toBeUndefined();
+
+      act(() => {
+        vi.advanceTimersByTime(10_000);
+      });
+      expect(map.calls.setLight).toHaveLength(1);
+      expect(map.calls.setLight[0][0]).toMatchObject({ anchor: "map", position: [1, expect.any(Number), expect.any(Number)] });
+      expect(map.calls.order).toEqual([["setLight"], ["triggerRepaint"]]);
+
+      unmount();
+      act(() => {
+        vi.advanceTimersByTime(30_000);
+      });
+      expect(map.calls.setLight).toHaveLength(1);
+    });
   });
 
   it("destroys the map on unmount", () => {

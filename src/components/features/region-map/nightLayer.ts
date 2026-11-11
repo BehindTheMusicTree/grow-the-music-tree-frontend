@@ -1,7 +1,7 @@
 import type { CustomLayerInterface, CustomRenderMethodInput } from "maplibre-gl";
 import { linkProgram, requireUniform } from "./glProgram";
 import { NIGHT_LAYER } from "./regionMapLayers";
-import { SUN_DIRECTION } from "./sun";
+import type { Sky } from "./sun";
 
 const LABEL = "Night";
 
@@ -49,13 +49,14 @@ type Resources = {
   vao: WebGLVertexArrayObject;
   buffer: WebGLBuffer;
   matrix: WebGLUniformLocation;
+  sun: WebGLUniformLocation;
 };
 
 /**
  * Dims the globe: 30 % on the lit side, more on the night side (the half facing away from the Sun), with a soft terminator. A full-screen pass that
  * ray-casts each pixel against the unit globe, drawn over the map layers but under the Moon, Sun and stars.
  */
-export function createNightLayer(): CustomLayerInterface {
+export function createNightLayer(sky: Sky): CustomLayerInterface {
   let resources: Resources | null = null;
 
   return {
@@ -79,10 +80,9 @@ export function createNightLayer(): CustomLayerInterface {
 
       const uniform = (name: string) => requireUniform(gl, LABEL, program, name);
       gl.useProgram(program);
-      gl.uniform3f(uniform("u_sun"), SUN_DIRECTION[0], SUN_DIRECTION[1], SUN_DIRECTION[2]);
       gl.uniform1f(uniform("u_day"), DAY_DIM);
       gl.uniform1f(uniform("u_night"), NIGHT_DIM);
-      resources = { program, vao, buffer, matrix: uniform("u_matrix") };
+      resources = { program, vao, buffer, matrix: uniform("u_matrix"), sun: uniform("u_sun") };
     },
     render(context, { defaultProjectionData }: CustomRenderMethodInput) {
       if (resources === null) return;
@@ -91,6 +91,7 @@ export function createNightLayer(): CustomLayerInterface {
       const gl = context as WebGL2RenderingContext;
       gl.useProgram(resources.program);
       gl.uniformMatrix4fv(resources.matrix, false, defaultProjectionData.mainMatrix);
+      gl.uniform3f(resources.sun, sky.sun[0], sky.sun[1], sky.sun[2]);
       gl.disable(gl.DEPTH_TEST);
       gl.disable(gl.STENCIL_TEST);
       gl.disable(gl.CULL_FACE);

@@ -2,7 +2,7 @@ import type { CustomLayerInterface, CustomRenderMethodInput } from "maplibre-gl"
 import { linkProgram, requireUniform } from "./glProgram";
 import { moonBasis } from "./moon";
 import { SUN_LAYER } from "./regionMapLayers";
-import { SUN_ANGULAR_RADIUS, SUN_DIRECTION, SUN_GLOW_SCALE } from "./sun";
+import { SUN_ANGULAR_RADIUS, SUN_GLOW_SCALE, type Sky } from "./sun";
 
 const LABEL = "Sun";
 
@@ -44,14 +44,19 @@ type Resources = {
   vao: WebGLVertexArrayObject;
   buffer: WebGLBuffer;
   matrix: WebGLUniformLocation;
+  sun: WebGLUniformLocation;
+  right: WebGLUniformLocation;
+  up: WebGLUniformLocation;
 };
 
 /**
  * The Sun: a bright disc with a soft halo, fixed in the sky like the stars. Drawn "under" the frame, so the
  * opaque globe hides it, it hides the stars behind it, and the atmosphere blends over it.
  */
-export function createSunLayer(): CustomLayerInterface {
+export function createSunLayer(sky: Sky): CustomLayerInterface {
   let resources: Resources | null = null;
+  // The billboard basis only changes when the sky ticks, so it is recomputed only for a new `sky.sun`.
+  let basisFor: Sky["sun"] | null = null;
 
   return {
     id: SUN_LAYER,
@@ -72,16 +77,20 @@ export function createSunLayer(): CustomLayerInterface {
       gl.vertexAttribPointer(location, 2, gl.FLOAT, false, 0, 0);
       gl.bindVertexArray(null);
 
-      // Everything but the matrix is fixed: compute it once and upload it once.
-      const { right, up } = moonBasis([0, 0, 0], SUN_DIRECTION);
       const uniform = (name: string) => requireUniform(gl, LABEL, program, name);
       gl.useProgram(program);
-      gl.uniform3f(uniform("u_sun"), SUN_DIRECTION[0], SUN_DIRECTION[1], SUN_DIRECTION[2]);
-      gl.uniform3f(uniform("u_right"), right[0], right[1], right[2]);
-      gl.uniform3f(uniform("u_up"), up[0], up[1], up[2]);
       gl.uniform1f(uniform("u_extent"), Math.tan(SUN_ANGULAR_RADIUS) * SUN_GLOW_SCALE);
       gl.uniform1f(uniform("u_scale"), SUN_GLOW_SCALE);
-      resources = { program, vao, buffer, matrix: uniform("u_matrix") };
+      basisFor = null;
+      resources = {
+        program,
+        vao,
+        buffer,
+        matrix: uniform("u_matrix"),
+        sun: uniform("u_sun"),
+        right: uniform("u_right"),
+        up: uniform("u_up"),
+      };
     },
     render(context, { defaultProjectionData }: CustomRenderMethodInput) {
       if (resources === null) return;
@@ -90,6 +99,14 @@ export function createSunLayer(): CustomLayerInterface {
       const gl = context as WebGL2RenderingContext;
       gl.useProgram(resources.program);
       gl.uniformMatrix4fv(resources.matrix, false, defaultProjectionData.mainMatrix);
+      const sun = sky.sun;
+      gl.uniform3f(resources.sun, sun[0], sun[1], sun[2]);
+      if (basisFor !== sun) {
+        const { right, up } = moonBasis([0, 0, 0], sun);
+        gl.uniform3f(resources.right, right[0], right[1], right[2]);
+        gl.uniform3f(resources.up, up[0], up[1], up[2]);
+        basisFor = sun;
+      }
       gl.disable(gl.DEPTH_TEST);
       gl.disable(gl.STENCIL_TEST);
       gl.disable(gl.CULL_FACE);

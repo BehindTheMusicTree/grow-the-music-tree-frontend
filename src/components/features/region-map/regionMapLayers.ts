@@ -2,7 +2,8 @@ import { hcl, interpolateYlGnBu, scaleSequentialSqrt } from "d3";
 import type { ExpressionSpecification, LngLatBoundsLike, StyleSpecification } from "maplibre-gl";
 import { labelHalo } from "@behindthemusictree/ui";
 import { WORLD_ID, type Region } from "@schemas/api/region-map";
-import { SUN_DIRECTION, sunLightPosition } from "./sun";
+import type { Vec3 } from "./moon";
+import { sunLightPosition } from "./sun";
 
 export const EMPTY_FILL = "#e5e7eb";
 export const MAX_ZOOM = 11;
@@ -290,6 +291,7 @@ type StyleOptions = {
   colors: ReadonlyMap<string, string>;
   backdrop: ReadonlyMap<string, string>;
   zoneFill: string | null;
+  sun: Vec3;
 };
 
 export function buildStyle({
@@ -301,6 +303,7 @@ export function buildStyle({
   colors,
   backdrop,
   zoneFill,
+  sun,
 }: StyleOptions): StyleSpecification {
   const zone = zoneFilters(zoneId, supranationalIds);
   return {
@@ -312,7 +315,7 @@ export function buildStyle({
       "sky-horizon-blend": 0.6,
       "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 0.25, 5, 0.25, 7, 0],
     },
-    light: { anchor: "map", position: sunLightPosition(SUN_DIRECTION) },
+    light: { anchor: "map", position: sunLightPosition(sun) },
     glyphs: glyphsUrl,
     sources: {
       [TILES_SOURCE]: {

@@ -52,6 +52,7 @@ import { createMoonLayer } from "./moonLayer";
 import { createNightLayer } from "./nightLayer";
 import { createStarfieldLayer } from "./starfieldLayer";
 import { createSunLayer } from "./sunLayer";
+import { sunDirectionAt, sunLightPosition, type Sky } from "./sun";
 import type { Camera } from "./useRegionMapUrlState";
 
 /** Asks the map to fly to a region, or to the world when `id` is null; `seq` makes a repeated request a new one. */
@@ -77,6 +78,8 @@ type Props = {
 const TOOLTIP_OFFSET = 12;
 const ON_GLOBE_TOLERANCE_PX = 1;
 const FIT_PADDING = 24;
+/** The Sun moves 0.04° per tick: invisible jumps, and little repaint work. */
+const SKY_TICK_MS = 10_000;
 const TILES_BASE_URL = publicEnv.NEXT_PUBLIC_TILES_BASE_URL;
 const featureState = (region: Pick<Region, "id" | "kind">) => ({
   source: TILES_SOURCE,
@@ -178,6 +181,8 @@ export default function RegionMapCanvas({
       focus: initialFocus,
     } = initialRef.current;
     const opening = initialFocus?.id == null ? undefined : regionsRef.current.get(initialFocus.id);
+    let skyTimer: ReturnType<typeof setInterval> | undefined;
+    const sky: Sky = { sun: sunDirectionAt(new Date()) };
     let map: MapLibreMap;
     try {
       map = new MapLibreMap({
@@ -191,6 +196,7 @@ export default function RegionMapCanvas({
           colors: colorsRef.current,
           backdrop: backdropRef.current,
           zoneFill: zoneColor(initialZone, regionsRef.current),
+          sun: sky.sun,
         }),
         ...(camera
           ? { center: [camera.lng, camera.lat] as [number, number], zoom: camera.zoom }
@@ -252,10 +258,15 @@ export default function RegionMapCanvas({
       map.addLayer(createStarfieldLayer());
       // Just before the stars: all draw "under" the frame, so the Moon and the Sun must go first to hide the stars
       // behind them. Order: Moon, Sun, stars.
-      map.addLayer(createMoonLayer(), STARFIELD_LAYER);
-      map.addLayer(createSunLayer(), STARFIELD_LAYER);
+      map.addLayer(createMoonLayer(sky), STARFIELD_LAYER);
+      map.addLayer(createSunLayer(sky), STARFIELD_LAYER);
       // Over every map layer, under the Moon: darkens the side of the globe facing away from the Sun.
-      map.addLayer(createNightLayer(), MOON_LAYER);
+      map.addLayer(createNightLayer(sky), MOON_LAYER);
+      skyTimer = setInterval(() => {
+        sky.sun = sunDirectionAt(new Date());
+        map.setLight({ anchor: "map", position: sunLightPosition(sky.sun) });
+        map.triggerRepaint();
+      }, SKY_TICK_MS);
     });
     map.on("idle", listVisible);
     map.on("moveend", () => {
@@ -284,6 +295,7 @@ export default function RegionMapCanvas({
     map.on("mouseleave", HIT_LAYERS, clearHover);
 
     return () => {
+      if (skyTimer !== undefined) clearInterval(skyTimer);
       map.remove();
       mapRef.current = null;
       hoveredRef.current = null;
