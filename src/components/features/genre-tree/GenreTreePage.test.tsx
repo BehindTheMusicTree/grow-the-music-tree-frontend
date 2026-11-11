@@ -54,6 +54,8 @@ vi.mock("@hooks/useIsAdmin", () => ({
   useIsAdmin: () => useIsAdminMock(),
 }));
 
+vi.mock("@components/features/genre-tree/GenreHistory", () => ({ default: () => <div>Genre history</div> }));
+
 const useVisibleGenrePlaylistsMock = vi.fn<
   (options: { artistUuid?: string | null }) => { genrePlaylists: unknown[]; isLoading: boolean }
 >(() => ({ genrePlaylists: [], isLoading: false }));
@@ -99,6 +101,7 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", async (importOriginal) => {
       data-focus={props.focusGenreUuid === undefined ? "absent" : String(props.focusGenreUuid)}
     >
       {props.getBackendBaseUrl()}
+      {props.renderGenreDetailExtras?.({ uuid: makeGenreUuid("rock") } as never)}
       <span data-testid="artist-filter">{String(props.artistUuid ?? "none")}</span>
       <span data-testid="artist-expanded">{String(props.artistExpanded)}</span>
       <span data-testid="selected-node">{String(props.selectedGenreUuid ?? "none")}</span>
@@ -270,6 +273,18 @@ describe("GenreTreePage", () => {
     expect(view.dataset.readonly).toBe("true");
     expect(view).toHaveTextContent("/api/grow-proxy");
     expect(screen.getByRole("heading", { name: "Genre Tree" })).toBeInTheDocument();
+  });
+
+  it("shows the genre history (Modifications) to admins only", async () => {
+    const { unmount } = renderGenreTreePage();
+    await screen.findByTestId("genre-tree-view");
+    expect(screen.queryByText("Genre history")).toBeNull();
+    unmount();
+
+    useIsAdminMock.mockReturnValue(true);
+    renderGenreTreePage();
+    await screen.findByTestId("genre-tree-view");
+    expect(screen.getByText("Genre history")).toBeInTheDocument();
   });
 
   it("renders the genre tree editable when signed in as admin", async () => {
