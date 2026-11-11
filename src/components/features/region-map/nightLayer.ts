@@ -7,7 +7,7 @@ const LABEL = "Night";
 
 /** Alpha of black over the map on the lit side (-30 % brightness) and on the night side. */
 export const DAY_DIM = 0.3;
-export const NIGHT_DIM = 0.55;
+export const NIGHT_DIM = 0.45;
 
 const VERTEX_SHADER = `#version 300 es
 in vec2 a_ndc;

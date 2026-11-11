@@ -11,6 +11,7 @@ import { usePlaybackContext } from "@behindthemusictree/app-kit/transport";
 import { Breadcrumb } from "@behindthemusictree/ui";
 import { regionMapLookup } from "@lib/region-map-index";
 import { useRegionMapIndex } from "@hooks/useRegionMap";
+import { useIsAdmin } from "@hooks/useIsAdmin";
 import { useEntityDocumentTitle } from "@hooks/useEntityDocumentTitle";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
@@ -42,6 +43,7 @@ export default function RegionMapView() {
 }
 
 function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
+  const isAdmin = useIsAdmin();
   const { state, update } = useRegionMapUrlState();
   const pathname = usePathname();
   const regions = regionMapLookup(index);
@@ -211,7 +213,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
             collapsed={collapsed}
             edgeTab={collapseEdgeTab(collapsed, setCollapsed)}
             extras={{
-              renderGenreDetailExtras: (overview) => <GenreHistory genreUuid={overview.uuid} />,
+              renderGenreDetailExtras: isAdmin ? (overview) => <GenreHistory genreUuid={overview.uuid} /> : undefined,
               renderArtistLink,
               renderSongLink,
             }}

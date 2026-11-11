@@ -112,6 +112,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- The "Modifications" (genre history) section of the genre side panel is only shown to admins, on the tree and on the region map.
+
 ### Added
 
 - **Region map**: without a URL camera or a target region, the globe opens at the same world zoom but turned to the visitor's country (from the playback context, which waits for it before opening; a failed or unknown country keeps the current world view). The country is found through an optional `isoCode` on the index's country regions, which the schema now accepts; until the pipelines publish it the map opens as before. Requires this release deployed before the pipelines publish an index with `isoCode`.
@@ -122,6 +126,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Artist panel shows the artist's origin** (begin area, else area) as a link to its region on the map (`renderPlaceLink`), on the tree and on the map, with a test. Bumps `@behindthemusictree/app-kit` and `app-kit-ui` to 42.0.0 (`ArtistDetailedSchema` requires a nullable `origin`; the e2e artist fixture carries one). Requires grow-the-music-tree-api #462 deployed.
 - **Genre panel shows the genre's Wikimedia Commons image** above the summary, with its author and license credit; nothing is shown for genres without one. Comes with `@behindthemusictree/app-kit` and `app-kit-ui` 41.0.0 (no Grow code change). Requires the grow API's genre `image` field (grow #461), deployed before the pipelines send it.
 - The curation review lists the new reasons `invalid_rule` (with the pipeline's `evidence.detail`) and `exclusive_parent_regional` (pointing to « Genres maintenus canoniques »), with tests. Needs grow-the-music-tree-api 16.0.0.
+
+### Changed
+
+- **Region map**: the night side of the globe is less dark (night dim 0.55 → 0.45).
 
 ### CI
 
