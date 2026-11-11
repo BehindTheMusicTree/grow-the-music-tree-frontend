@@ -122,6 +122,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Genre panel shows the genre's Wikimedia Commons image** above the summary, with its author and license credit; nothing is shown for genres without one. Comes with `@behindthemusictree/app-kit` and `app-kit-ui` 41.0.0 (no Grow code change). Requires the grow API's genre `image` field (grow #461), deployed before the pipelines send it.
 - The curation review lists the new reasons `invalid_rule` (with the pipeline's `evidence.detail`) and `exclusive_parent_regional` (pointing to « Genres maintenus canoniques »), with tests. Needs grow-the-music-tree-api 16.0.0.
 
+### Changed
+
+- **Region map**: the night side of the globe is less dark (night dim 0.55 → 0.45).
+
 ### CI
 
 - Playwright browser journeys on a production build with frozen API fixtures keep the genre, artist and song URL params and tab titles right across the tree and the map (`pnpm test:e2e`, `e2e` job).
