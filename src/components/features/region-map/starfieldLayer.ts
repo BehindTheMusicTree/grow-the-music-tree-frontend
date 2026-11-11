@@ -1,6 +1,9 @@
 import type { CustomLayerInterface, CustomRenderMethodInput, Map as MapLibreMap } from "maplibre-gl";
+import { linkProgram, requireUniform } from "./glProgram";
 import { STARFIELD_LAYER } from "./regionMapLayers";
 import { generateStars, STAR_COUNT, STAR_SEED, STAR_STRIDE, starfieldMatrix } from "./starfield";
+
+const LABEL = "Starfield";
 
 const VERTEX_SHADER = `#version 300 es
 in vec3 a_dir;
@@ -27,37 +30,6 @@ void main() {
   outColor = vec4(vec3(alpha), alpha);
 }`;
 
-function compile(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
-  const shader = gl.createShader(type);
-  if (shader === null) throw new Error("Starfield: cannot create a shader");
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    const log = gl.getShaderInfoLog(shader);
-    gl.deleteShader(shader);
-    throw new Error(`Starfield: shader compilation failed: ${log}`);
-  }
-  return shader;
-}
-
-function link(gl: WebGL2RenderingContext): WebGLProgram {
-  const program = gl.createProgram();
-  if (program === null) throw new Error("Starfield: cannot create a program");
-  const vertex = compile(gl, gl.VERTEX_SHADER, VERTEX_SHADER);
-  const fragment = compile(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER);
-  gl.attachShader(program, vertex);
-  gl.attachShader(program, fragment);
-  gl.linkProgram(program);
-  gl.deleteShader(vertex);
-  gl.deleteShader(fragment);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    const log = gl.getProgramInfoLog(program);
-    gl.deleteProgram(program);
-    throw new Error(`Starfield: program link failed: ${log}`);
-  }
-  return program;
-}
-
 type Resources = {
   program: WebGLProgram;
   vao: WebGLVertexArrayObject;
@@ -66,12 +38,6 @@ type Resources = {
   pixelRatio: WebGLUniformLocation;
   sizeRange: WebGLUniformLocation;
 };
-
-function requireUniform(gl: WebGL2RenderingContext, program: WebGLProgram, name: string): WebGLUniformLocation {
-  const location = gl.getUniformLocation(program, name);
-  if (location === null) throw new Error(`Starfield: missing uniform ${name}`);
-  return location;
-}
 
 /**
  * Static stars drawn "under" the frame: they only show where the framebuffer is still transparent, so the
@@ -88,7 +54,7 @@ export function createStarfieldLayer(): CustomLayerInterface {
     renderingMode: "2d",
     onAdd(addedTo, context) {
       const gl = context as WebGL2RenderingContext;
-      const program = link(gl);
+      const program = linkProgram(gl, LABEL, VERTEX_SHADER, FRAGMENT_SHADER);
       const vao = gl.createVertexArray();
       const buffer = gl.createBuffer();
       if (vao === null || buffer === null) throw new Error("Starfield: cannot allocate GL buffers");
@@ -113,9 +79,9 @@ export function createStarfieldLayer(): CustomLayerInterface {
         program,
         vao,
         buffer,
-        matrix: requireUniform(gl, program, "u_matrix"),
-        pixelRatio: requireUniform(gl, program, "u_pixel_ratio"),
-        sizeRange: requireUniform(gl, program, "u_size_range"),
+        matrix: requireUniform(gl, LABEL, program, "u_matrix"),
+        pixelRatio: requireUniform(gl, LABEL, program, "u_pixel_ratio"),
+        sizeRange: requireUniform(gl, LABEL, program, "u_size_range"),
       };
     },
     render(context, { fov }: CustomRenderMethodInput) {
