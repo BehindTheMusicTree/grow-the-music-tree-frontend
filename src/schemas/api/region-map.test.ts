@@ -45,6 +45,15 @@ describe("RegionMapIndexSchema", () => {
     expect(parsed).toMatchObject({ mainBbox: [1, 1, 2, 2], drillable: false });
   });
 
+  it("accepts a two-letter uppercase isoCode and rejects any other form", () => {
+    const parse = (isoCode: string) =>
+      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...fixture.regions[0], isoCode }] }).success;
+
+    expect(parse("FR")).toBe(true);
+    expect(parse("fr")).toBe(false);
+    expect(parse("FRA")).toBe(false);
+  });
+
   it("accepts missing boundaries and hidden regions together", () => {
     const missing = { ...fixture.regions[0], boundaryStatus: "missing", bbox: null, mainBbox: null, centroid: null };
     const hidden = { id: "hidden", name: "Hidden", kind: "admin_unit", parentId: "world", centroid: [1, 2] };

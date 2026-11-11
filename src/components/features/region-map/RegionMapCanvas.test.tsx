@@ -66,6 +66,9 @@ vi.mock("maplibre-gl", () => {
       this.record("triggerRepaint", []);
       this.record("order", ["triggerRepaint"]);
     }
+    jumpTo(...args: unknown[]) {
+      this.record("jumpTo", args);
+    }
     fitBounds(...args: unknown[]) {
       this.record("fitBounds", args);
     }
@@ -128,6 +131,7 @@ const mount = (props: Partial<Props> = {}) => {
       selectedId={null}
       zoneId={null}
       initialCamera={null}
+      homeCenter={null}
       focus={null}
       {...handlers}
       {...props}
@@ -191,6 +195,27 @@ describe("RegionMapCanvas", () => {
     expect(fakeMap().options).not.toHaveProperty("bounds");
   });
 
+  it("keeps the world zoom but turns the globe to the home country", () => {
+    mount({ homeCenter: [2, 46] });
+    const map = fakeMap();
+
+    expect(map.options).toMatchObject({
+      bounds: [
+        [-180, -58],
+        [180, 84],
+      ],
+    });
+    expect(map.calls.jumpTo).toEqual([[{ center: [2, 46] }]]);
+  });
+
+  it("ignores the home country when a camera or a focus opens the map", () => {
+    mount({ homeCenter: [2, 46], initialCamera: { lng: 2, lat: 46, zoom: 5 } });
+    expect(fakeMap().calls.jumpTo).toBeUndefined();
+
+    mount({ homeCenter: [2, 46], focus: { id: "Q142", seq: 0 } });
+    expect(fakeMap().calls.jumpTo).toBeUndefined();
+  });
+
   it("opens on the region of the focus present at mount, without flying to it again", async () => {
     mount({ focus: { id: "Q142", seq: 0 } });
     const map = fakeMap();
@@ -241,6 +266,7 @@ describe("RegionMapCanvas", () => {
         selectedId={null}
         zoneId={null}
         initialCamera={null}
+        homeCenter={null}
         focus={null}
         onRegionClick={vi.fn()}
         onClearSelection={vi.fn()}
@@ -259,6 +285,7 @@ describe("RegionMapCanvas", () => {
         selectedId={null}
         zoneId={null}
         initialCamera={null}
+        homeCenter={null}
         focus={{ id: "Q142", seq: 1 }}
         onRegionClick={vi.fn()}
         onClearSelection={vi.fn()}
