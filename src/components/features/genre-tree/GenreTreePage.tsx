@@ -429,7 +429,7 @@ function GenreTreePageContent() {
       defaultViewport={defaultViewport}
       onViewportChange={onViewportChange}
       floatingControlsLeading={canShowPopCore ? <ViewModeToggle /> : undefined}
-      renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
+      renderGenreDetailExtras={isAdmin ? (overview) => <GenreHistory genreUuid={overview.uuid} /> : undefined}
       renderArtistLink={renderArtistLink}
       renderSongLink={renderSongLink}
       renderPlaceLink={renderPlaceLink}
