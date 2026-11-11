@@ -30,6 +30,13 @@ describe("useRegionMapUrlState", () => {
     });
   });
 
+  it("reads empty entity params as null", () => {
+    search = new URLSearchParams("region=&genre=&artist=&song=");
+
+    const { state } = renderHook(() => useRegionMapUrlState()).result.current;
+    expect([state.region, state.genre, state.artist, state.song]).toEqual([null, null, null, null]);
+  });
+
   it("reads the open artist and song", () => {
     search = new URLSearchParams("artist=a1&song=s1");
 

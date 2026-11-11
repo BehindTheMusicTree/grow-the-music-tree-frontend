@@ -1,13 +1,12 @@
 import { useCallback } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { updateUrlQuery, type UrlQueryMethod } from "@lib/urlQuery";
-import { ARTIST_PARAM, SONG_PARAM } from "@hooks/useGenreTreeUrlState";
+import { ARTIST_PARAM, GENRE_PARAM, REGION_PARAM, SONG_PARAM, readQueryParam } from "@lib/entityParams";
 
 export const AT_PARAM = "at";
 /** The drill path of the former level-based map, read only to frame old shared links. */
 export const LEGACY_PATH_PARAM = "path";
-export const REGION_PARAM = "region";
-export const GENRE_PARAM = "genre";
+export { GENRE_PARAM, REGION_PARAM };
 
 export type Camera = { lng: number; lat: number; zoom: number };
 
@@ -49,10 +48,10 @@ export function useRegionMapUrlState() {
   const rawPath = searchParams.get(LEGACY_PATH_PARAM);
   const state: RegionMapUrlState = {
     at: parseCamera(searchParams.get(AT_PARAM)),
-    region: searchParams.get(REGION_PARAM),
-    genre: searchParams.get(GENRE_PARAM),
-    artist: searchParams.get(ARTIST_PARAM),
-    song: searchParams.get(SONG_PARAM),
+    region: readQueryParam(searchParams, REGION_PARAM),
+    genre: readQueryParam(searchParams, GENRE_PARAM),
+    artist: readQueryParam(searchParams, ARTIST_PARAM),
+    song: readQueryParam(searchParams, SONG_PARAM),
     legacyPath: rawPath ? rawPath.split("/").filter(Boolean) : [],
   };
 

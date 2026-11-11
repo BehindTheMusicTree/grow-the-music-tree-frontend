@@ -215,6 +215,12 @@ describe("genre entity URL boundary", () => {
     expect(result.current.selectedGenreUuid).toBe(oldPlaylistUuid);
   });
 
+  it.each(["genre=&view=1,2,3", "genre=%20&view=1,2,3"])("treats an empty entity param as no selection (%s)", (query) => {
+    setSearch(`${query}&artist=&song=`);
+    const { result } = renderState();
+    expect([result.current.selectedGenreUuid, result.current.artistUuid, result.current.songUuid]).toEqual([null, null, null]);
+  });
+
   it("passes a malformed selection through so the panel can say the genre was not found, without dropping the URL", async () => {
     setSearch("genre=not-a-uuid&view=1,2,3");
     const { result } = renderState();

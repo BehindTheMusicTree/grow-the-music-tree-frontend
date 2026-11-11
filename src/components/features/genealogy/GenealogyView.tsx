@@ -6,10 +6,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useGenreByWikidataId } from "@behindthemusictree/app-kit/genre-tree";
 import { useGenealogy } from "@hooks/useGenealogy";
+import { TRADITION_PARAM, readQueryParam } from "@lib/entityParams";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import TraditionDetailPanel from "./TraditionDetailPanel";
-
-const TRADITION_PARAM = "tradition";
 
 const GenealogyChart = dynamic(() => import("./GenealogyChart"), {
   ssr: false,
@@ -24,7 +23,7 @@ export default function GenealogyView() {
   const [openingQid, setOpeningQid] = useState<string | null>(null);
   const lookup = useGenreByWikidataId(openingQid, "reference", getGrowBackendBaseUrl);
 
-  const requestedId = searchParams.get(TRADITION_PARAM);
+  const requestedId = readQueryParam(searchParams, TRADITION_PARAM);
   const selected = useMemo(
     () => data?.traditions.find((tradition) => tradition.wikidataId === requestedId) ?? null,
     [data, requestedId],
