@@ -110,7 +110,7 @@ export function cameraFromMatrix(m: ArrayLike<number>): Vec3 {
     c2[0] * (c0[1] * c1[2] - c0[2] * c1[1]);
   const col = (j: number) => a.map((row) => row[j]);
   const det = det3(col(0), col(1), col(2));
-  if (Math.abs(det) < 1e-12) throw new Error("Moon: degenerate projection matrix");
+  if (!(Math.abs(det) >= 1e-12)) throw new Error("Moon: degenerate projection matrix");
   return [det3(b, col(1), col(2)) / det, det3(col(0), b, col(2)) / det, det3(col(0), col(1), b) / det];
 }
 
