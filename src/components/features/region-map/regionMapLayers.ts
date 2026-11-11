@@ -121,6 +121,17 @@ const union = (boxes: readonly NonNullable<Region["mainBbox"]>[]): NonNullable<R
   Math.max(...boxes.map((box) => box[3])),
 ];
 
+/**
+ * Where to centre the opening globe for a visitor in `country` (ISO alpha-2): the middle of the country's main box,
+ * not its centroid, which overseas territories drag away. `null` when the index does not know the country.
+ */
+export function homeCenter(country: string | null, regions: ReadonlyMap<string, Region>): [number, number] | null {
+  if (country === null) return null;
+  const region = Array.from(regions.values()).find((candidate) => candidate.kind === "country" && candidate.isoCode === country);
+  const box = region?.mainBbox ?? region?.bbox ?? null;
+  return box === null ? null : [(box[0] + box[2]) / 2, (box[1] + box[3]) / 2];
+}
+
 export function regionBounds(region: Region | undefined, regions: ReadonlyMap<string, Region>): LngLatBoundsLike {
   if (!region || region.mainBbox === null) return WORLD_BOUNDS;
   // A zone's own box spans the antimeridian through its overseas members, so frame the members instead.

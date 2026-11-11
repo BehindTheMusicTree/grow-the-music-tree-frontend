@@ -7,6 +7,7 @@ import { GenreUuidSchema, useRegionGenreLexicon } from "@behindthemusictree/app-
 import { EntityDetailPanel, GenreDetailPanel } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { collapseEdgeTab } from "@utils/collapseEdgeTab";
+import { usePlaybackContext } from "@behindthemusictree/app-kit/transport";
 import { Breadcrumb } from "@behindthemusictree/ui";
 import { regionMapLookup } from "@lib/region-map-index";
 import { useRegionMapIndex } from "@hooks/useRegionMap";
@@ -21,7 +22,7 @@ import type { Region, RegionMapIndex } from "@schemas/api/region-map";
 import RegionDetailPanel from "./RegionDetailPanel";
 import RegionMapSearch from "./RegionMapSearch";
 import type { FocusRequest } from "./RegionMapCanvas";
-import { ancestry } from "./regionMapLayers";
+import { ancestry, homeCenter } from "./regionMapLayers";
 import { useRegionMapUrlState, type Camera } from "./useRegionMapUrlState";
 
 const RegionMapCanvas = dynamic(() => import("./RegionMapCanvas"), {
@@ -59,6 +60,15 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
     };
   });
   const [focus, setFocus] = useState<FocusRequest | null>(initial.focus);
+  // With neither a URL camera nor a target region, the globe opens turned towards the visitor's country. It is
+  // resolved once, so a later refetch of the playback context never moves the globe under the visitor.
+  const playback = usePlaybackContext();
+  const opensOnHome = initial.camera === null && initial.focus === null;
+  const homeSettled = !opensOnHome || playback.ready || playback.error !== null;
+  const home = useRef<{ center: [number, number] | null } | null>(null);
+  if (home.current === null && homeSettled) {
+    home.current = { center: opensOnHome ? homeCenter(playback.country, regions) : null };
+  }
   // Region and genre of the last framing, so the effects below only fly for selections that did not already
   // call `flyTo` themselves (search and breadcrumb picks); map clicks, back/forward and edited URLs fly here.
   const lastFlown = useRef<string | null>(state.region);
@@ -145,6 +155,8 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   );
   const trail = selected ? ancestry(selected, regions) : [];
 
+  if (home.current === null) return <Skeleton />;
+
   return (
     <div className="h-full">
       <div className="relative h-full">
@@ -155,6 +167,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
           selectedId={state.region}
           zoneId={selected?.kind === "zone" ? selected.id : null}
           initialCamera={initial.camera}
+          homeCenter={home.current.center}
           focus={focus}
           onRegionClick={select}
           onClearSelection={clearSelection}

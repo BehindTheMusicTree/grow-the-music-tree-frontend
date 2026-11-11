@@ -68,6 +68,8 @@ type Props = {
   zoneId: string | null;
   /** Where the map opens; without it the map opens on the region of `focus`, or the world. */
   initialCamera: Camera | null;
+  /** Where the world view opens when there is neither a camera nor a focus: the visitor's country, if known. */
+  homeCenter: [number, number] | null;
   /** Each new `seq` flies to a region; the request present at mount frames the opening view instead. */
   focus: FocusRequest | null;
   onRegionClick: (region: Region) => void;
@@ -133,6 +135,7 @@ export default function RegionMapCanvas({
   zoneId,
   initialCamera,
   focus,
+  homeCenter,
   onRegionClick,
   onClearSelection,
   onCameraChange,
@@ -143,7 +146,7 @@ export default function RegionMapCanvas({
   const onClickRef = useRef(onRegionClick);
   const onClearRef = useRef(onClearSelection);
   const onCameraRef = useRef(onCameraChange);
-  const initialRef = useRef({ initialCamera, selectedId, zoneId, focus });
+  const initialRef = useRef({ initialCamera, selectedId, zoneId, focus, homeCenter });
   const focusSeqRef = useRef(focus?.seq);
   const hoveredRef = useRef<Region | null>(null);
   const [ready, setReady] = useState(false);
@@ -179,6 +182,7 @@ export default function RegionMapCanvas({
       selectedId: initialSelected,
       zoneId: initialZone,
       focus: initialFocus,
+      homeCenter: initialHome,
     } = initialRef.current;
     const opening = initialFocus?.id == null ? undefined : regionsRef.current.get(initialFocus.id);
     let skyTimer: ReturnType<typeof setInterval> | undefined;
@@ -215,6 +219,8 @@ export default function RegionMapCanvas({
       return;
     }
     mapRef.current = map;
+    // Same zoom as the world bounds, only turned; the `moveend` handler then writes the camera to the URL.
+    if (!camera && !opening && initialHome) map.jumpTo({ center: initialHome });
     // Overrides MapLibre's grab/grabbing container cursor: background shows the arrow, regions the pointer.
     map.getCanvas().style.cursor = "default";
 

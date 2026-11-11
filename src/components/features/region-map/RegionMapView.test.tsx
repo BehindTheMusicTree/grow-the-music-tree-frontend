@@ -14,10 +14,12 @@ type ChartProps = {
   zoneId: string | null;
   selectedId: string | null;
   initialCamera: { lng: number; lat: number; zoom: number } | null;
+  homeCenter: [number, number] | null;
   focus: { id: string | null; seq: number } | null;
   onCameraChange: (camera: { lng: number; lat: number; zoom: number }) => void;
 };
 let lastProps: ChartProps;
+let playback: { country: string | null; ready: boolean; error: Error | null } = { country: null, ready: true, error: null };
 let search = new URLSearchParams();
 const pushState = vi.spyOn(window.history, "pushState");
 const replaceState = vi.spyOn(window.history, "replaceState");
@@ -28,6 +30,10 @@ const setSearch = (query: string) => {
 };
 // URL writes are batched into a microtask, so history assertions run after it.
 const flushNavigation = () => act(async () => {});
+
+vi.mock("@behindthemusictree/app-kit/transport", () => ({
+  usePlaybackContext: () => playback,
+}));
 
 vi.mock("@hooks/useRegionMap", () => ({
   useRegionMapIndex: () => ({ data, isPending: false, isError: false }),
@@ -129,6 +135,7 @@ afterEach(() => {
   cleanup();
   chartMounts = 0;
   data = index;
+  playback = { country: null, ready: true, error: null };
 });
 
 describe("RegionMapView", () => {
@@ -186,6 +193,61 @@ describe("RegionMapView", () => {
     expect(params.get("genre")).toBe(makeGenreUuid("relative"));
     expect(params.get("region")).toBe("Q142");
     expect(params.get("at")).toBe("2,46,5");
+  });
+
+  describe("home country", () => {
+    const frenchIndex = () =>
+      RegionMapIndexSchema.parse({
+        ...fixture,
+        regions: fixture.regions.map((region) =>
+          region.id === "Q142" ? { ...region, isoCode: "FR", mainBbox: [-5, 42, 9, 51] } : region,
+        ),
+      });
+
+    it("centres the opening globe on the visitor's country", () => {
+      data = frenchIndex();
+      playback = { country: "FR", ready: true, error: null };
+      render(<RegionMapView />);
+
+      expect(lastProps.homeCenter).toEqual([2, 46.5]);
+    });
+
+    it("waits for the playback context before opening, then does not move the globe again", () => {
+      data = frenchIndex();
+      playback = { country: null, ready: false, error: null };
+      const { rerender } = render(<RegionMapView />);
+      expect(screen.getByRole("generic", { busy: true })).toBeInTheDocument();
+      expect(chartMounts).toBe(0);
+
+      playback = { country: "FR", ready: true, error: null };
+      rerender(<RegionMapView />);
+      expect(lastProps.homeCenter).toEqual([2, 46.5]);
+
+      playback = { country: "US", ready: true, error: null };
+      rerender(<RegionMapView />);
+      expect(lastProps.homeCenter).toEqual([2, 46.5]);
+    });
+
+    it("opens on the world when the playback context fails", () => {
+      data = frenchIndex();
+      playback = { country: null, ready: false, error: new Error("down") };
+      render(<RegionMapView />);
+
+      expect(lastProps.homeCenter).toBeNull();
+    });
+
+    it("leaves a URL camera or region alone and does not wait for the context", () => {
+      data = frenchIndex();
+      playback = { country: "FR", ready: false, error: null };
+      setSearch("at=2,46,5");
+      render(<RegionMapView />);
+      expect(lastProps.homeCenter).toBeNull();
+      cleanup();
+
+      setSearch("region=Q142");
+      render(<RegionMapView />);
+      expect(lastProps.homeCenter).toBeNull();
+    });
   });
 
   it("renders nothing before the region map is computed", () => {

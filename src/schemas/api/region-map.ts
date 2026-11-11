@@ -22,6 +22,8 @@ const RegionShapeSchema = z
     name: NonEmpty,
     kind: z.enum(["country", "admin_unit", "zone", "city"]),
     parentId: z.string().nullable(),
+    /** ISO 3166-1 alpha-2 code of a country region, from Natural Earth; absent when the pipeline has no unambiguous code. */
+    isoCode: z.string().regex(/^[A-Z]{2}$/).optional(),
     childIds: z.array(NonEmpty),
     zoneIds: z.array(NonEmpty),
     /** Point regions of kind "city" under an admin unit; not part of `childIds`. Optional until every published index carries them. */

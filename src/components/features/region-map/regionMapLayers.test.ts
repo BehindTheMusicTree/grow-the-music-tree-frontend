@@ -14,6 +14,7 @@ import {
   describe as describeRegion,
   EMPTY_FILL,
   fillColorExpression,
+  homeCenter,
   idFilter,
   inBand,
   regionBounds,
@@ -135,6 +136,26 @@ describe("zoneColor", () => {
       backdropColors(regions).get("Q142"),
     );
     expect(zoneColor(zone.id, new Map(regions).set(zone.id, { ...zone, songCount: 5 }))).toMatch(/^rgb\(/);
+  });
+});
+
+describe("homeCenter", () => {
+  const withIso = new Map(regions).set("Q142", { ...france, isoCode: "FR", mainBbox: [-5, 42, 9, 51] });
+
+  it("centres on the main box of the country with that ISO code", () => {
+    expect(homeCenter("FR", withIso)).toEqual([2, 46.5]);
+  });
+
+  it("is null without a country, for an unknown code, or for a country without a boundary", () => {
+    expect(homeCenter(null, withIso)).toBeNull();
+    expect(homeCenter("ZZ", withIso)).toBeNull();
+    const noBox = new Map(withIso).set("Q142", { ...france, isoCode: "FR", bbox: null, mainBbox: null, centroid: null });
+    expect(homeCenter("FR", noBox)).toBeNull();
+  });
+
+  it("ignores a region that is not a country", () => {
+    const region = new Map(withIso).set("Q142", { ...france, kind: "admin_unit" as const, isoCode: "FR" });
+    expect(homeCenter("FR", region)).toBeNull();
   });
 });
 
