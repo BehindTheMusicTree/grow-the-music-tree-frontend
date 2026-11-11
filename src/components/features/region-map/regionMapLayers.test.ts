@@ -22,6 +22,9 @@ import {
   zoneColor,
   zoneFilters,
 } from "./regionMapLayers";
+import { sunDirectionAt, sunLightPosition } from "./sun";
+
+const SUN = sunDirectionAt(new Date("2024-11-03T12:00:00Z"));
 
 const index = RegionMapIndexSchema.parse(fixture);
 const regions = new Map(index.regions.map((region) => [region.id, region]));
@@ -201,6 +204,7 @@ describe("buildStyle", () => {
       colors: new Map([["Q12130", "#123456"]]),
       backdrop: new Map([["Q142", "#abcdef"]]),
       zoneFill: null,
+      sun: SUN,
       ...overrides,
     });
   const layer = (id: string, built = style()) =>
@@ -209,7 +213,7 @@ describe("buildStyle", () => {
   it("lights the atmosphere from the sun, anchored to the map", () => {
     const built = style();
 
-    expect(built.light).toMatchObject({ anchor: "map", position: [1, expect.any(Number), expect.any(Number)] });
+    expect(built.light).toEqual({ anchor: "map", position: sunLightPosition(SUN) });
   });
 
   it("is a globe with an atmosphere, fed by one pmtiles vector source", () => {

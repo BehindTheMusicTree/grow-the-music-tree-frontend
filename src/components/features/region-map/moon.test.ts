@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   cameraFromMatrix,
-  DEFAULT_VIEW,
   dot,
   length,
   MARIA,
@@ -12,11 +11,14 @@ import {
   MOON_DISTANCE,
   MOON_RADIUS,
   selenographicDirection,
-  sunDirection,
   surfacePoint,
   type Vec3,
 } from "./moon";
 import { orbitRotation, perspective } from "./starfield";
+import { sunDirectionAt } from "./sun";
+
+const DEFAULT_VIEW = { lng: 0, lat: 44 };
+const SUN = sunDirectionAt(new Date("2024-11-03T12:00:00Z"));
 
 const FOV = (36.87 * Math.PI) / 180;
 const ASPECT = 16 / 9;
@@ -72,7 +74,7 @@ describe("cameraFromMatrix", () => {
 });
 
 describe("moonBasis", () => {
-  const center = moonCenter();
+  const center = moonCenter(SUN);
   const { right, up, toCamera } = moonBasis([0, 0, 4], center);
 
   it("is orthonormal and faces the camera", () => {
@@ -91,7 +93,7 @@ describe("moonBasis", () => {
 });
 
 describe("moonInFront", () => {
-  const center = moonCenter();
+  const center = moonCenter(SUN);
   it("is false from the default view and true once the camera is beyond the Moon", () => {
     expect(moonInFront(surfacePoint(DEFAULT_VIEW.lng, DEFAULT_VIEW.lat).map((v) => v * 4) as Vec3, center)).toBe(false);
     expect(moonInFront(center.map((v) => v * 1.5) as Vec3, center)).toBe(true);
@@ -99,22 +101,25 @@ describe("moonInFront", () => {
 });
 
 describe("placement and phase", () => {
-  const center = moonCenter();
+  const center = moonCenter(SUN);
 
   it("sits at the true distance", () => {
     expect(length(center)).toBeCloseTo(MOON_DISTANCE, 6);
   });
 
-  it("frames upper-right of the globe in the opening view, clear of the disc", () => {
-    const { matrix } = globeMatrix(WORLD_DISTANCE);
-    const { x, y, w } = project(matrix, center);
-    expect(w).toBeGreaterThan(0);
-    expect(x).toBeGreaterThan(0);
-    expect(y).toBeGreaterThan(0);
-    expect(Math.abs(x)).toBeLessThan(1);
-    expect(Math.abs(y)).toBeLessThan(1);
-    const globeRadiusNdc = Math.tan(Math.asin(1 / WORLD_DISTANCE)) / Math.tan(FOV / 2);
-    expect(Math.hypot(x * ASPECT, y)).toBeGreaterThan(globeRadiusNdc);
+  it("sits exactly opposite the Sun", () => {
+    for (let i = 0; i < 3; i++) expect(center[i]).toBeCloseTo(-SUN[i] * MOON_DISTANCE, 6);
+  });
+
+  it("is hidden behind the globe from the day side and clear of it from the night side", () => {
+    const angleSeenFrom = (camera: Vec3) => {
+      const toMoon = moonBasis(camera, center).toCamera.map((c) => -c);
+      const toGlobe = camera.map((c) => -c / length(camera));
+      return Math.acos(Math.max(-1, Math.min(1, dot(toMoon as Vec3, toGlobe as Vec3))));
+    };
+    const limit = Math.asin(1 / 4);
+    expect(angleSeenFrom(SUN.map((c) => c * 4) as Vec3)).toBeLessThan(limit);
+    expect(angleSeenFrom(SUN.map((c) => -c * 4) as Vec3)).toBeGreaterThan(limit);
   });
 
   it("is a few tens of pixels across in the world view", () => {
@@ -125,12 +130,8 @@ describe("placement and phase", () => {
     expect(radiusPx).toBeLessThan(40);
   });
 
-  it("is about 80 % lit from the default camera", () => {
-    const frame = moonBodyFrame(center);
-    const sun = sunDirection(frame);
-    const toCamera = moonBasis([0, 0, 4], center).toCamera;
-    expect((1 + dot(sun, toCamera)) / 2).toBeGreaterThan(0.75);
-    expect((1 + dot(sun, toCamera)) / 2).toBeLessThan(0.9);
+  it("is full as seen from Earth", () => {
+    expect(dot(SUN, moonBodyFrame(center).z)).toBeCloseTo(1, 6);
   });
 
   it("puts east longitudes on the viewer's right and keeps maria on the near side", () => {
