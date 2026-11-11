@@ -9,10 +9,10 @@ import {
   moonCenter,
   moonInFront,
   MOON_RADIUS,
-  sunDirection,
   type Vec3,
 } from "./moon";
 import { MOON_LAYER } from "./regionMapLayers";
+import { SUN_DIRECTION } from "./sun";
 
 const LABEL = "Moon";
 
@@ -102,10 +102,9 @@ export function createMoonLayer(): CustomLayerInterface {
       // Everything but the camera is fixed: compute it once and upload it once.
       const center3 = moonCenter();
       const frame = moonBodyFrame(center3);
-      const sun = sunDirection(frame);
       const uniform = (name: string) => requireUniform(gl, LABEL, program, name);
       gl.useProgram(program);
-      gl.uniform3f(uniform("u_sun"), sun[0], sun[1], sun[2]);
+      gl.uniform3f(uniform("u_sun"), SUN_DIRECTION[0], SUN_DIRECTION[1], SUN_DIRECTION[2]);
       gl.uniform4fv(uniform("u_maria"), mariaUniform(frame));
       gl.uniform3f(uniform("u_center"), center3[0], center3[1], center3[2]);
       gl.uniform1f(uniform("u_radius"), MOON_RADIUS);

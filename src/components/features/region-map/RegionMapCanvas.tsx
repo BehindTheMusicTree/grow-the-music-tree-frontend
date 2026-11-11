@@ -33,6 +33,7 @@ import {
   REGION_SELECTED_LAYER,
   REGIONS_SOURCE_LAYER,
   regionBounds,
+  MOON_LAYER,
   STARFIELD_LAYER,
   TILES_SOURCE,
   ZONE_FILL_LAYER,
@@ -48,7 +49,9 @@ import {
 } from "./regionMapLayers";
 import { containerFitPadding } from "./panelInset";
 import { createMoonLayer } from "./moonLayer";
+import { createNightLayer } from "./nightLayer";
 import { createStarfieldLayer } from "./starfieldLayer";
+import { createSunLayer } from "./sunLayer";
 import type { Camera } from "./useRegionMapUrlState";
 
 /** Asks the map to fly to a region, or to the world when `id` is null; `seq` makes a repeated request a new one. */
@@ -247,8 +250,12 @@ export default function RegionMapCanvas({
       setReady(true);
       // Topmost: drawn last of the layers, before MapLibre's atmosphere glow.
       map.addLayer(createStarfieldLayer());
-      // Just before the stars: both draw "under" the frame, so the Moon must go first to hide the stars behind it.
+      // Just before the stars: all draw "under" the frame, so the Moon and the Sun must go first to hide the stars
+      // behind them. Order: Moon, Sun, stars.
       map.addLayer(createMoonLayer(), STARFIELD_LAYER);
+      map.addLayer(createSunLayer(), STARFIELD_LAYER);
+      // Over every map layer, under the Moon: darkens the side of the globe facing away from the Sun.
+      map.addLayer(createNightLayer(), MOON_LAYER);
     });
     map.on("idle", listVisible);
     map.on("moveend", () => {

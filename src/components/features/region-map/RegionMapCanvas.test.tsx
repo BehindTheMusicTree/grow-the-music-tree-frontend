@@ -90,7 +90,7 @@ vi.mock("maplibre-gl", () => {
 });
 
 import RegionMapCanvas from "./RegionMapCanvas";
-import { MOON_LAYER, STARFIELD_LAYER, supranationalZoneIds, zoneFilters } from "./regionMapLayers";
+import { MOON_LAYER, NIGHT_LAYER, STARFIELD_LAYER, SUN_LAYER, supranationalZoneIds, zoneFilters } from "./regionMapLayers";
 
 type Fake = {
   options: Record<string, unknown>;
@@ -156,18 +156,24 @@ describe("RegionMapCanvas", () => {
     expect(hoisted.addProtocol).toHaveBeenCalledWith("pmtiles", expect.any(Function));
   });
 
-  it("adds the starfield on top, then the moon just before it, once the style has loaded, not before", async () => {
+  it("adds the starfield on top, then the moon, the sun and the night shade, once the style has loaded, not before", async () => {
     mount();
     const map = fakeMap();
     expect(map.calls.addLayer).toBeUndefined();
     await act(() => map.emit("load"));
-    expect(map.calls.addLayer).toHaveLength(2);
+    expect(map.calls.addLayer).toHaveLength(4);
     const [layer, beforeId] = map.calls.addLayer[0] as [{ id: string; type: string }, unknown];
     expect(layer).toMatchObject({ id: STARFIELD_LAYER, type: "custom" });
     expect(beforeId).toBeUndefined();
     const [moon, moonBefore] = map.calls.addLayer[1] as [{ id: string; type: string }, unknown];
     expect(moon).toMatchObject({ id: MOON_LAYER, type: "custom" });
     expect(moonBefore).toBe(STARFIELD_LAYER);
+    const [sun, sunBefore] = map.calls.addLayer[2] as [{ id: string; type: string }, unknown];
+    expect(sun).toMatchObject({ id: SUN_LAYER, type: "custom" });
+    expect(sunBefore).toBe(STARFIELD_LAYER);
+    const [night, nightBefore] = map.calls.addLayer[3] as [{ id: string; type: string }, unknown];
+    expect(night).toMatchObject({ id: NIGHT_LAYER, type: "custom" });
+    expect(nightBefore).toBe(MOON_LAYER);
   });
 
   it("opens on the given camera", () => {
