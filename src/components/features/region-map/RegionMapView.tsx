@@ -13,6 +13,7 @@ import { useRegionMapIndex } from "@hooks/useRegionMap";
 import { useEntityDocumentTitle } from "@hooks/useEntityDocumentTitle";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
+import { renderPlaceLink } from "@components/features/artist/renderPlaceLink";
 import { renderSongLink } from "@components/features/song/renderSongLink";
 import { useRegionGenreIndex } from "@components/features/search/useRegionGenreIndex";
 import type { GenreTreeShareTarget } from "@behindthemusictree/app-kit-ui/genre-tree";
@@ -213,6 +214,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
             onArtistUuidChange={(artist) => (artist === null ? clearSelection() : update({ artist }))}
             renderArtistLink={renderArtistLink}
             renderSongLink={renderSongLink}
+            renderPlaceLink={renderPlaceLink}
             collapsed={collapsed}
             edgeTab={collapseEdgeTab(collapsed, setCollapsed)}
             onSelectGenre={(genre) => { setCollapsed(false); update({ genre: genre.uuid }); }}
