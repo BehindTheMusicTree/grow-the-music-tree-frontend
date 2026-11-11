@@ -110,6 +110,7 @@ export const artist = ArtistDetailedSchema.parse({
   tracksCount: 1,
   playableTracksCount: 1,
   image: null,
+  origin: { name: "Paris", kind: "City", source: "begin_area", wikidataId: "Q90", longitude: 2.35, latitude: 48.85, regionId: "Q90" },
 });
 
 export const artistGenreCounts = ArtistGenreCountSchema.array().parse([

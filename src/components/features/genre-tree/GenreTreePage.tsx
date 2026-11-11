@@ -42,6 +42,7 @@ import AboutContent from "@components/features/about/AboutContent";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
 import { ViewModeToggle } from "@components/features/genre-tree/ViewModeToggle";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
+import { renderPlaceLink } from "@components/features/artist/renderPlaceLink";
 import { renderSongLink } from "@components/features/song/renderSongLink";
 import Page from "@components/ui/Page";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
@@ -431,6 +432,7 @@ function GenreTreePageContent() {
       renderGenreDetailExtras={(overview) => <GenreHistory genreUuid={overview.uuid} />}
       renderArtistLink={renderArtistLink}
       renderSongLink={renderSongLink}
+      renderPlaceLink={renderPlaceLink}
       SearchGroups={GrowSearchGroups}
       {...curation}
     />
