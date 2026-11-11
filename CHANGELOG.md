@@ -128,6 +128,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- `@behindthemusictree/app-kit` and `app-kit-ui` bumped from 42.0.0 to 42.0.1: `ArtistOriginSchema.kind` is nullable, so an artist whose origin has no kind no longer fails to parse. No Grow code change was needed.
 - An empty `?genre=`, `?artist=`, `?song=`, `?region=` or `?tradition=` is read as no selection (`src/lib/entityParams.ts`) by the tree, the map, the genealogy view and the view-switch links, so `?artist=` no longer requests `artists//genre-counts/`. The map no longer keeps its own "Genre unavailable" overlay for a malformed `?genre=`: like the tree, it hands the value to the panel, which says the genre was not found.
 - The region "Zoom to" and tradition "Open in genre tree" buttons, and the genre curation danger zone (alias, root, exclude, delete), become round action buttons with a label underneath, in the same action band as the other detail panels.
 - The region map index schema reads the lean index the pipelines are moving to, and still reads the current one: `boundaryStatus`, `mainBbox`, `drillable` and the genres' `rule` are optional. A region with no boundary is one with `bbox` and `centroid` null, `mainBbox` falls back to `bbox` and `drillable` to `childIds.length > 0`, so the map code reads one shape either way.
