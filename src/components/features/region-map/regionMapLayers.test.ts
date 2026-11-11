@@ -153,6 +153,13 @@ describe("homeCenter", () => {
     expect(homeCenter("FR", noBox)).toBeNull();
   });
 
+  it("takes the short way round a box that crosses the antimeridian", () => {
+    const fiji = new Map(withIso).set("Q142", { ...france, isoCode: "FJ", mainBbox: [177, -20, -178, -16] });
+    expect(homeCenter("FJ", fiji)?.[0]).toBeCloseTo(179.5);
+    const east = new Map(withIso).set("Q142", { ...france, isoCode: "FJ", mainBbox: [185, -20, 190, -16] });
+    expect(homeCenter("FJ", east)?.[0]).toBeCloseTo(-172.5);
+  });
+
   it("ignores a region that is not a country", () => {
     const region = new Map(withIso).set("Q142", { ...france, kind: "admin_unit" as const, isoCode: "FR" });
     expect(homeCenter("FR", region)).toBeNull();

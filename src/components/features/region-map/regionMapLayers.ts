@@ -129,7 +129,11 @@ export function homeCenter(country: string | null, regions: ReadonlyMap<string, 
   if (country === null) return null;
   const region = Array.from(regions.values()).find((candidate) => candidate.kind === "country" && candidate.isoCode === country);
   const box = region?.mainBbox ?? region?.bbox ?? null;
-  return box === null ? null : [(box[0] + box[2]) / 2, (box[1] + box[3]) / 2];
+  if (box === null) return null;
+  // A box that crosses the antimeridian has west > east: measure its width the short way round, then wrap.
+  const width = box[2] >= box[0] ? box[2] - box[0] : box[2] + 360 - box[0];
+  const lng = ((box[0] + width / 2 + 180) % 360 + 360) % 360 - 180;
+  return [lng, (box[1] + box[3]) / 2];
 }
 
 export function regionBounds(region: Region | undefined, regions: ReadonlyMap<string, Region>): LngLatBoundsLike {

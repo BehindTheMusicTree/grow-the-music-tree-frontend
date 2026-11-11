@@ -219,7 +219,7 @@ export default function RegionMapCanvas({
       return;
     }
     mapRef.current = map;
-    // Same zoom as the world bounds, only turned; the `moveend` handler then writes the camera to the URL.
+    // Same zoom as the world bounds, only turned.
     if (!camera && !opening && initialHome) map.jumpTo({ center: initialHome });
     // Overrides MapLibre's grab/grabbing container cursor: background shows the arrow, regions the pointer.
     map.getCanvas().style.cursor = "default";
