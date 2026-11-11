@@ -122,6 +122,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - Playwright browser journeys on a production build with frozen API fixtures keep the genre, artist and song URL params and tab titles right across the tree and the map (`pnpm test:e2e`, `e2e` job).
 - Removed the per-repo graphify `hook-guard` in `.claude/settings.json` and its graphify blocks in the tracked git hooks (the whole `post-commit` hook and the graphify part of `post-checkout`); the global agent-config freshness hook replaces it.
+- Pin the shared release workflows to the lag-tolerant github-workflows commit 79c1362, so tag creation tolerates GitHub read-after-write delays.
 
 ### Changed
 
