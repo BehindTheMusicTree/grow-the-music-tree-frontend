@@ -25,7 +25,7 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
     uuid === "artist-1" ? { status: "success", artist: { name: "Kassav" } } : { status: "idle" },
   useSong: (uuid: string | null) =>
     uuid === "song-1" ? { status: "success", song: { title: "Zouk la se sel medikaman" } } : { status: "idle" },
-  useFetchGenreDetail: (uuid: string | null) => ({ data: uuid === selectedGenre.uuid ? selectedGenre : undefined }),
+  useFetchGenreDetail: (uuid: string | null) => (uuid === selectedGenre.uuid ? { status: "success", genre: selectedGenre } : { status: uuid === null ? "idle" : "not-found" }),
   useGenreByWikidataId: (wikidataId: string | null) =>
     wikidataId === null ? { data: undefined, isError: false } : overviewLookup,
   useRegionGenreLexicon: (_getBaseUrl: unknown, enabled: boolean) => {

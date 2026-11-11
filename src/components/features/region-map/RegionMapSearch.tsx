@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { useRegionGenreLexicon, useFetchGenreDetail, useArtist, useSong, GenreUuidSchema, useSearchQueryState, type GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
+import { useRegionGenreLexicon, useFetchGenreDetail, useArtist, useSong, useSearchQueryState, type GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
 import { SearchBox, useArtistSearchGroup, useGenreRemoteSearchGroup, useSongSearchGroup } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { useRegionGenreIndex } from "@components/features/search/useRegionGenreIndex";
 import { usePlaceSearchGroup, useRegionGenreSearchGroup } from "@components/features/search/useRegionSearchGroups";
@@ -33,8 +33,8 @@ export default function RegionMapSearch({ index, regions, onPick, onPickArtist, 
   const source = { ready: !lexicon.isPending, isError: lexicon.isError };
   const lexiconUuids = useMemo(() => new Set(entries.map((entry) => entry.genre.uuid)), [entries]);
 
-  const parsedGenre = GenreUuidSchema.safeParse(selectedGenreUuid);
-  const { data: selectedGenre } = useFetchGenreDetail(parsedGenre.success ? parsedGenre.data : null, "reference", getGrowBackendBaseUrl);
+  const genreDetail = useFetchGenreDetail(selectedGenreUuid, "reference", getGrowBackendBaseUrl);
+  const selectedGenre = genreDetail.status === "success" ? genreDetail.genre : undefined;
   // The panel shows a genre first, then a song, then an artist, then the region.
   const songOpen = selectedGenreUuid === null && selectedSongUuid !== null;
   const artistOpen = selectedGenreUuid === null && !songOpen && selectedArtistUuid !== null;
