@@ -116,6 +116,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Region map**: the globe floats in a dark space with ~3,000 static stars that turn with the camera as if the sky were locked to the globe (one MapLibre custom WebGL layer, no repaint when idle); the sky and horizon colours are darker to match.
 - Admin curation edits genre edges (canonical and regional parents, accepted roots, regional overviews, secondary parents) from the genre page and a new `/admin/curation/edges` page, with relation filter, search and history.
 
+- **Genre panel shows the genre's Wikimedia Commons image** above the summary, with its author and license credit; nothing is shown for genres without one. Comes with `@behindthemusictree/app-kit` and `app-kit-ui` 41.0.0 (no Grow code change). Requires the grow API's genre `image` field (grow #461), deployed before the pipelines send it.
 - The curation review lists the new reasons `invalid_rule` (with the pipeline's `evidence.detail`) and `exclusive_parent_regional` (pointing to « Genres maintenus canoniques »), with tests. Needs grow-the-music-tree-api 16.0.0.
 
 ### CI

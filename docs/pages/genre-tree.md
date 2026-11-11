@@ -33,6 +33,7 @@ Cannot be statically generated - requires dynamic data and real-time updates.
 
 - Public access allows non-authenticated users to explore the genre taxonomy
 - Features interactive tree visualization, read-only (no write-action UI) unless signed in as admin
+- The genre detail panel shows the genre's Wikimedia Commons image above its summary, with author and license credit; nothing is shown for genres without one (needs the grow API's genre `image` field)
 - Also the logo / home link
 
 See [Genre selection](genre-selection.md) for the entity UUID URL contract shared with the map.
