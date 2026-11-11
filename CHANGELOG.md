@@ -112,6 +112,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Changed
+
+- The "Modifications" (genre history) section of the genre side panel is only shown to admins, on the tree and on the region map.
+
 ### Added
 
 - **Region map**: a Sun shines 130° from the Moon as seen from Earth (the side its gibbous phase implies): a bright disc with a soft halo, as large as the Moon, fixed in the sky like the stars and hidden by the globe (one more MapLibre custom WebGL layer, no repaint when idle). One `SUN_DIRECTION` drives the disc, the Moon's shading and the style `light`, so the atmosphere glows on the Sun's side (`atmosphere-blend` lowered to 0.25), and the globe is dimmed (lit side −30 %, night side darker, with a soft terminator; one full-screen ray-cast pass).

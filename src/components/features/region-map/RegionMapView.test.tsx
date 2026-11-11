@@ -29,6 +29,10 @@ const setSearch = (query: string) => {
 // URL writes are batched into a microtask, so history assertions run after it.
 const flushNavigation = () => act(async () => {});
 
+const useIsAdminMock = vi.fn(() => false);
+vi.mock("@hooks/useIsAdmin", () => ({ useIsAdmin: () => useIsAdminMock() }));
+vi.mock("@components/features/genre-tree/GenreHistory", () => ({ default: () => <div>Genre history</div> }));
+
 vi.mock("@hooks/useRegionMap", () => ({
   useRegionMapIndex: () => ({ data, isPending: false, isError: false }),
 }));
@@ -59,9 +63,10 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
       <button onClick={() => onSelectGenre({ uuid: makeGenreUuid("relative") })}>Open song genre</button>
     </section>
   ),
-  GenreDetailPanel: ({ genreUuid, onClose, onSelectGenre, collapsed, edgeTab }: { genreUuid: string; onClose: () => void; onSelectGenre: (uuid: string) => void; collapsed: boolean; edgeTab: { edge: { label: string; onClick: () => void } | null; center: { label: string; onClick: () => void } | null } }) => (
+  GenreDetailPanel: ({ genreUuid, onClose, onSelectGenre, collapsed, edgeTab, extras }: { extras?: { renderGenreDetailExtras?: (overview: { uuid: string }) => React.ReactNode }; genreUuid: string; onClose: () => void; onSelectGenre: (uuid: string) => void; collapsed: boolean; edgeTab: { edge: { label: string; onClick: () => void } | null; center: { label: string; onClick: () => void } | null } }) => (
     <section aria-label="Genre detail" data-collapsed={String(collapsed)}>
       {genreUuid}<button onClick={onClose}>Close genre</button>
+      {extras?.renderGenreDetailExtras?.({ uuid: genreUuid })}
       <button onClick={() => onSelectGenre(makeGenreUuid("relative"))}>Relative</button>
       <button onClick={(edgeTab.edge ?? edgeTab.center)!.onClick}>{(edgeTab.edge ?? edgeTab.center)!.label}</button>
     </section>
@@ -132,6 +137,19 @@ afterEach(() => {
 });
 
 describe("RegionMapView", () => {
+  beforeEach(() => useIsAdminMock.mockReturnValue(false));
+
+  it("shows the genre history (Modifications) to admins only", () => {
+    setSearch(`genre=${makeGenreUuid("regional")}`);
+    const { unmount } = render(<RegionMapView />);
+    expect(screen.queryByText("Genre history")).toBeNull();
+    unmount();
+
+    useIsAdminMock.mockReturnValue(true);
+    render(<RegionMapView />);
+    expect(screen.getByText("Genre history")).toBeInTheDocument();
+  });
+
   it("opens an explicit genre without a region and preserves the camera on close", async () => {
     setSearch(`genre=${makeGenreUuid("regional")}&at=2,46,5`);
     render(<RegionMapView />);
