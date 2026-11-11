@@ -89,9 +89,22 @@ jobs:
     name: Browser journeys
     runs-on: ubuntu-latest
     needs: [lint, test]
+    # Browsers and their system libraries ship in the image, so the job never touches the Ubuntu apt mirrors.
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble
+      options: --ipc=host
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Check the Playwright image matches @playwright/test
+        run: |
+          image_version=$(sed -nE 's#^ *image: mcr\.microsoft\.com/playwright:v([0-9.]+)-.*#\1#p' .github/workflows/validate.yml)
+          package_version=$(node -p "require('./package.json').devDependencies['@playwright/test']")
+          if [ "$image_version" != "$package_version" ]; then
+            echo "::error::validate.yml uses Playwright image '$image_version' but package.json pins @playwright/test '$package_version'; bump the e2e container image tag"
+            exit 1
+          fi
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -104,9 +117,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Install Chromium
-        run: pnpm exec playwright install --with-deps chromium
 
       - name: Build application
         env:
