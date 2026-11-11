@@ -7,17 +7,6 @@ export const MOON_DISTANCE = 60;
 /** Real radius is ~0.27 Earth radii; tripled so the Moon reads as more than a dot from the world view. */
 export const MOON_RADIUS = 0.82;
 
-/**
- * Where the opening world view looks (the WORLD_BOUNDS fit: lng 0, the mercator midpoint of -58..84, ~44°N).
- * The Moon is framed relative to it, so changing the opening bounds means revisiting this.
- */
-export const DEFAULT_VIEW = { lng: 0, lat: 44 };
-/** Angle of the Moon off the axis opposite the view centre, and its heading (45° = toward north-east). */
-const MOON_OFFSET_ANGLE = 17 * DEG;
-const MOON_OFFSET_HEADING = 45 * DEG;
-/** Sun–Moon–Earth angle seen from the Moon: 50° is ~82 % lit, gibbous. */
-const PHASE_ANGLE = 50 * DEG;
-
 /** Near-side maria as selenographic (east longitude, latitude, angular radius), in degrees. */
 export const MARIA: ReadonlyArray<{ lon: number; lat: number; radius: number }> = [
   { lon: -16, lat: 35, radius: 16 }, // Imbrium
@@ -49,18 +38,9 @@ export function surfacePoint(lng: number, lat: number): Vec3 {
   return [Math.sin(lng * DEG) * Math.cos(lat * DEG), Math.sin(lat * DEG), Math.cos(lng * DEG) * Math.cos(lat * DEG)];
 }
 
-/** Moon centre in the globe frame: the antipode of the view centre, tilted toward its north-east tangent. */
-export function moonCenter(view = DEFAULT_VIEW): Vec3 {
-  const centre = surfacePoint(view.lng, view.lat);
-  const lng = view.lng * DEG;
-  const lat = view.lat * DEG;
-  const east: Vec3 = [Math.cos(lng), 0, -Math.sin(lng)];
-  const north: Vec3 = [-Math.sin(lat) * Math.sin(lng), Math.cos(lat), -Math.sin(lat) * Math.cos(lng)];
-  const heading = add(scale(east, Math.cos(MOON_OFFSET_HEADING)), scale(north, Math.sin(MOON_OFFSET_HEADING)));
-  const direction = normalize(
-    add(scale(centre, -Math.cos(MOON_OFFSET_ANGLE)), scale(heading, Math.sin(MOON_OFFSET_ANGLE))),
-  );
-  return scale(direction, MOON_DISTANCE);
+/** Moon centre in the globe frame: always opposite the Sun, so it is full as seen from Earth. */
+export function moonCenter(sun: Vec3): Vec3 {
+  return scale(sun, -MOON_DISTANCE);
 }
 
 /**
@@ -80,11 +60,6 @@ export function selenographicDirection(frame: ReturnType<typeof moonBodyFrame>, 
     add(scale(frame.x, Math.sin(lon * DEG) * cosLat), scale(frame.y, Math.sin(lat * DEG))),
     scale(frame.z, Math.cos(lon * DEG) * cosLat),
   );
-}
-
-/** Sun direction from the Moon: lit from the viewer's left, at the phase angle from the Earth direction. */
-export function sunDirection(frame: ReturnType<typeof moonBodyFrame>): Vec3 {
-  return add(scale(frame.z, Math.cos(PHASE_ANGLE)), scale(frame.x, -Math.sin(PHASE_ANGLE)));
 }
 
 /** Maria as world-frame `[x, y, z, cos(angular radius)]`, flattened for a `vec4[]` uniform. */

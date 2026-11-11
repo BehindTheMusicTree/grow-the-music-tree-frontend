@@ -12,7 +12,7 @@ import {
   type Vec3,
 } from "./moon";
 import { MOON_LAYER } from "./regionMapLayers";
-import { SUN_DIRECTION } from "./sun";
+import type { Sky } from "./sun";
 
 const LABEL = "Moon";
 
@@ -69,7 +69,9 @@ type Resources = {
   right: WebGLUniformLocation;
   up: WebGLUniformLocation;
   toCamera: WebGLUniformLocation;
-  center3: Vec3;
+  sun: WebGLUniformLocation;
+  maria: WebGLUniformLocation;
+  center: WebGLUniformLocation;
 };
 
 /**
@@ -77,8 +79,11 @@ type Resources = {
  * with zoom. Drawn "under" the frame like the stars (the opaque globe hides it, it hides the stars) unless the
  * camera has flown beyond it, when it is drawn over the globe instead.
  */
-export function createMoonLayer(): CustomLayerInterface {
+export function createMoonLayer(sky: Sky): CustomLayerInterface {
   let resources: Resources | null = null;
+  // The Moon follows `sky.sun`; its centre and maria are recomputed only when the sky ticks to a new vector.
+  let placedFor: Vec3 | null = null;
+  let center3: Vec3 = [0, 0, 0];
 
   return {
     id: MOON_LAYER,
@@ -99,15 +104,10 @@ export function createMoonLayer(): CustomLayerInterface {
       gl.vertexAttribPointer(location, 2, gl.FLOAT, false, 0, 0);
       gl.bindVertexArray(null);
 
-      // Everything but the camera is fixed: compute it once and upload it once.
-      const center3 = moonCenter();
-      const frame = moonBodyFrame(center3);
       const uniform = (name: string) => requireUniform(gl, LABEL, program, name);
       gl.useProgram(program);
-      gl.uniform3f(uniform("u_sun"), SUN_DIRECTION[0], SUN_DIRECTION[1], SUN_DIRECTION[2]);
-      gl.uniform4fv(uniform("u_maria"), mariaUniform(frame));
-      gl.uniform3f(uniform("u_center"), center3[0], center3[1], center3[2]);
       gl.uniform1f(uniform("u_radius"), MOON_RADIUS);
+      placedFor = null;
       resources = {
         program,
         vao,
@@ -116,7 +116,9 @@ export function createMoonLayer(): CustomLayerInterface {
         right: uniform("u_right"),
         up: uniform("u_up"),
         toCamera: uniform("u_to_camera"),
-        center3,
+        sun: uniform("u_sun"),
+        maria: uniform("u_maria"),
+        center: uniform("u_center"),
       };
     },
     render(context, { defaultProjectionData }: CustomRenderMethodInput) {
@@ -125,8 +127,16 @@ export function createMoonLayer(): CustomLayerInterface {
       if (defaultProjectionData.projectionTransition < 1) return;
       const gl = context as WebGL2RenderingContext;
       const camera = cameraFromMatrix(defaultProjectionData.mainMatrix);
-      const { right, up, toCamera } = moonBasis(camera, resources.center3);
       gl.useProgram(resources.program);
+      const sun = sky.sun;
+      if (placedFor !== sun) {
+        center3 = moonCenter(sun);
+        gl.uniform3f(resources.sun, sun[0], sun[1], sun[2]);
+        gl.uniform4fv(resources.maria, mariaUniform(moonBodyFrame(center3)));
+        gl.uniform3f(resources.center, center3[0], center3[1], center3[2]);
+        placedFor = sun;
+      }
+      const { right, up, toCamera } = moonBasis(camera, center3);
       gl.uniformMatrix4fv(resources.matrix, false, defaultProjectionData.mainMatrix);
       gl.uniform3f(resources.right, right[0], right[1], right[2]);
       gl.uniform3f(resources.up, up[0], up[1], up[2]);
@@ -135,7 +145,7 @@ export function createMoonLayer(): CustomLayerInterface {
       gl.disable(gl.STENCIL_TEST);
       gl.disable(gl.CULL_FACE);
       gl.enable(gl.BLEND);
-      if (moonInFront(camera, resources.center3)) {
+      if (moonInFront(camera, center3)) {
         gl.blendFuncSeparate(gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
       } else {
         gl.blendFuncSeparate(gl.ONE_MINUS_DST_ALPHA, gl.ONE, gl.ONE_MINUS_DST_ALPHA, gl.ONE);

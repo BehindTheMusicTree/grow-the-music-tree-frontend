@@ -130,6 +130,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- **Region map**: the Sun now sits at its real position (the sub-solar point at the current time) and follows the day, refreshed every 10 s; the Moon is always opposite it, so it is full and only shows from the night side. The terminator, the Sun, the Moon's shading and the atmosphere light all read the same direction.
 - `@behindthemusictree/app-kit` and `app-kit-ui` bumped from 42.0.0 to 42.0.1: `ArtistOriginSchema.kind` is nullable, so an artist whose origin has no kind no longer fails to parse. No Grow code change was needed.
 - An empty `?genre=`, `?artist=`, `?song=`, `?region=` or `?tradition=` is read as no selection (`src/lib/entityParams.ts`) by the tree, the map, the genealogy view and the view-switch links, so `?artist=` no longer requests `artists//genre-counts/`. The map no longer keeps its own "Genre unavailable" overlay for a malformed `?genre=`: like the tree, it hands the value to the panel, which says the genre was not found.
 - The region "Zoom to" and tradition "Open in genre tree" buttons, and the genre curation danger zone (alias, root, exclude, delete), become round action buttons with a label underneath, in the same action band as the other detail panels.

@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { cameraFromMatrix, DEFAULT_VIEW, dot, length, moonBodyFrame, moonCenter, type Vec3 } from "./moon";
+import { cameraFromMatrix, dot, length, type Vec3 } from "./moon";
 import { orbitRotation, perspective } from "./starfield";
-import { SUN_ANGULAR_RADIUS, SUN_DIRECTION, sunLightPosition } from "./sun";
+import { SUN_ANGULAR_RADIUS, subsolarPoint, sunDirectionAt, sunLightPosition } from "./sun";
 
 const DEG = Math.PI / 180;
+const DEFAULT_VIEW = { lng: 0, lat: 44 };
+const DATE = new Date("2024-11-03T12:00:00Z");
+const SUN_DIRECTION = sunDirectionAt(DATE);
 const FOV = (36.87 * Math.PI) / 180;
 const ASPECT = 16 / 9;
 
@@ -43,22 +46,37 @@ function maplibreSun([r, azimuthal, polar]: [number, number, number], camera: Ca
   ];
 }
 
-describe("SUN_DIRECTION", () => {
+describe("subsolarPoint", () => {
+  it.each([
+    ["June solstice 2024", "2024-06-20T20:51:00Z", 23.44],
+    ["December solstice 2024", "2024-12-21T09:20:00Z", -23.44],
+    ["March equinox 2025", "2025-03-20T09:01:00Z", 0],
+  ])("has the right latitude at the %s", (_name, iso, lat) => {
+    expect(Math.abs(subsolarPoint(new Date(iso)).lat - lat)).toBeLessThan(0.05);
+  });
+
+  it("applies the equation of time: 16.4 min ahead of the mean Sun on 3 November", () => {
+    expect(Math.abs(subsolarPoint(DATE).lng - -4.1)).toBeLessThan(0.3);
+  });
+
+  it("moves 15° west per hour", () => {
+    const a = subsolarPoint(new Date("2024-11-03T12:00:00Z")).lng;
+    const b = subsolarPoint(new Date("2024-11-03T13:00:00Z")).lng;
+    expect(Math.abs(((a - b + 540) % 360) - 180 - 15)).toBeLessThan(0.01);
+  });
+
+  it("stays in [-180, 180)", () => {
+    for (let h = 0; h < 48; h++) {
+      const { lng } = subsolarPoint(new Date(Date.UTC(2024, 10, 3, h)));
+      expect(lng).toBeGreaterThanOrEqual(-180);
+      expect(lng).toBeLessThan(180);
+    }
+  });
+});
+
+describe("sunDirectionAt", () => {
   it("is a unit vector", () => {
-    expect(length(SUN_DIRECTION)).toBeCloseTo(1, 6);
-  });
-
-  it("lies 130° from the Moon as seen from Earth, on the far side", () => {
-    const moon = moonCenter();
-    const toMoon = moon.map((c) => c / length(moon)) as Vec3;
-    expect(Math.acos(dot(SUN_DIRECTION, toMoon)) / DEG).toBeCloseTo(130, 4);
-  });
-
-  it("keeps the Moon gibbous: lit fraction between 0.75 and 0.9", () => {
-    const frame = moonBodyFrame(moonCenter());
-    const lit = (1 + dot(SUN_DIRECTION, frame.z)) / 2;
-    expect(lit).toBeGreaterThan(0.75);
-    expect(lit).toBeLessThan(0.9);
+    expect(length(sunDirectionAt(DATE))).toBeCloseTo(1, 6);
   });
 });
 
@@ -95,11 +113,6 @@ describe("sunLightPosition", () => {
 });
 
 describe("Sun visibility", () => {
-  it("is behind the camera in the opening view", () => {
-    const matrix = globeMatrix(5.9, { ...DEFAULT_VIEW, bearing: 0, pitch: 0, roll: 0 });
-    expect(projectSun(matrix, SUN_DIRECTION).w).toBeLessThanOrEqual(0);
-  });
-
   it("shows beside the globe disc from a camera on the Sun's side", () => {
     // Look 25° off the sub-solar point, so the Sun sits next to the disc.
     const lat = Math.asin(SUN_DIRECTION[1]) / DEG;
