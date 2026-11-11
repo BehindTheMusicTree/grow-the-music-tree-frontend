@@ -421,6 +421,14 @@ describe("GenreTreePage", () => {
       expect(useVisibleGenrePlaylistsMock).toHaveBeenLastCalledWith(expect.objectContaining({ artistUuid: "band" }));
     });
 
+    it("does not filter by an empty ?artist=", async () => {
+      setSearch("artist=");
+      renderGenreTreePage();
+
+      await screen.findByTestId("genre-tree-view");
+      expect(useVisibleGenrePlaylistsMock).toHaveBeenLastCalledWith(expect.objectContaining({ artistUuid: null }));
+    });
+
     it("allows the pop-core view with the artist's pruned tree", async () => {
       setSearch("artist=band");
       useVisibleGenrePlaylistsMock.mockReturnValue({

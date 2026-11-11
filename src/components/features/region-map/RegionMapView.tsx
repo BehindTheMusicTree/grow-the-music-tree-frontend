@@ -7,7 +7,7 @@ import { GenreUuidSchema, useRegionGenreLexicon } from "@behindthemusictree/app-
 import { EntityDetailPanel, GenreDetailPanel } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import { collapseEdgeTab } from "@utils/collapseEdgeTab";
-import { Breadcrumb, DetailPanel } from "@behindthemusictree/ui";
+import { Breadcrumb } from "@behindthemusictree/ui";
 import { regionMapLookup } from "@lib/region-map-index";
 import { useRegionMapIndex } from "@hooks/useRegionMap";
 import { useEntityDocumentTitle } from "@hooks/useEntityDocumentTitle";
@@ -72,7 +72,8 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
 
   const [collapsed, setCollapsed] = useState(false);
   const selectedId = state.region;
-  const parsedGenre = GenreUuidSchema.safeParse(state.genre);
+  // Only a well-formed uuid can be shared or looked up in the lexicon; the panel itself says when a genre is not found.
+  const genreUuid = state.genre === null ? null : GenreUuidSchema.safeParse(state.genre).data ?? null;
   const selectedExists = selected !== undefined;
   useEffect(() => {
     if (selectedId === null) lastFlown.current = null;
@@ -112,8 +113,8 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
     [pathname],
   );
   const genreHasNoRegion =
-    state.genre !== null && !lexicon.isPending && !lexicon.isError && genreRegionId === null &&
-    !genreEntries.some((entry) => entry.genre.uuid === state.genre);
+    genreUuid !== null && !lexicon.isPending && !lexicon.isError && genreRegionId === null &&
+    !genreEntries.some((entry) => entry.genre.uuid === genreUuid);
 
   const hasLegacyPath = state.legacyPath.length > 0;
   const invalidRegion = state.region !== null && selected === undefined;
@@ -183,16 +184,16 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
             onSelectCurrent={() => { setCollapsed(false); flyTo(selected.id); }}
           />
         )}
-        {state.genre !== null ? parsedGenre.success ? (
+        {state.genre !== null ? (
           <GenreDetailPanel
             titleInSearch
-            genreUuid={parsedGenre.data}
+            genreUuid={state.genre}
             scope="reference"
             getBackendBaseUrl={getGrowBackendBaseUrl}
             onSelectGenre={(genre) => { setCollapsed(false); update({ genre }); }}
             onClose={clearSelection}
             shareUrl={typeof window === "undefined" ? undefined : window.location.href}
-            shareTarget={{ kind: "genre", genreUuid: parsedGenre.data, name: "Genre", scope: "reference", artistUuid: null }}
+            shareTarget={genreUuid === null ? undefined : { kind: "genre", genreUuid, name: "Genre", scope: "reference", artistUuid: null }}
             collapsed={collapsed}
             edgeTab={collapseEdgeTab(collapsed, setCollapsed)}
             extras={{
@@ -201,10 +202,6 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
               renderSongLink,
             }}
           />
-        ) : (
-          <DetailPanel titleInSearch title="Genre unavailable" side="left" onClose={clearSelection}>
-            <p role="alert">This genre could not be loaded.</p>
-          </DetailPanel>
         ) : state.song !== null || state.artist !== null ? (
           <EntityDetailPanel
             scope="reference"

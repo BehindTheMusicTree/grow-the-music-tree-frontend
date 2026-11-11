@@ -1,4 +1,5 @@
 import { REGION_MAP_HREF } from "@lib/constants/routes";
+import { ARTIST_PARAM, GENRE_PARAM, SONG_PARAM, readQueryParam } from "@lib/entityParams";
 
 /** Both visualizations identify genre entities independently of their playlists. */
 export const treeGenreHref = (genreUuid: string | null) =>
@@ -14,8 +15,8 @@ export const mapRegionHref = (regionId: string, genreUuid: string | null = null)
 /** Switching between the tree and the map keeps the open genre, artist and song; every other parameter belongs to one view. */
 export const viewSwitchHref = (target: "/" | typeof REGION_MAP_HREF, searchParams: URLSearchParams) => {
   const carried = new URLSearchParams();
-  for (const key of ["genre", "artist", "song"]) {
-    const value = searchParams.get(key);
+  for (const key of [GENRE_PARAM, ARTIST_PARAM, SONG_PARAM]) {
+    const value = readQueryParam(searchParams, key);
     if (value) carried.set(key, value);
   }
   const query = carried.toString();

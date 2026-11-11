@@ -143,6 +143,21 @@ describe("RegionMapView", () => {
     expect(url(pushState.mock.calls.at(-1)! ).searchParams.get("at")).toBe("2,46,5");
   });
 
+  it("hands a malformed genre to the panel as is, with no separate unavailable overlay", () => {
+    setSearch("genre=not-a-uuid");
+    render(<RegionMapView />);
+
+    expect(screen.getByRole("region", { name: "Genre detail" })).toHaveTextContent("not-a-uuid");
+    expect(screen.queryByText("Genre unavailable")).toBeNull();
+  });
+
+  it("treats an empty ?genre= as no selection", () => {
+    setSearch("genre=");
+    render(<RegionMapView />);
+
+    expect(screen.queryByRole("region", { name: "Genre detail" })).toBeNull();
+  });
+
   it("unselects both the genre and its region when the genre panel closes", async () => {
     setSearch(`genre=${makeGenreUuid("regional")}&region=Q142`);
     render(<RegionMapView />);

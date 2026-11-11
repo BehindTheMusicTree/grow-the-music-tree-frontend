@@ -2,15 +2,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 import { updateUrlQuery } from "@lib/urlQuery";
+import { ARTIST_PARAM, GENRE_PARAM, SONG_PARAM, readQueryParam } from "@lib/entityParams";
 import type { FocusChangeReason, GenreTreeViewport } from "@behindthemusictree/app-kit-ui/genre-tree";
 
-export const GENRE_PARAM = "genre";
 export const ZOOM_PARAM = "zoom";
 export const VIEW_PARAM = "view";
 export const ABOUT_PARAM = "about";
-export const ARTIST_PARAM = "artist";
-export const SONG_PARAM = "song";
 export const SIZE_PARAM = "size";
+
+export { ARTIST_PARAM, GENRE_PARAM, SONG_PARAM };
 
 export type SizeMetric = "songs" | "views";
 
@@ -34,11 +34,11 @@ interface UseGenreTreeUrlStateOptions {
 export function useGenreTreeUrlState({ viewMode }: UseGenreTreeUrlStateOptions) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const genre = searchParams.get(GENRE_PARAM);
+  const genre = readQueryParam(searchParams, GENRE_PARAM);
   const zoom = searchParams.get(ZOOM_PARAM);
   const view = searchParams.get(VIEW_PARAM);
-  const artist = searchParams.get(ARTIST_PARAM);
-  const song = searchParams.get(SONG_PARAM);
+  const artist = readQueryParam(searchParams, ARTIST_PARAM);
+  const song = readQueryParam(searchParams, SONG_PARAM);
   const sizeMetric: SizeMetric = searchParams.get(SIZE_PARAM) === "views" ? "views" : "songs";
   // Mount-only seed: the library ignores later changes, and later URL writes must not feed back.
   const [defaultViewport, setDefaultViewport] = useState(() => parseViewport(view));

@@ -273,18 +273,6 @@ function GenreTreePageContent() {
   const isAdmin = useIsAdmin();
   const { showPopup, hidePopup } = usePopup();
   const [expanded, setExpanded] = useState(false);
-  // The artist filters the visualization independently of the selected genre.
-  const artistFilter = useSearchParams().get(ARTIST_PARAM);
-
-  // Shares the react-query cache with GenreTreeView's internal fetches (same queryKeys), so this
-  // doesn't trigger extra network requests. Also drives whether the "pop-core" view mode is
-  // available, so AppHeader can grey out its toggle button accordingly.
-  const { genrePlaylists, isLoading: isLoadingGenrePlaylists } = useVisibleGenrePlaylists({
-    scope: "reference",
-    getBackendBaseUrl,
-    artistUuid: artistFilter,
-  });
-
   const {
     selectedGenreUuid,
     setSelectedGenreUuid,
@@ -299,6 +287,15 @@ function GenreTreePageContent() {
     defaultViewport,
     onViewportChange,
   } = useGenreTreeUrlState({ viewMode });
+
+  // Shares the react-query cache with GenreTreeView's internal fetches (same queryKeys), so this
+  // doesn't trigger extra network requests. Also drives whether the "pop-core" view mode is
+  // available, so AppHeader can grey out its toggle button accordingly.
+  const { genrePlaylists, isLoading: isLoadingGenrePlaylists } = useVisibleGenrePlaylists({
+    scope: "reference",
+    getBackendBaseUrl,
+    artistUuid,
+  });
 
   const canShowPopCore = useMemo(() => {
     const all = genrePlaylists;
