@@ -114,6 +114,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Region map**: a Sun shines 130° from the Moon as seen from Earth (the side its gibbous phase implies): a bright disc with a soft halo, as large as the Moon, fixed in the sky like the stars and hidden by the globe (one more MapLibre custom WebGL layer, no repaint when idle). One `SUN_DIRECTION` drives the disc, the Moon's shading and the style `light`, so the atmosphere glows on the Sun's side, and the globe is dimmed (lit side −30 %, night side darker, with a soft terminator; one full-screen ray-cast pass).
 - **Region map**: a Moon hangs beside the globe at its true distance (60 Earth radii, radius ×3): gibbous, with procedural maria, parallaxing against the stars, scaling with zoom and hidden by the globe (one more MapLibre custom WebGL layer, 4 vertices, no extra repaint when idle). The shader helpers are shared with the starfield (`glProgram.ts`).
 - **Region map**: the globe floats in a dark space with ~3,000 static stars that turn with the camera as if the sky were locked to the globe (one MapLibre custom WebGL layer, no repaint when idle); the sky and horizon colours are darker to match.
 - Admin curation edits genre edges (canonical and regional parents, accepted roots, regional overviews, secondary parents) from the genre page and a new `/admin/curation/edges` page, with relation filter, search and history.

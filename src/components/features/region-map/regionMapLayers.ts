@@ -2,6 +2,7 @@ import { hcl, interpolateYlGnBu, scaleSequentialSqrt } from "d3";
 import type { ExpressionSpecification, LngLatBoundsLike, StyleSpecification } from "maplibre-gl";
 import { labelHalo } from "@behindthemusictree/ui";
 import { WORLD_ID, type Region } from "@schemas/api/region-map";
+import { SUN_DIRECTION, sunLightPosition } from "./sun";
 
 export const EMPTY_FILL = "#e5e7eb";
 export const MAX_ZOOM = 11;
@@ -23,6 +24,8 @@ export const CITY_LAYER = "cities";
 export const CITY_LABEL_LAYER = "city-labels";
 export const STARFIELD_LAYER = "starfield";
 export const MOON_LAYER = "moon";
+export const SUN_LAYER = "sun";
+export const NIGHT_LAYER = "night";
 export const REGIONS_SOURCE_LAYER = "regions";
 /** The tileset's last zoom: MapLibre overzooms it up to MAX_ZOOM. */
 export const TILESET_MAX_ZOOM = 10;
@@ -307,8 +310,9 @@ export function buildStyle({
       "sky-color": "#0b1d3a",
       "horizon-color": "#1e40af",
       "sky-horizon-blend": 0.6,
-      "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 1, 7, 0],
+      "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 0.25, 5, 0.25, 7, 0],
     },
+    light: { anchor: "map", position: sunLightPosition(SUN_DIRECTION) },
     glyphs: glyphsUrl,
     sources: {
       [TILES_SOURCE]: {

@@ -206,6 +206,12 @@ describe("buildStyle", () => {
   const layer = (id: string, built = style()) =>
     built.layers.find((candidate) => candidate.id === id) as { filter?: unknown; paint?: unknown; layout?: unknown };
 
+  it("lights the atmosphere from the sun, anchored to the map", () => {
+    const built = style();
+
+    expect(built.light).toMatchObject({ anchor: "map", position: [1, expect.any(Number), expect.any(Number)] });
+  });
+
   it("is a globe with an atmosphere, fed by one pmtiles vector source", () => {
     const built = style();
 
