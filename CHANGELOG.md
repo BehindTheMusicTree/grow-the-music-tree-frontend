@@ -103,6 +103,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### CI
 
+- The `e2e` job runs in the Playwright container image instead of installing Chromium with `apt` on each run, so an unreachable Ubuntu mirror no longer fails the browser journeys; a first step fails with a clear message when the image tag and `@playwright/test` differ.
 - **Branch Protection**: Added automated enforcement of Git Flow branching rules
   - Blocks invalid PRs to main and develop branches
 ```
