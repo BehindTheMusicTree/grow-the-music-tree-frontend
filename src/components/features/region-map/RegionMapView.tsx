@@ -81,7 +81,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   }, [selectedId, selectedExists, flyTo]);
 
   // A genre selected from anywhere (family links, URL) frames the region the map lists it under.
-  const lexicon = useRegionGenreLexicon(getGrowBackendBaseUrl, state.genre !== null);
+  const lexicon = useRegionGenreLexicon(getGrowBackendBaseUrl, genreUuid !== null);
   const genreEntries = useRegionGenreIndex(index, lexicon.entries);
   const genreRegionId = useMemo(() => {
     const own = genreEntries.filter((entry) => entry.genre.uuid === state.genre);

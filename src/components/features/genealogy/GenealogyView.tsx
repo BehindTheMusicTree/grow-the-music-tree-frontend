@@ -10,7 +10,6 @@ import { TRADITION_PARAM, readQueryParam } from "@lib/entityParams";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import TraditionDetailPanel from "./TraditionDetailPanel";
 
-
 const GenealogyChart = dynamic(() => import("./GenealogyChart"), {
   ssr: false,
   loading: () => <div className="h-full w-full animate-pulse rounded-lg bg-gray-200" />,
