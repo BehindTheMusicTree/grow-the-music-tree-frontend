@@ -22,6 +22,7 @@ export const ZONE_LABEL_LAYER = "zone-labels";
 export const CITY_LAYER = "cities";
 export const CITY_LABEL_LAYER = "city-labels";
 export const STARFIELD_LAYER = "starfield";
+export const MOON_LAYER = "moon";
 export const REGIONS_SOURCE_LAYER = "regions";
 /** The tileset's last zoom: MapLibre overzooms it up to MAX_ZOOM. */
 export const TILESET_MAX_ZOOM = 10;

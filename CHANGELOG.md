@@ -114,6 +114,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Region map**: a Moon hangs beside the globe at its true distance (60 Earth radii, radius ×3): gibbous, with procedural maria, parallaxing against the stars, scaling with zoom and hidden by the globe (one more MapLibre custom WebGL layer, 4 vertices, no extra repaint when idle). The shader helpers are shared with the starfield (`glProgram.ts`).
 - **Region map**: the globe floats in a dark space with ~3,000 static stars that turn with the camera as if the sky were locked to the globe (one MapLibre custom WebGL layer, no repaint when idle); the sky and horizon colours are darker to match.
 - Admin curation edits genre edges (canonical and regional parents, accepted roots, regional overviews, secondary parents) from the genre page and a new `/admin/curation/edges` page, with relation filter, search and history.
 - **Artist panel shows the artist's origin** (begin area, else area) as a link to its region on the map (`renderPlaceLink`), on the tree and on the map, with a test. Bumps `@behindthemusictree/app-kit` and `app-kit-ui` to 42.0.0 (`ArtistDetailedSchema` requires a nullable `origin`; the e2e artist fixture carries one). Requires grow-the-music-tree-api #462 deployed.
