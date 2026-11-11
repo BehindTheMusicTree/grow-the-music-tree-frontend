@@ -105,3 +105,13 @@ test("a genre without a region says so on the map", async ({ page }) => {
   await expect(page.getByText("This genre has no region on the map.")).toBeVisible();
   await expectState(page, { title: APP_TITLE, panel: names.jazz });
 });
+
+test("artist origin links to its region on the map and leaves the artist panel", async ({ page }) => {
+  await page.goto(`/?artist=${ids.artist}`);
+  await expectState(page, { title: names.artist, panel: names.artist });
+  await page.getByRole("complementary", { name: names.artist }).getByRole("link", { name: "Paris" }).click();
+  await expect(page).toHaveURL(/\/map\?/);
+  expect(param(page, "region")).toBe("FR");
+  expect(param(page, "artist")).toBeNull();
+  await expectUrlInvariants(page);
+});
