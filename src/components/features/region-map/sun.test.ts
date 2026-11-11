@@ -97,12 +97,11 @@ describe("sunLightPosition", () => {
 describe("Sun visibility", () => {
   it("is behind the camera in the opening view", () => {
     const matrix = globeMatrix(5.9, { ...DEFAULT_VIEW, bearing: 0, pitch: 0, roll: 0 });
-    expect(cameraFromMatrix(matrix)).toBeDefined();
     expect(projectSun(matrix, SUN_DIRECTION).w).toBeLessThanOrEqual(0);
   });
 
   it("shows beside the globe disc from a camera on the Sun's side", () => {
-    // Look at the point 30° off the sub-solar point, so the Sun sits next to the disc.
+    // Look 25° off the sub-solar point, so the Sun sits next to the disc.
     const lat = Math.asin(SUN_DIRECTION[1]) / DEG;
     const lng = Math.atan2(SUN_DIRECTION[0], SUN_DIRECTION[2]) / DEG;
     const matrix = globeMatrix(5.9, { lng: lng + 180, lat: -lat, bearing: 0, pitch: 0, roll: 0 });
@@ -114,5 +113,9 @@ describe("Sun visibility", () => {
     expect(shown.w).toBeGreaterThan(0);
     expect(Math.abs(shown.x)).toBeLessThan(1);
     expect(Math.abs(shown.y)).toBeLessThan(1);
+    // Not masked by the globe: the angle between the Sun and the globe centre, seen from the camera, exceeds the globe's angular radius.
+    const camera = cameraFromMatrix(off);
+    const toCentre = camera.map((c) => -c / length(camera)) as Vec3;
+    expect(Math.acos(dot(SUN_DIRECTION, toCentre))).toBeGreaterThan(Math.asin(1 / length(camera)));
   });
 });
