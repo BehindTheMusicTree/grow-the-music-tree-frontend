@@ -65,9 +65,7 @@ export default function RegionDetailPanel({
         {boundaryNote}
         {failed ? (
           <p role="alert" className="text-red-600">
-            {region.overviewItemId === null
-              ? `The music genre covering ${region.name} could not be loaded.`
-              : `The genre “Music of ${region.name}” could not be loaded.`}
+            {`The music genre covering ${region.name} could not be loaded.`}
           </p>
         ) : (
           <div className="h-24 animate-pulse rounded bg-gray-200" aria-busy />
