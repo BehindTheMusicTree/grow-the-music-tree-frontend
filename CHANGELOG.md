@@ -112,6 +112,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Fixed
+
+- The admin session is bound to the grow-api upstream it was issued for: after `GROW_API_ORIGIN` changes (or for a cookie with no recorded upstream) the session reports `UpstreamChanged`, the admin is asked to sign in again, and the proxy no longer forwards a Google ID token minted for another OAuth client (which grow-api rejected with 401, including on public reads). Covered by `isBoundToUpstream` tests.
+
 ### Added
 
 - The admin pipeline run panel lists every stage of the run (full 11, curation 8, sync 5) with `StepList` from `@behindthemusictree/ui` 0.23.0: passed stages are ticked, the current one is marked (with the upload `x/y` count) and a failed, cancelled or expired run shows the stage it stopped at. Covered by `stepsOf` and panel tests.
