@@ -100,6 +100,9 @@ vi.mock("maplibre-gl", () => {
   return { Map: FakeMap, setWorkerUrl: hoisted.setWorkerUrl, addProtocol: hoisted.addProtocol };
 });
 
+let nightModeMock = false;
+vi.mock("@contexts/NightModeProvider", () => ({ useNightMode: () => ({ nightMode: nightModeMock, toggleNightMode: vi.fn() }) }));
+
 import RegionMapCanvas from "./RegionMapCanvas";
 import { MOON_LAYER, NIGHT_LAYER, STARFIELD_LAYER, SUN_LAYER, supranationalZoneIds, zoneFilters } from "./regionMapLayers";
 
