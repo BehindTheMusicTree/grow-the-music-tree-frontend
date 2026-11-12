@@ -36,4 +36,8 @@ Cannot be statically generated - requires dynamic data and real-time updates.
 - The genre detail panel shows the genre's Wikimedia Commons image above its summary, with author and license credit; nothing is shown for genres without one (needs the grow API's genre `image` field)
 - Also the logo / home link
 
+## Outline view (deactivated)
+
+The outline view is kept for later but cannot be reached: the wheel/outline toggle (`ViewModeToggle`) was removed. `@behindthemusictree/app-kit-ui` still renders `viewMode="outline"`, and `GenreTreeViewModeProvider` / `GenreTreePage` still accept it. To bring it back, restore `src/components/features/genre-tree/ViewModeToggle.tsx` (and its test) from git history, from the commit before the one that removed it, and pass it as `floatingControlsLeading={canShowPopCore ? <ViewModeToggle /> : undefined}` in `GenreTreePage`.
+
 See [Genre selection](genre-selection.md) for the entity UUID URL contract shared with the map.

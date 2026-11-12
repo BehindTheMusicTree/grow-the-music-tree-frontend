@@ -83,9 +83,9 @@ See [docs/frontend-auth.md](docs/frontend-auth.md).
   (`PopupProvider`/`usePopup`), track-list sidebar visibility (`TrackListSidebarVisibilityProvider`)
   — all from `@behindthemusictree/app-kit`, composed in `providers.tsx`. This app supplies the
   `loadTrack` callback and the list/detail endpoints; app-kit owns the state shape.
-- **Local React context**: `GenreTreeViewModeProvider` (`src/contexts/`) shares the Stacked/Wheel
-  tree view-mode toggle between `AppHeader` and the tree page, since the toggle itself renders in
-  the header but the tree page needs to read it.
+- **Local React context**: `GenreTreeViewModeProvider` (`src/contexts/`) holds the tree view mode
+  (always the wheel, `pop-core`, while the outline view is deactivated) and `canShowPopCore`, which
+  the tree page pushes up once it has loaded the tree data.
 - No Redux/Zustand/Jotai — nothing beyond React Query + the above context providers.
 
 ## Build/deploy

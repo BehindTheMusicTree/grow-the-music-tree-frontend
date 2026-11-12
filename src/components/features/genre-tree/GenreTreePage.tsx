@@ -40,7 +40,6 @@ import { ABOUT_PARAM, ARTIST_PARAM, GENRE_PARAM, SONG_PARAM, useGenreTreeUrlStat
 import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
 import AboutContent from "@components/features/about/AboutContent";
 import GenreHistory from "@components/features/genre-tree/GenreHistory";
-import { ViewModeToggle } from "@components/features/genre-tree/ViewModeToggle";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 import { renderPlaceLink } from "@components/features/artist/renderPlaceLink";
 import { renderSongLink } from "@components/features/song/renderSongLink";
@@ -428,7 +427,6 @@ function GenreTreePageContent() {
       focus={viewMode === "pop-core" ? { focusGenreUuid, onFocusGenreChange: setFocus } : undefined}
       defaultViewport={defaultViewport}
       onViewportChange={onViewportChange}
-      floatingControlsLeading={canShowPopCore ? <ViewModeToggle /> : undefined}
       renderGenreDetailExtras={isAdmin ? (overview) => <GenreHistory genreUuid={overview.uuid} /> : undefined}
       renderArtistLink={renderArtistLink}
       renderSongLink={renderSongLink}
