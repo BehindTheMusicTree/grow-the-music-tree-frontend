@@ -112,6 +112,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Removed
+
+- The region detail panel on the map no longer shows the « Focus » button (the tree view keeps it). `RegionDetailPanel` stops passing `onZoomIn` to `GenreDetailPanel`.
+
 ### Fixed
 
 - The admin session is bound to the grow-api upstream it was issued for: after `GROW_API_ORIGIN` changes (or for a cookie with no recorded upstream) the session reports `UpstreamChanged`, the admin is asked to sign in again, and the proxy no longer forwards a Google ID token minted for another OAuth client (which grow-api rejected with 401, including on public reads). Covered by `isBoundToUpstream`, `jwt` callback and `getAdminIdToken` tests.
