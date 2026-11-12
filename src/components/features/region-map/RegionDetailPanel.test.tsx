@@ -23,10 +23,12 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
   GenreDetailPanel: ({
     genreUuid,
+    onZoomIn,
     collapsed,
     edgeTab,
   }: {
     genreUuid: string;
+    onZoomIn?: () => void;
     collapsed?: boolean;
     edgeTab?: { center?: { label: string; onClick: () => void } | null };
   }) => (
@@ -34,6 +36,11 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
       {edgeTab?.center && (
         <button type="button" onClick={edgeTab.center.onClick}>
           {edgeTab.center.label}
+        </button>
+      )}
+      {onZoomIn && (
+        <button type="button" onClick={onZoomIn}>
+          Zoom in
         </button>
       )}
     </section>
