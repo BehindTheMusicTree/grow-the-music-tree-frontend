@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import NavButtons from "./NavButtons";
+import { NightModeProvider } from "@contexts/NightModeProvider";
 
 let searchParams = new URLSearchParams();
 let pathname = "/";
@@ -14,7 +15,11 @@ vi.mock("next/navigation", () => ({
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api", getAudiometaUrl: () => "" }));
 
 function renderHeader() {
-  render(<NavButtons />);
+  render(
+    <NightModeProvider>
+      <NavButtons />
+    </NightModeProvider>,
+  );
 }
 
 describe("NavButtons", () => {
@@ -31,6 +36,19 @@ describe("NavButtons", () => {
     expect(names).toEqual(["GrowTheMusicTree home", "Region map", "About"]);
     screen.getAllByRole("link").forEach((link) => expect(link).toHaveTextContent(/^$/));
     expect(screen.getByRole("link", { name: "GrowTheMusicTree home" })).toHaveAttribute("href", "/");
+  });
+
+  it("shows the night mode button on the map only, off by default, and toggles it", () => {
+    renderHeader();
+    expect(screen.queryByRole("button", { name: "Night mode" })).not.toBeInTheDocument();
+    cleanup();
+
+    pathname = "/map";
+    renderHeader();
+    const button = screen.getByRole("button", { name: "Night mode" });
+    expect(button).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "true");
   });
 
   it("links the About button to /?about", () => {

@@ -49,7 +49,8 @@ import {
 } from "./regionMapLayers";
 import { containerFitPadding } from "./panelInset";
 import { createMoonLayer } from "./moonLayer";
-import { createNightLayer } from "./nightLayer";
+import { createNightLayer, type NightState } from "./nightLayer";
+import { useNightMode } from "@contexts/NightModeProvider";
 import { createStarfieldLayer } from "./starfieldLayer";
 import { createSunLayer } from "./sunLayer";
 import { sunDirectionAt, sunLightPosition, type Sky } from "./sun";
@@ -149,6 +150,12 @@ export default function RegionMapCanvas({
   const initialRef = useRef({ initialCamera, selectedId, zoneId, focus, homeCenter });
   const focusSeqRef = useRef(focus?.seq);
   const hoveredRef = useRef<Region | null>(null);
+  const { nightMode } = useNightMode();
+  const nightRef = useRef<NightState>({ enabled: nightMode });
+  useEffect(() => {
+    nightRef.current.enabled = nightMode;
+    mapRef.current?.triggerRepaint();
+  }, [nightMode]);
   const [ready, setReady] = useState(false);
   const [webglFailed, setWebglFailed] = useState(false);
   const [visibleIds, setVisibleIds] = useState<readonly string[]>([]);
@@ -267,7 +274,7 @@ export default function RegionMapCanvas({
       map.addLayer(createMoonLayer(sky), STARFIELD_LAYER);
       map.addLayer(createSunLayer(sky), STARFIELD_LAYER);
       // Over every map layer, under the Moon: darkens the side of the globe facing away from the Sun.
-      map.addLayer(createNightLayer(sky), MOON_LAYER);
+      map.addLayer(createNightLayer(sky, nightRef.current), MOON_LAYER);
       skyTimer = setInterval(() => {
         sky.sun = sunDirectionAt(new Date());
         map.setLight({ anchor: "map", position: sunLightPosition(sky.sun) });

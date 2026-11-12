@@ -75,7 +75,7 @@ const freshSky = (): Sky => ({ sun: sunDirectionAt(new Date("2024-11-03T12:00:00
 
 describe.each([
   ["sun", () => createSunLayer(freshSky())],
-  ["night", () => createNightLayer(freshSky())],
+  ["night", () => createNightLayer(freshSky(), { enabled: true })],
   ["moon", () => createMoonLayer(freshSky())],
 ])("%s layer", (_name, create) => {
   const asContext = (gl: ReturnType<typeof mockGl>) => gl as unknown as WebGL2RenderingContext;
@@ -125,7 +125,7 @@ describe.each([
 
 describe.each([
   ["sun", createSunLayer],
-  ["night", createNightLayer],
+  ["night", (sky: Sky) => createNightLayer(sky, { enabled: true })],
   ["moon", createMoonLayer],
 ])("%s layer sky", (_name, create) => {
   const asContext = (gl: ReturnType<typeof mockGl>) => gl as unknown as WebGL2RenderingContext;

@@ -5,9 +5,9 @@ import type { Sky } from "./sun";
 
 const LABEL = "Night";
 
-/** Alpha of black over the map on the lit side (-30 % brightness) and on the night side. */
-export const DAY_DIM = 0.3;
-export const NIGHT_DIM = 0.45;
+/** Alpha of black over the map on the lit side (no dimming) and on the night side. */
+export const DAY_DIM = 0;
+export const NIGHT_DIM = 0.5;
 
 const VERTEX_SHADER = `#version 300 es
 in vec2 a_ndc;
@@ -52,11 +52,14 @@ type Resources = {
   sun: WebGLUniformLocation;
 };
 
+/** Mutable state read at render time (like `Sky`), so toggling needs only a repaint. */
+export type NightState = { enabled: boolean };
+
 /**
- * Dims the globe: 30 % on the lit side, more on the night side (the half facing away from the Sun), with a soft terminator. A full-screen pass that
+ * Dims the globe when enabled: not at all on the lit side, slightly on the night side (the half facing away from the Sun), with a soft terminator. A full-screen pass that
  * ray-casts each pixel against the unit globe, drawn over the map layers but under the Moon, Sun and stars.
  */
-export function createNightLayer(sky: Sky): CustomLayerInterface {
+export function createNightLayer(sky: Sky, night: NightState): CustomLayerInterface {
   let resources: Resources | null = null;
 
   return {
@@ -85,7 +88,7 @@ export function createNightLayer(sky: Sky): CustomLayerInterface {
       resources = { program, vao, buffer, matrix: uniform("u_matrix"), sun: uniform("u_sun") };
     },
     render(context, { defaultProjectionData }: CustomRenderMethodInput) {
-      if (resources === null) return;
+      if (resources === null || !night.enabled) return;
       // Mid globe-to-mercator transition the matrix is no longer in globe coordinates.
       if (defaultProjectionData.projectionTransition < 1) return;
       const gl = context as WebGL2RenderingContext;
