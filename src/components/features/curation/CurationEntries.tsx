@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { z } from "zod";
-import { Button, Pagination } from "@behindthemusictree/ui";
+import { Button, Checkbox, Input, Pagination, Select } from "@behindthemusictree/ui";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import CurationEntryEditor from "@components/features/curation/CurationEntryEditor";
 import { isPendingCurationEntry } from "@components/features/curation/CurationStatus";
@@ -156,30 +156,27 @@ function Toolbar({
     <div className="flex flex-wrap items-end gap-3">
       <label className="flex flex-col flex-1 min-w-48 gap-1 text-body font-medium text-gray-700">
         Rechercher
-        <input
+        <Input
           type="search"
           value={text}
           onChange={(event) => setText(event.target.value)}
           placeholder="Genre, QID, raison…"
-          className="w-full px-3 py-2 font-normal border rounded-md"
         />
       </label>
       <label className="flex flex-col gap-1 text-body font-medium text-gray-700">
         Trier par
-        <select
+        <Select
           value={ordering}
           onChange={(event) =>
             updateQuery({ ordering: event.target.value === "key" ? null : event.target.value, page: null })
           }
-          className="px-3 py-2 font-normal border rounded-md"
         >
           <option value="key">Clé</option>
           <option value="-updated_on">Dernière modification</option>
-        </select>
+        </Select>
       </label>
       <label className="flex items-center gap-2 py-2 text-body">
-        <input
-          type="checkbox"
+        <Checkbox
           checked={showQid}
           onChange={(event) => updateQuery({ qid: event.target.checked ? "1" : null })}
         />

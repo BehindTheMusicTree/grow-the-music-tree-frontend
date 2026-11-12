@@ -4,7 +4,7 @@ import { useState } from "react";
 import { YOUTUBE_UNPLAYABLE_REASON_LABELS } from "@behindthemusictree/app-kit/genre-tree";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { usePlaybackQuery } from "@behindthemusictree/app-kit/transport";
-import { RingLoader } from "@behindthemusictree/ui";
+import { Input, RingLoader, Select } from "@behindthemusictree/ui";
 import { useUpdateSongVideo } from "@hooks/curation/useUpdateSongVideo";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -76,11 +76,10 @@ export function VideoForm({ current, isPending, onSave, onCancel }: VideoFormPro
     >
       <label className="flex flex-col gap-1 text-body font-medium">
         YouTube URL or ID
-        <input
+        <Input
           type="text"
           value={text}
           onChange={(event) => setText(event.target.value)}
-          className="w-full px-3 py-2 font-normal border rounded-md"
         />
       </label>
       {invalid && (
@@ -98,10 +97,9 @@ export function VideoForm({ current, isPending, onSave, onCancel }: VideoFormPro
       )}
       <label className="flex flex-col gap-1 text-body font-medium">
         Unplayable reason
-        <select
+        <Select
           value={reason}
           onChange={(event) => setReason(event.target.value)}
-          className="px-3 py-2 font-normal border rounded-md"
         >
           <option value="">None</option>
           {Object.entries(YOUTUBE_UNPLAYABLE_REASON_LABELS).map(([value, label]) => (
@@ -109,7 +107,7 @@ export function VideoForm({ current, isPending, onSave, onCancel }: VideoFormPro
               {label}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
       <div className="flex justify-end gap-3">
         {current.youtubeVideoId && (

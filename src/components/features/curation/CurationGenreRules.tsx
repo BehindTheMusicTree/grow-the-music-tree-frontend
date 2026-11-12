@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Button } from "@behindthemusictree/ui";
+import { Button, Select } from "@behindthemusictree/ui";
 import CurationEdgeEditor from "@components/features/curation/CurationEdgeEditor";
 import CurationEdgeRows from "@components/features/curation/CurationEdgeRows";
 import { CurationEntryRows } from "@components/features/curation/CurationEntries";
@@ -87,17 +87,16 @@ export default function CurationGenreRules({ itemId, lists, rules, appliedExport
       <div className="flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1 text-body font-medium text-gray-700">
           Ajouter une règle pour ce genre
-          <select
+          <Select
             value={addTo}
             onChange={(event) => setAddTo(event.target.value)}
-            className="px-3 py-2 font-normal border rounded-md"
           >
             {addable.map((list) => (
               <option key={list.name} value={list.name}>
                 {curationListTitle(list.name)}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <Button onClick={add}>Ajouter</Button>
       </div>

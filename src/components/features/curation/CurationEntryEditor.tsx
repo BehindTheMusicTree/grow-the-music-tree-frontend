@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@behindthemusictree/ui";
 import { useId, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
@@ -98,8 +99,7 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
           if (kind === "bool") {
             return (
               <label key={column} className="flex items-center gap-2 text-body font-medium text-gray-700">
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={row[column] === "true"}
                   onChange={(event) => set(column, event.target.checked ? "true" : "")}
                 />
@@ -119,7 +119,6 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
                 onChange={(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
                   set(column, event.target.value)
                 }
-                className="w-full px-3 py-2 border rounded-md"
               />
             </div>
           );

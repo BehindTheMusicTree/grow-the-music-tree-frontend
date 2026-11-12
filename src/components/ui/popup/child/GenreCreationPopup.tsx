@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@behindthemusictree/ui";
 import { useState } from "react";
 import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit-ui/popup";
 import { CriteriaMinimum, type GenreUuid, useCreateGenre } from "@behindthemusictree/app-kit/genre-tree";
@@ -58,22 +59,20 @@ export default function GenreCreationPopup({ onClose, onCreated, parent, ...rest
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-4">
               <label className="block text-body font-medium text-gray-700 mb-1">Parent</label>
-              <input
+              <Input
                 type="text"
                 name="parent"
                 value={parent?.name || "(root genre)"}
-                className="w-full px-3 py-2 border rounded-md"
                 disabled
               />
             </div>
             <div className="space-y-4">
               <label className="block text-body font-medium text-gray-700 mb-1">Name</label>
-              <input
+              <Input
                 type="text"
                 name="name"
                 value={name}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-md"
                 autoFocus
               />
             </div>

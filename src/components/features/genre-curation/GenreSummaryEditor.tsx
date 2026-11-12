@@ -1,5 +1,6 @@
 "use client";
 
+import { Textarea } from "@behindthemusictree/ui";
 import { useEffect, useRef, useState } from "react";
 import type { CriteriaOverview } from "@behindthemusictree/app-kit/genre-tree";
 import { useGenreCuration } from "@components/features/genre-curation/GenreCurationProvider";
@@ -17,7 +18,7 @@ export default function GenreSummaryEditor({ overview }: { overview: CriteriaOve
   }, [overview.summary]);
 
   return (
-    <textarea
+    <Textarea
       aria-label="Genre summary"
       value={text}
       rows={4}
@@ -29,7 +30,6 @@ export default function GenreSummaryEditor({ overview }: { overview: CriteriaOve
         focused.current = false;
         if (text !== (overview.summary ?? "")) mutate({ uuid: overview.uuid, summary: text, previous: overview.summary ?? "" });
       }}
-      className="w-full px-2 py-1 text-body border rounded-md"
     />
   );
 }

@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { useFetchWrapper } from "@behindthemusictree/app-kit/transport";
 import { useSongSearch } from "@behindthemusictree/app-kit/genre-tree";
-import { RingLoader } from "@behindthemusictree/ui";
+import { Checkbox, Input, RingLoader } from "@behindthemusictree/ui";
 import { useAssignSongGenre } from "@hooks/curation/useAssignSongGenre";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -27,8 +27,7 @@ function CandidateRow({
 }) {
   return (
     <li className="flex items-center gap-2 py-1">
-      <input
-        type="checkbox"
+      <Checkbox
         id={`link-${candidate.uuid}`}
         checked={checked}
         onChange={onToggle}
@@ -103,15 +102,14 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
         </div>
         {tab === "search" && (
           <div className="flex flex-col gap-2">
-            <input
+            <Input
               type="search"
               aria-label="Search songs"
               value={text}
               onChange={(event) => setText(event.target.value)}
-              className="w-full px-3 py-2 border rounded-md"
             />
             <label className="flex items-center gap-2 text-body">
-              <input type="checkbox" checked={genreless} onChange={(event) => setGenreless(event.target.checked)} />
+              <Checkbox checked={genreless} onChange={(event) => setGenreless(event.target.checked)} />
               Only genreless
             </label>
           </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox, Select, Textarea } from "@behindthemusictree/ui";
 import { useId, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
@@ -132,19 +133,18 @@ export default function CurationEdgeEditor({ edge, itemId, labels, onClose }: Pr
           <label htmlFor={`${id}-relation`} className="text-body font-medium text-gray-700">
             {FIELD_TITLES.relation}
           </label>
-          <select
+          <Select
             id={`${id}-relation`}
             value={input.relation}
             disabled={Boolean(edge)}
             onChange={(event) => setInput(reshape(input, event.target.value as EdgeRelation))}
-            className="w-full px-3 py-2 border rounded-md"
           >
             {Object.entries(EDGE_RELATIONS).map(([relation, title]) => (
               <option key={relation} value={relation}>
                 {title}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
         {edge ? (
           <p className="text-body">
@@ -162,8 +162,7 @@ export default function CurationEdgeEditor({ edge, itemId, labels, onClose }: Pr
         )}
         {input.relation === "canonical_parent" && (
           <label className="flex items-center gap-2 text-body font-medium text-gray-700">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={root}
               onChange={(event) =>
                 setInput((current) => ({
@@ -190,23 +189,21 @@ export default function CurationEdgeEditor({ edge, itemId, labels, onClose }: Pr
             <label htmlFor={`${id}-action`} className="text-body font-medium text-gray-700">
               {FIELD_TITLES.action}
             </label>
-            <select
+            <Select
               id={`${id}-action`}
               value={input.action ?? "add"}
               onChange={(event) => set("action", event.target.value as "add" | "remove")}
-              className="w-full px-3 py-2 border rounded-md"
             >
               {Object.entries(EDGE_ACTIONS).map(([action, title]) => (
                 <option key={action} value={action}>
                   {title}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         ) : (
           <label className="flex items-center gap-2 text-body font-medium text-gray-700">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={input.exclude_other_parents === true}
               onChange={(event) => set("exclude_other_parents", event.target.checked)}
             />
@@ -217,11 +214,10 @@ export default function CurationEdgeEditor({ edge, itemId, labels, onClose }: Pr
           <label htmlFor={`${id}-reason`} className="text-body font-medium text-gray-700">
             {FIELD_TITLES.reason}
           </label>
-          <textarea
+          <Textarea
             id={`${id}-reason`}
             value={input.reason}
             onChange={(event) => set("reason", event.target.value)}
-            className="w-full px-3 py-2 border rounded-md"
           />
         </div>
         {formErrors.length > 0 && (

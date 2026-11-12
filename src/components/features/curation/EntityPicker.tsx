@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@behindthemusictree/ui";
 import { useId } from "react";
 import { z } from "zod";
 import { useFetchWrapper, useQueryWithParse } from "@behindthemusictree/app-kit/transport";
@@ -35,12 +36,11 @@ export default function EntityPicker({ label, value, onChange }: Props) {
       <label htmlFor={id} className="text-body font-medium text-gray-700">
         {label}
       </label>
-      <input
+      <Input
         id={id}
         list={`${id}-targets`}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full px-3 py-2 border rounded-md"
       />
       <datalist id={`${id}-targets`}>
         {data?.map((target) => (
