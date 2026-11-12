@@ -99,7 +99,7 @@ describe("PipelineRunPanel", () => {
 
     expect(items.map((item) => item.textContent)).toEqual([
       "Import de l'arbreterminée",
-      "Envoi des morceaux (1/4)en cours",
+      "Envoi des morceaux(1/4)en cours",
       "Fusion des morceauxà venir",
       "Envoi des artistesà venir",
       "Fusion des artistesà venir",
