@@ -44,7 +44,7 @@ import { ViewModeToggle } from "@components/features/genre-tree/ViewModeToggle";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 import { renderPlaceLink } from "@components/features/artist/renderPlaceLink";
 import { renderSongLink } from "@components/features/song/renderSongLink";
-import Page from "@components/ui/Page";
+import { Page } from "@behindthemusictree/ui";
 import { useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 import { useIsAdmin } from "@hooks/useIsAdmin";
 import { regionMapLookup } from "@lib/region-map-index";
@@ -230,7 +230,7 @@ function ZoomableGenreTreeView({
 
 export default function GenreTreePage() {
   return (
-    <Page title="Genre Tree" visuallyHiddenTitle dataPage="genre-tree">
+    <Page title="Genre Tree" layout="canvas" visuallyHiddenTitle data-page="genre-tree">
       <GenreCurationProvider>
         {/* useSearchParams needs a Suspense boundary when the route is prerendered. */}
         <Suspense fallback={<GenreTreeViewLoadingFallback />}>

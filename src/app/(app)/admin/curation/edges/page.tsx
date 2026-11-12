@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import Page from "@components/ui/Page";
+import { Page } from "@behindthemusictree/ui";
 import CurationEdges from "@components/features/curation/CurationEdges";
 import CurationStatus from "@components/features/curation/CurationStatus";
 import { auth } from "@lib/auth";
@@ -33,7 +33,7 @@ export default async function CurationEdgesPage({ searchParams }: Props) {
   }
 
   return (
-    <Page title="Arêtes de genres" dataPage="admin-curation-edges">
+    <Page title="Arêtes de genres" data-page="admin-curation-edges">
       <div className="flex flex-col gap-4 p-4">
         <CurationStatus status={status} />
         <p>Parents canoniques et régionaux, racines acceptées, vues régionales et parents secondaires.</p>

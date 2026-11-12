@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@behindthemusictree/ui";
 import { useState } from "react";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { CriteriaMinimum, useUpdateGenre } from "@behindthemusictree/app-kit/genre-tree";
@@ -47,12 +48,11 @@ export default function GenreRenamePopup({ onClose, genre }: GenreRenamePopupPro
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <label className="block text-body font-medium text-gray-700 mb-1">Name</label>
-            <input
+            <Input
               type="text"
               name="name"
               value={name}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-md"
               autoFocus
             />
           </div>

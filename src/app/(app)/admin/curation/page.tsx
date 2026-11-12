@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import Page from "@components/ui/Page";
+import { Page } from "@behindthemusictree/ui";
 import CurationStatus from "@components/features/curation/CurationStatus";
 import CurationGenreSearch from "@components/features/curation/CurationGenreSearch";
 import PipelineRunPanel from "@components/features/pipeline-runs/PipelineRunPanel";
@@ -21,7 +21,7 @@ export default async function CurationPage() {
   const groups = groupCurationLists(lists);
 
   return (
-    <Page title="Curation" dataPage="admin-curation">
+    <Page title="Curation" data-page="admin-curation">
       <div className="flex flex-col gap-6 p-4">
         <CurationStatus status={status} />
         <PipelineRunPanel pendingCount={status.pendingCount} initialRequest={latestRun} />

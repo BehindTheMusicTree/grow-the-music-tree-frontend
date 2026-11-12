@@ -33,6 +33,11 @@ const config = [
           selector: "Literal[value=/gtv-info-panel/], TemplateElement[value.raw=/gtv-info-panel/]",
           message: "Build panel sections with PanelSection from @behindthemusictree/ui, not gtv-info-panel-* classes.",
         },
+        // Form controls come from @behindthemusictree/ui so borders, focus and surface colours stay in one place.
+        {
+          selector: "JSXOpeningElement[name.name=/^(input|select|textarea)$/]",
+          message: "Use Input, Select, Textarea or Checkbox from @behindthemusictree/ui instead of raw form elements.",
+        },
         // Type sizes come from the brand roles (text-title, text-heading, text-body, text-caption, text-input, text-search).
         // text-[length:...] stays available for commented exceptions such as zoom-bound SVG labels.
         {

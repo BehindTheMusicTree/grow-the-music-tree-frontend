@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
-import { Button } from "@behindthemusictree/ui";
+import { Button, Input } from "@behindthemusictree/ui";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import { curationGenreHref } from "@components/features/curation/GenreRef";
 import type { GenreNameConflictGroup } from "@schemas/api/genre-name-conflicts";
@@ -35,12 +35,12 @@ function GenreConflictGroupCard({ group }: { group: GenreNameConflictGroup }) {
       {group.genres.map((genre) => (
         <div key={genre.uuid} className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center gap-4">
-            <input
+            <Input
               type="text"
+              className="w-72"
               aria-label={`Name of ${genre.name}`}
               value={names[genre.uuid]}
               onChange={(e) => setNames((current) => ({ ...current, [genre.uuid]: e.target.value }))}
-              className="w-72 rounded-md border px-3 py-1"
             />
             <span>Parent: {genre.parent?.name ?? "—"}</span>
             {genre.wikidataId && (

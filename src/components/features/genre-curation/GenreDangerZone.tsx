@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useDeleteGenre, type GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
-import { ActionBand, ActionButton, PanelBleed } from "@behindthemusictree/ui";
+import { ActionBand, ActionButton, PanelBleed, Select } from "@behindthemusictree/ui";
 import { ArrowUpToLine, Ban, Merge, Trash2, type LucideIcon } from "lucide-react";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import GenrePicker from "@components/features/curation/GenrePicker";
@@ -138,17 +138,16 @@ function ExcludePopup({ genre, onClose, onRemoved }: PopupProps & Pick<DangerZon
     >
       <label className="flex flex-col gap-1 text-body font-medium">
         Category
-        <select
+        <Select
           value={category}
           onChange={(event) => setCategory(event.target.value as ExcludeCategory)}
-          className="px-3 py-2 font-normal border rounded-md"
         >
           {(Object.entries(EXCLUDE_CATEGORIES) as [ExcludeCategory, string][]).map(([value, label]) => (
             <option key={value} value={value}>
               {label}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
     </BasePopup>
   );

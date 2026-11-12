@@ -5,7 +5,7 @@ import AdminPage from "./page";
 vi.mock("@lib/auth", () => ({ auth: async () => null, signIn: vi.fn(), signOut: vi.fn() }));
 vi.mock("@lib/genre-name-conflicts", () => ({ fetchGenreNameConflictGroups: vi.fn() }));
 vi.mock("@lib/genre-unaccepted-roots", () => ({ fetchUnacceptedRoots: vi.fn() }));
-vi.mock("@components/ui/Page", () => ({ default: ({ children }: { children: React.ReactNode }) => <div>{children}</div> }));
+vi.mock("@behindthemusictree/ui", async (orig) => ({ ...(await orig<typeof import("@behindthemusictree/ui")>()), Page: ({ children }: { children: React.ReactNode }) => <div>{children}</div> }));
 
 describe("AdminPage signed out", () => {
   afterEach(cleanup);
