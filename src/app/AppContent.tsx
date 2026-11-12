@@ -44,8 +44,8 @@ export default function AppContent({ children }: { children: ReactNode }) {
   return (
     <PlayerPanelProvider>
     <GenreTreeViewModeProvider>
-      <div className="app col h-screen">
-        <div className="center fixed top-0 flex h-full w-full">
+      <div className="h-screen">
+        <div className="fixed top-0 flex h-full w-full">
           <div
             className={cn(
               "group relative flex min-h-0 w-full flex-grow",
@@ -57,9 +57,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
               <UserMenu />
             </div>
             <div className="flex min-h-0 w-full flex-grow">
-              <main className="flex min-h-0 w-full flex-grow flex-col">
-                <div className="flex min-h-0 flex-1 flex-col">{children}</div>
-              </main>
+              <div className="flex min-h-0 w-full flex-grow flex-col">{children}</div>
             </div>
             {activePopup && (
               <div className="absolute top-0 right-0 bottom-0 left-0 z-40 pointer-events-none bg-black/10" aria-hidden />

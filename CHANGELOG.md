@@ -114,6 +114,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
+- Pages use the shared `Page` from `@behindthemusictree/ui` 0.22.0 (map, genre tree and genealogy as `canvas`; admin as document pages) with the brand base styles (`@behindthemusictree/brand` 12.13.0); the local `Page` and the dead `app col center` classes are removed, and `AppContent` no longer wraps routes in its own `<main>`.
 - The "Modifications" (genre history) section of the genre side panel is only shown to admins, on the tree and on the region map.
 
 ### Added

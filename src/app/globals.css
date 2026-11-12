@@ -45,9 +45,6 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  color: #213547;
-  background-color: #ffffff;
-  box-sizing: border-box;
   overflow-x: hidden;
 }
 

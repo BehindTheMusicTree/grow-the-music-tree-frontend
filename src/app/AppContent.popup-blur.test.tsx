@@ -38,7 +38,7 @@ function renderAppContent(withPopup: boolean) {
         <ConnectivityErrorProvider>
           <RaiseNetworkError enabled={withPopup} />
           <AppContent>
-            <div>main</div>
+            <main>main</main>
           </AppContent>
         </ConnectivityErrorProvider>
       </PopupProvider>,

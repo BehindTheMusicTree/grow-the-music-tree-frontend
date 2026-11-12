@@ -1,5 +1,4 @@
-import { Button } from "@behindthemusictree/ui";
-import Page from "@components/ui/Page";
+import { Button, Page } from "@behindthemusictree/ui";
 import Link from "next/link";
 import { auth, signIn, signOut } from "@lib/auth";
 import { fetchGenreNameConflictGroups } from "@lib/genre-name-conflicts";
@@ -28,7 +27,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     : null;
 
   return (
-    <Page title="Admin" dataPage="admin">
+    <Page title="Admin" data-page="admin">
       <div className="flex flex-col items-start gap-4 p-4">
         {isSignedIn ? (
           <>

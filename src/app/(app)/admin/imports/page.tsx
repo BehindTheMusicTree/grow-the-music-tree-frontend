@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import Page from "@components/ui/Page";
+import { Page } from "@behindthemusictree/ui";
 import ImportRunHistory from "@components/features/import-runs/ImportRunHistory";
 import LatestImportRuns from "@components/features/import-runs/LatestImportRuns";
 import PipelineRunHistory from "@components/features/pipeline-runs/PipelineRunHistory";
@@ -40,7 +40,7 @@ export default async function ImportsPage({ searchParams }: Props) {
   }
 
   return (
-    <Page title="Imports" dataPage="admin-imports">
+    <Page title="Imports" data-page="admin-imports">
       <div className="flex flex-col gap-6 p-4">
         <PipelineRunPanel pendingCount={curationStatus.pendingCount} initialRequest={latestRun} />
         <section aria-labelledby="pipeline-run-history" className="flex flex-col gap-2">
