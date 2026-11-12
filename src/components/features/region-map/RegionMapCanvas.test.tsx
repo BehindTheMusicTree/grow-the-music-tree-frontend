@@ -82,6 +82,18 @@ vi.mock("maplibre-gl", () => {
     getZoom() {
       return this.zoom;
     }
+    getMaxZoom() {
+      return 10;
+    }
+    getMinZoom() {
+      return 0;
+    }
+    zoomIn() {
+      this.record("zoomIn", []);
+    }
+    zoomOut() {
+      this.record("zoomOut", []);
+    }
     // Screen point <-> "lngLat" round trip on a disk of `surfaceRadius` around the origin: a point
     // outside snaps to the disk's edge, like MapLibre snapping a point in space onto the globe.
     unproject([x, y]: [number, number]) {
@@ -189,6 +201,43 @@ describe("RegionMapCanvas", () => {
     const [night, nightBefore] = map.calls.addLayer[3] as [{ id: string; type: string }, unknown];
     expect(night).toMatchObject({ id: NIGHT_LAYER, type: "custom" });
     expect(nightBefore).toBe(MOON_LAYER);
+  });
+
+  it("shows no map controls before the style has loaded", () => {
+    mount();
+    expect(screen.queryByRole("button", { name: "Zoom in" })).not.toBeInTheDocument();
+  });
+
+  it("zooms and fits the world from the controls, keeping the selection", async () => {
+    mount({ selectedId: index.worldChildIds[0] });
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+    expect(map.calls.zoomIn).toHaveLength(1);
+    expect(map.calls.zoomOut).toHaveLength(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "Fit to frame" }));
+    expect(map.calls.fitBounds).toHaveLength(1);
+    expect(map.calls.fitBounds[0][0]).toEqual([
+      [-180, -58],
+      [180, 84],
+    ]);
+  });
+
+  it("disables zoom out at the minimum zoom and zoom in at the maximum", async () => {
+    mount();
+    const map = fakeMap();
+    map.zoom = 0;
+    await act(() => map.emit("load"));
+    expect(screen.getByRole("button", { name: "Zoom out" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Zoom in" })).toBeEnabled();
+
+    map.zoom = 10;
+    await act(() => map.emit("zoom"));
+    expect(screen.getByRole("button", { name: "Zoom in" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Zoom out" })).toBeEnabled();
   });
 
   it("opens on the given camera", () => {
