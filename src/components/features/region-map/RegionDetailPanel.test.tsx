@@ -23,12 +23,10 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
 vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
   GenreDetailPanel: ({
     genreUuid,
-    onZoomIn,
     collapsed,
     edgeTab,
   }: {
     genreUuid: string;
-    onZoomIn?: () => void;
     collapsed?: boolean;
     edgeTab?: { center?: { label: string; onClick: () => void } | null };
   }) => (
@@ -36,11 +34,6 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
       {edgeTab?.center && (
         <button type="button" onClick={edgeTab.center.onClick}>
           {edgeTab.center.label}
-        </button>
-      )}
-      {onZoomIn && (
-        <button type="button" onClick={onZoomIn}>
-          Zoom in
         </button>
       )}
     </section>
@@ -69,15 +62,13 @@ afterEach(() => {
 });
 
 describe("RegionDetailPanel", () => {
-  it("shows the overview genre of the region and focuses on request", () => {
+  it("shows the overview genre of the region without a focus button", () => {
     lookup = { data: { uuid: "11111111-1111-4111-8111-111111111111" }, isError: false };
     const region = withOverview("Q672134");
     render(<RegionDetailPanel {...props} region={region} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
-
     expect(screen.getByRole("region", { name: /Genre 11111111/ })).toBeTruthy();
-    expect(props.onZoomTo).toHaveBeenCalledWith(region);
+    expect(screen.queryByRole("button", { name: /Zoom|Focus/ })).toBeNull();
   });
 
   it("reports an overview genre the API does not know", () => {
@@ -93,16 +84,14 @@ describe("RegionDetailPanel", () => {
     expect(lookedUp).toHaveBeenLastCalledWith("Q672134");
   });
 
-  it("shows the inherited overview genre when the region has none of its own, and focuses on request", () => {
+  it("shows the inherited overview genre when the region has none of its own", () => {
     lookup = { data: { uuid: "22222222-2222-4222-8222-222222222222" }, isError: false };
     const region = withOverview(null, "Q672134");
     render(<RegionDetailPanel {...props} region={region} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
-
     expect(lookedUp).toHaveBeenLastCalledWith("Q672134");
     expect(screen.getByRole("region", { name: /Genre 22222222/ })).toBeTruthy();
-    expect(props.onZoomTo).toHaveBeenCalledWith(region);
+    expect(screen.queryByRole("button", { name: /Zoom|Focus/ })).toBeNull();
   });
 
   it("does not name an inherited overview after the region when it fails to load", () => {

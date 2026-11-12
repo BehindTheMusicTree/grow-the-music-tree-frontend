@@ -84,7 +84,6 @@ export default function RegionDetailPanel({
       getBackendBaseUrl={getGrowBackendBaseUrl}
       onClose={onClose}
       onSelectGenre={onSelectGenre}
-      onZoomIn={onZoomIn}
       collapsed={collapsed}
       edgeTab={edgeTab}
       extras={boundaryNote ? { renderGenreDetailExtras: () => boundaryNote } : undefined}
