@@ -119,7 +119,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Changed
 
 - `@behindthemusictree/ui` 0.22.0 → 0.23.0.
-
 - **Region map**: the globe is no longer dimmed on the lit side; the night side (half facing away from the Sun) is dimmed only when night mode is on, and darker than before (50 %). Replaces the permanent dimming of the Sun entry below.
 - Pages use the shared `Page` from `@behindthemusictree/ui` 0.22.0 (map, genre tree and genealogy as `canvas`; admin as document pages) with the brand base styles (`@behindthemusictree/brand` 12.13.0); the local `Page` and the dead `app col center` classes are removed, and `AppContent` no longer wraps routes in its own `<main>`.
 - Curation, genre-curation, import-run, review and genre popup forms use `Input`, `Select`, `Textarea` and `Checkbox` from `@behindthemusictree/ui` instead of raw form elements with local border and padding classes; the global `input` background rule is removed and ESLint rejects raw `input`, `select` and `textarea` in JSX.
