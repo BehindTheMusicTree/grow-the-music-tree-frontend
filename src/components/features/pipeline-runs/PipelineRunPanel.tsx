@@ -4,37 +4,20 @@ import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
-import { Button } from "@behindthemusictree/ui";
+import { Button, StepList } from "@behindthemusictree/ui";
 import { useFetchWrapper, useQueryWithParse, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import { formatDuration } from "@components/features/import-runs/importedOn";
-import { KIND_LABELS, originOf } from "@components/features/pipeline-runs/labels";
+import { KIND_LABELS, STAGE_LABELS, UPLOAD_STAGES, originOf, stepsOf } from "@components/features/pipeline-runs/labels";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import {
   PIPELINE_RUN_KINDS,
   PIPELINE_RUN_STAGES,
   PipelineRunRequestSchema,
   type PipelineRunRequest,
-  type PipelineRunStage,
 } from "@schemas/api/pipeline-runs";
 
 const POLL_INTERVAL_MS = 5000;
 const LATEST_QUERY_KEY = ["pipelineRuns", "latest"];
-
-const STAGE_LABELS: Record<PipelineRunStage, string> = {
-  fetching_rules: "Récupération des règles",
-  ingesting_musicbrainz: "Ingestion MusicBrainz",
-  ingesting_wikidata: "Ingestion Wikidata",
-  building_songs: "Construction des morceaux",
-  building_genres: "Construction des genres",
-  matching_songs: "Rattachement des morceaux",
-  importing_tree: "Import de l'arbre",
-  uploading_songs: "Envoi des morceaux",
-  merging_songs: "Fusion des morceaux",
-  uploading_artists: "Envoi des artistes",
-  merging_artists: "Fusion des artistes",
-};
-
-const UPLOAD_STAGES: readonly PipelineRunStage[] = ["uploading_songs", "uploading_artists"];
 
 const isActive = (request: PipelineRunRequest | null | undefined) =>
   request?.status === "queued" || request?.status === "running";
@@ -150,6 +133,7 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
   const progress = request && progressOf(request);
   const now = useNow(request?.status === "running");
   const duration = request && durationOf(request, now);
+  const steps = request && stepsOf(request);
 
   return (
     <section className="flex flex-col gap-2" aria-label="Runs du pipeline">
@@ -181,6 +165,13 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
         <div className="flex flex-col gap-1">
           {progress !== null && (
             <progress value={progress} max={1} aria-label="Progression du run" className="w-full" />
+          )}
+          {steps && (
+            <StepList
+              aria-label="Étapes du run"
+              statusLabels={{ done: "terminée", current: "en cours", pending: "à venir", failed: "interrompue" }}
+              steps={steps}
+            />
           )}
           <p aria-live="polite" className={request.status === "failed" ? "text-red-600" : "text-gray-700"}>
             {KIND_LABELS[request.kind]} : {labelOf(request)}

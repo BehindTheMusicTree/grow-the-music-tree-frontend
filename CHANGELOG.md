@@ -112,7 +112,13 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ## [Unreleased]
 
+### Added
+
+- The admin pipeline run panel lists every stage of the run (full 11, curation 8, sync 5) with `StepList` from `@behindthemusictree/ui` 0.23.0: passed stages are ticked, the current one is marked (with the upload `x/y` count) and a failed, cancelled or expired run shows the stage it stopped at. Covered by `stepsOf` and panel tests.
+
 ### Changed
+
+- `@behindthemusictree/ui` 0.22.0 → 0.23.0.
 
 - Pages use the shared `Page` from `@behindthemusictree/ui` 0.22.0 (map, genre tree and genealogy as `canvas`; admin as document pages) with the brand base styles (`@behindthemusictree/brand` 12.13.0); the local `Page` and the dead `app col center` classes are removed, and `AppContent` no longer wraps routes in its own `<main>`.
 - Curation, genre-curation, import-run, review and genre popup forms use `Input`, `Select`, `Textarea` and `Checkbox` from `@behindthemusictree/ui` instead of raw form elements with local border and padding classes; the global `input` background rule is removed and ESLint rejects raw `input`, `select` and `textarea` in JSX.
