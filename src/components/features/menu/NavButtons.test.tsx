@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import { render, screen, cleanup } from "@testing-library/react";
 import NavButtons from "./NavButtons";
 import { NightModeProvider } from "@contexts/NightModeProvider";
 
@@ -38,17 +38,11 @@ describe("NavButtons", () => {
     expect(screen.getByRole("link", { name: "GrowTheMusicTree home" })).toHaveAttribute("href", "/");
   });
 
-  it("shows the night mode button on the map only, off by default, and toggles it", () => {
-    renderHeader();
-    expect(screen.queryByRole("button", { name: "Night mode" })).not.toBeInTheDocument();
-    cleanup();
-
+  it("leaves night mode to the map's own controls", () => {
     pathname = "/map";
     renderHeader();
-    const button = screen.getByRole("button", { name: "Night mode" });
-    expect(button).toHaveAttribute("aria-pressed", "false");
-    fireEvent.click(button);
-    expect(button).toHaveAttribute("aria-pressed", "true");
+
+    expect(screen.queryByRole("button", { name: "Night mode" })).not.toBeInTheDocument();
   });
 
   it("links the About button to /?about", () => {

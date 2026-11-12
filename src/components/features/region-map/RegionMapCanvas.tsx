@@ -1,7 +1,7 @@
 "use client";
 
 import "maplibre-gl/dist/maplibre-gl.css";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   addProtocol,
   Map as MapLibreMap,
@@ -48,6 +48,7 @@ import {
   supranationalZoneIds,
 } from "./regionMapLayers";
 import { containerFitPadding } from "./panelInset";
+import { RegionMapControls } from "./RegionMapControls";
 import { createMoonLayer } from "./moonLayer";
 import { createNightLayer, type NightState } from "./nightLayer";
 import { useNightMode } from "@contexts/NightModeProvider";
@@ -158,6 +159,7 @@ export default function RegionMapCanvas({
   }, [nightMode]);
   const [ready, setReady] = useState(false);
   const [webglFailed, setWebglFailed] = useState(false);
+  const [zoomLimits, setZoomLimits] = useState({ canZoomIn: true, canZoomOut: true });
   const [visibleIds, setVisibleIds] = useState<readonly string[]>([]);
   const { text: tooltipText, ref: tooltipRef, show: showTooltip, hide: hideTooltip } = useHoverTooltip();
 
@@ -267,6 +269,7 @@ export default function RegionMapCanvas({
     map.on("load", () => {
       // Ready first: a failing decorative layer must not leave the region styling and selection disabled.
       setReady(true);
+      syncZoomLimits();
       // Topmost: drawn last of the layers, before MapLibre's atmosphere glow.
       map.addLayer(createStarfieldLayer());
       // Just before the stars: all draw "under" the frame, so the Moon and the Sun must go first to hide the stars
@@ -281,6 +284,14 @@ export default function RegionMapCanvas({
         map.triggerRepaint();
       }, SKY_TICK_MS);
     });
+    const syncZoomLimits = () => {
+      const zoom = map.getZoom();
+      const next = { canZoomIn: zoom < map.getMaxZoom(), canZoomOut: zoom > map.getMinZoom() };
+      setZoomLimits((current) =>
+        current.canZoomIn === next.canZoomIn && current.canZoomOut === next.canZoomOut ? current : next,
+      );
+    };
+    map.on("zoom", syncZoomLimits);
     map.on("idle", listVisible);
     map.on("moveend", () => {
       const { lng, lat } = map.getCenter();
@@ -342,16 +353,22 @@ export default function RegionMapCanvas({
     map.setPaintProperty(CITY_LAYER, "circle-radius", cityRadius(selectedId));
   }, [ready, selectedId]);
 
+  const frameRegion = useCallback((region: Region | undefined) => {
+    const map = mapRef.current;
+    if (!map) return;
+    const container = containerRef.current;
+    const padding = container ? containerFitPadding(FIT_PADDING, container) : FIT_PADDING;
+    map.fitBounds(regionBounds(region, regionsRef.current), { padding, maxZoom: MAX_ZOOM });
+  }, []);
+
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map || focus === null || focus.seq === focusSeqRef.current) return;
     focusSeqRef.current = focus.seq;
     const region = focus.id === null ? undefined : regionsRef.current.get(focus.id);
     if (region?.boundaryStatus === "missing") return;
-    const container = containerRef.current;
-    const padding = container ? containerFitPadding(FIT_PADDING, container) : FIT_PADDING;
-    map.fitBounds(regionBounds(region, regionsRef.current), { padding, maxZoom: MAX_ZOOM });
-  }, [ready, focus]);
+    frameRegion(region);
+  }, [ready, focus, frameRegion]);
 
   const listed = useMemo(() => visibleIds.flatMap((id) => regions.get(id) ?? []).sort(byName), [visibleIds, regions]);
 
@@ -410,6 +427,15 @@ export default function RegionMapCanvas({
             <li key={region.id}>{regionButton(region, true)}</li>
           ))}
         </ul>
+      )}
+      {ready && !webglFailed && (
+        <RegionMapControls
+          canZoomIn={zoomLimits.canZoomIn}
+          canZoomOut={zoomLimits.canZoomOut}
+          onZoomIn={() => mapRef.current?.zoomIn()}
+          onZoomOut={() => mapRef.current?.zoomOut()}
+          onFit={() => frameRegion(undefined)}
+        />
       )}
       {tooltipText !== null && (
         <div

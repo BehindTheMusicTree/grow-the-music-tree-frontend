@@ -122,7 +122,8 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Changed
 
-- `@behindthemusictree/ui` 0.22.0 → 0.23.0.
+- `@behindthemusictree/ui` 0.22.0 → 0.24.0.
+- **Region map**: the night mode toggle moves from the navigation into the map's floating controls at the bottom right, next to the new zoom buttons, in the same style as the genre tree's controls (`FloatingToggle` from `@behindthemusictree/ui` 0.24.0).
 - **Region map**: the globe is no longer dimmed on the lit side; the night side (half facing away from the Sun) is dimmed only when night mode is on, and darker than before (50 %). Replaces the permanent dimming of the Sun entry below.
 - Pages use the shared `Page` from `@behindthemusictree/ui` 0.22.0 (map, genre tree and genealogy as `canvas`; admin as document pages) with the brand base styles (`@behindthemusictree/brand` 12.13.0); the local `Page` and the dead `app col center` classes are removed, and `AppContent` no longer wraps routes in its own `<main>`.
 - Curation, genre-curation, import-run, review and genre popup forms use `Input`, `Select`, `Textarea` and `Checkbox` from `@behindthemusictree/ui` instead of raw form elements with local border and padding classes; the global `input` background rule is removed and ESLint rejects raw `input`, `select` and `textarea` in JSX.
@@ -130,6 +131,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 ### Added
 
+- **Region map**: zoom in, zoom out and fit-to-world buttons at the bottom right, like the genre tree's (hidden on touch screens, where pinch replaces them); zoom in and out are disabled at the zoom limits, and fit keeps the selected region. Covered by `RegionMapControls` and canvas tests.
 - **Region map**: a moon button at the bottom right toggles night mode (dims the globe's hidden side); off by default and not persisted, shown only on `/map`, with tests for the provider, the button and the layer.
 - **Region map**: without a URL camera or a target region, the globe opens at the same world zoom but turned to the visitor's country (from the playback context, which waits for it before opening; a failed or unknown country keeps the current world view). The country is found through an optional `isoCode` on the index's country regions, which the schema now accepts; until the pipelines publish it the map opens as before. Requires this release deployed before the pipelines publish an index with `isoCode`.
 - **Region map**: a Sun shines 130° from the Moon as seen from Earth (the side its gibbous phase implies): a bright disc with a soft halo, as large as the Moon, fixed in the sky like the stars and hidden by the globe (one more MapLibre custom WebGL layer, no repaint when idle). One `SUN_DIRECTION` drives the disc, the Moon's shading and the style `light`, so the atmosphere glows on the Sun's side (`atmosphere-blend` lowered to 0.25), and the globe is dimmed (lit side −30 %, night side darker, with a soft terminator; one full-screen ray-cast pass).

@@ -4,14 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Info, Moon } from "lucide-react";
+import { Info } from "lucide-react";
 import { RegionGlobeIcon } from "./RegionGlobeIcon";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
 import { ABOUT_HREF, REGION_MAP_HREF } from "@lib/constants/routes";
 import { viewSwitchHref } from "@lib/searchHrefs";
 import { cn } from "@lib/utils";
-import { useNightMode } from "@contexts/NightModeProvider";
 import { iconPillClassName } from "./iconPillClassName";
 
 function AboutButton() {
@@ -34,22 +33,6 @@ function AboutButton() {
     >
       <Info className="h-5 w-5" aria-hidden />
     </Link>
-  );
-}
-
-function NightModeButton() {
-  const { nightMode, toggleNightMode } = useNightMode();
-
-  return (
-    <button
-      type="button"
-      onClick={toggleNightMode}
-      className={cn(iconPillClassName, "h-[calc(var(--layout-header-h)/2)] w-[calc(var(--layout-header-h)/2)]")}
-      aria-label="Night mode"
-      aria-pressed={nightMode}
-    >
-      <Moon className="h-5 w-5" aria-hidden />
-    </button>
   );
 }
 
@@ -88,7 +71,6 @@ export default function NavButtons() {
   const isRegionMap = pathname === REGION_MAP_HREF;
 
   return (
-    <>
     <nav
       aria-label="Main navigation"
       className={cn(
@@ -110,19 +92,5 @@ export default function NavButtons() {
         <AboutButton />
       </Suspense>
     </nav>
-    {isRegionMap && (
-      <div
-        className={cn(
-          "absolute bottom-1 right-1 z-50 transition-[right] duration-200 motion-reduce:transition-none",
-          // Mirrors the nav: clears an open right detail panel.
-          "group-has-[[data-detail-panel][data-side=right]:not([data-collapsed=true])]:md:right-[calc(var(--layout-detail-panel-w)+0.25rem)]",
-          "group-has-[[data-detail-panel][data-side=right][data-sheet=true]:not([data-collapsed=true])]:max-md:bottom-[calc(var(--layout-sheet-peek)+0.25rem)]",
-          "group-has-[[data-detail-panel][data-sheet=true]_[aria-label='Resize_panel'][aria-expanded=true]]:max-md:hidden",
-        )}
-      >
-        <NightModeButton />
-      </div>
-    )}
-    </>
   );
 }
