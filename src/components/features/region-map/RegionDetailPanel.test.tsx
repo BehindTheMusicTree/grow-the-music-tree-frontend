@@ -82,7 +82,7 @@ describe("RegionDetailPanel", () => {
     lookup = { data: null, isError: false };
     render(<RegionDetailPanel {...props} region={withOverview("Q672134")} />);
 
-    expect(screen.getByRole("alert").textContent).toContain("could not be loaded");
+    expect(screen.getByRole("alert").textContent).toBe(`The music genre covering ${france.name} could not be loaded.`);
   });
 
   it("prefers the region's own overview over an inherited one", () => {
