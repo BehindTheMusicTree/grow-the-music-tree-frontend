@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, act } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, act, within } from "@testing-library/react";
 import type { PipelineRunRequest } from "@schemas/api/pipeline-runs";
 import PipelineRunPanel from "./PipelineRunPanel";
 
@@ -89,6 +89,34 @@ describe("PipelineRunPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
 
     expect(mutateMock).toHaveBeenCalledWith(latest.uuid);
+  });
+
+  it("lists every stage of the run with its state", () => {
+    latest = request({ kind: "sync", stage: "uploading_songs", stageCurrent: 1, stageTotal: 4 });
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    const items = within(screen.getByRole("list", { name: "Étapes du run" })).getAllByRole("listitem");
+
+    expect(items.map((item) => item.textContent)).toEqual([
+      "Import de l'arbreterminée",
+      "Envoi des morceaux(1/4)en cours",
+      "Fusion des morceauxà venir",
+      "Envoi des artistesà venir",
+      "Fusion des artistesà venir",
+    ]);
+    expect(items[1]).toHaveAttribute("aria-current", "step");
+  });
+
+  it("marks the stage a failed run stopped at and hides the list once superseded", () => {
+    latest = request({ status: "failed", stage: "building_genres", error: "boom" });
+    const { rerender } = render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.getByText("interrompue").parentElement).toHaveTextContent("Construction des genres");
+
+    latest = request({ status: "superseded" });
+    rerender(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.queryByRole("list", { name: "Étapes du run" })).not.toBeInTheDocument();
   });
 
   it("shows a requested cancellation and the merge note", () => {
