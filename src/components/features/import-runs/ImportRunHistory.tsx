@@ -25,6 +25,7 @@ export default function ImportRunHistory({ runs, kind }: { runs: ImportRunsPage;
       <label className="flex items-center gap-2 text-body">
         Kind
         <Select
+          className="w-auto"
           value={kind ?? ""}
           onChange={(event) => navigate(ImportKindSchema.optional().parse(event.target.value || undefined), 1)}
         >

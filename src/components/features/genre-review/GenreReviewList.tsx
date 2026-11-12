@@ -37,6 +37,7 @@ function GenreConflictGroupCard({ group }: { group: GenreNameConflictGroup }) {
           <div className="flex flex-wrap items-center gap-4">
             <Input
               type="text"
+              className="w-72"
               aria-label={`Name of ${genre.name}`}
               value={names[genre.uuid]}
               onChange={(e) => setNames((current) => ({ ...current, [genre.uuid]: e.target.value }))}
