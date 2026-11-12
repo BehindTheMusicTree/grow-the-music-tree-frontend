@@ -16,6 +16,7 @@ import NetworkErrorPopup from "@components/ui/popup/child/NetworkErrorPopup";
 
 import { PlayerPanelProvider } from "@contexts/PlayerPanelProvider";
 import { GenreTreeViewModeProvider } from "@contexts/GenreTreeViewModeProvider";
+import { NightModeProvider } from "@contexts/NightModeProvider";
 
 export default function AppContent({ children }: { children: ReactNode }) {
   const { playerTrackObject } = usePlayer();
@@ -44,6 +45,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
   return (
     <PlayerPanelProvider>
     <GenreTreeViewModeProvider>
+    <NightModeProvider>
       <div className="h-screen">
         <div className="fixed top-0 flex h-full w-full">
           <div
@@ -68,6 +70,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
         <Player className={activePopup ? "blur-sm pointer-events-none" : undefined} />
         {activePopup}
       </div>
+    </NightModeProvider>
     </GenreTreeViewModeProvider>
     </PlayerPanelProvider>
   );
