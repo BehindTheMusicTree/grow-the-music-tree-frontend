@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import NavButtons from "./NavButtons";
 import { NightModeProvider } from "@contexts/NightModeProvider";
 
@@ -38,11 +38,30 @@ describe("NavButtons", () => {
     expect(screen.getByRole("link", { name: "GrowTheMusicTree home" })).toHaveAttribute("href", "/");
   });
 
-  it("leaves night mode to the map's own controls", () => {
+  it("toggles night mode from the current map button without navigating", () => {
     pathname = "/map";
+    searchParams = new URLSearchParams("genre=abc&region=Q1");
     renderHeader();
 
-    expect(screen.queryByRole("button", { name: "Night mode" })).not.toBeInTheDocument();
+    const button = screen.getByRole("button", { name: "Region map" });
+    expect(button).toHaveAttribute("aria-current", "page");
+    expect(button).toHaveAttribute("aria-pressed", "false");
+    expect(screen.queryByRole("link", { name: "Region map" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("region-globe-night-shade")).not.toBeInTheDocument();
+    fireEvent.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("region-globe-night-shade")).toBeInTheDocument();
+    expect(searchParams.toString()).toBe("genre=abc&region=Q1");
+    fireEvent.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "false");
+    expect(screen.queryByTestId("region-globe-night-shade")).not.toBeInTheDocument();
+  });
+
+  it("offers navigation to the map rather than a night toggle from the tree", () => {
+    renderHeader();
+    expect(screen.getByRole("link", { name: "Region map" })).toHaveAttribute("href", "/map");
+    expect(screen.queryByRole("button", { name: "Region map" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("region-globe-night-shade")).not.toBeInTheDocument();
   });
 
   it("links the About button to /?about", () => {

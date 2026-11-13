@@ -1,8 +1,6 @@
 "use client";
 
-import { Moon } from "lucide-react";
-import { FloatingToggle, ZoomControls } from "@behindthemusictree/ui";
-import { useNightMode } from "@contexts/NightModeProvider";
+import { ZoomControls } from "@behindthemusictree/ui";
 import { cn } from "@lib/utils";
 
 type Props = {
@@ -13,17 +11,6 @@ type Props = {
   onFit: () => void;
 };
 
-function NightModeToggle() {
-  const { nightMode, toggleNightMode } = useNightMode();
-
-  return (
-    <FloatingToggle pressed={nightMode} onPressedChange={toggleNightMode} aria-label="Night mode">
-      <Moon aria-hidden="true" className="h-[1.125rem] w-[1.125rem]" />
-    </FloatingToggle>
-  );
-}
-
-/** Bottom-right cluster over the map, laid out like the genre tree's: night toggle, then zoom in / out / fit. */
 export function RegionMapControls({ canZoomIn, canZoomOut, onZoomIn, onZoomOut, onFit }: Props) {
   return (
     <div
@@ -36,7 +23,6 @@ export function RegionMapControls({ canZoomIn, canZoomOut, onZoomIn, onZoomOut, 
         "group-has-[[data-detail-panel][data-sheet=true]_[aria-label='Resize_panel'][aria-expanded=true]]:max-md:hidden",
       )}
     >
-      <NightModeToggle />
       <ZoomControls
         className="[@media(pointer:coarse)]:hidden"
         canZoomIn={canZoomIn}
