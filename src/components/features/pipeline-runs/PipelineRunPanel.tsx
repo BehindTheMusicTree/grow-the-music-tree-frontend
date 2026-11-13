@@ -12,6 +12,7 @@ import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import {
   PIPELINE_RUN_KINDS,
   PIPELINE_RUN_STAGES,
+  stageIndexOf,
   PipelineRunRequestSchema,
   type PipelineRunRequest,
 } from "@schemas/api/pipeline-runs";
@@ -28,7 +29,7 @@ function progressOf({ kind, status, stage, stageCurrent, stageTotal }: PipelineR
   if (status === "queued") return 0;
   if (status !== "running") return null;
   const stages = PIPELINE_RUN_STAGES[kind];
-  const index = stage ? stages.indexOf(stage) : 0;
+  const index = stage ? Math.max(stageIndexOf(kind, stage), 0) : 0;
   const sub = stage && UPLOAD_STAGES.includes(stage) && stageCurrent !== null && stageTotal ? stageCurrent / stageTotal : 0;
   return (index + sub) / stages.length;
 }
@@ -180,7 +181,7 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
             {originOf(request)}
             {duration && ` · ${duration}`}
           </p>
-          {request.status === "running" && (request.stage === "merging_songs" || request.stage === "merging_artists") && (
+          {request.status === "running" && (request.stage === "merging_songs" || request.stage === "merging_artists" || request.stage === "merging_region_map") && (
             <p className="text-body text-gray-600">Une annulation laisse la fusion déjà commencée aller à son terme.</p>
           )}
         </div>

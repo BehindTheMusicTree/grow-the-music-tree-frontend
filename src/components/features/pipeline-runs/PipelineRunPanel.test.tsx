@@ -83,7 +83,7 @@ describe("PipelineRunPanel", () => {
 
     expect(curationButton()).toBeDisabled();
     expect(fullButton()).toBeDisabled();
-    expect(screen.getByRole("progressbar")).toHaveAttribute("value", String((7 + 1 / 4) / 11));
+    expect(screen.getByRole("progressbar")).toHaveAttribute("value", String((7 + 1 / 4) / 13));
     expect(screen.getByText("Ingestion complète : Envoi des morceaux (1/4)")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
@@ -103,6 +103,8 @@ describe("PipelineRunPanel", () => {
       "Fusion des morceauxà venir",
       "Envoi des artistesà venir",
       "Fusion des artistesà venir",
+      "Envoi de la carte des régionsà venir",
+      "Fusion de la carte des régionsà venir",
     ]);
     expect(items[1]).toHaveAttribute("aria-current", "step");
   });
@@ -111,7 +113,7 @@ describe("PipelineRunPanel", () => {
     latest = request({ status: "failed", stage: "building_genres", error: "boom" });
     const { rerender } = render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
 
-    expect(screen.getByText("interrompue").parentElement).toHaveTextContent("Construction des genres");
+    expect(screen.getByText("interrompue").parentElement).toHaveTextContent("Ingestion Wikidata et construction des genres");
 
     latest = request({ status: "superseded" });
     rerender(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
