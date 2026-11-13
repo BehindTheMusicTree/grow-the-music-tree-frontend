@@ -18,12 +18,15 @@ const MENU_LINKS = [
 const buttonClassName = "flex h-header w-header shrink-0 items-center justify-center rounded-full shadow-lg";
 const itemClassName = "block w-full px-3 py-2 text-left text-body hover:bg-white/10";
 
-export function UserMenu() {
+export function UserMenu({ compact = false }: { compact?: boolean }) {
   const { data: session, status } = useSession();
   const isAdmin = useIsAdmin();
   const [open, setOpen] = useState(false);
   const accountLabel = session?.user?.name ?? session?.user?.email;
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerClassName = compact
+    ? "flex h-[var(--layout-touch-target)] w-[var(--layout-touch-target)] shrink-0 items-center justify-center rounded-full"
+    : buttonClassName;
 
   useEffect(() => {
     if (!open) return;
@@ -45,7 +48,7 @@ export function UserMenu() {
     return (
       <button
         type="button"
-        className={`${buttonClassName} bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:opacity-50`}
+        className={`${triggerClassName} bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:opacity-50`}
         aria-label="Sign in"
         disabled={status === "loading"}
         onClick={() => void signIn("google", { redirectTo: ADMIN_HREF })}
@@ -59,7 +62,7 @@ export function UserMenu() {
     <div ref={containerRef} className="relative">
       <button
         type="button"
-        className={buttonClassName}
+        className={triggerClassName}
         aria-label="Account"
         aria-haspopup="menu"
         aria-expanded={open}

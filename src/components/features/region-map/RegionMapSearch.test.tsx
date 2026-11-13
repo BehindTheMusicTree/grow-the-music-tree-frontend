@@ -5,6 +5,8 @@ import fixture from "@schemas/api/region-map.fixture.json";
 import { RegionMapIndexSchema, type Region } from "@schemas/api/region-map";
 import RegionMapSearch from "./RegionMapSearch";
 
+vi.mock("@components/features/menu/UserMenu", () => ({ UserMenu: () => <button type="button">Account</button> }));
+
 const index = RegionMapIndexSchema.parse(fixture);
 const regions = new Map(index.regions.map((region) => [region.id, region]));
 const lexiconEnabled = vi.fn();

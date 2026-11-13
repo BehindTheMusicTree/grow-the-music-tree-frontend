@@ -8,6 +8,7 @@ import { usePlaceSearchGroup, useRegionGenreSearchGroup } from "@components/feat
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import type { Region, RegionMapIndex } from "@schemas/api/region-map";
 import { useRegionOverview } from "./useRegionOverview";
+import { SearchAccountAction } from "@components/features/menu/SearchAccountAction";
 
 type Props = {
   index: RegionMapIndex;
@@ -70,6 +71,8 @@ export default function RegionMapSearch({ index, regions, onPick, onPickArtist, 
   return (
     <SearchBox
       className={className}
+      trailingAction={<SearchAccountAction />}
+      trailingActionBreakpoint="md"
       label="Search the map"
       placeholder="Search places, genres, artists, songs"
       value={query}

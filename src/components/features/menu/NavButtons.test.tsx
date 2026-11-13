@@ -133,7 +133,7 @@ describe("NavButtons", () => {
 
     const classes = screen.getByRole("navigation", { name: "Main navigation" }).className;
     expect(classes).toContain("md:left-[calc(var(--layout-detail-panel-w)+0.25rem)]");
-    expect(classes).toContain("[data-sheet=true]:not([data-collapsed=true])]:max-md:bottom-[calc(var(--layout-sheet-peek)+0.25rem)]");
+    expect(classes).toContain("[data-sheet=true]:not([data-collapsed=true])]:max-md:bottom-[calc(var(--layout-sheet-peek)+0.75rem)]");
     expect(classes).toContain("max-md:hidden");
   });
 });

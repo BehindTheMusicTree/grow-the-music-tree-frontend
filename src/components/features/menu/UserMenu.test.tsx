@@ -13,6 +13,15 @@ vi.mock("next-auth/react", () => ({
 }));
 
 describe("UserMenu", () => {
+  it("opens and dismisses the compact account menu with Escape", () => {
+    session = { user: { email: "admin@example.com" } };
+    render(<UserMenu compact />);
+    fireEvent.click(screen.getByRole("button", { name: "Account" }));
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  });
+
   afterEach(() => {
     cleanup();
     session = null;
