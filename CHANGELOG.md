@@ -7,9 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Table of Contents
 
-- [Changelog Best Practices](#changelog-best-practices)
-  - [General Principles](#general-principles)
-  - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
 - [3.22.0 - 2026-11-03](#3220---2026-11-03)
 - [3.21.0 - 2026-11-01](#3210---2026-11-01)
@@ -45,70 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [1.1.0 - 2025-02-15](#110---2025-02-15)
 - [1.0.0 - 2025-02-12](#100---2025-02-12)
 - [0.2.0 - 2025-02-06](#020---2025-02-06)
-
-## Changelog Best Practices
-
-### General Principles
-
-- Changelogs are for humans, not machines.
-- Include an entry for every version, with the latest first.
-- Group similar changes under: Added, Changed, Improved, Deprecated, Removed, Fixed, Documentation, Performance, CI.
-- **"Test" is NOT a valid changelog category** - tests should be mentioned within the related feature or fix entry, not as standalone entries.
-- Use an "Unreleased" section for upcoming changes.
-- Follow Semantic Versioning where possible (see [docs/SEMVER_GUIDE.md](docs/SEMVER_GUIDE.md)).
-- Use ISO 8601 date format: YYYY-MM-DD.
-- Avoid dumping raw git logs; summarize notable changes clearly.
-
-### Guidelines for Contributors
-
-All contributors (including maintainers) should update `CHANGELOG.md` when creating PRs:
-
-1. **Add entries to the `[Unreleased]` section** - Add your changes under the appropriate category (Added, Changed, Improved, Deprecated, Removed, Fixed, Documentation, Performance, CI)
-2. **Follow the changelog format** - See examples below for detailed guidelines
-3. **Group related changes** - Similar changes should be grouped together
-4. **Be descriptive** - Write clear, user-focused descriptions of what changed
-5. **Mention tests when relevant** - Tests should be mentioned within the related feature or fix entry, not as standalone entries
-
-**Example:**
-
-```markdown
-## [1.4.0] - YYYY-MM-DD
-
-### Added
-
-- **Genre curation**: admins get a "Set as root…" action in a genre's danger zone (genres with a parent), behind a confirmation. It calls `POST genres/{uuid}/set-root/` and has no Undo, since moving the genre back under a parent would leave its accepted-root rule behind. Needs the grow-api endpoint deployed first.
-- **Artist search**: a header search box finds artists by name or alias (accent- and typo-tolerant) and opens their page. The curation genre picker now shares its combobox with it (`ui/Combobox`). Requires grow-api `GET artists/search/`.
-- **Genre Tree Visualization**: Added interactive D3.js-based genre tree component
-  - Includes unit tests for tree layout calculations and node interactions
-  - Supports zoom, pan, and node expansion/collapse
-
-- **Playlist Management**: Added drag-and-drop track reordering in playlists
-  - Includes integration tests for drag-and-drop functionality
-  - Optimistic UI updates with automatic rollback on API failure
-
-### Fixed
-
-- **Region map**: a subdivision without songs is tinted with the lightest shade when an enclosing region has some, so former regions (Alsace, Bourgogne…) no longer read as uncovered. Needs the matching pipelines export.
-- **Popups**: the left rail is now blurred and inert behind an open popup like the rest of the page; it used to stay sharp, undimmed and clickable.
-- **Region map, genealogy**: Escape in a search field no longer closes the open panel.
-- **Audio Player**: Fixed track progress bar not updating correctly on mobile Safari
-  - Includes regression tests across different browser environments
-  - Improved audio event handling for better compatibility
-
-### Performance
-
-- **Track List**: Implemented virtualized scrolling for large track lists (1000+ items)
-  - Reduced initial render time by 70%
-  - Includes performance benchmarks to prevent future regressions
-
-### CI
-
-- The `e2e` job runs in the Playwright container image instead of installing Chromium with `apt` on each run, so an unreachable Ubuntu mirror no longer fails the browser journeys; a first step fails with a clear message when the image tag and `@playwright/test` differ.
-- **Branch Protection**: Added automated enforcement of Git Flow branching rules
-  - Blocks invalid PRs to main and develop branches
-```
-
-**Note:** Prepare the version and changelog on the release or hotfix branch. The shared workflow creates the matching tag after merge to `main`; see [docs/VERSIONING.md](docs/VERSIONING.md).
 
 ## [Unreleased]
 
@@ -151,6 +84,10 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Changed
 
 - **Region map**: the night side of the globe is less dark (night dim 0.55 → 0.45).
+
+### Documentation
+
+- Removed the contributor guidelines and example entry from `CHANGELOG.md`: the example duplicated the `[Unreleased]` heading and led agents to write entries in the wrong place, and the conventions now live in the shared `create-pr` skill.
 
 ### CI
 
