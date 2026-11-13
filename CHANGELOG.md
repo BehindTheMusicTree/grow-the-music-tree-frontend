@@ -45,6 +45,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Pipeline runs**: the run's step list shows the Discogs ingestion, the Gold build and the region map upload and merge (`ingesting_discogs`, `building_gold`, `uploading_region_map`, `merging_region_map`), and the `building_genres` step is labelled « Ingestion Wikidata et construction des genres » since it waits for the parallel wikidata chain. A stage a kind doesn't list lands on the nearest earlier step. Needs the grow stages of migration `0128`. Tests in `labels.test.ts` and `PipelineRunPanel.test.tsx`.
+
 ### Removed
 
 - **Genre tree**: the wheel/outline view toggle is gone, so the outline view can no longer be reached. The view itself stays in `@behindthemusictree/app-kit-ui` and `GenreTreeViewModeProvider`; see `docs/pages/genre-tree.md` to bring it back. `ViewModeToggle` and its test are deleted.
