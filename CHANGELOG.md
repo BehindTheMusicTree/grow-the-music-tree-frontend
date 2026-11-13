@@ -63,6 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Make the tree, region map, and About navigation icons fill their buttons without inner spacing.
+- Size the About navigation button at 80% of the tree and map buttons.
 - Toggle night shading by pressing the Map button while already on the map; remove the separate moon control and shade the globe icon's right half along a 23.44° tilted axis when enabled.
 - `@behindthemusictree/ui` 0.22.0 → 0.24.0.
 - **Region map**: the night mode toggle moves from the navigation into the map's floating controls at the bottom right, next to the new zoom buttons, in the same style as the genre tree's controls (`FloatingToggle` from `@behindthemusictree/ui` 0.24.0).

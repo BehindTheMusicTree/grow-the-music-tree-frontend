@@ -28,7 +28,7 @@ function AboutButton() {
     <Link
       href={isOpen ? closedHref : openHref}
       prefetch={false}
-      className={cn(iconPillClassName, "h-[calc(var(--layout-header-h)/2)] w-[calc(var(--layout-header-h)/2)]")}
+      className={cn(iconPillClassName, "h-[calc(var(--layout-header-h)*0.8)] w-[calc(var(--layout-header-h)*0.8)]")}
       aria-label="About"
       aria-pressed={isOpen}
     >

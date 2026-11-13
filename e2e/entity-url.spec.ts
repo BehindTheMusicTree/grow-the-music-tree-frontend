@@ -17,6 +17,50 @@ const toMap = (page: Page) => page.getByRole("link", { name: "Region map" }).cli
 const toTree = (page: Page) => page.getByRole("link", { name: "GrowTheMusicTree home" }).click();
 const param = (page: Page, key: string) => new URL(page.url()).searchParams.get(key);
 
+test("the map button toggles night shading without navigation and remembers it across views", async ({ page }) => {
+  await page.goto(`/?genre=${ids.punk}`);
+  await expectState(page, { title: APP_TITLE, panel: names.punk });
+  await toMap(page);
+  await expectState(page, { title: APP_TITLE, panel: names.punk });
+
+  const mapButton = page.getByRole("button", { name: "Region map", exact: true });
+  await expect(mapButton).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByRole("button", { name: "Night mode", exact: true })).toHaveCount(0);
+  const before = await page.evaluate(() => history.length);
+  const camera = param(page, "at");
+  await mapButton.click();
+  await expect(mapButton).toHaveAttribute("aria-pressed", "true");
+  await expect(mapButton.getByTestId("region-globe-night-shade")).toBeVisible();
+  expect(param(page, "genre")).toBe(ids.punk);
+  expect(param(page, "at")).toBe(camera);
+  expect(await page.evaluate(() => history.length)).toBe(before);
+
+  await toTree(page);
+  await expectState(page, { title: APP_TITLE, panel: names.punk });
+  await expect(page.getByRole("link", { name: "Region map" }).getByTestId("region-globe-night-shade")).toBeVisible();
+  await toMap(page);
+  await expect(mapButton).toHaveAttribute("aria-pressed", "true");
+  await mapButton.click();
+  await expect(mapButton).toHaveAttribute("aria-pressed", "false");
+  await expect(mapButton.getByTestId("region-globe-night-shade")).toHaveCount(0);
+});
+
+test("navigation icons fill their buttons and About stays smaller", async ({ page }) => {
+  await page.goto("/");
+  await expectState(page, { title: APP_TITLE });
+  const tree = page.getByRole("link", { name: "GrowTheMusicTree home" });
+  const map = page.getByRole("link", { name: "Region map" });
+  const about = page.getByRole("link", { name: "About", exact: true });
+  const treeBox = (await tree.boundingBox())!;
+  const mapBox = (await map.boundingBox())!;
+  const aboutBox = (await about.boundingBox())!;
+  expect(aboutBox.width / treeBox.width).toBeCloseTo(0.8, 2);
+  expect(aboutBox.height / treeBox.height).toBeCloseTo(0.8, 2);
+  expect((await tree.locator("img").boundingBox())!.width).toBeCloseTo(treeBox.width);
+  expect((await map.locator("svg").boundingBox())!.width).toBeCloseTo(mapBox.width);
+  expect((await about.locator("svg").boundingBox())!.width).toBeCloseTo(aboutBox.width);
+});
+
 for (const [kind, id, panel, title] of [
   ["artist", ids.artist, names.artist, names.artist],
   ["song", ids.song, names.song, names.songTab],
