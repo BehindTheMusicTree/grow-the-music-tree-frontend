@@ -30,7 +30,11 @@ export const STAGE_LABELS: Record<PipelineRunStage, string> = {
   merging_region_map: "Fusion de la carte des régions",
 };
 
-export const UPLOAD_STAGES: readonly PipelineRunStage[] = ["uploading_songs", "uploading_artists", "uploading_region_map"];
+export const UPLOAD_STAGES: readonly PipelineRunStage[] = [
+  "uploading_songs",
+  "uploading_artists",
+  "uploading_region_map",
+];
 
 export function originOf({ trigger, requestedBy }: Pick<PipelineRunRequest, "trigger" | "requestedBy">) {
   if (trigger === "scheduled") return "Nightly";
