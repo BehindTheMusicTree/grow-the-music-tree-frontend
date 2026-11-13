@@ -52,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Genre review suggests the parent's name instead of the technical Wikidata suffix for flagged genres. Validate saves the displayed suggestion or the administrator's edits; genres without a parent keep their existing names.
 - The region detail panel no longer says the genre “Music of <region>” failed to load when a region overview cannot be loaded; it always shows « The music genre covering <region> could not be loaded. », since overviews are now generated `LOCAL:region-*` items. Covered by `RegionDetailPanel` tests.
 - The admin session is bound to the grow-api upstream it was issued for: after `GROW_API_ORIGIN` changes (or for a cookie with no recorded upstream) the session reports `UpstreamChanged`, the admin is asked to sign in again, and the proxy no longer forwards a Google ID token minted for another OAuth client (which grow-api rejected with 401, including on public reads). Covered by `isBoundToUpstream`, `jwt` callback and `getAdminIdToken` tests.
 

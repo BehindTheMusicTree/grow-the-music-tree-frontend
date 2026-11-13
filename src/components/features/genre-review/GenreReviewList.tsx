@@ -7,17 +7,24 @@ import { z } from "zod";
 import { Button, Input } from "@behindthemusictree/ui";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import { curationGenreHref } from "@components/features/curation/GenreRef";
-import type { GenreNameConflictGroup } from "@schemas/api/genre-name-conflicts";
+import type { ConflictingGenre, GenreNameConflictGroup } from "@schemas/api/genre-name-conflicts";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
 const ValidateGroupInputSchema = z.object({
   genres: z.array(z.object({ uuid: z.string(), name: z.string() })),
 });
 
+function initialName(genre: ConflictingGenre): string {
+  if (!genre.hasNameConflict || !genre.wikidataId || !genre.parent?.name.trim()) return genre.name;
+  const suffix = ` (${genre.wikidataId})`;
+  if (!genre.name.endsWith(suffix)) return genre.name;
+  return `${genre.name.slice(0, -suffix.length)} (${genre.parent.name})`;
+}
+
 function GenreConflictGroupCard({ group }: { group: GenreNameConflictGroup }) {
   const router = useRouter();
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
-  const [names, setNames] = useState(() => Object.fromEntries(group.genres.map((genre) => [genre.uuid, genre.name])));
+  const [names, setNames] = useState(() => Object.fromEntries(group.genres.map((genre) => [genre.uuid, initialName(genre)])));
   const { mutate, formErrors, isPending } = useValidatedMutation({
     inputSchema: ValidateGroupInputSchema,
     outputSchema: z.null(),

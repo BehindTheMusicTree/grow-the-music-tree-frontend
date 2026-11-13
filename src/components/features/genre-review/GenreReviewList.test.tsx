@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import GenreReviewList from "./GenreReviewList";
+import type { ConflictingGenre } from "@schemas/api/genre-name-conflicts";
 
 const mutateMock = vi.fn();
 const formErrorsMock = vi.fn((): { field: string; message: string }[] => []);
@@ -39,11 +40,53 @@ describe("GenreReviewList", () => {
     render(<GenreReviewList groups={groups} />);
 
     expect(screen.getByRole("heading", { name: "Pub rock" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Name of Pub rock (Q16250593)")).toHaveValue("Pub rock (Q16250593)");
+    expect(screen.getByLabelText("Name of Pub rock (Q16250593)")).toHaveValue("Pub rock (Rock)");
     expect(screen.getByText("Parent: Rock")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Q16250593" })).toHaveAttribute(
       "href",
       "https://www.wikidata.org/wiki/Q16250593",
+    );
+  });
+
+  it("validates the displayed suggestion without requiring an edit", () => {
+    render(<GenreReviewList groups={groups} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Validate" }));
+
+    expect(mutateMock).toHaveBeenCalledWith({
+      genres: [
+        { uuid: canonical.uuid, name: "Pub rock" },
+        { uuid: flagged.uuid, name: "Pub rock (Rock)" },
+      ],
+    });
+  });
+
+  it.each<{ label: string; overrides: Partial<ConflictingGenre> }>([
+    { label: "no parent", overrides: { parent: null } },
+    { label: "no parent label", overrides: { parent: { ...flagged.parent, name: " " } } },
+    { label: "no Wikidata ID", overrides: { wikidataId: null } },
+    { label: "no conflict", overrides: { hasNameConflict: false } },
+    { label: "an editorial suffix", overrides: { name: "Pub rock (Australia)" } },
+    { label: "a different QID suffix", overrides: { name: "Pub rock (Q123)" } },
+  ])("keeps the stored name with $label", ({ overrides }) => {
+    const genre = { ...flagged, ...overrides };
+    render(<GenreReviewList groups={[{ name: "Pub rock", genres: [genre] }]} />);
+
+    expect(screen.getByRole("textbox", { name: `Name of ${genre.name}` })).toHaveValue(genre.name);
+    fireEvent.click(screen.getByRole("button", { name: "Validate" }));
+    expect(mutateMock).toHaveBeenCalledWith({ genres: [{ uuid: genre.uuid, name: genre.name }] });
+  });
+
+  it("preserves existing parentheses and the parent's label verbatim", () => {
+    const genre = {
+      ...flagged,
+      name: "Rock (régional) (Q16250593)",
+      parent: { ...flagged.parent, name: "Musique électroacoustique" },
+    };
+    render(<GenreReviewList groups={[{ name: "Rock (régional)", genres: [genre] }]} />);
+
+    expect(screen.getByRole("textbox", { name: `Name of ${genre.name}` })).toHaveValue(
+      "Rock (régional) (Musique électroacoustique)",
     );
   });
 

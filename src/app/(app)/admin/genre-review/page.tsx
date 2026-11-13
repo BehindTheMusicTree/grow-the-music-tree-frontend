@@ -14,8 +14,8 @@ export default async function GenreReviewPage() {
     <Page title="Genre review" data-page="admin-genre-review">
       <div className="flex flex-col gap-4 p-4">
         <p>
-          Each group holds genres sharing a name. Edit any names that should differ, then Validate the group — names
-          left unchanged are kept as they are.
+          Each group holds genres sharing a name. Where a parent is available, its name replaces the Wikidata ID in
+          the suggested name. Edit any names that should differ, then Validate the group to save the displayed names.
         </p>
         {groups.length === 0 ? <p>No genres to review</p> : <GenreReviewList groups={groups} />}
       </div>
