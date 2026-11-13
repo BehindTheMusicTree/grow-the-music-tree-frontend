@@ -13,6 +13,12 @@ entities they outrank, and each view shows one panel.
 
 ## Map `/map`
 
+The Map navigation control links to `/map` from other pages. On `/map`, it becomes a button that toggles night
+shading without navigating, changing the camera or selection, or adding history entries. There is no separate moon
+button. Night shading starts disabled and persists across tree/map navigation during the current app session.
+When enabled, the globe icon's right half is shaded along an axis tilted 23.44° clockwise from vertical (bottom left
+to top right). The left half keeps its normal appearance. The button exposes its state through `aria-pressed`.
+
 Written by `useRegionMapUrlState`.
 
 | Param | Meaning | Crosses views | History | Setting it clears | In share links |

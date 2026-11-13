@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Info } from "lucide-react";
+import { useNightMode } from "@contexts/NightModeProvider";
 import { RegionGlobeIcon } from "./RegionGlobeIcon";
 import logo from "@assets/images/logos/tree.png";
 import { APP_NAME } from "@lib/constants/app";
@@ -27,11 +28,11 @@ function AboutButton() {
     <Link
       href={isOpen ? closedHref : openHref}
       prefetch={false}
-      className={cn(iconPillClassName, "h-[calc(var(--layout-header-h)/2)] w-[calc(var(--layout-header-h)/2)]")}
+      className={cn(iconPillClassName, "h-[calc(var(--layout-header-h)*0.8)] w-[calc(var(--layout-header-h)*0.8)]")}
       aria-label="About"
       aria-pressed={isOpen}
     >
-      <Info className="h-5 w-5" aria-hidden />
+      <Info className="h-full w-full" viewBox="1 1 22 22" aria-hidden />
     </Link>
   );
 }
@@ -69,6 +70,7 @@ export default function NavButtons() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const isRegionMap = pathname === REGION_MAP_HREF;
+  const { nightMode, toggleNightMode } = useNightMode();
 
   return (
     <nav
@@ -83,11 +85,25 @@ export default function NavButtons() {
       )}
     >
       <SwitchLink target="/" isCurrent={isHome} label={`${APP_NAME} home`}>
-        <Image src={logo} alt="" width={40} height={40} className={cn("h-auto w-7 shrink-0", isHome && "brightness-0")} aria-hidden priority />
+        <Image src={logo} alt="" width={48} height={48} className={cn("h-full w-full shrink-0 object-contain", isHome && "brightness-0")} aria-hidden priority />
       </SwitchLink>
-      <SwitchLink target={REGION_MAP_HREF} isCurrent={isRegionMap} label="Region map">
-        <RegionGlobeIcon className="h-7 w-7" />
-      </SwitchLink>
+      {isRegionMap ? (
+        <button
+          type="button"
+          className={iconPillClassName}
+          aria-label="Region map"
+          aria-current="page"
+          aria-pressed={nightMode}
+          title={nightMode ? "Disable night mode" : "Enable night mode"}
+          onClick={toggleNightMode}
+        >
+          <RegionGlobeIcon className="h-full w-full" nightMode={nightMode} />
+        </button>
+      ) : (
+        <SwitchLink target={REGION_MAP_HREF} isCurrent={false} label="Region map">
+          <RegionGlobeIcon className="h-full w-full" nightMode={nightMode} />
+        </SwitchLink>
+      )}
       <Suspense fallback={null}>
         <AboutButton />
       </Suspense>

@@ -1,14 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { NightModeProvider } from "@contexts/NightModeProvider";
 import { RegionMapControls } from "./RegionMapControls";
 
 const mount = (props: Partial<React.ComponentProps<typeof RegionMapControls>> = {}) => {
   const handlers = { onZoomIn: vi.fn(), onZoomOut: vi.fn(), onFit: vi.fn() };
   render(
-    <NightModeProvider>
-      <RegionMapControls canZoomIn canZoomOut {...handlers} {...props} />
-    </NightModeProvider>,
+    <RegionMapControls canZoomIn canZoomOut {...handlers} {...props} />,
   );
   return handlers;
 };
@@ -16,14 +13,10 @@ const mount = (props: Partial<React.ComponentProps<typeof RegionMapControls>> = 
 afterEach(cleanup);
 
 describe("RegionMapControls", () => {
-  it("toggles night mode, off by default", () => {
+  it("only offers zoom controls, with no separate night mode button", () => {
     mount();
-    const button = screen.getByRole("button", { name: "Night mode" });
-    expect(button).toHaveAttribute("aria-pressed", "false");
-    fireEvent.click(button);
-    expect(button).toHaveAttribute("aria-pressed", "true");
-    fireEvent.click(button);
-    expect(button).toHaveAttribute("aria-pressed", "false");
+    expect(screen.queryByRole("button", { name: "Night mode" })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("button")).toHaveLength(3);
   });
 
   it("calls the zoom and fit handlers", () => {
