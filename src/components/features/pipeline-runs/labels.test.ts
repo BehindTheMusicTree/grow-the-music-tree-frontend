@@ -6,24 +6,24 @@ const statuses = (steps: ReturnType<typeof stepsOf>) => steps?.map((step) => ste
 
 describe("stepsOf", () => {
   it("lists every stage of the kind", () => {
-    expect(stepsOf({ ...base, kind: "full", status: "queued" })).toHaveLength(11);
-    expect(stepsOf({ ...base, kind: "curation", status: "queued" })).toHaveLength(8);
-    expect(stepsOf({ ...base, status: "queued" })).toHaveLength(5);
+    expect(stepsOf({ ...base, kind: "full", status: "queued" })).toHaveLength(13);
+    expect(stepsOf({ ...base, kind: "curation", status: "queued" })).toHaveLength(11);
+    expect(stepsOf({ ...base, status: "queued" })).toHaveLength(7);
   });
 
   it("is all pending when queued or when a running run has no stage yet", () => {
-    expect(statuses(stepsOf({ ...base, status: "queued" }))).toEqual(Array(5).fill("pending"));
-    expect(statuses(stepsOf(base))).toEqual(Array(5).fill("pending"));
+    expect(statuses(stepsOf({ ...base, status: "queued" }))).toEqual(Array(7).fill("pending"));
+    expect(statuses(stepsOf(base))).toEqual(Array(7).fill("pending"));
   });
 
   it("is all done once succeeded", () => {
-    expect(statuses(stepsOf({ ...base, status: "succeeded" }))).toEqual(Array(5).fill("done"));
+    expect(statuses(stepsOf({ ...base, status: "succeeded" }))).toEqual(Array(7).fill("done"));
   });
 
   it("ticks stages before the current one and shows the upload count", () => {
     const steps = stepsOf({ ...base, stage: "uploading_songs", stageCurrent: 2, stageTotal: 5 });
 
-    expect(statuses(steps)).toEqual(["done", "current", "pending", "pending", "pending"]);
+    expect(statuses(steps)).toEqual(["done", "current", ...Array(5).fill("pending")]);
     expect(steps?.[1].detail).toBe("2/5");
   });
 
@@ -36,9 +36,20 @@ describe("stepsOf", () => {
       "done",
       "done",
       "failed",
-      "pending",
-      "pending",
+      ...Array(4).fill("pending"),
     ]);
+  });
+
+  it("shows the region map upload count", () => {
+    const steps = stepsOf({ ...base, stage: "uploading_region_map", stageCurrent: 3, stageTotal: 7 });
+
+    expect(steps?.[5]).toMatchObject({ status: "current", detail: "3/7" });
+  });
+
+  it("puts a stage the kind doesn't list on the nearest earlier step", () => {
+    const steps = stepsOf({ ...base, kind: "full", stage: "ingesting_wikidata" });
+
+    expect(steps?.[2]).toMatchObject({ key: "ingesting_musicbrainz", status: "current" });
   });
 
   it("has no list when superseded", () => {
