@@ -124,3 +124,36 @@ test("the mobile player clears the footer, including a bottom safe area", async 
   expect(playerBox.y + playerBox.height).toBeLessThanOrEqual(navBox.y);
   await page.screenshot({ path: "/tmp/mobile-bottom-navigation-safe-area.png" });
 });
+
+for (const width of [667, 844]) {
+  test(`touch landscape at ${width}px aligns detail above half-width tabs`, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width, height: 390 }, hasTouch: true });
+    const page = await context.newPage();
+    const { unstubbed: missing } = await installApi(page);
+    await page.goto(`/?genre=${ids.punk}`);
+    const panel = page.locator("[data-detail-panel][data-collapsed=false]");
+    await expect(panel).toBeVisible();
+    const navigation = page.getByRole("navigation", { name: "Main navigation" });
+    for (const label of ["Tree", "Map", "About"]) {
+      await expect(navigation.getByText(label, { exact: true })).toBeVisible();
+    }
+    const navBox = (await navigation.boundingBox())!;
+    expect(navBox.x).toBe(0);
+    expect(navBox.width).toBeCloseTo(width / 2, 0);
+    const panelBox = (await panel.boundingBox())!;
+    expect(panelBox.x).toBe(0);
+    expect(panelBox.width).toBeCloseTo(width / 2, 0);
+    expect(panelBox.y + panelBox.height).toBeLessThanOrEqual(navBox.y);
+    await panel.getByRole("button", { name: "Resize panel" }).click();
+    await expect(panel.getByRole("button", { name: "Resize panel" })).toHaveAttribute("aria-expanded", "true");
+    expect((await panel.boundingBox())!.width).toBeCloseTo(width / 2, 0);
+    await navigation.getByRole("link", { name: "Region map" }).click();
+    await expect(page).toHaveURL(/\/map\?/);
+    await expect(panel).toBeVisible();
+    expect((await panel.boundingBox())!.width).toBeCloseTo(width / 2, 0);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expectFooter(page);
+    expect(missing).toEqual([]);
+    await context.close();
+  });
+}

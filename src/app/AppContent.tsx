@@ -46,11 +46,13 @@ export default function AppContent({ children }: { children: ReactNode }) {
     <PlayerPanelProvider>
     <GenreTreeViewModeProvider>
     <NightModeProvider>
-      <div className="h-screen [--mobile-nav-h:4rem] md:[--mobile-nav-h:0rem]">
+      <div className="h-screen [--mobile-nav-h:4rem] md:[--mobile-nav-h:0rem] phone-landscape:![--mobile-nav-h:4rem]">
         <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+var(--mobile-nav-h))] top-0 flex">
           <div
             className={cn(
               "group relative flex min-h-0 w-full flex-grow",
+              "phone-landscape:[&_[data-detail-panel]]:!left-0 phone-landscape:[&_[data-detail-panel]]:!right-auto phone-landscape:[&_[data-detail-panel]]:!w-1/2 phone-landscape:[&_[data-detail-panel]]:!top-auto phone-landscape:[&_[data-detail-panel]]:!bottom-0 phone-landscape:[&_[data-detail-panel]]:!pb-0 phone-landscape:[&_[data-detail-panel]]:!h-1/2 phone-landscape:[&_[data-detail-panel]:has([aria-label='Resize_panel'][aria-expanded=true])]:!h-full phone-landscape:[&_[data-detail-panel][data-expanded=true]]:!h-full phone-landscape:[&_[data-detail-panel]_[aria-label='Resize_panel']]:!flex phone-landscape:[&_[data-detail-panel][data-collapsed=true]]:!translate-x-0 phone-landscape:[&_[data-detail-panel][data-collapsed=true]]:!translate-y-full",
+
               activePopup && "pointer-events-none blur-sm",
             )}
           >

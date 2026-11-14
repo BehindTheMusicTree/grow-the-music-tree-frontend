@@ -21,13 +21,18 @@ function setup(data: Record<string, string>, panelRect: Partial<DOMRect>) {
 }
 
 function mockMedia(matches: boolean) {
-  vi.stubGlobal("matchMedia", () => ({ matches }));
+  vi.stubGlobal("matchMedia", (query: string) => ({ matches: matches && query === "(max-width: 47.999rem)" }));
 }
 
 describe("measurePanelInset", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+  });
+
+  it("reserves the left half for a landscape detail sheet", () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    expect(measurePanelInset(setup({ collapsed: "false", sheet: "true" }, { right: 510, top: 300 }))).toEqual({ left: 500 });
   });
 
   it("returns nothing without a panel", () => {

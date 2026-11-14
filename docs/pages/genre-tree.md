@@ -41,3 +41,7 @@ Cannot be statically generated - requires dynamic data and real-time updates.
 The outline view is kept for later but cannot be reached: the wheel/outline toggle (`ViewModeToggle`) was removed. `@behindthemusictree/app-kit-ui` still renders `viewMode="outline"`, and `GenreTreeViewModeProvider` / `GenreTreePage` still accept it. To bring it back, restore `src/components/features/genre-tree/ViewModeToggle.tsx` (and its test) from git history, from the commit before the one that removed it, and pass it as `floatingControlsLeading={canShowPopCore ? <ViewModeToggle /> : undefined}` in `GenreTreePage`.
 
 See [Genre selection](genre-selection.md) for the entity UUID URL contract shared with the map.
+
+## Mobile landscape layout
+
+On touch screens in landscape with a viewport height of at most 500px, Tree, Map and About occupy the left half of the footer, including above the 768px width breakpoint. Detail panels use the same half-width above the footer; expanding a panel increases its height without increasing its width. Portrait retains the full-width mobile footer. Mouse-driven desktop layouts retain floating navigation controls.

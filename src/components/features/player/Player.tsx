@@ -24,7 +24,7 @@ export default function Player({ className }: PlayerProps) {
   return (
     <PlayerPanel
       className={cn(
-        "max-md:max-h-[calc(100dvh-var(--layout-band-top)-var(--mobile-nav-h)-env(safe-area-inset-bottom)-var(--layout-gutter))] max-md:[&>div:last-child]:overflow-y-auto",
+        "phone-landscape:max-w-[calc(50vw-2*var(--layout-gutter))] phone-landscape:max-h-[calc(100dvh-var(--layout-band-top)-var(--mobile-nav-h)-env(safe-area-inset-bottom)-var(--layout-gutter))] phone-landscape:[&>div:last-child]:overflow-y-auto max-md:max-h-[calc(100dvh-var(--layout-band-top)-var(--mobile-nav-h)-env(safe-area-inset-bottom)-var(--layout-gutter))] max-md:[&>div:last-child]:overflow-y-auto",
         className,
       )}
       isVisible={isVisible}

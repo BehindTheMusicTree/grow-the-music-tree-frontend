@@ -14,6 +14,9 @@ export function measurePanelInset(container: HTMLElement): PanelInset {
   if (!scope || !panel || panel.dataset.collapsed === "true") return {};
   const panelRect = panel.getBoundingClientRect();
   const scopeRect = scope.getBoundingClientRect();
+  if (window.matchMedia("(orientation: landscape) and (max-height: 500px) and (pointer: coarse)").matches) {
+    return { left: Math.max(0, Math.round(panelRect.right - scopeRect.left)) };
+  }
   if (panel.dataset.sheet === "true" && window.matchMedia(SHEET_QUERY).matches) {
     return { bottom: Math.max(0, Math.round(scopeRect.bottom - panelRect.top)) };
   }
