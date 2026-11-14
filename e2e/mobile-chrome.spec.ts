@@ -71,9 +71,9 @@ for (const path of ["/", "/map"]) {
 }
 
 for (const hasTouch of [false, true]) {
-  test.describe(`navigation alignment, touch=${hasTouch}`, () => {
+  test.describe(`navigation clearance, touch=${hasTouch}`, () => {
     test.use({ hasTouch });
-    test("centres navigation and tree controls on the same row", async ({ page }) => {
+    test("keeps tree controls visible above the mobile footer", async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.route("**/api/grow-proxy/genre-playlists/tree**", (route) => route.fulfill({
         json: tree.map((genre) => ({ ...genre, viewsCount: 100 })),
@@ -84,9 +84,15 @@ for (const hasTouch of [false, true]) {
         ? page.getByRole("group", { name: "Size nodes by" })
         : page.getByRole("group", { name: "Zoom controls" });
       await expect(control).toBeVisible();
-      const navBox = (await navigation.boundingBox())!;
-      const controlBox = (await control.boundingBox())!;
-      expect(Math.abs(navBox.y + navBox.height / 2 - controlBox.y - controlBox.height / 2)).toBeLessThan(1);
+      await expect(navigation).toBeVisible();
+      await expect.poll(async () => {
+        const navBox = await navigation.boundingBox();
+        const controlBox = await control.boundingBox();
+        if (!navBox || !controlBox) return false;
+        return navBox.y + navBox.height === 844
+          && controlBox.x >= 0 && controlBox.x + controlBox.width <= 390
+          && controlBox.y >= 0 && controlBox.y + controlBox.height <= navBox.y;
+      }).toBe(true);
     });
   });
 }
