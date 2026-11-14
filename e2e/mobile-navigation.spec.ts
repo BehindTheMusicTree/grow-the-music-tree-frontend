@@ -92,6 +92,12 @@ test("the mobile player clears the footer, including a bottom safe area", async 
     const playerBox = (await player.boundingBox())!;
     return playerBox.y + playerBox.height;
   }).toBeLessThanOrEqual((await navigation.boundingBox())!.y);
+  await page.setViewportSize({ width: 767, height: 375 });
+  await controls.scrollIntoViewIfNeeded();
+  const controlsBox = (await controls.boundingBox())!;
+  const landscapeNavBox = (await navigation.boundingBox())!;
+  expect(controlsBox.y + controlsBox.height).toBeLessThanOrEqual(landscapeNavBox.y);
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: "/tmp/mobile-bottom-navigation-player.png" });
 
   // Chromium reports a zero safe area; substitute 34px in the generated rules to exercise the inset arithmetic.
