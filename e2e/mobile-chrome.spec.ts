@@ -6,6 +6,21 @@ test.beforeEach(async ({ page }) => {
   await installApi(page);
 });
 
+for (const width of [390, 640]) {
+  test(`/map: expanded sheet stays resizable beside search at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto(`/map?genre=${ids.punk}`);
+    const handle = page.getByRole("button", { name: "Resize panel", exact: true });
+    await expect(handle).toHaveAttribute("aria-expanded", "false");
+    await handle.click();
+    await expect(handle).toHaveAttribute("aria-expanded", "true");
+    await page.getByRole("combobox").click({ trial: true });
+    await page.getByRole("button", { name: "Sign in", exact: true }).click({ trial: true });
+    await handle.click();
+    await expect(handle).toHaveAttribute("aria-expanded", "false");
+  });
+}
+
 for (const path of ["/", "/map"]) {
   test(`${path}: search fills the width below 640px and contains the account below 768px`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
