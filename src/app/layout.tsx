@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import { APP_NAME } from "@constants/app";
+import growTheMusicTreePngIcon from "@behindthemusictree/brand/favicons/grow-the-music-tree/icon-192.png";
 import growTheMusicTreeFavicon from "@behindthemusictree/brand/favicons/grow-the-music-tree/favicon.svg";
 import "./globals.css";
 import "@behindthemusictree/brand/styles";
@@ -13,7 +14,10 @@ export const metadata: Metadata = {
   title: APP_NAME,
   description: "The ultimate community-driven platform for exploring musical genres",
   icons: {
-    icon: [{ url: faviconUrl, type: "image/svg+xml" }],
+    icon: [
+      { url: growTheMusicTreePngIcon.src, type: "image/png", sizes: "192x192" },
+      { url: faviconUrl, type: "image/svg+xml" },
+    ],
     shortcut: faviconUrl,
     apple: faviconUrl,
   },
