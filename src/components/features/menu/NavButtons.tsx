@@ -14,7 +14,7 @@ import { viewSwitchHref } from "@lib/searchHrefs";
 import { cn } from "@lib/utils";
 
 const navItemClassName =
-  "flex h-16 min-w-0 flex-1 flex-col items-center justify-center gap-1 text-caption text-gray-300 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400 mobile-layout:data-[active=true]:bg-white/10 mobile-layout:data-[active=true]:text-white desktop-layout:h-[var(--layout-header-h)] desktop-layout:w-[var(--layout-header-h)] desktop-layout:flex-none desktop-layout:gap-0 desktop-layout:rounded-full desktop-layout:bg-black/70 desktop-layout:text-gray-100 desktop-layout:shadow-lg desktop-layout:backdrop-blur desktop-layout:aria-[current=page]:bg-white desktop-layout:aria-[current=page]:text-black desktop-layout:aria-pressed:bg-white desktop-layout:aria-pressed:text-black desktop-layout:aria-[current=page]:hover:text-black desktop-layout:aria-pressed:hover:text-black";
+  "flex h-16 min-w-0 flex-1 flex-col items-center justify-center gap-1 text-caption text-gray-300 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400 mobile-layout:data-[active=true]:bg-white/10 mobile-layout:data-[active=true]:text-white desktop-layout:h-[var(--layout-header-h)] desktop-layout:w-[var(--layout-header-h)] desktop-layout:flex-none desktop-layout:gap-0 desktop-layout:rounded-full desktop-layout:bg-black/70 desktop-layout:text-gray-100 desktop-layout:shadow-lg desktop-layout:backdrop-blur";
 const navIconClassName = "h-6 w-6 shrink-0 desktop-layout:h-full desktop-layout:w-full";
 
 function AboutButton() {
@@ -31,7 +31,7 @@ function AboutButton() {
     <Link
       href={isOpen ? closedHref : openHref}
       prefetch={false}
-      className={cn(navItemClassName, "desktop-layout:h-[calc(var(--layout-header-h)*0.8)] desktop-layout:w-[calc(var(--layout-header-h)*0.8)]")}
+      className={cn(navItemClassName, "desktop-layout:h-[calc(var(--layout-header-h)*0.8)] desktop-layout:w-[calc(var(--layout-header-h)*0.8)] desktop-layout:aria-pressed:bg-white desktop-layout:aria-pressed:text-black desktop-layout:aria-pressed:hover:text-black")}
       aria-label="About"
       aria-pressed={isOpen}
       data-active={isOpen}
@@ -87,7 +87,7 @@ function Navigation({ aboutOpen = false }: { aboutOpen?: boolean }) {
       )}
     >
       <SwitchLink target="/" isCurrent={isHome} label={`${APP_NAME} home`}>
-        <Image src={logo} alt="" width={48} height={48} className={cn(navIconClassName, "object-contain")} aria-hidden priority />
+        <Image src={logo} alt="" width={48} height={48} className={cn(navIconClassName, "object-contain", !isHome && "brightness-0 invert")} aria-hidden priority />
         <span className="desktop-layout:hidden">Tree</span>
       </SwitchLink>
       {isRegionMap ? (
@@ -101,12 +101,12 @@ function Navigation({ aboutOpen = false }: { aboutOpen?: boolean }) {
           title={nightMode ? "Disable night mode" : "Enable night mode"}
           onClick={toggleNightMode}
         >
-          <RegionGlobeIcon className={navIconClassName} nightMode={nightMode} />
+          <RegionGlobeIcon className={navIconClassName} nightMode={nightMode} colored={isRegionMap} />
           <span className="desktop-layout:hidden">Map</span>
         </button>
       ) : (
         <SwitchLink target={REGION_MAP_HREF} isCurrent={false} label="Region map">
-          <RegionGlobeIcon className={navIconClassName} nightMode={nightMode} />
+          <RegionGlobeIcon className={navIconClassName} nightMode={nightMode} colored={isRegionMap} />
           <span className="desktop-layout:hidden">Map</span>
         </SwitchLink>
       )}
