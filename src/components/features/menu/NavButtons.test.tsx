@@ -29,12 +29,12 @@ describe("NavButtons", () => {
     pathname = "/";
   });
 
-  it("lists tree, map and about from top to bottom, icon-only", () => {
+  it("lists Tree, Map and About in order with mobile labels", () => {
     renderHeader();
 
     const names = screen.getAllByRole("link").map((link) => link.getAttribute("aria-label"));
     expect(names).toEqual(["GrowTheMusicTree home", "Region map", "About"]);
-    screen.getAllByRole("link").forEach((link) => expect(link).toHaveTextContent(/^$/));
+    expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual(["Tree", "Map", "About"]);
     expect(screen.getByRole("link", { name: "GrowTheMusicTree home" })).toHaveAttribute("href", "/");
   });
 
@@ -128,12 +128,23 @@ describe("NavButtons", () => {
     expect(screen.getByRole("link", { name: "Region map" })).toHaveAttribute("href", "/map");
   });
 
-  it("keeps the panel-aware offset classes literal so Tailwind generates them", () => {
+  it("selects About instead of Tree when its panel is open", () => {
+    searchParams = new URLSearchParams("about&genre=abc");
     renderHeader();
 
-    const classes = screen.getByRole("navigation", { name: "Main navigation" }).className;
-    expect(classes).toContain("md:left-[calc(var(--layout-detail-panel-w)+0.25rem)]");
-    expect(classes).toContain("[data-sheet=true]:not([data-collapsed=true])]:max-md:bottom-[calc(var(--layout-sheet-peek)+0.75rem)]");
-    expect(classes).toContain("max-md:hidden");
+    expect(screen.getByRole("link", { name: "About" })).toHaveAttribute("data-active", "true");
+    expect(screen.getByRole("link", { name: "GrowTheMusicTree home" })).toHaveAttribute("data-active", "false");
+    expect(screen.getByRole("link", { name: "Region map" })).toHaveAttribute("data-active", "false");
+  });
+
+  it("keeps the active map tab selected when night mode is off or on", () => {
+    pathname = "/map";
+    renderHeader();
+
+    const map = screen.getByRole("button", { name: "Region map" });
+    expect(map).toHaveAttribute("data-active", "true");
+    fireEvent.click(map);
+    expect(map).toHaveAttribute("data-active", "true");
+    expect(map).toHaveAttribute("aria-pressed", "true");
   });
 });

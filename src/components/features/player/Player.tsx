@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { usePlayer } from "@behindthemusictree/app-kit/player";
 import { PlayerPanel } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
+import { cn } from "@lib/utils";
 import { trackEvent } from "@lib/analytics";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 
@@ -22,7 +23,10 @@ export default function Player({ className }: PlayerProps) {
 
   return (
     <PlayerPanel
-      className={className}
+      className={cn(
+        "max-md:max-h-[calc(100dvh-var(--layout-band-top)-var(--mobile-nav-h)-env(safe-area-inset-bottom)-var(--layout-gutter))]",
+        className,
+      )}
       isVisible={isVisible}
       expanded={isExpanded}
       onExpandedChange={setExpanded}

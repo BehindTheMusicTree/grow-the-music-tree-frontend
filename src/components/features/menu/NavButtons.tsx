@@ -12,7 +12,10 @@ import { APP_NAME } from "@lib/constants/app";
 import { ABOUT_HREF, REGION_MAP_HREF } from "@lib/constants/routes";
 import { viewSwitchHref } from "@lib/searchHrefs";
 import { cn } from "@lib/utils";
-import { iconPillClassName } from "./iconPillClassName";
+
+const navItemClassName =
+  "flex h-16 min-w-0 flex-1 flex-col items-center justify-center gap-1 text-caption text-gray-300 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400 max-md:data-[active=true]:bg-white/10 max-md:data-[active=true]:text-white md:h-[var(--layout-header-h)] md:w-[var(--layout-header-h)] md:flex-none md:gap-0 md:rounded-full md:bg-black/70 md:text-gray-100 md:shadow-lg md:backdrop-blur md:aria-[current=page]:bg-white md:aria-[current=page]:text-black md:aria-pressed:bg-white md:aria-pressed:text-black md:aria-[current=page]:hover:text-black md:aria-pressed:hover:text-black";
+const navIconClassName = "h-6 w-6 shrink-0 md:h-full md:w-full";
 
 function AboutButton() {
   const pathname = usePathname();
@@ -28,11 +31,13 @@ function AboutButton() {
     <Link
       href={isOpen ? closedHref : openHref}
       prefetch={false}
-      className={cn(iconPillClassName, "h-[calc(var(--layout-header-h)*0.8)] w-[calc(var(--layout-header-h)*0.8)]")}
+      className={cn(navItemClassName, "md:h-[calc(var(--layout-header-h)*0.8)] md:w-[calc(var(--layout-header-h)*0.8)]")}
       aria-label="About"
       aria-pressed={isOpen}
+      data-active={isOpen}
     >
-      <Info className="h-full w-full" viewBox="1 1 22 22" aria-hidden />
+      <Info className={navIconClassName} viewBox="1 1 22 22" aria-hidden />
+      <span className="md:hidden">About</span>
     </Link>
   );
 }
@@ -44,7 +49,7 @@ function ViewLink({ target, isCurrent, label, children }: { target: "/" | typeof
   const href = carriesGenre ? viewSwitchHref(target, searchParams) : target;
 
   return (
-    <Link href={href} prefetch={false} className={iconPillClassName} aria-label={label} aria-current={isCurrent ? "page" : undefined}>
+    <Link href={href} prefetch={false} className={navItemClassName} aria-label={label} aria-current={isCurrent ? "page" : undefined} data-active={isCurrent && !searchParams.has("about")}>
       {children}
     </Link>
   );
@@ -52,7 +57,7 @@ function ViewLink({ target, isCurrent, label, children }: { target: "/" | typeof
 
 function ViewLinkFallback({ target, isCurrent, label, children }: { target: "/" | typeof REGION_MAP_HREF; isCurrent: boolean; label: string; children: ReactNode }) {
   return (
-    <Link href={target} prefetch={false} className={iconPillClassName} aria-label={label} aria-current={isCurrent ? "page" : undefined}>
+    <Link href={target} prefetch={false} className={navItemClassName} aria-label={label} aria-current={isCurrent ? "page" : undefined} data-active={isCurrent}>
       {children}
     </Link>
   );
@@ -66,7 +71,7 @@ function SwitchLink(props: { target: "/" | typeof REGION_MAP_HREF; isCurrent: bo
   );
 }
 
-export default function NavButtons() {
+function Navigation({ aboutOpen = false }: { aboutOpen?: boolean }) {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const isRegionMap = pathname === REGION_MAP_HREF;
@@ -76,37 +81,51 @@ export default function NavButtons() {
     <nav
       aria-label="Main navigation"
       className={cn(
-        "absolute bottom-3 left-1 z-50 flex h-10 flex-row items-center gap-2 transition-[left] duration-200 motion-reduce:transition-none [@media(pointer:coarse)]:h-[calc(var(--layout-touch-target)+0.5rem)]",
-        // Sits right of an open left detail panel; :has() reads the panel's own state, which lives in each page.
-        // Class names must stay literal so Tailwind's scanner can see them.
+        "fixed inset-x-0 bottom-0 z-50 flex h-[calc(var(--mobile-nav-h)+env(safe-area-inset-bottom))] flex-row items-start border-t border-white/10 bg-zinc-950 pb-[env(safe-area-inset-bottom)] md:absolute md:inset-x-auto md:bottom-3 md:left-1 md:h-10 md:items-center md:gap-2 md:border-0 md:bg-transparent md:pb-0 md:transition-[left] md:duration-200 motion-reduce:transition-none md:[@media(pointer:coarse)]:h-[calc(var(--layout-touch-target)+0.5rem)]",
+        // Sits right of an open left detail panel; mobile navigation stays below the page.
         "group-has-[[data-detail-panel][data-side=left]:not([data-collapsed=true])]:md:left-[calc(var(--layout-detail-panel-w)+0.25rem)]",
-        "group-has-[[data-detail-panel][data-sheet=true]:not([data-collapsed=true])]:max-md:bottom-[calc(var(--layout-sheet-peek)+0.75rem)]",
-        "group-has-[[data-detail-panel][data-sheet=true]_[aria-label='Resize_panel'][aria-expanded=true]]:max-md:hidden",
       )}
     >
       <SwitchLink target="/" isCurrent={isHome} label={`${APP_NAME} home`}>
-        <Image src={logo} alt="" width={48} height={48} className={cn("h-full w-full shrink-0 object-contain", isHome && "brightness-0")} aria-hidden priority />
+        <Image src={logo} alt="" width={48} height={48} className={cn(navIconClassName, "object-contain", isHome && "md:brightness-0")} aria-hidden priority />
+        <span className="md:hidden">Tree</span>
       </SwitchLink>
       {isRegionMap ? (
         <button
           type="button"
-          className={iconPillClassName}
+          className={navItemClassName}
           aria-label="Region map"
           aria-current="page"
+          data-active={!aboutOpen}
           aria-pressed={nightMode}
           title={nightMode ? "Disable night mode" : "Enable night mode"}
           onClick={toggleNightMode}
         >
-          <RegionGlobeIcon className="h-full w-full" nightMode={nightMode} />
+          <RegionGlobeIcon className={navIconClassName} nightMode={nightMode} />
+          <span className="md:hidden">Map</span>
         </button>
       ) : (
         <SwitchLink target={REGION_MAP_HREF} isCurrent={false} label="Region map">
-          <RegionGlobeIcon className="h-full w-full" nightMode={nightMode} />
+          <RegionGlobeIcon className={navIconClassName} nightMode={nightMode} />
+          <span className="md:hidden">Map</span>
         </SwitchLink>
       )}
       <Suspense fallback={null}>
         <AboutButton />
       </Suspense>
     </nav>
+  );
+}
+
+function NavigationWithSearchParams() {
+  const searchParams = useSearchParams();
+  return <Navigation aboutOpen={searchParams.has("about")} />;
+}
+
+export default function NavButtons() {
+  return (
+    <Suspense fallback={<Navigation />}>
+      <NavigationWithSearchParams />
+    </Suspense>
   );
 }
