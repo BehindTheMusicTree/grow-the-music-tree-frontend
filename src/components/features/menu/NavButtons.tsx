@@ -7,7 +7,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { Info } from "lucide-react";
 import { useNightMode } from "@contexts/NightModeProvider";
 import { RegionGlobeIcon } from "./RegionGlobeIcon";
-import logo from "@assets/images/logos/tree.png";
+import logo from "@behindthemusictree/brand/marks/grow-the-music-tree/grow-the-music-tree-mark.png";
 import { APP_NAME } from "@lib/constants/app";
 import { ABOUT_HREF, REGION_MAP_HREF } from "@lib/constants/routes";
 import { viewSwitchHref } from "@lib/searchHrefs";
@@ -87,7 +87,7 @@ function Navigation({ aboutOpen = false }: { aboutOpen?: boolean }) {
       )}
     >
       <SwitchLink target="/" isCurrent={isHome} label={`${APP_NAME} home`}>
-        <Image src={logo} alt="" width={48} height={48} className={cn(navIconClassName, "object-contain", isHome && "desktop-layout:brightness-0")} aria-hidden priority />
+        <Image src={logo} alt="" width={48} height={48} className={cn(navIconClassName, "object-contain")} aria-hidden priority />
         <span className="desktop-layout:hidden">Tree</span>
       </SwitchLink>
       {isRegionMap ? (
