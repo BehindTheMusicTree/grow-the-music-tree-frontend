@@ -54,3 +54,5 @@ Changing the view mode drops `view`, and `zoom` outside pop-core, with replace.
 `useEntityDocumentTitle` titles the tab after the open song (`Title — Artists`) or artist, re-applies it if Next's
 layout `<title>` overwrites it after a navigation, and restores the app name when the entity closes. The genre tree
 and the map apply it only when no genre is selected, since the genre panel is the one displayed.
+
+The Tree navigation icon is colored on `/` and white elsewhere, on a black background. The globe has white oceans and black continents outside `/map`; on `/map`, its oceans are blue and continents green, with the night shading drawn over both colors.

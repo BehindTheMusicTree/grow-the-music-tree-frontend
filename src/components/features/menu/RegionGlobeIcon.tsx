@@ -5,7 +5,7 @@ import { REGION_GLOBES, REGION_GLOBE_PATHS } from "./regionGlobePaths";
 
 const ROTATION_INTERVAL_MS = 3000;
 
-export function RegionGlobeIcon({ className, nightMode = false }: { className?: string; nightMode?: boolean }) {
+export function RegionGlobeIcon({ className, nightMode = false, colored = false }: { className?: string; nightMode?: boolean; colored?: boolean }) {
   const [index, setIndex] = useState(0);
   const nightClipId = useId();
 
@@ -28,7 +28,8 @@ export function RegionGlobeIcon({ className, nightMode = false }: { className?: 
 
   return (
     <svg viewBox="0 0 512 512" fill="currentColor" className={className} aria-hidden>
-      <path data-testid="region-globe-path" d={REGION_GLOBE_PATHS[REGION_GLOBES[index]]} />
+      <circle cx="256" cy="256" r="256" className={colored ? "fill-green-500" : "fill-black"} />
+      <path className={colored ? "fill-blue-500" : "fill-white"} data-testid="region-globe-path" d={REGION_GLOBE_PATHS[REGION_GLOBES[index]]} />
       {nightMode && (
         <>
           <defs>

@@ -55,6 +55,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Navigation colors highlight the current view: a colored tree on Tree, or blue oceans and green continents on Map, retaining night shading.
+
 - Added a black background behind the desktop navigation buttons.
 
 - Updated the navigation mark and favicon to the latest Grow brand artwork.

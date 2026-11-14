@@ -190,3 +190,28 @@ for (const width of [667, 844]) {
     await context.close();
   });
 }
+
+for (const width of [390, 1280]) {
+  test(`navigation colors follow the current view at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto("/");
+    const navigation = page.getByRole("navigation", { name: "Main navigation" });
+    const treeImage = navigation.getByRole("link", { name: "GrowTheMusicTree home" }).locator("img");
+    const ocean = navigation.getByTestId("region-globe-path");
+    const continents = navigation.locator("svg > circle").first();
+    await expect(treeImage).toHaveCSS("filter", "none");
+    await expect(ocean).toHaveCSS("fill", "rgb(255, 255, 255)");
+    await expect(continents).toHaveCSS("fill", "rgb(0, 0, 0)");
+    await navigation.getByRole("link", { name: "Region map" }).click();
+    await expect(treeImage).toHaveCSS("filter", "brightness(0) invert(1)");
+    await expect(ocean).toHaveCSS("fill", "rgb(59, 130, 246)");
+    await expect(continents).toHaveCSS("fill", "rgb(34, 197, 94)");
+    await navigation.getByRole("button", { name: "Region map" }).click();
+    await expect(navigation.getByTestId("region-globe-night-shade")).toBeVisible();
+    await expect(ocean).toHaveCSS("fill", "rgb(59, 130, 246)");
+    await expect(continents).toHaveCSS("fill", "rgb(34, 197, 94)");
+    if (width === 1280) {
+      await expect(navigation.getByRole("button", { name: "Region map" })).toHaveCSS("background-color", "rgba(0, 0, 0, 0.7)");
+    }
+  });
+}
