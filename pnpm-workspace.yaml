@@ -30,6 +30,3 @@ allowBuilds:
   '@sentry/cli': false
   esbuild: false
   unrs-resolver: false
-
-patchedDependencies:
-  '@behindthemusictree/ui@0.25.0': patches/@behindthemusictree__ui@0.25.0.patch

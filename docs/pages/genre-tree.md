@@ -46,4 +46,4 @@ See [Genre selection](genre-selection.md) for the entity UUID URL contract share
 
 On touch screens in landscape with a viewport height of at most 500px, Tree, Map and About occupy the left half of the footer, including above the 768px width breakpoint. Detail panels use the same half-width above the footer; expanding a panel increases its height without increasing its width. Portrait retains the full-width mobile footer. Mouse-driven desktop layouts retain floating navigation controls.
 
-The app declares the occupied edge with `--detail-panel-obscured-edge: left` in the landscape rules. The shared `useObscuredInset` hook and the map use that edge for framing. Until the shared UI change is published, `patches/@behindthemusictree__ui@0.25.0.patch` supplies the hook correction; remove the patch when upgrading to a release containing it.
+The app declares the occupied edge with `--detail-panel-obscured-edge: left` in the landscape rules. The shared `useObscuredInset` hook and the map use that edge for framing. The contract is provided by `@behindthemusictree/ui` 0.26.0 and later.
