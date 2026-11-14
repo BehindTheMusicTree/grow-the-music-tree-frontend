@@ -46,8 +46,8 @@ export default function AppContent({ children }: { children: ReactNode }) {
     <PlayerPanelProvider>
     <GenreTreeViewModeProvider>
     <NightModeProvider>
-      <div className="h-screen">
-        <div className="fixed inset-x-0 bottom-[env(safe-area-inset-bottom)] top-0 flex">
+      <div className="h-screen [--mobile-nav-h:4rem] md:[--mobile-nav-h:0rem]">
+        <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+var(--mobile-nav-h))] top-0 flex">
           <div
             className={cn(
               "group relative flex min-h-0 w-full flex-grow",
