@@ -55,6 +55,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Added a black background behind the desktop navigation buttons.
+
 - Updated the navigation mark and favicon to the latest Grow brand artwork.
 
 ### Removed
