@@ -97,6 +97,10 @@ test("the mobile player clears the footer, including a bottom safe area", async 
   const controlsBox = (await controls.boundingBox())!;
   const landscapeNavBox = (await navigation.boundingBox())!;
   expect(controlsBox.y + controlsBox.height).toBeLessThanOrEqual(landscapeNavBox.y);
+  await player.getByRole("button", { name: "Hide tracks" }).click();
+  await controls.scrollIntoViewIfNeeded();
+  const collapsedControlsBox = (await controls.boundingBox())!;
+  expect(collapsedControlsBox.y + collapsedControlsBox.height).toBeLessThanOrEqual(landscapeNavBox.y);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: "/tmp/mobile-bottom-navigation-player.png" });
 
