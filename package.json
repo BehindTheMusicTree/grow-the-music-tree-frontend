@@ -23,10 +23,10 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@behindthemusictree/app-kit": "43.1.0",
-    "@behindthemusictree/app-kit-ui": "43.1.0",
+    "@behindthemusictree/app-kit": "43.1.2",
+    "@behindthemusictree/app-kit-ui": "43.1.2",
     "@behindthemusictree/brand": "12.13.0",
-    "@behindthemusictree/ui": "0.25.0",
+    "@behindthemusictree/ui": "0.26.0",
     "@fortawesome/fontawesome-svg-core": "6.5.2",
     "@fortawesome/free-solid-svg-icons": "6.5.2",
     "@fortawesome/react-fontawesome": "3.1.1",

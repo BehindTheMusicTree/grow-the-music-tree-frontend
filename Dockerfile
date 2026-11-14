@@ -2,7 +2,6 @@
 FROM node:26-alpine AS builder
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-COPY patches ./patches
 RUN npm install -g "$(node -p 'require("./package.json").packageManager')"
 RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
