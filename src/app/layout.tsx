@@ -8,6 +8,7 @@ import "@behindthemusictree/brand/styles";
 import "@behindthemusictree/brand/styles/icon-links.css";
 import "@behindthemusictree/app-kit-ui/genre-tree/styles.css";
 
+const pngIconUrl = typeof growTheMusicTreePngIcon === "string" ? growTheMusicTreePngIcon : growTheMusicTreePngIcon.src;
 const faviconUrl = typeof growTheMusicTreeFavicon === "string" ? growTheMusicTreeFavicon : growTheMusicTreeFavicon.src;
 
 export const metadata: Metadata = {
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
   description: "The ultimate community-driven platform for exploring musical genres",
   icons: {
     icon: [
-      { url: growTheMusicTreePngIcon.src, type: "image/png", sizes: "192x192" },
+      { url: pngIconUrl, type: "image/png", sizes: "192x192" },
       { url: faviconUrl, type: "image/svg+xml" },
     ],
     shortcut: faviconUrl,
