@@ -46,7 +46,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
     <PlayerPanelProvider>
     <GenreTreeViewModeProvider>
     <NightModeProvider>
-      <div className="h-screen [--mobile-nav-h:4rem] md:[--mobile-nav-h:0rem] phone-landscape:![--mobile-nav-h:4rem]">
+      <div className="h-screen [--mobile-nav-h:4rem] md:[--mobile-nav-h:0rem] phone-landscape:![--mobile-nav-h:4rem] phone-landscape:[--detail-panel-obscured-edge:left]">
         <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+var(--mobile-nav-h))] top-0 flex">
           <div
             className={cn(
