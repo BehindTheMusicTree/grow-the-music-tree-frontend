@@ -81,7 +81,7 @@ function Navigation({ aboutOpen = false }: { aboutOpen?: boolean }) {
     <nav
       aria-label="Main navigation"
       className={cn(
-        "phone-landscape:!right-1/2 fixed inset-x-0 bottom-0 z-50 flex h-[calc(var(--mobile-nav-h)+env(safe-area-inset-bottom))] flex-row items-start border-t border-white/10 bg-zinc-950 pb-[env(safe-area-inset-bottom)] desktop-layout:absolute desktop-layout:inset-x-auto desktop-layout:bottom-3 desktop-layout:left-1 desktop-layout:h-10 desktop-layout:items-center desktop-layout:gap-2 desktop-layout:border-0 desktop-layout:bg-transparent desktop-layout:pb-0 desktop-layout:transition-[left] desktop-layout:duration-200 motion-reduce:transition-none desktop-layout:[@media(pointer:coarse)]:h-[calc(var(--layout-touch-target)+0.5rem)]",
+        "phone-landscape:!right-1/2 fixed inset-x-0 bottom-0 z-50 flex h-[calc(var(--mobile-nav-h)+env(safe-area-inset-bottom))] flex-row items-start border-t border-white/10 bg-zinc-950 pb-[env(safe-area-inset-bottom)] desktop-layout:absolute desktop-layout:inset-x-auto desktop-layout:bottom-3 desktop-layout:left-1 desktop-layout:h-auto desktop-layout:items-center desktop-layout:gap-2 desktop-layout:p-1 desktop-layout:rounded-full desktop-layout:border-0 desktop-layout:bg-black desktop-layout:transition-[left] desktop-layout:duration-200 motion-reduce:transition-none desktop-layout:[@media(pointer:coarse)]:h-[calc(var(--layout-touch-target)+0.5rem)]",
         // Sits right of an open left detail panel; mobile navigation stays below the page.
         "group-has-[[data-detail-panel][data-side=left]:not([data-collapsed=true])]:desktop-layout:left-[calc(var(--layout-detail-panel-w)+0.25rem)]",
       )}
