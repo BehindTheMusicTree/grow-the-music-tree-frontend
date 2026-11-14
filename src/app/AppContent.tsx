@@ -47,7 +47,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
     <GenreTreeViewModeProvider>
     <NightModeProvider>
       <div className="h-screen">
-        <div className="fixed top-0 flex h-full w-full">
+        <div className="fixed inset-x-0 bottom-[env(safe-area-inset-bottom)] top-0 flex">
           <div
             className={cn(
               "group relative flex min-h-0 w-full flex-grow",
@@ -55,7 +55,7 @@ export default function AppContent({ children }: { children: ReactNode }) {
             )}
           >
             <NavButtons />
-            <div className="absolute top-[max(0.25rem,env(safe-area-inset-top))] right-1 z-50">
+            <div className="absolute top-[max(0.25rem,env(safe-area-inset-top))] right-1 z-50 group-has-[[data-search-account]]:max-md:hidden">
               <UserMenu />
             </div>
             <div className="flex min-h-0 w-full flex-grow">

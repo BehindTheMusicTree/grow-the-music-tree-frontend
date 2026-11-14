@@ -76,11 +76,11 @@ export default function NavButtons() {
     <nav
       aria-label="Main navigation"
       className={cn(
-        "absolute bottom-1 left-1 z-50 flex flex-row items-center gap-2 transition-[left] duration-200 motion-reduce:transition-none",
+        "absolute bottom-3 left-1 z-50 flex h-10 flex-row items-center gap-2 transition-[left] duration-200 motion-reduce:transition-none [@media(pointer:coarse)]:h-[calc(var(--layout-touch-target)+0.5rem)]",
         // Sits right of an open left detail panel; :has() reads the panel's own state, which lives in each page.
         // Class names must stay literal so Tailwind's scanner can see them.
         "group-has-[[data-detail-panel][data-side=left]:not([data-collapsed=true])]:md:left-[calc(var(--layout-detail-panel-w)+0.25rem)]",
-        "group-has-[[data-detail-panel][data-side=left][data-sheet=true]:not([data-collapsed=true])]:max-md:bottom-[calc(var(--layout-sheet-peek)+0.25rem)]",
+        "group-has-[[data-detail-panel][data-sheet=true]:not([data-collapsed=true])]:max-md:bottom-[calc(var(--layout-sheet-peek)+0.75rem)]",
         "group-has-[[data-detail-panel][data-sheet=true]_[aria-label='Resize_panel'][aria-expanded=true]]:max-md:hidden",
       )}
     >

@@ -66,6 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Using published app-kit/app-kit-ui 43.1.0 and UI 0.25.0, mobile tree and map search contain the account control in place of the search icon and fill the width only below 640px. Page navigation aligns with the floating controls and both respect the bottom safe area. Search leaves the resize handle clear while the map detail sheet is fully expanded, with browser coverage for expanding and collapsing the map sheet.
 - Make the tree, region map, and About navigation icons fill their buttons without inner spacing.
 - Size the About navigation button at 80% of the tree and map buttons.
 - Toggle night shading by pressing the Map button while already on the map; remove the separate moon control and shade the globe icon's right half along a 23.44° tilted axis when enabled.

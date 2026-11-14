@@ -1,5 +1,7 @@
 "use client";
 
+import { SearchAccountAction } from "@components/features/menu/SearchAccountAction";
+
 import { Suspense, useCallback, useEffect, useMemo, useState, type ComponentProps } from "react";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -212,6 +214,8 @@ function ZoomableGenreTreeView({
     collapsed: detailCollapsed,
     onCollapsedChange: setDetailCollapsed,
     placement: "regions" as const,
+    searchTrailingAction: <SearchAccountAction />,
+    searchFullWidthBreakpoint: "sm" as const,
     showDisplayOptions: false,
     artistUuid,
     onArtistUuidChange: setArtistUuid,
@@ -351,10 +355,10 @@ function GenreTreePageContent() {
     ({ genre, from, to }: ParentChange) => {
       const nameOf = (uuid: string) =>
         genrePlaylists.find((genrePlaylist) => genrePlaylist.criteria?.uuid === uuid)?.name;
-      const toName = nameOf(to);
+      const toName = to ? nameOf(to) : undefined;
       const fromName = from ? nameOf(from) : undefined;
       // The move is already saved; a name missing from this page's filtered list only costs the Undo.
-      if (!toName) {
+      if (!to || !toName) {
         toast.success("Parent changed");
         return;
       }

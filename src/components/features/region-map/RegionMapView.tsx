@@ -161,7 +161,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
 
   return (
     <div className="h-full">
-      <div className="relative h-full">
+      <div className="relative h-full max-md:[&:has([data-detail-panel][data-collapsed=false][data-sheet=true]_[aria-label='Resize_panel'][aria-expanded=true])_.region-map-search]:top-[max(var(--layout-touch-target),env(safe-area-inset-top))]">
         <RegionMapCanvas
           tileset={index.tileset}
           regions={regions}
@@ -175,7 +175,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
           onClearSelection={clearSelection}
           onCameraChange={onCameraChange}
         />
-        <RegionMapSearch index={index} regions={regions} onPick={pick} onPickArtist={(artist) => { setCollapsed(false); update({ artist }); }} onPickSong={(song) => { setCollapsed(false); update({ song }); }} selectedRegion={selected} selectedGenreUuid={state.genre} selectedArtistUuid={state.artist} selectedSongUuid={state.song} onClosePanel={clearSelection} className="absolute left-[var(--layout-search-inset)] right-[var(--layout-search-inset)] top-[var(--layout-search-inset)] z-20 md:right-auto md:w-[var(--layout-search-w)]" />
+        <RegionMapSearch index={index} regions={regions} onPick={pick} onPickArtist={(artist) => { setCollapsed(false); update({ artist }); }} onPickSong={(song) => { setCollapsed(false); update({ song }); }} selectedRegion={selected} selectedGenreUuid={state.genre} selectedArtistUuid={state.artist} selectedSongUuid={state.song} onClosePanel={clearSelection} className="region-map-search absolute left-[var(--layout-search-inset)] right-[var(--layout-search-inset)] top-[max(var(--layout-search-inset),env(safe-area-inset-top))] z-20 sm:right-auto sm:w-[var(--layout-search-w)] sm:max-md:max-w-sm" />
         {genreHasNoRegion && !selected && (
           <p role="status" className="absolute left-1/2 top-[calc(var(--layout-search-inset)+var(--layout-search-h)+0.5rem)] z-10 max-w-[calc(100%-theme(spacing.6))] -translate-x-1/2 rounded bg-white px-3 py-1 shadow">
             This genre has no region on the map.
