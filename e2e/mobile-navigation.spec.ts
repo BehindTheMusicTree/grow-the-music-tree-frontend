@@ -140,7 +140,7 @@ for (const width of [667, 844]) {
     const navBox = (await navigation.boundingBox())!;
     expect(navBox.x).toBe(0);
     expect(navBox.width).toBeCloseTo(width / 2, 0);
-    const selectedNode = page.locator(`[id="group-${ids.punk}"]`);
+    const selectedNode = page.locator(`[id="group-${ids.punkPlaylist}"]`);
     await expect(selectedNode).toBeVisible();
     await expect.poll(async () => {
       const box = (await selectedNode.boundingBox())!;

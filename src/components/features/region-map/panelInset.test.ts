@@ -16,6 +16,7 @@ function setup(data: Record<string, string>, panelRect: Partial<DOMRect>, edge?:
   const canvasRoot = document.createElement("div");
   canvasRoot.append(map);
   scope.append(canvasRoot, panel);
+  document.body.append(scope);
   vi.spyOn(scope, "getBoundingClientRect").mockReturnValue(rect({ left: 10, right: 1010, top: 0, bottom: 600 }));
   vi.spyOn(panel, "getBoundingClientRect").mockReturnValue(rect(panelRect));
   return map;
@@ -27,6 +28,7 @@ function mockMedia(matches: boolean) {
 
 describe("measurePanelInset", () => {
   afterEach(() => {
+    document.body.replaceChildren();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
