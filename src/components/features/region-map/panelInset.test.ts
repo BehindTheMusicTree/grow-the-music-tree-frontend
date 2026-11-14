@@ -6,28 +6,36 @@ function rect(r: Partial<DOMRect>): DOMRect {
   return { left: 0, top: 0, right: 0, bottom: 0, ...r } as DOMRect;
 }
 
-function setup(data: Record<string, string>, panelRect: Partial<DOMRect>) {
+function setup(data: Record<string, string>, panelRect: Partial<DOMRect>, edge?: string) {
   const scope = document.createElement("div");
   const map = document.createElement("div");
   const panel = document.createElement("aside");
   panel.setAttribute("data-detail-panel", "");
+  if (edge) panel.style.setProperty("--detail-panel-obscured-edge", edge);
   Object.entries(data).forEach(([k, v]) => panel.setAttribute(`data-${k}`, v));
   const canvasRoot = document.createElement("div");
   canvasRoot.append(map);
   scope.append(canvasRoot, panel);
+  document.body.append(scope);
   vi.spyOn(scope, "getBoundingClientRect").mockReturnValue(rect({ left: 10, right: 1010, top: 0, bottom: 600 }));
   vi.spyOn(panel, "getBoundingClientRect").mockReturnValue(rect(panelRect));
   return map;
 }
 
 function mockMedia(matches: boolean) {
-  vi.stubGlobal("matchMedia", () => ({ matches }));
+  vi.stubGlobal("matchMedia", (query: string) => ({ matches: matches && query === "(max-width: 47.999rem)" }));
 }
 
 describe("measurePanelInset", () => {
   afterEach(() => {
+    document.body.replaceChildren();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+  });
+
+  it("reserves the left half for a landscape detail sheet", () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    expect(measurePanelInset(setup({ collapsed: "false", sheet: "true" }, { right: 510, top: 300 }, "left"))).toEqual({ left: 500 });
   });
 
   it("returns nothing without a panel", () => {

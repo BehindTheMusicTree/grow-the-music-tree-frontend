@@ -14,8 +14,8 @@ import { viewSwitchHref } from "@lib/searchHrefs";
 import { cn } from "@lib/utils";
 
 const navItemClassName =
-  "flex h-16 min-w-0 flex-1 flex-col items-center justify-center gap-1 text-caption text-gray-300 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400 max-md:data-[active=true]:bg-white/10 max-md:data-[active=true]:text-white md:h-[var(--layout-header-h)] md:w-[var(--layout-header-h)] md:flex-none md:gap-0 md:rounded-full md:bg-black/70 md:text-gray-100 md:shadow-lg md:backdrop-blur md:aria-[current=page]:bg-white md:aria-[current=page]:text-black md:aria-pressed:bg-white md:aria-pressed:text-black md:aria-[current=page]:hover:text-black md:aria-pressed:hover:text-black";
-const navIconClassName = "h-6 w-6 shrink-0 md:h-full md:w-full";
+  "flex h-16 min-w-0 flex-1 flex-col items-center justify-center gap-1 text-caption text-gray-300 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400 mobile-layout:data-[active=true]:bg-white/10 mobile-layout:data-[active=true]:text-white desktop-layout:h-[var(--layout-header-h)] desktop-layout:w-[var(--layout-header-h)] desktop-layout:flex-none desktop-layout:gap-0 desktop-layout:rounded-full desktop-layout:bg-black/70 desktop-layout:text-gray-100 desktop-layout:shadow-lg desktop-layout:backdrop-blur desktop-layout:aria-[current=page]:bg-white desktop-layout:aria-[current=page]:text-black desktop-layout:aria-pressed:bg-white desktop-layout:aria-pressed:text-black desktop-layout:aria-[current=page]:hover:text-black desktop-layout:aria-pressed:hover:text-black";
+const navIconClassName = "h-6 w-6 shrink-0 desktop-layout:h-full desktop-layout:w-full";
 
 function AboutButton() {
   const pathname = usePathname();
@@ -31,13 +31,13 @@ function AboutButton() {
     <Link
       href={isOpen ? closedHref : openHref}
       prefetch={false}
-      className={cn(navItemClassName, "md:h-[calc(var(--layout-header-h)*0.8)] md:w-[calc(var(--layout-header-h)*0.8)]")}
+      className={cn(navItemClassName, "desktop-layout:h-[calc(var(--layout-header-h)*0.8)] desktop-layout:w-[calc(var(--layout-header-h)*0.8)]")}
       aria-label="About"
       aria-pressed={isOpen}
       data-active={isOpen}
     >
       <Info className={navIconClassName} viewBox="1 1 22 22" aria-hidden />
-      <span className="md:hidden">About</span>
+      <span className="desktop-layout:hidden">About</span>
     </Link>
   );
 }
@@ -81,14 +81,14 @@ function Navigation({ aboutOpen = false }: { aboutOpen?: boolean }) {
     <nav
       aria-label="Main navigation"
       className={cn(
-        "fixed inset-x-0 bottom-0 z-50 flex h-[calc(var(--mobile-nav-h)+env(safe-area-inset-bottom))] flex-row items-start border-t border-white/10 bg-zinc-950 pb-[env(safe-area-inset-bottom)] md:absolute md:inset-x-auto md:bottom-3 md:left-1 md:h-10 md:items-center md:gap-2 md:border-0 md:bg-transparent md:pb-0 md:transition-[left] md:duration-200 motion-reduce:transition-none md:[@media(pointer:coarse)]:h-[calc(var(--layout-touch-target)+0.5rem)]",
+        "phone-landscape:!right-1/2 fixed inset-x-0 bottom-0 z-50 flex h-[calc(var(--mobile-nav-h)+env(safe-area-inset-bottom))] flex-row items-start border-t border-white/10 bg-zinc-950 pb-[env(safe-area-inset-bottom)] desktop-layout:absolute desktop-layout:inset-x-auto desktop-layout:bottom-3 desktop-layout:left-1 desktop-layout:h-10 desktop-layout:items-center desktop-layout:gap-2 desktop-layout:border-0 desktop-layout:bg-transparent desktop-layout:pb-0 desktop-layout:transition-[left] desktop-layout:duration-200 motion-reduce:transition-none desktop-layout:[@media(pointer:coarse)]:h-[calc(var(--layout-touch-target)+0.5rem)]",
         // Sits right of an open left detail panel; mobile navigation stays below the page.
-        "group-has-[[data-detail-panel][data-side=left]:not([data-collapsed=true])]:md:left-[calc(var(--layout-detail-panel-w)+0.25rem)]",
+        "group-has-[[data-detail-panel][data-side=left]:not([data-collapsed=true])]:desktop-layout:left-[calc(var(--layout-detail-panel-w)+0.25rem)]",
       )}
     >
       <SwitchLink target="/" isCurrent={isHome} label={`${APP_NAME} home`}>
-        <Image src={logo} alt="" width={48} height={48} className={cn(navIconClassName, "object-contain", isHome && "md:brightness-0")} aria-hidden priority />
-        <span className="md:hidden">Tree</span>
+        <Image src={logo} alt="" width={48} height={48} className={cn(navIconClassName, "object-contain", isHome && "desktop-layout:brightness-0")} aria-hidden priority />
+        <span className="desktop-layout:hidden">Tree</span>
       </SwitchLink>
       {isRegionMap ? (
         <button
@@ -102,12 +102,12 @@ function Navigation({ aboutOpen = false }: { aboutOpen?: boolean }) {
           onClick={toggleNightMode}
         >
           <RegionGlobeIcon className={navIconClassName} nightMode={nightMode} />
-          <span className="md:hidden">Map</span>
+          <span className="desktop-layout:hidden">Map</span>
         </button>
       ) : (
         <SwitchLink target={REGION_MAP_HREF} isCurrent={false} label="Region map">
           <RegionGlobeIcon className={navIconClassName} nightMode={nightMode} />
-          <span className="md:hidden">Map</span>
+          <span className="desktop-layout:hidden">Map</span>
         </SwitchLink>
       )}
       <Suspense fallback={null}>

@@ -62,7 +62,10 @@ const config = {
     },
   },
   plugins: [
-    function ({ addComponents }) {
+    function ({ addComponents, addVariant }) {
+      addVariant("mobile-layout", "@media (max-width: 767px), (orientation: landscape) and (max-height: 500px) and (pointer: coarse)");
+      addVariant("desktop-layout", "@media (min-width: 768px) and (orientation: portrait), (min-width: 768px) and (min-height: 501px), (min-width: 768px) and (pointer: fine), (min-width: 768px) and (pointer: none)");
+      addVariant("phone-landscape", "@media (orientation: landscape) and (max-height: 500px) and (pointer: coarse)");
       const newComponents = {
         ".menu-item-container": {
           "@apply flex justify-center items-center h-menuitem w-menuitem text-white text-4xl rounded-md hover:bg-gray-800 p-2 mx-2 cursor-pointer":
