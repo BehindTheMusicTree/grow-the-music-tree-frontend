@@ -55,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Update app-kit and app-kit-ui to 43.1.4 so genre-tree dragging starts immediately from labels and chips.
 - Update app-kit and app-kit-ui to 43.1.3 for smoother touch pan and zoom in the genre tree.
 
 - Navigation colors highlight the current view: a colored tree on Tree, or blue oceans and green continents on Map, retaining night shading.
