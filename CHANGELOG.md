@@ -68,6 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Genre tree**: the wheel/outline view toggle is gone, so the outline view can no longer be reached. The view itself stays in `@behindthemusictree/app-kit-ui` and `GenreTreeViewModeProvider`; see `docs/pages/genre-tree.md` to bring it back. `ViewModeToggle` and its test are deleted.
 - The region detail panel on the map no longer shows the « Focus » button (the tree view keeps it). `RegionDetailPanel` stops passing `onZoomIn` to `GenreDetailPanel`.
+- Drop the tracked `.agent-plans/.gitignore`: plans now live in the common git directory.
 
 ### Fixed
 
