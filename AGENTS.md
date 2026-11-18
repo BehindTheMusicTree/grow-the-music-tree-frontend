@@ -93,6 +93,10 @@ Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONIN
   Docker's auto-set container-ID value. Removing either regresses a real production
   rollback incident (see `CHANGELOG.md` v2.4.0 "Fixed" and `ARCHITECTURE.md`).
 
+## Review checklist
+
+Flag in review: `console.log` or debug code left in; non-Tailwind inline styles or CSS; missing types or implicit `any`; branch or PR titles that break `CONTRIBUTING.md`; deviations from this file.
+
 ## Further docs
 
 - `docs/DEPLOYMENT.md`, `docs/frontend-auth.md`, `docs/DATA_ATTRIBUTES.md`, `docs/SEMANTIC_HTML.md`
