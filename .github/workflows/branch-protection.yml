@@ -6,6 +6,10 @@ on:
       - main
       - develop
 
+concurrency:
+  group: branch-protection-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   check-branch-name:
     name: Verify PR source branch

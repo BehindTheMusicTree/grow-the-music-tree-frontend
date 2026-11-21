@@ -4,6 +4,11 @@ on:
     branches: [main]
 permissions:
   contents: read
+# One run per pushed commit, never cancelled or replaced: release-tag validates only before..after, so a replaced run would leave its bump untagged.
+concurrency:
+  group: release-tag-${{ github.sha }}
+  cancel-in-progress: false
+
 jobs:
   release:
     uses: BehindTheMusicTree/github-workflows/.github/workflows/release-tag.yml@79c136234b5d487bb99e0cd2050f38f6b3e06747
