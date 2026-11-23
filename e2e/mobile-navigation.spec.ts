@@ -192,26 +192,31 @@ for (const width of [667, 844]) {
 }
 
 for (const width of [390, 1280]) {
-  test(`navigation colors follow the current view at ${width}px`, async ({ page }) => {
+  test(`navigation marks follow the current view at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 });
     await page.goto("/");
     const navigation = page.getByRole("navigation", { name: "Main navigation" });
     const treeImage = navigation.getByRole("link", { name: "GrowTheMusicTree home" }).locator("img");
-    const ocean = navigation.getByTestId("region-globe-path");
-    const continents = navigation.locator("svg > circle").first();
+    const mapLink = navigation.getByRole("link", { name: "Region map" });
+    const mapButton = navigation.getByRole("button", { name: "Region map" });
     await expect(treeImage).toHaveCSS("filter", "none");
-    await expect(ocean).toHaveCSS("fill", "rgb(255, 255, 255)");
-    await expect(continents).toHaveCSS("fill", "rgb(0, 0, 0)");
-    await navigation.getByRole("link", { name: "Region map" }).click();
+    const inactiveMark = mapLink.locator("img");
+    await expect(inactiveMark).toHaveAttribute("src", /icon-192\.[^/]+\.png$/);
+    await expect(inactiveMark).toHaveCSS("filter", "brightness(0) invert(1)");
+    await expect.poll(() => inactiveMark.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBe(192);
+    const markSrc = await inactiveMark.getAttribute("src");
+    await mapLink.click();
     await expect(treeImage).toHaveCSS("filter", "brightness(0) invert(1)");
-    await expect(ocean).toHaveCSS("fill", "rgb(59, 130, 246)");
-    await expect(continents).toHaveCSS("fill", "rgb(34, 197, 94)");
-    await navigation.getByRole("button", { name: "Region map" }).click();
-    await expect(navigation.getByTestId("region-globe-night-shade")).toBeVisible();
-    await expect(ocean).toHaveCSS("fill", "rgb(59, 130, 246)");
-    await expect(continents).toHaveCSS("fill", "rgb(34, 197, 94)");
+    const activeMark = mapButton.locator("img");
+    await expect(activeMark).toHaveAttribute("src", markSrc!);
+    await expect(activeMark).toHaveCSS("filter", "none");
+    await mapButton.click();
+    const shade = mapButton.getByTestId("map-mark-night-shade");
+    await expect(shade).toBeVisible();
+    await expect(shade).toHaveCSS("filter", "brightness(0.5)");
+    await expect(shade).toHaveCSS("clip-path", "polygon(71.7% 0px, 100% 0px, 100% 100%, 28.3% 100%)");
     if (width === 1280) {
-      await expect(navigation.getByRole("button", { name: "Region map" })).toHaveCSS("background-color", "rgba(0, 0, 0, 0.7)");
+      await expect(mapButton).toHaveCSS("background-color", "rgba(0, 0, 0, 0.7)");
     }
   });
 }

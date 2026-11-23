@@ -6,8 +6,8 @@ import { Suspense, type ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Info } from "lucide-react";
 import { useNightMode } from "@contexts/NightModeProvider";
-import { RegionGlobeIcon } from "./RegionGlobeIcon";
 import logo from "@behindthemusictree/brand/marks/grow-the-music-tree/grow-the-music-tree-mark.png";
+import mapMark from "@behindthemusictree/brand/favicons/the-music-map/icon-192.png";
 import { APP_NAME } from "@lib/constants/app";
 import { ABOUT_HREF, REGION_MAP_HREF } from "@lib/constants/routes";
 import { viewSwitchHref } from "@lib/searchHrefs";
@@ -16,6 +16,32 @@ import { cn } from "@lib/utils";
 const navItemClassName =
   "flex h-16 min-w-0 flex-1 flex-col items-center justify-center gap-1 text-caption text-gray-300 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400 mobile-layout:data-[active=true]:bg-white/10 mobile-layout:data-[active=true]:text-white desktop-layout:h-[var(--layout-header-h)] desktop-layout:w-[var(--layout-header-h)] desktop-layout:flex-none desktop-layout:gap-0 desktop-layout:rounded-full desktop-layout:bg-black/70 desktop-layout:text-gray-100 desktop-layout:shadow-lg desktop-layout:backdrop-blur";
 const navIconClassName = "h-6 w-6 shrink-0 desktop-layout:h-full desktop-layout:w-full";
+
+function MapMark({ active, nightMode }: { active: boolean; nightMode: boolean }) {
+  const mark = (
+    <Image
+      src={mapMark}
+      alt=""
+      width={48}
+      height={48}
+      className={cn("h-full w-full object-contain", !active && "brightness-0 invert")}
+    />
+  );
+
+  return (
+    <span className={cn(navIconClassName, "relative block")} aria-hidden>
+      {mark}
+      {nightMode && (
+        <span
+          className="absolute inset-0 brightness-50 [clip-path:polygon(71.7%_0,100%_0,100%_100%,28.3%_100%)]"
+          data-testid="map-mark-night-shade"
+        >
+          {mark}
+        </span>
+      )}
+    </span>
+  );
+}
 
 function AboutButton() {
   const pathname = usePathname();
@@ -101,12 +127,12 @@ function Navigation({ aboutOpen = false }: { aboutOpen?: boolean }) {
           title={nightMode ? "Disable night mode" : "Enable night mode"}
           onClick={toggleNightMode}
         >
-          <RegionGlobeIcon className={navIconClassName} nightMode={nightMode} colored={isRegionMap} />
+          <MapMark active={isRegionMap} nightMode={nightMode} />
           <span className="desktop-layout:hidden">Map</span>
         </button>
       ) : (
         <SwitchLink target={REGION_MAP_HREF} isCurrent={false} label="Region map">
-          <RegionGlobeIcon className={navIconClassName} nightMode={nightMode} colored={isRegionMap} />
+          <MapMark active={isRegionMap} nightMode={nightMode} />
           <span className="desktop-layout:hidden">Map</span>
         </SwitchLink>
       )}

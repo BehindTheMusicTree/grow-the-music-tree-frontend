@@ -16,7 +16,7 @@ entities they outrank, and each view shows one panel.
 The Map navigation control links to `/map` from other pages. On `/map`, it becomes a button that toggles night
 shading without navigating, changing the camera or selection, or adding history entries. There is no separate moon
 button. Night shading starts disabled and persists across tree/map navigation during the current app session.
-When enabled, the globe icon's right half is shaded along an axis tilted 23.44° clockwise from vertical (bottom left
+When enabled, the Music Map mark's right half is shaded along an axis tilted 23.44° clockwise from vertical (bottom left
 to top right). The left half keeps its normal appearance. The button exposes its state through `aria-pressed`.
 
 Written by `useRegionMapUrlState`.
@@ -55,4 +55,4 @@ Changing the view mode drops `view`, and `zoom` outside pop-core, with replace.
 layout `<title>` overwrites it after a navigation, and restores the app name when the entity closes. The genre tree
 and the map apply it only when no genre is selected, since the genre panel is the one displayed.
 
-The Tree navigation icon is colored on `/` and white elsewhere, on a black background. The globe has white oceans and black continents outside `/map`; on `/map`, its oceans are blue and continents green, with the night shading drawn over both colors.
+The Tree navigation icon is colored on `/` and white elsewhere, on a black background. The Map control uses the white Music Map mark outside `/map` and the full-color mark on `/map`.
