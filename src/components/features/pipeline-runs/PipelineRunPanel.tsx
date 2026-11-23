@@ -7,7 +7,10 @@ import { z } from "zod";
 import { Button, StepList } from "@behindthemusictree/ui";
 import { useFetchWrapper, useQueryWithParse, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import { formatDuration } from "@components/features/import-runs/importedOn";
-import { KIND_LABELS, STAGE_LABELS, UPLOAD_STAGES, originOf, stepsOf } from "@components/features/pipeline-runs/labels";
+import {
+  KIND_LABELS, STAGE_LABELS, UPLOAD_STAGES, WIKIDATA_JOIN_LABEL, foregroundStepDetails, originOf, stepsOf,
+  wikidataRetryLabel, wikidataStepsOf,
+} from "@components/features/pipeline-runs/labels";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import {
   PIPELINE_RUN_KINDS,
@@ -34,12 +37,14 @@ function progressOf({ kind, status, stage, stageCurrent, stageTotal }: PipelineR
   return (index + sub) / stages.length;
 }
 
-function labelOf({ kind, status, stage, stageCurrent, stageTotal, error }: PipelineRunRequest): string {
+function labelOf({ kind, status, stage, stageCurrent, stageTotal, error, stepTelemetry }: PipelineRunRequest): string {
   switch (status) {
     case "queued":
       return "En file d'attente";
     case "running": {
-      const label = STAGE_LABELS[stage ?? "fetching_rules"];
+      const waitingForWikidata = stage === "building_genres" &&
+        stepTelemetry?.foreground.some((step) => step.stage === "building_genres");
+      const label = waitingForWikidata ? WIKIDATA_JOIN_LABEL : STAGE_LABELS[stage ?? "fetching_rules"];
       return stage && UPLOAD_STAGES.includes(stage) && stageCurrent !== null && stageTotal !== null
         ? `${label} (${stageCurrent}/${stageTotal})`
         : label;
@@ -135,6 +140,8 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
   const now = useNow(request?.status === "running");
   const duration = request && durationOf(request, now);
   const steps = request && stepsOf(request);
+  const wikidataSteps = request ? wikidataStepsOf(request, now) : [];
+  const retry = request && wikidataRetryLabel(request);
 
   return (
     <section className="flex flex-col gap-2" aria-label="Runs du pipeline">
@@ -171,9 +178,17 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
             <StepList
               aria-label="Étapes du run"
               statusLabels={{ done: "terminée", current: "en cours", pending: "à venir", failed: "interrompue" }}
-              steps={steps}
+              steps={foregroundStepDetails(steps, request, now)}
             />
           )}
+          {wikidataSteps.length > 0 && (
+            <StepList
+              aria-label="Étapes de la chaîne Wikidata"
+              statusLabels={{ done: "terminée", current: "en cours", pending: "à venir", failed: "interrompue" }}
+              steps={wikidataSteps}
+            />
+          )}
+          {retry && <p role="status" className="text-body text-gray-600">{retry}</p>}
           <p aria-live="polite" className={request.status === "failed" ? "text-red-600" : "text-gray-700"}>
             {KIND_LABELS[request.kind]} : {labelOf(request)}
           </p>

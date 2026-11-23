@@ -208,6 +208,50 @@ describe("PipelineRunPanel", () => {
     expect(screen.getByText("Manuel · en 2 h 05 min")).toBeInTheDocument();
   });
 
+  it("shows recorded durations on both chains and clears a recovered WDQS retry", () => {
+    vi.useFakeTimers({ now: Date.parse("2026-10-12T10:03:00Z") });
+    const stepTelemetry: NonNullable<PipelineRunRequest["stepTelemetry"]> = {
+      variant: "split_silver",
+      foreground: [{
+        stage: "ingesting_discogs",
+        state: "succeeded",
+        startedAt: "2026-10-12T10:00:00Z",
+        finishedAt: "2026-10-12T10:00:45Z",
+      }],
+      wikidata: [{
+        stage: "ingesting_wikidata",
+        state: "running",
+        startedAt: "2026-10-12T10:02:00Z",
+        finishedAt: null,
+      }],
+      wikidataRetry: { attempt: 2, reason: "http", httpStatus: 503 },
+    };
+    latest = request({ kind: "full", stage: "building_songs", stepTelemetry });
+    const { rerender } = render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+    const foreground = within(screen.getByRole("list", { name: "Étapes du run" }));
+    const wikidata = within(screen.getByRole("list", { name: "Étapes de la chaîne Wikidata" }));
+
+    expect(foreground.getByText("(45 s)")).toBeInTheDocument();
+    expect(wikidata.getByText("(depuis 1 min)")).toBeInTheDocument();
+    expect(screen.getByText(/WDQS \(HTTP 503\).*tentative 2/)).toHaveAttribute("role", "status");
+    act(() => vi.advanceTimersByTime(60_000));
+    expect(wikidata.getByText("(depuis 2 min)")).toBeInTheDocument();
+
+    latest = request({ kind: "full", stage: "building_songs", stepTelemetry: { ...stepTelemetry, wikidataRetry: null } });
+    rerender(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+    expect(screen.queryByText(/WDQS \(HTTP 503\)/)).not.toBeInTheDocument();
+
+    latest = request({
+      kind: "full",
+      status: "succeeded",
+      stage: "ingesting_discogs",
+      stepTelemetry: { ...stepTelemetry, variant: "bronze_only", wikidata: [], wikidataRetry: null },
+    });
+    rerender(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+    expect(foreground.getByText("(45 s)")).toBeInTheDocument();
+    expect(foreground.queryByText("Construction du Gold")).not.toBeInTheDocument();
+  });
+
   it("counts up while the run is going", () => {
     vi.useFakeTimers({ now: Date.parse("2026-10-12T10:03:00Z") });
     latest = request({ trigger: "scheduled", startedOn: "2026-10-12T10:00:00Z" });

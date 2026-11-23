@@ -47,6 +47,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The admin panel shows completed and elapsed step durations for both branches of a full pipeline run, and reports active WDQS retries.
+
 - Touch-phone landscape navigation and detail panels share the left half of the screen, including beyond the desktop width breakpoint.
 
 - Mobile navigation now provides Tree, Map and About tabs above the device safe area.
