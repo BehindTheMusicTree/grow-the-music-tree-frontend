@@ -34,8 +34,8 @@ const WIKIDATA_STAGES = [
 export type WikidataStage = (typeof WIKIDATA_STAGES)[number];
 
 const StepTimingSchema = z.object({
-  startedAt: z.iso.datetime(),
-  finishedAt: z.iso.datetime().nullable(),
+  startedAt: z.iso.datetime({ offset: true }),
+  finishedAt: z.iso.datetime({ offset: true }).nullable(),
   state: z.enum(["running", "succeeded", "failed", "cancelled"]),
 });
 
@@ -47,7 +47,7 @@ const StepTelemetrySchema = z.object({
     .object({
       attempt: z.number().int().positive(),
       reason: z.enum(["http", "transport", "timeout"]),
-      httpStatus: z.number().int().nullable(),
+      httpStatus: z.number().int().nullish(),
     })
     .nullable(),
 });

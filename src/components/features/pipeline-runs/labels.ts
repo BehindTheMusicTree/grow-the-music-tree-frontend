@@ -79,7 +79,8 @@ export function foregroundStepDetails(steps: RunStep[], request: PipelineRunRequ
   return steps.flatMap((step) => {
     const timing = telemetry.foreground.find(({ stage }) => stage === step.key);
     if (!timing) {
-      if (!running || (bronzeOnly && !BRONZE_FOREGROUND_STAGES.includes(step.key))) return [];
+      if (bronzeOnly && !BRONZE_FOREGROUND_STAGES.includes(step.key)) return [];
+      if (!running) return step;
       return hasRunningStep ? { ...step, status: "pending", detail: undefined } : { ...step, status: step.status === "current" ? "current" : "pending" };
     }
     const status = stepStatusOf(timing, request);
@@ -111,7 +112,7 @@ export function wikidataRetryLabel(request: PipelineRunRequest): string | null {
   const retry = request.status === "running" ? request.stepTelemetry?.wikidataRetry : null;
   const step = request.stepTelemetry?.wikidata.at(-1);
   if (!retry || step?.stage !== "ingesting_wikidata" || step.state !== "running") return null;
-  const reason = retry.reason === "http" ? `HTTP ${retry.httpStatus}` : retry.reason === "timeout" ? "délai dépassé" : "erreur réseau";
+  const reason = retry.reason === "http" ? retry.httpStatus ? `HTTP ${retry.httpStatus}` : "erreur HTTP" : retry.reason === "timeout" ? "délai dépassé" : "erreur réseau";
   return `WDQS (${reason}) · nouvelle tentative après l’échec de la tentative ${retry.attempt}`;
 }
 

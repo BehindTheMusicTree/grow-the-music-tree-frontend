@@ -208,6 +208,36 @@ describe("PipelineRunPanel", () => {
     expect(screen.getByText("Manuel · en 2 h 05 min")).toBeInTheDocument();
   });
 
+  it("keeps the legacy step list when a stopped run has no recorded timing for its stage", () => {
+    latest = request({
+      kind: "full",
+      status: "failed",
+      stage: "ingesting_discogs",
+      error: "boom",
+      stepTelemetry: { variant: "split_silver", foreground: [], wikidata: [], wikidataRetry: null },
+    });
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    const steps = within(screen.getByRole("list", { name: "Étapes du run" }));
+    expect(steps.getByText("interrompue")).toBeInTheDocument();
+  });
+
+  it("describes a WDQS retry without an HTTP status", () => {
+    latest = request({
+      kind: "full",
+      stage: "building_songs",
+      stepTelemetry: {
+        variant: "split_silver",
+        foreground: [],
+        wikidata: [{ stage: "ingesting_wikidata", state: "running", startedAt: "2026-10-12T10:02:00+00:00", finishedAt: null }],
+        wikidataRetry: { attempt: 1, reason: "http", httpStatus: null },
+      },
+    });
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.getByText(/WDQS \(erreur HTTP\)/)).toBeInTheDocument();
+  });
+
   it("shows recorded durations on both chains and clears a recovered WDQS retry", () => {
     vi.useFakeTimers({ now: Date.parse("2026-10-12T10:03:00Z") });
     const stepTelemetry: NonNullable<PipelineRunRequest["stepTelemetry"]> = {
