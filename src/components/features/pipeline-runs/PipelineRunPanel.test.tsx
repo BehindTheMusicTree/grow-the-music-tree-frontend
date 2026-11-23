@@ -217,6 +217,11 @@ describe("PipelineRunPanel", () => {
         state: "succeeded",
         startedAt: "2026-10-12T10:00:00Z",
         finishedAt: "2026-10-12T10:00:45Z",
+      }, {
+        stage: "ingesting_musicbrainz",
+        state: "running",
+        startedAt: "2026-10-12T10:01:00Z",
+        finishedAt: null,
       }],
       wikidata: [{
         stage: "ingesting_wikidata",
@@ -232,6 +237,8 @@ describe("PipelineRunPanel", () => {
     const wikidata = within(screen.getByRole("list", { name: "Étapes de la chaîne Wikidata" }));
 
     expect(foreground.getByText("(45 s)")).toBeInTheDocument();
+    expect(foreground.getByText("(depuis 2 min)")).toBeInTheDocument();
+    expect(foreground.getAllByText("en cours")).toHaveLength(1);
     expect(wikidata.getByText("(depuis 1 min)")).toBeInTheDocument();
     expect(screen.getByText(/WDQS \(HTTP 503\).*tentative 2/)).toHaveAttribute("role", "status");
     act(() => vi.advanceTimersByTime(60_000));
@@ -245,7 +252,13 @@ describe("PipelineRunPanel", () => {
       kind: "full",
       status: "succeeded",
       stage: "ingesting_discogs",
-      stepTelemetry: { ...stepTelemetry, variant: "bronze_only", wikidata: [], wikidataRetry: null },
+      stepTelemetry: {
+        ...stepTelemetry,
+        variant: "bronze_only",
+        foreground: stepTelemetry.foreground.slice(0, 1),
+        wikidata: [],
+        wikidataRetry: null,
+      },
     });
     rerender(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
     expect(foreground.getByText("(45 s)")).toBeInTheDocument();

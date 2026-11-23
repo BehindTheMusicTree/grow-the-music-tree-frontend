@@ -139,7 +139,8 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
   const progress = request && progressOf(request);
   const now = useNow(request?.status === "running");
   const duration = request && durationOf(request, now);
-  const steps = request && stepsOf(request);
+  const legacySteps = request && stepsOf(request);
+  const steps = legacySteps && request ? foregroundStepDetails(legacySteps, request, now) : [];
   const wikidataSteps = request ? wikidataStepsOf(request, now) : [];
   const retry = request && wikidataRetryLabel(request);
 
@@ -174,11 +175,11 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
           {progress !== null && (
             <progress value={progress} max={1} aria-label="Progression du run" className="w-full" />
           )}
-          {steps && (
+          {steps.length > 0 && (
             <StepList
               aria-label="Étapes du run"
               statusLabels={{ done: "terminée", current: "en cours", pending: "à venir", failed: "interrompue" }}
-              steps={foregroundStepDetails(steps, request, now)}
+              steps={steps}
             />
           )}
           {wikidataSteps.length > 0 && (
