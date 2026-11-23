@@ -64,6 +64,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated the navigation mark and favicon to the latest Grow brand artwork.
 
+- Use the circled Grow brand mark for the Tree navigation button.
+
 ### Removed
 
 - **Genre tree**: the wheel/outline view toggle is gone, so the outline view can no longer be reached. The view itself stays in `@behindthemusictree/app-kit-ui` and `GenreTreeViewModeProvider`; see `docs/pages/genre-tree.md` to bring it back. `ViewModeToggle` and its test are deleted.

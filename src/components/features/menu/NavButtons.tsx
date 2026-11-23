@@ -6,7 +6,7 @@ import { Suspense, type ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Info } from "lucide-react";
 import { useNightMode } from "@contexts/NightModeProvider";
-import logo from "@behindthemusictree/brand/marks/grow-the-music-tree/grow-the-music-tree-mark.png";
+import logo from "@behindthemusictree/brand/marks/grow-the-music-tree/grow-the-music-tree-mark-circled.png";
 import mapMark from "@behindthemusictree/brand/favicons/the-music-map/icon-192.png";
 import { APP_NAME } from "@lib/constants/app";
 import { ABOUT_HREF, REGION_MAP_HREF } from "@lib/constants/routes";
