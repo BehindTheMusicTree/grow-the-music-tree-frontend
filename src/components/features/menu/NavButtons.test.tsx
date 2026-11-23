@@ -47,21 +47,21 @@ describe("NavButtons", () => {
     expect(button).toHaveAttribute("aria-current", "page");
     expect(button).toHaveAttribute("aria-pressed", "false");
     expect(screen.queryByRole("link", { name: "Region map" })).not.toBeInTheDocument();
-    expect(screen.queryByTestId("region-globe-night-shade")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("map-mark-night-shade")).not.toBeInTheDocument();
     fireEvent.click(button);
     expect(button).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByTestId("region-globe-night-shade")).toBeInTheDocument();
+    expect(screen.getByTestId("map-mark-night-shade")).toBeInTheDocument();
     expect(searchParams.toString()).toBe("genre=abc&region=Q1");
     fireEvent.click(button);
     expect(button).toHaveAttribute("aria-pressed", "false");
-    expect(screen.queryByTestId("region-globe-night-shade")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("map-mark-night-shade")).not.toBeInTheDocument();
   });
 
   it("offers navigation to the map rather than a night toggle from the tree", () => {
     renderHeader();
     expect(screen.getByRole("link", { name: "Region map" })).toHaveAttribute("href", "/map");
     expect(screen.queryByRole("button", { name: "Region map" })).not.toBeInTheDocument();
-    expect(screen.queryByTestId("region-globe-night-shade")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("map-mark-night-shade")).not.toBeInTheDocument();
   });
 
   it("links the About button to /?about", () => {

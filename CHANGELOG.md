@@ -58,7 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update app-kit and app-kit-ui to 43.1.4 so genre-tree dragging starts immediately from labels and chips.
 - Update app-kit and app-kit-ui to 43.1.3 for smoother touch pan and zoom in the genre tree.
 
-- Navigation colors highlight the current view: a colored tree on Tree, or blue oceans and green continents on Map, retaining night shading.
+- Use the Music Map mark from brand 12.15.0 in the Map control, with full color on the Map view and diagonal shading when night mode is enabled.
 
 - Added a black background behind the desktop navigation buttons.
 

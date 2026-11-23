@@ -30,19 +30,19 @@ test("the map button toggles night shading without navigation and remembers it a
   const camera = param(page, "at");
   await mapButton.click();
   await expect(mapButton).toHaveAttribute("aria-pressed", "true");
-  await expect(mapButton.getByTestId("region-globe-night-shade")).toBeVisible();
+  await expect(mapButton.getByTestId("map-mark-night-shade")).toBeVisible();
   expect(param(page, "genre")).toBe(ids.punk);
   expect(param(page, "at")).toBe(camera);
   expect(await page.evaluate(() => history.length)).toBe(before);
 
   await toTree(page);
   await expectState(page, { title: APP_TITLE, panel: names.punk });
-  await expect(page.getByRole("link", { name: "Region map" }).getByTestId("region-globe-night-shade")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Region map" }).getByTestId("map-mark-night-shade")).toBeVisible();
   await toMap(page);
   await expect(mapButton).toHaveAttribute("aria-pressed", "true");
   await mapButton.click();
   await expect(mapButton).toHaveAttribute("aria-pressed", "false");
-  await expect(mapButton.getByTestId("region-globe-night-shade")).toHaveCount(0);
+  await expect(mapButton.getByTestId("map-mark-night-shade")).toHaveCount(0);
 });
 
 test("navigation icons fill their buttons and About stays smaller", async ({ page }) => {
@@ -57,7 +57,7 @@ test("navigation icons fill their buttons and About stays smaller", async ({ pag
   expect(aboutBox.width / treeBox.width).toBeCloseTo(0.8, 2);
   expect(aboutBox.height / treeBox.height).toBeCloseTo(0.8, 2);
   expect((await tree.locator("img").boundingBox())!.width).toBeCloseTo(treeBox.width);
-  expect((await map.locator("svg").boundingBox())!.width).toBeCloseTo(mapBox.width);
+  expect((await map.locator("img").boundingBox())!.width).toBeCloseTo(mapBox.width);
   expect((await about.locator("svg").boundingBox())!.width).toBeCloseTo(aboutBox.width);
 });
 
