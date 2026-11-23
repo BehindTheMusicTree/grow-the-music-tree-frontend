@@ -1,13 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useId, useRef, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { Button, StepList } from "@behindthemusictree/ui";
 import { useFetchWrapper, useQueryWithParse, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import { formatDuration } from "@components/features/import-runs/importedOn";
-import { KIND_LABELS, STAGE_LABELS, UPLOAD_STAGES, originOf, stepsOf } from "@components/features/pipeline-runs/labels";
+import {
+  KIND_LABELS, STAGE_LABELS, UPLOAD_STAGES, WIKIDATA_JOIN_LABEL, foregroundStepDetails, originOf, stepsOf,
+  wikidataRetryLabel, wikidataStepsOf,
+} from "@components/features/pipeline-runs/labels";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import {
   PIPELINE_RUN_KINDS,
@@ -34,12 +37,14 @@ function progressOf({ kind, status, stage, stageCurrent, stageTotal }: PipelineR
   return (index + sub) / stages.length;
 }
 
-function labelOf({ kind, status, stage, stageCurrent, stageTotal, error }: PipelineRunRequest): string {
+function labelOf({ kind, status, stage, stageCurrent, stageTotal, error, stepTelemetry }: PipelineRunRequest): string {
   switch (status) {
     case "queued":
       return "En file d'attente";
     case "running": {
-      const label = STAGE_LABELS[stage ?? "fetching_rules"];
+      const waitingForWikidata = stage === "building_genres" &&
+        stepTelemetry?.foreground.some((step) => step.stage === "building_genres");
+      const label = waitingForWikidata ? WIKIDATA_JOIN_LABEL : STAGE_LABELS[stage ?? "fetching_rules"];
       return stage && UPLOAD_STAGES.includes(stage) && stageCurrent !== null && stageTotal !== null
         ? `${label} (${stageCurrent}/${stageTotal})`
         : label;
@@ -85,6 +90,7 @@ type Props = { pendingCount: number; initialRequest: PipelineRunRequest | null }
 
 /** Launches a curation run, a full ingestion or a Gold sync, follows its progress and cancels it. */
 export default function PipelineRunPanel({ pendingCount, initialRequest }: Props) {
+  const wikidataHeadingId = useId();
   const router = useRouter();
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
@@ -134,7 +140,10 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
   const progress = request && progressOf(request);
   const now = useNow(request?.status === "running");
   const duration = request && durationOf(request, now);
-  const steps = request && stepsOf(request);
+  const legacySteps = request && stepsOf(request);
+  const steps = legacySteps && request ? foregroundStepDetails(legacySteps, request, now) : [];
+  const wikidataSteps = request ? wikidataStepsOf(request, now) : [];
+  const retry = request && wikidataRetryLabel(request);
 
   return (
     <section className="flex flex-col gap-2" aria-label="Runs du pipeline">
@@ -167,13 +176,24 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
           {progress !== null && (
             <progress value={progress} max={1} aria-label="Progression du run" className="w-full" />
           )}
-          {steps && (
+          {steps.length > 0 && (
             <StepList
               aria-label="Étapes du run"
               statusLabels={{ done: "terminée", current: "en cours", pending: "à venir", failed: "interrompue" }}
               steps={steps}
             />
           )}
+          {wikidataSteps.length > 0 && (
+            <div className="mt-2 flex flex-col gap-1">
+              <p id={wikidataHeadingId} className="text-body font-medium">Chaîne Wikidata et Geohistory</p>
+              <StepList
+                aria-labelledby={wikidataHeadingId}
+                statusLabels={{ done: "terminée", current: "en cours", pending: "à venir", failed: "interrompue" }}
+                steps={wikidataSteps}
+              />
+            </div>
+          )}
+          {retry && <p role="status" className="text-body text-gray-600">{retry}</p>}
           <p aria-live="polite" className={request.status === "failed" ? "text-red-600" : "text-gray-700"}>
             {KIND_LABELS[request.kind]} : {labelOf(request)}
           </p>

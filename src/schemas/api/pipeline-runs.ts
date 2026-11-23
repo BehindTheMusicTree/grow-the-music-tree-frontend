@@ -23,6 +23,37 @@ const STAGES = [
 ] as const;
 export type PipelineRunStage = (typeof STAGES)[number];
 
+const WIKIDATA_STAGES = [
+  "ingesting_geohistory",
+  "ingesting_wikidata",
+  "building_wikidata_silver",
+  "building_geohistory_silver",
+  "resolving_wikidata_silver",
+  "anchoring_wikidata_silver",
+] as const;
+export type WikidataStage = (typeof WIKIDATA_STAGES)[number];
+
+const StepTimingSchema = z.object({
+  startedAt: z.iso.datetime({ offset: true }),
+  finishedAt: z.iso.datetime({ offset: true }).nullable(),
+  state: z.enum(["running", "succeeded", "failed", "cancelled"]),
+});
+
+const StepTelemetrySchema = z.object({
+  variant: z.enum(["bronze_only", "legacy_silver", "split_silver"]),
+  foreground: z.array(StepTimingSchema.extend({ stage: z.enum(STAGES) })),
+  wikidata: z.array(StepTimingSchema.extend({ stage: z.enum(WIKIDATA_STAGES) })),
+  wikidataRetry: z
+    .object({
+      attempt: z.number().int().positive(),
+      reason: z.enum(["http", "transport", "timeout"]),
+      httpStatus: z.number().int().nullish(),
+    })
+    .nullable(),
+});
+
+export type StepTiming = z.infer<typeof StepTimingSchema>;
+
 const IMPORT_STAGES = [
   "importing_tree",
   "uploading_songs",
@@ -68,6 +99,7 @@ export const PipelineRunRequestSchema = z.object({
   stage: z.enum(STAGES).nullable(),
   stageCurrent: z.number().nullable(),
   stageTotal: z.number().nullable(),
+  stepTelemetry: StepTelemetrySchema.nullish(),
   error: z.string().nullable(),
   cancelRequested: z.boolean(),
   requestedOn: z.string(),
