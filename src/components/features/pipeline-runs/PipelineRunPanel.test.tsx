@@ -234,7 +234,7 @@ describe("PipelineRunPanel", () => {
     latest = request({ kind: "full", stage: "building_songs", stepTelemetry });
     const { rerender } = render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
     const foreground = within(screen.getByRole("list", { name: "Étapes du run" }));
-    const wikidata = within(screen.getByRole("list", { name: "Étapes de la chaîne Wikidata" }));
+    const wikidata = within(screen.getByRole("list", { name: "Chaîne Wikidata et Geohistory" }));
 
     expect(foreground.getByText("(45 s)")).toBeInTheDocument();
     expect(foreground.getByText("(depuis 2 min)")).toBeInTheDocument();

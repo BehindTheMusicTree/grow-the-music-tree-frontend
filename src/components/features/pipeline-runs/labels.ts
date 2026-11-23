@@ -80,7 +80,7 @@ export function foregroundStepDetails(steps: RunStep[], request: PipelineRunRequ
     const timing = telemetry.foreground.find(({ stage }) => stage === step.key);
     if (!timing) {
       if (!running || (bronzeOnly && !BRONZE_FOREGROUND_STAGES.includes(step.key))) return [];
-      return { ...step, status: !hasRunningStep && step.status === "current" ? "current" : "pending" };
+      return hasRunningStep ? { ...step, status: "pending", detail: undefined } : { ...step, status: step.status === "current" ? "current" : "pending" };
     }
     const status = stepStatusOf(timing, request);
     const detail = [step.detail, timingDetail(timing, status === "current" ? now : null)].filter(Boolean).join(" · ");

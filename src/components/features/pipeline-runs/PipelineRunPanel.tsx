@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useId, useRef, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
@@ -90,6 +90,7 @@ type Props = { pendingCount: number; initialRequest: PipelineRunRequest | null }
 
 /** Launches a curation run, a full ingestion or a Gold sync, follows its progress and cancels it. */
 export default function PipelineRunPanel({ pendingCount, initialRequest }: Props) {
+  const wikidataHeadingId = useId();
   const router = useRouter();
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
@@ -183,11 +184,14 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
             />
           )}
           {wikidataSteps.length > 0 && (
-            <StepList
-              aria-label="Étapes de la chaîne Wikidata"
-              statusLabels={{ done: "terminée", current: "en cours", pending: "à venir", failed: "interrompue" }}
-              steps={wikidataSteps}
-            />
+            <div className="mt-2 flex flex-col gap-1">
+              <p id={wikidataHeadingId} className="text-body font-medium">Chaîne Wikidata et Geohistory</p>
+              <StepList
+                aria-labelledby={wikidataHeadingId}
+                statusLabels={{ done: "terminée", current: "en cours", pending: "à venir", failed: "interrompue" }}
+                steps={wikidataSteps}
+              />
+            </div>
           )}
           {retry && <p role="status" className="text-body text-gray-600">{retry}</p>}
           <p aria-live="polite" className={request.status === "failed" ? "text-red-600" : "text-gray-700"}>
