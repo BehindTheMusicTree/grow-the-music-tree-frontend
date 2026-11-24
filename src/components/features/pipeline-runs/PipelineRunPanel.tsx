@@ -52,6 +52,7 @@ function labelOf({ kind, status, stage, stageCurrent, stageTotal, error, stepTel
     case "succeeded":
       return kind === "curation" ? "Appliquée" : kind === "sync" ? "Réimportée" : "Terminée";
     case "failed":
+      if (stage === "ingesting_geohistory") return `Échec — ${STAGE_LABELS[stage]} : ${error ?? "erreur inconnue"}`;
       return `Échec : ${error ?? "erreur inconnue"}`;
     case "superseded":
       return "Déjà appliquée par le run nightly";

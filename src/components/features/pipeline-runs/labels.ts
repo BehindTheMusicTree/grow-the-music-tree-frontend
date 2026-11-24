@@ -19,6 +19,7 @@ export const STAGE_LABELS: Record<PipelineRunStage, string> = {
   fetching_rules: "Récupération des règles",
   ingesting_discogs: "Ingestion Discogs",
   ingesting_musicbrainz: "Ingestion MusicBrainz",
+  ingesting_geohistory: "Ingestion Geohistory",
   ingesting_wikidata: "Ingestion Wikidata",
   building_songs: "Construction des morceaux",
   building_genres: "Ingestion Wikidata et construction des genres",
@@ -126,7 +127,7 @@ export function stepsOf({
 }: Pick<PipelineRunRequest, "kind" | "status" | "stage" | "stageCurrent" | "stageTotal">): RunStep[] | null {
   if (status === "superseded") return null;
   const stages = PIPELINE_RUN_STAGES[kind];
-  const stageIndex = stage ? stageIndexOf(kind, stage) : -1;
+  const stageIndex = stage && stage !== "ingesting_geohistory" ? stageIndexOf(kind, stage) : -1;
   const stopped = status === "failed" || status === "cancelled" || status === "expired";
   return stages.map((key, index) => {
     let stepStatus: RunStepStatus = "pending";

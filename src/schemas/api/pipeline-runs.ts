@@ -3,11 +3,12 @@ import { z } from "zod";
 export const PIPELINE_RUN_KINDS = ["curation", "full", "sync"] as const;
 export type PipelineRunKind = (typeof PIPELINE_RUN_KINDS)[number];
 
-/** Every stage grow accepts, in run order. `ingesting_wikidata` is accepted but never shown: the wikidata chain runs in parallel. */
+/** Stages Grow accepts, including failures in the parallel Wikidata chain. */
 const STAGES = [
   "fetching_rules",
   "ingesting_discogs",
   "ingesting_musicbrainz",
+  "ingesting_geohistory",
   "ingesting_wikidata",
   "building_songs",
   "building_genres",
