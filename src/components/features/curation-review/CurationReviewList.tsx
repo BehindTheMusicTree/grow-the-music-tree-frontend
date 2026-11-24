@@ -27,7 +27,7 @@ const FALLBACK_EXPLANATIONS: Record<CurationReviewReason, string> = {
   synthetic_overview_renamed: "La vue d’ensemble utilise encore son ancien nom.",
   alias_target_missing: "L’identifiant enregistré est absent des données du pipeline.",
   alias_target_ineligible: "La cible ne peut plus recevoir ce tag.",
-  alias_source_auto_resolved: "Le libellé enregistré correspond automatiquement à un genre. L’alias peut encore servir pour des variantes du tag.",
+  alias_source_auto_resolved: "Le tag MusicBrainz correspond automatiquement à un genre. L’alias peut encore servir pour des variantes du tag.",
   alias_legacy_unmigrated: "Sélectionnez un identifiant pour remplacer le libellé historique.",
   redirect_conflict: "L'élément a été fusionné sur Wikidata vers un élément déjà présent dans la liste.",
   missing: "L'élément n'existe plus sur Wikidata.",

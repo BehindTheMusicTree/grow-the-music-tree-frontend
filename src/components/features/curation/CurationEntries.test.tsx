@@ -103,7 +103,7 @@ describe("CurationEntries", () => {
     expect(within(screen.getByRole("table")).getByText("Q2")).toBeInTheDocument();
   });
 
-  it("opens the alias from its review link and requires a selection after changing the target text", () => {
+  it.each(["", "Q1"])("requires a catalogue selection when repairing an alias with ID %s", (targetItemId) => {
     const aliasList = {
       ...list,
       name: "genre_alias",
@@ -118,7 +118,12 @@ describe("CurationEntries", () => {
     };
     const aliasEntry = {
       ...entry,
-      row: { musicbrainz_genre_name: "test tag", wikidata_genre_name: "Old label", target_item_id: "", reason: "Reason" },
+      row: {
+        musicbrainz_genre_name: "test tag",
+        wikidata_genre_name: "Old label",
+        target_item_id: targetItemId,
+        reason: "Reason",
+      },
     };
     searchParams = new URLSearchParams({ edit: aliasEntry.uuid });
     render(
@@ -134,14 +139,13 @@ describe("CurationEntries", () => {
     );
 
     const save = screen.getByRole("button", { name: "Enregistrer" });
-    fireEvent.click(save);
-    expect(mutateMock).toHaveBeenCalledOnce();
+    expect(save).toBeDisabled();
     const target = screen.getByDisplayValue("Old label");
     expect(target).toHaveValue("Old label");
     fireEvent.change(target, { target: { value: "New label" } });
     expect(save).toBeDisabled();
     fireEvent.click(save);
-    expect(mutateMock).toHaveBeenCalledOnce();
+    expect(mutateMock).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
     expect(replaceMock).toHaveBeenCalledWith("/admin/curation/canonical_parent");
   });

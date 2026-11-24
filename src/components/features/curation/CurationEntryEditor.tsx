@@ -27,16 +27,22 @@ type Props = {
   /** Prefills a new entry, e.g. with the genre it is added for. */
   initialRow?: CurationRow;
   labels: Record<string, string>;
+  requireAliasTargetSelection?: boolean;
   onClose: () => void;
 };
 
-export default function CurationEntryEditor({ list, entry, initialRow, labels, onClose }: Props) {
+export default function CurationEntryEditor({
+  list, entry, initialRow, labels, requireAliasTargetSelection = false, onClose,
+}: Props) {
   const id = useId();
   const router = useRouter();
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
-  const [row, setRow] = useState<CurationRow>(() => toCurationRow(list, entry?.row ?? initialRow ?? {}));
-  const [aliasTargetEdited, setAliasTargetEdited] = useState(false);
   const isAlias = list.name === "genre_alias" && list.columns.includes("target_item_id");
+  const [row, setRow] = useState<CurationRow>(() => {
+    const initial = toCurationRow(list, entry?.row ?? initialRow ?? {});
+    return isAlias && requireAliasTargetSelection ? { ...initial, target_item_id: "" } : initial;
+  });
+  const [aliasTargetEdited, setAliasTargetEdited] = useState(false);
   const inputSchema = useMemo(() => {
     const columns = isAlias ? list.columnSpecs.filter(({ name }) => name !== "wikidata_genre_name") : list.columnSpecs;
     return z.object({ row: buildCurationRowSchema({ ...list, columnSpecs: columns }) });
@@ -54,7 +60,7 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
 
   const submit = () => mutate({ row });
   const requiresAliasTarget = isAlias && !row.target_item_id && (
-    !entry || !!entry.row.target_item_id || aliasTargetEdited ||
+    requireAliasTargetSelection || !entry || !!entry.row.target_item_id || aliasTargetEdited ||
     row.musicbrainz_genre_name !== entry.row.musicbrainz_genre_name
   );
   const set = (column: string, value: string) => setRow((current) => ({ ...current, [column]: value }));

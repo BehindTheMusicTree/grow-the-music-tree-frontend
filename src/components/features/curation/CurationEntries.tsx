@@ -303,6 +303,7 @@ export default function CurationEntries({ list, entries, q, ordering, showQid, a
           list={list}
           entry={editing === "new" ? undefined : editing}
           labels={labels}
+          requireAliasTargetSelection={editing !== "new" && initialEntry?.uuid === editing.uuid}
           onClose={() => {
             setEditing(null);
             if (initialEntry) updateQuery({ edit: null });

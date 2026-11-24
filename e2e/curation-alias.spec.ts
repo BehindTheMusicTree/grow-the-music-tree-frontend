@@ -53,7 +53,6 @@ test("repairs the alias selected in the admin review queue by its UUID", async (
       overallTotal: 0, page: 1, totalPages: 1, results: [], labels: {},
     })],
     [entryPath, entry],
-    ["/v1/curation/genre-alias-targets/", AliasTargetSearchSchema.parse({ results: [target] })],
   ]);
   const upstream = createServer(async (request, response) => {
     const url = new URL(request.url ?? "/", adminApiOrigin);
@@ -71,6 +70,11 @@ test("repairs the alias selected in the admin review queue by its UUID", async (
         row: { ...entry.row, wikidata_genre_name: target.label, target_item_id: target.id },
         updatedOn: exportedOn,
       }));
+      return;
+    }
+    if (request.method === "GET" && url.pathname === "/v1/curation/genre-alias-targets/") {
+      const results = url.searchParams.get("q") === target.id ? [target] : [];
+      response.end(JSON.stringify(AliasTargetSearchSchema.parse({ results })));
       return;
     }
     const lookup = url.pathname.endsWith("/review/") ? url.pathname + url.search : url.pathname;
@@ -105,8 +109,9 @@ test("repairs the alias selected in the admin review queue by its UUID", async (
 
     const input = page.getByRole("combobox", { name: "Genre cible" });
     await expect(input).toHaveValue(previousLabel);
+    const save = dialog.getByRole("button", { name: "Enregistrer" });
+    await expect(save).toBeDisabled();
     await input.fill(target.id);
-    const save = page.getByRole("button", { name: "Enregistrer" });
     await expect(save).toBeDisabled();
     await page.getByRole("option", { name: new RegExp(target.id) }).click();
     await expect(input).toHaveValue(target.label);
@@ -121,6 +126,14 @@ test("repairs the alias selected in the admin review queue by its UUID", async (
     expect(writes).toEqual([{
       row: { musicbrainz_genre_name: tag, target_item_id: target.id, reason: "Curated" },
     }]);
+
+    await page.goBack();
+    await expect(page).toHaveURL(/\/admin\/curation-review$/);
+    await page.goForward();
+    await expect(page).toHaveURL((url) =>
+      url.pathname === "/admin/curation/genre_alias" && url.searchParams.get("q") === tag && !url.searchParams.has("edit"),
+    );
+    await expect(dialog).toHaveCount(0);
   } finally {
     await new Promise<void>((resolve, reject) => upstream.close((error) => error ? reject(error) : resolve()));
   }
