@@ -6,7 +6,7 @@ import { useGenreRemoteSearch, type GenreUuid } from "@behindthemusictree/app-ki
 import { Combobox } from "@behindthemusictree/ui";
 import { useDebouncedValue } from "@hooks/useDebouncedValue";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
-import { CurationItemSearchSchema, ITEM_ID_PATTERN } from "@schemas/api/curation";
+import { AliasTargetSearchSchema, CurationItemSearchSchema, ITEM_ID_PATTERN } from "@schemas/api/curation";
 
 type Props = {
   label: string;
@@ -18,11 +18,13 @@ type Props = {
   excludeUmbrellas?: boolean;
   /** Searches every known Wikidata item, pruned ones included, instead of the canonical genres. */
   catalog?: boolean;
+  aliasTargets?: boolean;
 };
 
 const GENRE_LIMIT = 25;
+const TREE_LABELS: Record<string, string> = { canonical: "Canonique", regional: "Régional", local: "Local" };
 
-type Option = { key: string; name: string; itemId: string; uuid?: GenreUuid };
+type Option = { key: string; name: string; itemId: string; uuid?: GenreUuid; tree?: string };
 
 /** Finds a canonical genre by name, or takes a QID / LOCAL:<slug> typed as is. */
 export default function GenrePicker({
@@ -32,6 +34,7 @@ export default function GenrePicker({
   onChange,
   excludeUmbrellas = false,
   catalog = false,
+  aliasTargets = false,
 }: Props) {
   const id = useId();
   const [text, setText] = useState(defaultText);
@@ -39,8 +42,8 @@ export default function GenrePicker({
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
   const search = useDebouncedValue(text.trim(), 250);
   const isItemId = ITEM_ID_PATTERN.test(search);
-  const enabled = open && search.length >= 2 && !isItemId;
-  const genres = useGenreRemoteSearch(getGrowBackendBaseUrl, enabled && !catalog ? text.trim() : "", {
+  const enabled = open && search.length >= 2 && (!isItemId || aliasTargets);
+  const genres = useGenreRemoteSearch(getGrowBackendBaseUrl, enabled && !catalog && !aliasTargets ? text.trim() : "", {
     treeName: "canonical",
     limit: GENRE_LIMIT,
   });
@@ -49,10 +52,24 @@ export default function GenrePicker({
     queryFn: () => fetch("curation/items/", true, false, {}, { q: search }),
     schema: CurationItemSearchSchema,
     context: "GenrePicker",
-    enabled: enabled && catalog,
+    enabled: enabled && catalog && !aliasTargets,
   });
-  const isFetching = genres.pending || items.isFetching;
-  const options: Option[] = catalog
+  const aliasItems = useQueryWithParse({
+    queryKey: ["genreAliasTargetPicker", search],
+    queryFn: () => fetch("curation/genre-alias-targets/", true, false, {}, { q: search }),
+    schema: AliasTargetSearchSchema,
+    context: "GenrePicker",
+    enabled: enabled && aliasTargets,
+  });
+  const isFetching = genres.pending || items.isFetching || aliasItems.isFetching;
+  const options: Option[] = aliasTargets
+    ? (search === text.trim() ? aliasItems.data?.results ?? [] : []).map(({ id, label, tree }) => ({
+        key: id,
+        name: label,
+        itemId: id,
+        tree,
+      }))
+    : catalog
     ? (items.data?.results ?? []).map((item) => ({ key: item.id, name: item.label, itemId: item.id }))
     : genres.genres.flatMap((genre) =>
         genre.wikidataId === null || (excludeUmbrellas && genre.isUmbrella)
@@ -87,7 +104,7 @@ export default function GenrePicker({
               content: (
                 <div className="flex justify-between gap-2">
                   <span>{option.name}</span>
-                  <span className="font-mono text-caption text-gray-500">{option.itemId}</span>
+                  <span className="font-mono text-caption text-gray-500">{option.tree && `${TREE_LABELS[option.tree]} · `}{option.itemId}</span>
                 </div>
               ),
             })),
@@ -96,14 +113,19 @@ export default function GenrePicker({
         open={open}
         onValueChange={(next) => {
           setText(next);
-          if (ITEM_ID_PATTERN.test(next.trim())) onChange(next.trim());
+          if (aliasTargets) {
+            if (value && next !== text) onChange("");
+          } else if (ITEM_ID_PATTERN.test(next.trim())) {
+            onChange(next.trim());
+          }
         }}
         onOpenChange={setOpen}
         onPick={pick}
       />
       <p id={`${id}-qid`} className="font-mono text-caption text-gray-500">
-        {value ? `QID : ${value}` : "Aucun genre choisi"}
+        {value ? `${aliasTargets ? "ID" : "QID"} : ${value}` : "Aucun genre choisi"}
         {isFetching && " · recherche…"}
+        {aliasTargets && aliasItems.isError && " · catalogue indisponible"}
       </p>
     </div>
   );

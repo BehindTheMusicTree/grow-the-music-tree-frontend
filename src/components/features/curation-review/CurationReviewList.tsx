@@ -10,9 +10,25 @@ const REASON_LABELS: Record<CurationReviewReason, string> = {
   not_in_tree: "Hors de l'arbre",
   invalid_rule: "Règle invalide",
   exclusive_parent_regional: "Exclusion impossible",
+  unreached_genre: "Genre non rattaché",
+  synthetic_overview_superseded: "Vue d’ensemble remplacée",
+  synthetic_overview_orphaned: "Vue d’ensemble sans genre",
+  synthetic_overview_renamed: "Vue d’ensemble renommée",
+  alias_target_missing: "Cible introuvable",
+  alias_target_ineligible: "Cible hors du catalogue",
+  alias_source_auto_resolved: "Tag résolu automatiquement",
+  alias_legacy_unmigrated: "Alias à migrer",
 };
 
 const FALLBACK_EXPLANATIONS: Record<CurationReviewReason, string> = {
+  unreached_genre: "Le genre doit être rattaché à l’arbre.",
+  synthetic_overview_superseded: "Une autre vue d’ensemble couvre cette région.",
+  synthetic_overview_orphaned: "Aucun genre n’est rattaché à cette région.",
+  synthetic_overview_renamed: "La vue d’ensemble utilise encore son ancien nom.",
+  alias_target_missing: "L’identifiant enregistré est absent des données du pipeline.",
+  alias_target_ineligible: "La cible ne peut plus recevoir ce tag.",
+  alias_source_auto_resolved: "Une correspondance par nom a pris la priorité.",
+  alias_legacy_unmigrated: "Sélectionnez un identifiant pour remplacer le libellé historique.",
   redirect_conflict: "L'élément a été fusionné sur Wikidata vers un élément déjà présent dans la liste.",
   missing: "L'élément n'existe plus sur Wikidata.",
   not_in_tree: "L'élément ne répond plus au critère d'appartenance à l'arbre.",
@@ -38,6 +54,8 @@ function explain({
   target,
   evidence,
 }: Pick<CurationReviewItem, "key" | "column" | "reason" | "target" | "evidence">) {
+  if (reason.startsWith("alias_") || reason === "unreached_genre" || reason.startsWith("synthetic_overview_"))
+    return FALLBACK_EXPLANATIONS[reason];
   if (reason === "redirect_conflict" && column !== "item_id" && target === key)
     return "Fusionné vers l'élément porteur de la règle lui-même (règle auto-référente).";
   if (!evidence) return FALLBACK_EXPLANATIONS[reason];
@@ -99,51 +117,89 @@ export default function CurationReviewList({ items }: { items: CurationReviewIte
         </tr>
       </thead>
       <tbody>
-        {items.map(({ ruleId, list, key, column, itemId, reason, target, evidence }) => (
-          <tr key={`${list}|${key}|${column}`}>
-            <td className="pr-4">
-              <Link
-                href={
-                  ruleId
-                    ? `/admin/curation/genre/${encodeURIComponent(key.split("\t")[0])}`
-                    : `/admin/curation/${encodeURIComponent(list)}`
-                }
-                className="underline"
-              >
-                {list}
-              </Link>
-            </td>
-            <td className="pr-4">
-              <GenreRef id={itemId} label={target ? undefined : evidence?.label} showQid={false} />
-              <span className="flex gap-2 text-caption">
-                <a
-                  href={`${WIKIDATA_URL}${itemId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${itemId} sur Wikidata`}
+        {items.map(({ ruleId, list, key, column, itemId, reason, target, evidence }) => {
+          if (reason.startsWith("alias_")) {
+            const exposure = evidence?.exposure;
+            return (
+              <tr key={`${ruleId ?? list}|${key ?? itemId}|${column}`}>
+                <td className="pr-4">
+                  <Link href={`/admin/curation/genre_alias?${new URLSearchParams({ q: key ?? "" })}`} className="underline">
+                    Modifier l’alias
+                  </Link>
+                </td>
+                <td className="pr-4">{itemId || "—"}</td>
+                <td className="pr-4">
+                  <p>{REASON_LABELS[reason]}</p>
+                  {exposure && (
+                    <p className="text-body text-gray-600">
+                      {exposure.any} chansons exposées ({exposure.recording} enregistrement, {exposure.releaseGroup} groupe
+                      de sorties, {exposure.artist} artiste)
+                    </p>
+                  )}
+                </td>
+                <td className="pr-4">{key}</td>
+                <td>
+                  {evidence?.label}
+                  {evidence?.alias?.currentLabel && evidence.alias.currentLabel !== evidence.label && (
+                    <p className="text-caption">Libellé actuel {evidence.alias.currentLabel}</p>
+                  )}
+                  {evidence?.alias?.candidateItemIds?.length ? (
+                    <p className="text-caption">{evidence.alias.candidateItemIds.join(", ")}</p>
+                  ) : null}
+                  {evidence?.alias?.automaticItemId && (
+                    <p className="text-caption">Correspondance automatique {evidence.alias.automaticItemId}</p>
+                  )}
+                </td>
+              </tr>
+            );
+          }
+
+          return (
+            <tr key={`${ruleId ?? list}|${key ?? itemId}|${column}`}>
+              <td className="pr-4">
+                <Link
+                  href={
+                    ruleId
+                      ? `/admin/curation/genre/${encodeURIComponent(key?.split("\t")[0] ?? itemId)}`
+                      : `/admin/curation/${encodeURIComponent(list ?? "synthetic_overview_resolutions")}`
+                  }
                   className="underline"
                 >
-                  Wikidata
-                </a>
-                <a
-                  href={`${WIKIDATA_URL}${itemId}?action=history`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Historique de ${itemId} sur Wikidata`}
-                  className="underline"
-                >
-                  Historique
-                </a>
-              </span>
-            </td>
-            <td className="pr-4">
-              <p>{REASON_LABELS[reason]}</p>
-              <p className="text-body text-gray-600">{explain({ key, column, reason, target, evidence })}</p>
-            </td>
-            <td className="pr-4">{column !== "item_id" && <Rule rowKey={key} column={column} />}</td>
-            <td>{target && <GenreRef id={target} label={evidence?.label} showQid={false} />}</td>
-          </tr>
-        ))}
+                  {list ?? "Vues d’ensemble régionales"}
+                </Link>
+              </td>
+              <td className="pr-4">
+                <GenreRef id={itemId} label={target ? undefined : evidence?.label ?? undefined} showQid={false} />
+                {itemId.startsWith("Q") && <span className="flex gap-2 text-caption">
+                  <a
+                    href={`${WIKIDATA_URL}${itemId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${itemId} sur Wikidata`}
+                    className="underline"
+                  >
+                    Wikidata
+                  </a>
+                  <a
+                    href={`${WIKIDATA_URL}${itemId}?action=history`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Historique de ${itemId} sur Wikidata`}
+                    className="underline"
+                  >
+                    Historique
+                  </a>
+                </span>}
+              </td>
+              <td className="pr-4">
+                <p>{REASON_LABELS[reason]}</p>
+                <p className="text-body text-gray-600">{explain({ key, column, reason, target, evidence })}</p>
+              </td>
+              <td className="pr-4">{key && column !== "item_id" && <Rule rowKey={key} column={column} />}</td>
+              <td>{target && <GenreRef id={target} label={evidence?.label ?? undefined} showQid={false} />}</td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

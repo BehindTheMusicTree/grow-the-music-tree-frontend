@@ -14,8 +14,7 @@ export default async function CurationReviewPage() {
     <Page title="Curation à revoir" data-page="admin-curation-review">
       <div className="flex flex-col gap-4 p-4">
         <p>
-          Éléments curés dont le QID Wikidata n&apos;a pas pu être remappé automatiquement par le pipeline. Corrigez-les
-          dans la curation.
+          Règles signalées par le pipeline. L’exposition indique combien de chansons portent le tag à chaque niveau.
         </p>
         {items.length === 0 ? <p>Rien à revoir</p> : <CurationReviewList items={items} />}
       </div>

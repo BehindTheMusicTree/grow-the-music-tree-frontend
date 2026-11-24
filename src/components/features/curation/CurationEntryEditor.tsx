@@ -35,7 +35,11 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
   const router = useRouter();
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
   const [row, setRow] = useState<CurationRow>(() => toCurationRow(list, entry?.row ?? initialRow ?? {}));
-  const inputSchema = useMemo(() => z.object({ row: buildCurationRowSchema(list) }), [list]);
+  const isAlias = list.name === "genre_alias" && list.columns.includes("target_item_id");
+  const inputSchema = useMemo(() => {
+    const columns = isAlias ? list.columnSpecs.filter(({ name }) => name !== "wikidata_genre_name") : list.columnSpecs;
+    return z.object({ row: buildCurationRowSchema({ ...list, columnSpecs: columns }) });
+  }, [isAlias, list]);
   const path = entry ? `curation/${list.name}/entries/${entry.uuid}/` : `curation/${list.name}/entries/`;
   const { mutate, formErrors, isPending } = useValidatedMutation({
     inputSchema,
@@ -48,6 +52,9 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
   });
 
   const submit = () => mutate({ row });
+  const requiresAliasTarget = isAlias && !row.target_item_id && (
+    !entry || !!entry.row.target_item_id || row.musicbrainz_genre_name !== entry.row.musicbrainz_genre_name
+  );
   const set = (column: string, value: string) => setRow((current) => ({ ...current, [column]: value }));
 
   return (
@@ -59,7 +66,7 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
       showCancelButton
       okButtonText="Enregistrer"
       cancelButtonText="Annuler"
-      okButtonDisabled={isPending}
+      okButtonDisabled={isPending || requiresAliasTarget}
       onOk={submit}
       onCancel={onClose}
       onClose={onClose}
@@ -68,11 +75,12 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          submit();
+          if (!requiresAliasTarget) submit();
         }}
         className="flex flex-col gap-4"
       >
         {list.columnSpecs.map(({ name: column, kind }) => {
+          if (isAlias && column === "wikidata_genre_name") return null;
           const title = curationColumnTitle(column);
           if (kind === "item_id") {
             return (
@@ -80,9 +88,10 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
                 key={column}
                 label={title}
                 value={row[column]}
-                defaultText={labels[row[column]] || row[column]}
+                defaultText={labels[row[column]] || (isAlias ? row.wikidata_genre_name : "") || row[column]}
                 onChange={(itemId) => set(column, itemId)}
-                catalog
+                catalog={!isAlias}
+                aliasTargets={isAlias}
               />
             );
           }

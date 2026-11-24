@@ -69,7 +69,7 @@ export async function fetchCurationStatus() {
 }
 
 export async function fetchCurationReview() {
-  const response = await fetchAsAdmin("curation/review/");
+  const response = await fetchAsAdmin("curation/review/?genre_alias_version=2");
   if (!response.ok) throw new Error(`Failed to fetch curation review: ${response.status}`);
   return CurationReviewItemsSchema.parse(await response.json());
 }
