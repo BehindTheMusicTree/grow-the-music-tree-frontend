@@ -7,6 +7,31 @@ const base = { ruleId: null, key: "Q1", column: "item_id", reportedOn: "2026-10-
 describe("CurationReviewList", () => {
   afterEach(cleanup);
 
+  it("links alias alerts to the editor for the exact entry", () => {
+    const entryUuid = "11111111-1111-4111-8111-111111111111";
+    render(
+      <CurationReviewList
+        items={[
+          {
+            ...base,
+            list: "genre_alias",
+            key: "regional mexicano",
+            column: "target_item_id",
+            itemId: "",
+            reason: "alias_legacy_unmigrated",
+            target: null,
+            evidence: { entryUuid, label: "Regional Mexican" },
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "Modifier l’alias regional mexicano" })).toHaveAttribute(
+      "href",
+      `/admin/curation/genre_alias?q=regional+mexicano&edit=${entryUuid}`,
+    );
+  });
+
   it("shows list, QID, French reason and target of each item", () => {
     render(
       <CurationReviewList

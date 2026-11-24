@@ -3,6 +3,7 @@ import { fetchAsAdmin } from "@lib/admin-fetch";
 import {
   CurationEdgesPageSchema,
   CurationEntriesPageSchema,
+  CurationEntrySchema,
   CurationHistoryPageSchema,
   CurationListsSchema,
   CurationReviewItemsSchema,
@@ -30,6 +31,13 @@ export async function fetchCurationEntries(
   if (q) query.set("q", q);
   const response = await fetchAsAdmin(`curation/${encodeURIComponent(listName)}/entries/?${query}`);
   return response.ok ? CurationEntriesPageSchema.parse(await response.json()) : null;
+}
+
+export async function fetchCurationEntry(listName: string, uuid: string) {
+  const response = await fetchAsAdmin(`curation/${encodeURIComponent(listName)}/entries/${encodeURIComponent(uuid)}/`);
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`Failed to fetch curation entry: ${response.status}`);
+  return CurationEntrySchema.parse(await response.json());
 }
 
 /** Null when `page` is past the last page. */

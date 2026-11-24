@@ -19,6 +19,7 @@ type Props = {
   /** Searches every known Wikidata item, pruned ones included, instead of the canonical genres. */
   catalog?: boolean;
   aliasTargets?: boolean;
+  onTextEdit?: (text: string) => void;
 };
 
 const GENRE_LIMIT = 25;
@@ -35,6 +36,7 @@ export default function GenrePicker({
   excludeUmbrellas = false,
   catalog = false,
   aliasTargets = false,
+  onTextEdit,
 }: Props) {
   const id = useId();
   const [text, setText] = useState(defaultText);
@@ -42,7 +44,7 @@ export default function GenrePicker({
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
   const search = useDebouncedValue(text.trim(), 250);
   const isItemId = ITEM_ID_PATTERN.test(search);
-  const enabled = open && search.length >= 2 && (!isItemId || aliasTargets);
+  const enabled = (open || aliasTargets) && search.length >= 2 && (!isItemId || aliasTargets);
   const genres = useGenreRemoteSearch(getGrowBackendBaseUrl, enabled && !catalog && !aliasTargets ? text.trim() : "", {
     treeName: "canonical",
     limit: GENRE_LIMIT,
@@ -114,7 +116,10 @@ export default function GenrePicker({
         onValueChange={(next) => {
           setText(next);
           if (aliasTargets) {
-            if (value && next !== text) onChange("");
+            if (next !== text) {
+              onTextEdit?.(next);
+              if (value) onChange("");
+            }
           } else if (ITEM_ID_PATTERN.test(next.trim())) {
             onChange(next.trim());
           }

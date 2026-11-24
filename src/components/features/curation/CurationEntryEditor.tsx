@@ -35,6 +35,7 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
   const router = useRouter();
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
   const [row, setRow] = useState<CurationRow>(() => toCurationRow(list, entry?.row ?? initialRow ?? {}));
+  const [aliasTargetEdited, setAliasTargetEdited] = useState(false);
   const isAlias = list.name === "genre_alias" && list.columns.includes("target_item_id");
   const inputSchema = useMemo(() => {
     const columns = isAlias ? list.columnSpecs.filter(({ name }) => name !== "wikidata_genre_name") : list.columnSpecs;
@@ -53,7 +54,8 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
 
   const submit = () => mutate({ row });
   const requiresAliasTarget = isAlias && !row.target_item_id && (
-    !entry || !!entry.row.target_item_id || row.musicbrainz_genre_name !== entry.row.musicbrainz_genre_name
+    !entry || !!entry.row.target_item_id || aliasTargetEdited ||
+    row.musicbrainz_genre_name !== entry.row.musicbrainz_genre_name
   );
   const set = (column: string, value: string) => setRow((current) => ({ ...current, [column]: value }));
 
@@ -92,6 +94,7 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
                 onChange={(itemId) => set(column, itemId)}
                 catalog={!isAlias}
                 aliasTargets={isAlias}
+                onTextEdit={(text) => setAliasTargetEdited(text !== entry?.row.wikidata_genre_name)}
               />
             );
           }

@@ -209,6 +209,7 @@ export type CurationReviewReason = z.infer<typeof CurationReviewReasonSchema>;
 const EvidenceItemSchema = z.object({ id: z.string(), label: z.string().nullable() });
 
 export const CurationReviewEvidenceSchema = z.object({
+  entryUuid: z.string().uuid().optional(),
   label: z.string().nullish(),
   modified: z.string().optional(),
   instanceOf: z.array(EvidenceItemSchema).optional(),

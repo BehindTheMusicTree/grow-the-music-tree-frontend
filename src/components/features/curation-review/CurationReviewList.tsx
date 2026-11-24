@@ -27,7 +27,7 @@ const FALLBACK_EXPLANATIONS: Record<CurationReviewReason, string> = {
   synthetic_overview_renamed: "La vue d’ensemble utilise encore son ancien nom.",
   alias_target_missing: "L’identifiant enregistré est absent des données du pipeline.",
   alias_target_ineligible: "La cible ne peut plus recevoir ce tag.",
-  alias_source_auto_resolved: "Une correspondance par nom a pris la priorité.",
+  alias_source_auto_resolved: "Le libellé enregistré correspond automatiquement à un genre. L’alias peut encore servir pour des variantes du tag.",
   alias_legacy_unmigrated: "Sélectionnez un identifiant pour remplacer le libellé historique.",
   redirect_conflict: "L'élément a été fusionné sur Wikidata vers un élément déjà présent dans la liste.",
   missing: "L'élément n'existe plus sur Wikidata.",
@@ -120,10 +120,12 @@ export default function CurationReviewList({ items }: { items: CurationReviewIte
         {items.map(({ ruleId, list, key, column, itemId, reason, target, evidence }) => {
           if (reason.startsWith("alias_")) {
             const exposure = evidence?.exposure;
+            const query = new URLSearchParams({ q: key ?? "" });
+            if (evidence?.entryUuid) query.set("edit", evidence.entryUuid);
             return (
               <tr key={`${ruleId ?? list}|${key ?? itemId}|${column}`}>
                 <td className="pr-4">
-                  <Link href={`/admin/curation/genre_alias?${new URLSearchParams({ q: key ?? "" })}`} className="underline">
+                  <Link href={`/admin/curation/genre_alias?${query}`} aria-label={`Modifier l’alias ${key ?? ""}`} className="underline">
                     Modifier l’alias
                   </Link>
                 </td>
