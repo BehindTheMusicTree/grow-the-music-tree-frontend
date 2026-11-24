@@ -114,6 +114,7 @@ Browser journeys (`e2e/entity-url.spec.ts`):
 - The API is frozen: `e2e/support/api.ts` stubs `**/api/grow-proxy/**` with `e2e/support/fixtures.ts`, each payload parsed by the schema the app uses. A call outside the stubs is answered 599 and collected in `unstubbed`; never point a journey at staging. Route patterns must accept the trailing slash (308 to no-slash) and query strings.
 - The map runs in headless Chromium through SwiftShader (launch args in `playwright.config.ts`).
 - `e2e/support/invariants.ts` is asserted after each step: no `at`/`region` on `/`, no `view`/`zoom` on `/map`, tab title and panel match the URL. It waits for the page to settle first, because a title read early can match a transient value.
+- The admin alias journey inserts a test-only NextAuth session and serves its Grow fixtures on loopback. It exercises the server-rendered review link, target picker and authenticated write.
 - Not covered by a journey: the title observer in `useEntityDocumentTitle` (unit-tested); Next's metadata commit does not race the hook on the production build.
 
 ---

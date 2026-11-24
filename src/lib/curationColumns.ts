@@ -12,6 +12,7 @@ const COLUMN_TITLES: Record<string, string> = {
   capitalized: "Forme capitalisée",
   display_label: "Libellé affiché",
   musicbrainz_genre_name: "Genre MusicBrainz",
+  target_item_id: "Genre cible",
   wikidata_genre_name: "Genre Wikidata",
   root_item_id: "Racine",
   pop_child_item_id: "Enfant pop",

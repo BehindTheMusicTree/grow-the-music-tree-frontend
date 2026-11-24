@@ -103,6 +103,53 @@ describe("CurationEntries", () => {
     expect(within(screen.getByRole("table")).getByText("Q2")).toBeInTheDocument();
   });
 
+  it.each(["", "Q1"])("requires a catalogue selection when repairing an alias with ID %s", (targetItemId) => {
+    const aliasList = {
+      ...list,
+      name: "genre_alias",
+      keyColumns: ["musicbrainz_genre_name"],
+      columns: ["musicbrainz_genre_name", "wikidata_genre_name", "target_item_id", "reason"],
+      columnSpecs: [
+        { name: "musicbrainz_genre_name", kind: "text" as const, optional: false },
+        { name: "wikidata_genre_name", kind: "text" as const, optional: false },
+        { name: "target_item_id", kind: "item_id" as const, optional: true },
+        { name: "reason", kind: "text" as const, optional: false },
+      ],
+    };
+    const aliasEntry = {
+      ...entry,
+      row: {
+        musicbrainz_genre_name: "test tag",
+        wikidata_genre_name: "Old label",
+        target_item_id: targetItemId,
+        reason: "Reason",
+      },
+    };
+    searchParams = new URLSearchParams({ edit: aliasEntry.uuid });
+    render(
+      <CurationEntries
+        list={aliasList}
+        entries={{ ...entries, results: [], labels: {} }}
+        initialEntry={aliasEntry}
+        q=""
+        ordering="key"
+        showQid={false}
+        appliedExportOn={null}
+      />,
+    );
+
+    const save = screen.getByRole("button", { name: "Enregistrer" });
+    expect(save).toBeDisabled();
+    const target = screen.getByDisplayValue("Old label");
+    expect(target).toHaveValue("Old label");
+    fireEvent.change(target, { target: { value: "New label" } });
+    expect(save).toBeDisabled();
+    fireEvent.click(save);
+    expect(mutateMock).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
+    expect(replaceMock).toHaveBeenCalledWith("/admin/curation/canonical_parent");
+  });
+
   it("toggles the QID display through the URL", () => {
     searchParams = new URLSearchParams("page=2");
     renderEntries();

@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { adminApiOrigin, authSecret } from "./e2e/support/admin-config";
 
 const port = 3100;
 
@@ -19,10 +20,10 @@ export default defineConfig({
     env: {
       PORT: String(port),
       HOSTNAME: "localhost",
-      AUTH_SECRET: "e2e-auth-secret",
+      AUTH_SECRET: authSecret,
       AUTH_GOOGLE_ID: "e2e-google-id",
       AUTH_GOOGLE_SECRET: "e2e-google-secret",
-      GROW_API_ORIGIN: "http://127.0.0.1:9",
+      GROW_API_ORIGIN: adminApiOrigin,
     },
     timeout: 30_000,
     reuseExistingServer: !process.env.CI,

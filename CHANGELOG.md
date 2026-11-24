@@ -47,6 +47,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The curation editor selects eligible genre alias targets by ID and shows matching alerts with song exposure in the review queue.
+
 - The admin panel shows completed and elapsed step durations for both branches of a full pipeline run, and reports active WDQS retries.
 
 - Touch-phone landscape navigation and detail panels share the left half of the screen, including beyond the desktop width breakpoint.

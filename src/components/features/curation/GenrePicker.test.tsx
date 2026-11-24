@@ -3,11 +3,12 @@ import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/re
 import GenrePicker from "./GenrePicker";
 
 const searchMock = vi.fn();
+const catalogueMock = vi.fn();
 
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api" }));
 vi.mock("@behindthemusictree/app-kit/transport", () => ({
   useFetchWrapper: () => ({ fetch: vi.fn() }),
-  useQueryWithParse: () => ({ data: undefined, isFetching: false }),
+  useQueryWithParse: (...args: unknown[]) => catalogueMock(...args),
 }));
 vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
   useGenreRemoteSearch: (...args: unknown[]) => searchMock(...args),
@@ -28,6 +29,8 @@ const renderPicker = (props: { excludeUmbrellas?: boolean; onChange?: () => void
 
 describe("GenrePicker", () => {
   beforeEach(() => {
+    catalogueMock.mockReset();
+    catalogueMock.mockReturnValue({ data: undefined, isFetching: false });
     searchMock.mockReset();
     searchMock.mockReturnValue({ genres: [], isError: false, settled: true, pending: false });
   });
@@ -70,5 +73,24 @@ describe("GenrePicker", () => {
     renderPicker({ excludeUmbrellas: true });
 
     expect(screen.getAllByRole("option")).toHaveLength(1);
+  });
+
+  it("requires selecting an eligible result after pasting an alias target id", async () => {
+    catalogueMock.mockImplementation(({ queryKey, enabled }) => ({
+      data: enabled && queryKey[0] === "genreAliasTargetPicker" && queryKey[1] === "LOCAL:sound"
+        ? { results: [{ id: "LOCAL:sound", label: "Local sound", tree: "local" }] }
+        : undefined,
+      isFetching: false,
+    }));
+    const onChange = vi.fn();
+    render(<GenrePicker label="Alias target" value="" defaultText="" onChange={onChange} aliasTargets />);
+    const input = screen.getByRole("combobox", { name: "Alias target" });
+    fireEvent.change(input, { target: { value: "LOCAL:sound" } });
+    fireEvent.keyDown(input, { key: "ArrowDown" });
+    expect(onChange).not.toHaveBeenCalled();
+
+    const option = await screen.findByRole("option", { name: /Local sound.*LOCAL:sound/ });
+    fireEvent.mouseDown(option);
+    expect(onChange).toHaveBeenCalledExactlyOnceWith("LOCAL:sound", "Local sound", undefined);
   });
 });

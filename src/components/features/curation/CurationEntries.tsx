@@ -27,6 +27,7 @@ type Props = {
   ordering: CurationOrdering;
   showQid: boolean;
   appliedExportOn: string | null;
+  initialEntry?: CurationEntry;
 };
 
 function useUpdateQuery() {
@@ -270,9 +271,9 @@ export function CurationEntryRows({
   );
 }
 
-export default function CurationEntries({ list, entries, q, ordering, showQid, appliedExportOn }: Props) {
+export default function CurationEntries({ list, entries, q, ordering, showQid, appliedExportOn, initialEntry }: Props) {
   const updateQuery = useUpdateQuery();
-  const [editing, setEditing] = useState<CurationEntry | "new" | null>(null);
+  const [editing, setEditing] = useState<CurationEntry | "new" | null>(initialEntry ?? null);
   const { labels, results } = entries;
 
   return (
@@ -302,7 +303,11 @@ export default function CurationEntries({ list, entries, q, ordering, showQid, a
           list={list}
           entry={editing === "new" ? undefined : editing}
           labels={labels}
-          onClose={() => setEditing(null)}
+          requireAliasTargetSelection={editing !== "new" && initialEntry?.uuid === editing.uuid}
+          onClose={() => {
+            setEditing(null);
+            if (initialEntry) updateQuery({ edit: null });
+          }}
         />
       )}
     </div>

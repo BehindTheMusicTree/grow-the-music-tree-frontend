@@ -10,6 +10,7 @@ const notFoundMock = vi.fn(() => {
 });
 const fetchListsMock = vi.fn();
 const fetchEntriesMock = vi.fn();
+const fetchEntryMock = vi.fn();
 
 vi.mock("@lib/auth", () => ({ auth: () => authMock() }));
 vi.mock("next/navigation", () => ({ redirect: (url: string) => redirectMock(url), notFound: () => notFoundMock() }));
@@ -17,6 +18,7 @@ vi.mock("@lib/curation", () => ({
   fetchCurationStatus: async () => ({ appliedExportOn: null, pendingCount: 0 }),
   fetchCurationLists: () => fetchListsMock(),
   fetchCurationEntries: (...args: unknown[]) => fetchEntriesMock(...args),
+  fetchCurationEntry: (...args: unknown[]) => fetchEntryMock(...args),
 }));
 
 const props = (list: string) => ({ params: Promise.resolve({ list }), searchParams: Promise.resolve({}) });
@@ -40,6 +42,24 @@ describe("CurationListPage", () => {
 
     await expect(CurationListPage(props("nope"))).rejects.toThrow("NEXT_NOT_FOUND");
     expect(fetchEntriesMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["00000000-0000-4000-8000-000000000001", true],
+    ["invalid", false],
+  ])("looks up the editor entry by UUID when edit is %s", async (edit, valid) => {
+    authMock.mockResolvedValue({ user: {} });
+    fetchListsMock.mockResolvedValue([{ name: "genre_alias", description: "", count: 0 }]);
+    fetchEntriesMock.mockResolvedValue({ results: [], labels: {} });
+    fetchEntryMock.mockResolvedValue(null);
+
+    await CurationListPage({
+      params: Promise.resolve({ list: "genre_alias" }),
+      searchParams: Promise.resolve({ edit }),
+    });
+
+    if (valid) expect(fetchEntryMock).toHaveBeenCalledExactlyOnceWith("genre_alias", edit);
+    else expect(fetchEntryMock).not.toHaveBeenCalled();
   });
 
   it("goes back to page 1 when the requested page is past the last one", async () => {

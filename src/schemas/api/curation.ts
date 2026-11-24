@@ -184,12 +184,24 @@ export const CurationItemSearchSchema = z.object({
   results: z.array(z.object({ id: z.string(), label: z.string() })),
 });
 
+export const AliasTargetSearchSchema = z.object({
+  results: z.array(z.object({ id: z.string(), label: z.string(), tree: z.enum(["canonical", "regional", "local"]) })),
+});
+
 export const CurationReviewReasonSchema = z.enum([
   "redirect_conflict",
   "missing",
   "not_in_tree",
   "invalid_rule",
   "exclusive_parent_regional",
+  "unreached_genre",
+  "synthetic_overview_superseded",
+  "synthetic_overview_orphaned",
+  "synthetic_overview_renamed",
+  "alias_target_missing",
+  "alias_target_ineligible",
+  "alias_source_auto_resolved",
+  "alias_legacy_unmigrated",
 ]);
 
 export type CurationReviewReason = z.infer<typeof CurationReviewReasonSchema>;
@@ -197,13 +209,26 @@ export type CurationReviewReason = z.infer<typeof CurationReviewReasonSchema>;
 const EvidenceItemSchema = z.object({ id: z.string(), label: z.string().nullable() });
 
 export const CurationReviewEvidenceSchema = z.object({
-  label: z.string().optional(),
+  entryUuid: z.string().uuid().optional(),
+  label: z.string().nullish(),
   modified: z.string().optional(),
   instanceOf: z.array(EvidenceItemSchema).optional(),
   subclassOf: z.array(EvidenceItemSchema).optional(),
   hasIndigenousTo: z.boolean().optional(),
   conflictList: z.string().optional(),
   detail: z.string().optional(),
+  alias: z.object({
+    automaticItemId: z.string().optional(),
+    candidateItemIds: z.array(z.string()).optional(),
+    currentLabel: z.string().optional(),
+    legacyStatus: z.enum(["unique", "ambiguous", "missing"]).optional(),
+  }).optional(),
+  exposure: z.object({
+    recording: z.number(),
+    releaseGroup: z.number(),
+    artist: z.number(),
+    any: z.number(),
+  }).optional(),
 });
 
 export type CurationReviewEvidence = z.infer<typeof CurationReviewEvidenceSchema>;
@@ -212,8 +237,8 @@ export const CurationReviewItemsSchema = z.array(
   z.object({
     /** Set when the dropped rule is a genre edge rather than a list entry. */
     ruleId: z.string().uuid().nullable(),
-    list: z.string(),
-    key: z.string(),
+    list: z.string().nullable(),
+    key: z.string().nullable(),
     column: z.string(),
     itemId: z.string(),
     reason: CurationReviewReasonSchema,
