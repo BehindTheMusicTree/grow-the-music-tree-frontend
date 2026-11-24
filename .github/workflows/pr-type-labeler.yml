@@ -9,7 +9,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: pr-type-labeler-${{ github.head_ref || github.ref }}
+  group: pr-type-labeler-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
