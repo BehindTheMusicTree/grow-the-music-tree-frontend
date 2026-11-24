@@ -64,6 +64,7 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
       title={entry ? "Modifier l'entrée" : "Ajouter une entrée"}
       topOffset={BANNER_HEIGHT}
       isDismissable
+      trapFocus
       showOkButton
       showCancelButton
       okButtonText="Enregistrer"

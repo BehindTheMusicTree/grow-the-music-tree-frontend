@@ -92,13 +92,16 @@ test("repairs the alias selected in the admin review queue by its UUID", async (
     await context.addCookies([{ name, value, domain: "localhost", path: "/", secure: true, httpOnly: true }]);
 
     await page.goto("/admin/curation-review");
-    await page.getByRole("link", { name: `Modifier l’alias ${tag}` }).click();
+    await page.getByRole("link", { name: `Modifier l’alias ${tag}` }).press("Enter");
     await expect(page).toHaveURL((url) =>
       url.pathname === "/admin/curation/genre_alias" &&
       url.searchParams.get("q") === tag &&
       url.searchParams.get("edit") === uuid,
     );
-    await expect(page.getByRole("textbox", { name: "Genre MusicBrainz" })).toHaveValue(tag);
+    const dialog = page.getByRole("dialog", { name: "Modifier l'entrée" });
+    await expect(dialog).toBeVisible();
+    await expect.poll(() => dialog.evaluate((element) => element.contains(document.activeElement))).toBe(true);
+    await expect(dialog.getByRole("textbox", { name: "Genre MusicBrainz" })).toHaveValue(tag);
 
     const input = page.getByRole("combobox", { name: "Genre cible" });
     await expect(input).toHaveValue(previousLabel);
