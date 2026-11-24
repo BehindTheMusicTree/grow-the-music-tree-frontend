@@ -126,6 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### CI
 
+- Pushes and pull requests run the `org-conformance` check (github-workflows v6.5.0), which `required-checks.json` in github-config declares as an optional job.
 - Give every workflow the canonical `concurrency` group: pull-request runs of the same branch cancel the older run, and `release-tag` runs once per pushed commit without cancellation (agent-drift, api-public-health, branch-protection, labeler, pr-size-labeler, pr-type-labeler, release-tag, validate).
 - Check that mobile tree controls remain visible above the bottom navigation.
 - Playwright browser journeys on a production build with frozen API fixtures keep the genre, artist and song URL params and tab titles right across the tree and the map (`pnpm test:e2e`, `e2e` job).
