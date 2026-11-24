@@ -76,6 +76,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Show Geohistory ingestion failures in the pipeline run status and history.
+
 - **Agent directories**: Keep plans and scratch data out of Git while tracking the directory ignore rules.
 
 - Genre review suggests the parent's name instead of the technical Wikidata suffix for flagged genres. Validate saves the displayed suggestion or the administrator's edits; genres without a parent keep their existing names.

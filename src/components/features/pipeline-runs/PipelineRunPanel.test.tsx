@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, act, within } from "@testing-library/react";
-import type { PipelineRunRequest } from "@schemas/api/pipeline-runs";
+import { PipelineRunsPageSchema, type PipelineRunRequest } from "@schemas/api/pipeline-runs";
 import PipelineRunPanel from "./PipelineRunPanel";
 
 const refreshMock = vi.fn();
@@ -147,6 +147,24 @@ describe("PipelineRunPanel", () => {
     render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
 
     expect(screen.getByText(label)).toBeInTheDocument();
+  });
+
+  it("shows a Geohistory failure from a parsed run history response", () => {
+    const page = PipelineRunsPageSchema.parse({
+      overallTotal: 1,
+      page: 1,
+      totalPages: 1,
+      results: [request({
+        kind: "full",
+        status: "failed",
+        stage: "ingesting_geohistory",
+        error: "source=openstreetmap HTTP 403",
+      })],
+    });
+    latest = page.results[0];
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.getByText("Ingestion complète : Échec — Ingestion Geohistory : source=openstreetmap HTTP 403")).toBeInTheDocument();
   });
 
   it("refreshes the page once the run finishes", () => {
