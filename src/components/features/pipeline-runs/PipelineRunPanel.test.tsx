@@ -228,6 +228,13 @@ describe("PipelineRunPanel", () => {
     expect(screen.getByText("Manuel · démarré le 12/10 à 12:00 · durée totale : 2 h 05 min")).toBeInTheDocument();
   });
 
+  it("shows only the start time of an expired run that never recorded an end", () => {
+    latest = request({ status: "expired", startedOn: "2026-10-12T10:00:00Z" });
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.getByText("Manuel · démarré le 12/10 à 12:00")).toBeInTheDocument();
+  });
+
   it("keeps the legacy step list when a stopped run has no recorded timing for its stage", () => {
     latest = request({
       kind: "full",
