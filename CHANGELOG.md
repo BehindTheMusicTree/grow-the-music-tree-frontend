@@ -81,6 +81,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Undo song genre edits through Grow API's undo token so a batch can restore each song's original attribution and curation rule.
+
 - Show Geohistory ingestion failures in the pipeline run status and history.
 
 - **Agent directories**: Keep plans and scratch data out of Git while tracking the directory ignore rules.
