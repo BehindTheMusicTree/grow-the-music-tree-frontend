@@ -95,7 +95,9 @@ Git workflow, PRs, releases, versioning: read `CONTRIBUTING.md`, `docs/VERSIONIN
 
 ## Review checklist
 
-Flag in review: `console.log` or debug code left in; non-Tailwind inline styles or CSS; missing types or implicit `any`; branch or PR titles that break `CONTRIBUTING.md`; deviations from this file.
+Before reviewing, read `CONTRIBUTING.md` and `docs/STYLE_GUIDE.md` for the relevant conventions.
+
+Flag in review: `console.log` or debug code left in; deep relative imports where a path alias exists; non-Tailwind inline styles or CSS; missing types or implicit `any`; branch or PR titles that break `CONTRIBUTING.md`; deviations from this file.
 
 ## Further docs
 

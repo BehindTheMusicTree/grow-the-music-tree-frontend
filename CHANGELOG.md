@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Table of Contents
 
 - [Unreleased](#unreleased)
+- [3.22.1 - 2026-11-25](#3221---2026-11-25)
 - [3.22.0 - 2026-11-03](#3220---2026-11-03)
 - [3.21.0 - 2026-11-01](#3210---2026-11-01)
 - [3.20.0 - 2026-10-29](#3200---2026-10-29)
@@ -267,6 +268,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Header**: the region map link's icon is now a globe that rotates through Africa, the Americas and Asia every few seconds (static under reduced motion).
 - **Dev tooling**: `./scripts/dev-up.sh` now targets read-only staging by default; pass `--local` to start the local grow-api (`--restore`/`--no-restore` require `--local`).
 - **Dev tooling**: `next dev` no longer rewrites `AGENTS.md` (`agentRules: false`); the Next.js guidance is now a hand-maintained section, so Next upgrades no longer leave a modified `AGENTS.md` that blocks `git pull`.
+
+## [3.22.1] - 2026-11-25
+
+### CI
+
+- Add organization conformance checks and safe workflow concurrency.
 
 ## [3.22.0] - 2026-11-03
 
