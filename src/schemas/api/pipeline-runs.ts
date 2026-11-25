@@ -113,6 +113,42 @@ export const PipelineRunRequestSchema = z.object({
 
 export type PipelineRunRequest = z.infer<typeof PipelineRunRequestSchema>;
 
+/** `kind` stays a string: Grow owns the list of import kinds and the front only labels it, falling back to the raw value. */
+const ImportProgressSchema = z.object({
+  runId: z.number(),
+  taskId: z.string(),
+  kind: z.string(),
+  mode: z.string(),
+  attempt: z.number(),
+  /** Strings, like `kind`: a state Grow adds later must not break parsing of the whole run; the front only tests for the terminal ones. */
+  state: z.string(),
+  startedAt: z.string().nullable(),
+  step: z.string().nullable(),
+  stepStartedAt: z.string().nullable(),
+  heartbeatAt: z.string().nullable(),
+  sql: z.object({
+    waitEventType: z.string().nullable().optional(),
+    blockerCount: z.number().optional(),
+  }),
+  observabilityStale: z.boolean(),
+  /** First import of the graph (no previous revision); null for other kinds or once the run was cleaned up. */
+  bootstrap: z.boolean().nullable(),
+});
+
+export type ImportProgress = z.infer<typeof ImportProgressSchema>;
+
+/** Only `pipeline/runs/latest/` carries these two keys; the launch, cancel and history responses do not. */
+export const PipelineRunLatestSchema = PipelineRunRequestSchema.extend({
+  /** Newest linked import attempt; null while the songs/artists parts upload, since the attempt only exists at commit. */
+  activeImport: ImportProgressSchema.nullable(),
+  /** Median seconds per stage over recent succeeded runs; null unless the run is a `full` one. */
+  typicalStageSeconds: z
+    .object({ foreground: z.record(z.string(), z.number()), wikidata: z.record(z.string(), z.number()) })
+    .nullable(),
+});
+
+export type PipelineRunLatest = z.infer<typeof PipelineRunLatestSchema>;
+
 // Not app-kit's PaginatedResponseSchema: app-kit's barrels create React contexts at import,
 // which breaks the server components that fetch this.
 export const PipelineRunsPageSchema = z.object({

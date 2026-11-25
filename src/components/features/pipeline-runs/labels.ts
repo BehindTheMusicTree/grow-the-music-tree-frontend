@@ -3,6 +3,7 @@ import {
   PIPELINE_RUN_STAGES,
   stageIndexOf,
   type PipelineRunKind,
+  type PipelineRunLatest,
   type PipelineRunRequest,
   type PipelineRunStage,
   type StepTiming,
@@ -58,6 +59,12 @@ const WIKIDATA_LABELS: Record<WikidataStage, string> = {
   anchoring_wikidata_silver: "Ancrage Wikidata",
 };
 
+/** The latest-only keys of a run returned by launch or cancel: kept from the cached latest run when it is the same run, else empty until the next poll. */
+export function asLatest(updated: PipelineRunRequest, cached: PipelineRunLatest | null | undefined): PipelineRunLatest {
+  const same = cached?.uuid === updated.uuid;
+  return { ...updated, activeImport: same ? cached.activeImport : null, typicalStageSeconds: same ? cached.typicalStageSeconds : null };
+}
+
 export const WIKIDATA_JOIN_LABEL = "Attente de la chaîne Wikidata";
 
 const BRONZE_FOREGROUND_STAGES: readonly PipelineRunStage[] = [
@@ -67,16 +74,30 @@ const BRONZE_FOREGROUND_STAGES: readonly PipelineRunStage[] = [
   "building_genres",
 ];
 
-function timingDetail(step: StepTiming, now: number | null): string | undefined {
+const EPOCH = "1970-01-01T00:00:00Z";
+const SLOW_MARGIN_SECONDS = 600;
+
+/** Same threshold as the pipeline poller: past it the stage is slower than usual. */
+export const isSlowStage = (elapsedSeconds: number, medianSeconds: number) =>
+  elapsedSeconds > Math.max(2 * medianSeconds, medianSeconds + SLOW_MARGIN_SECONDS);
+
+function timingDetail(step: StepTiming, now: number | null, medianSeconds?: number): string | undefined {
   if (step.finishedAt) return formatDuration(step.startedAt, step.finishedAt);
-  if (step.state === "running" && now !== null) return `depuis ${formatDuration(step.startedAt, now)}`;
+  if (step.state !== "running" || now === null) return;
+  const elapsed = `depuis ${formatDuration(step.startedAt, now)}`;
+  if (medianSeconds === undefined) return elapsed;
+  const usual = `habituellement ~${formatDuration(EPOCH, medianSeconds * 1000)}`;
+  return isSlowStage((now - Date.parse(step.startedAt)) / 1000, medianSeconds)
+    ? `${elapsed} · ${usual} · plus long que d'habitude`
+    : `${elapsed} · ${usual}`;
 }
 
-export function foregroundStepDetails(steps: RunStep[], request: PipelineRunRequest, now: number | null): RunStep[] {
+export function foregroundStepDetails(steps: RunStep[], request: PipelineRunLatest, now: number | null): RunStep[] {
   const telemetry = request.stepTelemetry;
   if (!telemetry) return steps;
   const running = request.status === "running";
   const bronzeOnly = telemetry.variant === "bronze_only";
+  const bootstrapping = request.activeImport?.bootstrap === true;
   const hasRunningStep = telemetry.foreground.at(-1)?.state === "running";
   // A step with no timing before the last recorded one never ran (e.g. `building_genres` when the Wikidata chain
   // finished before the join); hiding it beats showing it as "à venir" forever.
@@ -90,7 +111,9 @@ export function foregroundStepDetails(steps: RunStep[], request: PipelineRunRequ
       return hasRunningStep ? { ...step, status: "pending", detail: undefined } : { ...step, status: step.status === "current" ? "current" : "pending" };
     }
     const status = stepStatusOf(timing, request);
-    const detail = [step.detail, timingDetail(timing, status === "current" ? now : null)].filter(Boolean).join(" · ");
+    // A first graph import can take hours: the median would flag it as slow for nothing.
+    const median = bootstrapping && step.key === "importing_graph" ? undefined : request.typicalStageSeconds?.foreground[step.key];
+    const detail = [step.detail, timingDetail(timing, status === "current" ? now : null, median)].filter(Boolean).join(" · ");
     return {
       ...step,
       status,
@@ -105,12 +128,12 @@ function stepStatusOf(step: StepTiming, request: PipelineRunRequest): RunStepSta
   return step.state === "running" && request.status === "running" ? "current" : "failed";
 }
 
-export function wikidataStepsOf(request: PipelineRunRequest, now: number | null) {
+export function wikidataStepsOf(request: PipelineRunLatest, now: number | null) {
   return (request.stepTelemetry?.wikidata ?? []).map((step) => ({
     key: step.stage,
     label: WIKIDATA_LABELS[step.stage],
     status: stepStatusOf(step, request),
-    detail: timingDetail(step, now),
+    detail: timingDetail(step, now, request.typicalStageSeconds?.wikidata[step.stage]),
   }));
 }
 
