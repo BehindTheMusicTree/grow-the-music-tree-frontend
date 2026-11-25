@@ -233,9 +233,16 @@ export const AssignSongGenreInputSchema = z.object({
 });
 export type AssignSongGenreInput = z.infer<typeof AssignSongGenreInputSchema>;
 
-export const AssignSongGenreOutputSchema = z.object({
-  previous: z.array(z.object({ uuid: z.string(), genre: z.string().nullable(), undoable: z.boolean() })),
-});
+const PreviousSongGenreSchema = z.object({ uuid: z.string(), genre: z.string().nullable() });
+export const UndoSongGenreInputSchema = z.object({ undoToken: z.uuid() });
+
+export const AssignSongGenreOutputSchema = z.union([
+  UndoSongGenreInputSchema.extend({ previous: z.array(PreviousSongGenreSchema) }),
+  z.object({
+    undoToken: z.never().optional(),
+    previous: z.array(PreviousSongGenreSchema.extend({ undoable: z.boolean() })),
+  }),
+]);
 export type AssignSongGenreOutput = z.infer<typeof AssignSongGenreOutputSchema>;
 
 const VideoSchema = z.object({
