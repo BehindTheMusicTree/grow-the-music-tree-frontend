@@ -80,11 +80,16 @@ function useNow(ticking: boolean) {
   );
 }
 
+const START_DATE_FORMAT = new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "2-digit", timeZone: "Europe/Paris" });
+const START_TIME_FORMAT = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
+
 function durationOf({ status, startedOn, finishedOn }: PipelineRunRequest, now: number | null) {
   if (!startedOn || status === "queued") return null;
-  if (finishedOn) return `en ${formatDuration(startedOn, finishedOn)}`;
-  if (status === "running" && now !== null) return `depuis ${formatDuration(startedOn, now)}`;
-  return null;
+  const startedAt = new Date(startedOn);
+  const started = `démarré le ${START_DATE_FORMAT.format(startedAt)} à ${START_TIME_FORMAT.format(startedAt)}`;
+  if (finishedOn) return `${started} · durée totale : ${formatDuration(startedOn, finishedOn)}`;
+  if (status === "running" && now !== null) return `${started} · durée écoulée : ${formatDuration(startedOn, now)}`;
+  return started;
 }
 
 type Props = { pendingCount: number; initialRequest: PipelineRunRequest | null };
@@ -202,7 +207,7 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
             {originOf(request)}
             {duration && ` · ${duration}`}
           </p>
-          {request.status === "running" && (request.stage === "merging_songs" || request.stage === "merging_artists" || request.stage === "merging_region_map") && (
+          {request.status === "running" && (request.stage === "importing_graph" || request.stage === "merging_songs" || request.stage === "merging_artists" || request.stage === "merging_region_map") && (
             <p className="text-body text-gray-600">Une annulation laisse la fusion déjà commencée aller à son terme.</p>
           )}
         </div>

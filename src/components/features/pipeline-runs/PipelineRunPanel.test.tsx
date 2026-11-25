@@ -83,7 +83,7 @@ describe("PipelineRunPanel", () => {
 
     expect(curationButton()).toBeDisabled();
     expect(fullButton()).toBeDisabled();
-    expect(screen.getByRole("progressbar")).toHaveAttribute("value", String((7 + 1 / 4) / 13));
+    expect(screen.getByRole("progressbar")).toHaveAttribute("value", String((8 + 1 / 4) / 14));
     expect(screen.getByText("Ingestion complète : Envoi des morceaux (1/4)")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
@@ -98,7 +98,8 @@ describe("PipelineRunPanel", () => {
     const items = within(screen.getByRole("list", { name: "Étapes du run" })).getAllByRole("listitem");
 
     expect(items.map((item) => item.textContent)).toEqual([
-      "Import de l'arbreterminée",
+      "Import des arbres de genresterminée",
+      "Import du graphe des genresterminée",
       "Envoi des morceaux(1/4)en cours",
       "Fusion des morceauxà venir",
       "Envoi des artistesà venir",
@@ -106,7 +107,7 @@ describe("PipelineRunPanel", () => {
       "Envoi de la carte des régionsà venir",
       "Fusion de la carte des régionsà venir",
     ]);
-    expect(items[1]).toHaveAttribute("aria-current", "step");
+    expect(items[2]).toHaveAttribute("aria-current", "step");
   });
 
   it("marks the stage a failed run stopped at and hides the list once superseded", () => {
@@ -131,7 +132,8 @@ describe("PipelineRunPanel", () => {
 
   it.each([
     [{ status: "queued" as const }, "Curation : En file d'attente"],
-    [{ stage: "importing_tree" as const }, "Curation : Import de l'arbre"],
+    [{ stage: "importing_tree" as const }, "Curation : Import des arbres de genres"],
+    [{ stage: "importing_graph" as const }, "Curation : Import du graphe des genres"],
     [{ kind: "full" as const, stage: "ingesting_wikidata" as const }, "Ingestion complète : Ingestion Wikidata"],
     [{ status: "succeeded" as const }, "Curation : Appliquée"],
     [{ kind: "full" as const, status: "succeeded" as const }, "Ingestion complète : Terminée"],
@@ -223,7 +225,14 @@ describe("PipelineRunPanel", () => {
     });
     render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
 
-    expect(screen.getByText("Manuel · en 2 h 05 min")).toBeInTheDocument();
+    expect(screen.getByText("Manuel · démarré le 12/10 à 12:00 · durée totale : 2 h 05 min")).toBeInTheDocument();
+  });
+
+  it("shows only the start time of an expired run that never recorded an end", () => {
+    latest = request({ status: "expired", startedOn: "2026-10-12T10:00:00Z" });
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.getByText("Manuel · démarré le 12/10 à 12:00")).toBeInTheDocument();
   });
 
   it("keeps the legacy step list when a stopped run has no recorded timing for its stage", () => {
@@ -318,10 +327,10 @@ describe("PipelineRunPanel", () => {
     latest = request({ trigger: "scheduled", startedOn: "2026-10-12T10:00:00Z" });
     render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
 
-    expect(screen.getByText("Nightly · depuis 3 min")).toBeInTheDocument();
+    expect(screen.getByText("Nightly · démarré le 12/10 à 12:00 · durée écoulée : 3 min")).toBeInTheDocument();
 
     act(() => vi.advanceTimersByTime(60_000));
 
-    expect(screen.getByText("Nightly · depuis 4 min")).toBeInTheDocument();
+    expect(screen.getByText("Nightly · démarré le 12/10 à 12:00 · durée écoulée : 4 min")).toBeInTheDocument();
   });
 });

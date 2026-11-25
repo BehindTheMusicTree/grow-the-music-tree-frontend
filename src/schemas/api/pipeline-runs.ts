@@ -15,6 +15,7 @@ const STAGES = [
   "matching_songs",
   "building_gold",
   "importing_tree",
+  "importing_graph",
   "uploading_songs",
   "merging_songs",
   "uploading_artists",
@@ -57,6 +58,7 @@ export type StepTiming = z.infer<typeof StepTimingSchema>;
 
 const IMPORT_STAGES = [
   "importing_tree",
+  "importing_graph",
   "uploading_songs",
   "merging_songs",
   "uploading_artists",
