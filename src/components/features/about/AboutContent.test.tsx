@@ -28,6 +28,11 @@ describe("AboutContent", () => {
     expect(screen.queryByText(/sign in with Google to see your library/i)).not.toBeInTheDocument();
   });
 
+  it("links to the genealogy page", () => {
+    render(<AboutContent onClose={vi.fn()} />);
+    expect(screen.getByRole("link", { name: "genealogy chart" })).toHaveAttribute("href", "/genealogy");
+  });
+
   it("links the API repository", () => {
     render(<AboutContent onClose={vi.fn()} />);
     expect(screen.getByRole("link", { name: "API" })).toHaveAttribute(

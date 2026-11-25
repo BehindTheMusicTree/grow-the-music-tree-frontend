@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { buildCurationRowSchema, toCurationRow } from "./curation";
 
 const list = {
-  name: "main_parent",
+  name: "canonical_parent",
   keyColumns: ["item_id"],
   columns: ["item_id", "reason", "exclude_other_parents"],
   columnSpecs: [

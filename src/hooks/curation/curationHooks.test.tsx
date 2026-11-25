@@ -7,6 +7,7 @@ import { useAliasGenre } from "@hooks/curation/useAliasGenre";
 import { useAssignSongGenre } from "@hooks/curation/useAssignSongGenre";
 import { useEssentialSongs } from "@hooks/curation/useEssentialSongs";
 import { useExcludeGenre } from "@hooks/curation/useExcludeGenre";
+import { useSetGenreRoot } from "@hooks/curation/useSetGenreRoot";
 import { useUpdateGenreSummary } from "@hooks/curation/useUpdateGenreSummary";
 import { useUpdateSongVideo } from "@hooks/curation/useUpdateSongVideo";
 import { makeGenreUuid } from "@behindthemusictree/app-kit/genre-tree/testing";
@@ -52,6 +53,15 @@ describe("curation hooks", () => {
     const { result } = setup(useExcludeGenre);
     const [message] = await run(result, { uuid: "g1", category: "theme" });
     expect(message).toBe("Genre excluded");
+  });
+
+  it("makes a genre a root without offering an undo", async () => {
+    const { result } = setup(useSetGenreRoot);
+    const [message, options] = await run(result, { uuid: makeGenreUuid("g1"), name: "Folk" });
+    expect(message).toBe("Made Folk a root");
+    expect(options.action).toBeUndefined();
+    expect(fetchMock.mock.calls[0][0]).toBe(`genres/${makeGenreUuid("g1")}/set-root/`);
+    expect(fetchMock.mock.calls[0][3].method).toBe("POST");
   });
 
   it("updates the summary optimistically and undoes it", async () => {

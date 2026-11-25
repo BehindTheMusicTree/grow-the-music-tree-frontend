@@ -65,6 +65,7 @@ vi.mock("@hooks/curation/useAliasGenre", () => ({
   useAliasPreview: () => ({ data: m.aliasPreview.current }),
 }));
 vi.mock("@hooks/curation/useExcludeGenre", () => ({ useExcludeGenre: () => ({ mutate: m.exclude, isPending: false }) }));
+vi.mock("@hooks/curation/useSetGenreRoot", () => ({ useSetGenreRoot: () => ({ mutate: vi.fn(), isPending: false }) }));
 vi.mock("@hooks/curation/useEssentialSongs", () => ({ useEssentialSongs: () => ({ mutate: m.essential, isPending: false }) }));
 vi.mock("@hooks/curation/useUpdateGenreSummary", () => ({ useUpdateGenreSummary: () => ({ mutate: m.summary }) }));
 vi.mock("./SongVideoDialog", () => ({ default: () => null }));

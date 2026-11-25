@@ -4,7 +4,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { keepPreviousData } from "@tanstack/react-query";
 import { Pagination } from "@behindthemusictree/ui";
-import { PaginatedResponseSchema, useFetchWrapper, useQueryWithParse } from "@behindthemusictree/app-kit/transport";
+import { PaginatedResponseSchema, usePlaybackQuery } from "@behindthemusictree/app-kit/transport";
 import GenrePicker from "@components/features/curation/GenrePicker";
 import { useAssignSongGenre } from "@hooks/curation/useAssignSongGenre";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -27,7 +27,7 @@ function ToRefineRow({ song }: { song: ToRefineSong }) {
     <li className="flex flex-wrap items-end gap-4 rounded-md border p-4">
       <div className="flex min-w-48 flex-col">
         <span className="font-medium">{song.title}</span>
-        <span className="text-sm text-gray-600">{song.genre?.name}</span>
+        <span className="text-body text-gray-600">{song.genre?.name}</span>
       </div>
       <div className="min-w-64 flex-1">
         <GenrePicker
@@ -40,7 +40,7 @@ function ToRefineRow({ song }: { song: ToRefineSong }) {
       </div>
       <button
         type="button"
-        className="rounded border bg-white px-3 py-2 text-sm hover:bg-gray-100 disabled:opacity-50"
+        className="rounded border bg-white px-3 py-2 text-body hover:bg-gray-100 disabled:opacity-50"
         disabled={!target || isPending}
         onClick={() => target && mutate({ songs: [song.uuid], genre: target.uuid })}
       >
@@ -52,10 +52,10 @@ function ToRefineRow({ song }: { song: ToRefineSong }) {
 
 export default function ToRefineList() {
   const [page, setPage] = useState(1);
-  const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
-  const { data, isPending, isError } = useQueryWithParse({
+  const { data, isPending, isError } = usePlaybackQuery({
     queryKey: ["toRefineSongs", page],
-    queryFn: () => fetch("library/songs/", true, false, undefined, { genreIsUmbrella: true, page }),
+    getBackendBaseUrl: getGrowBackendBaseUrl,
+    queryFn: (fetch) => fetch("library/songs/", true, false, undefined, { genreIsUmbrella: true, page }),
     schema: ToRefinePageSchema,
     placeholderData: keepPreviousData,
     context: "ToRefineList",

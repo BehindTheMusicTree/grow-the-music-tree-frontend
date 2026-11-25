@@ -21,7 +21,7 @@ export default function OrgSocialLinks() {
         <EmailSocialLink className={BTMT_ICON_LINK_CLASS} iconClassName="h-6 w-6 shrink-0" />
       </div>
       {appVersion ? (
-        <p className="text-center text-xs text-gray-500 tabular-nums">v{appVersion}</p>
+        <p className="text-center text-caption text-gray-500 tabular-nums">v{appVersion}</p>
       ) : null}
     </div>
   );

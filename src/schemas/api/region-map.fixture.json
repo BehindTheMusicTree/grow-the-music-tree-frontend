@@ -36,7 +36,9 @@
         }
       ],
       "songCount": 120,
-      "genreCount": 1
+      "genreCount": 1,
+      "overviewItemId": null,
+      "inheritedOverviewItemId": null
     },
     {
       "id": "Q12130",
@@ -72,7 +74,9 @@
         }
       ],
       "songCount": 40,
-      "genreCount": 1
+      "genreCount": 1,
+      "overviewItemId": null,
+      "inheritedOverviewItemId": null
     },
     {
       "id": "Q183",
@@ -100,7 +104,9 @@
       "drillable": false,
       "genres": [],
       "songCount": 0,
-      "genreCount": 0
+      "genreCount": 0,
+      "overviewItemId": null,
+      "inheritedOverviewItemId": null
     },
     {
       "id": "Q236626",
@@ -134,7 +140,9 @@
         }
       ],
       "songCount": 40,
-      "genreCount": 1
+      "genreCount": 1,
+      "overviewItemId": null,
+      "inheritedOverviewItemId": null
     }
   ],
   "tileset": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"

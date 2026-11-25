@@ -67,13 +67,41 @@ describe("GenreHistory", () => {
     );
   });
 
+  it("labels side changes, the action an admin side toggle records", async () => {
+    fetchMock.mockResolvedValue([
+      entry({ action: "side_changed", actorPseudo: "alice", oldValue: "core", newValue: "pop" }),
+      entry({
+        action: "parent_changed",
+        actorPseudo: "alice",
+        oldValue: "Mainstream Pop",
+        newValue: "Rhythm and blues",
+      }),
+    ]);
+
+    renderHistory();
+
+    const items = within(await screen.findByRole("list")).getAllByRole("listitem");
+    expect(items[0]).toHaveTextContent("Side changed core → pop by alice");
+    expect(items[1]).toHaveTextContent("Moved from Mainstream Pop to Rhythm and blues by alice");
+  });
+
   it("shows a dash when the genre has no modifications", async () => {
     fetchMock.mockResolvedValue([]);
 
     renderHistory();
 
     expect(await screen.findByText("—")).toBeInTheDocument();
-    expect(screen.getByText("Modifications")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Modifications" })).toBeInTheDocument();
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
+  });
+
+  it("frames the entries in a titled Modifications section", async () => {
+    fetchMock.mockResolvedValue([entry({ action: "created" })]);
+
+    renderHistory();
+
+    const list = await screen.findByRole("list");
+    const toggle = screen.getByRole("button", { name: "Modifications" });
+    expect(toggle.closest("section")).toContainElement(list);
   });
 });

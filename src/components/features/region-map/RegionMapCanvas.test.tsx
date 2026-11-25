@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import fixture from "@schemas/api/region-map.fixture.json";
 import { RegionMapIndexSchema } from "@schemas/api/region-map";
 
@@ -17,6 +17,10 @@ vi.mock("maplibre-gl", () => {
     calls: Record<string, unknown[][]> = {};
     canvas = { style: { cursor: "" } };
     removed = false;
+    surfaceRadius = Infinity;
+    rendered: { properties: Record<string, unknown> }[] = [];
+    center = { lng: 0, lat: 0 };
+    zoom = 1;
 
     constructor(public options: unknown) {
       if (hoisted.failConstruction) throw new Error("WebGL unavailable");
@@ -27,8 +31,11 @@ vi.mock("maplibre-gl", () => {
     }
     on(type: string, ...rest: unknown[]) {
       const handler = rest[rest.length - 1] as Handler;
-      const key = rest.length === 2 ? `${type}:${rest[0]}` : type;
-      this.handlers.set(key, [...(this.handlers.get(key) ?? []), handler]);
+      const layers = rest.length === 2 ? ([] as string[]).concat(rest[0] as string | string[]) : [null];
+      for (const layer of layers) {
+        const key = layer === null ? type : `${type}:${layer}`;
+        this.handlers.set(key, [...(this.handlers.get(key) ?? []), handler]);
+      }
     }
     emit(key: string, event?: unknown) {
       for (const handler of this.handlers.get(key) ?? []) handler(event);
@@ -48,11 +55,55 @@ vi.mock("maplibre-gl", () => {
     removeFeatureState(...args: unknown[]) {
       this.record("removeFeatureState", args);
     }
+    addLayer(...args: unknown[]) {
+      this.record("addLayer", args);
+    }
+    setLight(...args: unknown[]) {
+      this.record("setLight", args);
+      this.record("order", ["setLight"]);
+    }
+    triggerRepaint() {
+      this.record("triggerRepaint", []);
+      this.record("order", ["triggerRepaint"]);
+    }
+    jumpTo(...args: unknown[]) {
+      this.record("jumpTo", args);
+    }
     fitBounds(...args: unknown[]) {
       this.record("fitBounds", args);
     }
-    project() {
-      return { x: 40, y: 60 };
+    queryRenderedFeatures(...args: unknown[]) {
+      this.record("queryRenderedFeatures", args);
+      return this.rendered;
+    }
+    getCenter() {
+      return this.center;
+    }
+    getZoom() {
+      return this.zoom;
+    }
+    getMaxZoom() {
+      return 10;
+    }
+    getMinZoom() {
+      return 0;
+    }
+    zoomIn() {
+      this.record("zoomIn", []);
+    }
+    zoomOut() {
+      this.record("zoomOut", []);
+    }
+    // Screen point <-> "lngLat" round trip on a disk of `surfaceRadius` around the origin: a point
+    // outside snaps to the disk's edge, like MapLibre snapping a point in space onto the globe.
+    unproject([x, y]: [number, number]) {
+      const distance = Math.hypot(x, y);
+      const scale = distance > this.surfaceRadius ? this.surfaceRadius / distance : 1;
+      return { lng: x * scale, lat: y * scale };
+    }
+    project(lngLat: [number, number] | { lng: number; lat: number }) {
+      if (Array.isArray(lngLat)) return { x: 40, y: 60 };
+      return { x: lngLat.lng, y: lngLat.lat };
     }
     remove() {
       this.removed = true;
@@ -61,13 +112,21 @@ vi.mock("maplibre-gl", () => {
   return { Map: FakeMap, setWorkerUrl: hoisted.setWorkerUrl, addProtocol: hoisted.addProtocol };
 });
 
+let nightModeMock = false;
+vi.mock("@contexts/NightModeProvider", () => ({ useNightMode: () => ({ nightMode: nightModeMock, toggleNightMode: vi.fn() }) }));
+
 import RegionMapCanvas from "./RegionMapCanvas";
+import { MOON_LAYER, NIGHT_LAYER, STARFIELD_LAYER, SUN_LAYER, supranationalZoneIds, zoneFilters } from "./regionMapLayers";
 
 type Fake = {
   options: Record<string, unknown>;
   calls: Record<string, unknown[][]>;
   canvas: { style: { cursor: string } };
   removed: boolean;
+  surfaceRadius: number;
+  rendered: { properties: Record<string, unknown> }[];
+  center: { lng: number; lat: number };
+  zoom: number;
   emit: (key: string, event?: unknown) => void;
 };
 const fakeMap = (): Fake => hoisted.instances[hoisted.instances.length - 1] as Fake;
@@ -75,21 +134,30 @@ const fakeMap = (): Fake => hoisted.instances[hoisted.instances.length - 1] as F
 const index = RegionMapIndexSchema.parse(fixture);
 const regions = new Map(index.regions.map((region) => [region.id, region]));
 
-const mount = (props: Partial<React.ComponentProps<typeof RegionMapCanvas>> = {}) => {
-  const onRegionClick = vi.fn();
-  const view = render(
+type Props = React.ComponentProps<typeof RegionMapCanvas>;
+
+const mount = (props: Partial<Props> = {}) => {
+  const handlers = { onRegionClick: vi.fn(), onClearSelection: vi.fn(), onCameraChange: vi.fn() };
+  const element = (overrides: Partial<Props>) => (
     <RegionMapCanvas
-      levelId="world"
       tileset={index.tileset}
-      zoneId={null}
       regions={regions}
+      rootIds={index.worldChildIds}
       selectedId={null}
-      onRegionClick={onRegionClick}
+      zoneId={null}
+      initialCamera={null}
+      homeCenter={null}
+      focus={null}
+      {...handlers}
       {...props}
-    />,
+      {...overrides}
+    />
   );
-  return { onRegionClick, ...view };
+  const view = render(element({}));
+  return { ...handlers, ...view, rerender: (overrides: Partial<Props>) => view.rerender(element(overrides)) };
 };
+
+const feature = (layer: string, properties: Record<string, unknown>) => ({ layer: { id: layer }, properties });
 
 beforeEach(() => {
   hoisted.instances.length = 0;
@@ -98,7 +166,7 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("RegionMapCanvas", () => {
-  it("builds the style from the tileset and frames the level once ready", async () => {
+  it("builds the style from the tileset and opens on the world", () => {
     mount();
     const map = fakeMap();
 
@@ -107,62 +175,196 @@ describe("RegionMapCanvas", () => {
         sources: { tiles: { url: `pmtiles://https://tiles.example.com/regions/${index.tileset}.pmtiles` } },
         glyphs: "https://tiles.example.com/fonts/{fontstack}/{range}.pbf",
       },
+      bounds: [
+        [-180, -58],
+        [180, 84],
+      ],
     });
     expect(hoisted.addProtocol).toHaveBeenCalledWith("pmtiles", expect.any(Function));
-
-    await act(() => map.emit("load"));
-
-    expect(map.calls.fitBounds).toHaveLength(1);
-    expect(map.calls.fitBounds[0][1]).toMatchObject({ animate: false });
   });
 
-  it("drills down on the same map by filtering, refitting and never fetching", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch");
-    const { rerender, onRegionClick } = mount();
+  it("adds the starfield on top, then the moon, the sun and the night shade, once the style has loaded, not before", async () => {
+    mount();
+    const map = fakeMap();
+    expect(map.calls.addLayer).toBeUndefined();
+    await act(() => map.emit("load"));
+    expect(map.calls.addLayer).toHaveLength(4);
+    const [layer, beforeId] = map.calls.addLayer[0] as [{ id: string; type: string }, unknown];
+    expect(layer).toMatchObject({ id: STARFIELD_LAYER, type: "custom" });
+    expect(beforeId).toBeUndefined();
+    const [moon, moonBefore] = map.calls.addLayer[1] as [{ id: string; type: string }, unknown];
+    expect(moon).toMatchObject({ id: MOON_LAYER, type: "custom" });
+    expect(moonBefore).toBe(STARFIELD_LAYER);
+    const [sun, sunBefore] = map.calls.addLayer[2] as [{ id: string; type: string }, unknown];
+    expect(sun).toMatchObject({ id: SUN_LAYER, type: "custom" });
+    expect(sunBefore).toBe(STARFIELD_LAYER);
+    const [night, nightBefore] = map.calls.addLayer[3] as [{ id: string; type: string }, unknown];
+    expect(night).toMatchObject({ id: NIGHT_LAYER, type: "custom" });
+    expect(nightBefore).toBe(MOON_LAYER);
+  });
+
+  it("shows no map controls before the style has loaded", () => {
+    mount();
+    expect(screen.queryByRole("button", { name: "Zoom in" })).not.toBeInTheDocument();
+  });
+
+  it("zooms and fits the world from the controls, keeping the selection", async () => {
+    mount({ selectedId: index.worldChildIds[0] });
     const map = fakeMap();
     await act(() => map.emit("load"));
 
-    rerender(
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+    expect(map.calls.zoomIn).toHaveLength(1);
+    expect(map.calls.zoomOut).toHaveLength(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "Fit to frame" }));
+    expect(map.calls.fitBounds).toHaveLength(1);
+    expect(map.calls.fitBounds[0][0]).toEqual([
+      [-180, -58],
+      [180, 84],
+    ]);
+  });
+
+  it("disables zoom out at the minimum zoom and zoom in at the maximum", async () => {
+    mount();
+    const map = fakeMap();
+    map.zoom = 0;
+    await act(() => map.emit("load"));
+    expect(screen.getByRole("button", { name: "Zoom out" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Zoom in" })).toBeEnabled();
+
+    map.zoom = 10;
+    await act(() => map.emit("zoom"));
+    expect(screen.getByRole("button", { name: "Zoom in" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Zoom out" })).toBeEnabled();
+  });
+
+  it("opens on the given camera", () => {
+    mount({ initialCamera: { lng: 2, lat: 46, zoom: 5 } });
+
+    expect(fakeMap().options).toMatchObject({ center: [2, 46], zoom: 5 });
+    expect(fakeMap().options).not.toHaveProperty("bounds");
+  });
+
+  it("keeps the world zoom but turns the globe to the home country", () => {
+    mount({ homeCenter: [2, 46] });
+    const map = fakeMap();
+
+    expect(map.options).toMatchObject({
+      bounds: [
+        [-180, -58],
+        [180, 84],
+      ],
+    });
+    expect(map.calls.jumpTo).toEqual([[{ center: [2, 46] }]]);
+  });
+
+  it("ignores the home country when a camera or a focus opens the map", () => {
+    mount({ homeCenter: [2, 46], initialCamera: { lng: 2, lat: 46, zoom: 5 } });
+    expect(fakeMap().calls.jumpTo).toBeUndefined();
+
+    mount({ homeCenter: [2, 46], focus: { id: "Q142", seq: 0 } });
+    expect(fakeMap().calls.jumpTo).toBeUndefined();
+  });
+
+  it("opens on the region of the focus present at mount, without flying to it again", async () => {
+    mount({ focus: { id: "Q142", seq: 0 } });
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+
+    expect(map.options).toMatchObject({
+      bounds: [
+        [-5, 42],
+        [8, 51],
+      ],
+    });
+    expect(map.calls.fitBounds).toBeUndefined();
+  });
+
+  it("flies to each new focus request, and to the world for a null id", async () => {
+    const { rerender } = mount();
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+
+    rerender({ focus: { id: "Q142", seq: 1 } });
+    rerender({ focus: { id: null, seq: 2 } });
+
+    expect(map.calls.fitBounds.map(([bounds]) => bounds)).toEqual([
+      [
+        [-5, 42],
+        [8, 51],
+      ],
+      [
+        [-180, -58],
+        [180, 84],
+      ],
+    ]);
+    expect(hoisted.instances).toHaveLength(1);
+  });
+
+  it("pads the fit by the detail panel width", async () => {
+    const host = document.createElement("div");
+    const panel = document.createElement("aside");
+    panel.setAttribute("data-detail-panel", "");
+    panel.getBoundingClientRect = () => ({ left: 0, right: 300, top: 0, bottom: 600 }) as DOMRect;
+    host.getBoundingClientRect = () => ({ left: 0, right: 1000, top: 0, bottom: 600 }) as DOMRect;
+    document.body.append(host);
+    const view = render(
       <RegionMapCanvas
-        levelId="Q142"
         tileset={index.tileset}
-        zoneId={null}
         regions={regions}
+        rootIds={index.worldChildIds}
         selectedId={null}
-        onRegionClick={onRegionClick}
+        zoneId={null}
+        initialCamera={null}
+        homeCenter={null}
+        focus={null}
+        onRegionClick={vi.fn()}
+        onClearSelection={vi.fn()}
+        onCameraChange={vi.fn()}
       />,
+      { container: host }
+    );
+    host.append(panel);
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+    view.rerender(
+      <RegionMapCanvas
+        tileset={index.tileset}
+        regions={regions}
+        rootIds={index.worldChildIds}
+        selectedId={null}
+        zoneId={null}
+        initialCamera={null}
+        homeCenter={null}
+        focus={{ id: "Q142", seq: 1 }}
+        onRegionClick={vi.fn()}
+        onClearSelection={vi.fn()}
+        onCameraChange={vi.fn()}
+      />
     );
 
-    const level = ["==", ["get", "parentId"], "Q142"];
-    expect(hoisted.instances).toHaveLength(1);
-    expect(map.removed).toBe(false);
-    expect(map.calls.setFilter).toEqual(
-      expect.arrayContaining([
-        ["region-fill", level],
-        ["region-line", level],
-        ["region-labels", level],
-      ]),
-    );
-    expect(map.calls.fitBounds).toHaveLength(2);
-    expect(map.calls.fitBounds[1][1]).toMatchObject({ animate: true });
-    expect(fetchSpy).not.toHaveBeenCalled();
-    fetchSpy.mockRestore();
+    expect(map.calls.fitBounds[0][1]).toMatchObject({ padding: { left: 324, right: 24, top: 24, bottom: 24 } });
+    host.remove();
+  });
+
+  it("reports the camera once a move ends", () => {
+    const { onCameraChange } = mount();
+    const map = fakeMap();
+    map.center = { lng: 2.5, lat: 46.1 };
+    map.zoom = 5.25;
+
+    map.emit("moveend");
+
+    expect(onCameraChange).toHaveBeenCalledWith({ lng: 2.5, lat: 46.1, zoom: 5.25 });
   });
 
   it("recreates the map when the index points at another tileset", () => {
-    const { rerender, onRegionClick } = mount();
+    const { rerender } = mount();
     const first = fakeMap();
 
-    rerender(
-      <RegionMapCanvas
-        levelId="world"
-        tileset={"e".repeat(64)}
-        zoneId={null}
-        regions={regions}
-        selectedId={null}
-        onRegionClick={onRegionClick}
-      />,
-    );
+    rerender({ tileset: "e".repeat(64) });
 
     expect(first.removed).toBe(true);
     expect(hoisted.instances).toHaveLength(2);
@@ -172,69 +374,183 @@ describe("RegionMapCanvas", () => {
     const { onRegionClick } = mount();
     const map = fakeMap();
     await act(() => map.emit("load"));
-    const event = { features: [{ properties: { id: "Q142" } }], point: { x: 10, y: 20 } };
+    const event = { features: [feature("region-fill", { id: "Q142", depth: 0 })], point: { x: 10, y: 20 } };
+    expect(map.canvas.style.cursor).toBe("default");
 
     await act(() => map.emit("mousemove:region-fill", event));
-    expect(map.canvas.style.cursor).toBe("zoom-in");
-    expect(screen.queryByText(/France · 120 songs/)).not.toBeNull();
+    expect(map.canvas.style.cursor).toBe("pointer");
+    const tooltip = screen.getByText(/France · 120 songs/);
+    expect(tooltip.style.left).toBe("22px");
+    expect(tooltip.style.top).toBe("32px");
+
+    await act(() => map.emit("mousemove:region-fill", { ...event, point: { x: 50, y: 60 } }));
+    expect(screen.getByText(/France · 120 songs/)).toBe(tooltip);
+    expect(tooltip.style.left).toBe("62px");
+    expect(tooltip.style.top).toBe("72px");
 
     map.emit("click:region-fill", event);
     expect(onRegionClick).toHaveBeenCalledWith(expect.objectContaining({ id: "Q142" }));
 
     await act(() => map.emit("mouseleave:region-fill"));
-    expect(map.canvas.style.cursor).toBe("");
+    expect(map.canvas.style.cursor).toBe("default");
     expect(screen.queryByText(/France · 120 songs/)).toBeNull();
+  });
+
+  it("treats a region label like its fill: pointer cursor and click select", async () => {
+    const { onRegionClick } = mount();
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+    const event = { features: [feature("region-fill", { id: "Q142", depth: 0 })], point: { x: 10, y: 20 } };
+
+    await act(() => map.emit("mousemove:region-labels", event));
+    expect(map.canvas.style.cursor).toBe("pointer");
+    map.emit("click:region-labels", event);
+    expect(onRegionClick).toHaveBeenCalledWith(expect.objectContaining({ id: "Q142" }));
+
+    await act(() => map.emit("mouseleave:region-labels"));
+    expect(map.canvas.style.cursor).toBe("default");
+  });
+
+  it("ignores a region MapLibre snaps to the horizon when the pointer is off the globe", async () => {
+    const { onRegionClick } = mount();
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+    map.surfaceRadius = 100;
+    const onGlobe = { features: [feature("region-fill", { id: "Q142", depth: 0 })], point: { x: 10, y: 20 } };
+    const inSpace = { ...onGlobe, point: { x: 300, y: 20 } };
+
+    await act(() => map.emit("mousemove:region-fill", onGlobe));
+    expect(screen.getByText(/France · 120 songs/)).toBeInTheDocument();
+
+    await act(() => map.emit("mousemove:region-fill", inSpace));
+    expect(screen.queryByText(/France · 120 songs/)).toBeNull();
+    expect(map.canvas.style.cursor).toBe("default");
+
+    map.emit("click:region-fill", inSpace);
+    expect(onRegionClick).not.toHaveBeenCalled();
+  });
+
+  it("clears the selection on a click that hits no region", async () => {
+    const { onClearSelection } = mount();
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+
+    map.rendered = [];
+    map.emit("click", { point: { x: 10, y: 20 } });
+    expect(onClearSelection).toHaveBeenCalledTimes(1);
+
+    map.rendered = [feature("region-fill", { id: "Q142", depth: 0 })];
+    map.emit("click", { point: { x: 10, y: 20 } });
+    expect(onClearSelection).toHaveBeenCalledTimes(1);
+  });
+
+  it("thickens a zone's outline while its label is hovered", async () => {
+    mount();
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+
+    await act(() =>
+      map.emit("mousemove:zone-labels", {
+        features: [feature("zone-labels", { id: "Q236626" })],
+        point: { x: 10, y: 20 },
+      }),
+    );
+
+    expect(map.calls.setFeatureState).toContainEqual([
+      { source: expect.any(String), sourceLayer: "zones", id: "Q236626" },
+      { hover: true },
+    ]);
   });
 
   it("points MapLibre at its worker bundle", () => {
     expect(hoisted.setWorkerUrl).toHaveBeenCalledWith(expect.stringContaining("maplibre-gl-worker.mjs"));
   });
 
-  it("marks the selected region through feature state on the regions layer", async () => {
-    const { rerender, onRegionClick } = mount();
+  it("picks the deepest region under the pointer, so a subdivision wins over its country", async () => {
+    const { onRegionClick } = mount();
     const map = fakeMap();
     await act(() => map.emit("load"));
 
-    rerender(
-      <RegionMapCanvas
-        levelId="world"
-        tileset={index.tileset}
-        zoneId={null}
-        regions={regions}
-        selectedId="Q183"
-        onRegionClick={onRegionClick}
-      />,
-    );
+    map.emit("click:region-hit", {
+      features: [feature("region-hit", { id: "Q142", depth: 0 }), feature("region-hit", { id: "Q12130", depth: 1 })],
+      point: { x: 10, y: 20 },
+    });
 
-    expect(map.calls.setFeatureState).toContainEqual([
-      { source: "tiles", sourceLayer: "regions", id: "Q183" },
-      { selected: true },
+    expect(onRegionClick).toHaveBeenCalledWith(expect.objectContaining({ id: "Q12130" }));
+  });
+
+  it("selects a zone through its label, over the regions it lies on", async () => {
+    const { onRegionClick } = mount();
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+
+    map.emit("click:zone-labels", {
+      features: [feature("region-fill", { id: "Q12130", depth: 1 }), feature("zone-labels", { id: "Q236626" })],
+      point: { x: 10, y: 20 },
+    });
+
+    expect(onRegionClick).toHaveBeenCalledWith(expect.objectContaining({ id: "Q236626" }));
+  });
+
+  it("outlines the selected region and enlarges a selected city", async () => {
+    const { rerender } = mount();
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+
+    rerender({ selectedId: "Q183" });
+
+    expect(map.calls.setFilter).toContainEqual(["region-selected-line", ["==", ["get", "id"], "Q183"]]);
+    expect(map.calls.setPaintProperty).toContainEqual([
+      "cities",
+      "circle-radius",
+      ["case", ["==", ["get", "id"], "Q183"], 6, 4],
     ]);
   });
 
-  it("shows the chosen zone by filtering the zone layers", async () => {
-    const { rerender, onRegionClick } = mount();
+  it("paints the backdrop of regions with songs once loaded", async () => {
+    mount();
     const map = fakeMap();
     await act(() => map.emit("load"));
 
-    rerender(
-      <RegionMapCanvas
-        levelId="world"
-        tileset={index.tileset}
-        zoneId="Q236626"
-        regions={regions}
-        selectedId={null}
-        onRegionClick={onRegionClick}
-      />,
-    );
+    expect(map.calls.setFilter).toContainEqual(["region-backdrop", expect.arrayContaining(["all"])]);
+    expect(map.calls.setPaintProperty).toContainEqual(["region-backdrop", "fill-color", expect.anything()]);
+  });
 
-    const zone = ["==", ["get", "id"], "Q236626"];
-    expect(map.calls.setFilter).toEqual(
-      expect.arrayContaining([
-        ["zone-fill", zone],
-        ["zone-line", zone],
-      ]),
-    );
+  it("fills the selected zone and keeps it outlined", async () => {
+    const { rerender } = mount();
+    const map = fakeMap();
+    await act(() => map.emit("load"));
+
+    rerender({ zoneId: "Q236626" });
+
+    const zone = zoneFilters("Q236626", supranationalZoneIds(regions));
+    expect(map.calls.setFilter).toContainEqual(["zone-fill", zone.fill]);
+    expect(map.calls.setFilter).toContainEqual(["zone-line", zone.line]);
+  });
+
+  describe("sky tick", () => {
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
+
+    it("moves the light then repaints every 10 s once loaded, and stops on unmount", async () => {
+      const { unmount } = mount();
+      const map = fakeMap();
+      await act(() => map.emit("load"));
+      expect(map.calls.setLight).toBeUndefined();
+
+      act(() => {
+        vi.advanceTimersByTime(10_000);
+      });
+      expect(map.calls.setLight).toHaveLength(1);
+      expect(map.calls.setLight[0][0]).toMatchObject({ anchor: "map", position: [1, expect.any(Number), expect.any(Number)] });
+      expect(map.calls.order).toEqual([["setLight"], ["triggerRepaint"]]);
+
+      unmount();
+      act(() => {
+        vi.advanceTimersByTime(30_000);
+      });
+      expect(map.calls.setLight).toHaveLength(1);
+    });
   });
 
   it("destroys the map on unmount", () => {
@@ -247,18 +563,36 @@ describe("RegionMapCanvas", () => {
   });
 
   describe("accessible region list", () => {
-    it("lists the regions of the level as buttons, pressing only the non-drillable ones", () => {
-      mount({ selectedId: "Q183" });
+    const showRendered = async (ids: string[]) => {
+      const map = fakeMap();
+      map.rendered = ids.map((id) => ({ properties: { id } }));
+      await act(() => map.emit("idle"));
+    };
 
-      expect(
-        screen.getByRole("button", { name: /^France · 120 songs · \d+ genres$/ }).getAttribute("aria-pressed"),
-      ).toBeNull();
-      expect(screen.getByRole("button", { name: /^Germany/ }).getAttribute("aria-pressed")).toBe("true");
-      expect(screen.queryByRole("button", { name: /Celtic/ })).toBeNull();
+    it("lists the regions drawn on the map, once each and by name, pressing the selected one", async () => {
+      mount({ selectedId: "Q183" });
+      await showRendered(["Q183", "Q142", "Q142"]);
+
+      const list = screen.getByRole("list", { name: "Regions on the map" });
+      const buttons = within(list).getAllByRole("button");
+      expect(buttons.map((button) => button.textContent)).toEqual(["France", "Germany"]);
+      expect(buttons[0].getAttribute("aria-pressed")).toBe("false");
+      expect(buttons[1].getAttribute("aria-pressed")).toBe("true");
     });
 
-    it("reports a click on a list button", () => {
+    it("follows what the map draws as it moves", async () => {
+      mount();
+      await showRendered(["Q142"]);
+      await showRendered(["Q12130", "Q236626"]);
+
+      expect(screen.queryByRole("button", { name: /^France/ })).toBeNull();
+      expect(screen.getByRole("button", { name: /^Brittany/ })).toBeTruthy();
+      expect(screen.getByRole("button", { name: /^Celtic nations/ })).toBeTruthy();
+    });
+
+    it("reports a click on a list button", async () => {
       const { onRegionClick } = mount();
+      await showRendered(["Q142"]);
 
       fireEvent.click(screen.getByRole("button", { name: /^France/ }));
 
@@ -267,6 +601,7 @@ describe("RegionMapCanvas", () => {
 
     it("shows the tooltip while a button has focus", async () => {
       mount();
+      await showRendered(["Q142"]);
       const button = screen.getByRole("button", { name: /^France/ });
 
       await act(() => button.focus());
@@ -277,12 +612,14 @@ describe("RegionMapCanvas", () => {
     });
   });
 
-  it("reports a WebGL failure and keeps the region list usable", () => {
+  it("reports a WebGL failure and offers the region hierarchy instead", () => {
     hoisted.failConstruction = true;
 
     mount();
 
     expect(screen.getByRole("alert").textContent).toMatch(/cannot be displayed/);
     expect(screen.getByRole("button", { name: /^France/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Brittany/ })).toBeTruthy();
+    expect(screen.getByText("Subdivisions of France")).toBeTruthy();
   });
 });

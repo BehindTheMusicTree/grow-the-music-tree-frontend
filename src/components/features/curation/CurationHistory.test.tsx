@@ -14,8 +14,8 @@ const item = (overrides: Partial<CurationHistoryItem>): CurationHistoryItem => (
   ...overrides,
 });
 
-const mainParent = {
-  name: "main_parent",
+const canonicalParent = {
+  name: "canonical_parent_additions",
   keyColumns: ["item_id"],
   columns: ["item_id", "parent_id", "reason", "exclude_other_parents"],
   columnSpecs: [
@@ -29,20 +29,21 @@ const mainParent = {
 };
 const labels = { Q1: "Rock", Q2: "Pop", Q3: "Jazz" };
 
-const snapshot = (row: Record<string, string | boolean>) => JSON.stringify({ list_name: "main_parent", ...row });
+const snapshot = (row: Record<string, string | boolean>) =>
+  JSON.stringify({ list_name: "canonical_parent_additions", ...row });
 
 describe("CurationHistory", () => {
   afterEach(cleanup);
 
   it("says when nothing was recorded", () => {
-    render(<CurationHistory items={[]} lists={[mainParent]} labels={labels} />);
+    render(<CurationHistory items={[]} lists={[canonicalParent]} labels={labels} />);
     expect(screen.getByText("Aucune modification enregistrée.")).toBeInTheDocument();
   });
 
   it("shows only the changed columns of an update, old then new", () => {
     render(
       <CurationHistory
-        lists={[mainParent]}
+        lists={[canonicalParent]}
         labels={labels}
         items={[
           item({
@@ -54,7 +55,7 @@ describe("CurationHistory", () => {
     );
 
     expect(screen.getByText("· Modification")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Parent principal imposé" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Parents canoniques ajoutés" })).toBeInTheDocument();
     expect(screen.getByRole("deletion")).toHaveTextContent("Pop");
     expect(screen.getByRole("insertion")).toHaveTextContent("Jazz");
     expect(screen.queryByText("Raison")).not.toBeInTheDocument();
@@ -63,7 +64,7 @@ describe("CurationHistory", () => {
   it("credits the pipeline and shows a deleted row's old values", () => {
     render(
       <CurationHistory
-        lists={[mainParent]}
+        lists={[canonicalParent]}
         labels={labels}
         items={[
           item({
@@ -80,5 +81,24 @@ describe("CurationHistory", () => {
     expect(within(article).getByText("· Suppression")).toBeInTheDocument();
     expect(within(article).getByRole("link", { name: /Rock/ })).toHaveAttribute("href", "/admin/curation/genre/Q1");
     expect(within(article).getByText("Oui")).toBeInTheDocument();
+  });
+
+  it("shows an edge snapshot under its relation, with genres as links", () => {
+    const edge = (parent: string) =>
+      JSON.stringify({ id: "x", relation: "regional_overview", item_id: "Q1", parent_item_id: parent, reason: "" });
+    render(
+      <CurationHistory
+        lists={[canonicalParent]}
+        labels={labels}
+        items={[item({ oldValue: edge("Q2"), newValue: edge("Q3") })]}
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "Vue régionale" })).toHaveAttribute(
+      "href",
+      "/admin/curation/edges?relation=regional_overview",
+    );
+    expect(screen.getByRole("deletion")).toHaveTextContent("Pop");
+    expect(screen.getByRole("insertion")).toHaveTextContent("Jazz");
   });
 });

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { z } from "zod";
-import { Button, Pagination } from "@behindthemusictree/ui";
+import { Button, Checkbox, Input, Pagination, Select } from "@behindthemusictree/ui";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import CurationEntryEditor from "@components/features/curation/CurationEntryEditor";
 import { isPendingCurationEntry } from "@components/features/curation/CurationStatus";
@@ -103,7 +103,7 @@ function EntryActions({
       {pending && (
         <span
           title="Modifiée depuis le dernier run du pipeline"
-          className="self-start px-2 py-0.5 text-xs font-medium text-yellow-900 bg-yellow-100 rounded-full"
+          className="self-start px-2 py-0.5 text-caption font-medium text-yellow-900 bg-yellow-100 rounded-full"
         >
           En attente
         </span>
@@ -123,7 +123,7 @@ function EntryActions({
         <Link
           href={`/admin/curation/history?${new URLSearchParams({ list: list.name, entry: entry.uuid })}`}
           aria-label={`Historique de ${name}`}
-          className="self-center text-sm underline"
+          className="self-center text-body underline"
         >
           Historique
         </Link>
@@ -154,32 +154,29 @@ function Toolbar({
 
   return (
     <div className="flex flex-wrap items-end gap-3">
-      <label className="flex flex-col flex-1 min-w-48 gap-1 text-sm font-medium text-gray-700">
+      <label className="flex flex-col flex-1 min-w-48 gap-1 text-body font-medium text-gray-700">
         Rechercher
-        <input
+        <Input
           type="search"
           value={text}
           onChange={(event) => setText(event.target.value)}
           placeholder="Genre, QID, raison…"
-          className="w-full px-3 py-2 font-normal border rounded-md"
         />
       </label>
-      <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
+      <label className="flex flex-col gap-1 text-body font-medium text-gray-700">
         Trier par
-        <select
+        <Select
           value={ordering}
           onChange={(event) =>
             updateQuery({ ordering: event.target.value === "key" ? null : event.target.value, page: null })
           }
-          className="px-3 py-2 font-normal border rounded-md"
         >
           <option value="key">Clé</option>
           <option value="-updated_on">Dernière modification</option>
-        </select>
+        </Select>
       </label>
-      <label className="flex items-center gap-2 py-2 text-sm">
-        <input
-          type="checkbox"
+      <label className="flex items-center gap-2 py-2 text-body">
+        <Checkbox
           checked={showQid}
           onChange={(event) => updateQuery({ qid: event.target.checked ? "1" : null })}
         />
@@ -213,7 +210,7 @@ export function CurationEntryRows({
           <thead>
             <tr>
               {columns.map((column) => (
-                <th key={column} className="p-2 text-sm font-medium text-gray-600">
+                <th key={column} className="p-2 text-body font-medium text-gray-600">
                   {curationColumnTitle(column)}
                 </th>
               ))}
@@ -251,7 +248,7 @@ export function CurationEntryRows({
               <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
                 {columns.map((column) => (
                   <div key={column} className="contents">
-                    <dt className="text-sm text-gray-600">{curationColumnTitle(column)}</dt>
+                    <dt className="text-body text-gray-600">{curationColumnTitle(column)}</dt>
                     <dd className="break-words">
                       <Cell list={list} column={column} entry={entry} labels={labels} showQid={showQid} />
                     </dd>
@@ -281,7 +278,7 @@ export default function CurationEntries({ list, entries, q, ordering, showQid, a
   return (
     <div className="flex flex-col gap-4">
       <Toolbar q={q} ordering={ordering} showQid={showQid} onAdd={() => setEditing("new")} />
-      <p className="text-sm text-gray-600">
+      <p className="text-body text-gray-600">
         {entries.overallTotal} entrée{entries.overallTotal > 1 ? "s" : ""}
         {q && ` pour « ${q} »`}
       </p>

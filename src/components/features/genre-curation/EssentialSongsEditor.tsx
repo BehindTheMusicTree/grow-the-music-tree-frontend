@@ -14,7 +14,7 @@ export default function EssentialSongsEditor({ overview }: { overview: CriteriaO
     mutate({ uuid: overview.uuid, tracks: next, previous: tracks });
   };
 
-  if (tracks.length === 0) return <p className="text-sm text-gray-500">No essential songs yet. Use ☆ on a song.</p>;
+  if (tracks.length === 0) return <p className="text-body text-gray-500">No essential songs yet. Use ☆ on a song.</p>;
 
   return (
     <ol className="flex flex-col gap-1">
@@ -27,7 +27,7 @@ export default function EssentialSongsEditor({ overview }: { overview: CriteriaO
             if (event.key === "ArrowUp") move(index, index - 1);
             if (event.key === "ArrowDown") move(index, index + 1);
           }}
-          className="flex items-center gap-2 text-sm"
+          className="flex items-center gap-2 text-body"
         >
           <span className="flex-1">
             {index + 1}. {track.title}

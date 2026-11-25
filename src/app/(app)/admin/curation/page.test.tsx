@@ -31,15 +31,15 @@ describe("CurationPage", () => {
 
   it("groups lists under titled sections with counts, unknown lists last", async () => {
     authMock.mockResolvedValue({ user: {} });
-    fetchListsMock.mockResolvedValue([list("brand_new", 3), list("main_parent", 118)]);
+    fetchListsMock.mockResolvedValue([list("brand_new", 3), list("canonical_parent_additions", 118)]);
 
     render(await CurationPage());
 
     const headings = screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent);
-    expect(headings).toEqual(["Parenté", "Non classées"]);
-    const mainParent = screen.getByRole("link", { name: /parent principal imposé/i });
-    expect(mainParent).toHaveAttribute("href", "/admin/curation/main_parent");
-    expect(within(mainParent).getByText("118")).toBeInTheDocument();
+    expect(headings).toEqual(["Arêtes de genres", "Parenté", "Non classées"]);
+    const canonicalParent = screen.getByRole("link", { name: /parents canoniques ajoutés/i });
+    expect(canonicalParent).toHaveAttribute("href", "/admin/curation/canonical_parent_additions");
+    expect(within(canonicalParent).getByText("118")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /brand_new/ })).toHaveAttribute("href", "/admin/curation/brand_new");
   });
 });

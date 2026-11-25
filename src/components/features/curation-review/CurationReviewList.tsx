@@ -8,12 +8,17 @@ const REASON_LABELS: Record<CurationReviewReason, string> = {
   redirect_conflict: "Fusion en conflit",
   missing: "Supprimé sur Wikidata",
   not_in_tree: "Hors de l'arbre",
+  invalid_rule: "Règle invalide",
+  exclusive_parent_regional: "Exclusion impossible",
 };
 
 const FALLBACK_EXPLANATIONS: Record<CurationReviewReason, string> = {
   redirect_conflict: "L'élément a été fusionné sur Wikidata vers un élément déjà présent dans la liste.",
   missing: "L'élément n'existe plus sur Wikidata.",
   not_in_tree: "L'élément ne répond plus au critère d'appartenance à l'arbre.",
+  invalid_rule: "La règle contredit Wikidata : le pipeline l'a ignorée.",
+  exclusive_parent_regional:
+    "L'élément reste régional malgré l'exclusion des autres parents : à déplacer dans « Genres maintenus canoniques ».",
 };
 
 const DATE_FORMAT = new Intl.DateTimeFormat("fr-FR", { dateStyle: "short", timeZone: "Europe/Paris" });
@@ -36,7 +41,9 @@ function explain({
   if (reason === "redirect_conflict" && column !== "item_id" && target === key)
     return "Fusionné vers l'élément porteur de la règle lui-même (règle auto-référente).";
   if (!evidence) return FALLBACK_EXPLANATIONS[reason];
-  const { modified, instanceOf, subclassOf, hasIndigenousTo, conflictList } = evidence;
+  const { modified, instanceOf, subclassOf, hasIndigenousTo, conflictList, detail } = evidence;
+  if (reason === "invalid_rule") return detail ?? FALLBACK_EXPLANATIONS.invalid_rule;
+  if (reason === "exclusive_parent_regional") return FALLBACK_EXPLANATIONS.exclusive_parent_regional;
   if (reason === "missing") return FALLBACK_EXPLANATIONS.missing;
   if (reason === "redirect_conflict") {
     return conflictList
@@ -70,7 +77,7 @@ function explain({
 function Rule({ rowKey, column }: { rowKey: string; column: string }) {
   const owner = <GenreRef id={rowKey} showQid={false} />;
   if (column === "parent_item_id" || column === "parent_id")
-    return <span className="flex gap-1">Parent principal de {owner}</span>;
+    return <span className="flex gap-1">Parent de {owner}</span>;
   if (column === "overview_item_id") return <span className="flex gap-1">Vue d&apos;ensemble de {owner}</span>;
   return (
     <span className="flex gap-1">
@@ -92,16 +99,23 @@ export default function CurationReviewList({ items }: { items: CurationReviewIte
         </tr>
       </thead>
       <tbody>
-        {items.map(({ list, key, column, itemId, reason, target, evidence }) => (
+        {items.map(({ ruleId, list, key, column, itemId, reason, target, evidence }) => (
           <tr key={`${list}|${key}|${column}`}>
             <td className="pr-4">
-              <Link href={`/admin/curation/${encodeURIComponent(list)}`} className="underline">
+              <Link
+                href={
+                  ruleId
+                    ? `/admin/curation/genre/${encodeURIComponent(key.split("\t")[0])}`
+                    : `/admin/curation/${encodeURIComponent(list)}`
+                }
+                className="underline"
+              >
                 {list}
               </Link>
             </td>
             <td className="pr-4">
               <GenreRef id={itemId} label={target ? undefined : evidence?.label} showQid={false} />
-              <span className="flex gap-2 text-xs">
+              <span className="flex gap-2 text-caption">
                 <a
                   href={`${WIKIDATA_URL}${itemId}`}
                   target="_blank"
@@ -124,7 +138,7 @@ export default function CurationReviewList({ items }: { items: CurationReviewIte
             </td>
             <td className="pr-4">
               <p>{REASON_LABELS[reason]}</p>
-              <p className="text-sm text-gray-600">{explain({ key, column, reason, target, evidence })}</p>
+              <p className="text-body text-gray-600">{explain({ key, column, reason, target, evidence })}</p>
             </td>
             <td className="pr-4">{column !== "item_id" && <Rule rowKey={key} column={column} />}</td>
             <td>{target && <GenreRef id={target} label={evidence?.label} showQid={false} />}</td>

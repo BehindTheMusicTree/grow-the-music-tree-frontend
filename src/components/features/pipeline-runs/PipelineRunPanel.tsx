@@ -1,40 +1,27 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useId, useRef, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
-import { Button } from "@behindthemusictree/ui";
+import { Button, StepList } from "@behindthemusictree/ui";
 import { useFetchWrapper, useQueryWithParse, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import { formatDuration } from "@components/features/import-runs/importedOn";
-import { KIND_LABELS, originOf } from "@components/features/pipeline-runs/labels";
+import {
+  KIND_LABELS, STAGE_LABELS, UPLOAD_STAGES, WIKIDATA_JOIN_LABEL, foregroundStepDetails, originOf, stepsOf,
+  wikidataRetryLabel, wikidataStepsOf,
+} from "@components/features/pipeline-runs/labels";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import {
   PIPELINE_RUN_KINDS,
   PIPELINE_RUN_STAGES,
+  stageIndexOf,
   PipelineRunRequestSchema,
   type PipelineRunRequest,
-  type PipelineRunStage,
 } from "@schemas/api/pipeline-runs";
 
 const POLL_INTERVAL_MS = 5000;
 const LATEST_QUERY_KEY = ["pipelineRuns", "latest"];
-
-const STAGE_LABELS: Record<PipelineRunStage, string> = {
-  fetching_rules: "Récupération des règles",
-  ingesting_musicbrainz: "Ingestion MusicBrainz",
-  ingesting_wikidata: "Ingestion Wikidata",
-  building_songs: "Construction des morceaux",
-  building_genres: "Construction des genres",
-  matching_songs: "Rattachement des morceaux",
-  importing_tree: "Import de l'arbre",
-  uploading_songs: "Envoi des morceaux",
-  merging_songs: "Fusion des morceaux",
-  uploading_artists: "Envoi des artistes",
-  merging_artists: "Fusion des artistes",
-};
-
-const UPLOAD_STAGES: readonly PipelineRunStage[] = ["uploading_songs", "uploading_artists"];
 
 const isActive = (request: PipelineRunRequest | null | undefined) =>
   request?.status === "queued" || request?.status === "running";
@@ -45,17 +32,19 @@ function progressOf({ kind, status, stage, stageCurrent, stageTotal }: PipelineR
   if (status === "queued") return 0;
   if (status !== "running") return null;
   const stages = PIPELINE_RUN_STAGES[kind];
-  const index = stage ? stages.indexOf(stage) : 0;
+  const index = stage ? Math.max(stageIndexOf(kind, stage), 0) : 0;
   const sub = stage && UPLOAD_STAGES.includes(stage) && stageCurrent !== null && stageTotal ? stageCurrent / stageTotal : 0;
   return (index + sub) / stages.length;
 }
 
-function labelOf({ kind, status, stage, stageCurrent, stageTotal, error }: PipelineRunRequest): string {
+function labelOf({ kind, status, stage, stageCurrent, stageTotal, error, stepTelemetry }: PipelineRunRequest): string {
   switch (status) {
     case "queued":
       return "En file d'attente";
     case "running": {
-      const label = STAGE_LABELS[stage ?? "fetching_rules"];
+      const waitingForWikidata = stage === "building_genres" &&
+        stepTelemetry?.foreground.some((step) => step.stage === "building_genres");
+      const label = waitingForWikidata ? WIKIDATA_JOIN_LABEL : STAGE_LABELS[stage ?? "fetching_rules"];
       return stage && UPLOAD_STAGES.includes(stage) && stageCurrent !== null && stageTotal !== null
         ? `${label} (${stageCurrent}/${stageTotal})`
         : label;
@@ -63,6 +52,7 @@ function labelOf({ kind, status, stage, stageCurrent, stageTotal, error }: Pipel
     case "succeeded":
       return kind === "curation" ? "Appliquée" : kind === "sync" ? "Réimportée" : "Terminée";
     case "failed":
+      if (stage === "ingesting_geohistory") return `Échec — ${STAGE_LABELS[stage]} : ${error ?? "erreur inconnue"}`;
       return `Échec : ${error ?? "erreur inconnue"}`;
     case "superseded":
       return "Déjà appliquée par le run nightly";
@@ -101,6 +91,7 @@ type Props = { pendingCount: number; initialRequest: PipelineRunRequest | null }
 
 /** Launches a curation run, a full ingestion or a Gold sync, follows its progress and cancels it. */
 export default function PipelineRunPanel({ pendingCount, initialRequest }: Props) {
+  const wikidataHeadingId = useId();
   const router = useRouter();
   const queryClient = useQueryClient();
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
@@ -150,6 +141,10 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
   const progress = request && progressOf(request);
   const now = useNow(request?.status === "running");
   const duration = request && durationOf(request, now);
+  const legacySteps = request && stepsOf(request);
+  const steps = legacySteps && request ? foregroundStepDetails(legacySteps, request, now) : [];
+  const wikidataSteps = request ? wikidataStepsOf(request, now) : [];
+  const retry = request && wikidataRetryLabel(request);
 
   return (
     <section className="flex flex-col gap-2" aria-label="Runs du pipeline">
@@ -182,15 +177,33 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
           {progress !== null && (
             <progress value={progress} max={1} aria-label="Progression du run" className="w-full" />
           )}
+          {steps.length > 0 && (
+            <StepList
+              aria-label="Étapes du run"
+              statusLabels={{ done: "terminée", current: "en cours", pending: "à venir", failed: "interrompue" }}
+              steps={steps}
+            />
+          )}
+          {wikidataSteps.length > 0 && (
+            <div className="mt-2 flex flex-col gap-1">
+              <p id={wikidataHeadingId} className="text-body font-medium">Chaîne Wikidata et Geohistory</p>
+              <StepList
+                aria-labelledby={wikidataHeadingId}
+                statusLabels={{ done: "terminée", current: "en cours", pending: "à venir", failed: "interrompue" }}
+                steps={wikidataSteps}
+              />
+            </div>
+          )}
+          {retry && <p role="status" className="text-body text-gray-600">{retry}</p>}
           <p aria-live="polite" className={request.status === "failed" ? "text-red-600" : "text-gray-700"}>
             {KIND_LABELS[request.kind]} : {labelOf(request)}
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="text-body text-gray-600">
             {originOf(request)}
             {duration && ` · ${duration}`}
           </p>
-          {request.status === "running" && (request.stage === "merging_songs" || request.stage === "merging_artists") && (
-            <p className="text-sm text-gray-600">Une annulation laisse la fusion déjà commencée aller à son terme.</p>
+          {request.status === "running" && (request.stage === "merging_songs" || request.stage === "merging_artists" || request.stage === "merging_region_map") && (
+            <p className="text-body text-gray-600">Une annulation laisse la fusion déjà commencée aller à son terme.</p>
           )}
         </div>
       )}

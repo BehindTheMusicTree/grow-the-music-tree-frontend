@@ -4,20 +4,27 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
-import { Button } from "@behindthemusictree/ui";
+import { Button, Input } from "@behindthemusictree/ui";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import { curationGenreHref } from "@components/features/curation/GenreRef";
-import type { GenreNameConflictGroup } from "@schemas/api/genre-name-conflicts";
+import type { ConflictingGenre, GenreNameConflictGroup } from "@schemas/api/genre-name-conflicts";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
 const ValidateGroupInputSchema = z.object({
   genres: z.array(z.object({ uuid: z.string(), name: z.string() })),
 });
 
+function initialName(genre: ConflictingGenre): string {
+  if (!genre.hasNameConflict || !genre.wikidataId || !genre.parent?.name.trim()) return genre.name;
+  const suffix = ` (${genre.wikidataId})`;
+  if (!genre.name.endsWith(suffix)) return genre.name;
+  return `${genre.name.slice(0, -suffix.length)} (${genre.parent.name})`;
+}
+
 function GenreConflictGroupCard({ group }: { group: GenreNameConflictGroup }) {
   const router = useRouter();
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
-  const [names, setNames] = useState(() => Object.fromEntries(group.genres.map((genre) => [genre.uuid, genre.name])));
+  const [names, setNames] = useState(() => Object.fromEntries(group.genres.map((genre) => [genre.uuid, initialName(genre)])));
   const { mutate, formErrors, isPending } = useValidatedMutation({
     inputSchema: ValidateGroupInputSchema,
     outputSchema: z.null(),
@@ -31,16 +38,16 @@ function GenreConflictGroupCard({ group }: { group: GenreNameConflictGroup }) {
 
   return (
     <section className="flex flex-col gap-3 rounded-md border p-4" aria-label={group.name}>
-      <h2 className="font-medium">{group.name}</h2>
+      <h2 className="text-heading">{group.name}</h2>
       {group.genres.map((genre) => (
         <div key={genre.uuid} className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center gap-4">
-            <input
+            <Input
               type="text"
+              className="w-72"
               aria-label={`Name of ${genre.name}`}
               value={names[genre.uuid]}
               onChange={(e) => setNames((current) => ({ ...current, [genre.uuid]: e.target.value }))}
-              className="w-72 rounded-md border px-3 py-1"
             />
             <span>Parent: {genre.parent?.name ?? "—"}</span>
             {genre.wikidataId && (
@@ -58,7 +65,7 @@ function GenreConflictGroupCard({ group }: { group: GenreNameConflictGroup }) {
                 Règles de curation
               </Link>
             )}
-            {genre.hasNameConflict && <span className="text-sm text-amber-600">flagged</span>}
+            {genre.hasNameConflict && <span className="text-body text-amber-600">flagged</span>}
           </div>
           {formErrors
             .filter((error) => error.field === genre.uuid)

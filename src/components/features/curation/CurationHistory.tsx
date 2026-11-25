@@ -5,8 +5,10 @@ import { curationListTitle } from "@lib/curationGroups";
 import {
   CurationSnapshotSchema,
   curationColumnKind,
+  EDGE_RELATIONS,
   type CurationHistoryItem,
   type CurationList,
+  type EdgeRelation,
 } from "@schemas/api/curation";
 
 type Snapshot = Record<string, string | boolean | null>;
@@ -28,7 +30,8 @@ type Context = { lists: CurationList[]; labels: Record<string, string> };
 function Value({ column, snapshot, lists, labels }: Context & { column: string; snapshot: Snapshot }) {
   const value = snapshot[column];
   const list = lists.find((candidate) => candidate.name === snapshot.list_name);
-  const kind = list ? curationColumnKind(list, column) : "text";
+  const isEdgeGenre = typeof snapshot.relation === "string" && (column === "item_id" || column === "parent_item_id");
+  const kind = isEdgeGenre ? "item_id" : list ? curationColumnKind(list, column) : "text";
   if (kind === "bool") return value === true || value === "true" ? "Oui" : "Non";
   if (kind === "item_id" && typeof value === "string" && value) {
     return <GenreRef id={value} label={labels[value]} showQid />;
@@ -38,7 +41,7 @@ function Value({ column, snapshot, lists, labels }: Context & { column: string; 
 
 function changedColumns(item: CurationHistoryItem, before: Snapshot, after: Snapshot) {
   const columns = Array.from(new Set([...Object.keys(before), ...Object.keys(after)])).filter(
-    (column) => column !== "list_name",
+    (column) => column !== "list_name" && column !== "id" && column !== "relation",
   );
   if (item.action !== "updated") return columns;
   return columns.filter((column) => String(before[column] ?? "") !== String(after[column] ?? ""));
@@ -48,17 +51,22 @@ function HistoryItem({ item, lists, labels }: Context & { item: CurationHistoryI
   const before = parseSnapshot(item.oldValue);
   const after = parseSnapshot(item.newValue);
   const listName = after.list_name ?? before.list_name;
+  const relation = after.relation ?? before.relation;
   const shown = item.action === "deleted" ? before : after;
 
   return (
     <article className="flex flex-col gap-2 p-3 border rounded-lg">
-      <p className="flex flex-wrap gap-x-2 text-sm text-gray-600">
+      <p className="flex flex-wrap gap-x-2 text-body text-gray-600">
         <time dateTime={item.createdOn}>{DATE_FORMAT.format(new Date(item.createdOn))}</time>
         <span>· {item.actorPseudo ?? "pipeline"}</span>
         <span className="font-medium text-gray-900">· {ACTION_LABELS[item.action]}</span>
         <span>
           ·{" "}
-          {typeof listName === "string" ? (
+          {typeof relation === "string" && relation in EDGE_RELATIONS ? (
+            <Link href={`/admin/curation/edges?relation=${relation}`} className="underline">
+              {EDGE_RELATIONS[relation as EdgeRelation]}
+            </Link>
+          ) : typeof listName === "string" ? (
             <Link href={`/admin/curation/${listName}`} className="underline">
               {curationListTitle(listName)}
             </Link>
@@ -70,7 +78,7 @@ function HistoryItem({ item, lists, labels }: Context & { item: CurationHistoryI
       <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
         {changedColumns(item, before, after).map((column) => (
           <div key={column} className="contents">
-            <dt className="text-sm text-gray-600">{curationColumnTitle(column)}</dt>
+            <dt className="text-body text-gray-600">{curationColumnTitle(column)}</dt>
             <dd className="flex flex-wrap items-center gap-2 break-words">
               {item.action === "updated" ? (
                 <>

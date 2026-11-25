@@ -5,6 +5,10 @@ import CurationGenreSearch from "./CurationGenreSearch";
 
 const pushMock = vi.fn();
 
+vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@behindthemusictree/app-kit/genre-tree")>()),
+  useGenreRemoteSearch: () => ({ genres: [], isError: false, settled: true, pending: false }),
+}));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: pushMock }) }));
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api/grow-proxy" }));
 vi.mock("@behindthemusictree/app-kit/transport", () => ({

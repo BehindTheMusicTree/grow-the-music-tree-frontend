@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import Page from "@components/ui/Page";
+import { Page } from "@behindthemusictree/ui";
 import RootReviewList from "@components/features/root-review/RootReviewList";
 import { auth } from "@lib/auth";
 import { fetchUnacceptedRoots } from "@lib/genre-unaccepted-roots";
@@ -11,7 +11,7 @@ export default async function RootReviewPage() {
   const roots = await fetchUnacceptedRoots();
 
   return (
-    <Page title="Root review" dataPage="admin-root-review">
+    <Page title="Root review" data-page="admin-root-review">
       <div className="flex flex-col gap-4 p-4">
         <p>
           These top-level genres are not in the pipeline&apos;s accepted-roots list. Accept the ones that are legitimate

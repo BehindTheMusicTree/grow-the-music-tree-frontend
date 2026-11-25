@@ -13,12 +13,13 @@ Access: public, read-only
 
 ## Purpose
 
-Shows one artist from the reference library: photo with its Commons credit, type, country, active years, external links, members (or the groups the artist belongs to), discography, and tracks that can be played.
+Shows one artist from the reference library: photo with its Commons credit, type, country, origin place (a link to its region on the map when the place is known), active years, external links, members (or the groups the artist belongs to), discography, and tracks that can be played.
 
 ## Data
 
 - Artist detail from the grow API `artists/<uuid>/`, fetched client-side through `/api/grow-proxy` (`useArtist`, panel built by app-kit's `GenreTreeView`); an unknown or malformed uuid shows "This artist does not exist." in the panel
 - `image` is a 500 px Wikimedia Commons thumbnail (or `null`), shown with the author (falling back to "Wikimedia Commons") linking to the Commons page and the license, linked when `licenseUrl` is set
+- `origin` (nullable) is the artist's begin area (else area) from MusicBrainz; `renderPlaceLink` links it to `/map?region=<regionId>` when it has a `regionId`, otherwise the name is plain text
 - Tracks from `library/songs/?artist=<uuid>&ordering=title`, fetched client-side one page at a time
 - The tree shows only the genres the artist has songs in (and their ancestors, plus Mainstream Pop), from `artists/<uuid>/genre-counts/`; the filter stays while a genre is selected (`?artist=<uuid>&genre=<uuid>` scopes the genre panel to the artist) and is cleared by the chip's x or by closing the artist panel
 - Discography is grouped from each release's primary and secondary types: live and compilation secondary types win over the primary type
@@ -34,4 +35,4 @@ Not applicable - the panel is rendered client-side over the genre tree.
 ## Notes
 
 - Play all queues the playable tracks of the current page; tracks without a video are listed but cannot be played
-- Artist names across the app (genre tree track lists, player track list, member lists) open this panel via `renderArtistLink`
+- Artist names across the app (genre tree track lists, player track list, member lists) open this panel via `renderArtistLink`; on the region map (`/map?artist=<uuid>`) they open the map's own panel instead, without the tree filter

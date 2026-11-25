@@ -1,10 +1,12 @@
 "use client";
 
+import { Checkbox, Input, Textarea } from "@behindthemusictree/ui";
 import { useId, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { useFetchWrapper, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
+import EntityPicker from "@components/features/curation/EntityPicker";
 import GenrePicker from "@components/features/curation/GenrePicker";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { curationColumnTitle } from "@lib/curationColumns";
@@ -84,11 +86,20 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
               />
             );
           }
+          if (kind === "entity_id") {
+            return (
+              <EntityPicker
+                key={column}
+                label={title}
+                value={row[column]}
+                onChange={(entityId) => set(column, entityId)}
+              />
+            );
+          }
           if (kind === "bool") {
             return (
-              <label key={column} className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <input
-                  type="checkbox"
+              <label key={column} className="flex items-center gap-2 text-body font-medium text-gray-700">
+                <Checkbox
                   checked={row[column] === "true"}
                   onChange={(event) => set(column, event.target.checked ? "true" : "")}
                 />
@@ -96,20 +107,20 @@ export default function CurationEntryEditor({ list, entry, initialRow, labels, o
               </label>
             );
           }
-          const Field = column === "reason" ? "textarea" : "input";
+          const fieldProps = {
+            id: `${id}-${column}`,
+            value: row[column],
+          };
           return (
             <div key={column} className="flex flex-col gap-1">
-              <label htmlFor={`${id}-${column}`} className="text-sm font-medium text-gray-700">
+              <label htmlFor={`${id}-${column}`} className="text-body font-medium text-gray-700">
                 {title}
               </label>
-              <Field
-                id={`${id}-${column}`}
-                value={row[column]}
-                onChange={(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-                  set(column, event.target.value)
-                }
-                className="w-full px-3 py-2 border rounded-md"
-              />
+              {column === "reason" ? (
+                <Textarea {...fieldProps} onChange={(event) => set(column, event.target.value)} />
+              ) : (
+                <Input {...fieldProps} onChange={(event) => set(column, event.target.value)} />
+              )}
             </div>
           );
         })}

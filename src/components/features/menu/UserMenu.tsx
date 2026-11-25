@@ -15,15 +15,18 @@ const MENU_LINKS = [
   { href: "/admin/root-review", label: "Root review" },
 ];
 
-const buttonClassName = "flex h-full aspect-square shrink-0 items-center justify-center rounded-full shadow-lg";
-const itemClassName = "block w-full px-3 py-2 text-left text-sm hover:bg-white/10";
+const buttonClassName = "flex h-header w-header shrink-0 items-center justify-center rounded-full shadow-lg";
+const itemClassName = "block w-full px-3 py-2 text-left text-body hover:bg-white/10";
 
-export function UserMenu() {
+export function UserMenu({ compact = false }: { compact?: boolean }) {
   const { data: session, status } = useSession();
   const isAdmin = useIsAdmin();
   const [open, setOpen] = useState(false);
   const accountLabel = session?.user?.name ?? session?.user?.email;
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerClassName = compact
+    ? "flex h-[var(--layout-touch-target)] w-[var(--layout-touch-target)] shrink-0 items-center justify-center rounded-full"
+    : buttonClassName;
 
   useEffect(() => {
     if (!open) return;
@@ -45,7 +48,7 @@ export function UserMenu() {
     return (
       <button
         type="button"
-        className={`${buttonClassName} bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:opacity-50`}
+        className={`${triggerClassName} bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:opacity-50`}
         aria-label="Sign in"
         disabled={status === "loading"}
         onClick={() => void signIn("google", { redirectTo: ADMIN_HREF })}
@@ -56,10 +59,10 @@ export function UserMenu() {
   }
 
   return (
-    <div ref={containerRef} className="relative h-full">
+    <div ref={containerRef} className="relative">
       <button
         type="button"
-        className={buttonClassName}
+        className={triggerClassName}
         aria-label="Account"
         aria-haspopup="menu"
         aria-expanded={open}
@@ -70,9 +73,9 @@ export function UserMenu() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-full mt-2 min-w-48 overflow-hidden rounded-lg bg-black/80 py-1 text-gray-100 shadow-lg backdrop-blur"
+          className="absolute top-full right-0 z-50 mt-2 min-w-48 overflow-hidden rounded-lg bg-black/80 py-1 text-gray-100 shadow-lg backdrop-blur"
         >
-          {session?.user?.email && <p className="px-3 py-2 text-xs text-gray-400">{session.user.email}</p>}
+          {session?.user?.email && <p className="px-3 py-2 text-caption text-gray-400">{session.user.email}</p>}
           {MENU_LINKS.map(({ href, label }) => (
             <Link key={href} href={href} role="menuitem" className={itemClassName} onClick={() => setOpen(false)}>
               {label}

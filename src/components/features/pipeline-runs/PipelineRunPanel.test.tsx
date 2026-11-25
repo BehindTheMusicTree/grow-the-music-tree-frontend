@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, act } from "@testing-library/react";
-import type { PipelineRunRequest } from "@schemas/api/pipeline-runs";
+import { render, screen, fireEvent, cleanup, act, within } from "@testing-library/react";
+import { PipelineRunsPageSchema, type PipelineRunRequest } from "@schemas/api/pipeline-runs";
 import PipelineRunPanel from "./PipelineRunPanel";
 
 const refreshMock = vi.fn();
@@ -83,12 +83,42 @@ describe("PipelineRunPanel", () => {
 
     expect(curationButton()).toBeDisabled();
     expect(fullButton()).toBeDisabled();
-    expect(screen.getByRole("progressbar")).toHaveAttribute("value", String((7 + 1 / 4) / 11));
+    expect(screen.getByRole("progressbar")).toHaveAttribute("value", String((7 + 1 / 4) / 13));
     expect(screen.getByText("Ingestion complète : Envoi des morceaux (1/4)")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
 
     expect(mutateMock).toHaveBeenCalledWith(latest.uuid);
+  });
+
+  it("lists every stage of the run with its state", () => {
+    latest = request({ kind: "sync", stage: "uploading_songs", stageCurrent: 1, stageTotal: 4 });
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    const items = within(screen.getByRole("list", { name: "Étapes du run" })).getAllByRole("listitem");
+
+    expect(items.map((item) => item.textContent)).toEqual([
+      "Import de l'arbreterminée",
+      "Envoi des morceaux(1/4)en cours",
+      "Fusion des morceauxà venir",
+      "Envoi des artistesà venir",
+      "Fusion des artistesà venir",
+      "Envoi de la carte des régionsà venir",
+      "Fusion de la carte des régionsà venir",
+    ]);
+    expect(items[1]).toHaveAttribute("aria-current", "step");
+  });
+
+  it("marks the stage a failed run stopped at and hides the list once superseded", () => {
+    latest = request({ status: "failed", stage: "building_genres", error: "boom" });
+    const { rerender } = render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.getByText("interrompue").parentElement).toHaveTextContent("Ingestion Wikidata et construction des genres");
+
+    latest = request({ status: "superseded" });
+    rerender(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.queryByRole("list", { name: "Étapes du run" })).not.toBeInTheDocument();
   });
 
   it("shows a requested cancellation and the merge note", () => {
@@ -117,6 +147,24 @@ describe("PipelineRunPanel", () => {
     render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
 
     expect(screen.getByText(label)).toBeInTheDocument();
+  });
+
+  it("shows a Geohistory failure from a parsed run history response", () => {
+    const page = PipelineRunsPageSchema.parse({
+      overallTotal: 1,
+      page: 1,
+      totalPages: 1,
+      results: [request({
+        kind: "full",
+        status: "failed",
+        stage: "ingesting_geohistory",
+        error: "source=openstreetmap HTTP 403",
+      })],
+    });
+    latest = page.results[0];
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.getByText("Ingestion complète : Échec — Ingestion Geohistory : source=openstreetmap HTTP 403")).toBeInTheDocument();
   });
 
   it("refreshes the page once the run finishes", () => {
@@ -176,6 +224,93 @@ describe("PipelineRunPanel", () => {
     render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
 
     expect(screen.getByText("Manuel · en 2 h 05 min")).toBeInTheDocument();
+  });
+
+  it("keeps the legacy step list when a stopped run has no recorded timing for its stage", () => {
+    latest = request({
+      kind: "full",
+      status: "failed",
+      stage: "ingesting_discogs",
+      error: "boom",
+      stepTelemetry: { variant: "split_silver", foreground: [], wikidata: [], wikidataRetry: null },
+    });
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    const steps = within(screen.getByRole("list", { name: "Étapes du run" }));
+    expect(steps.getByText("interrompue")).toBeInTheDocument();
+  });
+
+  it("describes a WDQS retry without an HTTP status", () => {
+    latest = request({
+      kind: "full",
+      stage: "building_songs",
+      stepTelemetry: {
+        variant: "split_silver",
+        foreground: [],
+        wikidata: [{ stage: "ingesting_wikidata", state: "running", startedAt: "2026-10-12T10:02:00+00:00", finishedAt: null }],
+        wikidataRetry: { attempt: 1, reason: "http", httpStatus: null },
+      },
+    });
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+
+    expect(screen.getByText(/WDQS \(erreur HTTP\)/)).toBeInTheDocument();
+  });
+
+  it("shows recorded durations on both chains and clears a recovered WDQS retry", () => {
+    vi.useFakeTimers({ now: Date.parse("2026-10-12T10:03:00Z") });
+    const stepTelemetry: NonNullable<PipelineRunRequest["stepTelemetry"]> = {
+      variant: "split_silver",
+      foreground: [{
+        stage: "ingesting_discogs",
+        state: "succeeded",
+        startedAt: "2026-10-12T10:00:00Z",
+        finishedAt: "2026-10-12T10:00:45Z",
+      }, {
+        stage: "ingesting_musicbrainz",
+        state: "running",
+        startedAt: "2026-10-12T10:01:00Z",
+        finishedAt: null,
+      }],
+      wikidata: [{
+        stage: "ingesting_wikidata",
+        state: "running",
+        startedAt: "2026-10-12T10:02:00Z",
+        finishedAt: null,
+      }],
+      wikidataRetry: { attempt: 2, reason: "http", httpStatus: 503 },
+    };
+    latest = request({ kind: "full", stage: "building_songs", stepTelemetry });
+    const { rerender } = render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+    const foreground = within(screen.getByRole("list", { name: "Étapes du run" }));
+    const wikidata = within(screen.getByRole("list", { name: "Chaîne Wikidata et Geohistory" }));
+
+    expect(foreground.getByText("(45 s)")).toBeInTheDocument();
+    expect(foreground.getByText("(depuis 2 min)")).toBeInTheDocument();
+    expect(foreground.getAllByText("en cours")).toHaveLength(1);
+    expect(wikidata.getByText("(depuis 1 min)")).toBeInTheDocument();
+    expect(screen.getByText(/WDQS \(HTTP 503\).*tentative 2/)).toHaveAttribute("role", "status");
+    act(() => vi.advanceTimersByTime(60_000));
+    expect(wikidata.getByText("(depuis 2 min)")).toBeInTheDocument();
+
+    latest = request({ kind: "full", stage: "building_songs", stepTelemetry: { ...stepTelemetry, wikidataRetry: null } });
+    rerender(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+    expect(screen.queryByText(/WDQS \(HTTP 503\)/)).not.toBeInTheDocument();
+
+    latest = request({
+      kind: "full",
+      status: "succeeded",
+      stage: "ingesting_discogs",
+      stepTelemetry: {
+        ...stepTelemetry,
+        variant: "bronze_only",
+        foreground: stepTelemetry.foreground.slice(0, 1),
+        wikidata: [],
+        wikidataRetry: null,
+      },
+    });
+    rerender(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+    expect(foreground.getByText("(45 s)")).toBeInTheDocument();
+    expect(foreground.queryByText("Construction du Gold")).not.toBeInTheDocument();
   });
 
   it("counts up while the run is going", () => {

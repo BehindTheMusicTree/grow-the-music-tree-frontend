@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import AdminNav from "./AdminNav";
 
-let pathname = "/admin/curation/main_parent";
+let pathname = "/admin/curation/canonical_parent";
 vi.mock("next/navigation", () => ({ usePathname: () => pathname }));
 
 describe("AdminNav", () => {

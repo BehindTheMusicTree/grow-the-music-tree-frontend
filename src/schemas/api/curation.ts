@@ -57,8 +57,51 @@ export const CurationEntriesPageSchema = z.object({
 
 export type CurationEntriesPage = z.infer<typeof CurationEntriesPageSchema>;
 
+export const EDGE_RELATIONS = {
+  canonical_parent: "Parent canonique",
+  regional_genre_parent: "Parent régional",
+  regional_overview: "Vue régionale",
+  secondary_parent: "Parent secondaire",
+} as const;
+
+export type EdgeRelation = keyof typeof EDGE_RELATIONS;
+
+export const EDGE_ACTIONS = { add: "Ajouter", remove: "Retirer" } as const;
+
+export const CurationEdgeSchema = z.object({
+  uuid: z.string().uuid(),
+  // Stays snake_case on the wire, like a list entry's row.
+  row: z.object({
+    id: z.string().uuid(),
+    relation: z.enum(["canonical_parent", "regional_genre_parent", "regional_overview", "secondary_parent"]),
+    item_id: z.string(),
+    /** Null on an accepted canonical root. */
+    parent_item_id: z.string().nullable(),
+    /** Secondary parents only. */
+    action: z.enum(["add", "remove"]).nullable(),
+    /** Null on a secondary parent. */
+    exclude_other_parents: z.boolean().nullable(),
+    reason: z.string(),
+  }),
+  createdOn: z.string(),
+  updatedOn: z.string().nullable(),
+});
+
+export type CurationEdge = z.infer<typeof CurationEdgeSchema>;
+
+export const CurationEdgesPageSchema = z.object({
+  overallTotal: z.number(),
+  page: z.number(),
+  totalPages: z.number(),
+  results: z.array(CurationEdgeSchema),
+  labels: z.record(z.string(), z.string()),
+});
+
+export type CurationEdgesPage = z.infer<typeof CurationEdgesPageSchema>;
+
 export const CurationRulesSchema = z.object({
   results: z.array(CurationEntrySchema.extend({ listName: z.string() })),
+  edges: z.array(CurationEdgeSchema),
   labels: z.record(z.string(), z.string()),
 });
 
@@ -141,20 +184,13 @@ export const CurationItemSearchSchema = z.object({
   results: z.array(z.object({ id: z.string(), label: z.string() })),
 });
 
-export const CanonicalGenreSearchSchema = z.object({
-  results: z.array(
-    z.object({
-      uuid: GenreUuidSchema,
-      name: z.string(),
-      wikidataId: z.string().nullable(),
-      isUmbrella: z.boolean().optional(),
-    }),
-  ),
-  page: z.number().int(),
-  totalPages: z.number().int(),
-});
-
-export const CurationReviewReasonSchema = z.enum(["redirect_conflict", "missing", "not_in_tree"]);
+export const CurationReviewReasonSchema = z.enum([
+  "redirect_conflict",
+  "missing",
+  "not_in_tree",
+  "invalid_rule",
+  "exclusive_parent_regional",
+]);
 
 export type CurationReviewReason = z.infer<typeof CurationReviewReasonSchema>;
 
@@ -167,12 +203,15 @@ export const CurationReviewEvidenceSchema = z.object({
   subclassOf: z.array(EvidenceItemSchema).optional(),
   hasIndigenousTo: z.boolean().optional(),
   conflictList: z.string().optional(),
+  detail: z.string().optional(),
 });
 
 export type CurationReviewEvidence = z.infer<typeof CurationReviewEvidenceSchema>;
 
 export const CurationReviewItemsSchema = z.array(
   z.object({
+    /** Set when the dropped rule is a genre edge rather than a list entry. */
+    ruleId: z.string().uuid().nullable(),
     list: z.string(),
     key: z.string(),
     column: z.string(),
@@ -268,6 +307,10 @@ export const UpdateGenreParentInputSchema = z.object({
 export type UpdateGenreParentInput = z.infer<typeof UpdateGenreParentInputSchema>;
 export const UpdateGenreOutputSchema = UuidOutputSchema;
 
+export const SetGenreRootInputSchema = z.object({ uuid: GenreUuidSchema, name: z.string() });
+export type SetGenreRootInput = z.infer<typeof SetGenreRootInputSchema>;
+export const SetGenreRootOutputSchema = UuidOutputSchema;
+
 const EssentialSongSchema = z.object({
   uuid: z.string(),
   title: z.string(),
@@ -289,7 +332,3 @@ export const LinkCandidateSchema = z.object({
 });
 export type LinkCandidate = z.infer<typeof LinkCandidateSchema>;
 export const LinkSuggestionsSchema = z.array(LinkCandidateSchema);
-export const SongSearchSchema = z.object({
-  results: z.array(LinkCandidateSchema),
-  next: z.string().nullable(),
-});

@@ -444,7 +444,7 @@ Before submitting a Pull Request, ensure the following checks are completed:
 
    ```bash
    mkdir -p .pr-descriptions
-   cp .github/pull_request_template.md .pr-descriptions/feature-your-branch-name.md
+   gh api repos/BehindTheMusicTree/.github/contents/.github/pull_request_template.md -H 'Accept: application/vnd.github.raw+json' > .pr-descriptions/feature-your-branch-name.md
    ```
 
 2. **Edit the file locally** - Fill in all relevant sections, update as you work

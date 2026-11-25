@@ -9,11 +9,12 @@ const config = {
   content: [
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
-    "./node_modules/@behindthemusictree/**/dist/**/*.{js,cjs}",
+    "./node_modules/@behindthemusictree/*/dist/**/*.{js,cjs}",
   ],
   theme: {
     extend: {
       colors: {
+        space: "#050a1a",
         "scrollbar-base": "#your-base-color",
         "scrollbar-light": "#your-thumb-color",
       },
@@ -22,9 +23,6 @@ const config = {
       },
       boxShadow: {
         "progress-bar-blue": "-403px 0 0 400px #3B82F6", // blue-500
-      },
-      fontSize: {
-        "1.5xl": "1.1rem",
       },
       keyframes: {
         "scale-pulse": {
@@ -64,7 +62,10 @@ const config = {
     },
   },
   plugins: [
-    function ({ addComponents }) {
+    function ({ addComponents, addVariant }) {
+      addVariant("mobile-layout", "@media (max-width: 767px), (orientation: landscape) and (max-height: 500px) and (pointer: coarse)");
+      addVariant("desktop-layout", "@media (min-width: 768px) and (orientation: portrait), (min-width: 768px) and (min-height: 501px), (min-width: 768px) and (pointer: fine), (min-width: 768px) and (pointer: none)");
+      addVariant("phone-landscape", "@media (orientation: landscape) and (max-height: 500px) and (pointer: coarse)");
       const newComponents = {
         ".menu-item-container": {
           "@apply flex justify-center items-center h-menuitem w-menuitem text-white text-4xl rounded-md hover:bg-gray-800 p-2 mx-2 cursor-pointer":
