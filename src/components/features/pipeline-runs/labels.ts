@@ -59,6 +59,12 @@ const WIKIDATA_LABELS: Record<WikidataStage, string> = {
   anchoring_wikidata_silver: "Ancrage Wikidata",
 };
 
+/** The latest-only keys of a run returned by launch or cancel: kept from the cached latest run when it is the same run, else empty until the next poll. */
+export function asLatest(updated: PipelineRunRequest, cached: PipelineRunLatest | null | undefined): PipelineRunLatest {
+  const same = cached?.uuid === updated.uuid;
+  return { ...updated, activeImport: same ? cached.activeImport : null, typicalStageSeconds: same ? cached.typicalStageSeconds : null };
+}
+
 export const WIKIDATA_JOIN_LABEL = "Attente de la chaîne Wikidata";
 
 const BRONZE_FOREGROUND_STAGES: readonly PipelineRunStage[] = [

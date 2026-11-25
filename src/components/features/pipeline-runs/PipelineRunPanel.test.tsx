@@ -428,6 +428,17 @@ describe("PipelineRunPanel", () => {
       expect(progress()).toBeCloseTo(600 / 2300);
     });
 
+    it("falls back to the stage position when every median is zero", () => {
+      latest = request({
+        kind: "sync",
+        stage: "merging_songs",
+        typicalStageSeconds: { foreground: { importing_tree: 0 }, wikidata: {} },
+      });
+      render(<PipelineRunPanel pendingCount={0} initialRequest={latest} />);
+
+      expect(progress()).toBeCloseTo(3 / 8);
+    });
+
     it("falls back to equal weights without typical durations", () => {
       latest = request({ kind: "sync", stage: "merging_songs" });
       render(<PipelineRunPanel pendingCount={0} initialRequest={latest} />);

@@ -118,9 +118,10 @@ const ImportProgressSchema = z.object({
   runId: z.number(),
   taskId: z.string(),
   kind: z.string(),
-  mode: z.enum(["full", "delta"]),
+  mode: z.string(),
   attempt: z.number(),
-  state: z.enum(["queued", "running", "committing", "cleaning_up", "succeeded", "failed", "interrupted"]),
+  /** Strings, like `kind`: a state Grow adds later must not break parsing of the whole run; the front only tests for the terminal ones. */
+  state: z.string(),
   startedAt: z.string().nullable(),
   step: z.string().nullable(),
   stepStartedAt: z.string().nullable(),

@@ -8,7 +8,7 @@ import { Button, StepList } from "@behindthemusictree/ui";
 import { useFetchWrapper, useQueryWithParse, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import { formatDuration } from "@components/features/import-runs/importedOn";
 import {
-  KIND_LABELS, STAGE_LABELS, UPLOAD_STAGES, WIKIDATA_JOIN_LABEL, foregroundStepDetails, originOf, stepsOf,
+  KIND_LABELS, STAGE_LABELS, asLatest, UPLOAD_STAGES, WIKIDATA_JOIN_LABEL, foregroundStepDetails, originOf, stepsOf,
   wikidataRetryLabel, wikidataStepsOf,
 } from "@components/features/pipeline-runs/labels";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
@@ -49,7 +49,9 @@ function progressOf({ kind, status, stage, stageCurrent, stageTotal, typicalStag
   const index = stage ? Math.max(stageIndexOf(kind, stage), 0) : 0;
   const sub = stage && UPLOAD_STAGES.includes(stage) && stageCurrent !== null && stageTotal ? stageCurrent / stageTotal : 0;
   const done = weights.slice(0, index).reduce((sum, weight) => sum + weight, 0) + weights[index] * sub;
-  return done / weights.reduce((sum, weight) => sum + weight, 0);
+  const total = weights.reduce((sum, weight) => sum + weight, 0);
+  // Medians are rounded to whole seconds, so a degenerate set can sum to 0.
+  return total > 0 ? done / total : index / weights.length;
 }
 
 function labelOf({ kind, status, stage, stageCurrent, stageTotal, error, stepTelemetry }: PipelineRunRequest): string {
@@ -107,7 +109,7 @@ function durationOf({ status, startedOn, finishedOn }: PipelineRunRequest, now: 
   return started;
 }
 
-const TERMINAL_IMPORT_STATES: readonly ImportProgress["state"][] = ["succeeded", "failed", "interrupted"];
+const TERMINAL_IMPORT_STATES: readonly string[] = ["succeeded", "failed", "interrupted"];
 
 /** Progress of the merge Grow runs for the current pipeline run, hidden once its attempt is over. */
 function ImportProgressNote({ progress, now }: { progress: ImportProgress; now: number | null }) {
@@ -157,9 +159,8 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
     refetch();
     router.refresh();
   };
-  // The two latest-only keys come with the next poll.
   const onSuccess = (updated: PipelineRunRequest) =>
-    queryClient.setQueryData(LATEST_QUERY_KEY, { ...updated, activeImport: null, typicalStageSeconds: null });
+    queryClient.setQueryData<PipelineRunLatest | null>(LATEST_QUERY_KEY, (cached) => asLatest(updated, cached));
   const launch = useValidatedMutation({
     inputSchema: z.enum(PIPELINE_RUN_KINDS),
     outputSchema: PipelineRunRequestSchema,

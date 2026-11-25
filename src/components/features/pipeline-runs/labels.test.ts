@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { foregroundStepDetails, stepsOf } from "./labels";
-import type { ImportProgress, PipelineRunLatest, PipelineRunStage } from "@schemas/api/pipeline-runs";
+import { asLatest, foregroundStepDetails, stepsOf } from "./labels";
+import type { ImportProgress, PipelineRunLatest, PipelineRunRequest, PipelineRunStage } from "@schemas/api/pipeline-runs";
 
 const base = { kind: "sync" as const, status: "running" as const, stage: null, stageCurrent: null, stageTotal: null };
 const statuses = (steps: ReturnType<typeof stepsOf>) => steps?.map((step) => step.status);
@@ -154,5 +154,29 @@ describe("foregroundStepDetails", () => {
 
       expect(detailAt(120, { activeImport })).toBe("depuis 2 h 00 min");
     });
+  });
+});
+
+describe("asLatest", () => {
+  const run = (uuid: string, activeImport: ImportProgress | null, typicalStageSeconds: PipelineRunLatest["typicalStageSeconds"]) =>
+    ({
+      uuid, kind: "full", trigger: "manual", requestedBy: null, status: "running", stage: null, stageCurrent: null,
+      stageTotal: null, error: null, cancelRequested: false, requestedOn: "2026-11-25T10:00:00Z", startedOn: null,
+      heartbeatOn: null, finishedOn: null, activeImport, typicalStageSeconds,
+    }) satisfies PipelineRunLatest;
+  const typical = { foreground: { importing_graph: 600 }, wikidata: {} };
+  const updated: PipelineRunRequest = run("a", null, null);
+
+  it("keeps the cached import progress and medians of the same run", () => {
+    const cached = run("a", { bootstrap: true } as ImportProgress, typical);
+
+    expect(asLatest(updated, cached)).toMatchObject({ activeImport: cached.activeImport, typicalStageSeconds: typical });
+  });
+
+  it("leaves them empty for another run or an empty cache", () => {
+    const cached = run("b", { bootstrap: true } as ImportProgress, typical);
+
+    expect(asLatest(updated, cached)).toMatchObject({ activeImport: null, typicalStageSeconds: null });
+    expect(asLatest(updated, null)).toMatchObject({ activeImport: null, typicalStageSeconds: null });
   });
 });
