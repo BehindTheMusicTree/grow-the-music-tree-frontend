@@ -29,6 +29,9 @@ function makeGenrePlaylist(uuid: string, name: string, parent: { uuid: string; n
     parent,
     root: parent ?? { uuid, name },
     tracksCount: 1,
+    genreOnlyTracksCount: 0,
+    genreAndSubgenresTracksCount: { canonical: 1, regional: 0, all: 1 },
+    catalogue: { genreOnlyTracksCount: 0, genreAndSubgenresTracksCount: { canonical: 1, regional: 0, all: 1 } },
     viewsCount: 0,
     isUnacceptedRoot: false,
     criteria: { uuid: uuid.replace(/.$/, "f"), name },
@@ -75,6 +78,7 @@ describe("GenreTreePage zoom controls", () => {
       "fetch",
       vi.fn(async (input: RequestInfo | URL) => {
         const url = String(input);
+        if (url.includes("playback/context")) return jsonResponse({ country: null });
         if (url.includes("genre-playlists")) {
           return jsonResponse(genrePlaylists);
         }

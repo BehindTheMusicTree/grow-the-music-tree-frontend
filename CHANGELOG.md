@@ -7,10 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Table of Contents
 
-- [Changelog Best Practices](#changelog-best-practices)
-  - [General Principles](#general-principles)
-  - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.23.0 - 2026-11-25](#3230---2026-11-25)
 - [3.22.1 - 2026-11-25](#3221---2026-11-25)
 - [3.22.0 - 2026-11-03](#3220---2026-11-03)
 - [3.21.0 - 2026-11-01](#3210---2026-11-01)
@@ -47,66 +45,238 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [1.0.0 - 2025-02-12](#100---2025-02-12)
 - [0.2.0 - 2025-02-06](#020---2025-02-06)
 
-## Changelog Best Practices
+## [Unreleased]
 
-### General Principles
-
-- Changelogs are for humans, not machines.
-- Include an entry for every version, with the latest first.
-- Group similar changes under: Added, Changed, Improved, Deprecated, Removed, Fixed, Documentation, Performance, CI.
-- **"Test" is NOT a valid changelog category** - tests should be mentioned within the related feature or fix entry, not as standalone entries.
-- Use an "Unreleased" section for upcoming changes.
-- Follow Semantic Versioning where possible (see [docs/SEMVER_GUIDE.md](docs/SEMVER_GUIDE.md)).
-- Use ISO 8601 date format: YYYY-MM-DD.
-- Avoid dumping raw git logs; summarize notable changes clearly.
-
-### Guidelines for Contributors
-
-All contributors (including maintainers) should update `CHANGELOG.md` when creating PRs:
-
-1. **Add entries to the `[Unreleased]` section** - Add your changes under the appropriate category (Added, Changed, Improved, Deprecated, Removed, Fixed, Documentation, Performance, CI)
-2. **Follow the changelog format** - See examples below for detailed guidelines
-3. **Group related changes** - Similar changes should be grouped together
-4. **Be descriptive** - Write clear, user-focused descriptions of what changed
-5. **Mention tests when relevant** - Tests should be mentioned within the related feature or fix entry, not as standalone entries
-
-**Example:**
-
-```markdown
-## [1.4.0] - YYYY-MM-DD
+## [3.23.0] - 2026-11-25
 
 ### Added
 
-- **Artist search**: a header search box finds artists by name or alias (accent- and typo-tolerant) and opens their page. The curation genre picker now shares its combobox with it (`ui/Combobox`). Requires grow-api `GET artists/search/`.
-- **Genre Tree Visualization**: Added interactive D3.js-based genre tree component
-  - Includes unit tests for tree layout calculations and node interactions
-  - Supports zoom, pan, and node expansion/collapse
+- **Pipeline runs**: while Grow merges an import, the run shows its step, attempt, last sign of life, SQL wait and bootstrap note (with a warning when its telemetry is stale); a running step shows « habituellement ~N min » and « plus long que d'habitude » past the poller threshold (not during a graph bootstrap); the progress bar weights each stage by its median duration. Reads `activeImport` and `typicalStageSeconds` from `pipeline/runs/latest/`: deploy after the grow endpoint that serves them. Tests in `labels.test.ts` and `PipelineRunPanel.test.tsx`.
 
-- **Playlist Management**: Added drag-and-drop track reordering in playlists
-  - Includes integration tests for drag-and-drop functionality
-  - Optimistic UI updates with automatic rollback on API failure
+- **Pipeline runs**: the graph import is its own step (`importing_graph`, « Import du graphe des genres ») after « Import des arbres de genres », a step that never ran before a recorded one is hidden instead of staying « à venir », and the run line reads « démarré le 24/11 à 02:00 · durée totale / durée écoulée : … ». Needs the grow `importing_graph` stage; deploy with or after it. Tests in `labels.test.ts` and `PipelineRunPanel.test.tsx`.
+
+- The admin panel shows completed and elapsed step durations for both branches of a full pipeline run, and reports active WDQS retries.
+
+- Touch-phone landscape navigation and detail panels share the left half of the screen, including beyond the desktop width breakpoint.
+
+- Mobile navigation now provides Tree, Map and About tabs above the device safe area.
+
+- **Pipeline runs**: the run's step list shows the Discogs ingestion, the Gold build and the region map upload and merge (`ingesting_discogs`, `building_gold`, `uploading_region_map`, `merging_region_map`), and the `building_genres` step is labelled « Ingestion Wikidata et construction des genres » since it waits for the parallel wikidata chain. A stage a kind doesn't list lands on the nearest earlier step. Needs the grow stages of migration `0128`. Tests in `labels.test.ts` and `PipelineRunPanel.test.tsx`.
+
+### Changed
+
+- Update app-kit and app-kit-ui to 43.1.4 so genre-tree dragging starts immediately from labels and chips.
+- Update app-kit and app-kit-ui to 43.1.3 for smoother touch pan and zoom in the genre tree.
+
+- Use the Music Map mark from brand 12.15.0 in the Map control, with full color on the Map view and diagonal shading when night mode is enabled.
+
+- Added a black background behind the desktop navigation buttons.
+
+- Updated the navigation mark and favicon to the latest Grow brand artwork.
+
+- Use the circled Grow brand mark for the Tree navigation button.
+
+### Removed
+
+- **Genre tree**: the wheel/outline view toggle is gone, so the outline view can no longer be reached. The view itself stays in `@behindthemusictree/app-kit-ui` and `GenreTreeViewModeProvider`; see `docs/pages/genre-tree.md` to bring it back. `ViewModeToggle` and its test are deleted.
+- The region detail panel on the map no longer shows the « Focus » button (the tree view keeps it). `RegionDetailPanel` stops passing `onZoomIn` to `GenreDetailPanel`.
+- Drop the tracked `.agent-plans/.gitignore`: plans now live in the common git directory.
 
 ### Fixed
 
-- **Audio Player**: Fixed track progress bar not updating correctly on mobile Safari
-  - Includes regression tests across different browser environments
-  - Improved audio event handling for better compatibility
+- Undo song genre edits through Grow API's undo token so a batch can restore each song's original attribution and curation rule.
 
-### Performance
+- Show Geohistory ingestion failures in the pipeline run status and history.
 
-- **Track List**: Implemented virtualized scrolling for large track lists (1000+ items)
-  - Reduced initial render time by 70%
-  - Includes performance benchmarks to prevent future regressions
+- **Agent directories**: Keep plans and scratch data out of Git while tracking the directory ignore rules.
+
+- Genre review suggests the parent's name instead of the technical Wikidata suffix for flagged genres. Validate saves the displayed suggestion or the administrator's edits; genres without a parent keep their existing names.
+- The region detail panel no longer says the genre “Music of <region>” failed to load when a region overview cannot be loaded; it always shows « The music genre covering <region> could not be loaded. », since overviews are now generated `LOCAL:region-*` items. Covered by `RegionDetailPanel` tests.
+- The admin session is bound to the grow-api upstream it was issued for: after `GROW_API_ORIGIN` changes (or for a cookie with no recorded upstream) the session reports `UpstreamChanged`, the admin is asked to sign in again, and the proxy no longer forwards a Google ID token minted for another OAuth client (which grow-api rejected with 401, including on public reads). Covered by `isBoundToUpstream`, `jwt` callback and `getAdminIdToken` tests.
+
+### Added
+
+- The admin pipeline run panel lists every stage of the run (full 11, curation 8, sync 5) with `StepList` from `@behindthemusictree/ui` 0.23.0: passed stages are ticked, the current one is marked (with the upload `x/y` count) and a failed, cancelled or expired run shows the stage it stopped at. Covered by `stepsOf` and panel tests.
+
+### Changed
+
+- Consume the published UI 0.26.0 responsive panel-framing contract through updated app-kit packages, replacing the temporary local UI patch.
+
+- Using published app-kit/app-kit-ui 43.1.0 and UI 0.25.0, mobile tree and map search contain the account control in place of the search icon and fill the width only below 640px. Page navigation aligns with the floating controls and both respect the bottom safe area. Search leaves the resize handle clear while the map detail sheet is fully expanded, with browser coverage for expanding and collapsing the map sheet.
+- Make the tree, region map, and About navigation icons fill their buttons without inner spacing.
+- Size the About navigation button at 80% of the tree and map buttons.
+- Toggle night shading by pressing the Map button while already on the map; remove the separate moon control and shade the globe icon's right half along a 23.44° tilted axis when enabled.
+- `@behindthemusictree/ui` 0.22.0 → 0.24.0.
+- **Region map**: the night mode toggle moves from the navigation into the map's floating controls at the bottom right, next to the new zoom buttons, in the same style as the genre tree's controls (`FloatingToggle` from `@behindthemusictree/ui` 0.24.0).
+- **Region map**: the globe is no longer dimmed on the lit side; the night side (half facing away from the Sun) is dimmed only when night mode is on, and darker than before (50 %). Replaces the permanent dimming of the Sun entry below.
+- Pages use the shared `Page` from `@behindthemusictree/ui` 0.22.0 (map, genre tree and genealogy as `canvas`; admin as document pages) with the brand base styles (`@behindthemusictree/brand` 12.13.0); the local `Page` and the dead `app col center` classes are removed, and `AppContent` no longer wraps routes in its own `<main>`.
+- Curation, genre-curation, import-run, review and genre popup forms use `Input`, `Select`, `Textarea` and `Checkbox` from `@behindthemusictree/ui` instead of raw form elements with local border and padding classes; the global `input` background rule is removed and ESLint rejects raw `input`, `select` and `textarea` in JSX.
+- The "Modifications" (genre history) section of the genre side panel is only shown to admins, on the tree and on the region map.
+
+### Added
+
+- **Region map**: zoom in, zoom out and fit-to-world buttons at the bottom right, like the genre tree's (hidden on touch screens, where pinch replaces them); zoom in and out are disabled at the zoom limits, and fit keeps the selected region. Covered by `RegionMapControls` and canvas tests.
+- **Region map**: a moon button at the bottom right toggles night mode (dims the globe's hidden side); off by default and not persisted, shown only on `/map`, with tests for the provider, the button and the layer.
+- **Region map**: without a URL camera or a target region, the globe opens at the same world zoom but turned to the visitor's country (from the playback context, which waits for it before opening; a failed or unknown country keeps the current world view). The country is found through an optional `isoCode` on the index's country regions, which the schema now accepts; until the pipelines publish it the map opens as before. Requires this release deployed before the pipelines publish an index with `isoCode`.
+- **Region map**: a Sun shines 130° from the Moon as seen from Earth (the side its gibbous phase implies): a bright disc with a soft halo, as large as the Moon, fixed in the sky like the stars and hidden by the globe (one more MapLibre custom WebGL layer, no repaint when idle). One `SUN_DIRECTION` drives the disc, the Moon's shading and the style `light`, so the atmosphere glows on the Sun's side (`atmosphere-blend` lowered to 0.25), and the globe is dimmed (lit side −30 %, night side darker, with a soft terminator; one full-screen ray-cast pass).
+- **Region map**: a Moon hangs beside the globe at its true distance (60 Earth radii, radius ×3): gibbous, with procedural maria, parallaxing against the stars, scaling with zoom and hidden by the globe (one more MapLibre custom WebGL layer, 4 vertices, no extra repaint when idle). The shader helpers are shared with the starfield (`glProgram.ts`).
+- **Region map**: the globe floats in a dark space with ~3,000 static stars that turn with the camera as if the sky were locked to the globe (one MapLibre custom WebGL layer, no repaint when idle); the sky and horizon colours are darker to match.
+- Admin curation edits genre edges (canonical and regional parents, accepted roots, regional overviews, secondary parents) from the genre page and a new `/admin/curation/edges` page, with relation filter, search and history.
+- **Artist panel shows the artist's origin** (begin area, else area) as a link to its region on the map (`renderPlaceLink`), on the tree and on the map, with a test. Bumps `@behindthemusictree/app-kit` and `app-kit-ui` to 42.0.0 (`ArtistDetailedSchema` requires a nullable `origin`; the e2e artist fixture carries one). Requires grow-the-music-tree-api #462 deployed.
+- **Genre panel shows the genre's Wikimedia Commons image** above the summary, with its author and license credit; nothing is shown for genres without one. Comes with `@behindthemusictree/app-kit` and `app-kit-ui` 41.0.0 (no Grow code change). Requires the grow API's genre `image` field (grow #461), deployed before the pipelines send it.
+- The curation review lists the new reasons `invalid_rule` (with the pipeline's `evidence.detail`) and `exclusive_parent_regional` (pointing to « Genres maintenus canoniques »), with tests. Needs grow-the-music-tree-api 16.0.0.
+
+### Changed
+
+- **Region map**: the night side of the globe is less dark (night dim 0.55 → 0.45).
+
+### Documentation
+
+- Removed the contributor guidelines and example entry from `CHANGELOG.md`: the example duplicated the `[Unreleased]` heading and led agents to write entries in the wrong place, and the conventions now live in the shared `create-pr` skill.
 
 ### CI
 
-- **Branch Protection**: Added automated enforcement of Git Flow branching rules
-  - Blocks invalid PRs to main and develop branches
-```
+- Pushes and pull requests run the `org-conformance` check (github-workflows v6.5.0), which `required-checks.json` in github-config declares as an optional job.
+- Give every workflow the canonical `concurrency` group: pull-request runs of the same branch cancel the older run, and `release-tag` runs once per pushed commit without cancellation (agent-drift, api-public-health, branch-protection, labeler, pr-size-labeler, pr-type-labeler, release-tag, validate).
+- Check that mobile tree controls remain visible above the bottom navigation.
+- Playwright browser journeys on a production build with frozen API fixtures keep the genre, artist and song URL params and tab titles right across the tree and the map (`pnpm test:e2e`, `e2e` job).
+- Removed the per-repo graphify `hook-guard` in `.claude/settings.json` and its graphify blocks in the tracked git hooks (the whole `post-commit` hook and the graphify part of `post-checkout`); the global agent-config freshness hook replaces it.
+- Pin the shared release workflows to the lag-tolerant github-workflows commit 79c1362, so tag creation tolerates GitHub read-after-write delays.
 
-**Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
+### Changed
 
-## [Unreleased]
+- **Region map**: the Sun now sits at its real position (the sub-solar point at the current time) and follows the day, refreshed every 10 s; the Moon is always opposite it, so it is full and only shows from the night side. The terminator, the Sun, the Moon's shading and the atmosphere light all read the same direction.
+- `@behindthemusictree/app-kit` and `app-kit-ui` bumped from 42.0.0 to 42.0.1: `ArtistOriginSchema.kind` is nullable, so an artist whose origin has no kind no longer fails to parse. No Grow code change was needed.
+- An empty `?genre=`, `?artist=`, `?song=`, `?region=` or `?tradition=` is read as no selection (`src/lib/entityParams.ts`) by the tree, the map, the genealogy view and the view-switch links, so `?artist=` no longer requests `artists//genre-counts/`. The map no longer keeps its own "Genre unavailable" overlay for a malformed `?genre=`: like the tree, it hands the value to the panel, which says the genre was not found.
+- The region "Zoom to" and tradition "Open in genre tree" buttons, and the genre curation danger zone (alias, root, exclude, delete), become round action buttons with a label underneath, in the same action band as the other detail panels.
+- The region map index schema reads the lean index the pipelines are moving to, and still reads the current one: `boundaryStatus`, `mainBbox`, `drillable` and the genres' `rule` are optional. A region with no boundary is one with `bbox` and `centroid` null, `mainBbox` falls back to `bbox` and `drillable` to `childIds.length > 0`, so the map code reads one shape either way.
+- `@behindthemusictree/ui` bumped from 0.21.1 to 0.21.2.
+- `@behindthemusictree/app-kit` and `app-kit-ui` bumped from 40.1.0 to 41.0.0: a 404 on a genre, artist or song opens a closable "not found" panel instead of the BAC4040 connectivity popup, and a GET 404 from any other query now reports `isError` rather than the popup. The `?genre=` value is handed to the panel as is, so `useGenreTreeUrlState` no longer exposes `invalidGenre` and the page's "Genre unavailable" overlay is gone; `RegionMapSearch` reads the new `useFetchGenreDetail` result.
+- `@behindthemusictree/app-kit` and `app-kit-ui` bumped from 39.0.0 to 40.1.0 (pulls `genre-tree-view` 9.2.1): the genre detail panel colors a genre and its family from the tree again, an open artist keeps the whole tree with genres outside their footprint muted, and a failed genre playlist load shows the error popup. No Grow code change was needed.
+- Genre, artist and song panels get Play buttons with playable counts and the tree's node colors, and the detail panels now rely on the panel body for their margin: `@behindthemusictree/app-kit` and `app-kit-ui` 39.0.0, `ui` 0.21.1, `brand` 12.12.0. The region, tradition and About panels drop their own padding so the margin is no longer applied twice, and the curation selection bar spans the panel edges.
+
+- Removed the graphify `merge=graphify` git attribute, which pointed at a machine-specific merge driver; the global agent-config freshness hook keeps the graph fresh.
+- Text sizes follow the brand type roles (`text-title`, `text-heading`, `text-body`, `text-caption`) across curation, about, admin, menu and popups; the global `h1`/`h2`/`h3` sizes, `text-1.5xl` and `.page-title` are gone, and ESLint rejects Tailwind size classes and arbitrary sizes (`text-[length:…]` stays for commented exceptions).
+
+- On the region map, the search box follows the shared layout tokens and the breadcrumb sits right under it, centred on the map.
+
+- The type scale follows Google Maps' density: `@behindthemusictree/brand` 12.11.0, `ui` 0.20.0, `app-kit` and `app-kit-ui` 38.0.0 (the search box is centred in the panel).
+
+- The genre tree's tab title keeps the app name while the genre panel is open, like the map, instead of naming the artist or song filter beside it.
+
+- The region map no longer shows the « Regions without a boundary » bar above it. Those regions stay reachable through the search and `?region=`, and the panel says when a region has no boundary.
+
+- The left bar is gone: the detail panel sits against the left edge, and the Tree, Map and About buttons sit at the bottom left, moving to the right of the panel while it is open. Genealogy is reached from the About page.
+
+- Switching between the tree and the region map keeps the open genre; the map frames its region on opening, or says the genre has no region.
+
+- The region map opens artist and song panels (`/map?artist=` and `/map?song=`) from search, genre tracks and family links, and the Tree and Map buttons carry the open artist or song across views. A genre outranks a song, a song an artist, and an artist a region.
+
+- The five lists replaced by genre edges no longer appear among the curation lists; the curation review links an edge rule to its genre page.
+
+- Tree and map genre links now use genre entity UUIDs. Playlist UUID links are no longer interpreted as genre selections.
+
+- On the map, the search box alone shows the selected region or genre and closes its panel: the panel header has no title or close cross, and the search cross appears only while a panel is open and unselects the item. Closing a genre opened from a region now closes everything; browser back returns to the region.
+- Removed the local pull request template; the organization-wide template from `BehindTheMusicTree/.github` applies.
+
+### Fixed
+
+- The genre tree no longer loads blank on first visit when the playback country resolves while the tree request is in flight. Upgrade `@behindthemusictree/app-kit` and `app-kit-ui` to 36.0.0 and read country-dependent data (song detail, to-refine songs, player track loading) through the explicit playback binding.
+- Open regional search results in the current view, including descendants absent from the map index. Genre details work without a visible tree node or region, preserve map context during family navigation, and reopen on repeated selection.
+- Remove the region selection halo, which produced dark artifacts along intricate coastlines, and round zone halo joins.
+- The region map now centers on any selected region (map click, URL, back/forward) and on a selected genre's region, and fits the whole region in the part of the map the detail panel leaves visible.
+- The region map keeps at least a third of the map visible when fitting beside a wide detail panel, and recenters again on a region reselected after the selection was cleared.
+- Switching between the tree and the map no longer copies the map camera (`at`) into the tree URL; an artist or song tab title survives Next's metadata update, and the map titles the tab after the panel it shows rather than a hidden artist. The URL parameters of both views are documented in `docs/pages/map.md`.
+
+### Improved
+
+- Direct coding agents to the established performance measurement and search profiling procedures.
+- Keep search typing within the search panel and reuse indexed place and genre names for faster local results.
+- Reuse the region lookup between map and genre search for each cached region index, and prepare descendant lookups once for map focus.
+
+### Added
+
+- Add repeatable browser search profiling with recorded run metadata, trace checksums, and a documented evidence-retention procedure.
+- Add a repeatable tree and region-map network snapshot script and record the staging baseline.
+
+### Fixed
+
+- Keep regions without a boundary searchable and selectable, show their genres, and avoid camera or hover geometry for them.
+- Use explicit genre playlist counts for tree sizing and preserve separate catalogue and playlist summaries in the shared genre panels.
+
+- Link songs: the search text is kept when switching tabs, and results no longer empty on each keystroke while a track is playing (app-kit 33.3.0).
+- Genre picker: searches the canonical tree with the ranked genre search (typo-tolerant) instead of a paged list.
+- Give detail panel scrollbars consistent theme colors and sizing.
+- Region map: zoomed-out coasts no longer look hairy. Borders use round joins instead of spiky miters and are half as thick at world scale.
+- Limit shared-package style scanning to package output so local linked-package production builds finish without scanning nested dependencies.
+
+### CI
+
+- Automate stable release tags from the version and changelog on `main`.
+
+### Added
+
+- Genre tree search also lists places and regional genres (from the region map index and genre lexicon, loaded on first focus); picking one opens it on the map.
+- **Region map**: a search box over the canvas (top-left, full width on mobile) finds places, overviews and regional or canonical genres linked to a region, other genres, artists and songs. Places and region genres are matched in memory, ranked and accent-insensitive; the genre lexicon (`regions/map/genres/`) loads on the first focus. Picking a place or genre selects its region, frames it and opens the genre in the panel; other genres open in the tree, artists and songs in their tree panels. The breadcrumb moves below the box. Needs app-kit and app-kit-ui 33.2.0, ui 0.18.0 and grow-api #414. Tests cover the region-genre index, the hrefs and the box.
+- Region map index accepts an optional `hiddenRegions` list (subdivisions kept off the map), and the curation entry editor offers an entity picker listing drawn and hidden regions for `entity_id` columns, so a tradition can be attached to a subdivision that has no genre yet. Needs grow-api's `GET regions/map/attachable/`: deploy this app first, then grow-api, then the pipelines. Tested.
+- **Region map**: the index schema accepts regions of kind `city` (point regions under an admin unit) and the optional `cityIds` on admin units, so the pipelines can publish city-level genre anchors. Must be deployed before such an index is imported.
+- **Region map**: cities claimed by a genre are drawn as points (tileset layer `cities`, from their zoom band). They hover, show the region tooltip and open the detail panel on click, like any region.
+
+### Changed
+
+- **Link songs dialog**: song search goes through app-kit's `useSongSearch` (shared debounce and minimum length) instead of its own query.
+- **Region map**: subdivisions appear and disappear with the zoom, as on Google Maps. Zooming in on a country reveals its regions, zooming out brings the country back, and a country's name stays a little after its regions show up. Each depth (countries, first-level regions…) is colored against its own peers worldwide. Zones show as a dashed outline with a clickable label within their zoom range, and the outline doubles in width while its label is hovered; zones spanning several countries only show a thick blue outline when hovered or selected, without tinting their interior. Country borders are dark. A region without songs of its own but inside a zone that has some gets the palest yellow instead of grey, and regions with songs start at light green. Clicking outside any region clears the selection. The breadcrumb follows the selected region's ancestry. The panel's "Focus on" becomes "Zoom to". The URL keeps the camera in `?at=lng,lat,zoom`, replacing `?path=`: old `?path=` links still open on their deepest level. **Needs the pipelines tileset with zoom bands** (`min_zoom`/`max_zoom`/`depth`, `zone_labels`): publish it before deploying.
+- **Detail panels**: on desktop the panel now sits flush against the canvas edges, with no left, top or bottom margin, and panel sections have half the left padding. Needs ui 0.17.1.
+- **Side rail**: the About button sits at the bottom of the rail at half size, the account button moves to the top-right corner of the screen, and the button of the current page is highlighted (white pill, dark icon).
+- **Region map**: the "Zone" selector above the map is gone. Zones can no longer be selected from the map; a `?region=<zone>` URL still selects one and draws its overlay.
+- **Region map**: selecting a country, region or zone puts it in focus. The rest of the map turns grey (each region keeps its lightness) and a soft halo surrounds the selection. A country or region keeps its subdivisions in color; a zone is filled from its own outline in its own color, so only its share of each country is lit (this replaces the orange tint of zones). Cities do not grey out the map. Zoomed past a country with songs, the parts its drawn subdivisions do not cover keep the palest tint instead of turning grey. Regions with songs now start at a clearer green, and subdivision borders are dark like country borders, thinner.
+- **Breadcrumbs**: the region map and the genre tree share one breadcrumb. On the map it is now a floating card over the canvas like the tree's: a home icon for World, collapsed long paths, and the current region still reopens its panel. On the tree, clicking the current genre centers it and opens its info panel. Needs app-kit and app-kit-ui 32.0.2, ui 0.17.0 and genre-tree-view 8.2.0.
+- **Labels**: hovering a tradition label on the genealogy chart or a region label on the map shows the pointer, and clicking it selects the tradition or region. Labels on the genealogy chart and the map get a contrast halo (black behind light text, white behind dark text) sized to the font. Needs app-kit and app-kit-ui 32.0.1, ui 0.16.0 and genre-tree-view 8.1.0.
+
+### Added
+
+- Use trusted edge country context for playback, prevent caching of contextual song responses, and show retry controls when playback context cannot be loaded. Requires app-kit and app-kit-ui 33.1.0; includes the 33.0 network-error prop migration.
+
+- **Detail panels**: the genre, artist, song, region and genealogy panels share one shell. On desktop it sits flush against the left rail (the left margin is gone; top and bottom gutters stay), and the region and genealogy panels get the same bottom sheet on mobile and the same edge tab to hide and show the panel as the genre panel. Needs app-kit and app-kit-ui 31.0.0, ui 0.15.0, brand 12.10.0 and genre-tree-view 8.0.0.
+- **Song search and detail**: the search box finds songs alongside genres and artists, and a song opens in a detail panel at `?song=<uuid>` (`/songs/<uuid>` redirects there). The link-songs dialog uses the new `library/songs/search/` endpoint. The curation genre picker uses the shared `Combobox`. **Must deploy together with the API song search endpoint.** Needs `@behindthemusictree/app-kit` and `app-kit-ui` 30.0.0 and `@behindthemusictree/ui` 0.14.0.
+- **Region map**: clicking a region (country, continent, zone or sub-national region) selects it and opens its "Music of X" genre in a left detail panel, with a Focus action to drill in. Zones can now be drilled into too, and the selection, drill path and panel genre live in the URL (`?region=`, `?path=`, `?genre=`). Needs `@behindthemusictree/app-kit` and `app-kit-ui` 29.0.0.
+- **Region map**: a region without its own "Music of X" genre opens the one of its nearest parent region instead (Normandie opens "Music of France"), from the index's new optional `inheritedOverviewItemId`. **Must reach production before a pipelines index carrying that key is imported:** the index schema rejects unknown keys.
+- **Genealogy**: tradition names are always shown on the chart. Like the genre tree, the most-linked traditions (Wikidata sitelinks) get larger labels and appear at lower zoom; the rest appear as you zoom in, colliding labels are dropped, and the selected tradition is always labelled. Includes unit tests for the label layout. Needs `@behindthemusictree/ui` 0.12.0.
+
+### Changed
+
+- **Region map**: the index schema now requires `overviewItemId` and `inheritedOverviewItemId` (nullable) on every region. **Must not reach production before the published index carries both keys.**
+- **Curation admin**: the lists `umbrella_genres` and `non_stylistic_genres` are now `umbrella_stylistic_genres` and `umbrella_non_stylistic_genres` (same labels). Needs grow-the-music-tree-api's migration 0102 and the-music-tree-pipelines' matching rename; merge together
+- **Curation admin**: "Genres maintenus canoniques" follows the list's new name, `forced_canonical_genres` (was `canonical_overrides`). Needs grow-the-music-tree-api with the renamed list.
+
+### Fixed
+
+- **Genre tree, region map**: selecting a genre no longer opens its panel only to close it again when the zoom ends: URL updates now build on the current URL instead of a stale one. Panning and zooming also stop triggering a server request on every move.
+- **Genre tree**: sector boundaries (the underground/EDM edge included) no longer stair-step while panning or zooming, and the wheel backdrop follows the tree without repainting. Needs app-kit and app-kit-ui 32.0.3 and genre-tree-view 8.3.0. The pinned genre-tree-view 8.0.0 tarball override, left from when the scope resolved through GitHub Packages, is removed: genre-tree-view now resolves through app-kit-ui, so the 8.1.0 and 8.2.0 changes the entries below require are actually installed.
+- **Genre panel**: the Links, Summary, Essential and Songs sections get their padding, border and collapsible title back, as `PanelSection`s, by moving to `@behindthemusictree/app-kit` and `app-kit-ui` 32.0.0 (the summary and essential-songs editors now sit inside a titled section). Needs app-kit and app-kit-ui 32.0.0.
+- **Genre panel**: the Modifications section is a `PanelSection` again, so it keeps its padding and border (genre-tree-view 8.0.0 removed the class it relied on). ESLint now rejects `gtv-info-panel-*` classes.
+- **Region map**: the zone selector and region path no longer touch the edge of the side rail.
+- **Region map**: opening a shared or reloaded `?region=<zone>` link now highlights that zone and shows it in the Zone selector, instead of only opening its panel.
+- **Genealogy, region map**: the mouse cursor no longer stutters while hovering. The hover tooltip re-rendered the whole chart or map on every pointer move; only its text is state now, the position is applied directly.
+- **Genealogy**: the schema accepts the `sitelinks` count the API now serves on every tradition (the strict schema would otherwise reject the new snapshot).
+- **Header**: the Map and Genealogy buttons are round like About when their label is collapsed, instead of oval.
+- **Region map**: pointing at space beside the globe no longer highlights, tooltips or clicks the region on the horizon in that direction.
+- **Genre history**: a genre whose pop/core side was changed shows its Modifications panel again (it failed to load on the unknown `side_changed` action), with side changes labelled "Side changed core → pop".
+
+### Changed
+
+- **Curation admin**: the Parenté group follows the three parent axes: "Parent canonique imposé" (`canonical_parent`, was `main_parent`), "Parent régional imposé" (`regional_genre_parent`), and under Régional "Vues régionales imposées" (`regional_overviews`, was `regional_overrides`) and "Genres maintenus canoniques" (`canonical_overrides`). A parent rule in the review queue reads "Parent de" instead of "Parent principal de". Needs grow-the-music-tree-api with the three-parent-axes curation lists.
+- **Navigation**: the floating header is replaced by a permanent icon-only rail on the left of the detail panel (tree, map, genealogy, About, sign-in/account, top to bottom). The app title next to the logo is gone, and the account menu opens to the right of the rail.
+- **Genealogy**: the column header now starts at the top of the chart, since no floating header covers it any more.
+- **Region map**: `/map` no longer shows the "Music by region" title or a "not computed yet" message; the page stays empty until a map is available.
+- **Genealogy**: the chart fills the page width and spreads the years over the spare height. Its header extends under the floating app header, with centred region labels kept below the buttons. Crowded year labels and region labels too wide for their cell are hidden, and the empty column-label row collapses until you zoom in.
+- **Cursor**: the genealogy chart and region map backgrounds show the arrow instead of the grab hand; regions and traditions show the pointer. The genre tree background does the same, with the pointer only on nodes and controls (`@behindthemusictree/app-kit` and `app-kit-ui` 29.0.1).
+- **Header**: the Genealogy button is icon-only.
+- **Genre tree**: the outline/wheel toggle sits in the floating controls next to the size metric. Both toggles use the floating segmented style, matching the zoom controls' height (`@behindthemusictree/ui` 0.13.0, `app-kit`/`app-kit-ui` 29.1.0).
+- **Region map**: the map attribution control is removed.
+- **Header**: the region map link's icon is now a globe that rotates through Africa, the Americas and Asia every few seconds (static under reduced motion).
+- **Dev tooling**: `./scripts/dev-up.sh` now targets read-only staging by default; pass `--local` to start the local grow-api (`--restore`/`--no-restore` require `--local`).
+- **Dev tooling**: `next dev` no longer rewrites `AGENTS.md` (`agentRules: false`); the Next.js guidance is now a hand-maintained section, so Next upgrades no longer leave a modified `AGENTS.md` that blocks `git pull`.
 
 ## [3.22.1] - 2026-11-25
 
@@ -163,7 +333,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **PR labeler**: `.cursor/**` no longer maps to the `infrastructure` label.
 
-
 ## [3.20.0] - 2026-10-29
 
 ### Changed
@@ -178,7 +347,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 ### Removed
 
 - **Dead edit-mode panel**: the title and parents editors, the secondary-parent editor and the rename hook were no longer rendered since `app-kit` 25.0.0 removed the edit-mode slots. The "Parent" action-band popup is the only parent-change flow. The genre tree's extra props are now type-checked so a slot removed upstream fails `pnpm typecheck`.
-
 
 ## [3.19.0] - 2026-10-29
 
@@ -252,14 +420,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 17.1.1: genre counts are no longer inflated (genre-tree-view 4.0.0 treats `itemCount` as a subtree total).
 
-
 ## [3.17.0] - 2026-10-26
 
 ### Changed
 
 - **Recording renamed to Song**: bumps `@behindthemusictree/app-kit` and `app-kit-ui` to 17.0.0 (needs grow-api >= 13.2.0). The app calls `library/songs`, sends `essentialSongs` and `songs` (assign-genre), and reads the `songs` / `essentialSongs` alias counts. Its own `Recording*` identifiers, files and query keys are now `Song*` (`SongRowActions`, `SongPopups`, `SongVideoDialog`, `LinkSongsDialog`, `useAssignSongGenre`, `ArtistSongs`, `EssentialSongsEditor`). MusicBrainz recording names are unchanged. No behavior change.
 - Bump `@behindthemusictree/app-kit` and `app-kit-ui` to 16.1.0: segmented view-mode toggle and brand-token dark track sidebar. Removed the unused `trackListName` and `144` Tailwind keys.
-
 
 ## [3.16.0] - 2026-10-26
 
@@ -289,13 +455,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   - The curation genre picker searches every known Wikidata item (`curation/items/`), pruned ones included. Genre assignment pickers still search canonical genres.
   - Requires grow-api with the `columnSpecs` list metadata and the `labels` history map.
 
-
 ## [3.15.1] - 2026-10-26
 
 ### Fixed
 
 - A failed genre edit (e.g. a server error when reparenting) now rolls back the change and shows the real error instead of an "Output validation failed" Zod error, via app-kit 13.4.1.
-
 
 ## [3.15.0] - 2026-10-22
 
@@ -334,7 +498,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - The About panel is rewritten around TheMusicTree: a short pitch, what you can do, what's next, an open-source section and data credits (Wikidata, MusicBrainz, YouTube); the API link now points at `grow-the-music-tree-api`.
 - The About panel stops where the player panel begins while it is visible, and extends to the right edge otherwise (`@behindthemusictree/app-kit` 11.8.0).
 - `@behindthemusictree/app-kit` 12.0.0 and `@behindthemusictree/ui` 0.2.0: `ui` is now a peer dependency of app-kit, so the app owns the single installed copy.
-
 
 ## [3.12.0] - 2026-10-20
 
@@ -563,7 +726,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Branching**: `fix/*` and `chore/*` are not strict Gitflow and branch protection now rejects them for PRs to `develop`; bug fixes and CI/tooling/maintenance work use `feature/*`.
 
-
 ## [3.2.1] - 2026-09-29
 
 ### Changed
@@ -605,7 +767,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Genre tree**: `@behindthemusictree/app-kit` 6.0.0 → 7.0.0. Selecting a node (notably in the Outline view) opens the detail panel without lag: only the two affected rows re-render, the panel loads the lean genre overview (grow-api v8.0.0) and prefetches it on hover.
 
-
 ## [3.0.0] - 2026-09-27
 
 ### Changed
@@ -632,7 +793,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Genre tree**: Creating or renaming a genre with a name that's already taken now shows the error in the popup, which stays open with the typed name and parent, instead of closing silently.
 - **Genre name review**: The conflict list is now validated against a schema, so a malformed grow-api response fails loudly instead of rendering broken rows.
 
-
 ## [2.7.0] - 2026-09-26
 
 ### Added
@@ -654,7 +814,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   Removed the `env/` presets, `verify-env`, `dev:local`/`dev:remote` and their scripts. The
   Dockerfile now forwards `NEXT_PUBLIC_AUDIOMETA_URL` as a build arg and drops stale Spotify/Google
   args; `.dockerignore` excludes `.env*` so local env files never reach the image.
-
 
 ## [2.6.0] - 2026-09-24
 
@@ -804,7 +963,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
   Stacked/Wheel/Pop-Core toggle, leaving Stacked and Pop-Core. The reference tree now defaults to
   "Stacked" instead of "Wheel".
 
-
 ## [2.5.0] - 2026-08-28
 
 ### Changed
@@ -860,7 +1018,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Genre tree "Pop/Core" view mode**: Bumped `@behindthemusictree/app-kit` to `4.4.0`, which adds a third `"pop-core"` `GenreTreeView` mode rendering a radial view rooted at a "Mainstream Pop" node. `AppHeader.tsx`'s Stacked/Wheel toggle group now has a third "Pop/Core" button, always rendered but disabled (with a tooltip) when the loaded tree has no "Mainstream Pop" root. `GenreTreePage.tsx` computes this via app-kit's exported `hasMainstreamPopRoot` helper against the same `useListFullGenrePlaylists` data `GenreTreeView` fetches internally (shared react-query cache, no extra request), and pushes the result into `GenreTreeViewModeProvider`'s context (new `canShowPopCore`/`setCanShowPopCore`) so `AppHeader.tsx` can read it without new prop-drilling.
 - **Genre tree view-mode toggle**: The Stacked/Wheel/Pop-Core toggle group in `AppHeader.tsx` now also renders on `/prototype/reference-genre-tree`, not just `/reference-genre-tree` — it previously only checked the live route, so the prototype page had no way to switch view modes.
-
 
 ## [2.4.0] - 2026-08-27
 
@@ -984,7 +1141,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Org assets dependency**: Switched from the stale `@behindthemusictree/assets` package to `@behindthemusictree/brand`, which is the package actually published from the org's asset source repo. Mark asset subpaths moved from `/brand/*` to `/marks/*` to match the new package's exports map.
 - **Brand package**: Bumped `@behindthemusictree/brand` to `11.5.2`, which fixes broken image URLs in `TheMusicTreeByline`/`TheMusicTreeMarkLink` (previously bundled as relative paths that only resolved correctly relative to the package's own module location, 404ing in this app).
 
-
 ## [1.5.1] - 2026-06-20
 
 ### CI
@@ -1000,7 +1156,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Site URLs**: `getBackendBaseUrl()` and `getAudiometaUrl()` now throw if `HTMT_API_SUBDOMAIN` / `AUDIOMETA_FRONT_SUBDOMAIN` are missing, instead of silently building a malformed URL.
 
 - **Site URLs**: `getBackendBaseUrl()` no longer honors a stale `NEXT_PUBLIC_BACKEND_BASE_URL` left in a Vercel project's environment settings — the override now only applies outside Vercel (when `NEXT_PUBLIC_VERCEL_ENV` is unset), e.g. for local or remote dev.
-
 
 ## [1.5.0] - 2026-04-05
 
@@ -1056,7 +1211,6 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Git Flow and tooling**: Align CONTRIBUTING, PR template, branch-protection error copy, `docs/STYLE_GUIDE.md`, and `.cursor/rules` (`git-flow-branches.mdc`, `pr-description-workflow.mdc`) with enforced PR branch prefixes; document `chore/*` for CI changes (not `ci/*`). Update DEPLOYMENT, VERSIONING, README, CONTRIBUTING, and `validate.yml` comment for the two-workflow model.
 
-
 ## [1.4.3] - 2026-03-28
 
 ### CI
@@ -1074,13 +1228,11 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 - **Deployment and versioning**: Update `docs/DEPLOYMENT.md`, `docs/VERSIONING.md`, `README.md`, and `CONTRIBUTING.md` for hook-based Vercel deploys, required env configuration, and release flow (PR-only merges to `main`, release tag on `main`).
 - **Contributor workflow**: Update `.cursor/rules/pr-description-workflow.mdc` so draft PR descriptions live under `.pr-descriptions/<branch-name>.md`.
 
-
 ## [1.4.2] - 2026-03-26
 
 ### CI
 
 - **Sync Vercel env**: `NEXT_PUBLIC_BACKEND_BASE_URL` includes the API root from required repo var `HTMT_API_ROOT_SEGMENT` (e.g. `v2`); the workflow fails validation if it is missing. Preview/staging API host uses `staging.<HTMT_API_SUBDOMAIN>.<DOMAIN_NAME>` instead of `<subdomain>-test.<DOMAIN_NAME>`. Preview job prefers `SPOTIFY_CLIENT_ID_STAGING` / `GOOGLE_CLIENT_ID_STAGING`, with fallback to the existing `*_TEST` variables. Subdomain GitHub variables are `HTMT_API_SUBDOMAIN`, `GTMT_FRONT_SUBDOMAIN`, and `AUDIOMETA_SUBDOMAIN` (replaces the previous `*_SUBDOMAIN_NAME` names).
-
 
 ## [1.4.1] - 2026-03-15
 
@@ -1341,7 +1493,7 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 
 - **Branch Protection**: Added Git Flow branch protection workflow
   - Enforces branch naming conventions for PRs to `main` (hotfix/_, release/_ only)
-  - Enforces branch naming conventions for PRs to `develop` (feature/_, fix/_, chore/_, dependabot/\_ only)
+  - Enforces branch naming conventions for PRs to `develop` (feature/_, fix/_, chore/\_, dependabot/\_ only)
   - Automatically comments on invalid PRs with clear instructions
   - Prevents merging branches that don't follow Git Flow workflow
 

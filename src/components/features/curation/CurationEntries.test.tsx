@@ -9,13 +9,17 @@ const formErrorsMock = vi.fn((): { field: string; message: string }[] => []);
 const searchResultsMock = vi.fn(() => ({ results: [] as { id: string; label: string }[] }));
 let searchParams = new URLSearchParams();
 
+vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@behindthemusictree/app-kit/genre-tree")>()),
+  useGenreRemoteSearch: () => ({ genres: [], isError: false, settled: true, pending: false }),
+}));
 vi.mock("@tanstack/react-query", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@tanstack/react-query")>()),
   useInfiniteQuery: () => ({ data: undefined, isFetching: false, hasNextPage: false }),
 }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: replaceMock, push: pushMock, refresh: vi.fn() }),
-  usePathname: () => "/admin/curation/main_parent",
+  usePathname: () => "/admin/curation/canonical_parent",
   useSearchParams: () => searchParams,
 }));
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api/grow-proxy" }));
@@ -29,7 +33,7 @@ vi.mock("@behindthemusictree/app-kit/transport", () => ({
 }));
 
 const list = {
-  name: "main_parent",
+  name: "canonical_parent",
   keyColumns: ["item_id"],
   columns: ["item_id", "reason", "parent_item_id", "exclude_other_parents"],
   columnSpecs: [
@@ -103,7 +107,7 @@ describe("CurationEntries", () => {
     searchParams = new URLSearchParams("page=2");
     renderEntries();
     fireEvent.click(screen.getByRole("checkbox", { name: "Afficher les QID" }));
-    expect(replaceMock).toHaveBeenCalledWith("/admin/curation/main_parent?page=2&qid=1");
+    expect(replaceMock).toHaveBeenCalledWith("/admin/curation/canonical_parent?page=2&qid=1");
   });
 
   it("searches once typing settles, back on page 1", () => {
@@ -112,7 +116,7 @@ describe("CurationEntries", () => {
     fireEvent.change(screen.getByRole("searchbox", { name: "Rechercher" }), { target: { value: " rock " } });
     expect(replaceMock).not.toHaveBeenCalled();
     act(() => vi.advanceTimersByTime(300));
-    expect(replaceMock).toHaveBeenCalledWith("/admin/curation/main_parent?qid=1&q=rock");
+    expect(replaceMock).toHaveBeenCalledWith("/admin/curation/canonical_parent?qid=1&q=rock");
   });
 
   it("deletes an entry after confirmation", () => {
@@ -127,7 +131,7 @@ describe("CurationEntries", () => {
     renderEntries();
     expect(within(screen.getByRole("table")).getByRole("link", { name: "Historique de Palaeo" })).toHaveAttribute(
       "href",
-      "/admin/curation/history?list=main_parent&entry=11111111-1111-4111-8111-111111111111",
+      "/admin/curation/history?list=canonical_parent&entry=11111111-1111-4111-8111-111111111111",
     );
   });
 

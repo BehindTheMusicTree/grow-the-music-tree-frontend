@@ -20,7 +20,7 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.ts"],
     env: { NEXT_PUBLIC_CONTACT_EMAIL: "test@example.com", NEXT_PUBLIC_TILES_BASE_URL: "https://tiles.example.com" },
     include: ["**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-    exclude: [...configDefaults.exclude, ".claude/**"],
+    exclude: [...configDefaults.exclude, ".claude/**", "e2e/**"],
     server: {
       deps: {
         inline: ["@behindthemusictree/app-kit"],

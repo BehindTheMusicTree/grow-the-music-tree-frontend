@@ -17,6 +17,7 @@ interface CurationMutationConfig<I, O> {
   request: (fetch: Fetch, input: I) => Promise<unknown>;
   optimistic?: (queryClient: QueryClient, input: I) => QueryKey[];
   undo?: (input: I, output: O) => I | null;
+  undoAction?: (output: O) => (() => void) | undefined;
   message: (input: I) => string;
   pendingLabel: (input: I) => string;
 }
@@ -44,8 +45,9 @@ export function useCurationMutation<I, O>(
     },
     onSuccess: (output: O, input: I) => {
       const inverse = config.undo?.(input, output) ?? null;
+      const onUndo = config.undoAction?.(output) ?? (inverse ? () => mutation.mutate(inverse) : undefined);
       toast.success(config.message(input), {
-        action: inverse ? { label: "Undo", onClick: () => mutation.mutate(inverse) } : undefined,
+        action: onUndo ? { label: "Undo", onClick: onUndo } : undefined,
       });
     },
     onSettled: () => queryClient.invalidateQueries({ predicate: (query) => isCurationQuery(query.queryKey) }),

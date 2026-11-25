@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
-import Page from "@components/ui/Page";
+import { Page } from "@behindthemusictree/ui";
 import CurationStatus from "@components/features/curation/CurationStatus";
 import CurationHistory from "@components/features/curation/CurationHistory";
 import GenreRef from "@components/features/curation/GenreRef";
@@ -49,11 +49,11 @@ export default async function CurationHistoryPage({ searchParams }: Props) {
   if (!history) redirect(historyHref(filter));
 
   return (
-    <Page title="Historique de curation" dataPage="admin-curation-history">
+    <Page title="Historique de curation" data-page="admin-curation-history">
       <div className="flex flex-col gap-4 p-4">
         <CurationStatus status={status} />
         {(list || entry || itemId) && (
-          <p className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+          <p className="flex flex-wrap items-center gap-2 text-body text-gray-600">
             Filtré sur
             {list && <span className="font-medium text-gray-900">{curationListTitle(list)}</span>}
             {entry && <span>une entrée</span>}
@@ -63,7 +63,7 @@ export default async function CurationHistoryPage({ searchParams }: Props) {
             </Link>
           </p>
         )}
-        <p className="text-sm text-gray-600">
+        <p className="text-body text-gray-600">
           {history.overallTotal} modification{history.overallTotal > 1 ? "s" : ""}
         </p>
         <CurationHistory items={history.results} lists={lists} labels={history.labels} />
@@ -74,7 +74,7 @@ export default async function CurationHistoryPage({ searchParams }: Props) {
                 Précédent
               </Link>
             )}
-            <span className="text-sm text-gray-600">
+            <span className="text-body text-gray-600">
               Page {history.page} / {history.totalPages}
             </span>
             {history.page < history.totalPages && (

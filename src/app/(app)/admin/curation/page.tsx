@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import Page from "@components/ui/Page";
+import { Page } from "@behindthemusictree/ui";
 import CurationStatus from "@components/features/curation/CurationStatus";
 import CurationGenreSearch from "@components/features/curation/CurationGenreSearch";
 import PipelineRunPanel from "@components/features/pipeline-runs/PipelineRunPanel";
@@ -21,14 +21,22 @@ export default async function CurationPage() {
   const groups = groupCurationLists(lists);
 
   return (
-    <Page title="Curation" dataPage="admin-curation">
+    <Page title="Curation" data-page="admin-curation">
       <div className="flex flex-col gap-6 p-4">
         <CurationStatus status={status} />
         <PipelineRunPanel pendingCount={status.pendingCount} initialRequest={latestRun} />
         <CurationGenreSearch />
+        <section aria-labelledby="curation-group-edges">
+          <h2 id="curation-group-edges" className="mb-2 text-heading">
+            Arêtes de genres
+          </h2>
+          <Link href="/admin/curation/edges" className="font-medium underline">
+            Parents canoniques, parents régionaux, vues régionales, parents secondaires
+          </Link>
+        </section>
         {groups.map((group) => (
           <section key={group.title} aria-labelledby={`curation-group-${group.title}`}>
-            <h2 id={`curation-group-${group.title}`} className="mb-2 text-lg font-semibold">
+            <h2 id={`curation-group-${group.title}`} className="mb-2 text-heading">
               {group.title}
             </h2>
             <ul className="flex flex-col divide-y divide-gray-200">

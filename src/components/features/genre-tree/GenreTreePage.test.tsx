@@ -1,17 +1,23 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { act, render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
+import { makeGenreUuid } from "@behindthemusictree/app-kit/genre-tree/testing";
 import type { GenreUuid } from "@behindthemusictree/app-kit/genre-tree";
 import type { GenreTreeViewProps } from "@behindthemusictree/app-kit-ui/genre-tree";
 import GenreTreePage from "./GenreTreePage";
 import { GenreTreeViewModeProvider, useGenreTreeViewMode } from "@contexts/GenreTreeViewModeProvider";
 
-// URL writes are batched into a microtask, so router assertions run after it.
+// URL writes are batched into a microtask, so history assertions run after it.
 const flushNavigation = () => act(async () => {});
 
-const routerPushMock = vi.fn();
-const routerReplaceMock = vi.fn();
 let searchParams = new URLSearchParams();
+const pushState = vi.spyOn(window.history, "pushState");
+const replaceState = vi.spyOn(window.history, "replaceState");
+// URL writes start from window.location, so the rendered params must match it.
+const setSearch = (query: string) => {
+  Object.getPrototypeOf(window.history).replaceState.call(window.history, null, "", query ? `/?${query}` : "/");
+  searchParams = new URLSearchParams(query);
+};
 let tracklistExpanded = false;
 const setTracklistExpandedMock = vi.fn();
 
@@ -23,8 +29,13 @@ vi.mock("@contexts/PlayerPanelProvider", () => ({
     setExpanded: setTracklistExpandedMock,
   }),
 }));
+const routerPushMock = vi.fn();
+const regionMapIndexMock = vi.fn<(enabled?: boolean) => unknown>(() => ({ data: undefined, isPending: false, isError: false }));
+const lexiconMock = vi.fn<(enabled: boolean) => unknown>(() => ({ entries: [], isPending: false, isError: false }));
+
+vi.mock("@hooks/useRegionMap", () => ({ useRegionMapIndex: (enabled?: boolean) => regionMapIndexMock(enabled) }));
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: routerPushMock, replace: routerReplaceMock }),
+  useRouter: () => ({ push: routerPushMock, replace: vi.fn() }),
   usePathname: () => "/",
   useSearchParams: () => searchParams,
 }));
@@ -43,9 +54,11 @@ vi.mock("@hooks/useIsAdmin", () => ({
   useIsAdmin: () => useIsAdminMock(),
 }));
 
-const useVisibleGenrePlaylistsMock = vi.fn<(options: { artistUuid?: string | null }) => { genrePlaylists: unknown[]; isLoading: boolean }>(
-  () => ({ genrePlaylists: [], isLoading: false }),
-);
+vi.mock("@components/features/genre-tree/GenreHistory", () => ({ default: () => <div>Genre history</div> }));
+
+const useVisibleGenrePlaylistsMock = vi.fn<
+  (options: { artistUuid?: string | null }) => { genrePlaylists: unknown[]; isLoading: boolean }
+>(() => ({ genrePlaylists: [], isLoading: false }));
 
 vi.mock("@lib/site-urls", () => ({
   getGrowBackendBaseUrl: () => "/api/grow-proxy",
@@ -57,15 +70,30 @@ vi.mock("@behindthemusictree/app-kit/popup", () => ({
 
 const hasMainstreamPopRootMock = vi.fn<(nodes: { id: string }[]) => boolean>(() => true);
 
-vi.mock("@behindthemusictree/app-kit/genre-tree", () => ({
+vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   useVisibleGenrePlaylists: (options: { artistUuid?: string | null }) => useVisibleGenrePlaylistsMock(options),
   hasMainstreamPopRoot: (nodes: { id: string }[]) => hasMainstreamPopRootMock(nodes),
+  useRegionGenreLexicon: (_getBaseUrl: () => string, enabled: boolean) => lexiconMock(enabled),
+  SEARCH_QUERY_MIN_LENGTH: 2,
+  rankByName: <T,>(items: T[], query: string, getName: (item: T) => string) =>
+    items.filter((item) => getName(item).toLowerCase().includes(query.toLowerCase())),
   useArtist: () => ({ status: "idle" }),
+  useSong: () => ({ status: "idle" }),
   GenrePlaylistUuidSchema: { parse: (value: string) => value },
 }));
 
-vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
-  GenreTreeView: (props: GenreTreeViewProps) => (
+vi.mock("@behindthemusictree/app-kit-ui/genre-tree", async (importOriginal) => {
+  const { SearchBox } = await importOriginal<typeof import("@behindthemusictree/app-kit-ui/genre-tree")>();
+  return ({
+  useGenreRemoteSearchGroup: (_base: unknown, query: string, select: (genre: { uuid: GenreUuid }) => void, options: { key?: string; label?: string }) => ({
+    key: options.key ?? "genres", label: options.label, items: query ? [{ key: "g-regional", content: "Fra regional", onSelect: () => select({ uuid: makeGenreUuid("regional") }) }] : [],
+  }),
+  GenreTreeView: (props: GenreTreeViewProps) => {
+    const [query, setQuery] = useState("");
+    const [focused, setFocused] = useState(false);
+    const Groups = props.SearchGroups;
+    return (
     <div
       data-testid="genre-tree-view"
       data-readonly={String(props.readOnly)}
@@ -73,15 +101,16 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
       data-focus={props.focusGenreUuid === undefined ? "absent" : String(props.focusGenreUuid)}
     >
       {props.getBackendBaseUrl()}
+      {props.renderGenreDetailExtras?.({ uuid: makeGenreUuid("rock") } as never)}
       <span data-testid="artist-filter">{String(props.artistUuid ?? "none")}</span>
       <span data-testid="artist-expanded">{String(props.artistExpanded)}</span>
-      <span data-testid="selected-node">{String(props.selectedNodeId ?? "none")}</span>
+      <span data-testid="selected-node">{String(props.selectedGenreUuid ?? "none")}</span>
       <span data-testid="default-viewport">{JSON.stringify(props.defaultViewport ?? null)}</span>
       <button onClick={() => props.onViewportChange?.({ x: 10.04, y: -20, zoom: 0.5 })}>Pan</button>
-      <button onClick={() => props.onSelectedNodeIdChange?.("rock")}>Select genre</button>
+      <button onClick={() => props.onSelectedGenreUuidChange?.(makeGenreUuid("rock"))}>Select genre</button>
       <button
         onClick={() => {
-          if (props.selectedNodeId) props.onSelectedNodeIdChange?.(null);
+          if (props.selectedGenreUuid) props.onSelectedGenreUuidChange?.(null);
           props.onArtistUuidChange?.("band");
         }}
       >
@@ -90,17 +119,39 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
       <button onClick={() => props.onArtistUuidChange?.(null)}>Clear artist</button>
       {props.onParentChanged && (
         <>
-          <button onClick={() => props.onParentChanged?.({ genre: "criteria-dance-pop" as GenreUuid, from: "criteria-pop" as GenreUuid, to: "criteria-core" as GenreUuid })}>
+          <button
+            onClick={() =>
+              props.onParentChanged?.({
+                genre: "criteria-dance-pop" as GenreUuid,
+                from: "criteria-pop" as GenreUuid,
+                to: "criteria-core" as GenreUuid,
+              })
+            }
+          >
             Change parent
           </button>
-          <button onClick={() => props.onParentChanged?.({ genre: "criteria-pop" as GenreUuid, from: null, to: "criteria-core" as GenreUuid })}>
+          <button
+            onClick={() =>
+              props.onParentChanged?.({
+                genre: "criteria-pop" as GenreUuid,
+                from: null,
+                to: "criteria-core" as GenreUuid,
+              })
+            }
+          >
             Change root parent
           </button>
         </>
       )}
       <button onClick={() => props.onArtistExpandedChange?.(true)}>Expand artist</button>
+      <button onClick={() => setFocused(true)}>Focus search</button>
+      <button onClick={() => setQuery("fra")}>Type fra</button>
+      {Groups && <Groups query={query} focused={focused} onSelectGenre={(uuid) => props.onSelectedGenreUuidChange?.(uuid)}>{(groups) => (
+        <SearchBox label="Test genre search" value={query} onValueChange={setQuery}
+          groups={[{ key: "genres", items: [] }, ...groups]} />
+      )}</Groups>}
       {props.overlayPanel && (
-        <section aria-label={props.overlayPanel.title}>
+        <section aria-label={String(props.overlayPanel.title)}>
           {props.overlayPanel.content}
           <button onClick={props.overlayPanel.onClose}>Close panel</button>
           {props.overlayPanel.onExpandedChange && (
@@ -116,11 +167,14 @@ vi.mock("@behindthemusictree/app-kit-ui/genre-tree", () => ({
         </>
       )}
     </div>
-  ),
+  );
+  },
+  searchStatus: () => undefined,
   GenreTreeViewSkeleton: ({ viewMode }: { viewMode: string }) => (
     <div data-testid="genre-tree-view-skeleton" data-viewmode={viewMode} />
   ),
-}));
+});
+});
 
 function ForceWheelViewMode() {
   const { setViewMode } = useGenreTreeViewMode();
@@ -157,11 +211,59 @@ describe("GenreTreePage", () => {
     useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [], isLoading: false });
     hasMainstreamPopRootMock.mockReturnValue(true);
     useIsAdminMock.mockReturnValue(false);
-    searchParams = new URLSearchParams();
-    routerPushMock.mockReset();
-    routerReplaceMock.mockReset();
+    setSearch("");
+    pushState.mockClear();
+    replaceState.mockClear();
     tracklistExpanded = false;
     setTracklistExpandedMock.mockReset();
+    routerPushMock.mockReset();
+    regionMapIndexMock.mockClear();
+    lexiconMock.mockClear();
+  });
+
+  it("loads the place index on focus and does not use the map lexicon for genre discovery", async () => {
+    renderGenreTreePage();
+    await screen.findByTestId("genre-tree-view");
+    expect(regionMapIndexMock).toHaveBeenLastCalledWith(false);
+    expect(lexiconMock).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Focus search" }));
+
+    await waitFor(() => expect(regionMapIndexMock).toHaveBeenLastCalledWith(true));
+    expect(lexiconMock).not.toHaveBeenCalled();
+  });
+
+  it("opens regional search results in the tree and places on the map", async () => {
+    regionMapIndexMock.mockReturnValue({
+      data: {
+        regions: [{ id: "Q142", name: "France", kind: "country", parentId: null, overviewItemId: null, genres: [{ itemId: "Q1", relation: "regional" }, { itemId: "Q2", relation: "canonical" }] }],
+      },
+      isPending: false,
+      isError: false,
+    });
+    lexiconMock.mockReturnValue({
+      entries: [
+        { wikidataId: "Q1", uuid: "g-regional", name: "Fra regional", treeName: "regional", genrePlaylistUuid: null, isUmbrella: false, viewsCount: 1 },
+        { wikidataId: "Q2", uuid: "g-canonical", name: "Fra canonical", treeName: "canonical", genrePlaylistUuid: null, isUmbrella: false, viewsCount: 1 },
+      ],
+      isPending: false,
+      isError: false,
+    });
+    renderGenreTreePage();
+    await screen.findByTestId("genre-tree-view");
+    fireEvent.click(screen.getByRole("button", { name: "Type fra" }));
+
+    fireEvent.focus(screen.getByRole("combobox", { name: "Test genre search" }));
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "fra" } });
+    expect(screen.queryByRole("option", { name: "Fra canonical" })).not.toBeInTheDocument();
+    fireEvent.mouseDown(screen.getByRole("option", { name: "Fra regional" }));
+    await flushNavigation();
+    expect(new URL(String(pushState.mock.calls.at(-1)?.[2]), "http://localhost").searchParams.get("genre")).toBe(makeGenreUuid("regional"));
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "fran" } });
+    fireEvent.mouseDown(screen.getByRole("option", { name: /France/ }));
+    expect(routerPushMock).toHaveBeenLastCalledWith("/map?region=Q142");
+    regionMapIndexMock.mockReturnValue({ data: undefined, isPending: false, isError: false });
+    lexiconMock.mockReturnValue({ entries: [], isPending: false, isError: false });
   });
 
   it("renders the genre tree read-only, hiding its write controls, when not signed in as admin", async () => {
@@ -171,6 +273,18 @@ describe("GenreTreePage", () => {
     expect(view.dataset.readonly).toBe("true");
     expect(view).toHaveTextContent("/api/grow-proxy");
     expect(screen.getByRole("heading", { name: "Genre Tree" })).toBeInTheDocument();
+  });
+
+  it("shows the genre history (Modifications) to admins only", async () => {
+    const { unmount } = renderGenreTreePage();
+    await screen.findByTestId("genre-tree-view");
+    expect(screen.queryByText("Genre history")).toBeNull();
+    unmount();
+
+    useIsAdminMock.mockReturnValue(true);
+    renderGenreTreePage();
+    await screen.findByTestId("genre-tree-view");
+    expect(screen.getByText("Genre history")).toBeInTheDocument();
   });
 
   it("renders the genre tree editable when signed in as admin", async () => {
@@ -183,46 +297,46 @@ describe("GenreTreePage", () => {
   });
 
   it("clears the selected genre from the URL when the About panel opens", async () => {
-    searchParams = new URLSearchParams("genre=rock&about");
+    setSearch(`genre=${makeGenreUuid("rock")}&about`);
     renderGenreTreePage();
 
     expect(await screen.findByRole("region", { name: "TheMusicTree" })).toBeInTheDocument();
-    await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/?about=", { scroll: false }));
+    await waitFor(() => expect(replaceState).toHaveBeenCalledWith(null, "", "/?about="));
   });
 
   it("removes ?about when the About panel is closed", async () => {
-    searchParams = new URLSearchParams("about");
+    setSearch("about");
     renderGenreTreePage();
 
     fireEvent.click(await screen.findByRole("button", { name: "Close panel" }));
 
     await flushNavigation();
-    expect(routerPushMock).toHaveBeenCalledWith("/", { scroll: false });
+    expect(pushState).toHaveBeenCalledWith(null, "", "/");
   });
 
   it("closes the About panel when a genre is selected", async () => {
-    searchParams = new URLSearchParams("about");
+    setSearch("about");
     renderGenreTreePage();
 
     fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
 
     await flushNavigation();
-    expect(routerPushMock).toHaveBeenCalledWith("/?genre=rock", { scroll: false });
+    expect(pushState).toHaveBeenCalledWith(null, "", `/?genre=${makeGenreUuid("rock")}`);
   });
 
   it("keeps About open and collapses the tracklist when ?about loads with the tracklist expanded", async () => {
-    searchParams = new URLSearchParams("about");
+    setSearch("about");
     tracklistExpanded = true;
     renderGenreTreePage();
 
     expect(await screen.findByRole("region", { name: "TheMusicTree" })).toBeInTheDocument();
     expect(setTracklistExpandedMock).toHaveBeenCalledWith(false);
     await flushNavigation();
-    expect(routerReplaceMock).not.toHaveBeenCalled();
+    expect(replaceState).not.toHaveBeenCalled();
   });
 
   it("closes About when the tracklist expands while About is open", async () => {
-    searchParams = new URLSearchParams("about");
+    setSearch("about");
     const { rerender } = renderGenreTreePage();
     await screen.findByRole("region", { name: "TheMusicTree" });
 
@@ -233,7 +347,7 @@ describe("GenreTreePage", () => {
       </GenreTreeViewModeProvider>,
     );
 
-    await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/", { scroll: false }));
+    await waitFor(() => expect(replaceState).toHaveBeenCalledWith(null, "", "/"));
   });
 
   it("leaves the URL alone when the tracklist expands without About", async () => {
@@ -248,13 +362,18 @@ describe("GenreTreePage", () => {
     );
 
     await flushNavigation();
-    expect(routerReplaceMock).not.toHaveBeenCalled();
+    expect(replaceState).not.toHaveBeenCalled();
   });
 
   describe("parent change undo", () => {
     const playlists = [
       { uuid: "playlist-pop", name: "Pop", root: { uuid: "playlist-pop" }, criteria: { uuid: "criteria-pop" } },
-      { uuid: "playlist-core", name: "Core electronic", root: { uuid: "playlist-pop" }, criteria: { uuid: "criteria-core" } },
+      {
+        uuid: "playlist-core",
+        name: "Core electronic",
+        root: { uuid: "playlist-pop" },
+        criteria: { uuid: "criteria-core" },
+      },
     ];
 
     it("offers Undo that moves the genre back under its previous parent by criteria uuid", async () => {
@@ -299,26 +418,34 @@ describe("GenreTreePage", () => {
 
   describe("artist filter", () => {
     it("pushes ?artist= in place of the genre when an artist is picked", async () => {
-      searchParams = new URLSearchParams("genre=rock&zoom=pop");
+      setSearch(`genre=${makeGenreUuid("rock")}&zoom=pop`);
       renderGenreTreePage();
 
       fireEvent.click(await screen.findByRole("button", { name: "Pick artist" }));
 
       await flushNavigation();
-      expect(routerPushMock).toHaveBeenCalledWith("/?zoom=pop&artist=band", { scroll: false });
-      expect(routerPushMock).toHaveBeenCalledTimes(1);
+      expect(pushState).toHaveBeenCalledWith(null, "", "/?zoom=pop&artist=band");
+      expect(pushState).toHaveBeenCalledTimes(1);
     });
 
     it("passes ?artist= to the tree and asks for the artist's visible tree", async () => {
-      searchParams = new URLSearchParams("artist=band");
+      setSearch("artist=band");
       renderGenreTreePage();
 
       expect(await screen.findByTestId("artist-filter")).toHaveTextContent("band");
       expect(useVisibleGenrePlaylistsMock).toHaveBeenLastCalledWith(expect.objectContaining({ artistUuid: "band" }));
     });
 
+    it("does not filter by an empty ?artist=", async () => {
+      setSearch("artist=");
+      renderGenreTreePage();
+
+      await screen.findByTestId("genre-tree-view");
+      expect(useVisibleGenrePlaylistsMock).toHaveBeenLastCalledWith(expect.objectContaining({ artistUuid: null }));
+    });
+
     it("allows the pop-core view with the artist's pruned tree", async () => {
-      searchParams = new URLSearchParams("artist=band");
+      setSearch("artist=band");
       useVisibleGenrePlaylistsMock.mockReturnValue({
         genrePlaylists: [{ uuid: "pop", name: "Mainstream Pop", root: { uuid: "pop" } }],
         isLoading: false,
@@ -332,30 +459,30 @@ describe("GenreTreePage", () => {
     });
 
     it("keeps ?artist= and adds ?genre= when a genre is selected", async () => {
-      searchParams = new URLSearchParams("artist=band");
+      setSearch("artist=band");
       renderGenreTreePage();
 
       fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
 
       await flushNavigation();
-      expect(routerPushMock).toHaveBeenCalledWith("/?artist=band&genre=rock", { scroll: false });
+      expect(pushState).toHaveBeenCalledWith(null, "", `/?artist=band&genre=${makeGenreUuid("rock")}`);
     });
 
     it("keeps ?genre= alongside ?artist= on load", async () => {
-      searchParams = new URLSearchParams("genre=rock&artist=band");
+      setSearch(`genre=${makeGenreUuid("rock")}&artist=band`);
       useVisibleGenrePlaylistsMock.mockReturnValue({
         genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }],
         isLoading: false,
       });
       renderGenreTreePage();
 
-      expect(await screen.findByTestId("selected-node")).toHaveTextContent("rock");
+      expect(await screen.findByTestId("selected-node")).toHaveTextContent(makeGenreUuid("rock"));
       await flushNavigation();
-      expect(routerReplaceMock).not.toHaveBeenCalled();
+      expect(replaceState).not.toHaveBeenCalled();
     });
 
     it("removes only ?artist= when the filter is cleared", async () => {
-      searchParams = new URLSearchParams("genre=rock&artist=band");
+      setSearch(`genre=${makeGenreUuid("rock")}&artist=band`);
       useVisibleGenrePlaylistsMock.mockReturnValue({
         genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }],
         isLoading: false,
@@ -365,19 +492,19 @@ describe("GenreTreePage", () => {
       fireEvent.click(await screen.findByRole("button", { name: "Clear artist" }));
 
       await flushNavigation();
-      expect(routerPushMock).toHaveBeenCalledWith("/?genre=rock", { scroll: false });
+      expect(pushState).toHaveBeenCalledWith(null, "", `/?genre=${makeGenreUuid("rock")}`);
     });
 
     it("lets About replace the artist", async () => {
-      searchParams = new URLSearchParams("artist=band&about");
+      setSearch("artist=band&about");
       renderGenreTreePage();
 
       expect(await screen.findByRole("region", { name: "TheMusicTree" })).toBeInTheDocument();
-      await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/?about=", { scroll: false }));
+      await waitFor(() => expect(replaceState).toHaveBeenCalledWith(null, "", "/?about="));
     });
 
     it("collapses the tracklist when the artist panel expands, and the panel when the tracklist expands", async () => {
-      searchParams = new URLSearchParams("artist=band");
+      setSearch("artist=band");
       const { rerender } = renderGenreTreePage();
 
       fireEvent.click(await screen.findByRole("button", { name: "Expand artist" }));
@@ -435,7 +562,9 @@ describe("GenreTreePage", () => {
       name: uuid,
       parent: uuid === rootUuid ? null : { uuid: rootUuid },
       root: { uuid: rootUuid },
-      tracksCount: 1,
+      tracksCount: 999,
+      genreOnlyTracksCount: 0,
+      genreAndSubgenresTracksCount: { canonical: 1, regional: 0, all: 1 },
       viewsCount: 0,
       isUnacceptedRoot,
     });
@@ -448,35 +577,35 @@ describe("GenreTreePage", () => {
 
     await screen.findByTestId("genre-tree-view");
     expect(hasMainstreamPopRootMock).toHaveBeenLastCalledWith([
-      expect.objectContaining({ id: "pop" }),
-      expect.objectContaining({ id: "pop-child" }),
+      expect.objectContaining({ id: "pop", itemCount: 1 }),
+      expect.objectContaining({ id: "pop-child", itemCount: 1 }),
     ]);
   });
 
   describe("zoom", () => {
     it("passes ?zoom= to the pop-core view as is", async () => {
-      searchParams = new URLSearchParams("zoom=pop-rock&other=1");
+      setSearch("zoom=pop-rock&other=1");
 
       renderGenreTreePage({ forcePopCore: true });
 
       await waitFor(() => expect(screen.getByTestId("genre-tree-view").dataset.focus).toBe("pop-rock"));
       await flushNavigation();
-      expect(routerReplaceMock).not.toHaveBeenCalled();
+      expect(replaceState).not.toHaveBeenCalled();
     });
 
     it("replaces ?zoom= away when the view rejects it", async () => {
-      searchParams = new URLSearchParams("zoom=unknown&other=1");
+      setSearch("zoom=unknown&other=1");
 
       renderGenreTreePage({ forcePopCore: true });
 
       fireEvent.click(await screen.findByRole("button", { name: "Reject zoom" }));
       await flushNavigation();
-      expect(routerReplaceMock).toHaveBeenCalledWith("/?other=1", { scroll: false });
-      expect(routerPushMock).not.toHaveBeenCalled();
+      expect(replaceState).toHaveBeenCalledWith(null, "", "/?other=1");
+      expect(pushState).not.toHaveBeenCalled();
     });
 
     it("passes no focus props outside pop-core and drops ?zoom=", async () => {
-      searchParams = new URLSearchParams("zoom=rock");
+      setSearch("zoom=rock");
 
       render(
         <GenreTreeViewModeProvider>
@@ -488,46 +617,46 @@ describe("GenreTreePage", () => {
       await waitFor(() => expect(screen.getByTestId("genre-tree-view").dataset.viewmode).toBe("wheel"));
       expect(screen.getByTestId("genre-tree-view").dataset.focus).toBe("absent");
       expect(screen.queryByRole("button", { name: "Zoom in" })).not.toBeInTheDocument();
-      await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/", { scroll: false }));
+      await waitFor(() => expect(replaceState).toHaveBeenCalledWith(null, "", "/"));
     });
 
     it("pushes the zoomed uuid and removes the param when the user zooms back out", async () => {
-      searchParams = new URLSearchParams("zoom=pop-rock&other=1");
+      setSearch("zoom=pop-rock&other=1");
 
       renderGenreTreePage({ forcePopCore: true });
 
       fireEvent.click(await screen.findByRole("button", { name: "Zoom in" }));
       await flushNavigation();
-      expect(routerPushMock).toHaveBeenLastCalledWith("/?zoom=rock&other=1", { scroll: false });
+      expect(pushState).toHaveBeenLastCalledWith(null, "", "/?zoom=rock&other=1");
 
       fireEvent.click(screen.getByRole("button", { name: "All genres" }));
       await flushNavigation();
-      expect(routerPushMock).toHaveBeenLastCalledWith("/?other=1", { scroll: false });
-      expect(routerReplaceMock).not.toHaveBeenCalled();
+      expect(pushState).toHaveBeenLastCalledWith(null, "", "/?other=1");
+      expect(replaceState).not.toHaveBeenCalled();
     });
   });
 
   describe("genre and viewport URL state", () => {
     it("reads the selected genre from ?genre=", async () => {
-      searchParams = new URLSearchParams("genre=rock");
+      setSearch(`genre=${makeGenreUuid("rock")}`);
 
       renderGenreTreePage();
 
-      expect(await screen.findByTestId("selected-node")).toHaveTextContent("rock");
+      expect(await screen.findByTestId("selected-node")).toHaveTextContent(makeGenreUuid("rock"));
     });
 
     it("pushes ?genre= when the user selects a genre", async () => {
-      searchParams = new URLSearchParams("other=1");
+      setSearch("other=1");
 
       renderGenreTreePage();
 
       fireEvent.click(await screen.findByRole("button", { name: "Select genre" }));
       await flushNavigation();
-      expect(routerPushMock).toHaveBeenCalledWith("/?other=1&genre=rock", { scroll: false });
+      expect(pushState).toHaveBeenCalledWith(null, "", `/?other=1&genre=${makeGenreUuid("rock")}`);
     });
 
     it("seeds the view from ?view= on load", async () => {
-      searchParams = new URLSearchParams("view=12.5,-3,0.75");
+      setSearch("view=12.5,-3,0.75");
 
       renderGenreTreePage();
 
@@ -535,11 +664,11 @@ describe("GenreTreePage", () => {
     });
 
     it("replaces a malformed ?view= away without seeding", async () => {
-      searchParams = new URLSearchParams("view=1,2");
+      setSearch("view=1,2");
 
       renderGenreTreePage();
 
-      await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/", { scroll: false }));
+      await waitFor(() => expect(replaceState).toHaveBeenCalledWith(null, "", "/"));
       expect(screen.getByTestId("default-viewport")).toHaveTextContent("null");
     });
 
@@ -548,32 +677,32 @@ describe("GenreTreePage", () => {
 
       fireEvent.click(await screen.findByRole("button", { name: "Pan" }));
       await flushNavigation();
-      expect(routerReplaceMock).toHaveBeenCalledWith("/?view=10.0%2C-20.0%2C0.50", { scroll: false });
-      expect(routerPushMock).not.toHaveBeenCalled();
+      expect(replaceState).toHaveBeenCalledWith(null, "", "/?view=10.0%2C-20.0%2C0.50");
+      expect(pushState).not.toHaveBeenCalled();
     });
 
     it("skips the write when the view already matches ?view=", async () => {
-      searchParams = new URLSearchParams("view=10.0,-20.0,0.50");
+      setSearch("view=10.0,-20.0,0.50");
 
       renderGenreTreePage();
 
       fireEvent.click(await screen.findByRole("button", { name: "Pan" }));
       await flushNavigation();
-      expect(routerReplaceMock).not.toHaveBeenCalled();
+      expect(replaceState).not.toHaveBeenCalled();
     });
 
     it("drops ?view= when the user zooms into a frame", async () => {
-      searchParams = new URLSearchParams("view=1,2,1");
+      setSearch("view=1,2,1");
 
       renderGenreTreePage({ forcePopCore: true });
 
       fireEvent.click(await screen.findByRole("button", { name: "Zoom in" }));
       await flushNavigation();
-      expect(routerPushMock).toHaveBeenLastCalledWith("/?zoom=rock", { scroll: false });
+      expect(pushState).toHaveBeenLastCalledWith(null, "", "/?zoom=rock");
     });
 
     it("drops ?view= and the seed when the view mode changes", async () => {
-      searchParams = new URLSearchParams("view=1,2,1");
+      setSearch("view=1,2,1");
 
       render(
         <GenreTreeViewModeProvider>
@@ -582,52 +711,63 @@ describe("GenreTreePage", () => {
         </GenreTreeViewModeProvider>,
       );
 
-      await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/", { scroll: false }));
+      await waitFor(() => expect(replaceState).toHaveBeenCalledWith(null, "", "/"));
       expect(screen.getByTestId("default-viewport")).toHaveTextContent("null");
     });
 
-    it("replaces an unknown ?genre= away once the genre playlists have loaded", async () => {
-      searchParams = new URLSearchParams("genre=ghost&other=1");
-      useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }], isLoading: false });
+    it("hands an unknown genre to the view as is and leaves the URL alone", async () => {
+      setSearch("genre=ghost&other=1");
+      useVisibleGenrePlaylistsMock.mockReturnValue({
+        genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }],
+        isLoading: false,
+      });
 
       renderGenreTreePage();
 
-      await waitFor(() => expect(routerReplaceMock).toHaveBeenCalledWith("/?other=1", { scroll: false }));
+      expect(await screen.findByTestId("selected-node")).toHaveTextContent("ghost");
+      await flushNavigation();
+      expect(replaceState).not.toHaveBeenCalled();
     });
 
     it("keeps a known ?genre= and waits for the playlists before judging it", async () => {
-      searchParams = new URLSearchParams("genre=rock");
+      setSearch(`genre=${makeGenreUuid("rock")}`);
       useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [], isLoading: true });
 
       const { rerender } = renderGenreTreePage();
       await screen.findByTestId("genre-tree-view");
       await flushNavigation();
-      expect(routerReplaceMock).not.toHaveBeenCalled();
+      expect(replaceState).not.toHaveBeenCalled();
 
-      useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }], isLoading: false });
+      useVisibleGenrePlaylistsMock.mockReturnValue({
+        genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }],
+        isLoading: false,
+      });
       rerender(
         <GenreTreeViewModeProvider>
           <GenreTreePage />
         </GenreTreeViewModeProvider>,
       );
       await flushNavigation();
-      expect(routerReplaceMock).not.toHaveBeenCalled();
+      expect(replaceState).not.toHaveBeenCalled();
     });
 
     it("does not strip a genre selected after the list loaded, before it refetches", async () => {
-      useVisibleGenrePlaylistsMock.mockReturnValue({ genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }], isLoading: false });
+      useVisibleGenrePlaylistsMock.mockReturnValue({
+        genrePlaylists: [{ uuid: "rock", name: "rock", root: { uuid: "rock" } }],
+        isLoading: false,
+      });
 
       const { rerender } = renderGenreTreePage();
       await screen.findByTestId("genre-tree-view");
 
-      searchParams = new URLSearchParams("genre=just-created");
+      setSearch("genre=just-created");
       rerender(
         <GenreTreeViewModeProvider>
           <GenreTreePage />
         </GenreTreeViewModeProvider>,
       );
       await flushNavigation();
-      expect(routerReplaceMock).not.toHaveBeenCalled();
+      expect(replaceState).not.toHaveBeenCalled();
     });
   });
 });

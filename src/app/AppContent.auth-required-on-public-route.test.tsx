@@ -31,7 +31,8 @@ vi.mock("@behindthemusictree/app-kit/genre-tree", async (importOriginal) => {
 
 vi.mock("@lib/sentry", () => ({ initSentry: vi.fn() }));
 
-vi.mock("@components/features/menu/AppHeader", () => ({ default: () => null }));
+vi.mock("@components/features/menu/NavButtons", () => ({ default: () => null }));
+vi.mock("@components/features/menu/UserMenu", () => ({ UserMenu: () => null }));
 vi.mock("@components/features/player/Player", () => ({ default: () => null }));
 vi.mock("@components/features/player/AutoAdvance", () => ({ default: () => null }));
 

@@ -27,14 +27,16 @@ describe("CurationListPage", () => {
   it.each([null, { error: "RefreshTokenError" }])("redirects to /admin when not signed in (%o)", async (session) => {
     authMock.mockResolvedValue(session);
 
-    await expect(CurationListPage(props("main_parent"))).rejects.toThrow("NEXT_REDIRECT");
+    await expect(CurationListPage(props("canonical_parent"))).rejects.toThrow("NEXT_REDIRECT");
     expect(redirectMock).toHaveBeenCalledWith("/admin");
     expect(fetchListsMock).not.toHaveBeenCalled();
   });
 
   it("404s on a list the registry doesn't have", async () => {
     authMock.mockResolvedValue({ user: {} });
-    fetchListsMock.mockResolvedValue([{ name: "main_parent", keyColumns: [], columns: [], description: "", count: 0 }]);
+    fetchListsMock.mockResolvedValue([
+      { name: "canonical_parent", keyColumns: [], columns: [], description: "", count: 0 },
+    ]);
 
     await expect(CurationListPage(props("nope"))).rejects.toThrow("NEXT_NOT_FOUND");
     expect(fetchEntriesMock).not.toHaveBeenCalled();
@@ -42,31 +44,35 @@ describe("CurationListPage", () => {
 
   it("goes back to page 1 when the requested page is past the last one", async () => {
     authMock.mockResolvedValue({ user: {} });
-    fetchListsMock.mockResolvedValue([{ name: "main_parent", keyColumns: [], columns: [], description: "", count: 0 }]);
+    fetchListsMock.mockResolvedValue([
+      { name: "canonical_parent", keyColumns: [], columns: [], description: "", count: 0 },
+    ]);
     fetchEntriesMock.mockResolvedValue(null);
 
     await expect(
       CurationListPage({
-        params: Promise.resolve({ list: "main_parent" }),
+        params: Promise.resolve({ list: "canonical_parent" }),
         searchParams: Promise.resolve({ page: "8" }),
       }),
     ).rejects.toThrow("NEXT_REDIRECT");
-    expect(fetchEntriesMock).toHaveBeenCalledWith("main_parent", { page: 8, q: "", ordering: "key" });
-    expect(redirectMock).toHaveBeenCalledWith("/admin/curation/main_parent");
+    expect(fetchEntriesMock).toHaveBeenCalledWith("canonical_parent", { page: 8, q: "", ordering: "key" });
+    expect(redirectMock).toHaveBeenCalledWith("/admin/curation/canonical_parent");
   });
 
   it("keeps search, ordering and QID display when going back to page 1", async () => {
     authMock.mockResolvedValue({ user: {} });
-    fetchListsMock.mockResolvedValue([{ name: "main_parent", keyColumns: [], columns: [], description: "", count: 0 }]);
+    fetchListsMock.mockResolvedValue([
+      { name: "canonical_parent", keyColumns: [], columns: [], description: "", count: 0 },
+    ]);
     fetchEntriesMock.mockResolvedValue(null);
 
     await expect(
       CurationListPage({
-        params: Promise.resolve({ list: "main_parent" }),
+        params: Promise.resolve({ list: "canonical_parent" }),
         searchParams: Promise.resolve({ page: "8", q: " rock ", ordering: "-updated_on", qid: "1" }),
       }),
     ).rejects.toThrow("NEXT_REDIRECT");
-    expect(fetchEntriesMock).toHaveBeenCalledWith("main_parent", { page: 8, q: "rock", ordering: "-updated_on" });
-    expect(redirectMock).toHaveBeenCalledWith("/admin/curation/main_parent?q=rock&ordering=-updated_on&qid=1");
+    expect(fetchEntriesMock).toHaveBeenCalledWith("canonical_parent", { page: 8, q: "rock", ordering: "-updated_on" });
+    expect(redirectMock).toHaveBeenCalledWith("/admin/curation/canonical_parent?q=rock&ordering=-updated_on&qid=1");
   });
 });

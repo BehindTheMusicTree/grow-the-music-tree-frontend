@@ -1,14 +1,15 @@
 "use client";
 
+import { Input } from "@behindthemusictree/ui";
 import { useState } from "react";
 import { BasePopup, BasePopupProps } from "@behindthemusictree/app-kit-ui/popup";
-import { CriteriaMinimum, useCreateGenre } from "@behindthemusictree/app-kit/genre-tree";
+import { CriteriaMinimum, type GenreUuid, useCreateGenre } from "@behindthemusictree/app-kit/genre-tree";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 
 type GenreCreationPopupProps = Omit<BasePopupProps, "title" | "children" | "icon" | "isDismissable" | "onClose"> & {
   onClose: () => void;
-  onCreated: (nodeId: string) => void;
+  onCreated: (genreUuid: GenreUuid) => void;
   parent?: CriteriaMinimum | null;
 };
 
@@ -24,7 +25,7 @@ export default function GenreCreationPopup({ onClose, onCreated, parent, ...rest
       {
         onSuccess: (genre) => {
           onClose();
-          onCreated(genre.criteriaPlaylist.uuid);
+          onCreated(genre.uuid);
         },
       },
     );
@@ -57,23 +58,21 @@ export default function GenreCreationPopup({ onClose, onCreated, parent, ...rest
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Parent</label>
-              <input
+              <label className="block text-body font-medium text-gray-700 mb-1">Parent</label>
+              <Input
                 type="text"
                 name="parent"
                 value={parent?.name || "(root genre)"}
-                className="w-full px-3 py-2 border rounded-md"
                 disabled
               />
             </div>
             <div className="space-y-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-              <input
+              <label className="block text-body font-medium text-gray-700 mb-1">Name</label>
+              <Input
                 type="text"
                 name="name"
                 value={name}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-md"
                 autoFocus
               />
             </div>

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { ReactNode } from "react";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider, useMutation } from "@tanstack/react-query";
@@ -7,14 +7,20 @@ import { useAliasGenre } from "@hooks/curation/useAliasGenre";
 import { useAssignSongGenre } from "@hooks/curation/useAssignSongGenre";
 import { useEssentialSongs } from "@hooks/curation/useEssentialSongs";
 import { useExcludeGenre } from "@hooks/curation/useExcludeGenre";
+import { useSetGenreRoot } from "@hooks/curation/useSetGenreRoot";
 import { useUpdateGenreSummary } from "@hooks/curation/useUpdateGenreSummary";
 import { useUpdateSongVideo } from "@hooks/curation/useUpdateSongVideo";
+import { AssignSongGenreOutputSchema } from "@schemas/api/curation";
 import { makeGenreUuid } from "@behindthemusictree/app-kit/genre-tree/testing";
 
 const fetchMock = vi.fn();
+const undoFetchMock = vi.fn();
 const toastSuccess = vi.fn();
+const toastError = vi.fn();
 
-vi.mock("sonner", () => ({ toast: { success: (...args: unknown[]) => toastSuccess(...args), error: vi.fn() } }));
+vi.mock("sonner", () => ({
+  toast: { success: (...args: unknown[]) => toastSuccess(...args), error: (...args: unknown[]) => toastError(...args) },
+}));
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api" }));
 vi.mock("@behindthemusictree/app-kit/transport", () => ({
   useFetchWrapper: () => ({ fetch: fetchMock }),
@@ -38,7 +44,12 @@ async function run<T extends { mutate: (input: never) => void }>(hook: { current
 describe("curation hooks", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal("fetch", undoFetchMock);
     fetchMock.mockResolvedValue({ uuid: "g1", previous: [{ uuid: "r1", genre: "old", undoable: true }] });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("aliases a genre", async () => {
@@ -52,6 +63,15 @@ describe("curation hooks", () => {
     const { result } = setup(useExcludeGenre);
     const [message] = await run(result, { uuid: "g1", category: "theme" });
     expect(message).toBe("Genre excluded");
+  });
+
+  it("makes a genre a root without offering an undo", async () => {
+    const { result } = setup(useSetGenreRoot);
+    const [message, options] = await run(result, { uuid: makeGenreUuid("g1"), name: "Folk" });
+    expect(message).toBe("Made Folk a root");
+    expect(options.action).toBeUndefined();
+    expect(fetchMock.mock.calls[0][0]).toBe(`genres/${makeGenreUuid("g1")}/set-root/`);
+    expect(fetchMock.mock.calls[0][3].method).toBe("POST");
   });
 
   it("updates the summary optimistically and undoes it", async () => {
@@ -89,6 +109,48 @@ describe("curation hooks", () => {
     act(() => options.action?.onClick());
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(JSON.parse(fetchMock.mock.calls[1][3].body)).toEqual({ songs, genre: "old" });
+  });
+
+  it("restores a mixed batch through the server token", async () => {
+    const undoToken = "c0af8092-c2d1-4ff5-af52-59d405f59cef";
+    const assignment = {
+      undoToken,
+      previous: [{ uuid: "r1", genre: "a", undoable: false }, { uuid: "r2", genre: null, undoable: false }],
+    };
+    fetchMock.mockResolvedValueOnce(AssignSongGenreOutputSchema.parse(assignment));
+    undoFetchMock.mockResolvedValueOnce(new Response(null, { status: 204 }));
+    const { result } = setup(() => useAssignSongGenre("unlinked"));
+    const [message, options] = await run(result, { songs: ["r1", "r2"], genre: null });
+
+    expect(message).toBe("2 songs unlinked");
+    expect(options.action).toBeDefined();
+    act(() => options.action?.onClick());
+    await waitFor(() => expect(toastSuccess).toHaveBeenLastCalledWith("Song genre changes restored", { action: undefined }));
+    expect(undoFetchMock).toHaveBeenCalledWith("/api/library/songs/assign-genre/undo/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ undoToken }),
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    [409, "A song changed since this edit. Reload to see the current genres."],
+    [404, "This edit can no longer be undone."],
+  ])("refreshes song data when the server declines undo (%s)", async (status, message) => {
+    fetchMock.mockResolvedValueOnce({ undoToken: "c0af8092-c2d1-4ff5-af52-59d405f59cef", previous: [] });
+    undoFetchMock.mockResolvedValueOnce(new Response(null, { status }));
+    const { result, queryClient } = setup(() => useAssignSongGenre("moved"));
+    const [, options] = await run(result, { songs: ["r1"], genre: "g2" });
+    const key = [libraryQueryKeys.reference.songs.all[0], "/api", "genre", "g2"];
+    queryClient.setQueryData(key, []);
+
+    act(() => options.action?.onClick());
+
+    await waitFor(() => expect(queryClient.getQueryState(key)?.isInvalidated).toBe(true));
+    expect(toastError).toHaveBeenCalledWith(message);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(undoFetchMock).toHaveBeenCalledTimes(1);
   });
 
   it("offers no undo when moved songs came from several genres", async () => {

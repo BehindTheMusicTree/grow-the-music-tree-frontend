@@ -5,10 +5,11 @@ import { getToken, type JWT } from "next-auth/jwt";
 import { z } from "zod";
 import { getGrowApiUpstreamBaseUrl } from "@lib/grow-api-upstream-url";
 import { getServerEnv } from "@lib/env.server";
+import { isBoundToUpstream } from "@lib/upstream-binding";
 
 declare module "next-auth" {
   interface Session {
-    error?: "RefreshTokenError";
+    error?: "RefreshTokenError" | "UpstreamChanged";
   }
 }
 
@@ -17,7 +18,8 @@ declare module "next-auth/jwt" {
     idToken?: string;
     refreshToken?: string;
     expiresAt?: number;
-    error?: "RefreshTokenError";
+    upstream?: string;
+    error?: "RefreshTokenError" | "UpstreamChanged";
   }
 }
 
@@ -40,6 +42,10 @@ async function isGrowApiAdmin(idToken: string): Promise<boolean> {
   if (!response.ok) return false;
   const parsed = AuthMeSchema.safeParse(await response.json());
   return parsed.success && parsed.data.role === "admin";
+}
+
+function isBoundToCurrentUpstream(token: JWT): boolean {
+  return isBoundToUpstream(token.upstream, getGrowApiUpstreamBaseUrl());
 }
 
 function isExpired(token: JWT): boolean {
@@ -96,8 +102,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => ({
           idToken: account.id_token,
           refreshToken: account.refresh_token,
           expiresAt: account.expires_at,
+          upstream: getGrowApiUpstreamBaseUrl(),
         };
       }
+      // The ID token was minted for the OAuth client of another grow-api; forwarding it would 401.
+      if (!isBoundToCurrentUpstream(token)) return { ...token, error: "UpstreamChanged" };
       if (token.error || !isExpired(token)) return token;
       return refreshIdToken(token);
     },
@@ -114,7 +123,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => ({
  */
 export async function getAdminIdToken(request: { headers: Headers }): Promise<string | null> {
   const token = await getToken({ req: request, secret: getServerEnv().AUTH_SECRET, secureCookie: useSecureCookies });
-  if (!token || token.error || !token.idToken) return null;
+  if (!token || token.error || !token.idToken || !isBoundToCurrentUpstream(token)) return null;
   if (!isExpired(token)) return token.idToken;
   // ponytail: the refreshed token isn't written back to the cookie here; the client's next
   // /api/auth/session fetch persists it via the jwt callback. Until then each write refreshes again.

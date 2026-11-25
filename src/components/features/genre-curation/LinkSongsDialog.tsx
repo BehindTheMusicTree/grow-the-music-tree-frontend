@@ -1,22 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { BasePopup } from "@behindthemusictree/app-kit-ui/popup";
 import { useFetchWrapper } from "@behindthemusictree/app-kit/transport";
-import { RingLoader } from "@behindthemusictree/ui";
+import { useSongSearch } from "@behindthemusictree/app-kit/genre-tree";
+import { Checkbox, Input, RingLoader } from "@behindthemusictree/ui";
 import { useAssignSongGenre } from "@hooks/curation/useAssignSongGenre";
-import { useDebouncedValue } from "@hooks/useDebouncedValue";
 import { BANNER_HEIGHT } from "@lib/constants/layout";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
-import {
-  LinkSuggestionsSchema,
-  SongSearchSchema,
-  type LinkCandidate,
-} from "@schemas/api/curation";
+import { LinkSuggestionsSchema, type LinkCandidate } from "@schemas/api/curation";
 import type { CuratedGenre } from "@components/features/genre-curation/GenreCurationProvider";
 
 type Tab = "suggested" | "search";
+
+const SEARCH_LIMIT = 50;
 
 function CandidateRow({
   candidate,
@@ -29,8 +27,7 @@ function CandidateRow({
 }) {
   return (
     <li className="flex items-center gap-2 py-1">
-      <input
-        type="checkbox"
+      <Checkbox
         id={`link-${candidate.uuid}`}
         checked={checked}
         onChange={onToggle}
@@ -40,7 +37,7 @@ function CandidateRow({
         {candidate.title}
         {candidate.artists?.length ? ` — ${candidate.artists.map((artist) => artist.name).join(", ")}` : ""}
       </label>
-      {candidate.genre && <span className="text-xs text-gray-500">already in {candidate.genre.name}</span>}
+      {candidate.genre && <span className="text-caption text-gray-500">already in {candidate.genre.name}</span>}
     </li>
   );
 }
@@ -51,7 +48,6 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
   const [text, setText] = useState("");
   const [genreless, setGenreless] = useState(true);
   const [checked, setChecked] = useState<ReadonlySet<string>>(new Set());
-  const query = useDebouncedValue(text.trim(), 300);
   const { mutate, isPending } = useAssignSongGenre(`linked to ${genre.name}`);
 
   const suggestions = useQuery({
@@ -60,19 +56,13 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
     queryFn: async () =>
       LinkSuggestionsSchema.parse(await fetch(`genres/${genre.uuid}/link-suggestions/`, true, false)),
   });
-  const search = useInfiniteQuery({
-    queryKey: ["referenceSongs", "linkSearch", query, genreless],
-    enabled: tab === "search" && query.length >= 2,
-    initialPageParam: "",
-    queryFn: async ({ pageParam }) =>
-      SongSearchSchema.parse(
-        await fetch("library/songs/search/", true, false, {}, { q: query, genreless, cursor: pageParam }),
-      ),
-    getNextPageParam: (last) => last.next ?? undefined,
+  const search = useSongSearch(getGrowBackendBaseUrl, text.trim(), {
+    limit: SEARCH_LIMIT,
+    genre: genreless ? "without" : "any",
   });
 
-  const candidates = tab === "suggested" ? (suggestions.data ?? []) : (search.data?.pages.flatMap((p) => p.results) ?? []);
-  const loading = tab === "suggested" ? suggestions.isLoading : search.isFetching && !search.isFetchingNextPage;
+  const candidates = tab === "suggested" ? (suggestions.data ?? []) : search.songs;
+  const loading = tab === "suggested" ? suggestions.isLoading : search.pending;
   const toggle = (uuid: string) =>
     setChecked((current) => {
       const next = new Set(current);
@@ -104,7 +94,7 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
               role="tab"
               aria-selected={tab === name}
               onClick={() => setTab(name)}
-              className="px-3 py-1 text-sm capitalize border-b-2 border-transparent cursor-pointer aria-selected:border-blue-600"
+              className="px-3 py-1 text-body capitalize border-b-2 border-transparent cursor-pointer aria-selected:border-blue-600"
             >
               {name}
             </button>
@@ -112,15 +102,14 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
         </div>
         {tab === "search" && (
           <div className="flex flex-col gap-2">
-            <input
+            <Input
               type="search"
               aria-label="Search songs"
               value={text}
               onChange={(event) => setText(event.target.value)}
-              className="w-full px-3 py-2 border rounded-md"
             />
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={genreless} onChange={(event) => setGenreless(event.target.checked)} />
+            <label className="flex items-center gap-2 text-body">
+              <Checkbox checked={genreless} onChange={(event) => setGenreless(event.target.checked)} />
               Only genreless
             </label>
           </div>
@@ -136,15 +125,6 @@ export default function LinkSongsDialog({ genre, onClose }: { genre: CuratedGenr
             />
           ))}
         </ul>
-        {tab === "search" && search.hasNextPage && (
-          <button
-            type="button"
-            className="self-start px-3 py-1 text-sm border rounded cursor-pointer hover:bg-gray-100"
-            onClick={() => search.fetchNextPage()}
-          >
-            More results
-          </button>
-        )}
       </div>
     </BasePopup>
   );

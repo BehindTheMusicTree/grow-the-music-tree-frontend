@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import Page from "@components/ui/Page";
+import { Page } from "@behindthemusictree/ui";
 import CurationStatus from "@components/features/curation/CurationStatus";
 import CurationGenreRules from "@components/features/curation/CurationGenreRules";
 import CurationHistory from "@components/features/curation/CurationHistory";
@@ -26,10 +26,10 @@ export default async function CurationGenrePage({ params }: Props) {
   const name = rules.labels[itemId];
 
   return (
-    <Page title={name ?? itemId} dataPage="admin-curation-genre">
+    <Page title={name ?? itemId} data-page="admin-curation-genre">
       <div className="flex flex-col gap-4 p-4">
         <CurationStatus status={status} />
-        <p className="flex flex-wrap gap-3 text-sm text-gray-600">
+        <p className="flex flex-wrap gap-3 text-body text-gray-600">
           <span className="font-mono">{itemId}</span>
           {itemId.startsWith("Q") && (
             <a href={`https://www.wikidata.org/wiki/${itemId}`} target="_blank" rel="noreferrer" className="underline">
@@ -39,7 +39,7 @@ export default async function CurationGenrePage({ params }: Props) {
         </p>
         <CurationGenreRules itemId={itemId} lists={lists} rules={rules} appliedExportOn={status.appliedExportOn} />
         <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold">Dernières modifications</h2>
+          <h2 className="text-heading">Dernières modifications</h2>
           <CurationHistory items={history?.results ?? []} lists={lists} labels={history?.labels ?? {}} />
           {history && history.overallTotal > history.results.length && (
             <Link href={`/admin/curation/history?${new URLSearchParams({ item_id: itemId })}`} className="underline">

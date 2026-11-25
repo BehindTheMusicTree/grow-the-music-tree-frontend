@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createYearScale, yearTicks, YEAR_BREAKPOINTS } from "./yearScale";
+import { BASE_HEIGHT, createYearScale, yearTicks, YEAR_BREAKPOINTS } from "./yearScale";
 
 describe("createYearScale", () => {
   const scale = createYearScale();
@@ -26,6 +26,15 @@ describe("createYearScale", () => {
   it("clamps years outside the domain", () => {
     expect(scale(-5000)).toBe(0);
     expect(scale(2100)).toBe(2350);
+  });
+});
+
+describe("createYearScale with a stretch", () => {
+  it("scales every segment by the stretch", () => {
+    const stretched = createYearScale(1.5);
+
+    expect(stretched(0)).toBe(300);
+    expect(stretched(1950)).toBe(BASE_HEIGHT * 1.5);
   });
 });
 

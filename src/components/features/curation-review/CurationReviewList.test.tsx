@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import CurationReviewList from "./CurationReviewList";
 
-const base = { key: "Q1", column: "item_id", reportedOn: "2026-10-19T00:00:00Z" };
+const base = { ruleId: null, key: "Q1", column: "item_id", reportedOn: "2026-10-19T00:00:00Z" };
 
 describe("CurationReviewList", () => {
   afterEach(cleanup);
@@ -27,6 +27,27 @@ describe("CurationReviewList", () => {
     expect(screen.getByText("Fusion en conflit")).toBeInTheDocument();
     expect(screen.getByText("Supprimé sur Wikidata")).toBeInTheDocument();
     expect(screen.getByText("Hors de l'arbre")).toBeInTheDocument();
+  });
+
+  it("links an edge rule to its owner's genre page instead of a list", () => {
+    render(
+      <CurationReviewList
+        items={[
+          {
+            ...base,
+            ruleId: "11111111-1111-4111-8111-111111111111",
+            key: "Q5\tQ6",
+            list: "canonical_parent",
+            column: "parent_item_id",
+            itemId: "Q6",
+            reason: "missing",
+            target: null,
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "canonical_parent" })).toHaveAttribute("href", "/admin/curation/genre/Q5");
   });
 
   it("falls back to a generic sentence per reason without evidence", () => {
@@ -216,11 +237,11 @@ describe("CurationReviewList", () => {
             ...base,
             key: "Q10",
             column: "parent_item_id",
-            list: "main_parent",
+            list: "canonical_parent",
             itemId: "Q99",
             reason: "redirect_conflict",
             target: "Q10",
-            evidence: { conflictList: "main_parent" },
+            evidence: { conflictList: "canonical_parent" },
           },
         ]}
       />,
@@ -253,7 +274,7 @@ describe("CurationReviewList", () => {
             ...base,
             key: "Q10",
             column: "parent_item_id",
-            list: "main_parent",
+            list: "canonical_parent",
             itemId: "Q99",
             reason: "missing",
             target: null,
@@ -262,7 +283,7 @@ describe("CurationReviewList", () => {
             ...base,
             key: "Q11",
             column: "overview_item_id",
-            list: "regional_overrides",
+            list: "regional_overviews",
             itemId: "Q98",
             reason: "missing",
             target: null,
@@ -271,9 +292,39 @@ describe("CurationReviewList", () => {
       />,
     );
 
-    expect(screen.getByText(/Parent principal de/)).toBeInTheDocument();
+    expect(screen.getByText(/Parent de/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Q10" })).toBeInTheDocument();
     expect(screen.getByText(/Vue d'ensemble de/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Q11" })).toBeInTheDocument();
+  });
+
+  it("explains an invalid rule from its evidence detail and falls back without it", () => {
+    render(
+      <CurationReviewList
+        items={[
+          {
+            ...base,
+            list: "a",
+            itemId: "Q1",
+            reason: "invalid_rule",
+            target: null,
+            evidence: { detail: "Racine classée régionale" },
+          },
+          { ...base, key: "Q2", list: "a", itemId: "Q2", reason: "invalid_rule", target: null, evidence: null },
+        ]}
+      />,
+    );
+    expect(screen.getByText("Racine classée régionale")).toBeInTheDocument();
+    expect(screen.getByText("La règle contredit Wikidata : le pipeline l'a ignorée.")).toBeInTheDocument();
+  });
+
+  it("points an exclusive regional parent to the forced canonical genres", () => {
+    render(
+      <CurationReviewList
+        items={[{ ...base, list: "a", itemId: "Q1", reason: "exclusive_parent_regional", target: null }]}
+      />,
+    );
+    expect(screen.getByText("Exclusion impossible")).toBeInTheDocument();
+    expect(screen.getByText(/Genres maintenus canoniques/)).toBeInTheDocument();
   });
 });

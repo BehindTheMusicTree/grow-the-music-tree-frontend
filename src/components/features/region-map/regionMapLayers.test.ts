@@ -1,29 +1,201 @@
 import { describe, expect, it } from "vitest";
 import fixture from "@schemas/api/region-map.fixture.json";
-import { RegionMapIndexSchema, WORLD_ID } from "@schemas/api/region-map";
+import { RegionMapIndexSchema, type Region } from "@schemas/api/region-map";
 import {
+  ancestry,
+  focusIds,
+  greyed,
+  backdropColors,
+  backdropFilter,
   buildStyle,
+  cityRadius,
+  depthColors,
+  depthOf,
   describe as describeRegion,
   EMPTY_FILL,
   fillColorExpression,
-  levelBounds,
-  levelRegions,
-  regionColors,
+  homeCenter,
+  idFilter,
+  inBand,
+  regionBounds,
+  supranationalZoneIds,
+  WORLD_BOUNDS,
+  zoneColor,
+  zoneFilters,
 } from "./regionMapLayers";
+import { sunDirectionAt, sunLightPosition } from "./sun";
+
+const SUN = sunDirectionAt(new Date("2024-11-03T12:00:00Z"));
 
 const index = RegionMapIndexSchema.parse(fixture);
 const regions = new Map(index.regions.map((region) => [region.id, region]));
+const france = regions.get("Q142")!;
+const brittany = regions.get("Q12130")!;
 
-describe("regionColors", () => {
-  it("greys out a region without songs and colours the others", () => {
-    const colors = regionColors(["Q142", "Q183"], regions);
+describe("depthOf", () => {
+  it("counts the steps from the world", () => {
+    expect(depthOf(france, regions)).toBe(0);
+    expect(depthOf(brittany, regions)).toBe(1);
+  });
+
+  it("fails on a parent missing from the index", () => {
+    expect(() => depthOf({ ...brittany, parentId: "missing" }, regions)).toThrow();
+  });
+});
+
+describe("depthColors", () => {
+  it("compares regions with their peers of the same depth and greys out those without songs", () => {
+    const colors = depthColors(regions);
 
     expect(colors.get("Q183")).toBe(EMPTY_FILL);
+    // Brittany tops its own depth even though France has more songs.
+    expect(colors.get("Q12130")).toBe(colors.get("Q142"));
     expect(colors.get("Q142")).toMatch(/^rgb\(/);
   });
 
-  it("skips ids that are not in the index", () => {
-    expect(regionColors(["missing"], regions).size).toBe(0);
+  it("tints a region without songs when one of its zones has some", () => {
+    const zone = regions.get("Q236626")!;
+    const covered = new Map(regions)
+      .set(zone.id, { ...zone, songCount: 10 })
+      .set("Q183", { ...regions.get("Q183")!, songCount: 0, zoneIds: [zone.id] });
+
+    expect(depthColors(covered).get("Q183")).toMatch(/^rgb\(/);
+    expect(depthColors(regions).get("Q183")).toBe(EMPTY_FILL);
+  });
+
+  it("tints a region without songs when an admin ancestor has some", () => {
+    const empty = new Map(regions).set("Q12130", { ...brittany, songCount: 0 });
+
+    expect(depthColors(empty).get("Q12130")).toMatch(/^rgb\(/);
+    expect(depthColors(empty).get("Q12130")).not.toBe(EMPTY_FILL);
+  });
+
+  it("leaves zones out", () => {
+    expect(depthColors(regions).has("Q236626")).toBe(false);
+  });
+});
+
+describe("backdropColors", () => {
+  it("gives the lightest tint to admin regions with songs only", () => {
+    const backdrop = backdropColors(regions);
+
+    expect(backdrop.get("Q142")).toMatch(/^rgb\(/);
+    expect(backdrop.get("Q142")).not.toBe(depthColors(regions).get("Q142"));
+    expect(backdrop.has("Q183")).toBe(false);
+    expect(backdrop.has("Q236626")).toBe(false);
+  });
+});
+
+describe("greyed", () => {
+  it("keeps each colour's lightness and drops its hue", () => {
+    const grey = greyed(new Map([["Q142", "#41b6c4"]])).get("Q142")!;
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(grey.slice(i, i + 2), 16));
+
+    expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThanOrEqual(2);
+    expect(r).toBeGreaterThan(100);
+  });
+});
+
+describe("focusIds", () => {
+  it("does not let a caller mutate the cached focus set", () => {
+    focusIds("Q142", regions)!.clear();
+    expect(focusIds("Q142", regions)).toEqual(new Set(["Q142", "Q12130"]));
+    expect(focusIds("Q12130", regions)).toEqual(new Set(["Q12130"]));
+    const replacement = new Map(regions);
+    replacement.delete("Q12130");
+    expect(focusIds("Q142", replacement)).toEqual(new Set(["Q142"]));
+  });
+
+  it("keeps an admin region and its subdivisions, nothing for a zone, no focus for a city or none", () => {
+    expect(focusIds(null, regions)).toBeNull();
+    expect(focusIds("Q142", regions)).toEqual(new Set(["Q142", "Q12130"]));
+    expect(focusIds("Q12130", regions)).toEqual(new Set(["Q12130"]));
+    expect(focusIds("Q236626", regions)).toEqual(new Set());
+    const city = { ...brittany, id: "Q90", kind: "city" as const };
+    expect(focusIds("Q90", new Map(regions).set("Q90", city))).toBeNull();
+  });
+
+  it("leaves the kept colours untouched", () => {
+    const colors = new Map([
+      ["Q142", "#41b6c4"],
+      ["Q183", "#41b6c4"],
+    ]);
+    const shown = greyed(colors, new Set(["Q142"]));
+
+    expect(shown.get("Q142")).toBe("#41b6c4");
+    expect(shown.get("Q183")).not.toBe("#41b6c4");
+  });
+});
+
+describe("zoneColor", () => {
+  it("is null without a zone and colours a zone by its songs", () => {
+    const zone = regions.get("Q236626")!;
+
+    expect(zoneColor(null, regions)).toBeNull();
+    expect(zoneColor(zone.id, new Map(regions).set(zone.id, { ...zone, songCount: 0 }))).toBe(
+      backdropColors(regions).get("Q142"),
+    );
+    expect(zoneColor(zone.id, new Map(regions).set(zone.id, { ...zone, songCount: 5 }))).toMatch(/^rgb\(/);
+  });
+});
+
+describe("homeCenter", () => {
+  const withIso = new Map(regions).set("Q142", { ...france, isoCode: "FR", mainBbox: [-5, 42, 9, 51] });
+
+  it("centres on the main box of the country with that ISO code", () => {
+    expect(homeCenter("FR", withIso)).toEqual([2, 46.5]);
+  });
+
+  it("is null without a country, for an unknown code, or for a country without a boundary", () => {
+    expect(homeCenter(null, withIso)).toBeNull();
+    expect(homeCenter("ZZ", withIso)).toBeNull();
+    const noBox = new Map(withIso).set("Q142", { ...france, isoCode: "FR", bbox: null, mainBbox: null, centroid: null });
+    expect(homeCenter("FR", noBox)).toBeNull();
+  });
+
+  it("takes the short way round a box that crosses the antimeridian", () => {
+    const fiji = new Map(withIso).set("Q142", { ...france, isoCode: "FJ", mainBbox: [177, -20, -178, -16] });
+    expect(homeCenter("FJ", fiji)?.[0]).toBeCloseTo(179.5);
+    const east = new Map(withIso).set("Q142", { ...france, isoCode: "FJ", mainBbox: [185, -20, 190, -16] });
+    expect(homeCenter("FJ", east)?.[0]).toBeCloseTo(-172.5);
+  });
+
+  it("ignores a region that is not a country", () => {
+    const region = new Map(withIso).set("Q142", { ...france, kind: "admin_unit" as const, isoCode: "FR" });
+    expect(homeCenter("FR", region)).toBeNull();
+  });
+});
+
+describe("regionBounds", () => {
+  it("frames the whole world without a region", () => {
+    expect(regionBounds(undefined, regions)).toEqual(WORLD_BOUNDS);
+  });
+
+  it("frames a region by its main bbox", () => {
+    const [west, south, east, north] = france.mainBbox!;
+
+    expect(regionBounds(france, regions)).toEqual([
+      [west, south],
+      [east, north],
+    ]);
+  });
+
+  it("frames a zone by the union of its members", () => {
+    const zone: Region = { ...regions.get("Q236626")!, childIds: ["Q142", "Q183"], mainBbox: [-180, -90, 180, 90] };
+    const germany: Region = { ...regions.get("Q183")!, mainBbox: [6, 47, 15, 55] };
+    const withMembers = new Map(regions).set("Q183", germany);
+
+    expect(regionBounds(zone, withMembers)).toEqual([
+      [-5, 42],
+      [15, 55],
+    ]);
+  });
+});
+
+describe("ancestry", () => {
+  it("lists the ancestors outermost first, without the world", () => {
+    expect(ancestry(brittany, regions).map((region) => region.id)).toEqual(["Q142", "Q12130"]);
+    expect(ancestry(france, regions).map((region) => region.id)).toEqual(["Q142"]);
   });
 });
 
@@ -43,28 +215,8 @@ describe("fillColorExpression", () => {
   });
 });
 
-describe("levelBounds", () => {
-  it("frames the whole world at the root level", () => {
-    expect(levelBounds(WORLD_ID, regions)).toEqual([
-      [-180, -58],
-      [180, 84],
-    ]);
-  });
-
-  it("frames a region by its main bbox", () => {
-    const [west, south, east, north] = regions.get("Q142")!.mainBbox;
-
-    expect(levelBounds("Q142", regions)).toEqual([
-      [west, south],
-      [east, north],
-    ]);
-  });
-});
-
 describe("describeRegion", () => {
   it("states the name and the counts", () => {
-    const france = regions.get("Q142")!;
-
     expect(describeRegion(france)).toBe(`France · ${france.songCount} songs · ${france.genreCount} genres`);
   });
 });
@@ -74,12 +226,23 @@ describe("buildStyle", () => {
     buildStyle({
       tilesetUrl: "https://tiles.example.com/regions/abc.pmtiles",
       glyphsUrl: "https://tiles.example.com/fonts/{fontstack}/{range}.pbf",
-      levelId: "Q142",
       zoneId: null,
+      supranationalIds: [],
+      selectedId: null,
       colors: new Map([["Q12130", "#123456"]]),
+      backdrop: new Map([["Q142", "#abcdef"]]),
+      zoneFill: null,
+      sun: SUN,
       ...overrides,
     });
-  const layer = (id: string) => style().layers.find((candidate) => candidate.id === id) as { filter?: unknown };
+  const layer = (id: string, built = style()) =>
+    built.layers.find((candidate) => candidate.id === id) as { filter?: unknown; paint?: unknown; layout?: unknown };
+
+  it("lights the atmosphere from the sun, anchored to the map", () => {
+    const built = style();
+
+    expect(built.light).toEqual({ anchor: "map", position: sunLightPosition(SUN) });
+  });
 
   it("is a globe with an atmosphere, fed by one pmtiles vector source", () => {
     const built = style();
@@ -97,37 +260,112 @@ describe("buildStyle", () => {
     });
   });
 
+  it("rounds the joins of every border and thins it at world scale", () => {
+    for (const id of [
+      "region-line",
+      "disputed",
+      "zone-line",
+      "zone-supra-hover",
+      "zone-supra-selected",
+      "region-selected-line",
+    ]) {
+      expect(layer(id).layout).toMatchObject({ "line-join": "round", "line-cap": "round" });
+    }
+    expect((layer("region-selected-line").paint as Record<string, unknown>)["line-width"]).toEqual([
+      "interpolate",
+      ["linear"],
+      ["zoom"],
+      0,
+      ["*", 0.5, 2],
+      6,
+      2,
+    ]);
+  });
+
   it("stacks the layers from the ocean up to the labels", () => {
     expect(style().layers.map((candidate) => candidate.id)).toEqual([
       "ocean",
       "land",
       "lakes",
+      "region-hit",
+      "region-backdrop",
       "region-fill",
+      "zone-fill",
       "rivers",
       "region-line",
       "disputed",
-      "zone-fill",
+      "zone-glow",
       "zone-line",
+      "zone-supra-hover",
+      "zone-supra-selected",
+      "region-selected-line",
       "places",
       "place-labels",
+      "cities",
+      "city-labels",
+      "zone-labels",
       "region-labels",
     ]);
   });
 
-  it("shows only the children of the level, with their colours", () => {
-    expect(layer("region-fill").filter).toEqual(["==", ["get", "parentId"], "Q142"]);
-    expect(layer("region-line").filter).toEqual(["==", ["get", "parentId"], "Q142"]);
-    expect(layer("region-labels").filter).toEqual(["==", ["get", "parentId"], "Q142"]);
-    expect(style().layers.find((candidate) => candidate.id === "region-fill")).toMatchObject({
-      paint: { "fill-color": ["match", ["get", "id"], "Q12130", "#123456", EMPTY_FILL] },
+  it("fills and labels a region inside its zoom band, with its colour", () => {
+    expect(layer("region-fill").filter).toEqual(inBand);
+    expect(layer("region-labels").filter).toEqual(inBand);
+    expect(layer("zone-labels").filter).toEqual(inBand);
+    expect(layer("region-fill").paint).toMatchObject({
+      "fill-color": ["match", ["get", "id"], "Q12130", "#123456", EMPTY_FILL],
     });
   });
 
-  it("shows no zone until one is chosen", () => {
-    expect(layer("zone-fill").filter).toEqual(["==", ["get", "id"], ""]);
-    expect(style({ zoneId: "Q236626" }).layers.find((candidate) => candidate.id === "zone-line")).toMatchObject({
-      filter: ["==", ["get", "id"], "Q236626"],
+  it("backs a region zoomed past its band with the lightest tint, under its subdivisions", () => {
+    expect(layer("region-backdrop").filter).toEqual(backdropFilter(new Map([["Q142", "#abcdef"]])));
+    expect(backdropFilter(new Map([["Q142", "#abcdef"]]))).toEqual([
+      "all",
+      ["<=", ["get", "min_zoom"], ["zoom"]],
+      ["!", inBand],
+      ["in", ["get", "id"], ["literal", ["Q142"]]],
+    ]);
+    expect(layer("region-backdrop").paint).toMatchObject({
+      "fill-color": ["match", ["get", "id"], "Q142", "#abcdef", EMPTY_FILL],
     });
+  });
+
+  it("keeps borders and click targets from a region's min_zoom on", () => {
+    const byMinZoom = ["<=", ["get", "min_zoom"], ["zoom"]];
+
+    expect(layer("region-line").filter).toEqual(byMinZoom);
+    expect(layer("region-hit").filter).toEqual(byMinZoom);
+    expect(layer("cities").filter).toEqual(byMinZoom);
+  });
+
+  it("outlines the selection at any zoom", () => {
+    expect(layer("region-selected-line").filter).toEqual(idFilter(null));
+    expect(layer("region-selected-line", style({ selectedId: "Q142" })).filter).toEqual(["==", ["get", "id"], "Q142"]);
+    expect(layer("cities", style({ selectedId: "Q90" })).paint).toMatchObject({ "circle-radius": cityRadius("Q90") });
+  });
+
+  it("fills only the chosen zone and keeps it outlined out of its band", () => {
+    expect(layer("zone-fill").filter).toEqual(zoneFilters(null, []).fill);
+    const zone = zoneFilters("Q236626", []);
+    expect(layer("zone-fill", style({ zoneId: "Q236626" })).filter).toEqual(zone.fill);
+    expect(layer("zone-line", style({ zoneId: "Q236626" })).filter).toEqual(zone.line);
+  });
+
+  it("outlines a supranational zone in blue only while hovered or selected, and fills it in focus", () => {
+    const supra = style({ zoneId: "Q4412", supranationalIds: ["Q4412"] });
+
+    expect(layer("zone-supra-hover", supra).paint).toMatchObject({ "line-opacity": ["case", expect.anything(), 1, 0] });
+    expect(layer("zone-supra-selected", supra).filter).toEqual(zoneFilters("Q4412", ["Q4412"]).supraSelected);
+    expect(layer("zone-fill", supra).filter).toEqual(idFilter("Q4412"));
+    expect(layer("zone-fill", style({ zoneFill: "#abcdef" })).paint).toEqual({ "fill-color": "#abcdef" });
+  });
+
+  it("treats a zone with a country member as supranational", () => {
+    const zone = regions.get("Q236626")!;
+    const withCountry = new Map(regions).set(zone.id, { ...zone, childIds: ["Q142"] });
+
+    expect(supranationalZoneIds(withCountry)).toContain(zone.id);
+    expect(supranationalZoneIds(new Map(regions).set(zone.id, { ...zone, childIds: [] }))).not.toContain(zone.id);
   });
 
   it("reveals cities and rivers from their Natural Earth min_zoom", () => {
@@ -139,9 +377,12 @@ describe("buildStyle", () => {
   });
 });
 
-describe("levelRegions", () => {
-  it("lists the children of a level", () => {
-    expect(levelRegions(regions, WORLD_ID).map((region) => region.id)).toContain("Q142");
-    expect(levelRegions(regions, "Q142").map((region) => region.id)).toEqual(["Q12130"]);
+describe("inBand", () => {
+  it("draws a feature from its min_zoom up to, not including, its max_zoom, or forever without one", () => {
+    expect(inBand).toEqual([
+      "all",
+      ["<=", ["get", "min_zoom"], ["zoom"]],
+      ["any", ["!", ["has", "max_zoom"]], ["<", ["zoom"], ["get", "max_zoom"]]],
+    ]);
   });
 });

@@ -7,6 +7,59 @@ describe("RegionMapIndexSchema", () => {
     expect(RegionMapIndexSchema.safeParse(fixture).success).toBe(true);
   });
 
+  it("accepts missing boundaries only with null coordinates", () => {
+    const missing = { ...fixture.regions[0], boundaryStatus: "missing", bbox: null, mainBbox: null, centroid: null };
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [missing] }).success).toBe(true);
+    for (const invalid of [
+      { ...missing, boundaryStatus: "available" },
+      { ...missing, centroid: [0, 0] },
+      { ...fixture.regions[0], boundaryStatus: "missing" },
+      { ...fixture.regions[0], centroid: null },
+      { ...fixture.regions[0], mainBbox: null },
+    ]) {
+      expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [invalid] }).success).toBe(false);
+    }
+  });
+
+  it("reads a lean index: no boundaryStatus, mainBbox, drillable or genre rule", () => {
+    const { genres, ...rest } = fixture.regions[0];
+    const lean = {
+      ...Object.fromEntries(Object.entries(rest).filter(([key]) => !["boundaryStatus", "mainBbox", "drillable"].includes(key))),
+      genres: genres.map(({ itemId, relation }) => ({ itemId, relation })),
+    };
+    const missing = { ...lean, bbox: null, centroid: null };
+    const parsed = RegionMapIndexSchema.parse({ ...fixture, regions: [lean, missing] });
+
+    expect(parsed.regions[0]).toMatchObject({
+      boundaryStatus: "available",
+      mainBbox: fixture.regions[0].bbox,
+      drillable: fixture.regions[0].childIds.length > 0,
+    });
+    expect(parsed.regions[1]).toMatchObject({ boundaryStatus: "missing", bbox: null, mainBbox: null, centroid: null });
+  });
+
+  it("keeps a distinct mainBbox and an explicit drillable when the index carries them", () => {
+    const region = { ...fixture.regions[0], bbox: [0, 0, 10, 10], mainBbox: [1, 1, 2, 2], drillable: false };
+    const [parsed] = RegionMapIndexSchema.parse({ ...fixture, regions: [region] }).regions;
+
+    expect(parsed).toMatchObject({ mainBbox: [1, 1, 2, 2], drillable: false });
+  });
+
+  it("accepts a two-letter uppercase isoCode and rejects any other form", () => {
+    const parse = (isoCode: string) =>
+      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...fixture.regions[0], isoCode }] }).success;
+
+    expect(parse("FR")).toBe(true);
+    expect(parse("fr")).toBe(false);
+    expect(parse("FRA")).toBe(false);
+  });
+
+  it("accepts missing boundaries and hidden regions together", () => {
+    const missing = { ...fixture.regions[0], boundaryStatus: "missing", bbox: null, mainBbox: null, centroid: null };
+    const hidden = { id: "hidden", name: "Hidden", kind: "admin_unit", parentId: "world", centroid: [1, 2] };
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [missing], hiddenRegions: [hidden] }).success).toBe(true);
+  });
+
   it("accepts a bbox that crosses the antimeridian", () => {
     const fiji = { ...fixture.regions[0], bbox: [177, -20, 182, -16], mainBbox: [177, -20, 182, -16] };
 
@@ -21,6 +74,48 @@ describe("RegionMapIndexSchema", () => {
     ).toBe(false);
   });
 
+  it("requires both overview keys on every region, null when there is none", () => {
+    const withoutOwn = { ...fixture.regions[0], overviewItemId: undefined };
+    const withoutInherited = { ...fixture.regions[0], inheritedOverviewItemId: undefined };
+
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [withoutOwn] }).success).toBe(false);
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [withoutInherited] }).success).toBe(false);
+  });
+
+  it("accepts a city point region and the cityIds of its admin unit", () => {
+    const rennes = {
+      ...fixture.regions[0],
+      id: "Q647",
+      kind: "city",
+      parentId: fixture.regions[0].id,
+      childIds: [],
+      zoneIds: [],
+      bbox: [-1.68, 48.11, -1.68, 48.11],
+      mainBbox: [-1.68, 48.11, -1.68, 48.11],
+      centroid: [-1.68, 48.11],
+      drillable: false,
+    };
+    const parent = { ...fixture.regions[0], cityIds: ["Q647"] };
+
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [parent, rennes] }).success).toBe(true);
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...parent, cityIds: [""] }] }).success).toBe(false);
+  });
+
+  it("accepts the overview a region inherits from its nearest ancestor", () => {
+    const normandie = { ...fixture.regions[0], overviewItemId: null, inheritedOverviewItemId: "Q672134" };
+
+    expect(RegionMapIndexSchema.parse({ ...fixture, regions: [normandie] }).regions[0].inheritedOverviewItemId).toBe(
+      "Q672134",
+    );
+    expect(
+      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: null }] })
+        .success,
+    ).toBe(true);
+    expect(
+      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...normandie, inheritedOverviewItemId: "" }] }).success,
+    ).toBe(false);
+  });
+
   it("rejects unknown keys (including the removed files map) and an unknown kind", () => {
     expect(RegionMapIndexSchema.safeParse({ ...fixture, extra: 1 }).success).toBe(false);
     expect(RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...fixture.regions[0], extra: 1 }] }).success).toBe(
@@ -28,7 +123,38 @@ describe("RegionMapIndexSchema", () => {
     );
     expect(RegionMapIndexSchema.safeParse({ ...fixture, files: {} }).success).toBe(false);
     expect(
-      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...fixture.regions[0], kind: "city" }] }).success,
+      RegionMapIndexSchema.safeParse({ ...fixture, regions: [{ ...fixture.regions[0], kind: "village" }] }).success,
+    ).toBe(false);
+  });
+
+  it("fills the world level from parentId while the index predates worldChildIds", () => {
+    const parsed = RegionMapIndexSchema.parse(fixture);
+
+    expect(parsed.worldChildIds).toEqual(fixture.regions.filter((r) => r.parentId === "world").map((r) => r.id));
+    expect(parsed.worldZoneIds).toEqual(
+      fixture.regions.filter((r) => r.kind === "zone" && r.parentId === null).map((r) => r.id),
+    );
+  });
+
+  it("keeps the world level an index provides", () => {
+    const parsed = RegionMapIndexSchema.parse({ ...fixture, worldChildIds: ["Q183"], worldZoneIds: [] });
+
+    expect(parsed.worldChildIds).toEqual(["Q183"]);
+    expect(parsed.worldZoneIds).toEqual([]);
+  });
+
+  it("accepts hidden regions outside the drawn ones and refuses unknown keys on them", () => {
+    const normandy = {
+      id: "Q18677875",
+      name: "Normandy",
+      kind: "admin_unit",
+      parentId: "Q142",
+      centroid: [1.02, 49.38],
+    };
+
+    expect(RegionMapIndexSchema.safeParse({ ...fixture, hiddenRegions: [normandy] }).success).toBe(true);
+    expect(
+      RegionMapIndexSchema.safeParse({ ...fixture, hiddenRegions: [{ ...normandy, bbox: [0, 0, 1, 1] }] }).success,
     ).toBe(false);
   });
 });

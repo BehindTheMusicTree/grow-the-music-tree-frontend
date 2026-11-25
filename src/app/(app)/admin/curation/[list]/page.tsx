@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import Page from "@components/ui/Page";
+import { Page } from "@behindthemusictree/ui";
 import CurationStatus from "@components/features/curation/CurationStatus";
 import CurationEntries from "@components/features/curation/CurationEntries";
 import { auth } from "@lib/auth";
@@ -38,7 +38,7 @@ export default async function CurationListPage({ params, searchParams }: Props) 
   }
 
   return (
-    <Page title={curationListTitle(list.name)} dataPage="admin-curation-list">
+    <Page title={curationListTitle(list.name)} data-page="admin-curation-list">
       <div className="flex flex-col gap-4 p-4">
         <CurationStatus status={status} />
         <p>{list.description}</p>

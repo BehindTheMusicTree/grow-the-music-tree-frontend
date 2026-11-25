@@ -1,9 +1,9 @@
 {
   "name": "grow-the-music-tree",
   "private": true,
-  "version": "3.22.1",
+  "version": "3.23.0",
   "growApi": {
-    "minVersion": "15.0.0"
+    "minVersion": "19.0.0"
   },
   "engines": {
     "node": ">=26 <27"
@@ -20,13 +20,13 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "postversion": "node scripts/update-changelog-release.mjs && git add CHANGELOG.md && git commit --amend --no-edit && (v=$(node -p \"require('./package.json').version\"); git tag -d v$v 2>/dev/null; git tag v$v) && node scripts/delete-test-dev-tags.mjs"
+    "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@behindthemusictree/app-kit": "28.0.2",
-    "@behindthemusictree/app-kit-ui": "28.0.2",
-    "@behindthemusictree/brand": "12.8.0",
-    "@behindthemusictree/ui": "0.10.0",
+    "@behindthemusictree/app-kit": "43.1.4",
+    "@behindthemusictree/app-kit-ui": "43.1.4",
+    "@behindthemusictree/brand": "12.15.0",
+    "@behindthemusictree/ui": "0.26.0",
     "@fortawesome/fontawesome-svg-core": "6.5.2",
     "@fortawesome/free-solid-svg-icons": "6.5.2",
     "@fortawesome/react-fontawesome": "3.1.1",
@@ -41,7 +41,7 @@
     "is-fullwidth-code-point": "3.0.0",
     "lucide-react": "0.487.0",
     "maplibre-gl": "6.15.0",
-    "next": "16.4.3",
+    "next": "16.4.5",
     "next-auth": "5.0.0-beta.32",
     "pmtiles": "4.5.0",
     "prop-types": "15.8.1",
@@ -58,6 +58,7 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.0",
     "@tanstack/react-query-devtools": "5.72.2",
     "@testing-library/dom": "^10.0.0",
     "@testing-library/jest-dom": "6.6.3",
@@ -80,6 +81,7 @@
     "git-worktree-scripts": "1.4.1",
     "happy-dom": "21.0.4",
     "jsdom": "28.0.0",
+    "playwright-core": "1.65.0",
     "postcss": "8.5.23",
     "tailwindcss": "3.4.17",
     "typescript": "5.8.3",

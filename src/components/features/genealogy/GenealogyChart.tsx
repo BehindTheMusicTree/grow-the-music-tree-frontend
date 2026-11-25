@@ -1,26 +1,34 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { linkVertical, select, zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from "d3";
-import { ZoomControls } from "@behindthemusictree/ui";
+import { labelHalo, ZoomControls } from "@behindthemusictree/ui";
+import { useHoverTooltip } from "@hooks/useHoverTooltip";
 import { useIsAdmin } from "@hooks/useIsAdmin";
 import type { Genealogy, GenealogyLane, GenealogyTradition } from "@schemas/api/genealogy";
 import GenealogyColumnHeader from "./GenealogyColumnHeader";
 import { formatSpan, formatYear } from "./format";
-import { anchorPosition, AXIS_WIDTH, buildAnchorIndex, COLUMN_WIDTH, columnX, HEADER_HEIGHT, TOP_MARGIN } from "./geometry";
-import { createYearScale, YEAR_MAX, YEAR_MIN, yearTicks } from "./yearScale";
+import { anchorPosition, AXIS_WIDTH, buildAnchorIndex, COLUMN_WIDTH, columnX, headerHeight, TOP_MARGIN } from "./geometry";
+import { genealogyLabelLayout, sitelinksRange } from "./labelLayout";
+import { BASE_HEIGHT, createYearScale, YEAR_MAX, YEAR_MIN, yearTicks } from "./yearScale";
 
 const LANE_WIDTH = 8;
 const MARKER_RADIUS = 5;
 const MIN_ZOOM = 0.3;
 const MAX_ZOOM = 6;
 const ARROW_ID = "genealogy-arrow";
+// Hex, not a Tailwind class: the halo color is derived from it.
+const LABEL_COLOR = "#334155";
 
-type Tooltip = { x: number; y: number; text: string };
-
+// From this many times the fit scale on, every tradition is eligible for a label.
+const LABEL_FOCUS_FIT_MULTIPLE = 3;
 const ZOOM_STEP = 1.4;
 const ZOOM_DURATION = 200;
 const FIT_PADDING = 24;
+const AXIS_LABEL_CLEARANCE = 6;
+const MIN_TICK_GAP = 14;
+// Just enough for the first year label to clear the header line.
+const FIT_TOP_PADDING = 8;
 
 type Props = {
   data: Genealogy;
@@ -35,9 +43,13 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
   const fittedRef = useRef(false);
   const [transform, setTransform] = useState<ZoomTransform>(zoomIdentity);
   const [minZoom, setMinZoom] = useState(MIN_ZOOM);
-  const [tooltip, setTooltip] = useState<Tooltip | null>(null);
+  const [fitScale, setFitScale] = useState(MIN_ZOOM);
+  const [height, setHeight] = useState(0);
+  const tooltip = useHoverTooltip();
   const [width, setWidth] = useState(0);
-  const yearScale = useMemo(createYearScale, []);
+  const headerBottom = headerHeight(transform.k);
+  const [stretch, setStretch] = useState(1);
+  const yearScale = useMemo(() => createYearScale(stretch), [stretch]);
   const ticks = useMemo(yearTicks, []);
   const anchors = useMemo(() => buildAnchorIndex(data), [data]);
   const lanes = useMemo(
@@ -60,10 +72,37 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
     [data.traditions, anchors, yearScale],
   );
   const markerById = useMemo(() => new Map(markers.map((marker) => [marker.tradition.wikidataId, marker])), [markers]);
+  const traditionById = useMemo(() => new Map(markers.map(({ tradition }) => [tradition.wikidataId, tradition])), [markers]);
   const unplacedCount = data.traditions.length - markers.length;
+  const labelMarkers = useMemo(
+    () =>
+      markers.map(({ tradition, x, y }) => ({
+        id: tradition.wikidataId,
+        label: tradition.label,
+        sitelinks: tradition.sitelinks,
+        x,
+        y,
+        radius: tradition.wikidataId === selectedId ? MARKER_RADIUS + 2 : MARKER_RADIUS,
+      })),
+    [markers, selectedId],
+  );
+  const labelRange = useMemo(() => (labelMarkers.length > 0 ? sitelinksRange(labelMarkers) : { min: 0, max: 0 }), [labelMarkers]);
+  const labels = useMemo(
+    () =>
+      genealogyLabelLayout(labelMarkers, {
+        transform,
+        viewport: { width, height },
+        headerBottom,
+        selectedId,
+        sitelinksRange: labelRange,
+        minScale: minZoom,
+        focusScale: fitScale * LABEL_FOCUS_FIT_MULTIPLE,
+      }),
+    [labelMarkers, transform, width, height, headerBottom, selectedId, labelRange, minZoom, fitScale],
+  );
 
   const fit = useCallback(
-    (animate: boolean) => {
+    (animate: boolean, wholeChart: boolean) => {
       const svg = svgRef.current;
       const behavior = behaviorRef.current;
       if (!svg || !behavior || svg.clientWidth === 0 || svg.clientHeight === 0) return false;
@@ -74,25 +113,33 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
       const x0 = AXIS_WIDTH;
       const x1 = columnX(lastPosition) + COLUMN_WIDTH / 2;
       const y0 = TOP_MARGIN;
-      const y1 = TOP_MARGIN + yearScale(YEAR_MAX);
       const availableWidth = svg.clientWidth - AXIS_WIDTH - 2 * FIT_PADDING;
-      const availableHeight = svg.clientHeight - HEADER_HEIGHT - 2 * FIT_PADDING;
-      const k = Math.min(availableWidth / (x1 - x0), availableHeight / (y1 - y0));
+      const widthK = availableWidth / (x1 - x0);
+      const top = headerHeight(widthK);
+      const availableHeight = svg.clientHeight - top - FIT_TOP_PADDING - FIT_PADDING;
+      const heightK = availableHeight / BASE_HEIGHT;
+      // By default the chart fills the width and may extend beyond the viewport height; "Fit to frame" shows it whole.
+      const k = wholeChart ? Math.min(widthK, heightK) : widthK;
+      // Spare height is used by spreading the years, so marks and labels keep their proportions.
+      const nextStretch = Math.max(1, availableHeight / (k * BASE_HEIGHT));
       const next = zoomIdentity
         .translate(
           AXIS_WIDTH + FIT_PADDING + (availableWidth - k * (x1 - x0)) / 2 - k * x0,
-          HEADER_HEIGHT + FIT_PADDING + (availableHeight - k * (y1 - y0)) / 2 - k * y0,
+          top + FIT_TOP_PADDING - k * y0,
         )
         .scale(k);
-      const floor = Math.min(MIN_ZOOM, k);
+      const fitK = Math.min(widthK, heightK);
+      const floor = Math.min(MIN_ZOOM, fitK);
+      setStretch(nextStretch);
       behavior.scaleExtent([floor, MAX_ZOOM]);
       setMinZoom(floor);
+      setFitScale(fitK);
       const selection = select(svg);
       if (animate) selection.transition().duration(ZOOM_DURATION).call(behavior.transform, next);
       else selection.call(behavior.transform, next);
       return true;
     },
-    [data.columns, data.bands, yearScale],
+    [data.columns, data.bands],
   );
 
   useEffect(() => {
@@ -109,12 +156,14 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
     };
   }, []);
 
-  useEffect(() => {
+  // Layout effect: the first fit must land before paint, or the chart flashes at its unfitted scale.
+  useLayoutEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
     const fitOnce = () => {
       setWidth(svg.clientWidth);
-      if (!fittedRef.current && fit(false)) fittedRef.current = true;
+      setHeight(svg.clientHeight);
+      if (!fittedRef.current && fit(false, false)) fittedRef.current = true;
     };
     fitOnce();
     if (typeof ResizeObserver === "undefined") return;
@@ -131,9 +180,9 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
 
   const showTooltip = (event: { clientX: number; clientY: number }, text: string) => {
     const box = svgRef.current?.getBoundingClientRect();
-    setTooltip({ x: event.clientX - (box?.left ?? 0) + 12, y: event.clientY - (box?.top ?? 0) + 12, text });
+    tooltip.show(event.clientX - (box?.left ?? 0) + 12, event.clientY - (box?.top ?? 0) + 12, text);
   };
-  const hideTooltip = () => setTooltip(null);
+  const hideTooltip = tooltip.hide;
 
   const onMarkerKeyDown = (event: KeyboardEvent, { wikidataId }: GenealogyTradition) => {
     if (event.key !== "Enter" && event.key !== " ") return;
@@ -141,11 +190,25 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
     onSelect(wikidataId);
   };
 
+  const traditionHandlers = (tradition: GenealogyTradition) => ({
+    onClick: () => onSelect(tradition.wikidataId),
+    onMouseMove: (event: { clientX: number; clientY: number }) =>
+      showTooltip(event, `${tradition.label} · ${formatSpan(tradition.start, tradition.end)}`),
+    onMouseLeave: hideTooltip,
+  });
+
+  const visibleTicks = ticks.reduce<{ year: number; y: number }[]>((shown, year) => {
+    const y = transform.applyY(TOP_MARGIN + yearScale(year));
+    const previous = shown[shown.length - 1];
+    if (y < headerBottom + AXIS_LABEL_CLEARANCE || (previous && y - previous.y < MIN_TICK_GAP)) return shown;
+    return [...shown, { year, y }];
+  }, []);
+
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-lg bg-white" data-testid="genealogy-chart">
+    <div className="relative h-full w-full overflow-hidden bg-white" data-testid="genealogy-chart">
       <svg
         ref={svgRef}
-        className="h-full w-full cursor-grab touch-none select-none active:cursor-grabbing"
+        className="h-full w-full touch-none select-none"
         role="img"
         aria-label="Genealogy of music traditions"
       >
@@ -264,30 +327,55 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
                   tabIndex={0}
                   aria-label={tradition.label}
                   aria-pressed={selected}
-                  onClick={() => onSelect(tradition.wikidataId)}
                   onKeyDown={(event) => onMarkerKeyDown(event, tradition)}
-                  onMouseMove={(event) =>
-                    showTooltip(event, `${tradition.label} · ${formatSpan(tradition.start, tradition.end)}`)
-                  }
-                  onMouseLeave={hideTooltip}
+                  {...traditionHandlers(tradition)}
                 />
               );
             })}
           </g>
         </g>
 
-        <GenealogyColumnHeader columns={data.columns} regions={data.regions} transform={transform} width={width} />
+        <g data-layer="tradition-labels">
+          {labels.map(({ id, text, x, y, anchor, fontSize, selected }) => {
+            const tradition = traditionById.get(id);
+            const halo = labelHalo(LABEL_COLOR, fontSize);
+            return (
+              <text
+                key={id}
+                data-tradition-label={id}
+                x={x}
+                y={y}
+                textAnchor={anchor}
+                dominantBaseline="middle"
+                fontSize={fontSize}
+                fill={LABEL_COLOR}
+                stroke={halo.color}
+                strokeWidth={2 * halo.width}
+                strokeLinejoin="round"
+                paintOrder="stroke"
+                aria-hidden="true"
+                className={`cursor-pointer ${selected ? "font-semibold" : ""}`}
+                {...(tradition ? traditionHandlers(tradition) : {})}
+              >
+                {text}
+              </text>
+            );
+          })}
+        </g>
+
+        <GenealogyColumnHeader columns={data.columns} regions={data.regions} transform={transform} width={width} top={0} />
 
         <g data-layer="year-axis" pointerEvents="none">
           <rect x={0} y={0} width={AXIS_WIDTH} height="100%" className="fill-white" />
-          {ticks.map((year) => (
+          <line x1={0} x2={AXIS_WIDTH} y1={headerBottom} y2={headerBottom} className="stroke-slate-300" />
+          {visibleTicks.map(({ year, y }) => (
             <text
               key={year}
-              x={AXIS_WIDTH - 8}
-              y={transform.applyY(TOP_MARGIN + yearScale(year))}
+              x={AXIS_WIDTH - 6}
+              y={y}
               textAnchor="end"
               dominantBaseline="middle"
-              className="fill-slate-600 text-[11px]"
+              className="fill-slate-600 text-[length:11px]"
             >
               {formatYear(year)}
             </text>
@@ -296,7 +384,7 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
       </svg>
 
       {isAdmin && unplacedCount > 0 && (
-        <p className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded bg-white/90 px-2 py-1 text-xs text-slate-600 shadow">
+        <p className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded bg-white/90 px-2 py-1 text-caption text-slate-600 shadow">
           {unplacedCount} traditions without a place are not shown
         </p>
       )}
@@ -305,15 +393,15 @@ export default function GenealogyChart({ data, selectedId, onSelect }: Props) {
         orientation="horizontal"
         onZoomIn={() => zoomBy(ZOOM_STEP)}
         onZoomOut={() => zoomBy(1 / ZOOM_STEP)}
-        onFit={() => fit(true)}
+        onFit={() => fit(true, true)}
         canZoomIn={transform.k < MAX_ZOOM}
         canZoomOut={transform.k > minZoom}
       />
-      {tooltip && (
+      {tooltip.text !== null && (
         <div
+          ref={tooltip.ref}
           role="tooltip"
-          className="pointer-events-none absolute z-10 max-w-xs rounded bg-slate-900 px-2 py-1 text-xs text-white shadow"
-          style={{ left: tooltip.x, top: tooltip.y }}
+          className="pointer-events-none absolute z-10 max-w-xs rounded bg-slate-900 px-2 py-1 text-caption text-white shadow"
         >
           {tooltip.text}
         </div>

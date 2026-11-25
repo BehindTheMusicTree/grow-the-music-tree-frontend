@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { usePlayer } from "@behindthemusictree/app-kit/player";
 import { PlayerPanel } from "@behindthemusictree/app-kit-ui/genre-tree";
 import { usePlayerPanel } from "@contexts/PlayerPanelProvider";
+import { cn } from "@lib/utils";
 import { trackEvent } from "@lib/analytics";
 import { renderArtistLink } from "@components/features/artist/renderArtistLink";
 
@@ -13,7 +14,7 @@ interface PlayerProps {
 
 export default function Player({ className }: PlayerProps) {
   const { playerTrackObject } = usePlayer();
-  const { isVisible, dismiss, isExpanded, setExpanded } = usePlayerPanel();
+  const { isVisible, isExpanded, setExpanded } = usePlayerPanel();
   const trackId = playerTrackObject?.track?.id;
 
   useEffect(() => {
@@ -22,9 +23,11 @@ export default function Player({ className }: PlayerProps) {
 
   return (
     <PlayerPanel
-      className={className}
+      className={cn(
+        "phone-landscape:max-h-[calc(100dvh-var(--layout-band-top)-var(--mobile-nav-h)-env(safe-area-inset-bottom)-var(--layout-gutter))] phone-landscape:[&>div:last-child]:overflow-y-auto max-md:max-h-[calc(100dvh-var(--layout-band-top)-var(--mobile-nav-h)-env(safe-area-inset-bottom)-var(--layout-gutter))] max-md:[&>div:last-child]:overflow-y-auto",
+        className,
+      )}
       isVisible={isVisible}
-      onClose={dismiss}
       expanded={isExpanded}
       onExpandedChange={setExpanded}
       renderArtistLink={renderArtistLink}

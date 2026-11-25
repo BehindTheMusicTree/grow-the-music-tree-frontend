@@ -25,12 +25,28 @@ describe("GenealogySchema", () => {
 
   it("rejects a malformed tradition id, an unknown link kind and an empty lane list", () => {
     expect(
-      GenealogySchema.safeParse({ ...fixture, traditions: [{ ...fixture.traditions[0], wikidataId: "LOCAL:x" }] }).success,
+      GenealogySchema.safeParse({ ...fixture, traditions: [{ ...fixture.traditions[0], wikidataId: "LOCAL:x" }] })
+        .success,
     ).toBe(false);
     expect(
-      GenealogySchema.safeParse({ ...fixture, traditionLinks: [{ ...fixture.traditionLinks[0], kind: "other" }] }).success,
+      GenealogySchema.safeParse({ ...fixture, traditionLinks: [{ ...fixture.traditionLinks[0], kind: "other" }] })
+        .success,
     ).toBe(false);
-    expect(GenealogySchema.safeParse({ ...fixture, columns: [{ ...fixture.columns[0], lanes: [] }] }).success).toBe(false);
+    expect(GenealogySchema.safeParse({ ...fixture, columns: [{ ...fixture.columns[0], lanes: [] }] }).success).toBe(
+      false,
+    );
+  });
+
+  it("rejects a tradition without sitelinks or with a negative or fractional count", () => {
+    const withoutSitelinks: Record<string, unknown> = { ...fixture.traditions[0] };
+    delete withoutSitelinks.sitelinks;
+    for (const tradition of [
+      withoutSitelinks,
+      { ...fixture.traditions[0], sitelinks: -1 },
+      { ...fixture.traditions[0], sitelinks: 1.5 },
+    ]) {
+      expect(GenealogySchema.safeParse({ ...fixture, traditions: [tradition] }).success).toBe(false);
+    }
   });
 
   it("rejects a document without regions or a column without a region", () => {
