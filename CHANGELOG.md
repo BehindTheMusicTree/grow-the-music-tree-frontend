@@ -48,6 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Pipeline runs**: the graph import is its own step (`importing_graph`, « Import du graphe des genres ») after « Import des arbres de genres », a step that never ran before a recorded one is hidden instead of staying « à venir », and the run line reads « démarré le 24/11 à 02:00 · durée totale / durée écoulée : … ». Needs the grow `importing_graph` stage; deploy with or after it. Tests in `labels.test.ts` and `PipelineRunPanel.test.tsx`.
+
 - The admin panel shows completed and elapsed step durations for both branches of a full pipeline run, and reports active WDQS retries.
 
 - Touch-phone landscape navigation and detail panels share the left half of the screen, including beyond the desktop width breakpoint.

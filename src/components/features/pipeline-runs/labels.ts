@@ -25,7 +25,8 @@ export const STAGE_LABELS: Record<PipelineRunStage, string> = {
   building_genres: "Ingestion Wikidata et construction des genres",
   matching_songs: "Rattachement des morceaux",
   building_gold: "Construction du Gold",
-  importing_tree: "Import de l'arbre",
+  importing_tree: "Import des arbres de genres",
+  importing_graph: "Import du graphe des genres",
   uploading_songs: "Envoi des morceaux",
   merging_songs: "Fusion des morceaux",
   uploading_artists: "Envoi des artistes",
@@ -77,9 +78,13 @@ export function foregroundStepDetails(steps: RunStep[], request: PipelineRunRequ
   const running = request.status === "running";
   const bronzeOnly = telemetry.variant === "bronze_only";
   const hasRunningStep = telemetry.foreground.at(-1)?.state === "running";
-  return steps.flatMap((step) => {
+  // A step with no timing before the last recorded one never ran (e.g. `building_genres` when the Wikidata chain
+  // finished before the join); hiding it beats showing it as "à venir" forever.
+  const lastRecorded = steps.findLastIndex((step) => telemetry.foreground.some(({ stage }) => stage === step.key));
+  return steps.flatMap((step, index) => {
     const timing = telemetry.foreground.find(({ stage }) => stage === step.key);
     if (!timing) {
+      if (index < lastRecorded) return [];
       if (bronzeOnly && !BRONZE_FOREGROUND_STAGES.includes(step.key)) return [];
       if (!running) return step;
       return hasRunningStep ? { ...step, status: "pending", detail: undefined } : { ...step, status: step.status === "current" ? "current" : "pending" };
