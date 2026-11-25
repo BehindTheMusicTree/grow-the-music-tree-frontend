@@ -4,6 +4,10 @@ on:
     branches: [main]
 permissions:
   contents: read
+concurrency:
+  group: release-tag-${{ github.sha }}
+  cancel-in-progress: false
+
 jobs:
   release:
     uses: BehindTheMusicTree/github-workflows/.github/workflows/release-tag.yml@73148058f64deee76f076689f72ca4455fb19ec1

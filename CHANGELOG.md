@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [General Principles](#general-principles)
   - [Guidelines for Contributors](#guidelines-for-contributors)
 - [Unreleased](#unreleased)
+- [3.22.1 - 2026-11-25](#3221---2026-11-25)
 - [3.22.0 - 2026-11-03](#3220---2026-11-03)
 - [3.21.0 - 2026-11-01](#3210---2026-11-01)
 - [3.20.0 - 2026-10-29](#3200---2026-10-29)
@@ -106,6 +107,12 @@ All contributors (including maintainers) should update `CHANGELOG.md` when creat
 **Note:** During releases, maintainers run **`npm version` on `main` only**, after merging **`release/*` or `hotfix/*`** into `main` via PR—not from chore or feature branches. The postversion script moves entries from `[Unreleased]` to a new versioned section (e.g. `## [1.4.0] - YYYY-MM-DD`). See [docs/VERSIONING.md](docs/VERSIONING.md) and [CONTRIBUTING.md](CONTRIBUTING.md) §7.
 
 ## [Unreleased]
+
+## [3.22.1] - 2026-11-25
+
+### CI
+
+- Add organization conformance checks and safe workflow concurrency.
 
 ## [3.22.0] - 2026-11-03
 
