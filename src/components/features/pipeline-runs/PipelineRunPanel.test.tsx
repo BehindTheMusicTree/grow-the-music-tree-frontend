@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, act, within } from "@testing-library/react";
-import { PipelineRunsPageSchema, type PipelineRunRequest } from "@schemas/api/pipeline-runs";
+import { PipelineRunsPageSchema, type ImportProgress, type PipelineRunLatest } from "@schemas/api/pipeline-runs";
 import PipelineRunPanel from "./PipelineRunPanel";
 
 const refreshMock = vi.fn();
 const mutateMock = vi.fn();
-let latest: PipelineRunRequest | null = null;
+let latest: PipelineRunLatest | null = null;
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: refreshMock }) }));
 vi.mock("@tanstack/react-query", () => ({ useQueryClient: () => ({ setQueryData: vi.fn() }) }));
@@ -16,7 +16,7 @@ vi.mock("@behindthemusictree/app-kit/transport", () => ({
   useQueryWithParse: () => ({ data: latest, refetch: vi.fn() }),
 }));
 
-const request = (overrides: Partial<PipelineRunRequest>): PipelineRunRequest => ({
+const request = (overrides: Partial<PipelineRunLatest>): PipelineRunLatest => ({
   uuid: "11111111-1111-4111-8111-111111111111",
   kind: "curation",
   trigger: "manual",
@@ -31,6 +31,8 @@ const request = (overrides: Partial<PipelineRunRequest>): PipelineRunRequest => 
   startedOn: null,
   heartbeatOn: null,
   finishedOn: null,
+  activeImport: null,
+  typicalStageSeconds: null,
   ...overrides,
 });
 
@@ -163,7 +165,7 @@ describe("PipelineRunPanel", () => {
         error: "source=openstreetmap HTTP 403",
       })],
     });
-    latest = page.results[0];
+    latest = { ...page.results[0], activeImport: null, typicalStageSeconds: null };
     render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
 
     expect(screen.getByText("Ingestion complète : Échec — Ingestion Geohistory : source=openstreetmap HTTP 403")).toBeInTheDocument();
@@ -267,7 +269,7 @@ describe("PipelineRunPanel", () => {
 
   it("shows recorded durations on both chains and clears a recovered WDQS retry", () => {
     vi.useFakeTimers({ now: Date.parse("2026-10-12T10:03:00Z") });
-    const stepTelemetry: NonNullable<PipelineRunRequest["stepTelemetry"]> = {
+    const stepTelemetry: NonNullable<PipelineRunLatest["stepTelemetry"]> = {
       variant: "split_silver",
       foreground: [{
         stage: "ingesting_discogs",
@@ -332,5 +334,105 @@ describe("PipelineRunPanel", () => {
     act(() => vi.advanceTimersByTime(60_000));
 
     expect(screen.getByText("Nightly · démarré le 12/10 à 12:00 · durée écoulée : 4 min")).toBeInTheDocument();
+  });
+
+  describe("import progress", () => {
+    const NOW = "2026-11-25T10:00:00Z";
+    const importProgress = (overrides: Partial<ImportProgress> = {}): ImportProgress => ({
+      runId: 127,
+      taskId: "import-run-127",
+      kind: "genre_graph",
+      mode: "full",
+      attempt: 1,
+      state: "running",
+      startedAt: "2026-11-25T09:00:00Z",
+      step: "write",
+      stepStartedAt: "2026-11-25T09:31:00Z",
+      heartbeatAt: "2026-11-25T09:59:42Z",
+      sql: {},
+      observabilityStale: false,
+      bootstrap: false,
+      ...overrides,
+    });
+    const renderImport = (activeImport: ImportProgress | null) => {
+      vi.useFakeTimers({ now: Date.parse(NOW) });
+      latest = request({ kind: "sync", stage: "merging_songs", activeImport });
+      render(<PipelineRunPanel pendingCount={0} initialRequest={latest} />);
+    };
+
+    it("shows the running merge step, attempt and last sign of life", () => {
+      renderImport(importProgress());
+
+      expect(screen.getByText("Fusion : étape write depuis 29 min · tentative 1 · dernier signe de vie il y a 18 s")).toBeInTheDocument();
+      expect(screen.queryByText(/attente SQL/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/bootstrap/)).not.toBeInTheDocument();
+    });
+
+    it("shows the SQL wait with its blockers", () => {
+      renderImport(importProgress({ sql: { waitEventType: "Lock", blockerCount: 2 } }));
+
+      expect(screen.getByText(/· attente SQL : Lock \(2 bloquants\)/)).toBeInTheDocument();
+    });
+
+    it("notes a bootstrap", () => {
+      renderImport(importProgress({ bootstrap: true }));
+
+      expect(screen.getByText(/· bootstrap \(premier import du graphe, peut durer plusieurs heures\)/)).toBeInTheDocument();
+    });
+
+    it("warns, as a status, when the observability is stale", () => {
+      renderImport(importProgress({ observabilityStale: true }));
+
+      expect(screen.getByRole("status")).toHaveTextContent("Aucun signe de vie récent de la fusion");
+    });
+
+    it.each(["succeeded", "failed", "interrupted"] as const)("hides a %s attempt", (state) => {
+      renderImport(importProgress({ state }));
+
+      expect(screen.queryByText(/Fusion : étape/)).not.toBeInTheDocument();
+    });
+
+    it("shows nothing without an import", () => {
+      renderImport(null);
+
+      expect(screen.queryByText(/Fusion : étape/)).not.toBeInTheDocument();
+    });
+  });
+
+  describe("progress bar", () => {
+    const progress = () => (screen.getByRole("progressbar") as HTMLProgressElement).value;
+
+    it("weights each stage by its median, with the median of medians for a stage without one", () => {
+      latest = request({
+        kind: "sync",
+        stage: "merging_songs",
+        typicalStageSeconds: { foreground: { importing_tree: 100, importing_graph: 300, merging_songs: 600 }, wikidata: {} },
+      });
+      render(<PipelineRunPanel pendingCount={0} initialRequest={latest} />);
+
+      // done: 100 + 300 + 300 (uploading_songs); total: 1000 + 5 × 300
+      expect(progress()).toBeCloseTo(700 / 2500);
+    });
+
+    it("applies the upload sub-progress to the weight of the current stage", () => {
+      latest = request({
+        kind: "sync",
+        stage: "uploading_songs",
+        stageCurrent: 1,
+        stageTotal: 2,
+        typicalStageSeconds: { foreground: { importing_tree: 100, importing_graph: 300, uploading_songs: 400 }, wikidata: {} },
+      });
+      render(<PipelineRunPanel pendingCount={0} initialRequest={latest} />);
+
+      // done: 100 + 300 + 400 / 2; total: 800 + 5 × 300
+      expect(progress()).toBeCloseTo(600 / 2300);
+    });
+
+    it("falls back to equal weights without typical durations", () => {
+      latest = request({ kind: "sync", stage: "merging_songs" });
+      render(<PipelineRunPanel pendingCount={0} initialRequest={latest} />);
+
+      expect(progress()).toBeCloseTo(3 / 8);
+    });
   });
 });

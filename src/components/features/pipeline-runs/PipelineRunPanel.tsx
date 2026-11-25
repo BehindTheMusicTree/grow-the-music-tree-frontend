@@ -16,7 +16,11 @@ import {
   PIPELINE_RUN_KINDS,
   PIPELINE_RUN_STAGES,
   stageIndexOf,
+  PipelineRunLatestSchema,
   PipelineRunRequestSchema,
+  type ImportProgress,
+  type PipelineRunKind,
+  type PipelineRunLatest,
   type PipelineRunRequest,
 } from "@schemas/api/pipeline-runs";
 
@@ -26,15 +30,26 @@ const LATEST_QUERY_KEY = ["pipelineRuns", "latest"];
 const isActive = (request: PipelineRunRequest | null | undefined) =>
   request?.status === "queued" || request?.status === "running";
 
+/** Each stage weighs its median duration; a stage without one takes the median of the known ones, and no medians means equal weights. */
+function stageWeights(kind: PipelineRunKind, typical: PipelineRunLatest["typicalStageSeconds"]): number[] {
+  const medians = PIPELINE_RUN_STAGES[kind].map((stage) => typical?.foreground[stage]);
+  const known = medians.filter((median): median is number => median !== undefined).sort((a, b) => a - b);
+  if (known.length === 0) return medians.map(() => 1);
+  const middle = known.length >> 1;
+  const fallback = known.length % 2 ? known[middle] : (known[middle - 1] + known[middle]) / 2;
+  return medians.map((median) => median ?? fallback);
+}
+
 /** Fraction of the run done, or null when there's no bar to show. */
-function progressOf({ kind, status, stage, stageCurrent, stageTotal }: PipelineRunRequest): number | null {
+function progressOf({ kind, status, stage, stageCurrent, stageTotal, typicalStageSeconds }: PipelineRunLatest): number | null {
   if (status === "succeeded") return 1;
   if (status === "queued") return 0;
   if (status !== "running") return null;
-  const stages = PIPELINE_RUN_STAGES[kind];
+  const weights = stageWeights(kind, typicalStageSeconds);
   const index = stage ? Math.max(stageIndexOf(kind, stage), 0) : 0;
   const sub = stage && UPLOAD_STAGES.includes(stage) && stageCurrent !== null && stageTotal ? stageCurrent / stageTotal : 0;
-  return (index + sub) / stages.length;
+  const done = weights.slice(0, index).reduce((sum, weight) => sum + weight, 0) + weights[index] * sub;
+  return done / weights.reduce((sum, weight) => sum + weight, 0);
 }
 
 function labelOf({ kind, status, stage, stageCurrent, stageTotal, error, stepTelemetry }: PipelineRunRequest): string {
@@ -92,7 +107,35 @@ function durationOf({ status, startedOn, finishedOn }: PipelineRunRequest, now: 
   return started;
 }
 
-type Props = { pendingCount: number; initialRequest: PipelineRunRequest | null };
+const TERMINAL_IMPORT_STATES: readonly ImportProgress["state"][] = ["succeeded", "failed", "interrupted"];
+
+/** Progress of the merge Grow runs for the current pipeline run, hidden once its attempt is over. */
+function ImportProgressNote({ progress, now }: { progress: ImportProgress; now: number | null }) {
+  if (TERMINAL_IMPORT_STATES.includes(progress.state)) return null;
+  const parts = [
+    progress.step
+      ? `Fusion : étape ${progress.step}${progress.stepStartedAt && now !== null ? ` depuis ${formatDuration(progress.stepStartedAt, now)}` : ""}`
+      : "Fusion : en attente",
+    `tentative ${progress.attempt}`,
+    progress.heartbeatAt && now !== null ? `dernier signe de vie il y a ${formatDuration(progress.heartbeatAt, now)}` : null,
+    progress.sql.waitEventType
+      ? `attente SQL : ${progress.sql.waitEventType} (${progress.sql.blockerCount ?? 0} bloquant${progress.sql.blockerCount === 1 ? "" : "s"})`
+      : null,
+    progress.bootstrap ? "bootstrap (premier import du graphe, peut durer plusieurs heures)" : null,
+  ];
+  return (
+    <>
+      <p className="text-body text-gray-600">{parts.filter(Boolean).join(" · ")}</p>
+      {progress.observabilityStale && (
+        <p role="status" className="text-body text-red-600">
+          Aucun signe de vie récent de la fusion : l&rsquo;avancement affiché peut être périmé.
+        </p>
+      )}
+    </>
+  );
+}
+
+type Props = { pendingCount: number; initialRequest: PipelineRunLatest | null };
 
 /** Launches a curation run, a full ingestion or a Gold sync, follows its progress and cancels it. */
 export default function PipelineRunPanel({ pendingCount, initialRequest }: Props) {
@@ -104,7 +147,7 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
   const { data: request = null, refetch } = useQueryWithParse({
     queryKey: LATEST_QUERY_KEY,
     queryFn: () => fetch("pipeline/runs/latest/", true, false, {}, undefined, false, true),
-    schema: PipelineRunRequestSchema.nullable(),
+    schema: PipelineRunLatestSchema.nullable(),
     context: "PipelineRunPanel",
     initialData: initialRequest,
     refetchInterval: (query) => (isActive(query.state.data) ? POLL_INTERVAL_MS : false),
@@ -114,7 +157,9 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
     refetch();
     router.refresh();
   };
-  const onSuccess = (updated: PipelineRunRequest) => queryClient.setQueryData(LATEST_QUERY_KEY, updated);
+  // The two latest-only keys come with the next poll.
+  const onSuccess = (updated: PipelineRunRequest) =>
+    queryClient.setQueryData(LATEST_QUERY_KEY, { ...updated, activeImport: null, typicalStageSeconds: null });
   const launch = useValidatedMutation({
     inputSchema: z.enum(PIPELINE_RUN_KINDS),
     outputSchema: PipelineRunRequestSchema,
@@ -198,6 +243,9 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
                 steps={wikidataSteps}
               />
             </div>
+          )}
+          {request.status === "running" && request.activeImport && (
+            <ImportProgressNote progress={request.activeImport} now={now} />
           )}
           {retry && <p role="status" className="text-body text-gray-600">{retry}</p>}
           <p aria-live="polite" className={request.status === "failed" ? "text-red-600" : "text-gray-700"}>

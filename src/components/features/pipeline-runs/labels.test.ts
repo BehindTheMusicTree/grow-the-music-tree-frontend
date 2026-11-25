@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { foregroundStepDetails, stepsOf } from "./labels";
-import type { PipelineRunRequest } from "@schemas/api/pipeline-runs";
+import type { ImportProgress, PipelineRunLatest, PipelineRunStage } from "@schemas/api/pipeline-runs";
 
 const base = { kind: "sync" as const, status: "running" as const, stage: null, stageCurrent: null, stageTotal: null };
 const statuses = (steps: ReturnType<typeof stepsOf>) => steps?.map((step) => step.status);
@@ -70,13 +70,17 @@ describe("stepsOf", () => {
 });
 
 describe("foregroundStepDetails", () => {
-  const timing = (stage: "building_gold" | "building_songs", state: "succeeded" | "running") => ({
+  const timing = (stage: PipelineRunStage, state: "succeeded" | "running", startedAt = "2026-11-24T02:00:00Z") => ({
     stage,
     state,
-    startedAt: "2026-11-24T02:00:00Z",
+    startedAt,
     finishedAt: state === "succeeded" ? "2026-11-24T02:10:00Z" : null,
   });
-  const request = (foreground: ReturnType<typeof timing>[], stage: PipelineRunRequest["stage"]): PipelineRunRequest => ({
+  const request = (
+    foreground: ReturnType<typeof timing>[],
+    stage: PipelineRunLatest["stage"],
+    overrides: Partial<PipelineRunLatest> = {},
+  ): PipelineRunLatest => ({
     uuid: "11111111-1111-4111-8111-111111111111",
     kind: "full",
     trigger: "manual",
@@ -92,8 +96,11 @@ describe("foregroundStepDetails", () => {
     startedOn: "2026-11-24T02:00:00Z",
     heartbeatOn: null,
     finishedOn: null,
+    activeImport: null,
+    typicalStageSeconds: null,
+    ...overrides,
   });
-  const keys = (run: PipelineRunRequest) => foregroundStepDetails(stepsOf(run) ?? [], run, null).map((step) => step.key);
+  const keys = (run: PipelineRunLatest) => foregroundStepDetails(stepsOf(run) ?? [], run, null).map((step) => step.key);
 
   it("hides a step with no timing that sits before the last recorded one", () => {
     const run = request([timing("building_songs", "succeeded"), timing("building_gold", "running")], "building_gold");
@@ -106,5 +113,46 @@ describe("foregroundStepDetails", () => {
     const run = request([timing("building_songs", "running")], "building_songs");
 
     expect(keys(run)).toContain("building_genres");
+  });
+
+  describe("typical durations", () => {
+    const startedAt = "2026-11-24T05:00:00Z";
+    const typical = { foreground: { importing_graph: 600 }, wikidata: {} };
+    const detailAt = (minutes: number, overrides: Partial<PipelineRunLatest> = {}) => {
+      const run = request([timing("importing_graph", "running", startedAt)], "importing_graph", {
+        typicalStageSeconds: typical,
+        ...overrides,
+      });
+      const now = Date.parse(startedAt) + minutes * 60_000;
+      return foregroundStepDetails(stepsOf(run) ?? [], run, now).find((step) => step.key === "importing_graph")?.detail;
+    };
+
+    it("shows the usual duration next to the elapsed time", () => {
+      expect(detailAt(15)).toBe("depuis 15 min · habituellement ~10 min");
+    });
+
+    it("flags a stage past max(2 × median, median + 600 s)", () => {
+      expect(detailAt(20)).toBe("depuis 20 min · habituellement ~10 min");
+      expect(detailAt(21)).toBe("depuis 21 min · habituellement ~10 min · plus long que d'habitude");
+    });
+
+    it("uses the 600 s margin when it beats twice a short median", () => {
+      const detail = detailAt(12, { typicalStageSeconds: { foreground: { importing_graph: 60 }, wikidata: {} } });
+
+      expect(detail).toBe("depuis 12 min · habituellement ~1 min · plus long que d'habitude");
+      expect(detailAt(11, { typicalStageSeconds: { foreground: { importing_graph: 60 }, wikidata: {} } })).toBe(
+        "depuis 11 min · habituellement ~1 min",
+      );
+    });
+
+    it("shows no usual duration without a median for the stage", () => {
+      expect(detailAt(15, { typicalStageSeconds: null })).toBe("depuis 15 min");
+    });
+
+    it("shows neither the usual duration nor the alert during a graph bootstrap", () => {
+      const activeImport = { bootstrap: true } as ImportProgress;
+
+      expect(detailAt(120, { activeImport })).toBe("depuis 2 h 00 min");
+    });
   });
 });
