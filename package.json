@@ -1,9 +1,9 @@
 {
   "name": "grow-the-music-tree",
   "private": true,
-  "version": "3.22.1",
+  "version": "3.23.0",
   "growApi": {
-    "minVersion": "15.0.0"
+    "minVersion": "19.0.0"
   },
   "engines": {
     "node": ">=26 <27"
