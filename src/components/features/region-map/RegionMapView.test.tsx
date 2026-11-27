@@ -54,6 +54,7 @@ vi.mock("./RegionMapSearch", () => ({
   default: ({ onPick, onPickArtist, onPickSong }: { onPick: (region: string | null, genre: string | null) => void; onPickArtist: (uuid: string) => void; onPickSong: (uuid: string) => void }) => (
     <>
       <button onClick={() => onPick(null, makeGenreUuid("regional"))}>Pick regional genre</button>
+      <button onClick={() => onPick(null, makeGenreUuid("relative"))}>Pick relative genre</button>
       <button onClick={() => onPick("JO", null)}>Pick Joseon</button>
       <button onClick={() => onPickArtist("artist-1")}>Pick artist</button>
       <button onClick={() => onPickSong("song-1")}>Pick song</button>
@@ -382,6 +383,16 @@ describe("RegionMapView", () => {
 
     expect([...lastProps.highlightIds].sort()).toEqual(["Q142", "Q183"]);
     expect([...(lastProps.focus?.ids ?? [])].sort()).toEqual(["Q142", "Q183"]);
+  });
+
+  it("frames the genre again when it is picked while already open", () => {
+    setSearch("genre=" + makeGenreUuid("relative"));
+    render(<RegionMapView />);
+    const before = lastProps.focus;
+
+    fireEvent.click(screen.getByRole("button", { name: "Pick relative genre" }));
+
+    expect(lastProps.focus).toEqual({ ids: ["Q142"], seq: (before?.seq ?? 0) + 1 });
   });
 
   it("outlines nothing without a selected genre", () => {

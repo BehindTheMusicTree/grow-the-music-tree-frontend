@@ -156,9 +156,12 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
       if (regionId !== null) {
         lastGenreFlown.current = genre;
         flyTo([regionId]);
+      } else if (genre !== null && genre === state.genre && frameIds.length > 0) {
+        // The genre is already open, so the framing effect will not run again: reframe it for the visitor.
+        flyTo(frameIds);
       }
     },
-    [update, flyTo],
+    [update, flyTo, state.genre, frameIds],
   );
   const trail = selected ? ancestry(selected, regions) : [];
 

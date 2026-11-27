@@ -312,8 +312,8 @@ describe("buildStyle", () => {
       "zone-line",
       "zone-supra-hover",
       "zone-supra-selected",
-      "region-selected-line",
       "region-genre-line",
+      "region-selected-line",
     ]) {
       expect(layer(id).layout).toMatchObject({ "line-join": "round", "line-cap": "round" });
     }
@@ -344,8 +344,8 @@ describe("buildStyle", () => {
       "zone-line",
       "zone-supra-hover",
       "zone-supra-selected",
-      "region-selected-line",
       "region-genre-line",
+      "region-selected-line",
       "places",
       "place-labels",
       "cities",

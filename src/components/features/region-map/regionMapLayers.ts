@@ -483,6 +483,15 @@ export function buildStyle({
         paint: { "line-color": SUPRA_ZONE_COLOR, "line-width": 4 },
       },
       {
+        id: REGION_GENRE_LAYER,
+        type: "line",
+        source: TILES_SOURCE,
+        "source-layer": REGIONS_SOURCE_LAYER,
+        filter: idsFilter([]),
+        layout: ROUND_LINE,
+        paint: { "line-color": GENRE_HIGHLIGHT, "line-width": byZoom(2) },
+      },
+      {
         // No zoom filter: the selection stays outlined once the map zooms past its band.
         id: REGION_SELECTED_LAYER,
         type: "line",
@@ -491,15 +500,6 @@ export function buildStyle({
         filter: idFilter(selectedId),
         layout: ROUND_LINE,
         paint: { "line-color": "#111827", "line-width": byZoom(2) },
-      },
-      {
-        id: REGION_GENRE_LAYER,
-        type: "line",
-        source: TILES_SOURCE,
-        "source-layer": REGIONS_SOURCE_LAYER,
-        filter: idsFilter([]),
-        layout: ROUND_LINE,
-        paint: { "line-color": GENRE_HIGHLIGHT, "line-width": byZoom(2) },
       },
       {
         id: "places",
