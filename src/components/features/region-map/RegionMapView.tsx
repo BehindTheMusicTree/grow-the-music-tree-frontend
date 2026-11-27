@@ -57,7 +57,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
       camera: state.at,
       focus:
         state.at === null && target !== null && regions.get(target)?.boundaryStatus !== "missing"
-          ? { id: target, seq: 0 }
+          ? { ids: [target], seq: 0 }
           : null,
     };
   });
@@ -77,10 +77,10 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   const lastGenreFlown = useRef<string | null>(
     state.at === null && state.region === null ? null : state.genre,
   );
-  const flyTo = useCallback((id: string | null) => {
-    lastFlown.current = id;
-    if (id !== null && regions.get(id)?.boundaryStatus === "missing") return;
-    setFocus((current) => ({ id, seq: (current?.seq ?? 0) + 1 }));
+  const flyTo = useCallback((ids: readonly string[]) => {
+    lastFlown.current = ids.length === 1 ? ids[0] : null;
+    if (ids.length === 1 && regions.get(ids[0])?.boundaryStatus === "missing") return;
+    setFocus((current) => ({ ids, seq: (current?.seq ?? 0) + 1 }));
   }, [regions]);
 
   const [collapsed, setCollapsed] = useState(false);
@@ -90,27 +90,31 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
   const selectedExists = selected !== undefined;
   useEffect(() => {
     if (selectedId === null) lastFlown.current = null;
-    else if (selectedExists && selectedId !== lastFlown.current) flyTo(selectedId);
+    else if (selectedExists && selectedId !== lastFlown.current) flyTo([selectedId]);
   }, [selectedId, selectedExists, flyTo]);
 
   // A genre selected from anywhere (family links, URL) frames the region the map lists it under.
   const lexicon = useRegionGenreLexicon(getGrowBackendBaseUrl, genreUuid !== null);
   const genreEntries = useRegionGenreIndex(index, lexicon.entries);
-  const genreRegionId = useMemo(() => {
-    const own = genreEntries.filter((entry) => entry.genre.uuid === state.genre);
-    // Keep the current framing when the selected region already lists the genre.
-    if (own.some((entry) => entry.region.id === selectedId)) return null;
-    return own[0]?.region.id ?? null;
-  }, [genreEntries, state.genre, selectedId]);
+  const genreRegions = useMemo(
+    () => (state.genre === null ? [] : (genreEntries.find((entry) => entry.genre.uuid === state.genre)?.regions ?? [])),
+    [genreEntries, state.genre],
+  );
+  const highlightIds = useMemo(() => genreRegions.map((region) => region.id), [genreRegions]);
+  // Keep the current framing when the selected region already lists the genre.
+  const frameIds = useMemo(
+    () => (selectedId !== null && highlightIds.includes(selectedId) ? [] : highlightIds),
+    [highlightIds, selectedId],
+  );
   useEffect(() => {
     if (state.genre === null) {
       lastGenreFlown.current = null;
       return;
     }
-    if (genreRegionId === null || state.genre === lastGenreFlown.current) return;
+    if (frameIds.length === 0 || state.genre === lastGenreFlown.current) return;
     lastGenreFlown.current = state.genre;
-    flyTo(genreRegionId);
-  }, [state.genre, genreRegionId, flyTo]);
+    flyTo(frameIds);
+  }, [state.genre, frameIds, flyTo]);
   useEffect(() => {
     setCollapsed(false);
   }, [selectedId, state.genre, state.artist, state.song]);
@@ -126,8 +130,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
     [pathname],
   );
   const genreHasNoRegion =
-    genreUuid !== null && !lexicon.isPending && !lexicon.isError && genreRegionId === null &&
-    !genreEntries.some((entry) => entry.genre.uuid === genreUuid);
+    genreUuid !== null && !lexicon.isPending && !lexicon.isError && !genreEntries.some((entry) => entry.genre.uuid === genreUuid);
 
   const hasLegacyPath = state.legacyPath.length > 0;
   const invalidRegion = state.region !== null && selected === undefined;
@@ -150,8 +153,10 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
     (regionId: string | null, genre: string | null) => {
       setCollapsed(false);
       update({ ...(regionId !== null ? { region: regionId } : {}), genre });
-      lastGenreFlown.current = genre;
-      if (regionId !== null) flyTo(regionId);
+      if (regionId !== null) {
+        lastGenreFlown.current = genre;
+        flyTo([regionId]);
+      }
     },
     [update, flyTo],
   );
@@ -171,6 +176,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
           initialCamera={initial.camera}
           homeCenter={home.current.center}
           focus={focus}
+          highlightIds={highlightIds}
           onRegionClick={select}
           onClearSelection={clearSelection}
           onCameraChange={onCameraChange}
@@ -188,16 +194,16 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
               label: "World",
               onSelect: () => {
                 update({ region: null, genre: null, artist: null, song: null });
-                flyTo(null);
+                flyTo([]);
               },
             }}
             items={trail.map((region) => ({ id: region.id, label: region.name }))}
             onSelect={(id) => {
               setCollapsed(false);
               update({ region: id, genre: null });
-              flyTo(id);
+              flyTo([id]);
             }}
-            onSelectCurrent={() => { setCollapsed(false); flyTo(selected.id); }}
+            onSelectCurrent={() => { setCollapsed(false); flyTo([selected.id]); }}
           />
         )}
         {state.genre !== null ? (
@@ -241,7 +247,7 @@ function LoadedRegionMap({ index }: { index: RegionMapIndex }) {
             collapsed={collapsed}
             onCollapsedChange={setCollapsed}
             onSelectGenre={(genre) => { setCollapsed(false); update({ genre }); }}
-            onZoomTo={(region) => flyTo(region.id)}
+            onZoomTo={(region) => flyTo([region.id])}
             onClose={clearSelection}
           />
         ) : null}

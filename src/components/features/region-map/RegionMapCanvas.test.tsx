@@ -148,6 +148,7 @@ const mount = (props: Partial<Props> = {}) => {
       initialCamera={null}
       homeCenter={null}
       focus={null}
+      highlightIds={[]}
       {...handlers}
       {...props}
       {...overrides}
@@ -264,12 +265,12 @@ describe("RegionMapCanvas", () => {
     mount({ homeCenter: [2, 46], initialCamera: { lng: 2, lat: 46, zoom: 5 } });
     expect(fakeMap().calls.jumpTo).toBeUndefined();
 
-    mount({ homeCenter: [2, 46], focus: { id: "Q142", seq: 0 } });
+    mount({ homeCenter: [2, 46], focus: { ids: ["Q142"], seq: 0 } });
     expect(fakeMap().calls.jumpTo).toBeUndefined();
   });
 
   it("opens on the region of the focus present at mount, without flying to it again", async () => {
-    mount({ focus: { id: "Q142", seq: 0 } });
+    mount({ focus: { ids: ["Q142"], seq: 0 } });
     const map = fakeMap();
     await act(() => map.emit("load"));
 
@@ -287,8 +288,8 @@ describe("RegionMapCanvas", () => {
     const map = fakeMap();
     await act(() => map.emit("load"));
 
-    rerender({ focus: { id: "Q142", seq: 1 } });
-    rerender({ focus: { id: null, seq: 2 } });
+    rerender({ focus: { ids: ["Q142"], seq: 1 } });
+    rerender({ focus: { ids: [], seq: 2 } });
 
     expect(map.calls.fitBounds.map(([bounds]) => bounds)).toEqual([
       [
@@ -320,6 +321,7 @@ describe("RegionMapCanvas", () => {
         initialCamera={null}
         homeCenter={null}
         focus={null}
+        highlightIds={[]}
         onRegionClick={vi.fn()}
         onClearSelection={vi.fn()}
         onCameraChange={vi.fn()}
@@ -338,7 +340,8 @@ describe("RegionMapCanvas", () => {
         zoneId={null}
         initialCamera={null}
         homeCenter={null}
-        focus={{ id: "Q142", seq: 1 }}
+        focus={{ ids: ["Q142"], seq: 1 }}
+        highlightIds={[]}
         onRegionClick={vi.fn()}
         onClearSelection={vi.fn()}
         onCameraChange={vi.fn()}

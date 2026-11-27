@@ -138,13 +138,13 @@ describe("RegionMapSearch", () => {
     expect(onPick).toHaveBeenCalledWith("Q12130", null);
   });
 
-  it("opens a picked genre in the region that lists it", () => {
+  it("opens a picked genre without choosing a region", () => {
     const onPick = setup();
     const input = screen.getByRole("combobox", { name: "Search the map" });
     fireEvent.focus(input);
     fireEvent.change(input, { target: { value: "breton" } });
     fireEvent.mouseDown(screen.getByRole("option", { name: /Breton music/ }));
-    expect(onPick).toHaveBeenCalledWith("Q12130", "uuid-q2");
+    expect(onPick).toHaveBeenCalledWith(null, "uuid-q2");
   });
 
   it.each([

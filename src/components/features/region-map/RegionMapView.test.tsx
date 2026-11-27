@@ -15,7 +15,8 @@ type ChartProps = {
   selectedId: string | null;
   initialCamera: { lng: number; lat: number; zoom: number } | null;
   homeCenter: [number, number] | null;
-  focus: { id: string | null; seq: number } | null;
+  focus: { ids: readonly string[]; seq: number } | null;
+  highlightIds: readonly string[];
   onCameraChange: (camera: { lng: number; lat: number; zoom: number }) => void;
 };
 let lastProps: ChartProps;
@@ -324,7 +325,7 @@ describe("RegionMapView", () => {
     setSearch("region=Q142");
     rerender(<RegionMapView />);
 
-    expect(lastProps.focus).toEqual({ id: "Q142", seq: (before?.seq ?? 0) + 1 });
+    expect(lastProps.focus).toEqual({ ids: ["Q142"], seq: (before?.seq ?? 0) + 1 });
   });
 
   it("frames the region a newly selected genre is listed under", () => {
@@ -335,7 +336,7 @@ describe("RegionMapView", () => {
     setSearch("region=Q12130&genre=" + makeGenreUuid("relative"));
     rerender(<RegionMapView />);
 
-    expect(lastProps.focus).toEqual({ id: "Q142", seq: (before?.seq ?? 0) + 1 });
+    expect(lastProps.focus).toEqual({ ids: ["Q142"], seq: (before?.seq ?? 0) + 1 });
   });
 
   it("frames a region again when it is reselected after the selection was cleared", () => {
@@ -348,7 +349,7 @@ describe("RegionMapView", () => {
     setSearch("region=Q142");
     rerender(<RegionMapView />);
 
-    expect(lastProps.focus).toEqual({ id: "Q142", seq: (before?.seq ?? 0) + 1 });
+    expect(lastProps.focus).toEqual({ ids: ["Q142"], seq: (before?.seq ?? 0) + 1 });
   });
 
   it("keeps the framing when the selected region already lists the genre", () => {
@@ -366,7 +367,27 @@ describe("RegionMapView", () => {
     setSearch("genre=" + makeGenreUuid("relative"));
     render(<RegionMapView />);
 
-    expect(lastProps.focus).toEqual({ id: "Q142", seq: 1 });
+    expect(lastProps.focus).toEqual({ ids: ["Q142"], seq: 1 });
+  });
+
+  it("outlines and frames every region listing the genre", () => {
+    data = RegionMapIndexSchema.parse({
+      ...fixture,
+      regions: fixture.regions.map((region) =>
+        region.id === "Q183" ? { ...region, genres: [{ itemId: "Q1", rule: "anchor", relation: "regional" }] } : region,
+      ),
+    });
+    setSearch("genre=" + makeGenreUuid("relative"));
+    render(<RegionMapView />);
+
+    expect([...lastProps.highlightIds].sort()).toEqual(["Q142", "Q183"]);
+    expect([...(lastProps.focus?.ids ?? [])].sort()).toEqual(["Q142", "Q183"]);
+  });
+
+  it("outlines nothing without a selected genre", () => {
+    render(<RegionMapView />);
+
+    expect(lastProps.highlightIds).toEqual([]);
   });
 
   it("keeps a shared camera instead of framing the genre on opening", () => {
@@ -404,7 +425,7 @@ describe("RegionMapView", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Zoom to" }));
 
-    expect(lastProps.focus).toEqual({ id: "Q142", seq: (before?.seq ?? 0) + 1 });
+    expect(lastProps.focus).toEqual({ ids: ["Q142"], seq: (before?.seq ?? 0) + 1 });
     await flushNavigation();
     expect(pushState).not.toHaveBeenCalled();
   });
@@ -419,7 +440,7 @@ describe("RegionMapView", () => {
     setSearch("region=Q142");
     render(<RegionMapView />);
     expect(lastProps.initialCamera).toBeNull();
-    expect(lastProps.focus).toEqual({ id: "Q142", seq: 0 });
+    expect(lastProps.focus).toEqual({ ids: ["Q142"], seq: 0 });
   });
 
   it("writes the camera with replace, adding no history entry", async () => {
@@ -441,19 +462,19 @@ describe("RegionMapView", () => {
     fireEvent.click(breadcrumb.getByRole("button", { name: "France" }));
     await flushNavigation();
     expect(url(pushState.mock.calls[0]).searchParams.get("region")).toBe("Q142");
-    expect(lastProps.focus).toMatchObject({ id: "Q142" });
+    expect(lastProps.focus).toMatchObject({ ids: ["Q142"] });
 
     fireEvent.click(breadcrumb.getByRole("button", { name: "World" }));
     await flushNavigation();
     expect(url(pushState.mock.calls[1]).searchParams.get("region")).toBeNull();
-    expect(lastProps.focus).toMatchObject({ id: null });
+    expect(lastProps.focus).toMatchObject({ ids: [] });
   });
 
   it("frames an old ?path= link on its deepest known level, then drops it with replace", async () => {
     setSearch("path=Q142/nope");
     render(<RegionMapView />);
 
-    expect(lastProps.focus).toEqual({ id: "Q142", seq: 0 });
+    expect(lastProps.focus).toEqual({ ids: ["Q142"], seq: 0 });
     await flushNavigation();
     expect(url(replaceState.mock.calls.at(-1)!).searchParams.get("path")).toBeNull();
   });
