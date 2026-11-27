@@ -79,6 +79,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The region detail panel on the map no longer shows the « Focus » button (the tree view keeps it). `RegionDetailPanel` stops passing `onZoomIn` to `GenreDetailPanel`.
 - Drop the tracked `.agent-plans/.gitignore`: plans now live in the common git directory.
 
+- Remove the local issue forms and `config.yml`: new issues use the shared forms from the organization `.github` repository.
+
 ### Fixed
 
 - Undo song genre edits through Grow API's undo token so a batch can restore each song's original attribution and curation rule.
