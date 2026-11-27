@@ -14,6 +14,7 @@ export const REGION_BACKDROP_LAYER = "region-backdrop";
 export const REGION_FILL_LAYER = "region-fill";
 export const REGION_LINE_LAYER = "region-line";
 export const REGION_SELECTED_LAYER = "region-selected-line";
+export const REGION_GENRE_LAYER = "region-genre-line";
 export const REGION_LABEL_LAYER = "region-labels";
 export const ZONE_FILL_LAYER = "zone-fill";
 export const ZONE_GLOW_LAYER = "zone-glow";
@@ -114,13 +115,6 @@ export function fillColorExpression(colors: ReadonlyMap<string, string>): string
   return ["match", ["get", "id"], ...Array.from(colors).flat(), EMPTY_FILL] as unknown as ExpressionSpecification;
 }
 
-const union = (boxes: readonly NonNullable<Region["mainBbox"]>[]): NonNullable<Region["mainBbox"]> => [
-  Math.min(...boxes.map((box) => box[0])),
-  Math.min(...boxes.map((box) => box[1])),
-  Math.max(...boxes.map((box) => box[2])),
-  Math.max(...boxes.map((box) => box[3])),
-];
-
 /**
  * Where to centre the opening globe for a visitor in `country` (ISO alpha-2): the middle of the country's main box,
  * not its centroid, which overseas territories drag away. `null` when the index does not know the country.
@@ -136,9 +130,11 @@ export function homeCenter(country: string | null, regions: ReadonlyMap<string, 
   return [lng, (box[1] + box[3]) / 2];
 }
 
-export function regionBounds(region: Region | undefined, regions: ReadonlyMap<string, Region>): LngLatBoundsLike {
-  if (!region || region.mainBbox === null) return WORLD_BOUNDS;
-  // A zone's own box spans the antimeridian through its overseas members, so frame the members instead.
+type Bbox = NonNullable<Region["mainBbox"]>;
+
+/** The boxes to frame for a region: a zone's members (its own box spans the antimeridian through overseas members). */
+export function regionBoxes(region: Region, regions: ReadonlyMap<string, Region>): Bbox[] {
+  if (region.mainBbox === null) return [];
   const members =
     region.kind === "zone"
       ? region.childIds.flatMap((id) => {
@@ -146,12 +142,39 @@ export function regionBounds(region: Region | undefined, regions: ReadonlyMap<st
           return box ? [box] : [];
         })
       : [];
-  const [west, south, east, north] = members.length > 0 ? union(members) : region.mainBbox;
+  return members.length > 0 ? members : [region.mainBbox];
+}
+
+/** The smallest box around the regions, going the short way round the antimeridian; the world when none has a box. */
+export function boundsOf(list: readonly Region[], regions: ReadonlyMap<string, Region>): LngLatBoundsLike {
+  const boxes = list.flatMap((region) => regionBoxes(region, regions));
+  if (boxes.length === 0) return WORLD_BOUNDS;
+  const south = Math.min(...boxes.map((box) => box[1]));
+  const north = Math.max(...boxes.map((box) => box[3]));
+  if (boxes.length === 1) {
+    const [west, , east] = boxes[0];
+    return [
+      [west, south],
+      [east, north],
+    ];
+  }
+  const arcs = boxes.map(([west, , east]) => ({ west, length: (east >= west ? east - west : east + 360 - west) }));
+  // The best covering arc starts at the west edge of one of the boxes.
+  let best = { west: arcs[0].west, width: Infinity };
+  for (const { west: start } of arcs) {
+    const width = Math.max(...arcs.map((arc) => ((((arc.west - start) % 360) + 360) % 360) + arc.length));
+    if (width < best.width) best = { west: start, width };
+  }
+  const width = Math.min(best.width, 360);
+  const west = width >= 360 ? -180 : best.west;
   return [
     [west, south],
-    [east, north],
+    [west + width, north],
   ];
 }
+
+export const regionBounds = (region: Region | undefined, regions: ReadonlyMap<string, Region>): LngLatBoundsLike =>
+  region ? boundsOf([region], regions) : WORLD_BOUNDS;
 
 /**
  * What keeps its colours while a selection is in focus: an admin region and its subdivisions, nothing for a zone (its
@@ -223,6 +246,19 @@ export const cityRadius = (selectedId: string | null): ExpressionSpecification =
   6,
   4,
 ];
+
+const GENRE_HIGHLIGHT = "#d97706";
+
+export const idsFilter = (ids: readonly string[]): ExpressionSpecification => ["in", ["get", "id"], ["literal", [...ids]]];
+
+export const cityStrokeColor = (ids: readonly string[]): ExpressionSpecification => [
+  "case",
+  idsFilter(ids),
+  GENRE_HIGHLIGHT,
+  "#ffffff",
+];
+
+export const cityStrokeWidth = (ids: readonly string[]): ExpressionSpecification => ["case", idsFilter(ids), 3, 1.5];
 
 /** A feature id is never empty, so this matches nothing while no id is given. */
 export const idFilter = (id: string | null): ExpressionSpecification => ["==", ["get", "id"], id ?? ""];
@@ -447,6 +483,15 @@ export function buildStyle({
         paint: { "line-color": SUPRA_ZONE_COLOR, "line-width": 4 },
       },
       {
+        id: REGION_GENRE_LAYER,
+        type: "line",
+        source: TILES_SOURCE,
+        "source-layer": REGIONS_SOURCE_LAYER,
+        filter: idsFilter([]),
+        layout: ROUND_LINE,
+        paint: { "line-color": GENRE_HIGHLIGHT, "line-width": byZoom(2) },
+      },
+      {
         // No zoom filter: the selection stays outlined once the map zooms past its band.
         id: REGION_SELECTED_LAYER,
         type: "line",
@@ -493,8 +538,8 @@ export function buildStyle({
         paint: {
           "circle-radius": cityRadius(selectedId),
           "circle-color": CITY_COLOR,
-          "circle-stroke-color": "#ffffff",
-          "circle-stroke-width": 1.5,
+          "circle-stroke-color": cityStrokeColor([]),
+          "circle-stroke-width": cityStrokeWidth([]),
         },
       },
       {

@@ -32,7 +32,11 @@ import {
   REGION_LABEL_LAYER,
   REGION_SELECTED_LAYER,
   REGIONS_SOURCE_LAYER,
-  regionBounds,
+  boundsOf,
+  cityStrokeColor,
+  cityStrokeWidth,
+  idsFilter,
+  REGION_GENRE_LAYER,
   MOON_LAYER,
   STARFIELD_LAYER,
   TILES_SOURCE,
@@ -58,7 +62,8 @@ import { sunDirectionAt, sunLightPosition, type Sky } from "./sun";
 import type { Camera } from "./useRegionMapUrlState";
 
 /** Asks the map to fly to a region, or to the world when `id` is null; `seq` makes a repeated request a new one. */
-export type FocusRequest = { id: string | null; seq: number };
+/** The regions to frame; none frames the world. */
+export type FocusRequest = { ids: readonly string[]; seq: number };
 
 type Props = {
   /** sha256 of the vector tileset (`regions/<sha256>.pmtiles` in the tiles bucket), from the index; immutable per content hash. */
@@ -74,6 +79,8 @@ type Props = {
   homeCenter: [number, number] | null;
   /** Each new `seq` flies to a region; the request present at mount frames the opening view instead. */
   focus: FocusRequest | null;
+  /** Regions outlined for the selected genre. */
+  highlightIds: readonly string[];
   onRegionClick: (region: Region) => void;
   onClearSelection: () => void;
   onCameraChange: (camera: Camera) => void;
@@ -137,6 +144,7 @@ export default function RegionMapCanvas({
   zoneId,
   initialCamera,
   focus,
+  highlightIds,
   homeCenter,
   onRegionClick,
   onClearSelection,
@@ -193,7 +201,7 @@ export default function RegionMapCanvas({
       focus: initialFocus,
       homeCenter: initialHome,
     } = initialRef.current;
-    const opening = initialFocus?.id == null ? undefined : regionsRef.current.get(initialFocus.id);
+    const opening = (initialFocus?.ids ?? []).flatMap((id) => regionsRef.current.get(id) ?? []);
     let skyTimer: ReturnType<typeof setInterval> | undefined;
     const sky: Sky = { sun: sunDirectionAt(new Date()) };
     let map: MapLibreMap;
@@ -214,7 +222,7 @@ export default function RegionMapCanvas({
         ...(camera
           ? { center: [camera.lng, camera.lat] as [number, number], zoom: camera.zoom }
           : {
-              bounds: regionBounds(opening, regionsRef.current),
+              bounds: boundsOf(opening, regionsRef.current),
               fitBoundsOptions: { padding: containerFitPadding(FIT_PADDING, container), maxZoom: MAX_ZOOM },
             }),
         maxZoom: MAX_ZOOM,
@@ -229,7 +237,7 @@ export default function RegionMapCanvas({
     }
     mapRef.current = map;
     // Same zoom as the world bounds, only turned.
-    if (!camera && !opening && initialHome) map.jumpTo({ center: initialHome });
+    if (!camera && opening.length === 0 && initialHome) map.jumpTo({ center: initialHome });
     // Overrides MapLibre's grab/grabbing container cursor: background shows the arrow, regions the pointer.
     map.getCanvas().style.cursor = "default";
 
@@ -353,22 +361,30 @@ export default function RegionMapCanvas({
     map.setPaintProperty(CITY_LAYER, "circle-radius", cityRadius(selectedId));
   }, [ready, selectedId]);
 
-  const frameRegion = useCallback((region: Region | undefined) => {
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    map.setFilter(REGION_GENRE_LAYER, idsFilter(highlightIds));
+    map.setPaintProperty(CITY_LAYER, "circle-stroke-color", cityStrokeColor(highlightIds));
+    map.setPaintProperty(CITY_LAYER, "circle-stroke-width", cityStrokeWidth(highlightIds));
+  }, [ready, highlightIds]);
+
+  const frameRegions = useCallback((ids: readonly string[]) => {
     const map = mapRef.current;
     if (!map) return;
+    const targets = ids.flatMap((id) => regionsRef.current.get(id) ?? []).filter((region) => region.boundaryStatus !== "missing");
+    if (ids.length > 0 && targets.length === 0) return;
     const container = containerRef.current;
     const padding = container ? containerFitPadding(FIT_PADDING, container) : FIT_PADDING;
-    map.fitBounds(regionBounds(region, regionsRef.current), { padding, maxZoom: MAX_ZOOM });
+    map.fitBounds(boundsOf(targets, regionsRef.current), { padding, maxZoom: MAX_ZOOM });
   }, []);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map || focus === null || focus.seq === focusSeqRef.current) return;
     focusSeqRef.current = focus.seq;
-    const region = focus.id === null ? undefined : regionsRef.current.get(focus.id);
-    if (region?.boundaryStatus === "missing") return;
-    frameRegion(region);
-  }, [ready, focus, frameRegion]);
+    frameRegions(focus.ids);
+  }, [ready, focus, frameRegions]);
 
   const listed = useMemo(() => visibleIds.flatMap((id) => regions.get(id) ?? []).sort(byName), [visibleIds, regions]);
 
@@ -434,7 +450,7 @@ export default function RegionMapCanvas({
           canZoomOut={zoomLimits.canZoomOut}
           onZoomIn={() => mapRef.current?.zoomIn()}
           onZoomOut={() => mapRef.current?.zoomOut()}
-          onFit={() => frameRegion(undefined)}
+          onFit={() => frameRegions([])}
         />
       )}
       {tooltipText !== null && (

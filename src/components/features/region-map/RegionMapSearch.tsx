@@ -51,7 +51,7 @@ export default function RegionMapSearch({ index, regions, onPick, onPickArtist, 
   const { query, setQuery, isTyping, clear } = useSearchQueryState({ selectedName, onClear: onClosePanel });
   const text = isTyping ? query : "";
   const places = usePlaceSearchGroup(regions, { ready: true, isError: false }, text, useCallback((region: Region) => onPick(region.id, null), [onPick]));
-  const regionGenres = useRegionGenreSearchGroup(entries, source, text, useCallback((entry) => onPick(entry.region.id, entry.genre.uuid), [onPick]));
+  const regionGenres = useRegionGenreSearchGroup(entries, source, text, useCallback((entry) => onPick(null, entry.genre.uuid), [onPick]));
   const otherGenres = useGenreRemoteSearchGroup(
     getGrowBackendBaseUrl,
     text,

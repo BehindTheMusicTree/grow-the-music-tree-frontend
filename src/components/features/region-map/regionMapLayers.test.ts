@@ -17,6 +17,7 @@ import {
   homeCenter,
   idFilter,
   inBand,
+  boundsOf,
   regionBounds,
   supranationalZoneIds,
   WORLD_BOUNDS,
@@ -192,6 +193,50 @@ describe("regionBounds", () => {
   });
 });
 
+describe("boundsOf", () => {
+  const at = (id: string, mainBbox: Region["mainBbox"], boundaryStatus: Region["boundaryStatus"] = "available"): Region => ({
+    ...france,
+    id,
+    kind: "country",
+    mainBbox,
+    boundaryStatus,
+  });
+  const none = new Map<string, Region>();
+
+  it("joins two disjoint boxes", () => {
+    expect(boundsOf([at("a", [-5, 40, 8, 51]), at("b", [70, 20, 80, 30])], none)).toEqual([
+      [-5, 20],
+      [80, 51],
+    ]);
+  });
+
+  it("takes the short way round the antimeridian", () => {
+    const fiji = at("fj", [177, -20, -178, -12]);
+    const samoa = at("ws", [-173, -14.1, -171, -13.4]);
+    expect(boundsOf([fiji, samoa], none)).toEqual([
+      [177, -20],
+      [189, -12],
+    ]);
+  });
+
+  it("covers the whole circle when the boxes surround the globe", () => {
+    const [[west], [east]] = boundsOf([at("a", [-180, 0, 10, 10]), at("b", [100, 0, 180, 10]), at("c", [0, 0, 120, 10])], none) as [
+      [number, number],
+      [number, number],
+    ];
+    expect(east - west).toBeLessThanOrEqual(360);
+    expect(west).toBe(-180);
+  });
+
+  it("ignores a region with no box and frames the world when none has one", () => {
+    expect(boundsOf([at("a", null), at("b", [1, 2, 3, 4])], none)).toEqual([
+      [1, 2],
+      [3, 4],
+    ]);
+    expect(boundsOf([], none)).toEqual(WORLD_BOUNDS);
+  });
+});
+
 describe("ancestry", () => {
   it("lists the ancestors outermost first, without the world", () => {
     expect(ancestry(brittany, regions).map((region) => region.id)).toEqual(["Q142", "Q12130"]);
@@ -267,6 +312,7 @@ describe("buildStyle", () => {
       "zone-line",
       "zone-supra-hover",
       "zone-supra-selected",
+      "region-genre-line",
       "region-selected-line",
     ]) {
       expect(layer(id).layout).toMatchObject({ "line-join": "round", "line-cap": "round" });
@@ -298,6 +344,7 @@ describe("buildStyle", () => {
       "zone-line",
       "zone-supra-hover",
       "zone-supra-selected",
+      "region-genre-line",
       "region-selected-line",
       "places",
       "place-labels",

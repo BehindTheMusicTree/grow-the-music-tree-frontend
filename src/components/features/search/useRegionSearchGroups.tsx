@@ -53,6 +53,12 @@ export function usePlaceSearchGroup(
   }, [query, regions, index, source.ready, source.isError, onSelect]);
 }
 
+const SHOWN_REGIONS = 2;
+
+const regionNames = (regions: readonly Region[]) =>
+  regions.slice(0, SHOWN_REGIONS).map((region) => region.name).join(" · ") +
+  (regions.length > SHOWN_REGIONS ? ` +${regions.length - SHOWN_REGIONS}` : "");
+
 /** Overviews and regional, tradition and canonical genres linked to a region, ranked locally. */
 export function useRegionGenreSearchGroup(
   entries: readonly RegionGenreEntry[],
@@ -75,7 +81,7 @@ export function useRegionGenreSearchGroup(
         content: (
           <Option
             name={entry.genre.name}
-            detail={`${entry.region.name}${entry.genre.isUmbrella ? " · umbrella" : ""}`}
+            detail={`${regionNames(entry.regions)}${entry.genre.isUmbrella ? " · umbrella" : ""}`}
           />
         ),
         onSelect: () => onSelect(entry),
