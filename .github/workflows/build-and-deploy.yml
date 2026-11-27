@@ -15,8 +15,8 @@ permissions:
 
 # Serializes build+deploy per branch so an older run can't overwrite a newer :staging/:prod tag.
 concurrency:
-  group: build-and-deploy-${{ github.ref }}
-  cancel-in-progress: false
+  group: build-and-deploy-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
