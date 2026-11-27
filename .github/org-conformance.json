@@ -1,1 +1,0 @@
-{"concurrency":{"exemptions":[{"workflow":"build-and-deploy.yml","form":"queue","reason":"Builds and deployments queue per ref and must not be cancelled mid-run."}]}}
