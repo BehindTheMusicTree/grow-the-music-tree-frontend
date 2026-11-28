@@ -95,6 +95,28 @@ describe("GenreHistory", () => {
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
   });
 
+  it("keeps the history visible when the API adds an action", async () => {
+    fetchMock.mockResolvedValue([
+      entry({ action: "description_changed", actorPseudo: "alice" }),
+      entry({ action: "created" }),
+    ]);
+
+    renderHistory();
+
+    const items = within(await screen.findByRole("list")).getAllByRole("listitem");
+    expect(items).toHaveLength(2);
+    expect(items[0]).toHaveTextContent("Modified by alice");
+    expect(items[1]).toHaveTextContent("Created by Pipeline");
+  });
+
+  it.each([42, " \t"])("shows an error when the action is malformed (%j)", async (action) => {
+    fetchMock.mockResolvedValue([entry({ action })]);
+
+    renderHistory();
+
+    expect(await screen.findByText("Could not load modifications.")).toBeInTheDocument();
+  });
+
   it("frames the entries in a titled Modifications section", async () => {
     fetchMock.mockResolvedValue([entry({ action: "created" })]);
 

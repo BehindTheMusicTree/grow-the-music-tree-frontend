@@ -27,6 +27,8 @@ function describeEntry({ action, oldValue, newValue }: GenreHistoryEntry): strin
       return "Name conflict resolved";
     case "root_accepted":
       return "Accepted as root";
+    default:
+      return "Modified";
   }
 }
 
