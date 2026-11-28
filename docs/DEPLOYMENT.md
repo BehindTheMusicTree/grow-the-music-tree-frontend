@@ -13,6 +13,8 @@ On push to `develop` or `main`, [`build-and-deploy.yml`](../.github/workflows/bu
 | Production  | `main`    | Push to `main`               | `grow.themusictree.org` (production domain)    |
 | Staging     | `develop` | Push to `develop`            | `grow-staging.themusictree.org`                |
 
+Deploy the Grow API with historical Gold recovery first, then deploy and verify the compatible pipeline poller, and only then deploy this interface in each environment. For rollback, remove this interface action first, restore the poller, then roll back the API after imports have drained.
+
 ## 2. Build-time vs. runtime environment variables
 
 This is the distinction that matters most when adding a new env var:

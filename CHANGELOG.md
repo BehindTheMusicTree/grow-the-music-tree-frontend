@@ -48,6 +48,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Recover artists from an eligible historical Gold run in the admin history.
+
+### Added
+
 - The region map outlines every region that lists the selected genre and frames them all together, taking the short way round the antimeridian (#609). A genre search result now opens the genre without choosing a region, and its detail lists the first two regions followed by `+N`.
 - **Pipeline runs**: while Grow merges an import, the run shows its step, attempt, last sign of life, SQL wait and bootstrap note (with a warning when its telemetry is stale); a running step shows « habituellement ~N min » and « plus long que d'habitude » past the poller threshold (not during a graph bootstrap); the progress bar weights each stage by its median duration. Reads `activeImport` and `typicalStageSeconds` from `pipeline/runs/latest/`: deploy after the grow endpoint that serves them. Tests in `labels.test.ts` and `PipelineRunPanel.test.tsx`.
 

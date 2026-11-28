@@ -8,12 +8,12 @@ import { Button, StepList } from "@behindthemusictree/ui";
 import { useFetchWrapper, useQueryWithParse, useValidatedMutation } from "@behindthemusictree/app-kit/transport";
 import { formatDuration } from "@components/features/import-runs/importedOn";
 import {
-  KIND_LABELS, STAGE_LABELS, asLatest, UPLOAD_STAGES, WIKIDATA_JOIN_LABEL, foregroundStepDetails, originOf, stepsOf,
+  KIND_LABELS, STAGE_LABELS, asLatest, UPLOAD_STAGES, WIKIDATA_JOIN_LABEL, foregroundStepDetails, isPipelineRunActive, originOf, stepsOf,
   wikidataRetryLabel, wikidataStepsOf,
 } from "@components/features/pipeline-runs/labels";
 import { getGrowBackendBaseUrl } from "@lib/site-urls";
 import {
-  PIPELINE_RUN_KINDS,
+  PIPELINE_RUN_LATEST_QUERY_KEY,
   PIPELINE_RUN_STAGES,
   stageIndexOf,
   PipelineRunLatestSchema,
@@ -25,10 +25,6 @@ import {
 } from "@schemas/api/pipeline-runs";
 
 const POLL_INTERVAL_MS = 5000;
-const LATEST_QUERY_KEY = ["pipelineRuns", "latest"];
-
-const isActive = (request: PipelineRunRequest | null | undefined) =>
-  request?.status === "queued" || request?.status === "running";
 
 /** Each stage weighs its median duration; a stage without one takes the median of the known ones, and no medians means equal weights. */
 function stageWeights(kind: PipelineRunKind, typical: PipelineRunLatest["typicalStageSeconds"]): number[] {
@@ -59,6 +55,7 @@ function labelOf({ kind, status, stage, stageCurrent, stageTotal, error, stepTel
     case "queued":
       return "En file d'attente";
     case "running": {
+      if (kind === "sync_artists" && stage === null) return "Préparation";
       const waitingForWikidata = stage === "building_genres" &&
         stepTelemetry?.foreground.some((step) => step.stage === "building_genres");
       const label = waitingForWikidata ? WIKIDATA_JOIN_LABEL : STAGE_LABELS[stage ?? "fetching_rules"];
@@ -147,12 +144,12 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
   const { fetch } = useFetchWrapper(getGrowBackendBaseUrl);
   // skipGlobalError: the wrapper would otherwise resolve a failed poll to null, ending the progress tracking.
   const { data: request = null, refetch } = useQueryWithParse({
-    queryKey: LATEST_QUERY_KEY,
+    queryKey: PIPELINE_RUN_LATEST_QUERY_KEY,
     queryFn: () => fetch("pipeline/runs/latest/", true, false, {}, undefined, false, true),
     schema: PipelineRunLatestSchema.nullable(),
     context: "PipelineRunPanel",
     initialData: initialRequest,
-    refetchInterval: (query) => (isActive(query.state.data) ? POLL_INTERVAL_MS : false),
+    refetchInterval: (query) => (isPipelineRunActive(query.state.data) ? POLL_INTERVAL_MS : false),
   });
   // 409 (a run is active, or the run already ended) or 400 (nothing left to curate): show the up-to-date state.
   const onError = () => {
@@ -160,9 +157,9 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
     router.refresh();
   };
   const onSuccess = (updated: PipelineRunRequest) =>
-    queryClient.setQueryData<PipelineRunLatest | null>(LATEST_QUERY_KEY, (cached) => asLatest(updated, cached));
+    queryClient.setQueryData<PipelineRunLatest | null>(PIPELINE_RUN_LATEST_QUERY_KEY, (cached) => asLatest(updated, cached));
   const launch = useValidatedMutation({
-    inputSchema: z.enum(PIPELINE_RUN_KINDS),
+    inputSchema: z.enum(["curation", "full", "sync"]),
     outputSchema: PipelineRunRequestSchema,
     mutationFn: (kind) =>
       fetch("pipeline/runs/", true, false, { method: "POST", body: JSON.stringify({ kind }) }, undefined, false, true),
@@ -188,7 +185,7 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
     router.refresh();
   }, [runKey, router]);
 
-  const active = isActive(request);
+  const active = isPipelineRunActive(request);
   const progress = request && progressOf(request);
   const now = useNow(request?.status === "running");
   const duration = request && durationOf(request, now);

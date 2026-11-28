@@ -14,6 +14,7 @@ export const KIND_LABELS: Record<PipelineRunKind, string> = {
   curation: "Curation",
   full: "Ingestion complète",
   sync: "Réimport du dernier Gold",
+  sync_artists: "Import des artistes du Gold",
 };
 
 export const STAGE_LABELS: Record<PipelineRunStage, string> = {
@@ -41,6 +42,9 @@ export const UPLOAD_STAGES: readonly PipelineRunStage[] = [
   "uploading_artists",
   "uploading_region_map",
 ];
+
+export const isPipelineRunActive = (request: PipelineRunRequest | null | undefined) =>
+  request?.status === "queued" || request?.status === "running";
 
 export function originOf({ trigger, requestedBy }: Pick<PipelineRunRequest, "trigger" | "requestedBy">) {
   if (trigger === "scheduled") return "Nightly";

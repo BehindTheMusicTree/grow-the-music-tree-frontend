@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const PIPELINE_RUN_KINDS = ["curation", "full", "sync"] as const;
+export const PIPELINE_RUN_KINDS = ["curation", "full", "sync", "sync_artists"] as const;
 export type PipelineRunKind = (typeof PIPELINE_RUN_KINDS)[number];
 
 /** Stages Grow accepts, including failures in the parallel Wikidata chain. */
@@ -78,6 +78,7 @@ export const PIPELINE_RUN_STAGES: Record<PipelineRunKind, readonly PipelineRunSt
     ...IMPORT_STAGES,
   ],
   sync: IMPORT_STAGES,
+  sync_artists: ["uploading_artists", "merging_artists"],
   curation: ["fetching_rules", "building_genres", "matching_songs", "building_gold", ...IMPORT_STAGES],
 };
 
@@ -91,8 +92,24 @@ export function stageIndexOf(kind: PipelineRunKind, stage: PipelineRunStage): nu
   return -1;
 }
 
+export const PIPELINE_RUN_LATEST_QUERY_KEY = ["pipelineRuns", "latest"];
+
+export const PipelineRunConflictSchema = z.object({
+  details: z.object({ message: z.string().min(1) }),
+});
+
+const ArtistsRecoverySchema = z.object({
+  eligible: z.boolean(),
+  reason: z.string().nullable(),
+  songsApplied: z.boolean(),
+  artistsApplied: z.boolean(),
+  snapshotsFinalized: z.boolean(),
+});
+
 export const PipelineRunRequestSchema = z.object({
   uuid: z.string().uuid(),
+  sourceRunUuid: z.string().uuid().optional(),
+  artistsRecovery: ArtistsRecoverySchema.nullish(),
   kind: z.enum(PIPELINE_RUN_KINDS),
   trigger: z.enum(["manual", "scheduled"]),
   /** Requesting admin's email; null for a scheduled run, or a manual run older than this field. */
