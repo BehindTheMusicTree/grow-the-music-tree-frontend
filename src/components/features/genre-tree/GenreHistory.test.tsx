@@ -109,8 +109,8 @@ describe("GenreHistory", () => {
     expect(items[1]).toHaveTextContent("Created by Pipeline");
   });
 
-  it("shows an error when the action is malformed", async () => {
-    fetchMock.mockResolvedValue([entry({ action: 42 })]);
+  it.each([42, " \t"])("shows an error when the action is malformed (%j)", async (action) => {
+    fetchMock.mockResolvedValue([entry({ action })]);
 
     renderHistory();
 

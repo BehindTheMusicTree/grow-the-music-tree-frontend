@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const GenreHistoryEntrySchema = z.object({
   uuid: z.string().uuid(),
-  action: z.string().min(1),
+  action: z.string().regex(/\S/),
   actorPseudo: z.string().nullable(),
   oldValue: z.string().nullable(),
   newValue: z.string().nullable(),
