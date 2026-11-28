@@ -156,8 +156,10 @@ export default function PipelineRunPanel({ pendingCount, initialRequest }: Props
     refetch();
     router.refresh();
   };
-  const onSuccess = (updated: PipelineRunRequest) =>
+  const onSuccess = async (updated: PipelineRunRequest) => {
+    await queryClient.cancelQueries({ queryKey: PIPELINE_RUN_LATEST_QUERY_KEY });
     queryClient.setQueryData<PipelineRunLatest | null>(PIPELINE_RUN_LATEST_QUERY_KEY, (cached) => asLatest(updated, cached));
+  };
   const launch = useValidatedMutation({
     inputSchema: z.enum(["curation", "full", "sync"]),
     outputSchema: PipelineRunRequestSchema,

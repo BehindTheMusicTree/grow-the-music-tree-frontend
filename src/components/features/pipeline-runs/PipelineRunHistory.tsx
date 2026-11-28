@@ -55,7 +55,8 @@ export default function PipelineRunHistory({ runs }: { runs: PipelineRunsPage })
       }
       throw new Error(`Grow returned HTTP ${response.status}`);
     },
-    onSuccess: (updated) => {
+    onSuccess: async (updated) => {
+      await queryClient.cancelQueries({ queryKey: PIPELINE_RUN_LATEST_QUERY_KEY });
       queryClient.setQueryData<PipelineRunLatest | null>(
         PIPELINE_RUN_LATEST_QUERY_KEY,
         (cached) => asLatest(updated, cached),
