@@ -8,7 +8,7 @@ const mutateMock = vi.fn();
 let latest: PipelineRunLatest | null = null;
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: refreshMock }) }));
-vi.mock("@tanstack/react-query", () => ({ useQueryClient: () => ({ setQueryData: vi.fn() }) }));
+vi.mock("@tanstack/react-query", () => ({ useQueryClient: () => ({ setQueryData: vi.fn(), cancelQueries: vi.fn() }) }));
 vi.mock("@lib/site-urls", () => ({ getGrowBackendBaseUrl: () => "/api/grow-proxy" }));
 vi.mock("@behindthemusictree/app-kit/transport", () => ({
   useFetchWrapper: () => ({ fetch: vi.fn() }),
@@ -122,6 +122,14 @@ describe("PipelineRunPanel", () => {
     rerender(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
 
     expect(screen.queryByRole("list", { name: "Étapes du run" })).not.toBeInTheDocument();
+  });
+
+  it("restores an artists recovery before its first stage and shows only artist steps", () => {
+    latest = request({ kind: "sync_artists", stage: null });
+    render(<PipelineRunPanel pendingCount={1} initialRequest={latest} />);
+    expect(screen.getByText("Import des artistes du Gold : Préparation")).toBeInTheDocument();
+    const items = within(screen.getByRole("list", { name: "Étapes du run" })).getAllByRole("listitem");
+    expect(items.map((item) => item.textContent)).toEqual(["Envoi des artistesà venir", "Fusion des artistesà venir"]);
   });
 
   it("shows a requested cancellation and the merge note", () => {
